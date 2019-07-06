@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.2
-Stable tag: 1.8.7
+Stable tag: 1.8.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -109,10 +109,15 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.8.7 =
-This release brings significant speed improvements of the customizing user interface. It also fixes a problem with the global styling options.
+= 1.8.8 =
+This releases fixes a regression introduced in version 1.8.7, leading to a stylesheet not loaded on page refresh.
 
 == Changelog ==
+= 1.8.8 : July 6th 2019 =
+* fixed : Nimble dyn stylesheet gets removed on refresh
+* fixed : don't print nimble-global-breakpoint-options style if no global breakpoint set
+* fixed : Nimble Dynamic CSS "priority" should be higher so it overrides theme's style
+
 = 1.8.7 : July 5th 2019 =
 * fixed : global stylesheet ( for global styling ) might not be printed when the page has no global sections
 * fixed : preview not refreshed on page reset

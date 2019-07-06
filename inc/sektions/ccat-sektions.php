@@ -6583,9 +6583,8 @@ function sek_write_global_custom_breakpoint() {
     $custom_breakpoint = sek_get_global_custom_breakpoint();
     if ( $custom_breakpoint >= 1 ) {
         $css .= '@media (min-width:' . $custom_breakpoint . 'px) {.sek-global-custom-breakpoint-col-8 {-ms-flex: 0 0 8.333%;flex: 0 0 8.333%;max-width: 8.333%;}.sek-global-custom-breakpoint-col-9 {-ms-flex: 0 0 9.090909%;flex: 0 0 9.090909%;max-width: 9.090909%;}.sek-global-custom-breakpoint-col-10 {-ms-flex: 0 0 10%;flex: 0 0 10%;max-width: 10%;}.sek-global-custom-breakpoint-col-11 {-ms-flex: 0 0 11.111%;flex: 0 0 11.111%;max-width: 11.111%;}.sek-global-custom-breakpoint-col-12 {-ms-flex: 0 0 12.5%;flex: 0 0 12.5%;max-width: 12.5%;}.sek-global-custom-breakpoint-col-14 {-ms-flex: 0 0 14.285%;flex: 0 0 14.285%;max-width: 14.285%;}.sek-global-custom-breakpoint-col-16 {-ms-flex: 0 0 16.666%;flex: 0 0 16.666%;max-width: 16.666%;}.sek-global-custom-breakpoint-col-20 {-ms-flex: 0 0 20%;flex: 0 0 20%;max-width: 20%;}.sek-global-custom-breakpoint-col-25 {-ms-flex: 0 0 25%;flex: 0 0 25%;max-width: 25%;}.sek-global-custom-breakpoint-col-30 {-ms-flex: 0 0 30%;flex: 0 0 30%;max-width: 30%;}.sek-global-custom-breakpoint-col-33 {-ms-flex: 0 0 33.333%;flex: 0 0 33.333%;max-width: 33.333%;}.sek-global-custom-breakpoint-col-40 {-ms-flex: 0 0 40%;flex: 0 0 40%;max-width: 40%;}.sek-global-custom-breakpoint-col-50 {-ms-flex: 0 0 50%;flex: 0 0 50%;max-width: 50%;}.sek-global-custom-breakpoint-col-60 {-ms-flex: 0 0 60%;flex: 0 0 60%;max-width: 60%;}.sek-global-custom-breakpoint-col-66 {-ms-flex: 0 0 66.666%;flex: 0 0 66.666%;max-width: 66.666%;}.sek-global-custom-breakpoint-col-70 {-ms-flex: 0 0 70%;flex: 0 0 70%;max-width: 70%;}.sek-global-custom-breakpoint-col-75 {-ms-flex: 0 0 75%;flex: 0 0 75%;max-width: 75%;}.sek-global-custom-breakpoint-col-80 {-ms-flex: 0 0 80%;flex: 0 0 80%;max-width: 80%;}.sek-global-custom-breakpoint-col-83 {-ms-flex: 0 0 83.333%;flex: 0 0 83.333%;max-width: 83.333%;}.sek-global-custom-breakpoint-col-90 {-ms-flex: 0 0 90%;flex: 0 0 90%;max-width: 90%;}.sek-global-custom-breakpoint-col-100 {-ms-flex: 0 0 100%;flex: 0 0 100%;max-width: 100%;}}';
+        printf('<style type="text/css" id="nimble-global-breakpoint-options">%1$s</style>', $css );
     }
-
-    printf('<style type="text/css" id="nimble-global-breakpoint-options">%1$s</style>', $css );
 }
 ?><?php
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
@@ -12554,24 +12553,24 @@ class Sek_Dyn_CSS_Handler {
             $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model, $this->is_global_stylesheet );
 
             // now that the stylesheet is ready let's cache it
-            $this->css_string_to_enqueue_or_print = (string)$this->builder-> get_stylesheet();
+            $this->css_string_to_enqueue_or_print = (string)$this->builder->get_stylesheet();
         }
-
-        //hook setup for printing or enqueuing
-        //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Customizer_Setting::update()
-        //sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' ?? => $this->css_string_to_enqueue_or_print => ', $this->css_string_to_enqueue_or_print );
 
         // Do we have any rules to print / enqueue ?
         // If yes, print in the dom or enqueue depending on the current context ( customization or front )
         // If not, delete any previouly created stylesheet
-        if ( $this->css_string_to_enqueue_or_print ) {
-            if ( ! $this->customizer_save ) {
-                $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
-            } else {
-                $this->sek_dyn_css_maybe_write_css_file();
-            }
+
+        //hook setup for printing or enqueuing
+        //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Customizer_Setting::update()
+        if ( ! $this->customizer_save ) {
+            $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
         } else {
-            $this->sek_dyn_css_maybe_delete_file();
+            //sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' ?? => $this->css_string_to_enqueue_or_print => ', $this->css_string_to_enqueue_or_print );
+            if ( $this->css_string_to_enqueue_or_print ) {
+                $this->sek_dyn_css_maybe_write_css_file();
+            } else {
+                $this->sek_dyn_css_maybe_delete_file();
+            }
         }
     }//__construct
 
@@ -16065,7 +16064,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
     class SEK_Front_Render_Css extends SEK_Front_Render {
         // Fired in __construct()
         function _setup_hook_for_front_css_printing_or_enqueuing() {
-            add_action( 'wp_enqueue_scripts', array( $this, 'print_or_enqueue_seks_style') );
+            add_action( 'wp_enqueue_scripts', array( $this, 'print_or_enqueue_seks_style'), PHP_INT_MAX );
         }
 
         // Can be fired :
