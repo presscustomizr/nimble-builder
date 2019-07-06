@@ -3,7 +3,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
     class SEK_Front_Render_Css extends SEK_Front_Render {
         // Fired in __construct()
         function _setup_hook_for_front_css_printing_or_enqueuing() {
-            add_action( 'wp_enqueue_scripts', array( $this, 'print_or_enqueue_seks_style') );
+            add_action( 'wp_enqueue_scripts', array( $this, 'print_or_enqueue_seks_style'), PHP_INT_MAX );
         }
 
         // Can be fired :
