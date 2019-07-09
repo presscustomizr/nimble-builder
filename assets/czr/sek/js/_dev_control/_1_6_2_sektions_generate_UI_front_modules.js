@@ -135,6 +135,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     origin : 'nimble',
                                     level : params.level,
                                     what : 'control',
+                                    module_id : params.id,// <= the id of the corresponding module level as saved in DB. Can be needed, @see image slider module
                                     id : optionData.settingControlId,
                                     label : optionData.controlLabel,
                                     //label : sektionsLocalizedData.i18n['Customize the options for module :'] + ' ' + optionData.controlLabel,

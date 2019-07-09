@@ -539,10 +539,15 @@ jQuery( function($){
 /* ------------------------------------------------------------------------- */
 jQuery( function($){
     var mySwipers = [];
-    var doSwiperInstantiation = function() {
+    // Each swiper is instantiated with a unique id
+    // so that if we have several instance on the same page, they are totally independant.
+    // If we don't use a unique Id for swiper + navigation buttons, a click on a button, make all slider move synchronously.
+    var doSingleSwiperInstantiation = function() {
           console.log('MY SWIPER ??', mySwipers );
+          var swiperClass = 'sek-swiper' + $(this).data('swiper-id');
+          console.log('swiperClass ??', swiperClass );
           mySwipers.push( new Swiper(
-              $(this),//$(this)[0],
+              '.' + swiperClass,//$(this)[0],
               {
                   // spaceBetween: 30,
                   // effect: 'fade',
@@ -550,15 +555,21 @@ jQuery( function($){
                   //   el: '.swiper-pagination',
                   //   clickable: true,
                   // },
+                  loop : true,//Set to true to enable continuous loop mode
                   navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
+                    nextEl: '.swiper-button-next' + $(this).data('swiper-id'),
+                    prevEl: '.swiper-button-prev' + $(this).data('swiper-id')
                   }
               }
           ));
     };
+    var doAllSwiperInstanciation = function() {
+          $('.sektion-wrapper').find('[data-swiper-id]').each( function() {
+                doSingleSwiperInstantiation.call($(this));
+          });
+    };
 
-    // Delegate instantiation
+    // On custom events
     $( 'body').on( 'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-level-refreshed', '[data-sek-level="location"]',
           function() {
             if ( ! _utils_.isEmpty( mySwipers ) ) {
@@ -567,14 +578,38 @@ jQuery( function($){
                   });
             }
             mySwipers = [];
-            $('.sektion-wrapper').find('.swiper-container').each( function() {
-                  doSwiperInstantiation.call($(this));
-            });
+            doAllSwiperInstanciation();
           }
     );
 
     // on load
     $('.sektion-wrapper').find('.swiper-container').each( function() {
-          doSwiperInstantiation.call($(this));
+          doAllSwiperInstanciation();
     });
+
+
+    // When customizing, focus on the currently expanded / edited item
+    // @see CZRItemConstructor in api.czrModuleMap.czr_img_slider_collection_child
+    if ( ! _utils_.isUndefined( wp.customize ) ) {
+          wp.customize.preview.bind('sek-item-focus', function( params ) {
+
+                var $itemEl = $('[data-sek-item-id="' + params.item_id +'"]').first();
+                if ( 1 > $itemEl.length )
+                  return;
+                var $swiperContainer = $itemEl.closest('.swiper-container');
+                if ( 1 > $swiperContainer.length )
+                  return;
+
+                var activeSwiperInstance = $itemEl.closest('.swiper-container')[0].swiper;
+
+                if ( _utils_.isUndefined( activeSwiperInstance ) )
+                  return;
+                // we can't rely on internal indexing system of swipe, because it uses duplicate item when infinite looping is enabled
+                // jQuery is our friend
+                var slideIndex = $( '.swiper-slide', $swiperContainer ).index( $itemEl );
+                //http://idangero.us/swiper/api/#methods
+                //mySwiper.slideTo(index, speed, runCallbacks);
+                activeSwiperInstance.slideTo( slideIndex, 100 );
+          });
+    }
 });

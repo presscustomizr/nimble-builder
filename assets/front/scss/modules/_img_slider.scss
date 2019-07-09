@@ -2,6 +2,13 @@
     .swiper-container {
       width: 100%;
       height: 100%;
+      .swiper-wrapper {
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-align: center;
+        align-items: center;
+        height: 350px;
+      }
     }
     .swiper-slide {
       text-align: center;
@@ -20,5 +27,36 @@
       -ms-flex-align: center;
       -webkit-align-items: center;
       align-items: center;
-    }
+      .sek-carousel-img {
+        width: 100%;
+        img {
+          width: 100%;
+        }
+      }
+      .sek-slider-text-content {
+          height: auto;
+          max-height: 80%;
+          width: 80%;
+          text-align: center;
+          z-index: 3;
+          overflow: hidden;
+          -webkit-transform: translate(-50%,-50%);
+          transform: translate(-50%,-50%);
+          -webkit-transform: translate3d(-50%,-50%,0);
+          transform: translate3d(-50%,-50%,0);
+          top: 50%;
+          left: 50%;
+          position: absolute;
+          color: white;
+      }
+      &[data-sek-has-overlay="true"]::after {
+        content: '';
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        position: absolute;
+        background: rgba(49,49,49,.5);
+      }
+    }//.swiper-slide
 }

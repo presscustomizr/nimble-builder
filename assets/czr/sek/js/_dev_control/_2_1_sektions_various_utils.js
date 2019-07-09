@@ -1047,6 +1047,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( !_.isFunction(visibilityCallBack) || _.isEmpty(controlledInputId) ) {
                         throw new Error('::scheduleVisibilityOfInputId => error when firing for input id : ' + this.id );
                   }
+                  if ( !item.czr_Input.has( controlledInputId ) ) {
+                        throw new Error('::scheduleVisibilityOfInputId => missing input id : ' + controlledInputId );
+                  }
                   //Fire on init
                   item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
                   //React on change

@@ -27,36 +27,32 @@ if ( ! function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
 
 
 if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
-  function sek_print_img_slider( $img_collection, $slider_options ) {
+  function sek_print_img_slider( $img_collection, $slider_options, $model ) {
       ?>
-        <div class="swiper-container">
+        <div class="swiper-container sek-swiper<?php echo $model['id']; ?>" data-swiper-id="<?php echo $model['id']; ?>">
           <div class="swiper-wrapper">
           <?php
+          //sek_error_log('$img_collection???', $img_collection );
           foreach( $img_collection as $item ) {
-              // normalize
-              $item = !is_array( $item ) ? array() : $item;
-              $default_item = array(
-                  'id' => '',
-                  'img' => ''
-              );
+              $is_text_enabled = true === sek_booleanize_checkbox_val( $item['enable_text'] );
+              $has_text_content = ! empty( $item['text_content'] );
 
-              $item = wp_parse_args( $item, $default_item );
+              if ( skp_is_customizing() ) {
+                    // text content uses post message, so we need to have the text content wrapper already printed
+                    $text_content = sprintf('<div class="sek-slider-text-content">%1$s</div>', $item['text_content'] );
+              } else {
+                    $text_content = !$has_text_content ? '' : sprintf('<div class="sek-slider-text-content">%1$s</div>', $item['text_content'] );
+              }
 
-              // links like tel:*** or skype:**** or call:**** should work
-              // implemented for https://github.com/presscustomizr/social-links-modules/issues/7
-              // $social_link = 'javascript:void(0)';
-              // if ( isset($item['link']) && ! empty( $item['link'] ) ) {
-              //     if ( false !== strpos($item['link'], 'callto:') || false !== strpos($item['link'], 'tel:') || false !== strpos($item['link'], 'skype:') ) {
-              //         $social_link = esc_attr( $item['link'] );
-              //     } else {
-              //         $social_link = esc_url( $item['link'] );
-              //     }
-              // }
+              $has_overlay = $is_text_enabled && true === sek_booleanize_checkbox_val( $item['apply_overlay'] );
 
               // Put them together
-              printf( '<div class="swiper-slide" title="%1$s">%2$s</div>',
+              printf( '<div class="swiper-slide" title="%1$s" data-sek-item-id="%4$s" data-sek-has-overlay="%5$s"><div class="sek-carousel-img">%2$s</div>%3$s</div>',
                   esc_attr( $item['title_attr'] ),
-                  sek_get_img_slider_module_img_html( $item )
+                  sek_get_img_slider_module_img_html( $item ),
+                  $text_content,
+                  $item['id'],
+                  true === sek_booleanize_checkbox_val( $has_overlay ) ? 'true' : 'false'
               );
 
           }//foreach
@@ -64,8 +60,8 @@ if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
           </div><!-- swiper-container -->
         </div><!-- swiper-wrapper -->
         <!-- Add Arrows -->
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next swiper-button-next<?php echo $model['id']; ?>"></div>
+        <div class="swiper-button-prev swiper-button-prev<?php echo $model['id']; ?>"></div>
       <?php
   }
 }
@@ -76,7 +72,7 @@ $img_collection = !empty($value['img_collection']) ? $value['img_collection'] : 
 $slider_options = !empty($value['slider_options']) ? $value['slider_options'] : array();
 
 if ( !empty( $img_collection ) ) {
-    sek_print_img_slider( $img_collection, $slider_options );
+    sek_print_img_slider( $img_collection, $slider_options, $model );
 } else {
     if ( skp_is_customizing() ) {
         printf( '<ul class="sek-social-icons-wrapper"><li class="sek-social-icons-placeholder"><span><i>%1$s</i></span></li></ul>',

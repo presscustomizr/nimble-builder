@@ -69,17 +69,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $.extend( query, { local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ) } );
                   });
 
-                  // added for https://github.com/presscustomizr/nimble-builder/issues/403
-                  // in fmk::setupTinyMceEditor => each id of newly instantiated editor is added to the [] api.czrActiveWPEditors
-                  // We need to remove those instances when cleaning registered controls
-                  api.bind( 'sek-before-clean-registered', function() {
+
+                  // TINY MCE EDITOR
+                  var clearActiveWPEditorsInstances = function() {
                         if ( _.isArray( api.czrActiveWPEditors ) ) {
                               _.each( api.czrActiveWPEditors, function( _id ) {
                                     wp.editor.remove( _id );
                               });
                               api.czrActiveWPEditors = [];
                         }
-                  });
+                  };
+                  // added for https://github.com/presscustomizr/nimble-builder/issues/403
+                  // in fmk::setupTinyMceEditor => each id of newly instantiated editor is added to the [] api.czrActiveWPEditors
+                  // We need to remove those instances when cleaning registered controls
+                  api.bind( 'sek-before-clean-registered', clearActiveWPEditorsInstances );
+
+                  // When using the text editor in the items of in a multi-item module
+                  // We need to clear the editor instances each time all items are closed, before opening a new one
+                  // 'czr-all-items-closed' is fired in CZRModuleMths.closeAllItems()
+                  api.bind('czr-all-items-closed', clearActiveWPEditorsInstances );
             },// initialize()
 
 
@@ -346,6 +354,31 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             });
                         }, 2000 );//delay()
                   }
+
+                  // SCHEDULE AN AUTOFOCUS ON THE ITEM THAT HAS BEEN MODIFIED IN THE PREVIEW
+                  // the 'multi-items-module-refreshed' event is sent on each preview update due to a Nimble change
+                  // @see sendSuccessDataToPanel() in SekPreviewPrototype::schedulePanelMsgReactions
+                  api.previewer.bind('multi-items-module-refreshed', function( params ) {
+                        if ( _.isUndefined( params.apiParams.changed_item_id ) || _.isUndefined( params.apiParams.control_id ) )
+                          return;
+                        // the module_id param is added on control registration
+                        // @see CZRSeksPrototype::generateUIforFrontModules
+                        // we use it to identify that
+                        api.control( params.apiParams.control_id, function( _control_ ) {
+                              if ( _.isUndefined( _control_.params.sek_registration_params ) )
+                                return;
+                              if ( api.control( _control_.id ).params.sek_registration_params.module_id !== params.apiParams.id )
+                                return;
+                              _control_.czr_Module.each( function( _module_ ) {
+                                    _module_.czr_Item.each( function( _item_ ) {
+                                          if( 'expanded' === _item_.viewState() ) {
+                                                _item_.trigger('sek-request-item-focus-in-preview');
+                                          }
+                                    });
+                              });
+                        });
+                  });//api.previewer.bind()
+
             },//doSektionThinksOnApiReady
 
 

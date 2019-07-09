@@ -109,31 +109,145 @@
                         // });
                         //fire the parent
                         api.CZRItem.prototype.ready.call( item );
+
+                        // FOCUS ON CURRENTLY EXPANDED / EDITED ITEM
+                        var requestFocusToPreview = function() {
+                              api.previewer.send( 'sek-item-focus', {
+                                    control_id : item.module.control.id,
+                                    item_id : item.id,
+                                    item_value : item()
+                              });
+                        };
+                        // when the item get expanded
+                        item.viewState.callbacks.add( function( to, from ) {
+                              if ( 'expanded' === to ) {
+                                    requestFocusToPreview();
+                              }
+                        });
+
+                        // when the item value is changed
+                        item.callbacks.add( requestFocusToPreview );
+
+                        // when the module requests a focus after a preview update
+                        item.bind('sek-request-item-focus-in-preview', requestFocusToPreview );
                   },
 
 
-                  _buildTitle : function( title, icon, color ) {
-                          var item = this,
-                              module     = item.module;
-                          title = title || ( 'string' === typeof(icon) ? api.CZR_Helpers.capitalize( icon.replace( 'fa-', '') ) : '' );
-                          title = api.CZR_Helpers.truncate(title, 20);
-                          color = color || module.defaultSocialColor;
 
-                          return '<div><span class="' + icon + '" style="color:' + color + '"></span> ' + title + '</div>';
+                //overrides the default parent method by a custom one
+                //at this stage, the model passed in the obj is up to date
+                  writeItemViewTitle : function( model, data ) {
+                        var item = this,
+                            index = 1,
+                            module  = item.module,
+                            _model = model || item(),
+                            _title = '',
+                            _slideBg,
+                            _src = 'not_set',
+                            _areDataSet = ! _.isUndefined( data ) && _.isObject( data );
+
+                        //When shall we update the item title ?
+                        //=> when the slide title or the thumbnail have been updated
+                        //=> on module model initialized
+                        if ( _areDataSet && data.input_changed && ! _.contains( [ 'img' ], data.input_changed ) )
+                          return;
+
+                        //set title with index
+                        if ( ! _.isEmpty( _model.title ) ) {
+                              _title = _model.title;
+                        } else {
+                              //find the current item index in the collection
+                              var _index = _.findIndex( module.itemCollection(), function( _itm ) {
+                                    return _itm.id === item.id;
+                              });
+                              _index = _.isUndefined( _index ) ? index : _index + 1;
+                              //_title = [ '@missi18n Slide', _index ].join( ' ' );
+                        }
+
+                        //if the slide title is set, use it
+                        _title = api.CZR_Helpers.truncate( _title, 15 );
+
+                        //make sure the slide bg id is a number
+                        _slideBg = ( _model['img'] && _.isString( _model['img'] ) ) ? parseInt( _model['img'], 10 ) : _model['img'];
+
+                        // _title = [
+                        //       '<div class="slide-thumb"></div>',
+                        //       '<div class="slide-title">' + _title + '</div>',,
+                        // ].join('');
+
+                        var _getThumbSrc = function() {
+                              return $.Deferred( function() {
+                                    var dfd = this;
+                                    //try to set the default src
+                                    // if ( huemanSlideModuleParams && huemanSlideModuleParams.defaultThumb ) {
+                                    //       _src = huemanSlideModuleParams.defaultThumb;
+                                    // }
+                                    if ( ! _.isNumber( _slideBg ) ) {
+                                          dfd.resolve( _src );
+                                    } else {
+                                          wp.media.attachment( _slideBg ).fetch()
+                                                .always( function() {
+                                                      var attachment = this;
+                                                      if ( _.isObject( attachment ) && _.has( attachment, 'attributes' ) && _.has( attachment.attributes, 'sizes' ) ) {
+                                                            _src = this.get('sizes').thumbnail.url;
+                                                            dfd.resolve( _src );
+                                                      }
+                                                });
+                                    }
+                              }).promise();
+                        };
+
+
+                        var $slideTitleEl = $( '.' + module.control.css_attr.item_title , item.container ).find('.slide-title'),
+                            $slideThumbEl = $( '.' + module.control.css_attr.item_title , item.container ).find( '.slide-thumb');
+
+                        //TITLE
+                        //always write the title
+                        // if ( 1 > $slideTitleEl.length ) {
+                        //       //remove the default item title
+                        //       $( '.' + module.control.css_attr.item_title , item.container ).html( '' );
+                        //       //write the new one
+                        //       $( '.' + module.control.css_attr.item_title , item.container ).append( $( '<div/>',
+                        //             {
+                        //                 class : 'slide-title',
+                        //                 html : _title
+                        //             }
+                        //       ) );
+                        // } else {
+                        //       $slideTitleEl.html( _title );
+                        // }
+
+                        //THUMB
+                        //When shall we append the item thumb ?
+                        //=>IF the slide-thumb element is not set
+                        //=>OR in the case where data have been provided and the input_changed is 'img'
+                        //=>OR if no data is provided ( we are in the initialize phase )
+                        var _isBgChange = _areDataSet && data.input_changed && 'img' === data.input_changed;
+                        $( '.' + module.control.css_attr.item_title, item.container ).css('padding', '0 4px');
+                        if ( 1 > $slideThumbEl.length ) {
+                              _getThumbSrc().done( function( src ) {
+                                    if ( 'not_set' != src ) {
+                                          $( '.' + module.control.css_attr.item_title, item.container ).prepend( $('<div/>',
+                                                {
+                                                      class : 'slide-thumb',
+                                                      html : '<img src="' + src + '" width="32" alt="' + _title + '" />',
+                                                      style : 'width:32px;height:32px;overflow:hidden;'
+                                                }
+                                          ));
+                                    }
+                              });
+                        } else if ( _isBgChange || ! _areDataSet ) {
+                              _getThumbSrc().done( function( src ) {
+                                    if ( 'not_set' != src ) {
+                                          $slideThumbEl.html( '<img src="' + src + '" width="32" height="32" alt="' + _title + '" />' );
+                                    }
+                              });
+                        }
                   },
 
-                  //overrides the default parent method by a custom one
-                  //at this stage, the model passed in the obj is up to date
-                  // writeItemViewTitle : function( model ) {
-                  //         var item = this,
-                  //             module     = item.module,
-                  //             _model = model || item(),
-                  //             _title = ( _model['icon'] ? _model['icon'] : '' ).replace('fa-', '').replace('envelope', 'email').replace( 'far', '').replace( 'fab', '').replace( 'fas', '');
 
-                  //         $( '.' + module.control.css_attr.item_title , item.container ).html(
-                  //           item._buildTitle( _title, _model['icon'], _model['color_css'] )
-                  //         );
-                  // },
+
+
 
                   //Fired when the input collection is populated
                   //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
@@ -144,12 +258,49 @@
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
-                                    case 'use_custom_color_on_hover' :
-                                          _.each( [ 'social_color_hover' ] , function( _inputId_ ) {
+                                    case 'link-to' :
+                                          _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      return input();
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'link-custom-url' :
+                                                                  bool = 'url' === input() && '_custom_' == item.czr_Input('link-pick-url')().id;
+                                                            break;
+                                                            case 'link-pick-url' :
+                                                                  bool = 'url' === input();
+                                                            break;
+                                                            case 'link-target' :
+                                                                  bool = ! _.contains( [ 'no-link'], input() );
+                                                            break;
+                                                      }
+                                                      return bool;
                                                 }); } catch( er ) {
-                                                      api.errare( 'Featured pages module => error in setInputVisibilityDeps', er );
+                                                      api.errare( 'Image module => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'link-pick-url' :
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                                return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
+                                          });
+                                    break;
+
+                                    case 'apply-overlay' :
+                                          _.each( [ 'color-overlay', 'opacity-overlay' ] , function(_inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return api.CZR_Helpers.isChecked( input() );
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+
+                                    case 'enable_text' :
+                                          _.each( [ 'text_content', 'h_alignment_css', 'v_alignment', 'apply_overlay' ] , function(_inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return api.CZR_Helpers.isChecked( input() );
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
                                                 }
                                           });
                                     break;
@@ -240,8 +391,117 @@
       });
 })( wp.customize , jQuery, _ );
 
+
+
+
+
+
+
 /* ------------------------------------------------------------------------- *
- *  SOCIAL ICONS OPTIONS
+ *  SLIDER OPTIONS
+/* ------------------------------------------------------------------------- */
+( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  //console.log('INITIALIZING FP MODULE', id, options );
+                  var module = this;
+
+
+                  module.crudModulePart = 'nimble-crud-module-part';
+                  module.rudItemPart = 'nimble-rud-item-part';
+
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
+
+                  // module.isReady.then( function() {
+                  //       if ( _.isUndefined( module.preItem ) )
+                  //         return;
+                  //       //specific update for the item preModel on social-icon change
+                  //       module.preItem.bind( function( to, from ) {
+                  //             if ( ! _.has(to, 'icon') )
+                  //               return;
+                  //             if ( _.isEqual( to['icon'], from['icon'] ) )
+                  //               return;
+                  //             module.updateItemModel( module.preItem, true );
+                  //       });
+                  // });
+
+
+                  // run the parent initialize
+                  // Note : must be always invoked always after the input / item class extension
+                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+            },//initialize
+
+            CZRItemConstructor : {
+                  //overrides the parent ready
+                  ready : function() {
+                        var item = this;
+                        //wait for the input collection to be populated,
+                        //and then set the input visibility dependencies
+                        item.inputCollection.bind( function( col ) {
+                              if( _.isEmpty( col ) )
+                                return;
+                              try { item.setInputVisibilityDeps(); } catch( er ) {
+                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                              }
+                        });//item.inputCollection.bind()
+
+                        api.CZRItem.prototype.ready.call( item );
+                  },
+
+                  //Fired when the input collection is populated
+                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                  setInputVisibilityDeps : function() {
+                        var item = this,
+                            module = item.module;
+
+                        //Internal item dependencies
+                        item.czr_Input.each( function( input ) {
+                              switch( input.id ) {
+                                    // case 'apply-overlay' :
+                                    //       _.each( [ 'color-overlay', 'opacity-overlay' ] , function(_inputId_ ) {
+                                    //             try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                    //                   return api.CZR_Helpers.isChecked( input() );
+                                    //             }); } catch( er ) {
+                                    //                   api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                    //             }
+                                    //       });
+                                    // break;
+                              }
+                        });
+                  },
+            },//CZRItemConstructor
+      };//Constructor
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_img_slider_opts_child : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_img_slider_opts_child', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_img_slider_opts_child' )
+            }
+      });
+})( wp.customize , jQuery, _ );
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  SLIDER DESIGN OPTIONS
 /* ------------------------------------------------------------------------- */
 ( function ( api, $, _ ) {
       //provides a description of each module
@@ -254,14 +514,14 @@
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            czr_img_slider_opts_child : {
+            czr_img_slider_fonts_child : {
                   //mthds : Constructor,
                   crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_img_slider_opts_child', 'name' ),
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_img_slider_fonts_child', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : false,
                   ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_img_slider_opts_child' )
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_img_slider_fonts_child' )
             }
       });
 })( wp.customize , jQuery, _ );

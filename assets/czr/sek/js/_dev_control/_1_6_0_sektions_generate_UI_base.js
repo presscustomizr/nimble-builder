@@ -287,6 +287,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // since https://github.com/presscustomizr/nimble-builder/issues/403, 2 cases :
                                     // 1) update simply by postMessage, without ajax action <= refresh_markup is a string of selectors, and the content does not include content that needs server side parsing, like shortcode or template tages
                                     // 2) otherwise => update the level with an ajax refresh action
+
+                                    var _changed_item_id;
+                                    if ( isMultiItemModule && params.settingParams.args.inputRegistrationParams && _.isFunction( params.settingParams.args.inputRegistrationParams.input_parent ) ) {
+                                          _changed_item_id = params.settingParams.args.inputRegistrationParams.input_parent.id;
+                                    }
+
                                     var _sendRequestForAjaxMarkupRefresh = function() {
                                           api.previewer.send( 'sek-refresh-level', {
                                                 location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
@@ -294,7 +300,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 apiParams : {
                                                       action : 'sek-refresh-level',
                                                       id : params.uiParams.id,
-                                                      level : params.uiParams.level
+                                                      level : params.uiParams.level,
+                                                      changed_item_id : _changed_item_id,
+                                                      control_id : _ctrl_.id
                                                 },
                                                 skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                           });
@@ -304,9 +312,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           _sendRequestForAjaxMarkupRefresh();
                                     }
 
-                                    // @todo:
-                                    // for multi-item modules, send the item identifier
+                                    // Note : for multi-item modules, the changed item id is sent
                                     if ( refreshMarkupWhenNeededForInput() ) {
+
                                           var _html_content = params.settingParams.args.input_value;
                                           if ( ! _.isString( _html_content ) ) {
                                                 throw new Error( '::updateAPISettingAndExecutePreviewActions => _doUpdateWithRequestedAction => refreshMarkupWhenNeededForInput => html content is not a string.');
@@ -314,6 +322,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           if ( ! self.htmlIncludesShortcodesOrTmplTags( _html_content ) ) {
                                                 api.previewer.send( 'sek-update-html-in-selector', {
                                                       selector : inputRegistrationParams.refresh_markup,
+                                                      changed_item_id : _changed_item_id,
                                                       html : _html_content,
                                                       id : params.uiParams.id,
                                                       location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing

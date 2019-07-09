@@ -443,7 +443,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             // resulting in the target element not being rendered on first call
                             'sek-update-html-in-selector' : function( params ) {
                                   var $level_el = $('[data-sek-id="' + params.id + '"]' ),
-                                      $target_el = $(params.selector, $level_el);
+                                      $target_el;
+
+                                  // for multi-item modules, the changed item id is passed
+                                  if ( !_.isEmpty( params.changed_item_id ) ) {
+                                        $target_el = $( '[data-sek-item-id="' + params.changed_item_id + '"] ' + params.selector, $level_el);
+                                  } else {
+                                        $target_el = $(params.selector, $level_el);
+                                  }
 
                                   if ( $level_el.length > 0 && $target_el.length > 0 ) {
                                         $target_el.html( params.html );
@@ -475,6 +482,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     // always send back the {msgId}_done message, so the control panel can fire the "complete" callback.
                                     // @see api.czr_sektions::reactToPreviewMsg
                                     api.preview.send( [ msgId, 'done'].join('_'), params );
+
+                                    // For multi-items module, when the level is refreshed, we want to focus on the changed_item
+                                    // @see CZRSeksPrototype::doSektionThinksOnApiReady
+                                    if ( params.apiParams.changed_item_id && params.apiParams.action === 'sek-refresh-level' ) {
+                                          api.preview.send( 'multi-items-module-refreshed', params );
+                                    }
+
                                     if ( _.isUndefined( _ajaxResponse_ ) )
                                       return;
 

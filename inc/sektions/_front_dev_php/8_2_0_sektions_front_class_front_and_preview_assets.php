@@ -77,10 +77,10 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
 
             // Swiper js + css is needed for the czr_img_slider_module
-            if ( sek_front_needs_swiper() ) {
+            if ( skp_is_customizing() || ( ! skp_is_customizing() && sek_front_needs_swiper() ) ) {
                 wp_enqueue_style(
                     'czr-swiper',
-                    NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.min.css',
+                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.css' : NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.min.css',
                     array(),
                     NIMBLE_ASSETS_VERSION,
                     $media = 'all'

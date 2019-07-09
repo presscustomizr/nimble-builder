@@ -20,10 +20,10 @@
                       defaultQuickTagBtns = "strong,em,link,code";
 
                   if ( _.isNull( _id ) ) {
-                        throw new Error( 'setupTinyMceEditor => missing textarea for module :' + input.module.id );
+                        throw new Error( 'api.czrInputMap.nimble_tinymce_editor => missing textarea for module :' + input.module.id );
                   }
                   if ( tinyMCE.get( _id ) ) {
-                        throw new Error( 'setupTinyMceEditor => duplicate editor id.');
+                        throw new Error( 'api.czrInputMap.nimble_tinymce_editor => duplicate editor id.');
                   }
                   var getToolbarBtns = function() {
                         var toolBarBtn = defaultToolbarBtns.split(',');

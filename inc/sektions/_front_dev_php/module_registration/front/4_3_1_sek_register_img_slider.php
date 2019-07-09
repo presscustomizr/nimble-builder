@@ -11,7 +11,8 @@ function sek_get_module_params_for_czr_img_slider_module() {
         'is_father' => true,
         'children' => array(
             'img_collection' => 'czr_img_slider_collection_child',
-            'slider_options' => 'czr_img_slider_opts_child'
+            'slider_options' => 'czr_img_slider_opts_child',
+            'font_options' => 'czr_img_slider_fonts_child'
         ),
         'name' => __('Image Carousel', 'text_doma'),
         // 'starting_value' => array(
@@ -43,7 +44,7 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
         'dynamic_registration' => true,
         'module_type' => 'czr_img_slider_collection_child',
         'is_crud' => true,
-        'name' => __( 'Icon collection', 'text_doma' ),
+        'name' => __( 'Slides collection', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         'css_selectors' => array( '.sek-social-icon' ),//array( '.sek-icon i' ),
         'tmpl' => array(
@@ -70,40 +71,89 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
                     'title'       => __('Title', 'text_domain_to_be_replaced'),
                     'notice_after'      => __('This is the text displayed on mouse over.', 'text_domain_to_be_replaced'),
                 ),
-                // 'link_target' => array(
-                //     'input_type'  => 'nimblecheck',
-                //     'title'       => __('Open link in a new browser tab', 'text_doma'),
-                //     'default'     => false,
-                //     'title_width' => 'width-80',
-                //     'input_width' => 'width-20',
-                // ),
-                // 'color_css' => array(
-                //     'input_type'  => 'wp_color_alpha',
-                //     'title'       => __('Color', 'text_doma'),
-                //     'width-100'   => true,
-                //     'default'    => '#707070',
-                //     'refresh_markup' => false,
-                //     'refresh_stylesheet' => true,
-                //     'css_identifier' => 'color'
-                // ),
-                // 'use_custom_color_on_hover' => array(
-                //     'input_type'  => 'nimblecheck',
-                //     'title'       => __( 'Set a custom icon color on mouse hover', 'text_doma' ),
-                //     'title_width' => 'width-80',
-                //     'input_width' => 'width-20',
-                //     'refresh_markup' => false,
-                //     'refresh_stylesheet' => true,
-                //     'default'     => false,
-                // ),
-                // 'social_color_hover' => array(
-                //     'input_type'  => 'wp_color_alpha',
-                //     'title'       => __('Hover color', 'text_doma'),
-                //     'width-100'   => true,
-                //     'default'    => '#969696',
-                //     'refresh_markup' => false,
-                //     'refresh_stylesheet' => true,
-                //     //'css_identifier' => 'color_hover'
-                // )
+
+                'enable_text' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Add text content', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'text_content' => array(
+                    'input_type'        => 'nimble_tinymce_editor',
+                    'editor_params'     => array(
+                        'media_button' => false,
+                        'includedBtns' => 'basic_btns',
+                    ),
+                    'title'             => __( 'Text content', 'text_doma' ),
+                    'default'           => '',
+                    'width-100'         => true,
+                    //'notice_before'     => __( 'You may use some html tags like a, br,p, div, span with attributes like style, id, class ...', 'text_doma'),
+                    'refresh_markup'    => '.sek-slider-text-content',
+                    'html_before' => '<hr/><h3>' . __('TEXT CONTENT') .'</h3>'
+                ),
+                'h_alignment_css' => array(
+                    'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
+                    'title'       => __('Horizontal alignment', 'text_doma'),
+                    'default'     => array( 'desktop' => 'center'),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'h_alignment',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                    'css_selectors' => array( '.sek-slider-text-content' ),
+                ),
+                'v_alignment' => array(
+                    'input_type'  => 'verticalAlignWithDeviceSwitcher',
+                    'title'       => __('Vertical alignment', 'text_doma'),
+                    'default'     => array( 'desktop' => 'center' ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    //'css_identifier' => 'v_alignment',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                ),
+                'apply_overlay' => array(
+                    'input_type'  => 'nimblecheck',
+                    'notice_after' => __('A color overlay is usually recommended when displaying text content on top of the image. You can customize the color and transparency in the global design settings of the carousel.', 'text_doma' ),
+                    'title'       => __('Apply an overlay', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+
+                'link-to' => array(
+                    'input_type'  => 'simpleselect',
+                    'title'       => __('Schedule an action on click or tap', 'text_doma'),
+                    'default'     => 'no-link',
+                    'choices'     => array(
+                        'no-link' => __('No click action', 'text_doma' ),
+                        'url' => __('Link to site content or custom url', 'text_doma' ),
+                        'img-file' => __('Link to image file', 'text_doma' ),
+                        'img-page' =>__('Link to image page', 'text_doma' )
+                    ),
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                    'html_before' => '<hr/><h3>' . __('ACTION ON CLICK') .'</h3>',
+                    'notice_after' => __('Note that some click actions are disabled during customization.', 'text_doma' ),
+                ),
+                'link-pick-url' => array(
+                    'input_type'  => 'content_picker',
+                    'title'       => __('Link url', 'text_doma'),
+                    'default'     => array()
+                ),
+                'link-custom-url' => array(
+                    'input_type'  => 'text',
+                    'title'       => __('Custom link url', 'text_doma'),
+                    'default'     => ''
+                ),
+                'link-target' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Open link in a new browser tab', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                )
             )
         ),
         'render_tmpl_path' => '',
@@ -112,13 +162,13 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
 
 
 /* ------------------------------------------------------------------------- *
- *  SOCIAL ICONS STYLING
+ *  SLIDER OPTIONS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_img_slider_opts_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_img_slider_opts_child',
-        'name' => __( 'Design options : size, spacing, alignment,...', 'text_doma' ),
+        'name' => __( 'Slider options : autoplay, ', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_doma'),
@@ -131,15 +181,351 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
         //     'use_box_shadow' => 1,
         //     'push_effect' => 1
         // ),
-        'css_selectors' => array( '.sek-social-icons-wrapper' ),//array( '.sek-icon i' ),
+        //'css_selectors' => array( '.sek-social-icons-wrapper' ),//array( '.sek-icon i' ),
         'tmpl' => array(
             'item-inputs' => array(
-
+                'pause_on_hover' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Pause on mouse hover', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+                'autoplay' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Autoplay', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+                'autoplay_delay' => array(
+                    'input_type'  => 'range_simple',
+                    'title'       => __( 'Delay between each slide in milliseconds (ms)', 'text_doma' ),
+                    'min' => 1,
+                    'max' => 10000,
+                    'unit' => '',
+                    'default' => 1,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                ),
+                'infinite_loop' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Infinite loop', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+                'height-type' => array(
+                    'input_type'  => 'simpleselect',
+                    'title'       => __('Height : auto or custom', 'text_doma'),
+                    'default'     => 'custom',
+                    'choices'     => sek_get_select_options_for_input_id( 'height-type' ),
+                    'html_before' => '<hr/><h3>' . __('SLIDER HEIGHT') .'</h3>'
+                ),
+                'custom-height' => array(
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
+                    'title'       => __('Custom height', 'text_doma'),
+                    'min' => 0,
+                    'max' => 500,
+                    'default'     => array( 'desktop' => '350px' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
+                ),
+                // 'apply-overlay' => array(
+                //     'input_type'  => 'nimblecheck',
+                //     'title'       => __('Apply an overlay', 'text_doma'),
+                //     'title_width' => 'width-80',
+                //     'input_width' => 'width-20',
+                //     'default'     => 0,
+                //     'html_before' => '<hr/><h3>' . __('OVERLAY COLOR') .'</h3>'
+                // ),
+                'color-overlay' => array(
+                    'input_type'  => 'wp_color_alpha',
+                    'title'       => __('Overlay Color', 'text_doma'),
+                    'width-100'   => true,
+                    'default'     => '#000000'
+                ),
+                'opacity-overlay' => array(
+                    'input_type'  => 'range_simple',
+                    'title'       => __('Opacity (in percents)', 'text_doma'),
+                    'orientation' => 'horizontal',
+                    'min' => 0,
+                    'max' => 100,
+                    // 'unit' => '%',
+                    'default'  => '40',
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
+                ),
+                'nav_type' => array(
+                    'input_type'  => 'simpleselect',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                    'default' => 'arrows_dots',
+                    'choices'     => array(
+                        'arrows_dots' => __('Arrows and dots', 'text_doma'),
+                        'arrows' => __('Arrows', 'text_doma'),
+                        'dots' => __('Dots', 'text_doma'),
+                        'none' => __('None', 'text_doma')
+                    ),
+                    'html_before' => '<hr/><h3>' . __('NAVIGATION') .'</h3>'
+                ),
+                'arrows_size'  => array(
+                    'input_type'  => 'range_simple_device_switcher',
+                    'title'       => __( 'Size of the arrows', 'text_doma' ),
+                    'default'     => array( 'desktop' => '16'),
+                    'min'         => 1,
+                    'max'         => 50,
+                    'step'        => 1,
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
+                ),//null,
+                'arrows_color_css' => array(
+                    'input_type'  => 'wp_color_alpha',
+                    'title'       => __('Arrows color', 'text_doma'),
+                    'width-100'   => true,
+                    'default'    => '#707070',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'color'
+                ),
+                'dots_size'  => array(
+                    'input_type'  => 'range_simple_device_switcher',
+                    'title'       => __( 'Size of the dots', 'text_doma' ),
+                    'default'     => array( 'desktop' => '16'),
+                    'min'         => 1,
+                    'max'         => 50,
+                    'step'        => 1,
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
+                ),//null,
+                'dots_color_css' => array(
+                    'input_type'  => 'wp_color_alpha',
+                    'title'       => __('Dots color', 'text_doma'),
+                    'width-100'   => true,
+                    'default'    => '#707070',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'color'
+                ),
             )
         ),
         'render_tmpl_path' => '',
     );
 }
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  DESIGN OPTIONS
+/* ------------------------------------------------------------------------- */
+function sek_get_module_params_for_czr_img_slider_fonts_child() {
+    $pt_font_selectors = array( '.sek-module-inner .sek-post-grid-wrapper .sek-pg-title a', '.sek-module-inner .sek-post-grid-wrapper .sek-pg-title' );
+    $pe_font_selectors = array( '.sek-module-inner  .sek-post-grid-wrapper .sek-excerpt', '.sek-module-inner  .sek-post-grid-wrapper .sek-excerpt *' );
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_img_slider_fonts_child',
+        'name' => __( 'Slider font options', 'text_doma' ),
+        //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
+        // 'starting_value' => array(
+        // ),
+        //'css_selectors' => array( '.sek-module-inner .sek-post-grid-wrapper' ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'tabs' => array(
+                    array(
+                        'title' => __( 'Text content', 'text_doma' ),
+                        'inputs' => array(
+                            'pe_font_family_css' => array(
+                                'input_type'  => 'font_picker',
+                                'title'       => __( 'Font family', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'refresh_fonts' => true,
+                                'css_identifier' => 'font_family',
+                                'css_selectors' => $pe_font_selectors,
+                            ),
+                            'pe_font_size_css'       => array(
+                                'input_type'  => 'range_with_unit_picker_device_switcher',
+                                'default'     => array( 'desktop' => '16px' ),
+                                'title_width' => 'width-100',
+                                'title'       => __( 'Font size', 'text_doma' ),
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size',
+                                'css_selectors' => $pe_font_selectors,
+                            ),//16,//"14px",
+                            'pe_line_height_css'     => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Line height', 'text_doma' ),
+                                'default'     => '1.5em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'line_height',
+                                'css_selectors' => $pe_font_selectors,
+                            ),//24,//"20px",
+                            'pe_color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_doma' ),
+                                'default'     => '#494949',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => $pe_font_selectors,
+                            ),//"#000000",
+                            'pe_color_hover_css'     => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'css_identifier' => 'color_hover',
+                                'css_selectors' => $pe_font_selectors,
+                            ),//"#000000",
+                            'pe_font_weight_css'     => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Font weight', 'text_doma' ),
+                                'default'     => 'normal',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_weight',
+                                'css_selectors' => $pe_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
+                            ),//null,
+                            'pe_font_style_css'      => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Font style', 'text_doma' ),
+                                'default'     => 'inherit',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_style',
+                                'css_selectors' => $pe_font_selectors,
+                                'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
+                            ),
+                            'pe_text_transform_css'  => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Text transform', 'text_doma' ),
+                                'default'     => 'none',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_transform',
+                                'css_selectors' => $pe_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
+                            )
+                        ),//inputs
+                    ),//tab
+                    array(
+                        'title' => __( 'Caption', 'text_doma' ),
+                        'inputs' => array(
+                            'pt_font_family_css' => array(
+                                'input_type'  => 'font_picker',
+                                'title'       => __( 'Font family', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'refresh_fonts' => true,
+                                'css_identifier' => 'font_family',
+                                'css_selectors' => $pt_font_selectors,
+                            ),
+                            'pt_font_size_css'       => array(
+                                'input_type'  => 'range_with_unit_picker_device_switcher',
+                                'default'     => array( 'desktop' => '28px' ),
+                                'title_width' => 'width-100',
+                                'title'       => __( 'Font size', 'text_doma' ),
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size',
+                                'css_selectors' => $pt_font_selectors,
+                            ),//16,//"14px",
+                            'pt_line_height_css'     => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Line height', 'text_doma' ),
+                                'default'     => '1.3em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'line_height',
+                                'css_selectors' => $pt_font_selectors,
+                            ),//24,//"20px",
+                            'pt_color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_doma' ),
+                                'default'     => '#444',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => $pt_font_selectors,
+                            ),//"#000000",
+                            'pt_color_hover_css'     => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'css_identifier' => 'color_hover',
+                                'css_selectors' => $pt_font_selectors,
+                            ),//"#000000",
+                            'pt_font_weight_css'     => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Font weight', 'text_doma' ),
+                                'default'     => 400,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_weight',
+                                'css_selectors' => $pt_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
+                            ),//null,
+                            'pt_font_style_css'      => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Font style', 'text_doma' ),
+                                'default'     => 'inherit',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_style',
+                                'css_selectors' => $pt_font_selectors,
+                                'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
+                            ),//null,
+                            'pt_text_transform_css'  => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __( 'Text transform', 'text_doma' ),
+                                'default'     => 'none',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'text_transform',
+                                'css_selectors' => $pt_font_selectors,
+                                'choices'    => sek_get_select_options_for_input_id( 'text_transform_css' )
+                            )
+                        )
+                    )
+                )//tabs
+            )//item-inputs
+        ),//tmpl
+        'render_tmpl_path' => '',
+    );
+}
+
+
+
 
 /* ------------------------------------------------------------------------- *
  *  SCHEDULE CSS RULES FILTERING
