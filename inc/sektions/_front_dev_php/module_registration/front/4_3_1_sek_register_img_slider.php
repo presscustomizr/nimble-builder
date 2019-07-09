@@ -46,7 +46,7 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
         'is_crud' => true,
         'name' => __( 'Slides collection', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
-        'css_selectors' => array( '.sek-social-icon' ),//array( '.sek-icon i' ),
+        //'css_selectors' => array( '.sek-social-icon' ),//array( '.sek-icon i' ),
         'tmpl' => array(
             'pre-item' => array(
                 // 'page-id' => array(
@@ -60,101 +60,136 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
                 ),
             ),
             'item-inputs' => array(
-                'img' => array(
-                    'input_type'  => 'upload',
-                    'title'       => __('Pick an image', 'text_doma'),
-                    'default'     => ''
-                ),
-                'title_attr'  => array(
-                    'input_type'  => 'text',
-                    'default'     => '',
-                    'title'       => __('Title', 'text_domain_to_be_replaced'),
-                    'notice_after'      => __('This is the text displayed on mouse over.', 'text_domain_to_be_replaced'),
-                ),
-
-                'enable_text' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Add text content', 'text_doma'),
-                    'default'     => false,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                ),
-                'text_content' => array(
-                    'input_type'        => 'nimble_tinymce_editor',
-                    'editor_params'     => array(
-                        'media_button' => false,
-                        'includedBtns' => 'basic_btns',
+                'tabs' => array(
+                    array(
+                        'title' => __( 'Image', 'text_doma' ),
+                        'inputs' => array(
+                            'img' => array(
+                                'input_type'  => 'upload',
+                                'title'       => __('Pick an image', 'text_doma'),
+                                'default'     => ''
+                            ),
+                            'title_attr'  => array(
+                                'input_type'  => 'text',
+                                'default'     => '',
+                                'title'       => __('Title', 'text_domain_to_be_replaced'),
+                                'notice_after'      => __('This is the text displayed on mouse over.', 'text_domain_to_be_replaced'),
+                            )
+                        )
                     ),
-                    'title'             => __( 'Text content', 'text_doma' ),
-                    'default'           => '',
-                    'width-100'         => true,
-                    //'notice_before'     => __( 'You may use some html tags like a, br,p, div, span with attributes like style, id, class ...', 'text_doma'),
-                    'refresh_markup'    => '.sek-slider-text-content',
-                    'html_before' => '<hr/><h3>' . __('TEXT CONTENT') .'</h3>'
-                ),
-                'h_alignment_css' => array(
-                    'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
-                    'title'       => __('Horizontal alignment', 'text_doma'),
-                    'default'     => array( 'desktop' => 'center'),
-                    'refresh_markup' => false,
-                    'refresh_stylesheet' => true,
-                    'css_identifier' => 'h_alignment',
-                    'title_width' => 'width-100',
-                    'width-100'   => true,
-                    'css_selectors' => array( '.sek-slider-text-content' ),
-                ),
-                'v_alignment' => array(
-                    'input_type'  => 'verticalAlignWithDeviceSwitcher',
-                    'title'       => __('Vertical alignment', 'text_doma'),
-                    'default'     => array( 'desktop' => 'center' ),
-                    'refresh_markup' => false,
-                    'refresh_stylesheet' => true,
-                    //'css_identifier' => 'v_alignment',
-                    'title_width' => 'width-100',
-                    'width-100'   => true,
-                ),
-                'apply_overlay' => array(
-                    'input_type'  => 'nimblecheck',
-                    'notice_after' => __('A color overlay is usually recommended when displaying text content on top of the image. You can customize the color and transparency in the global design settings of the carousel.', 'text_doma' ),
-                    'title'       => __('Apply an overlay', 'text_doma'),
-                    'default'     => true,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                ),
 
-                'link-to' => array(
-                    'input_type'  => 'simpleselect',
-                    'title'       => __('Schedule an action on click or tap', 'text_doma'),
-                    'default'     => 'no-link',
-                    'choices'     => array(
-                        'no-link' => __('No click action', 'text_doma' ),
-                        'url' => __('Link to site content or custom url', 'text_doma' ),
-                        'img-file' => __('Link to image file', 'text_doma' ),
-                        'img-page' =>__('Link to image page', 'text_doma' )
+                    array(
+                        'title' => __( 'Text', 'text_doma' ),
+                        'inputs' => array(
+                            'enable_text' => array(
+                                'input_type'  => 'nimblecheck',
+                                'title'       => __('Add text content', 'text_doma'),
+                                'default'     => false,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20',
+                                'html_before' => '<hr/><h3>' . __('TEXT CONTENT') .'</h3>'
+                            ),
+                            'text_content' => array(
+                                'input_type'        => 'nimble_tinymce_editor',
+                                'editor_params'     => array(
+                                    'media_button' => false,
+                                    'includedBtns' => 'basic_btns',
+                                ),
+                                'title'             => __( 'Text content', 'text_doma' ),
+                                'default'           => '',
+                                'width-100'         => true,
+                                //'notice_before'     => __( 'You may use some html tags like a, br,p, div, span with attributes like style, id, class ...', 'text_doma'),
+                                'refresh_markup'    => '.sek-slider-text-content'
+                            ),
+                            'h_alignment_css' => array(
+                                'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
+                                'title'       => __('Horizontal alignment', 'text_doma'),
+                                'default'     => array( 'desktop' => 'center'),
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'h_alignment',
+                                'title_width' => 'width-100',
+                                'width-100'   => true,
+                                'css_selectors' => array( '.sek-slider-text-content' ),
+                            ),
+                            'v_alignment' => array(
+                                'input_type'  => 'verticalAlignWithDeviceSwitcher',
+                                'title'       => __('Vertical alignment', 'text_doma'),
+                                'default'     => array( 'desktop' => 'center' ),
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                //'css_identifier' => 'v_alignment',
+                                'title_width' => 'width-100',
+                                'width-100'   => true,
+                            ),
+                            'spacing_css'     => array(
+                                'input_type'  => 'spacingWithDeviceSwitcher',
+                                'title'       => __( 'Spacing of the text content', 'text_doma' ),
+                                'default'     => array('desktop' => array(
+                                    'padding-bottom' => '5',
+                                    'padding-top' => '5',
+                                    'padding-right' => '5',
+                                    'padding-left' => '5',
+                                    'unit' => '%')
+                                ),//consistent with SCSS
+                                'title_width' => 'width-100',
+                                'width-100'   => true,
+                                'refresh_markup'     => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'spacing_with_device_switcher',
+                                'css_selectors' => array( '.sek-slider-text-content' )
+                            ),
+                            'apply_overlay' => array(
+                                'input_type'  => 'nimblecheck',
+                                'notice_after' => __('A color overlay is usually recommended when displaying text content on top of the image. You can customize the color and transparency in the global design settings of the carousel.', 'text_doma' ),
+                                'title'       => __('Apply a color overlay', 'text_doma'),
+                                'default'     => true,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20',
+                            )
+                        )
                     ),
-                    'title_width' => 'width-100',
-                    'width-100'   => true,
-                    'html_before' => '<hr/><h3>' . __('ACTION ON CLICK') .'</h3>',
-                    'notice_after' => __('Note that some click actions are disabled during customization.', 'text_doma' ),
-                ),
-                'link-pick-url' => array(
-                    'input_type'  => 'content_picker',
-                    'title'       => __('Link url', 'text_doma'),
-                    'default'     => array()
-                ),
-                'link-custom-url' => array(
-                    'input_type'  => 'text',
-                    'title'       => __('Custom link url', 'text_doma'),
-                    'default'     => ''
-                ),
-                'link-target' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Open link in a new browser tab', 'text_doma'),
-                    'default'     => false,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                )
-            )
+
+
+                    array(
+                        'title' => __( 'Click action', 'text_doma' ),
+                        'inputs' => array(
+                            'link-to' => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __('Schedule an action on click or tap', 'text_doma'),
+                                'default'     => 'no-link',
+                                'choices'     => array(
+                                    'no-link' => __('No click action', 'text_doma' ),
+                                    'url' => __('Link to site content or custom url', 'text_doma' ),
+                                    'img-file' => __('Link to image file', 'text_doma' ),
+                                    'img-page' =>__('Link to image page', 'text_doma' )
+                                ),
+                                'title_width' => 'width-100',
+                                'width-100'   => true,
+                                'html_before' => '<hr/><h3>' . __('ACTION ON CLICK') .'</h3>',
+                                'notice_after' => __('Note that some click actions are disabled during customization.', 'text_doma' ),
+                            ),
+                            'link-pick-url' => array(
+                                'input_type'  => 'content_picker',
+                                'title'       => __('Link url', 'text_doma'),
+                                'default'     => array()
+                            ),
+                            'link-custom-url' => array(
+                                'input_type'  => 'text',
+                                'title'       => __('Custom link url', 'text_doma'),
+                                'default'     => ''
+                            ),
+                            'link-target' => array(
+                                'input_type'  => 'nimblecheck',
+                                'title'       => __('Open link in a new browser tab', 'text_doma'),
+                                'default'     => false,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20',
+                            )
+                        )
+                    )
+                )//'tabs'
+            )//'item-inputs'
         ),
         'render_tmpl_path' => '',
     );
@@ -219,7 +254,9 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                     'input_type'  => 'simpleselect',
                     'title'       => __('Height : auto or custom', 'text_doma'),
                     'default'     => 'custom',
-                    'choices'     => sek_get_select_options_for_input_id( 'height-type' ),
+                    'choices'     => sek_get_select_options_for_input_id( 'height-type' ),// auto, custom
+                    'refresh_markup'     => false,
+                    'refresh_stylesheet' => true,
                     'html_before' => '<hr/><h3>' . __('SLIDER HEIGHT') .'</h3>'
                 ),
                 'custom-height' => array(
@@ -227,9 +264,11 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                     'title'       => __('Custom height', 'text_doma'),
                     'min' => 0,
                     'max' => 500,
-                    'default'     => array( 'desktop' => '350px' ),
+                    'default'     => array( 'desktop' => '350px', 'mobile' => '200px' ),
                     'width-100'   => true,
-                    'title_width' => 'width-100'
+                    'title_width' => 'width-100',
+                    'refresh_markup'     => false,
+                    'refresh_stylesheet' => true,
                 ),
                 // 'apply-overlay' => array(
                 //     'input_type'  => 'nimblecheck',
@@ -531,7 +570,7 @@ function sek_get_module_params_for_czr_img_slider_fonts_child() {
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
 // PER ITEM CSS DESIGN => FILTERING OF EACH ITEM MODEL, TARGETING THE ID ( [data-sek-item-id="893af157d5e3"] )
-//add_filter( 'sek_add_css_rules_for_single_item_in_module_type___czr_img_slider_collection_child', '\Nimble\sek_add_css_rules_for_items_in_czr_img_slider_collection_child', 10, 2 );
+add_filter( 'sek_add_css_rules_for_single_item_in_module_type___czr_img_slider_collection_child', '\Nimble\sek_add_css_rules_for_items_in_czr_img_slider_collection_child', 10, 2 );
 
 // filter documented in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker
 // Note : $complete_modul_model has been normalized
@@ -559,40 +598,49 @@ function sek_get_module_params_for_czr_img_slider_fonts_child() {
 
 // )
 function sek_add_css_rules_for_items_in_czr_img_slider_collection_child( $rules, $params ) {
-    //sek_error_log('SOCIAL ITEMS PARAMS?', $params );
+    //sek_error_log('SLIDER ITEMS PARAMS?', $params );
 
     // $item_input_list = wp_parse_args( $item_input_list, $default_value_model );
     $item_model = isset( $params['input_list'] ) ? $params['input_list'] : array();
 
-    // COLOR ON HOVER
-    $icon_color = $item_model['color_css'];
-    if ( sek_booleanize_checkbox_val( $item_model['use_custom_color_on_hover'] ) ) {
-        $color_hover = $item_model['social_color_hover'];
-    } else {
-        // Build the lighter rgb from the user picked bg color
-        if ( 0 === strpos( $icon_color, 'rgba' ) ) {
-            list( $rgb, $alpha ) = sek_rgba2rgb_a( $icon_color );
-            $color_hover_rgb  = sek_lighten_rgb( $rgb, $percent=15, $array = true );
-            $color_hover      = sek_rgb2rgba( $color_hover_rgb, $alpha, $array = false, $make_prop_value = true );
-        } else if ( 0 === strpos( $icon_color, 'rgb' ) ) {
-            $color_hover      = sek_lighten_rgb( $icon_color, $percent=15 );
-        } else {
-            $color_hover      = sek_lighten_hex( $icon_color, $percent=15 );
+    // VERTICAL ALIGNMENT
+    if ( ! empty( $item_model[ 'v_alignment' ] ) ) {
+        if ( ! is_array( $item_model[ 'v_alignment' ] ) ) {
+            sek_error_log( __FUNCTION__ . ' => error => the v_alignment option should be an array( {device} => {alignment} )');
         }
+        $v_alignment_value = is_array( $item_model[ 'v_alignment' ] ) ? $item_model[ 'v_alignment' ] : array();
+        $v_alignment_value = wp_parse_args( $v_alignment_value, array(
+            'desktop' => 'center',
+            'tablet' => '',
+            'mobile' => ''
+        ));
+        $mapped_values = array();
+        foreach ( $v_alignment_value as $device => $align_val ) {
+            switch ( $align_val ) {
+                case 'top' :
+                    $mapped_values[$device] = "flex-start";
+                break;
+                case 'center' :
+                    $mapped_values[$device] = "center";
+                break;
+                case 'bottom' :
+                    $mapped_values[$device] = "flex-end";
+                break;
+            }
+        }
+        $rules = sek_set_mq_css_rules( array(
+            'value' => $mapped_values,
+            'css_property' => 'align-items',
+            'selector' => sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"] .sek-slider-text-wrapper', $params['parent_module_id'], $item_model['id'] )
+        ), $rules );
     }
-    $color_hover_selector = sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"] .sek-social-icon:hover', $params['parent_module_id'], $item_model['id'] );
-    $rules[] = array(
-        'selector' => $color_hover_selector,
-        'css_rules' => 'color:' . $color_hover . ';',
-        'mq' =>null
-    );
+
     return $rules;
 }
 
+
 // GLOBAL CSS DESIGN => FILTERING OF THE ENTIRE MODULE MODEL
-//add_filter( 'sek_add_css_rules_for_module_type___czr_img_slider_module', '\Nimble\sek_add_css_rules_for_czr_img_slider_module', 10, 2 );
-
-
+add_filter( 'sek_add_css_rules_for_module_type___czr_img_slider_module', '\Nimble\sek_add_css_rules_for_czr_img_slider_module', 10, 2 );
 // filter documented in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker
 // Note : $complete_modul_model has been normalized
 // @return populated $rules
@@ -601,39 +649,51 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
       return $rules;
 
     $value = $complete_modul_model['value'];
-    $icons_style = $value['icons_style'];
+    $slider_options = $value['slider_options'];
 
-    // HORIZONTAL SPACE BETWEEN ICONS
-    $padding_right = $icons_style['space_between_icons'];
-    $padding_right = is_array( $padding_right ) ? $padding_right : array();
-    $defaults = array(
-        'desktop' => '15px',// <= this value matches the static CSS rule and the input default for the module
-        'tablet' => '',
-        'mobile' => ''
-    );
-    $padding_right = wp_parse_args( $padding_right, $defaults );
-    $padding_right_ready_val = $padding_right;
-    foreach ($padding_right as $device => $num_unit ) {
-        $num_val = sek_extract_numeric_value( $num_unit );
-        $padding_right_ready_val[$device] = '';
-        // Leave the device value empty if === to default
-        // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
-        // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-        if ( ! empty( $num_unit ) && $num_val.'px' !== $defaults[$device].'' ) {
-            $unit = sek_extract_unit( $num_unit );
-            $num_val = $num_val < 0 ? 0 : $num_val;
-            $padding_right_ready_val[$device] = $num_val . $unit;
+    $selector = '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .swiper-container .swiper-wrapper';
+
+    // CUSTOM HEIGHT BY DEVICE
+    if ( ! empty( $slider_options[ 'height-type' ] ) ) {
+        if ( 'custom' === $slider_options[ 'height-type' ] ) {
+            $custom_user_height = array_key_exists( 'custom-height', $slider_options ) ? $slider_options[ 'custom-height' ] : array();
+
+            if ( ! is_array( $custom_user_height ) ) {
+                sek_error_log( __FUNCTION__ . ' => error => the height option should be an array( {device} => {number}{unit} )', $custom_user_height);
+            }
+            $custom_user_height = is_array( $custom_user_height ) ? $custom_user_height : array();
+            $custom_user_height = wp_parse_args( $custom_user_height, array(
+                'desktop' => '350px',
+                'tablet' => '',
+                'mobile' => '200px'
+            ));
+            $height_value = $custom_user_height;
+            foreach ( $custom_user_height as $device => $num_unit ) {
+                $numeric = sek_extract_numeric_value( $num_unit );
+                if ( ! empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $num_unit );
+                    $unit = '%' === $unit ? 'vh' : $unit;
+                    $height_value[$device] = $numeric . $unit;
+                }
+            }
+
+            $rules = sek_set_mq_css_rules(array(
+                'value' => $height_value,
+                'css_property' => 'height',
+                'selector' => $selector
+            ), $rules );
+        }// if custom height
+        else {
+            $rules[] = array(
+                'selector' => $selector,
+                'css_rules' => 'height:auto;',
+                'mq' =>null
+            );
         }
     }
-    $rules = sek_set_mq_css_rules( array(
-        'value' => $padding_right_ready_val,
-        'css_property' => 'padding-right',
-        'selector' => implode(',', array(
-            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-social-icons-wrapper > *:not(:last-child)',
-        )),
-        'is_important' => false
-    ), $rules );
 
     return $rules;
 }
+
+
 ?>

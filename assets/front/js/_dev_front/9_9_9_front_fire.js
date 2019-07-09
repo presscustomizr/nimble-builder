@@ -544,27 +544,36 @@ jQuery( function($){
     // If we don't use a unique Id for swiper + navigation buttons, a click on a button, make all slider move synchronously.
     var doSingleSwiperInstantiation = function() {
           console.log('MY SWIPER ??', mySwipers );
-          var swiperClass = 'sek-swiper' + $(this).data('swiper-id');
+          var swiperClass = 'sek-swiper' + $(this).data('sek-swiper-id');
           console.log('swiperClass ??', swiperClass );
+          var swiperParams = {
+              // spaceBetween: 30,
+              // effect: 'fade',
+              // pagination: {
+              //   el: '.swiper-pagination',
+              //   clickable: true,
+              // },
+              loop : "true" == $(this).data('sek-loop'),//Set to true to enable continuous loop mode
+              navigation: {
+                nextEl: '.swiper-button-next' + $(this).data('sek-swiper-id'),
+                prevEl: '.swiper-button-prev' + $(this).data('sek-swiper-id')
+              }
+          };
+          if ( 'true' == $(this).data('sek-autoplay') ) {
+              $.extend( swiperParams, {
+                  autoplay : {
+                      delay : $(this).data('sek-autoplay-delay')
+                  }
+              });
+          }
+          console.log('swiperParams ??', swiperParams );
           mySwipers.push( new Swiper(
               '.' + swiperClass,//$(this)[0],
-              {
-                  // spaceBetween: 30,
-                  // effect: 'fade',
-                  // pagination: {
-                  //   el: '.swiper-pagination',
-                  //   clickable: true,
-                  // },
-                  loop : true,//Set to true to enable continuous loop mode
-                  navigation: {
-                    nextEl: '.swiper-button-next' + $(this).data('swiper-id'),
-                    prevEl: '.swiper-button-prev' + $(this).data('swiper-id')
-                  }
-              }
+              swiperParams
           ));
     };
     var doAllSwiperInstanciation = function() {
-          $('.sektion-wrapper').find('[data-swiper-id]').each( function() {
+          $('.sektion-wrapper').find('[data-sek-swiper-id]').each( function() {
                 doSingleSwiperInstantiation.call($(this));
           });
     };

@@ -29,19 +29,16 @@ if ( ! function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
 if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
   function sek_print_img_slider( $img_collection, $slider_options, $model ) {
       ?>
-        <div class="swiper-container sek-swiper<?php echo $model['id']; ?>" data-swiper-id="<?php echo $model['id']; ?>">
+        <div class="swiper-container sek-swiper<?php echo $model['id']; ?>" data-sek-swiper-id="<?php echo $model['id']; ?>" data-sek-pause-on-hover="true" data-sek-autoplay="true" data-sek-autoplay-delay="3000" data-sek-loop="true">
           <div class="swiper-wrapper">
           <?php
           //sek_error_log('$img_collection???', $img_collection );
           foreach( $img_collection as $item ) {
               $is_text_enabled = true === sek_booleanize_checkbox_val( $item['enable_text'] );
               $has_text_content = ! empty( $item['text_content'] );
-
-              if ( skp_is_customizing() ) {
-                    // text content uses post message, so we need to have the text content wrapper already printed
-                    $text_content = sprintf('<div class="sek-slider-text-content">%1$s</div>', $item['text_content'] );
-              } else {
-                    $text_content = !$has_text_content ? '' : sprintf('<div class="sek-slider-text-content">%1$s</div>', $item['text_content'] );
+              $text_content = sprintf('<div class="sek-slider-text-wrapper"><div class="sek-slider-text-content">%1$s</div></div>', $item['text_content'] );
+              if ( ! skp_is_customizing() ) {
+                  $text_content = !$has_text_content ? '' : $text_content;
               }
 
               $has_overlay = $is_text_enabled && true === sek_booleanize_checkbox_val( $item['apply_overlay'] );
@@ -75,7 +72,7 @@ if ( !empty( $img_collection ) ) {
     sek_print_img_slider( $img_collection, $slider_options, $model );
 } else {
     if ( skp_is_customizing() ) {
-        printf( '<ul class="sek-social-icons-wrapper"><li class="sek-social-icons-placeholder"><span><i>%1$s</i></span></li></ul>',
+        printf( '<div class="sek-slider-placeholder"><i>%1$s</i></div>',
             __('Click to start adding images.', 'hueman')
         );
     }

@@ -296,7 +296,7 @@
                                     break;
 
                                     case 'enable_text' :
-                                          _.each( [ 'text_content', 'h_alignment_css', 'v_alignment', 'apply_overlay' ] , function(_inputId_ ) {
+                                          _.each( [ 'text_content', 'h_alignment_css', 'v_alignment', 'spacing_css', 'apply_overlay' ] , function(_inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return api.CZR_Helpers.isChecked( input() );
                                                 }); } catch( er ) {
@@ -459,15 +459,15 @@
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
-                                    // case 'apply-overlay' :
-                                    //       _.each( [ 'color-overlay', 'opacity-overlay' ] , function(_inputId_ ) {
-                                    //             try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                    //                   return api.CZR_Helpers.isChecked( input() );
-                                    //             }); } catch( er ) {
-                                    //                   api.errare( module.id + ' => error in setInputVisibilityDeps', er );
-                                    //             }
-                                    //       });
-                                    // break;
+                                    case 'height-type' :
+                                          _.each( [ 'custom-height' ] , function(_inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return 'custom' === input();
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
                               }
                         });
                   },
