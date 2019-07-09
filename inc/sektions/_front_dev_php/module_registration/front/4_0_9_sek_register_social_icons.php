@@ -1,6 +1,6 @@
 <?php
 /* ------------------------------------------------------------------------- *
- *  LOAD AND REGISTER FEATURED PAGES MODULE
+ *  LOAD AND REGISTER SOCIAL ICONS MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 function sek_get_module_params_for_czr_social_icons_module() {
