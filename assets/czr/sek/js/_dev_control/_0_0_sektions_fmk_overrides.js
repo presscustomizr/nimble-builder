@@ -31,16 +31,13 @@
                         template_name = 'h_text_alignment';
                   break;
 
-                  case 'font_size' :
-                  case 'line_height' :
-                        template_name = 'font_size_line_height';
-                  break;
-
                   case 'range_simple' :
                   case 'range_simple_device_switcher' :
                         template_name = 'range_simple';
                   break;
 
+                  case 'font_size' :
+                  case 'line_height' :
                   case 'range_with_unit_picker' :
                   case 'range_with_unit_picker_device_switcher' :
                         template_name = 'range_with_unit_picker';
