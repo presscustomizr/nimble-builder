@@ -7,12 +7,33 @@
         display: flex;
         -ms-flex-align: center;
         align-items: center;
-        height: 350px;
-        @include media-breakpoint-only(xs) {
-          height: 200px;
+        // height: 350px;//consistent with defaults on registration
+        // @include media-breakpoint-only(xs) {
+        //   height: 200px;
+        // }
+      }
+      &[data-sek-image-layout="nimble-wizard"] {
+        .sek-carousel-img {
+          height: 100%;
+          overflow: hidden;
+          img {
+            max-width: none;
+          }
         }
       }
-    }
+      &[data-sek-image-layout="height-100"] {
+        .sek-carousel-img {
+          height: 100%;
+          width: auto;
+          overflow: hidden;
+          img {
+            height: 100%;
+            width: auto;
+            max-width: none;
+          }
+        }
+      }
+    }//.swiper-container
     .swiper-slide {
       text-align: center;
       font-size: 18px;
@@ -41,7 +62,9 @@
         bottom: 0;
         top: 0;
         position: absolute;
-        background: rgba(49,49,49,.5);
+        //background: rgba(49,49,49,.5);
+        background-color: #000000;
+        opacity: 0.3;
       }
       .sek-slider-text-wrapper {
         height: 100%;
@@ -53,7 +76,8 @@
         top: 50%;
         left: 50%;
         position: absolute;
-        /* Center slide text vertically */
+        /* Center slide text vertically
+         => consistent with defaults in module registration */
         display: -webkit-box;
         display: -ms-flexbox;
         display: -webkit-flex;
@@ -68,14 +92,20 @@
         align-items: center;
       }
       .sek-slider-text-content {
-          height: auto;
-          max-height: 100%;
-          width: 100%;
-          padding:5%;
-          text-align: center;
-          z-index: 3;
-          overflow: hidden;
-          color: white;
+        height: auto;
+        max-height: 100%;
+        width: 100%;
+        padding:5%;//consistent with defaults in module registration
+        text-align: center;//consistent with defaults in module registration
+        z-index: 3;
+        overflow: hidden;
+        color: #ffffff;//consistent with defaults in module registration
+        font-size:16px;//consistent with defaults in module registration
+        line-height:1.5em;//consistent with defaults in module registration
+        * {
+          font-size:16px;//consistent with defaults in module registration
+          line-height:1.5em;//consistent with defaults in module registration
+        }
       }
     }//.swiper-slide
 }

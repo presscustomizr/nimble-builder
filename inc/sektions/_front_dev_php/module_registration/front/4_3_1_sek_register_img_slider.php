@@ -11,8 +11,8 @@ function sek_get_module_params_for_czr_img_slider_module() {
         'is_father' => true,
         'children' => array(
             'img_collection' => 'czr_img_slider_collection_child',
-            'slider_options' => 'czr_img_slider_opts_child',
-            'font_options' => 'czr_img_slider_fonts_child'
+            'slider_options' => 'czr_img_slider_opts_child'
+            //'font_options' => 'czr_img_slider_fonts_child'
         ),
         'name' => __('Image Carousel', 'text_doma'),
         // 'starting_value' => array(
@@ -40,6 +40,7 @@ function sek_get_module_params_for_czr_img_slider_module() {
  *  MAIN SETTINGS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_img_slider_collection_child() {
+    $text_content_selector = array( '.sek-slider-text-content', '.sek-slider-text-content *' );
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_img_slider_collection_child',
@@ -56,7 +57,7 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
                 'img' => array(
                     'input_type'  => 'upload',
                     'title'       => __('Pick an image', 'text_doma'),
-                    'default'     => NIMBLE_BASE_URL . '/assets/img/default-img.png'
+                    'default'     => ''
                 ),
             ),
             'item-inputs' => array(
@@ -73,87 +74,8 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
                                 'input_type'  => 'text',
                                 'default'     => '',
                                 'title'       => __('Title', 'text_domain_to_be_replaced'),
-                                'notice_after'      => __('This is the text displayed on mouse over.', 'text_domain_to_be_replaced'),
-                            )
-                        )
-                    ),
-
-                    array(
-                        'title' => __( 'Text', 'text_doma' ),
-                        'inputs' => array(
-                            'enable_text' => array(
-                                'input_type'  => 'nimblecheck',
-                                'title'       => __('Add text content', 'text_doma'),
-                                'default'     => false,
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20',
-                                'html_before' => '<hr/><h3>' . __('TEXT CONTENT') .'</h3>'
+                                'notice_after' => sprintf( __('This is the text displayed on mouse over. You can use the following template tags referring to the image attributes : %1$s', 'text_domain_to_be_replaced'), '&#123;&#123;title&#125;&#125;, &#123;&#123;caption&#125;&#125;, &#123;&#123;description&#125;&#125;' )
                             ),
-                            'text_content' => array(
-                                'input_type'        => 'nimble_tinymce_editor',
-                                'editor_params'     => array(
-                                    'media_button' => false,
-                                    'includedBtns' => 'basic_btns',
-                                ),
-                                'title'             => __( 'Text content', 'text_doma' ),
-                                'default'           => '',
-                                'width-100'         => true,
-                                //'notice_before'     => __( 'You may use some html tags like a, br,p, div, span with attributes like style, id, class ...', 'text_doma'),
-                                'refresh_markup'    => '.sek-slider-text-content'
-                            ),
-                            'h_alignment_css' => array(
-                                'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
-                                'title'       => __('Horizontal alignment', 'text_doma'),
-                                'default'     => array( 'desktop' => 'center'),
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'h_alignment',
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                                'css_selectors' => array( '.sek-slider-text-content' ),
-                            ),
-                            'v_alignment' => array(
-                                'input_type'  => 'verticalAlignWithDeviceSwitcher',
-                                'title'       => __('Vertical alignment', 'text_doma'),
-                                'default'     => array( 'desktop' => 'center' ),
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                //'css_identifier' => 'v_alignment',
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                            ),
-                            'spacing_css'     => array(
-                                'input_type'  => 'spacingWithDeviceSwitcher',
-                                'title'       => __( 'Spacing of the text content', 'text_doma' ),
-                                'default'     => array('desktop' => array(
-                                    'padding-bottom' => '5',
-                                    'padding-top' => '5',
-                                    'padding-right' => '5',
-                                    'padding-left' => '5',
-                                    'unit' => '%')
-                                ),//consistent with SCSS
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                                'refresh_markup'     => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'spacing_with_device_switcher',
-                                'css_selectors' => array( '.sek-slider-text-content' )
-                            ),
-                            'apply_overlay' => array(
-                                'input_type'  => 'nimblecheck',
-                                'notice_after' => __('A color overlay is usually recommended when displaying text content on top of the image. You can customize the color and transparency in the global design settings of the carousel.', 'text_doma' ),
-                                'title'       => __('Apply a color overlay', 'text_doma'),
-                                'default'     => true,
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20',
-                            )
-                        )
-                    ),
-
-
-                    array(
-                        'title' => __( 'Click action', 'text_doma' ),
-                        'inputs' => array(
                             'link-to' => array(
                                 'input_type'  => 'simpleselect',
                                 'title'       => __('Schedule an action on click or tap', 'text_doma'),
@@ -187,6 +109,153 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
                                 'input_width' => 'width-20',
                             )
                         )
+                    ),
+                    array(
+                        'title' => __( 'Text', 'text_doma' ),
+                        'inputs' => array(
+                            'enable_text' => array(
+                                'input_type'  => 'nimblecheck',
+                                'title'       => __('Add text content', 'text_doma'),
+                                'default'     => false,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20'
+                            ),
+                            'text_content' => array(
+                                'input_type'        => 'nimble_tinymce_editor',
+                                'editor_params'     => array(
+                                    'media_button' => false,
+                                    'includedBtns' => 'basic_btns',
+                                ),
+                                'title'             => __( 'Text content', 'text_doma' ),
+                                'default'           => '',
+                                'width-100'         => true,
+                                'refresh_markup'    => '.sek-slider-text-content',
+                                'notice_before' => sprintf( __('You may use some html tags in the "text" tab of the editor. You can also use the following template tags referring to the image attributes : %1$s', 'text_domain_to_be_replaced'), '&#123;&#123;title&#125;&#125;, &#123;&#123;caption&#125;&#125;, &#123;&#123;description&#125;&#125;' )
+                            ),
+                            'font_family_css' => array(
+                                'input_type'  => 'font_picker',
+                                'title'       => __( 'Font family', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'refresh_fonts' => true,
+                                'css_identifier' => 'font_family',
+                                'css_selectors' => $text_content_selector,
+                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>'
+                            ),
+                            'font_size_css'       => array(
+                                'input_type'  => 'range_with_unit_picker_device_switcher',
+                                'default'     => array( 'desktop' => '16px' ),
+                                'title_width' => 'width-100',
+                                'title'       => __( 'Font size', 'text_doma' ),
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size',
+                                'css_selectors' => $text_content_selector,
+                            ),//16,//"14px",
+                            'line_height_css'     => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Line height', 'text_doma' ),
+                                'default'     => '1.5em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'line_height',
+                                'css_selectors' => $text_content_selector,
+                            ),//24,//"20px",
+                            'color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_doma' ),
+                                'default'     => '#ffffff',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => $text_content_selector,
+                            ),//"#000000",
+
+                            'h_alignment_css' => array(
+                                'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
+                                'title'       => __('Horizontal alignment', 'text_doma'),
+                                'default'     => array( 'desktop' => 'center'),
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'h_alignment',
+                                'title_width' => 'width-100',
+                                'width-100'   => true,
+                                'css_selectors' => array( '.sek-slider-text-content' ),
+                                'html_before' => '<hr/><h3>' . __('ALIGNMENTS') .'</h3>'
+                            ),
+                            'v_alignment' => array(
+                                'input_type'  => 'verticalAlignWithDeviceSwitcher',
+                                'title'       => __('Vertical alignment', 'text_doma'),
+                                'default'     => array( 'desktop' => 'center' ),
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                //'css_identifier' => 'v_alignment',
+                                'title_width' => 'width-100',
+                                'width-100'   => true,
+                            ),
+                            'spacing_css'     => array(
+                                'input_type'  => 'spacingWithDeviceSwitcher',
+                                'title'       => __( 'Spacing of the text content', 'text_doma' ),
+                                'default'     => array('desktop' => array(
+                                    'padding-bottom' => '5',
+                                    'padding-top' => '5',
+                                    'padding-right' => '5',
+                                    'padding-left' => '5',
+                                    'unit' => '%')
+                                ),//consistent with SCSS
+                                'title_width' => 'width-100',
+                                'width-100'   => true,
+                                'refresh_markup'     => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'spacing_with_device_switcher',
+                                'css_selectors' => array( '.sek-slider-text-content' ),
+                                'html_before' => '<hr/><h3>' . __('SPACING') .'</h3>'
+                            )
+                        )
+                    ),
+                    array(
+                        'title' => __( 'Color overlay', 'text_doma' ),
+                        'inputs' => array(
+                            'apply-overlay' => array(
+                                'input_type'  => 'nimblecheck',
+                                'notice_after' => __('A color overlay is usually recommended when displaying text content on top of the image. You can customize the color and transparency in the global design settings of the carousel.', 'text_doma' ),
+                                'title'       => __('Apply a color overlay', 'text_doma'),
+                                'default'     => false,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20',
+                                'html_before' => '<hr/><h3>' . __('COLOR OVERLAY') .'</h3>'
+                            ),
+                            'color-overlay' => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __('Overlay Color', 'text_doma'),
+                                'width-100'   => true,
+                                'default'     => '#000000',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true
+                            ),
+                            'opacity-overlay' => array(
+                                'input_type'  => 'range_simple',
+                                'title'       => __('Opacity (in percents)', 'text_doma'),
+                                'orientation' => 'horizontal',
+                                'min' => 0,
+                                'max' => 100,
+                                // 'unit' => '%',
+                                'default'  => '30',
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true
+                            )
+                        )
                     )
                 )//'tabs'
             )//'item-inputs'
@@ -203,7 +272,7 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_img_slider_opts_child',
-        'name' => __( 'Slider options : autoplay, ', 'text_doma' ),
+        'name' => __( 'Slider options : height, autoplay, navigation...', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_doma'),
@@ -219,19 +288,26 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
         //'css_selectors' => array( '.sek-social-icons-wrapper' ),//array( '.sek-icon i' ),
         'tmpl' => array(
             'item-inputs' => array(
-                'pause_on_hover' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Pause on mouse hover', 'text_doma'),
-                    'default'     => true,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20'
+                'image-layout' => array(
+                    'input_type'  => 'simpleselect',
+                    'title'       => __('Image layout', 'text_doma'),
+                    'default'     => 'nimble-wizard',
+                    'choices'     => array(
+                        'nimble-wizard' => __('Nimble wizard', 'text_doma' ),
+                        'width-100' => __('Adapt images to carousel\'s width', 'text_doma' ),
+                        'height-100' => __('Adapt images to carousel\'s height', 'text_doma' ),
+                    ),
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                    'notice_before' => __('Nimble wizard ensures that the images fill all available space of the carousel in any devices, without blank spaces on the edges, and without stretching the images.', 'text_doma' ),
                 ),
                 'autoplay' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Autoplay', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
-                    'input_width' => 'width-20'
+                    'input_width' => 'width-20',
+                    'notice_after' => __('Note that the autoplay is disabled during customization.', 'text_doma' ),
                 ),
                 'autoplay_delay' => array(
                     'input_type'  => 'range_simple',
@@ -239,13 +315,20 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                     'min' => 1,
                     'max' => 10000,
                     'unit' => '',
-                    'default' => 1,
+                    'default' => 3000,
                     'width-100'   => true,
-                    'title_width' => 'width-100',
+                    'title_width' => 'width-100'
                 ),
                 'infinite_loop' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Infinite loop', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+                'pause_on_hover' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Pause autoplay on mouse over', 'text_doma'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
@@ -269,31 +352,6 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                     'title_width' => 'width-100',
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
-                ),
-                // 'apply-overlay' => array(
-                //     'input_type'  => 'nimblecheck',
-                //     'title'       => __('Apply an overlay', 'text_doma'),
-                //     'title_width' => 'width-80',
-                //     'input_width' => 'width-20',
-                //     'default'     => 0,
-                //     'html_before' => '<hr/><h3>' . __('OVERLAY COLOR') .'</h3>'
-                // ),
-                'color-overlay' => array(
-                    'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Overlay Color', 'text_doma'),
-                    'width-100'   => true,
-                    'default'     => '#000000'
-                ),
-                'opacity-overlay' => array(
-                    'input_type'  => 'range_simple',
-                    'title'       => __('Opacity (in percents)', 'text_doma'),
-                    'orientation' => 'horizontal',
-                    'min' => 0,
-                    'max' => 100,
-                    // 'unit' => '%',
-                    'default'  => '40',
-                    'width-100'   => true,
-                    'title_width' => 'width-100'
                 ),
                 'nav_type' => array(
                     'input_type'  => 'simpleselect',
@@ -348,217 +406,6 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                 ),
             )
         ),
-        'render_tmpl_path' => '',
-    );
-}
-
-
-
-
-/* ------------------------------------------------------------------------- *
- *  DESIGN OPTIONS
-/* ------------------------------------------------------------------------- */
-function sek_get_module_params_for_czr_img_slider_fonts_child() {
-    $pt_font_selectors = array( '.sek-module-inner .sek-post-grid-wrapper .sek-pg-title a', '.sek-module-inner .sek-post-grid-wrapper .sek-pg-title' );
-    $pe_font_selectors = array( '.sek-module-inner  .sek-post-grid-wrapper .sek-excerpt', '.sek-module-inner  .sek-post-grid-wrapper .sek-excerpt *' );
-    return array(
-        'dynamic_registration' => true,
-        'module_type' => 'czr_img_slider_fonts_child',
-        'name' => __( 'Slider font options', 'text_doma' ),
-        //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
-        // 'starting_value' => array(
-        // ),
-        //'css_selectors' => array( '.sek-module-inner .sek-post-grid-wrapper' ),
-        'tmpl' => array(
-            'item-inputs' => array(
-                'tabs' => array(
-                    array(
-                        'title' => __( 'Text content', 'text_doma' ),
-                        'inputs' => array(
-                            'pe_font_family_css' => array(
-                                'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_doma' ),
-                                'default'     => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'refresh_fonts' => true,
-                                'css_identifier' => 'font_family',
-                                'css_selectors' => $pe_font_selectors,
-                            ),
-                            'pe_font_size_css'       => array(
-                                'input_type'  => 'range_with_unit_picker_device_switcher',
-                                'default'     => array( 'desktop' => '16px' ),
-                                'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_doma' ),
-                                'min' => 0,
-                                'max' => 100,
-                                'width-100'         => true,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_size',
-                                'css_selectors' => $pe_font_selectors,
-                            ),//16,//"14px",
-                            'pe_line_height_css'     => array(
-                                'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_doma' ),
-                                'default'     => '1.5em',
-                                'min' => 0,
-                                'max' => 10,
-                                'step' => 0.1,
-                                'width-100'         => true,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'line_height',
-                                'css_selectors' => $pe_font_selectors,
-                            ),//24,//"20px",
-                            'pe_color_css'           => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
-                                'default'     => '#494949',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'css_identifier' => 'color',
-                                'css_selectors' => $pe_font_selectors,
-                            ),//"#000000",
-                            'pe_color_hover_css'     => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
-                                'default'     => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'title_width' => 'width-100',
-                                'css_identifier' => 'color_hover',
-                                'css_selectors' => $pe_font_selectors,
-                            ),//"#000000",
-                            'pe_font_weight_css'     => array(
-                                'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font weight', 'text_doma' ),
-                                'default'     => 'normal',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_weight',
-                                'css_selectors' => $pe_font_selectors,
-                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
-                            ),//null,
-                            'pe_font_style_css'      => array(
-                                'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font style', 'text_doma' ),
-                                'default'     => 'inherit',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_style',
-                                'css_selectors' => $pe_font_selectors,
-                                'choices'       => sek_get_select_options_for_input_id( 'font_style_css' )
-                            ),
-                            'pe_text_transform_css'  => array(
-                                'input_type'  => 'simpleselect',
-                                'title'       => __( 'Text transform', 'text_doma' ),
-                                'default'     => 'none',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'text_transform',
-                                'css_selectors' => $pe_font_selectors,
-                                'choices'            => sek_get_select_options_for_input_id( 'text_transform_css' )
-                            )
-                        ),//inputs
-                    ),//tab
-                    array(
-                        'title' => __( 'Caption', 'text_doma' ),
-                        'inputs' => array(
-                            'pt_font_family_css' => array(
-                                'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_doma' ),
-                                'default'     => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'refresh_fonts' => true,
-                                'css_identifier' => 'font_family',
-                                'css_selectors' => $pt_font_selectors,
-                            ),
-                            'pt_font_size_css'       => array(
-                                'input_type'  => 'range_with_unit_picker_device_switcher',
-                                'default'     => array( 'desktop' => '28px' ),
-                                'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_doma' ),
-                                'min' => 0,
-                                'max' => 100,
-                                'width-100'         => true,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_size',
-                                'css_selectors' => $pt_font_selectors,
-                            ),//16,//"14px",
-                            'pt_line_height_css'     => array(
-                                'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_doma' ),
-                                'default'     => '1.3em',
-                                'min' => 0,
-                                'max' => 10,
-                                'step' => 0.1,
-                                'width-100'         => true,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'line_height',
-                                'css_selectors' => $pt_font_selectors,
-                            ),//24,//"20px",
-                            'pt_color_css'           => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
-                                'default'     => '#444',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'css_identifier' => 'color',
-                                'css_selectors' => $pt_font_selectors,
-                            ),//"#000000",
-                            'pt_color_hover_css'     => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
-                                'default'     => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'title_width' => 'width-100',
-                                'css_identifier' => 'color_hover',
-                                'css_selectors' => $pt_font_selectors,
-                            ),//"#000000",
-                            'pt_font_weight_css'     => array(
-                                'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font weight', 'text_doma' ),
-                                'default'     => 400,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_weight',
-                                'css_selectors' => $pt_font_selectors,
-                                'choices'            => sek_get_select_options_for_input_id( 'font_weight_css' )
-                            ),//null,
-                            'pt_font_style_css'      => array(
-                                'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font style', 'text_doma' ),
-                                'default'     => 'inherit',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_style',
-                                'css_selectors' => $pt_font_selectors,
-                                'choices'            => sek_get_select_options_for_input_id( 'font_style_css' )
-                            ),//null,
-                            'pt_text_transform_css'  => array(
-                                'input_type'  => 'simpleselect',
-                                'title'       => __( 'Text transform', 'text_doma' ),
-                                'default'     => 'none',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'text_transform',
-                                'css_selectors' => $pt_font_selectors,
-                                'choices'    => sek_get_select_options_for_input_id( 'text_transform_css' )
-                            )
-                        )
-                    )
-                )//tabs
-            )//item-inputs
-        ),//tmpl
         'render_tmpl_path' => '',
     );
 }
@@ -633,10 +480,39 @@ function sek_add_css_rules_for_items_in_czr_img_slider_collection_child( $rules,
             'css_property' => 'align-items',
             'selector' => sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"] .sek-slider-text-wrapper', $params['parent_module_id'], $item_model['id'] )
         ), $rules );
-    }
+    }//Vertical alignment
+
+    //Background overlay?
+    // 1) a background image should be set
+    // 2) the option should be checked
+    if ( sek_is_checked( $item_model[ 'apply-overlay'] ) ) {
+        //(needs validation: we need a sanitize hex or rgba color)
+        $bg_color_overlay = isset( $item_model[ 'color-overlay' ] ) ? $item_model[ 'color-overlay' ] : null;
+        if ( $bg_color_overlay ) {
+            //overlay pseudo element
+            $bg_overlay_css_rules = 'background-color:'.$bg_color_overlay;
+
+            //opacity
+            //validate/sanitize
+            $bg_overlay_opacity     = isset( $item_model[ 'opacity-overlay' ] ) ? filter_var( $item_model[ 'opacity-overlay' ], FILTER_VALIDATE_INT, array( 'options' =>
+                array( "min_range"=>0, "max_range"=>100 ) )
+            ) : FALSE;
+            $bg_overlay_opacity     = FALSE !== $bg_overlay_opacity ? filter_var( $bg_overlay_opacity / 100, FILTER_VALIDATE_FLOAT ) : $bg_overlay_opacity;
+
+            $bg_overlay_css_rules = FALSE !== $bg_overlay_opacity ? $bg_overlay_css_rules . ';opacity:' . $bg_overlay_opacity . ';' : $bg_overlay_css_rules;
+
+            $rules[]     = array(
+                'selector' => sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"][data-sek-has-overlay="true"] .sek-carousel-img::after', $params['parent_module_id'], $item_model['id'] ),
+                'css_rules' => $bg_overlay_css_rules,
+                'mq' =>null
+            );
+        }
+    }// BG Overlay
 
     return $rules;
 }
+
+
 
 
 // GLOBAL CSS DESIGN => FILTERING OF THE ENTIRE MODULE MODEL
@@ -690,7 +566,7 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
                 'mq' =>null
             );
         }
-    }
+    }// Custom height rules
 
     return $rules;
 }

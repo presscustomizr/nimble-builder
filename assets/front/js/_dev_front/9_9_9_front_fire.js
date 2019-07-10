@@ -539,12 +539,26 @@ jQuery( function($){
 /* ------------------------------------------------------------------------- */
 jQuery( function($){
     var mySwipers = [];
+    var triggerSimpleLoad = function( $_imgs ) {
+          if ( 0 === $_imgs.length )
+            return;
+
+          $_imgs.map( function( _ind, _img ) {
+            $(_img).load( function () {
+              $(_img).trigger('simple_load');
+            });//end load
+            if ( $(_img)[0] && $(_img)[0].complete )
+              $(_img).load();
+          } );//end map
+    };//end of fn
+
+
     // Each swiper is instantiated with a unique id
     // so that if we have several instance on the same page, they are totally independant.
     // If we don't use a unique Id for swiper + navigation buttons, a click on a button, make all slider move synchronously.
     var doSingleSwiperInstantiation = function() {
           console.log('MY SWIPER ??', mySwipers );
-          var swiperClass = 'sek-swiper' + $(this).data('sek-swiper-id');
+          var $swiperWrapper = $(this), swiperClass = 'sek-swiper' + $swiperWrapper.data('sek-swiper-id');
           console.log('swiperClass ??', swiperClass );
           var swiperParams = {
               // spaceBetween: 30,
@@ -553,20 +567,54 @@ jQuery( function($){
               //   el: '.swiper-pagination',
               //   clickable: true,
               // },
-              loop : "true" == $(this).data('sek-loop'),//Set to true to enable continuous loop mode
+              loop : true === $swiperWrapper.data('sek-loop'),//Set to true to enable continuous loop mode
               navigation: {
-                nextEl: '.swiper-button-next' + $(this).data('sek-swiper-id'),
-                prevEl: '.swiper-button-prev' + $(this).data('sek-swiper-id')
+                nextEl: '.swiper-button-next' + $swiperWrapper.data('sek-swiper-id'),
+                prevEl: '.swiper-button-prev' + $swiperWrapper.data('sek-swiper-id')
+              },
+              on : {
+                init : function() {
+                    console.log('DO ON INIT');
+                    if ( 'nimble-wizard' === $swiperWrapper.data('sek-image-layout') ) {
+                        $swiperWrapper.find('.sek-carousel-img').each( function() {
+                            var $_imgsToSimpleLoad = $(this).nimbleCenterImages({
+                                  enableCentering : 1,
+                                  enableGoldenRatio : false,
+                                  disableGRUnder : 0,//<= don't disable golden ratio when responsive,
+                                  zeroTopAdjust: 0,
+                                  setOpacityWhenCentered : false,//will set the opacity to 1
+                                  oncustom : [ 'simple_load', 'smartload', 'sek-nimble-refreshed' ]
+                            })
+                            //images with src which starts with "data" are our smartload placeholders
+                            //we don't want to trigger the simple_load on them
+                            //the centering, will be done on the smartload event (see onCustom above)
+                            .find( 'img:not([src^="data"])' );
+
+                            //trigger the simple load
+                            _utils_.delay( function() {
+                                triggerSimpleLoad( $_imgsToSimpleLoad );
+                            }, 10 );
+
+                        });//each()
+                    }
+                }
               }
           };
-          if ( 'true' == $(this).data('sek-autoplay') ) {
+          if ( true === $swiperWrapper.data('sek-autoplay') ) {
               $.extend( swiperParams, {
                   autoplay : {
-                      delay : $(this).data('sek-autoplay-delay')
+                      delay : $swiperWrapper.data('sek-autoplay-delay'),
+                      disableOnInteraction : $swiperWrapper.data('sek-pause-on-hover')
+                  }
+              });
+          } else {
+              $.extend( swiperParams, {
+                  autoplay : {
+                      delay : 999999999//<= the autoplay:false doesn't seem to work...
                   }
               });
           }
-          console.log('swiperParams ??', swiperParams );
+          console.log('swiperParams ??',$swiperWrapper.data('sek-autoplay'), swiperParams );
           mySwipers.push( new Swiper(
               '.' + swiperClass,//$(this)[0],
               swiperParams
@@ -588,14 +636,47 @@ jQuery( function($){
             }
             mySwipers = [];
             doAllSwiperInstanciation();
+
+            $(this).find('.swiper-container img').each( function() {
+                  $(this).trigger('sek-nimble-refreshed');
+            });
           }
     );
+
+    // When the stylesheet is refreshed, update the centering with a custom event
+    // this is needed when setting the custom height of the slider wrapper
+    $( 'body').on( 'sek-stylesheet-refreshed', '[data-sek-module-type="czr_img_slider_module"]',
+          function() {
+            $(this).find('.swiper-container img').each( function() {
+                  $(this).trigger('sek-nimble-refreshed');
+            });
+          }
+    );
+
 
     // on load
     $('.sektion-wrapper').find('.swiper-container').each( function() {
           doAllSwiperInstanciation();
     });
 
+
+
+
+    // Behaviour on mouse hover
+    // @seehttps://stackoverflow.com/questions/53028089/swiper-autoplay-stop-the-swiper-when-you-move-the-mouse-cursor-and-start-playba
+    $('.swiper-slide').on('mouseover mouseout', function( evt ) {
+        var swiperInstance = $(this).closest('.swiper-container')[0].swiper;
+        if ( ! _utils_.isUndefined( swiperInstance ) && true === swiperInstance.params.autoplay.disableOnInteraction ) {
+            switch( evt.type ) {
+                case 'mouseover' :
+                    swiperInstance.autoplay.stop();
+                break;
+                case 'mouseout' :
+                    swiperInstance.autoplay.start();
+                break;
+            }
+        }
+    });
 
     // When customizing, focus on the currently expanded / edited item
     // @see CZRItemConstructor in api.czrModuleMap.czr_img_slider_collection_child
@@ -622,3 +703,311 @@ jQuery( function($){
           });
     }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===================================================
+ * jqueryCenterImages.js v1.0.0
+ * ===================================================
+ * (c) 2015 Nicolas Guillaume, Nice, France
+ * CenterImages plugin may be freely distributed under the terms of the GNU GPL v2.0 or later license.
+ *
+ * License URI: http://www.gnu.org/licenses/gpl-2.0.html
+ *
+ * Center images in a specified container
+ *
+ * =================================================== */
+(function ( $, window ) {
+      //defaults
+      var pluginName = 'nimbleCenterImages',
+          defaults = {
+                enableCentering : true,
+                onresize : true,
+                onInit : true,//<= shall we smartload on init or wait for a custom event, typically smartload ?
+                oncustom : [],//list of event here
+                $containerToListen : null,//<= we might want to listen to custom event trigger to a parent container.Should be a jQuery obj
+                imgSel : 'img',
+                defaultCSSVal : { width : 'auto' , height : 'auto' },
+                leftAdjust : 0,
+                zeroLeftAdjust : 0,
+                topAdjust : 0,
+                zeroTopAdjust : -2,//<= top ajustement for h-centered
+                enableGoldenRatio : false,
+                goldenRatioLimitHeightTo : 350,
+                goldenRatioVal : 1.618,
+                skipGoldenRatioClasses : ['no-gold-ratio'],
+                disableGRUnder : 767,//in pixels
+                useImgAttr:false,//uses the img height and width attributes if not visible (typically used for the customizr slider hidden images)
+                setOpacityWhenCentered : false,//this can be used to hide the image during the time it is centered
+                addCenteredClassWithDelay : 0,//<= a small delay can be required when we rely on the v-centered or h-centered css classes to set the opacity for example
+                opacity : 1
+          };
+
+      function Plugin( element, options ) {
+            var self = this;
+            this.container  = element;
+            this.options    = $.extend( {}, defaults, options) ;
+            this._defaults  = defaults;
+            this._name      = pluginName;
+            this._customEvt = $.isArray(self.options.oncustom) ? self.options.oncustom : self.options.oncustom.split(' ');
+            this.init();
+      }
+
+      //can access this.element and this.option
+      //@return void
+      Plugin.prototype.init = function () {
+            var self = this,
+                _do = function( _event_ ) {
+                    _event_ = _event_ || 'init';
+                    //applies golden ratio to all containers ( even if there are no images in container )
+                    self._maybe_apply_golden_r();
+
+                    //parses imgs ( if any ) in current container
+                    var $_imgs = $( self.options.imgSel , self.container );
+
+                    //WINDOW RESIZE EVENT ACTIONS
+                    //GOLDEN RATIO (before image centering)
+                    //creates a golden ratio fn on resize
+                    if ( self.options.enableGoldenRatio ) {
+                          $(window).bind(
+                                'resize',
+                                {},
+                                _utils_.debounce( function( evt ) { self._maybe_apply_golden_r( evt ); }, 200 )
+                          );
+                    }
+
+
+                    //if no images or centering is not active, only handle the golden ratio on resize event
+                    if ( 1 <= $_imgs.length && self.options.enableCentering ) {
+                          self._parse_imgs( $_imgs, _event_ );
+                    }
+                };
+
+            //fire
+            if ( self.options.onInit ) {
+                  _do();
+            }
+
+            //console.log('$( self.container )', $( self.container ) );
+            //bind the container element with custom events if any
+            //( the images will also be bound )
+            if ( $.isArray( self._customEvt ) ) {
+                  self._customEvt.map( function( evt ) {
+                        var $_containerToListen = ( self.options.$containerToListen instanceof $ && 1 < self.options.$containerToListen.length ) ? self.options.$containerToListen : $( self.container );
+                        //console.log('container to listen',$_containerToListen, evt  );
+                        $_containerToListen.bind( evt, {} , function() {
+                              _do( evt );
+                        });
+                  } );
+            }
+      };
+
+
+      //@return void
+      Plugin.prototype._maybe_apply_golden_r = function() {
+            //check if options are valids
+            if ( ! this.options.enableGoldenRatio || ! this.options.goldenRatioVal || 0 === this.options.goldenRatioVal )
+              return;
+
+            //make sure the container has not a forbidden class
+            if ( ! this._is_selector_allowed() )
+              return;
+            //check if golden ratio can be applied under custom window width
+            if ( ! this._is_window_width_allowed() ) {
+                  //reset inline style for the container
+                  $(this.container).attr('style' , '');
+                  return;
+            }
+
+            var new_height = Math.round( $(this.container).width() / this.options.goldenRatioVal );
+            //check if the new height does not exceed the goldenRatioLimitHeightTo option
+            new_height = new_height > this.options.goldenRatioLimitHeightTo ? this.options.goldenRatioLimitHeightTo : new_height;
+            $(this.container)
+                  .css({
+                        'line-height' : new_height + 'px',
+                        height : new_height + 'px'
+                  })
+                  .trigger('golden-ratio-applied');
+      };
+
+
+      /*
+      * @params string : ids or classes
+      * @return boolean
+      */
+      Plugin.prototype._is_window_width_allowed = function() {
+            return $(window).width() > this.options.disableGRUnder - 15;
+      };
+
+
+      //@return void
+      Plugin.prototype._parse_imgs = function( $_imgs, _event_ ) {
+            var self = this;
+            $_imgs.each(function ( ind, img ) {
+                  var $_img = $(img);
+                  self._pre_img_cent( $_img, _event_ );
+
+                  // IMG CENTERING FN ON RESIZE ?
+                  // Parse Img can be fired several times, so bind once
+                  if ( self.options.onresize && ! $_img.data('resize-react-bound' ) ) {
+                        $_img.data('resize-react-bound', true );
+                        $(window).resize( _utils_.debounce( function() {
+                              self._pre_img_cent( $_img, 'resize');
+                        }, 100 ) );
+                  }
+
+            });//$_imgs.each()
+
+            // Mainly designed to check if a container is not getting parsed too many times
+            if ( $(self.container).attr('data-img-centered-in-container') ) {
+                  var _n = parseInt( $(self.container).attr('data-img-centered-in-container'), 10 ) + 1;
+                  $(self.container).attr('data-img-centered-in-container', _n );
+            } else {
+                  $(self.container).attr('data-img-centered-in-container', 1 );
+            }
+      };
+
+
+
+      //@return void
+      Plugin.prototype._pre_img_cent = function( $_img ) {
+
+            var _state = this._get_current_state( $_img ),
+                self = this,
+                _case  = _state.current,
+                _p     = _state.prop[_case],
+                _not_p = _state.prop[ 'h' == _case ? 'v' : 'h'],
+                _not_p_dir_val = 'h' == _case ? ( this.options.zeroTopAdjust || 0 ) : ( this.options.zeroLeftAdjust || 0 );
+
+            var _centerImg = function( $_img ) {
+                  $_img
+                      .css( _p.dim.name , _p.dim.val )
+                      .css( _not_p.dim.name , self.options.defaultCSSVal[ _not_p.dim.name ] || 'auto' )
+                      .css( _p.dir.name, _p.dir.val ).css( _not_p.dir.name, _not_p_dir_val );
+
+                  if ( 0 !== self.options.addCenteredClassWithDelay && _utils_.isNumber( self.options.addCenteredClassWithDelay ) ) {
+                        _utils_.delay( function() {
+                              $_img.addClass( _p._class ).removeClass( _not_p._class );
+                        }, self.options.addCenteredClassWithDelay );
+                  } else {
+                        $_img.addClass( _p._class ).removeClass( _not_p._class );
+                  }
+
+                  // Mainly designed to check if a single image is not getting parsed too many times
+                  if ( $_img.attr('data-img-centered') ) {
+                        var _n = parseInt( $_img.attr('data-img-centered'), 10 ) + 1;
+                        $_img.attr('data-img-centered', _n );
+                  } else {
+                        $_img.attr('data-img-centered', 1 );
+                  }
+                  return $_img;
+            };
+            if ( this.options.setOpacityWhenCentered ) {
+                  $.when( _centerImg( $_img ) ).done( function( $_img ) {
+                        $_img.css( 'opacity', self.options.opacity );
+                  });
+            } else {
+                  _utils_.delay(function() { _centerImg( $_img ); }, 0 );
+            }
+      };
+
+
+
+
+      /********
+      * HELPERS
+      *********/
+      //@return object with initial conditions : { current : 'h' or 'v', prop : {} }
+      Plugin.prototype._get_current_state = function( $_img ) {
+            var c_x     = $_img.closest(this.container).outerWidth(),
+                c_y     = $(this.container).outerHeight(),
+                i_x     = this._get_img_dim( $_img , 'x'),
+                i_y     = this._get_img_dim( $_img , 'y'),
+                up_i_x  = i_y * c_y !== 0 ? Math.round( i_x / i_y * c_y ) : c_x,
+                up_i_y  = i_x * c_x !== 0 ? Math.round( i_y / i_x * c_x ) : c_y,
+                current = 'h';
+            //avoid dividing by zero if c_x or i_x === 0
+            if ( 0 !== c_x * i_x ) {
+                  current = ( c_y / c_x ) >= ( i_y / i_x ) ? 'h' : 'v';
+            }
+
+            var prop    = {
+                  h : {
+                        dim : { name : 'height', val : c_y },
+                        dir : { name : 'left', val : ( c_x - up_i_x ) / 2 + ( this.options.leftAdjust || 0 ) },
+                        _class : 'h-centered'
+                  },
+                  v : {
+                        dim : { name : 'width', val : c_x },
+                        dir : { name : 'top', val : ( c_y - up_i_y ) / 2 + ( this.options.topAdjust || 0 ) },
+                        _class : 'v-centered'
+                  }
+            };
+
+            return { current : current , prop : prop };
+      };
+
+      //@return img height or width
+      //uses the img height and width if not visible and set in options
+      Plugin.prototype._get_img_dim = function( $_img, _dim ) {
+            if ( ! this.options.useImgAttr )
+              return 'x' == _dim ? $_img.outerWidth() : $_img.outerHeight();
+
+            if ( $_img.is(":visible") ) {
+                  return 'x' == _dim ? $_img.outerWidth() : $_img.outerHeight();
+            } else {
+                  if ( 'x' == _dim ){
+                        var _width = $_img.originalWidth();
+                        return typeof _width === undefined ? 0 : _width;
+                  }
+                  if ( 'y' == _dim ){
+                        var _height = $_img.originalHeight();
+                        return typeof _height === undefined ? 0 : _height;
+                  }
+            }
+      };
+
+      /*
+      * @params string : ids or classes
+      * @return boolean
+      */
+      Plugin.prototype._is_selector_allowed = function() {
+            //has requested sel ?
+            if ( ! $(this.container).attr( 'class' ) )
+              return true;
+
+            //check if option is well formed
+            if ( ! this.options.skipGoldenRatioClasses || ! $.isArray( this.options.skipGoldenRatioClasses )  )
+              return true;
+
+            var _elSels       = $(this.container).attr( 'class' ).split(' '),
+                _selsToSkip   = this.options.skipGoldenRatioClasses,
+                _filtered     = _elSels.filter( function(classe) { return -1 != $.inArray( classe , _selsToSkip ) ;});
+
+            //check if the filtered selectors array with the non authorized selectors is empty or not
+            //if empty => all selectors are allowed
+            //if not, at least one is not allowed
+            return 0 === _filtered.length;
+      };
+
+
+      // prevents against multiple instantiations
+      $.fn[pluginName] = function ( options ) {
+            return this.each(function () {
+                if (!$.data(this, 'plugin_' + pluginName)) {
+                    $.data(this, 'plugin_' + pluginName,
+                    new Plugin( this, options ));
+                }
+            });
+      };
+
+})( jQuery, window );

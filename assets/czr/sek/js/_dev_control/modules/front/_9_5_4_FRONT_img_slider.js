@@ -104,7 +104,6 @@
 
                         // //update the item model on social-icon change
                         // item.bind('icon:changed', function(){
-                        //       console.log('MERDE ?');
                         //       //item.module.updateItemModel( item );
                         // });
                         //fire the parent
@@ -296,7 +295,16 @@
                                     break;
 
                                     case 'enable_text' :
-                                          _.each( [ 'text_content', 'h_alignment_css', 'v_alignment', 'spacing_css', 'apply_overlay' ] , function(_inputId_ ) {
+                                          _.each( [ 'text_content', 'font_family_css', 'font_size_css', 'line_height_css', 'color_css', 'h_alignment_css', 'v_alignment', 'spacing_css'] , function(_inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return api.CZR_Helpers.isChecked( input() );
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'apply_overlay' :
+                                          _.each( [ 'color-overlay', 'opacity-overlay' ] , function(_inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return api.CZR_Helpers.isChecked( input() );
                                                 }); } catch( er ) {
@@ -463,6 +471,15 @@
                                           _.each( [ 'custom-height' ] , function(_inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return 'custom' === input();
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'autoplay' :
+                                          _.each( [ 'autoplay_delay' ] , function(_inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return api.CZR_Helpers.isChecked( input() );
                                                 }); } catch( er ) {
                                                       api.errare( module.id + ' => error in setInputVisibilityDeps', er );
                                                 }
