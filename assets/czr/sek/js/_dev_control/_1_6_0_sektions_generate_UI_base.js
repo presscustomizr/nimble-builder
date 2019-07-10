@@ -302,7 +302,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       id : params.uiParams.id,
                                                       level : params.uiParams.level,
                                                       changed_item_id : _changed_item_id,
-                                                      control_id : _ctrl_.id
+                                                      control_id : _ctrl_.id,
+                                                      is_multi_items : isMultiItemModule
                                                 },
                                                 skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                           });
@@ -323,6 +324,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 api.previewer.send( 'sek-update-html-in-selector', {
                                                       selector : inputRegistrationParams.refresh_markup,
                                                       changed_item_id : _changed_item_id,
+                                                      is_multi_items : isMultiItemModule,
                                                       html : _html_content,
                                                       id : params.uiParams.id,
                                                       location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing

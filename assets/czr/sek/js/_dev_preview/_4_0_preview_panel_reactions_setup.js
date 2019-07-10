@@ -485,7 +485,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                                     // For multi-items module, when the level is refreshed, we want to focus on the changed_item
                                     // @see CZRSeksPrototype::doSektionThinksOnApiReady
-                                    if ( params.apiParams.changed_item_id && params.apiParams.action === 'sek-refresh-level' ) {
+                                    if ( params.apiParams.is_multi_items && params.apiParams.action === 'sek-refresh-level' ) {
                                           api.preview.send( 'multi-items-module-refreshed', params );
                                     }
 

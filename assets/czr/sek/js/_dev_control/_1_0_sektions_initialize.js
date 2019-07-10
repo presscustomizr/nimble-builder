@@ -359,7 +359,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // the 'multi-items-module-refreshed' event is sent on each preview update due to a Nimble change
                   // @see sendSuccessDataToPanel() in SekPreviewPrototype::schedulePanelMsgReactions
                   api.previewer.bind('multi-items-module-refreshed', function( params ) {
-                        if ( _.isUndefined( params.apiParams.changed_item_id ) || _.isUndefined( params.apiParams.control_id ) )
+                        if ( _.isUndefined( params.apiParams.control_id ) )
                           return;
                         // the module_id param is added on control registration
                         // @see CZRSeksPrototype::generateUIforFrontModules
