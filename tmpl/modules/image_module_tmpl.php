@@ -51,7 +51,6 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
         //   'href' => get_permalink( $attachment->ID ),
         //   'src' => $attachment->guid,
         //   'title' => $attachment->post_title
-        $img_post = get_post( $value['img'] );
         if ( is_int( $value['img'] ) ) {
             $img_post = get_post( $value['img'] );
             if ( !is_wp_error( $img_post ) && is_object( $img_post ) && 'attachment' === $img_post->post_type ) {
