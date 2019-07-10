@@ -177,7 +177,7 @@ function sek_print_nimble_input_templates() {
               value = _.has( item_model, input_id ) ? item_model[input_id] : null,
               code_type = data.input_data.code_type;
         #>
-        <textarea data-czrtype="{{input_id}}" data-editor-code-type="{{code_type}}" class="width-100" name="textarea" rows="10" cols="">{{value}}</textarea>
+        <textarea data-czrtype="{{input_id}}" data-editor-code-type="{{code_type}}" class="width-100" name="textarea" rows="10" cols=""></textarea>
       </script>
 
 
@@ -192,7 +192,7 @@ function sek_print_nimble_input_templates() {
         #>
         <button type="button" class="button text_editor-button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{input_id}}" data-czr-action="open-tinymce-editor"><?php _e('Edit', 'text_doma'); ?></button>&nbsp;
         <button type="button" class="button text_editor-button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{input_id}}" data-czr-action="close-tinymce-editor"><?php _e('Hide editor', 'text_doma'); ?></button>
-        <input data-czrtype="{{input_id}}" type="hidden" value="{{value}}"/>
+        <input data-czrtype="{{input_id}}" type="hidden" value=""/>
       </script>
 
       <script type="text/html" id="tmpl-nimble-input___nimble_tinymce_editor">
@@ -205,7 +205,7 @@ function sek_print_nimble_input_templates() {
               input_id = data.input_id,
               value = _.has( item_model, input_id ) ? item_model[input_id] : null;
         #>
-        <textarea id="textarea-{{data.control_id}}" data-czrtype="{{input_id}}" class="width-100" name="textarea" rows="10" cols="">{{value}}</textarea>
+        <textarea id="textarea-{{data.control_id}}" data-czrtype="{{input_id}}" class="width-100" name="textarea" rows="10" cols=""></textarea>
       </script>
 
 

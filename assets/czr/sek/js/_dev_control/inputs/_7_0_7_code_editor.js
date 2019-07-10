@@ -105,6 +105,10 @@
                               }, 10 );
                         };
 
+                        // inject the content in the code editor now
+                        // @fixes the problem of {{...}} syntax being parsed by _. templating system
+                        $textarea.html( input() );
+
                         $.when( _getEditorParams() ).done( function( editorParams ) {
                               //$textarea.attr( 'data-editor-params', editorParams );
                               // Obtain editorSettings for instantiation.

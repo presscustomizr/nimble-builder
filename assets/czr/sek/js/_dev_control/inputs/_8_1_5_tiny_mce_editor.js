@@ -117,6 +117,9 @@
                   // Let's set the input() value when the editor is ready
                   // Because when we instantiate it, the textarea might not reflect the input value because too early
                   var _doOnInit = function() {
+                        // inject the content in the code editor now
+                        // @fixes the problem of {{...}} syntax being parsed by _. templating system
+                        $textarea.html( input() );
                         _editor.setContent( input() );
                         //$('#wp-' + _editor.id + '-wrap' ).find('iframe').addClass('labite').css('height','50px');
                   };
