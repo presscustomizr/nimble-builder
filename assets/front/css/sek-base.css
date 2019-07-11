@@ -1891,6 +1891,164 @@ button.sek-btn,
   transition: all 0.2s ease-in-out;
 }
 
+[data-sek-module-type="czr_img_slider_module"] {
+  /* SWIPER BULLETS */
+  /* SWIPER ARROWS */
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-container {
+  width: 100%;
+  height: 100%;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-container .swiper-wrapper {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-container[data-sek-image-layout="nimble-wizard"] .sek-carousel-img {
+  height: 100%;
+  overflow: hidden;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-container[data-sek-image-layout="nimble-wizard"] .sek-carousel-img img {
+  max-width: none;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-container[data-sek-image-layout="height-100"] .sek-carousel-img {
+  height: 100%;
+  width: auto;
+  overflow: hidden;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-container[data-sek-image-layout="height-100"] .sek-carousel-img img {
+  height: 100%;
+  width: auto;
+  max-width: none;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-slide {
+  text-align: center;
+  font-size: 18px;
+  background: #fff;
+  /* Center slide image vertically */
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-slide .sek-carousel-img {
+  width: 100%;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-slide .sek-carousel-img img {
+  width: 100%;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-slide[data-sek-has-overlay="true"] .sek-carousel-img::after {
+  content: '';
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  position: absolute;
+  background-color: #000000;
+  opacity: 0.3;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-slide .sek-slider-text-wrapper {
+  height: 100%;
+  width: 100%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate3d(-50%, -50%, 0);
+  transform: translate3d(-50%, -50%, 0);
+  top: 50%;
+  left: 50%;
+  position: absolute;
+  /* Center slide text vertically
+         => consistent with defaults in module registration */
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-slide .sek-slider-text-content {
+  height: auto;
+  max-height: 100%;
+  width: 100%;
+  padding: 5%;
+  text-align: center;
+  z-index: 3;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1.5em;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-slide .sek-slider-text-content * {
+  font-size: 16px;
+  line-height: 1.5em;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-pagination-bullet-active {
+  background-color: #ffffff;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .sek-swiper-nav {
+  cursor: pointer;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .sek-swiper-nav .sek-swiper-prev {
+  left: 0;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  border-bottom-left-radius: 0px;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .sek-swiper-nav .sek-swiper-next {
+  right: 0;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 2px;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .sek-swiper-nav .sek-swiper-prev, [data-sek-module-type="czr_img_slider_module"] .sek-swiper-nav .sek-swiper-next {
+  position: absolute;
+  z-index: 2;
+  top: calc(50% - 30px);
+  text-align: center;
+  margin-top: 0px;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  display: block;
+  color: #ffffff;
+  height: 60px;
+  width: 50px;
+  opacity: 0.6;
+  background-color: rgba(32, 32, 32, 0.4);
+  transition: all 0.3s cubic-bezier(0.39, 0.575, 0.565, 1);
+  line-height: 64px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .sek-swiper-nav .sek-swiper-prev:hover, [data-sek-module-type="czr_img_slider_module"] .sek-swiper-nav .sek-swiper-next:hover {
+  background-color: rgba(32, 32, 32, 0.7);
+  opacity: 1;
+  width: 100px;
+}
+
 .sek-module-inner {
   line-height: 1.5em;
 }

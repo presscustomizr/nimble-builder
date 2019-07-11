@@ -1019,11 +1019,12 @@ function sek_print_nimble_input_templates() {
         <#
           var item_model = data.item_model,
               input_id = data.input_id,
-              value = _.has( item_model, input_id ) ? item_model[input_id] : null,
+              rawValue = _.has( item_model, input_id ) ? item_model[input_id] : null,
+              value,
               unit;
 
-          value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
-          unit = _.isString( value ) ? value.replace(/[0-9]|\.|,/g, '') : 'px';
+          value = _.isString( rawValue ) ? rawValue.replace(/px|em|%/g,'') : rawValue;
+          unit = _.isString( rawValue ) ? rawValue.replace(/[0-9]|\.|,/g, '') : 'px';
           unit = _.isEmpty( unit ) ? 'px' : unit;
           var _step = _.has( data.input_data, 'step' ) ? 'step="' + data.input_data.step + '"' : '',
               _saved_unit = _.has( item_model, 'unit' ) ? 'data-unit="' + data.input_data.unit + '"' : '',
@@ -1080,7 +1081,7 @@ function sek_print_nimble_input_templates() {
               value = _.has( item_model, input_id ) ? item_model[input_id] : null,
               code_type = data.input_data.code_type;
         #>
-        <textarea data-czrtype="{{input_id}}" data-editor-code-type="{{code_type}}" class="width-100" name="textarea" rows="10" cols="">{{value}}</textarea>
+        <textarea data-czrtype="{{input_id}}" data-editor-code-type="{{code_type}}" class="width-100" name="textarea" rows="10" cols=""></textarea>
       </script>
 
 
@@ -1095,7 +1096,7 @@ function sek_print_nimble_input_templates() {
         #>
         <button type="button" class="button text_editor-button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{input_id}}" data-czr-action="open-tinymce-editor"><?php _e('Edit', 'text_doma'); ?></button>&nbsp;
         <button type="button" class="button text_editor-button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{input_id}}" data-czr-action="close-tinymce-editor"><?php _e('Hide editor', 'text_doma'); ?></button>
-        <input data-czrtype="{{input_id}}" type="hidden" value="{{value}}"/>
+        <input data-czrtype="{{input_id}}" type="hidden" value=""/>
       </script>
 
       <script type="text/html" id="tmpl-nimble-input___nimble_tinymce_editor">
@@ -1108,7 +1109,7 @@ function sek_print_nimble_input_templates() {
               input_id = data.input_id,
               value = _.has( item_model, input_id ) ? item_model[input_id] : null;
         #>
-        <textarea id="textarea-{{data.control_id}}" data-czrtype="{{input_id}}" class="width-100" name="textarea" rows="10" cols="">{{value}}</textarea>
+        <textarea id="textarea-{{data.control_id}}" data-czrtype="{{input_id}}" class="width-100" name="textarea" rows="10" cols=""></textarea>
       </script>
 
 
@@ -1157,37 +1158,6 @@ function sek_print_nimble_input_templates() {
           <label for="nimblecheck-{{_uniqueId}}" class="nimblecheck-label">{{sektionsLocalizedData.i18n['Switch']}}</label>
         </div>
       </script>
-
-
-      <?php
-      /* ------------------------------------------------------------------------- *
-       *  FONT SIZE / LINE HEIGHT
-      /* ------------------------------------------------------------------------- */
-      ?>
-      <script type="text/html" id="tmpl-nimble-input___font_size_line_height">
-        <?php
-          // we save the int value + unit
-          // we want to keep only the numbers when printing the tmpl
-          // dev note : value.replace(/\D+/g, '') : ''; not working because remove "." which we might use for em for example
-        ?>
-        <#
-          var item_model = data.item_model,
-              input_id = data.input_id,
-              value = _.has( item_model, input_id ) ? item_model[input_id] : null,
-              unit;
-
-          value = _.isString( value ) ? value.replace(/px|em|%/g,'') : value;
-          unit = _.isString( value ) ? value.replace(/[0-9]|\.|,/g, '') : 'px';
-          unit = _.isEmpty( unit ) ? 'px' : unit;
-        #>
-        <div class="sek-font-size-line-height-wrapper">
-          <input data-czrtype="{{input_id}}" type="hidden" data-sek-unit="{{unit}}"/>
-          <div aria-label="<?php _e('unit', 'text_doma'); ?>" class="sek-ui-button-group sek-float-right" role="group">
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('pixels', 'text_doma'); ?>" data-sek-unit="px">px</button><button type="button" aria-pressed="false" class="sek-ui-button" title="em" data-sek-unit="em">em</button><button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('percents', 'text_doma'); ?>" data-sek-unit="%">%</button></div>
-          </div>
-        </div>
-      </script>
-
 
 
       <?php

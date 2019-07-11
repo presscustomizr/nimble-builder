@@ -31,16 +31,13 @@
                         template_name = 'h_text_alignment';
                   break;
 
-                  case 'font_size' :
-                  case 'line_height' :
-                        template_name = 'font_size_line_height';
-                  break;
-
                   case 'range_simple' :
                   case 'range_simple_device_switcher' :
                         template_name = 'range_simple';
                   break;
 
+                  case 'font_size' :
+                  case 'line_height' :
                   case 'range_with_unit_picker' :
                   case 'range_with_unit_picker_device_switcher' :
                         template_name = 'range_with_unit_picker';
@@ -290,17 +287,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $.extend( query, { local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ) } );
                   });
 
-                  // added for https://github.com/presscustomizr/nimble-builder/issues/403
-                  // in fmk::setupTinyMceEditor => each id of newly instantiated editor is added to the [] api.czrActiveWPEditors
-                  // We need to remove those instances when cleaning registered controls
-                  api.bind( 'sek-before-clean-registered', function() {
+
+                  // TINY MCE EDITOR
+                  var clearActiveWPEditorsInstances = function() {
                         if ( _.isArray( api.czrActiveWPEditors ) ) {
                               _.each( api.czrActiveWPEditors, function( _id ) {
                                     wp.editor.remove( _id );
                               });
                               api.czrActiveWPEditors = [];
                         }
-                  });
+                  };
+                  // added for https://github.com/presscustomizr/nimble-builder/issues/403
+                  // in fmk::setupTinyMceEditor => each id of newly instantiated editor is added to the [] api.czrActiveWPEditors
+                  // We need to remove those instances when cleaning registered controls
+                  api.bind( 'sek-before-clean-registered', clearActiveWPEditorsInstances );
+
+                  // When using the text editor in the items of in a multi-item module
+                  // We need to clear the editor instances each time all items are closed, before opening a new one
+                  // 'czr-all-items-closed' is fired in CZRModuleMths.closeAllItems()
+                  api.bind('czr-all-items-closed', clearActiveWPEditorsInstances );
             },// initialize()
 
 
@@ -567,6 +572,31 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             });
                         }, 2000 );//delay()
                   }
+
+                  // SCHEDULE AN AUTOFOCUS ON THE ITEM THAT HAS BEEN MODIFIED IN THE PREVIEW
+                  // the 'multi-items-module-refreshed' event is sent on each preview update due to a Nimble change
+                  // @see sendSuccessDataToPanel() in SekPreviewPrototype::schedulePanelMsgReactions
+                  api.previewer.bind('multi-items-module-refreshed', function( params ) {
+                        if ( _.isUndefined( params.apiParams.control_id ) )
+                          return;
+                        // the module_id param is added on control registration
+                        // @see CZRSeksPrototype::generateUIforFrontModules
+                        // we use it to identify that
+                        api.control( params.apiParams.control_id, function( _control_ ) {
+                              if ( _.isUndefined( _control_.params.sek_registration_params ) )
+                                return;
+                              if ( api.control( _control_.id ).params.sek_registration_params.module_id !== params.apiParams.id )
+                                return;
+                              _control_.czr_Module.each( function( _module_ ) {
+                                    _module_.czr_Item.each( function( _item_ ) {
+                                          if( 'expanded' === _item_.viewState() ) {
+                                                _item_.trigger('sek-request-item-focus-in-preview');
+                                          }
+                                    });
+                              });
+                        });
+                  });//api.previewer.bind()
+
             },//doSektionThinksOnApiReady
 
 
@@ -3458,6 +3488,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // since https://github.com/presscustomizr/nimble-builder/issues/403, 2 cases :
                                     // 1) update simply by postMessage, without ajax action <= refresh_markup is a string of selectors, and the content does not include content that needs server side parsing, like shortcode or template tages
                                     // 2) otherwise => update the level with an ajax refresh action
+
+                                    var _changed_item_id;
+                                    if ( isMultiItemModule && params.settingParams.args.inputRegistrationParams && _.isFunction( params.settingParams.args.inputRegistrationParams.input_parent ) ) {
+                                          _changed_item_id = params.settingParams.args.inputRegistrationParams.input_parent.id;
+                                    }
+
                                     var _sendRequestForAjaxMarkupRefresh = function() {
                                           api.previewer.send( 'sek-refresh-level', {
                                                 location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
@@ -3465,7 +3501,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 apiParams : {
                                                       action : 'sek-refresh-level',
                                                       id : params.uiParams.id,
-                                                      level : params.uiParams.level
+                                                      level : params.uiParams.level,
+                                                      changed_item_id : _changed_item_id,
+                                                      control_id : _ctrl_.id,
+                                                      is_multi_items : isMultiItemModule
                                                 },
                                                 skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
                                           });
@@ -3475,9 +3514,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           _sendRequestForAjaxMarkupRefresh();
                                     }
 
-                                    // @todo:
-                                    // for multi-item modules, send the item identifier
+                                    // Note : for multi-item modules, the changed item id is sent
                                     if ( refreshMarkupWhenNeededForInput() ) {
+
                                           var _html_content = params.settingParams.args.input_value;
                                           if ( ! _.isString( _html_content ) ) {
                                                 throw new Error( '::updateAPISettingAndExecutePreviewActions => _doUpdateWithRequestedAction => refreshMarkupWhenNeededForInput => html content is not a string.');
@@ -3485,6 +3524,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           if ( ! self.htmlIncludesShortcodesOrTmplTags( _html_content ) ) {
                                                 api.previewer.send( 'sek-update-html-in-selector', {
                                                       selector : inputRegistrationParams.refresh_markup,
+                                                      changed_item_id : _changed_item_id,
+                                                      is_multi_items : isMultiItemModule,
                                                       html : _html_content,
                                                       id : params.uiParams.id,
                                                       location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
@@ -4206,6 +4247,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     origin : 'nimble',
                                     level : params.level,
                                     what : 'control',
+                                    module_id : params.id,// <= the id of the corresponding module level as saved in DB. Can be needed, @see image slider module
                                     id : optionData.settingControlId,
                                     label : optionData.controlLabel,
                                     //label : sektionsLocalizedData.i18n['Customize the options for module :'] + ' ' + optionData.controlLabel,
@@ -7390,53 +7432,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
-            //-------------------------------------------------------------------------------------------------
-            // GENERIC WAY TO SETUP FONT SIZE AND LINE HEIGHT INPUTS
-            // DEPRECATED
-            //-------------------------------------------------------------------------------------------------
-            // "this" is the input
-            setupFontSizeAndLineHeightInputs : function( obj ) {
-                  var input      = this,
-                      $wrapper = $('.sek-font-size-line-height-wrapper', input.container ),
-                      initial_unit = $wrapper.find('input[data-czrtype]').data('sek-unit'),
-                      validateUnit = function( unit ) {
-                            if ( ! _.contains( ['px', 'em', '%'], unit ) ) {
-                                  api.errare( 'error : invalid unit for input ' + input.id, unit );
-                                  unit = 'px';
-                            }
-                            return unit;
-                      };
-                  // initialize the unit with the value provided in the dom
-                  input.css_unit = new api.Value( _.isEmpty( initial_unit ) ? 'px' : validateUnit( initial_unit ) );
-                  // React to a unit change
-                  input.css_unit.bind( function( to ) {
-                        to = _.isEmpty( to ) ? 'px' : to;
-                        $wrapper.find( 'input[type="number"]').trigger('change');
-                  });
-
-                  // instantiate stepper and schedule change reactions
-                  $wrapper.find( 'input[type="number"]').on('input change', function( evt ) {
-                        input( $(this).val() + validateUnit( input.css_unit() ) );
-                  }).stepper();
-
-
-                  // Schedule unit changes on button click
-                  $wrapper.on( 'click', '[data-sek-unit]', function(evt) {
-                        evt.preventDefault();
-                        // handle the is-selected css class toggling
-                        $wrapper.find('[data-sek-unit]').removeClass('is-selected').attr( 'aria-pressed', false );
-                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        // update the initial unit ( not mandatory)
-                        $wrapper.find('input[data-czrtype]').data('sek-unit', $(this).data('sek-unit') );
-                        // set the current unit Value
-                        input.css_unit( $(this).data('sek-unit') );
-                  });
-
-                  // add is-selected button on init to the relevant unit button
-                  $wrapper.find( '.sek-ui-button[data-sek-unit="'+ initial_unit +'"]').addClass('is-selected').attr( 'aria-pressed', true );
-            },
-
-
 
             //-------------------------------------------------------------------------------------------------
             // PREPARE INPUT REGISTERED WITH has_device_switcher set to true
@@ -7652,6 +7647,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var item = this.input_parent;
                   if ( !_.isFunction(visibilityCallBack) || _.isEmpty(controlledInputId) ) {
                         throw new Error('::scheduleVisibilityOfInputId => error when firing for input id : ' + this.id );
+                  }
+                  if ( !item.czr_Input.has( controlledInputId ) ) {
+                        throw new Error('::scheduleVisibilityOfInputId => missing input id : ' + controlledInputId );
                   }
                   //Fire on init
                   item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
@@ -9212,39 +9210,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       // For example, a content picker can be given params to display only taxonomies
       // the default input_event_map can also be overriden in this callback
       $.extend( api.czrInputMap, {
-            font_size : function( params ) {
-                  api.czr_sektions.setupFontSizeAndLineHeightInputs.call(this);
-            },
-
-      });//$.extend( api.czrInputMap, {})
-
-
-})( wp.customize, jQuery, _ );//global sektionsLocalizedData
-( function ( api, $, _ ) {
-      // all available input type as a map
-      api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
-      $.extend( api.czrInputMap, {
-            line_height : function( params ) {
-                  api.czr_sektions.setupFontSizeAndLineHeightInputs.call(this);
-            }
-      });//$.extend( api.czrInputMap, {})
-
-
-})( wp.customize, jQuery, _ );//global sektionsLocalizedData
-( function ( api, $, _ ) {
-      // all available input type as a map
-      api.czrInputMap = api.czrInputMap || {};
-
-      // input_type => callback fn to fire in the Input constructor on initialize
-      // the callback can receive specific params define in each module constructor
-      // For example, a content picker can be given params to display only taxonomies
-      // the default input_event_map can also be overriden in this callback
-      $.extend( api.czrInputMap, {
             // FONT PICKER
             font_picker : function( input_options ) {
                   var input = this,
@@ -9751,6 +9716,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                    $input_title.click();
                               }, 10 );
                         };
+
+                        // inject the content in the code editor now
+                        // @fixes the problem of {{...}} syntax being parsed by _. templating system
+                        $textarea.html( input() );
 
                         $.when( _getEditorParams() ).done( function( editorParams ) {
                               //$textarea.attr( 'data-editor-params', editorParams );
@@ -11076,10 +11045,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       defaultQuickTagBtns = "strong,em,link,code";
 
                   if ( _.isNull( _id ) ) {
-                        throw new Error( 'setupTinyMceEditor => missing textarea for module :' + input.module.id );
+                        throw new Error( 'api.czrInputMap.nimble_tinymce_editor => missing textarea for module :' + input.module.id );
                   }
                   if ( tinyMCE.get( _id ) ) {
-                        throw new Error( 'setupTinyMceEditor => duplicate editor id.');
+                        throw new Error( 'api.czrInputMap.nimble_tinymce_editor => duplicate editor id.');
                   }
                   var getToolbarBtns = function() {
                         var toolBarBtn = defaultToolbarBtns.split(',');
@@ -11173,6 +11142,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Let's set the input() value when the editor is ready
                   // Because when we instantiate it, the textarea might not reflect the input value because too early
                   var _doOnInit = function() {
+                        // inject the content in the code editor now
+                        // @fixes the problem of {{...}} syntax being parsed by _. templating system
+                        $textarea.html( input() );
                         _editor.setContent( input() );
                         //$('#wp-' + _editor.id + '-wrap' ).find('iframe').addClass('labite').css('height','50px');
                   };
@@ -16326,6 +16298,549 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   ready_on_section_expanded : false,
                   ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_social_icons_style_child' )
+            }
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  //console.log('INITIALIZING FP MODULE', id, options );
+                  var module = this;
+
+
+                  module.crudModulePart = 'nimble-crud-module-part';
+                  module.rudItemPart = 'nimble-rud-item-part';
+
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
+
+                  // module.isReady.then( function() {
+                  //       if ( _.isUndefined( module.preItem ) )
+                  //         return;
+                  //       //specific update for the item preModel on social-icon change
+                  //       module.preItem.bind( function( to, from ) {
+                  //             if ( ! _.has(to, 'icon') )
+                  //               return;
+                  //             if ( _.isEqual( to['icon'], from['icon'] ) )
+                  //               return;
+                  //             module.updateItemModel( module.preItem, true );
+                  //       });
+                  // });
+
+                  // run the parent initialize
+                  // Note : must be always invoked always after the input / item class extension
+                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+            },//initialize
+
+
+            // overrides the default fmk method which generates a too long id for each item, like : "czr_img_slider_collection_child_2"
+            // this method generates a uniq GUID id for each item
+            generateItemId : function() {
+                    return api.czr_sektions.guid();
+            },
+
+            // Overrides the default fmk method, to disable the default preview refresh
+            _makeItemsSortable : function(obj) {
+                  if ( wp.media.isTouchDevice || ! $.fn.sortable )
+                    return;
+                  var module = this;
+                  $( '.' + module.control.css_attr.items_wrapper, module.container ).sortable( {
+                        handle: '.' + module.control.css_attr.item_sort_handle,
+                        start: function() {},
+                        update: function( event, ui ) {
+                              var _sortedCollectionReact = function() {
+                                    if ( _.has(module, 'preItem') ) {
+                                          module.preItemExpanded.set(false);
+                                    }
+
+                                    module.closeAllItems().closeRemoveDialogs();
+                                    // var refreshPreview = function() {
+                                    //       api.previewer.refresh();
+                                    // };
+                                    // //refreshes the preview frame  :
+                                    // //1) only needed if transport is postMessage, because is triggered by wp otherwise
+                                    // //2) only needed when : add, remove, sort item(s).
+                                    // //var isItemUpdate = ( _.size(from) == _.size(to) ) && ! _.isEmpty( _.difference(from, to) );
+                                    // if ( 'postMessage' == api(module.control.id).transport  && ! api.CZR_Helpers.hasPartRefresh( module.control.id ) ) {
+                                    //       refreshPreview = _.debounce( refreshPreview, 500 );//500ms are enough
+                                    //       refreshPreview();
+                                    // }
+
+                                    module.trigger( 'item-collection-sorted' );
+                              };
+                              module._getSortedDOMItemCollection()
+                                    .done( function( _collection_ ) {
+                                          module.itemCollection.set( _collection_ );
+                                    })
+                                    .then( function() {
+                                          _sortedCollectionReact();
+                                    });
+                              //refreshes the preview frame, only if the associated setting is a postMessage transport one, with no partial refresh
+                              // if ( 'postMessage' == api( module.control.id ).transport && ! api.CZR_Helpers.hasPartRefresh( module.control.id ) ) {
+                              //         _.delay( function() { api.previewer.refresh(); }, 100 );
+                              // }
+                        }//update
+                      }
+                  );
+            },//_makeItemsSortable
+
+
+            //////////////////////////////////////////////////////////
+            /// ITEM CONSTRUCTOR
+            //////////////////////////////////////////
+            CZRItemConstructor : {
+                  //overrides the parent ready
+                  ready : function() {
+                        var item = this;
+                        //wait for the input collection to be populated,
+                        //and then set the input visibility dependencies
+                        item.inputCollection.bind( function( col ) {
+                              if( _.isEmpty( col ) )
+                                return;
+                              try { item.setInputVisibilityDeps(); } catch( er ) {
+                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                              }
+                        });//item.inputCollection.bind()
+
+                        // //update the item model on social-icon change
+                        // item.bind('icon:changed', function(){
+                        //       //item.module.updateItemModel( item );
+                        // });
+                        //fire the parent
+                        api.CZRItem.prototype.ready.call( item );
+
+                        // FOCUS ON CURRENTLY EXPANDED / EDITED ITEM
+                        var requestFocusToPreview = function() {
+                              api.previewer.send( 'sek-item-focus', {
+                                    control_id : item.module.control.id,
+                                    item_id : item.id,
+                                    item_value : item()
+                              });
+                        };
+                        // when the item get expanded
+                        item.viewState.callbacks.add( function( to, from ) {
+                              if ( 'expanded' === to ) {
+                                    requestFocusToPreview();
+                              }
+                        });
+
+                        // when the item value is changed
+                        item.callbacks.add( requestFocusToPreview );
+
+                        // when the module requests a focus after a preview update
+                        item.bind('sek-request-item-focus-in-preview', requestFocusToPreview );
+                  },
+
+
+
+                //overrides the default parent method by a custom one
+                //at this stage, the model passed in the obj is up to date
+                  writeItemViewTitle : function( model, data ) {
+                        var item = this,
+                            index = 1,
+                            module  = item.module,
+                            _model = model || item(),
+                            _title = '',
+                            _slideBg,
+                            _src = 'not_set',
+                            _areDataSet = ! _.isUndefined( data ) && _.isObject( data );
+
+                        //When shall we update the item title ?
+                        //=> when the slide title or the thumbnail have been updated
+                        //=> on module model initialized
+                        if ( _areDataSet && data.input_changed && ! _.contains( [ 'img' ], data.input_changed ) )
+                          return;
+
+                        //set title with index
+                        if ( ! _.isEmpty( _model.title ) ) {
+                              _title = _model.title;
+                        } else {
+                              //find the current item index in the collection
+                              var _index = _.findIndex( module.itemCollection(), function( _itm ) {
+                                    return _itm.id === item.id;
+                              });
+                              _index = _.isUndefined( _index ) ? index : _index + 1;
+                              //_title = [ '@missi18n Slide', _index ].join( ' ' );
+                        }
+
+                        //if the slide title is set, use it
+                        _title = api.CZR_Helpers.truncate( _title, 15 );
+
+                        //make sure the slide bg id is a number
+                        _slideBg = ( _model['img'] && _.isString( _model['img'] ) ) ? parseInt( _model['img'], 10 ) : _model['img'];
+
+                        // _title = [
+                        //       '<div class="slide-thumb"></div>',
+                        //       '<div class="slide-title">' + _title + '</div>',,
+                        // ].join('');
+
+                        var _getThumbSrc = function() {
+                              return $.Deferred( function() {
+                                    var dfd = this;
+                                    //try to set the default src
+                                    // if ( huemanSlideModuleParams && huemanSlideModuleParams.defaultThumb ) {
+                                    //       _src = huemanSlideModuleParams.defaultThumb;
+                                    // }
+                                    if ( ! _.isNumber( _slideBg ) ) {
+                                          dfd.resolve( _src );
+                                    } else {
+                                          wp.media.attachment( _slideBg ).fetch()
+                                                .always( function() {
+                                                      var attachment = this;
+                                                      if ( _.isObject( attachment ) && _.has( attachment, 'attributes' ) && _.has( attachment.attributes, 'sizes' ) ) {
+                                                            _src = this.get('sizes').thumbnail.url;
+                                                            dfd.resolve( _src );
+                                                      }
+                                                });
+                                    }
+                              }).promise();
+                        };
+
+
+                        var $slideTitleEl = $( '.' + module.control.css_attr.item_title , item.container ).find('.slide-title'),
+                            $slideThumbEl = $( '.' + module.control.css_attr.item_title , item.container ).find( '.slide-thumb');
+
+                        //TITLE
+                        //always write the title
+                        // if ( 1 > $slideTitleEl.length ) {
+                        //       //remove the default item title
+                        //       $( '.' + module.control.css_attr.item_title , item.container ).html( '' );
+                        //       //write the new one
+                        //       $( '.' + module.control.css_attr.item_title , item.container ).append( $( '<div/>',
+                        //             {
+                        //                 class : 'slide-title',
+                        //                 html : _title
+                        //             }
+                        //       ) );
+                        // } else {
+                        //       $slideTitleEl.html( _title );
+                        // }
+
+                        //THUMB
+                        //When shall we append the item thumb ?
+                        //=>IF the slide-thumb element is not set
+                        //=>OR in the case where data have been provided and the input_changed is 'img'
+                        //=>OR if no data is provided ( we are in the initialize phase )
+                        var _isBgChange = _areDataSet && data.input_changed && 'img' === data.input_changed;
+                        $( '.' + module.control.css_attr.item_title, item.container ).css('padding', '0 4px');
+                        if ( 1 > $slideThumbEl.length ) {
+                              _getThumbSrc().done( function( src ) {
+                                    if ( 'not_set' != src ) {
+                                          $( '.' + module.control.css_attr.item_title, item.container ).prepend( $('<div/>',
+                                                {
+                                                      class : 'slide-thumb',
+                                                      html : '<img src="' + src + '" width="32" alt="' + _title + '" />',
+                                                      style : 'width:32px;height:32px;overflow:hidden;'
+                                                }
+                                          ));
+                                    }
+                              });
+                        } else if ( _isBgChange || ! _areDataSet ) {
+                              _getThumbSrc().done( function( src ) {
+                                    if ( 'not_set' != src ) {
+                                          $slideThumbEl.html( '<img src="' + src + '" width="32" height="32" alt="' + _title + '" />' );
+                                    }
+                              });
+                        }
+                  },
+
+
+
+
+
+                  //Fired when the input collection is populated
+                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                  setInputVisibilityDeps : function() {
+                        var item = this,
+                            module = item.module;
+
+                        //Internal item dependencies
+                        item.czr_Input.each( function( input ) {
+                              switch( input.id ) {
+                                    case 'link-to' :
+                                          _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'link-custom-url' :
+                                                                  bool = 'url' === input() && '_custom_' == item.czr_Input('link-pick-url')().id;
+                                                            break;
+                                                            case 'link-pick-url' :
+                                                                  bool = 'url' === input();
+                                                            break;
+                                                            case 'link-target' :
+                                                                  bool = ! _.contains( [ 'no-link'], input() );
+                                                            break;
+                                                      }
+                                                      return bool;
+                                                }); } catch( er ) {
+                                                      api.errare( 'Image module => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'link-pick-url' :
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
+                                                return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
+                                          });
+                                    break;
+
+                                    case 'apply-overlay' :
+                                          _.each( [ 'color-overlay', 'opacity-overlay' ] , function(_inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return api.CZR_Helpers.isChecked( input() );
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+
+                                    case 'enable_text' :
+                                          _.each( [ 'text_content', 'font_family_css', 'font_size_css', 'line_height_css', 'color_css', 'h_alignment_css', 'v_alignment', 'spacing_css'] , function(_inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return api.CZR_Helpers.isChecked( input() );
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'apply_overlay' :
+                                          _.each( [ 'color-overlay', 'opacity-overlay' ] , function(_inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return api.CZR_Helpers.isChecked( input() );
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                              }
+                        });
+                  },
+
+                  // Overrides the default fmk method in order to disable the remove dialog box
+                  toggleRemoveAlert : function() {
+                        this.removeItem();
+                  },
+
+                  // Overrides the default fmk method, to disable the default preview refresh
+                  //fired on click dom event
+                  //for dynamic multi input modules
+                  //@return void()
+                  //@param params : { dom_el : {}, dom_event : {}, event : {}, model {} }
+                  removeItem : function( params ) {
+                        params = params || {};
+                        var item = this,
+                            module = this.module,
+                            _new_collection = _.clone( module.itemCollection() );
+
+                        //hook here
+                        module.trigger('pre_item_dom_remove', item() );
+
+                        //destroy the Item DOM el
+                        item._destroyView();
+
+                        //new collection
+                        //say it
+                        _new_collection = _.without( _new_collection, _.findWhere( _new_collection, {id: item.id }) );
+                        module.itemCollection.set( _new_collection );
+                        //hook here
+                        module.trigger('pre_item_api_remove', item() );
+
+                        var _item_ = $.extend( true, {}, item() );
+
+                        // <REMOVE THE ITEM FROM THE COLLECTION>
+                        module.czr_Item.remove( item.id );
+                        // </REMOVE THE ITEM FROM THE COLLECTION>
+
+                        //refresh the preview frame (only needed if transport is postMessage && has no partial refresh set )
+                        //must be a dom event not triggered
+                        //otherwise we are in the init collection case where the items are fetched and added from the setting in initialize
+                        if ( 'postMessage' == api(module.control.id).transport && _.has( params, 'dom_event') && ! _.has( params.dom_event, 'isTrigger' ) && ! api.CZR_Helpers.hasPartRefresh( module.control.id ) ) {
+                              // api.previewer.refresh().done( function() {
+                              //       _dfd_.resolve();
+                              // });
+                              // It would be better to wait for the refresh promise
+                              // The following approach to bind and unbind when refreshing the preview is similar to the one coded in module::addItem()
+                              var triggerEventWhenPreviewerReady = function() {
+                                    api.previewer.unbind( 'ready', triggerEventWhenPreviewerReady );
+                                    module.trigger( 'item-removed', _item_ );
+                              };
+                              api.previewer.bind( 'ready', triggerEventWhenPreviewerReady );
+                              //api.previewer.refresh();
+                        } else {
+                              module.trigger( 'item-removed', _item_ );
+                              module.control.trigger( 'item-removed', _item_ );
+                        }
+
+                  },
+            },//CZRItemConstructor
+      };//Constructor
+
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_img_slider_collection_child : {
+                  mthds : Constructor,
+                  crud : true,//api.czr_sektions.getRegisteredModuleProperty( 'czr_img_slider_collection_child', 'is_crud' ),
+                  hasPreItem : false,//a crud module has a pre item by default
+                  refresh_on_add_item : false,// the preview is refreshed on item add
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_img_slider_collection_child', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_img_slider_collection_child' )
+            },
+      });
+})( wp.customize , jQuery, _ );
+
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  SLIDER OPTIONS
+/* ------------------------------------------------------------------------- */
+( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  //console.log('INITIALIZING FP MODULE', id, options );
+                  var module = this;
+
+
+                  module.crudModulePart = 'nimble-crud-module-part';
+                  module.rudItemPart = 'nimble-rud-item-part';
+
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
+
+                  // module.isReady.then( function() {
+                  //       if ( _.isUndefined( module.preItem ) )
+                  //         return;
+                  //       //specific update for the item preModel on social-icon change
+                  //       module.preItem.bind( function( to, from ) {
+                  //             if ( ! _.has(to, 'icon') )
+                  //               return;
+                  //             if ( _.isEqual( to['icon'], from['icon'] ) )
+                  //               return;
+                  //             module.updateItemModel( module.preItem, true );
+                  //       });
+                  // });
+
+
+                  // run the parent initialize
+                  // Note : must be always invoked always after the input / item class extension
+                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+            },//initialize
+
+            CZRItemConstructor : {
+                  //overrides the parent ready
+                  ready : function() {
+                        var item = this;
+                        //wait for the input collection to be populated,
+                        //and then set the input visibility dependencies
+                        item.inputCollection.bind( function( col ) {
+                              if( _.isEmpty( col ) )
+                                return;
+                              try { item.setInputVisibilityDeps(); } catch( er ) {
+                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                              }
+                        });//item.inputCollection.bind()
+
+                        api.CZRItem.prototype.ready.call( item );
+                  },
+
+                  //Fired when the input collection is populated
+                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                  setInputVisibilityDeps : function() {
+                        var item = this,
+                            module = item.module;
+
+                        //Internal item dependencies
+                        item.czr_Input.each( function( input ) {
+                              switch( input.id ) {
+                                    case 'height-type' :
+                                          _.each( [ 'custom-height' ] , function(_inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return 'custom' === input();
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'autoplay' :
+                                          _.each( [ 'autoplay_delay' ] , function(_inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return api.CZR_Helpers.isChecked( input() );
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                              }
+                        });
+                  },
+            },//CZRItemConstructor
+      };//Constructor
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_img_slider_opts_child : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_img_slider_opts_child', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_img_slider_opts_child' )
+            }
+      });
+})( wp.customize , jQuery, _ );
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  SLIDER DESIGN OPTIONS
+/* ------------------------------------------------------------------------- */
+( function ( api, $, _ ) {
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_img_slider_fonts_child : {
+                  //mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_img_slider_fonts_child', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_img_slider_fonts_child' )
             }
       });
 })( wp.customize , jQuery, _ );
