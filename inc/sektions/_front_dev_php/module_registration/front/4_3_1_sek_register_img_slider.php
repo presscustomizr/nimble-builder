@@ -12,7 +12,6 @@ function sek_get_module_params_for_czr_img_slider_module() {
         'children' => array(
             'img_collection' => 'czr_img_slider_collection_child',
             'slider_options' => 'czr_img_slider_opts_child'
-            //'font_options' => 'czr_img_slider_fonts_child'
         ),
         'name' => __('Image Carousel', 'text_doma'),
         // 'starting_value' => array(
@@ -76,38 +75,38 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
                                 'title'       => __('Title', 'text_domain_to_be_replaced'),
                                 'notice_after' => sprintf( __('This is the text displayed on mouse over. You can use the following template tags referring to the image attributes : %1$s', 'text_domain_to_be_replaced'), '&#123;&#123;title&#125;&#125;, &#123;&#123;caption&#125;&#125;, &#123;&#123;description&#125;&#125;' )
                             ),
-                            'link-to' => array(
-                                'input_type'  => 'simpleselect',
-                                'title'       => __('Schedule an action on click or tap', 'text_doma'),
-                                'default'     => 'no-link',
-                                'choices'     => array(
-                                    'no-link' => __('No click action', 'text_doma' ),
-                                    'url' => __('Link to site content or custom url', 'text_doma' ),
-                                    'img-file' => __('Link to image file', 'text_doma' ),
-                                    'img-page' =>__('Link to image page', 'text_doma' )
-                                ),
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                                'html_before' => '<hr/><h3>' . __('ACTION ON CLICK') .'</h3>',
-                                'notice_after' => __('Note that some click actions are disabled during customization.', 'text_doma' ),
-                            ),
-                            'link-pick-url' => array(
-                                'input_type'  => 'content_picker',
-                                'title'       => __('Link url', 'text_doma'),
-                                'default'     => array()
-                            ),
-                            'link-custom-url' => array(
-                                'input_type'  => 'text',
-                                'title'       => __('Custom link url', 'text_doma'),
-                                'default'     => ''
-                            ),
-                            'link-target' => array(
-                                'input_type'  => 'nimblecheck',
-                                'title'       => __('Open link in a new browser tab', 'text_doma'),
-                                'default'     => false,
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20',
-                            )
+                            // 'link-to' => array(
+                            //     'input_type'  => 'simpleselect',
+                            //     'title'       => __('Schedule an action on click or tap', 'text_doma'),
+                            //     'default'     => 'no-link',
+                            //     'choices'     => array(
+                            //         'no-link' => __('No click action', 'text_doma' ),
+                            //         'url' => __('Link to site content or custom url', 'text_doma' ),
+                            //         'img-file' => __('Link to image file', 'text_doma' ),
+                            //         'img-page' =>__('Link to image page', 'text_doma' )
+                            //     ),
+                            //     'title_width' => 'width-100',
+                            //     'width-100'   => true,
+                            //     'html_before' => '<hr/><h3>' . __('ACTION ON CLICK') .'</h3>',
+                            //     'notice_after' => __('Note that some click actions are disabled during customization.', 'text_doma' ),
+                            // ),
+                            // 'link-pick-url' => array(
+                            //     'input_type'  => 'content_picker',
+                            //     'title'       => __('Link url', 'text_doma'),
+                            //     'default'     => array()
+                            // ),
+                            // 'link-custom-url' => array(
+                            //     'input_type'  => 'text',
+                            //     'title'       => __('Custom link url', 'text_doma'),
+                            //     'default'     => ''
+                            // ),
+                            // 'link-target' => array(
+                            //     'input_type'  => 'nimblecheck',
+                            //     'title'       => __('Open link in a new browser tab', 'text_doma'),
+                            //     'default'     => false,
+                            //     'title_width' => 'width-80',
+                            //     'input_width' => 'width-20',
+                            // )
                         )
                     ),
                     array(
@@ -288,122 +287,143 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
         //'css_selectors' => array( '.sek-social-icons-wrapper' ),//array( '.sek-icon i' ),
         'tmpl' => array(
             'item-inputs' => array(
-                'image-layout' => array(
-                    'input_type'  => 'simpleselect',
-                    'title'       => __('Image layout', 'text_doma'),
-                    'default'     => 'nimble-wizard',
-                    'choices'     => array(
-                        'nimble-wizard' => __('Nimble wizard', 'text_doma' ),
-                        'width-100' => __('Adapt images to carousel\'s width', 'text_doma' ),
-                        'height-100' => __('Adapt images to carousel\'s height', 'text_doma' ),
+                'tabs' => array(
+                    array(
+                        'title' => __( 'General', 'text_doma' ),
+                        'inputs' => array(
+                            'image-layout' => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __('Image layout', 'text_doma'),
+                                'default'     => 'nimble-wizard',
+                                'choices'     => array(
+                                    'nimble-wizard' => __('Nimble wizard', 'text_doma' ),
+                                    'width-100' => __('Adapt images to carousel\'s width', 'text_doma' ),
+                                    'height-100' => __('Adapt images to carousel\'s height', 'text_doma' ),
+                                ),
+                                'title_width' => 'width-100',
+                                'width-100'   => true,
+                                'notice_before' => __('Nimble wizard ensures that the images fill all available space of the carousel in any devices, without blank spaces on the edges, and without stretching the images.', 'text_doma' ),
+                            ),
+                            'autoplay' => array(
+                                'input_type'  => 'nimblecheck',
+                                'title'       => __('Autoplay', 'text_doma'),
+                                'default'     => true,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20',
+                                'notice_after' => __('Note that the autoplay is disabled during customization.', 'text_doma' ),
+                            ),
+                            'autoplay_delay' => array(
+                                'input_type'  => 'range_simple',
+                                'title'       => __( 'Delay between each slide in milliseconds (ms)', 'text_doma' ),
+                                'min' => 1,
+                                'max' => 10000,
+                                'unit' => '',
+                                'default' => 3000,
+                                'width-100'   => true,
+                                'title_width' => 'width-100'
+                            ),
+                            'infinite_loop' => array(
+                                'input_type'  => 'nimblecheck',
+                                'title'       => __('Infinite loop', 'text_doma'),
+                                'default'     => true,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20'
+                            ),
+                            'pause_on_hover' => array(
+                                'input_type'  => 'nimblecheck',
+                                'title'       => __('Pause autoplay on mouse over', 'text_doma'),
+                                'default'     => true,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20'
+                            )
+                        )//inputs
                     ),
-                    'title_width' => 'width-100',
-                    'width-100'   => true,
-                    'notice_before' => __('Nimble wizard ensures that the images fill all available space of the carousel in any devices, without blank spaces on the edges, and without stretching the images.', 'text_doma' ),
-                ),
-                'autoplay' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Autoplay', 'text_doma'),
-                    'default'     => true,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                    'notice_after' => __('Note that the autoplay is disabled during customization.', 'text_doma' ),
-                ),
-                'autoplay_delay' => array(
-                    'input_type'  => 'range_simple',
-                    'title'       => __( 'Delay between each slide in milliseconds (ms)', 'text_doma' ),
-                    'min' => 1,
-                    'max' => 10000,
-                    'unit' => '',
-                    'default' => 3000,
-                    'width-100'   => true,
-                    'title_width' => 'width-100'
-                ),
-                'infinite_loop' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Infinite loop', 'text_doma'),
-                    'default'     => true,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20'
-                ),
-                'pause_on_hover' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Pause autoplay on mouse over', 'text_doma'),
-                    'default'     => true,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20'
-                ),
-                'height-type' => array(
-                    'input_type'  => 'simpleselect',
-                    'title'       => __('Height : auto or custom', 'text_doma'),
-                    'default'     => 'custom',
-                    'choices'     => sek_get_select_options_for_input_id( 'height-type' ),// auto, custom
-                    'refresh_markup'     => false,
-                    'refresh_stylesheet' => true,
-                    'html_before' => '<hr/><h3>' . __('SLIDER HEIGHT') .'</h3>'
-                ),
-                'custom-height' => array(
-                    'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Custom height', 'text_doma'),
-                    'min' => 0,
-                    'max' => 500,
-                    'default'     => array( 'desktop' => '350px', 'mobile' => '200px' ),
-                    'width-100'   => true,
-                    'title_width' => 'width-100',
-                    'refresh_markup'     => false,
-                    'refresh_stylesheet' => true,
-                ),
-                'nav_type' => array(
-                    'input_type'  => 'simpleselect',
-                    'title_width' => 'width-100',
-                    'width-100'   => true,
-                    'default' => 'arrows_dots',
-                    'choices'     => array(
-                        'arrows_dots' => __('Arrows and dots', 'text_doma'),
-                        'arrows' => __('Arrows', 'text_doma'),
-                        'dots' => __('Dots', 'text_doma'),
-                        'none' => __('None', 'text_doma')
+                    array(
+                        'title' => __( 'Height', 'text_doma' ),
+                        'inputs' => array(
+                            'height-type' => array(
+                                'input_type'  => 'simpleselect',
+                                'title'       => __('Height : auto or custom', 'text_doma'),
+                                'default'     => 'custom',
+                                'choices'     => sek_get_select_options_for_input_id( 'height-type' ),// auto, custom
+                                'refresh_markup'     => false,
+                                'refresh_stylesheet' => true,
+                                'html_before' => '<hr/><h3>' . __('SLIDER HEIGHT') .'</h3>'
+                            ),
+                            'custom-height' => array(
+                                'input_type'  => 'range_with_unit_picker_device_switcher',
+                                'title'       => __('Custom height', 'text_doma'),
+                                'min' => 0,
+                                'max' => 500,
+                                'default'     => array( 'desktop' => '350px', 'mobile' => '200px' ),
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'refresh_markup'     => false,
+                                'refresh_stylesheet' => true,
+                            )
+                        )
                     ),
-                    'html_before' => '<hr/><h3>' . __('NAVIGATION') .'</h3>'
-                ),
-                'arrows_size'  => array(
-                    'input_type'  => 'range_simple_device_switcher',
-                    'title'       => __( 'Size of the arrows', 'text_doma' ),
-                    'default'     => array( 'desktop' => '16'),
-                    'min'         => 1,
-                    'max'         => 50,
-                    'step'        => 1,
-                    'width-100'   => true,
-                    'title_width' => 'width-100'
-                ),//null,
-                'arrows_color_css' => array(
-                    'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Arrows color', 'text_doma'),
-                    'width-100'   => true,
-                    'default'    => '#707070',
-                    'refresh_markup' => false,
-                    'refresh_stylesheet' => true,
-                    'css_identifier' => 'color'
-                ),
-                'dots_size'  => array(
-                    'input_type'  => 'range_simple_device_switcher',
-                    'title'       => __( 'Size of the dots', 'text_doma' ),
-                    'default'     => array( 'desktop' => '16'),
-                    'min'         => 1,
-                    'max'         => 50,
-                    'step'        => 1,
-                    'width-100'   => true,
-                    'title_width' => 'width-100'
-                ),//null,
-                'dots_color_css' => array(
-                    'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Dots color', 'text_doma'),
-                    'width-100'   => true,
-                    'default'    => '#707070',
-                    'refresh_markup' => false,
-                    'refresh_stylesheet' => true,
-                    'css_identifier' => 'color'
-                ),
+                    array(
+                        'title' => __( 'Navigation', 'text_doma' ),
+                        'inputs' => array(
+                            'nav_type' => array(
+                                'input_type'  => 'simpleselect',
+                                'title_width' => 'width-100',
+                                'width-100'   => true,
+                                'default' => 'arrows_dots',
+                                'choices'     => array(
+                                    'arrows_dots' => __('Arrows and dots', 'text_doma'),
+                                    'arrows' => __('Arrows', 'text_doma'),
+                                    'dots' => __('Dots', 'text_doma'),
+                                    'none' => __('None', 'text_doma')
+                                ),
+                                'html_before' => '<hr/><h3>' . __('NAVIGATION') .'</h3>'
+                            ),
+                            // 'arrows_size'  => array(
+                            //     'input_type'  => 'range_simple_device_switcher',
+                            //     'title'       => __( 'Size of the arrows', 'text_doma' ),
+                            //     'default'     => array( 'desktop' => '18'),
+                            //     'min'         => 1,
+                            //     'max'         => 50,
+                            //     'step'        => 1,
+                            //     'width-100'   => true,
+                            //     'title_width' => 'width-100'
+                            // ),//null,
+                            'arrows_color_css' => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __('Color ot the navigation arrows', 'text_doma'),
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'default'    => '#ffffff',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => array('.sek-swiper-nav .sek-swiper-arrows')
+                            ),
+                            // 'dots_size'  => array(
+                            //     'input_type'  => 'range_simple_device_switcher',
+                            //     'title'       => __( 'Size of the dots', 'text_doma' ),
+                            //     'default'     => array( 'desktop' => '16'),
+                            //     'min'         => 1,
+                            //     'max'         => 50,
+                            //     'step'        => 1,
+                            //     'width-100'   => true,
+                            //     'title_width' => 'width-100'
+                            // ),//null,
+                            'dots_color_css' => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __('Color of the active pagination bullet', 'text_doma'),
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'default'    => '#ffffff',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'background_color',
+                                'css_selectors' => array('.swiper-pagination-bullet-active')
+                            ),
+                        )//inputs
+                    )
+                )//tabs
             )
         ),
         'render_tmpl_path' => '',

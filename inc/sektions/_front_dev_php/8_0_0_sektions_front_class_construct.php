@@ -222,8 +222,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
           'czr_img_slider_module' => array(
             'czr_img_slider_module',
             'czr_img_slider_collection_child',
-            'czr_img_slider_opts_child',
-            'czr_img_slider_fonts_child'
+            'czr_img_slider_opts_child'
           ),
         ];
 

@@ -78,51 +78,65 @@ if ( ! function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
 
 
 if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
-  function sek_print_img_slider( $img_collection, $slider_options, $model ) {
+  function sek_print_img_slider( $img_collection = array(), $slider_options, $model ) {
+      $img_collection = is_array( $img_collection ) ? $img_collection : array();
+      $is_multislide = count( $img_collection ) > 1;
       $autoplay = ( ! skp_is_customizing() && true === sek_booleanize_checkbox_val( $slider_options['autoplay'] ) ) ? "true" : "false";
       // don't authorize value < 300 ms
       $autoplay_delay = intval( $slider_options['autoplay_delay'] ) < 300 ? 1000 : intval( $slider_options['autoplay_delay'] );
       $pause_on_hover = true === sek_booleanize_checkbox_val( $slider_options['pause_on_hover'] ) ? "true" : "false";;
       $loop_on = true === sek_booleanize_checkbox_val( $slider_options['infinite_loop'] ) ? "true" : "false";
+      $nav_type = ( is_string( $slider_options['nav_type'] ) && !empty( $slider_options['nav_type'] ) ) ? $slider_options['nav_type'] : 'arrows_dots';
       ?>
-        <?php printf('<div class="swiper-container sek-swiper%1$s" data-sek-swiper-id="%1$s" data-sek-autoplay="%2$s" data-sek-autoplay-delay="%3$s" data-sek-pause-on-hover="%4$s" data-sek-loop="%5$s" data-sek-image-layout="%6$s">',
+        <?php printf('<div class="swiper-container sek-swiper%1$s" data-sek-swiper-id="%1$s" data-sek-autoplay="%2$s" data-sek-autoplay-delay="%3$s" data-sek-pause-on-hover="%4$s" data-sek-loop="%5$s" data-sek-image-layout="%6$s" data-sek-navtype="%7$s" data-sek-is-multislide="%8$s">',
             $model['id'],
             $autoplay,
             $autoplay_delay,
             $pause_on_hover,
             $loop_on,
-            $slider_options['image-layout']
+            $slider_options['image-layout'],
+            $nav_type,
+            $is_multislide ? 'true' : 'false'
           ); ?>
-          <div class="swiper-wrapper">
-          <?php
-          //sek_error_log('slider_collection???', $img_collection );
-          foreach( $img_collection as $item ) {
-              $is_text_enabled = true === sek_booleanize_checkbox_val( $item['enable_text'] );
-              $text_content = $is_text_enabled ? $item['text_content'] : '';
-              $has_text_content = ! empty( $text_content );
-              $text_html = sprintf('<div class="sek-slider-text-wrapper"><div class="sek-slider-text-content">%1$s</div></div>', $text_content );
-              if ( ! skp_is_customizing() ) {
-                  $text_html = !$has_text_content ? '' : $text_html;
-              }
+          <?php if ( is_array( $img_collection ) && count( $img_collection ) > 0 ) : ?>
+            <div class="swiper-wrapper">
+              <?php
+              foreach( $img_collection as $item ) {
+                  $is_text_enabled = true === sek_booleanize_checkbox_val( $item['enable_text'] );
+                  $text_content = $is_text_enabled ? $item['text_content'] : '';
+                  $has_text_content = ! empty( $text_content );
+                  $text_html = sprintf('<div class="sek-slider-text-wrapper"><div class="sek-slider-text-content">%1$s</div></div>', $text_content );
+                  if ( ! skp_is_customizing() ) {
+                      $text_html = !$has_text_content ? '' : $text_html;
+                  }
 
-              $has_overlay = true === sek_booleanize_checkbox_val( $item['apply-overlay'] );
+                  $has_overlay = true === sek_booleanize_checkbox_val( $item['apply-overlay'] );
 
-              // Put them together
-              printf( '<div class="swiper-slide" title="%1$s" data-sek-item-id="%4$s" data-sek-has-overlay="%5$s"><figure class="sek-carousel-img">%2$s</figure>%3$s</div>',
-                  sek_slider_parse_template_tags( esc_html( esc_attr( $item['title_attr'] ) ), $item ),
-                  sek_get_img_slider_module_img_html( $item ),
-                  sek_slider_parse_template_tags( $text_html, $item ),
-                  $item['id'],
-                  true === sek_booleanize_checkbox_val( $has_overlay ) ? 'true' : 'false'
-              );
+                  // Put them together
+                  printf( '<div class="swiper-slide" title="%1$s" data-sek-item-id="%4$s" data-sek-has-overlay="%5$s"><figure class="sek-carousel-img">%2$s</figure>%3$s</div>',
+                      sek_slider_parse_template_tags( esc_html( esc_attr( $item['title_attr'] ) ), $item ),
+                      sek_get_img_slider_module_img_html( $item ),
+                      sek_slider_parse_template_tags( $text_html, $item ),
+                      $item['id'],
+                      true === sek_booleanize_checkbox_val( $has_overlay ) ? 'true' : 'false'
+                  );
 
-          }//foreach
-          ?>
-          </div><!-- swiper-container -->
-        </div><!-- swiper-wrapper -->
-        <!-- Add Arrows -->
-        <div class="swiper-button-next swiper-button-next<?php echo $model['id']; ?>"></div>
-        <div class="swiper-button-prev swiper-button-prev<?php echo $model['id']; ?>"></div>
+              }//foreach
+              ?>
+            </div><?php //.swiper-wrapper ?>
+          <?php endif; ?>
+          <?php if ( in_array($nav_type,array('arrows_dots', 'dots') ) && $is_multislide ) : ?>
+            <div class="swiper-pagination swiper-pagination<?php echo $model['id']; ?>"></div>
+          <?php endif; ?>
+
+          <?php if ( in_array($nav_type,array('arrows_dots', 'arrows') ) && $is_multislide ) : ?>
+            <div class="sek-swiper-nav">
+              <span class="sek-swiper-arrows sek-swiper-prev sek-swiper-prev<?php echo $model['id']; ?> control-left icn-left-open-big" title="<?php _e('previous', 'textdom'); ?>"><i class="fas fa-chevron-left"></i></span>
+              <span class="sek-swiper-arrows sek-swiper-next sek-swiper-next<?php echo $model['id']; ?> control-right icn-right-open-big" title="<?php _e('next', 'textdom'); ?>"><i class="fas fa-chevron-right"></i></span>
+            </div>
+          <?php endif; ?>
+        </div><?php //.swiper-container ?>
+
       <?php
   }
 }

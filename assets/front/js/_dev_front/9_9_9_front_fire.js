@@ -534,8 +534,15 @@ jQuery( function($){
 });
 
 
+
+
+
+
+
+
+
 /* ------------------------------------------------------------------------- *
- *  SWIPER
+ *  SWIPER CAROUSEL
 /* ------------------------------------------------------------------------- */
 jQuery( function($){
     var mySwipers = [];
@@ -557,30 +564,19 @@ jQuery( function($){
     // so that if we have several instance on the same page, they are totally independant.
     // If we don't use a unique Id for swiper + navigation buttons, a click on a button, make all slider move synchronously.
     var doSingleSwiperInstantiation = function() {
-          console.log('MY SWIPER ??', mySwipers );
           var $swiperWrapper = $(this), swiperClass = 'sek-swiper' + $swiperWrapper.data('sek-swiper-id');
-          console.log('swiperClass ??', swiperClass );
           var swiperParams = {
+              // slidesPerView: 3,
               // spaceBetween: 30,
-              // effect: 'fade',
-              // pagination: {
-              //   el: '.swiper-pagination',
-              //   clickable: true,
-              // },
-              loop : true === $swiperWrapper.data('sek-loop'),//Set to true to enable continuous loop mode
-              navigation: {
-                nextEl: '.swiper-button-next' + $swiperWrapper.data('sek-swiper-id'),
-                prevEl: '.swiper-button-prev' + $swiperWrapper.data('sek-swiper-id')
-              },
+              loop : true === $swiperWrapper.data('sek-loop') && true === $swiperWrapper.data('sek-is-multislide'),//Set to true to enable continuous loop mode
+              grabCursor : true === $swiperWrapper.data('sek-is-multislide'),
               on : {
                 init : function() {
-                    console.log('DO ON INIT');
+                    // center images with Nimble wizard when needed
                     if ( 'nimble-wizard' === $swiperWrapper.data('sek-image-layout') ) {
                         $swiperWrapper.find('.sek-carousel-img').each( function() {
                             var $_imgsToSimpleLoad = $(this).nimbleCenterImages({
                                   enableCentering : 1,
-                                  enableGoldenRatio : false,
-                                  disableGRUnder : 0,//<= don't disable golden ratio when responsive,
                                   zeroTopAdjust: 0,
                                   setOpacityWhenCentered : false,//will set the opacity to 1
                                   oncustom : [ 'simple_load', 'smartload', 'sek-nimble-refreshed' ]
@@ -594,12 +590,13 @@ jQuery( function($){
                             _utils_.delay( function() {
                                 triggerSimpleLoad( $_imgsToSimpleLoad );
                             }, 10 );
-
                         });//each()
                     }
                 }
-              }
+              }//on
           };
+
+          // AUTOPLAY
           if ( true === $swiperWrapper.data('sek-autoplay') ) {
               $.extend( swiperParams, {
                   autoplay : {
@@ -614,7 +611,27 @@ jQuery( function($){
                   }
               });
           }
-          console.log('swiperParams ??',$swiperWrapper.data('sek-autoplay'), swiperParams );
+
+          // NAVIGATION ARROWS && PAGINATION DOTS
+          if ( true === $swiperWrapper.data('sek-is-multislide') ) {
+              if ( _utils_.contains( ['arrows_dots', 'arrows'], $swiperWrapper.data('sek-navtype') ) ) {
+                  $.extend( swiperParams, {
+                      navigation: {
+                        nextEl: '.sek-swiper-next' + $swiperWrapper.data('sek-swiper-id'),
+                        prevEl: '.sek-swiper-prev' + $swiperWrapper.data('sek-swiper-id')
+                      }
+                  });
+              }
+              if ( _utils_.contains( ['arrows_dots', 'dots'], $swiperWrapper.data('sek-navtype') ) ) {
+                  $.extend( swiperParams, {
+                      pagination: {
+                        el: '.swiper-pagination' + $swiperWrapper.data('sek-swiper-id'),
+                        clickable: true,
+                      }
+                  });
+              }
+          }
+
           mySwipers.push( new Swiper(
               '.' + swiperClass,//$(this)[0],
               swiperParams
@@ -660,6 +677,14 @@ jQuery( function($){
     });
 
 
+    // Action on click
+    $( 'body').on( 'click', '[data-sek-module-type="czr_img_slider_module"]', function(evt ) {
+            console.log('on click ??', evt );
+            // $(this).find('[data-sek-swiper-id]').each( function() {
+            //       $(this).trigger('sek-nimble-refreshed');
+            // });
+          }
+    );
 
 
     // Behaviour on mouse hover
@@ -716,9 +741,10 @@ jQuery( function($){
 
 
 /* ===================================================
- * jqueryCenterImages.js v1.0.0
+ * jquerynimbleCenterImages.js v1.0.0
+ * ( inspired by Customizr theme jQuery plugin )
  * ===================================================
- * (c) 2015 Nicolas Guillaume, Nice, France
+ * (c) 2019 Nicolas Guillaume, Nice, France
  * CenterImages plugin may be freely distributed under the terms of the GNU GPL v2.0 or later license.
  *
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -741,11 +767,6 @@ jQuery( function($){
                 zeroLeftAdjust : 0,
                 topAdjust : 0,
                 zeroTopAdjust : -2,//<= top ajustement for h-centered
-                enableGoldenRatio : false,
-                goldenRatioLimitHeightTo : 350,
-                goldenRatioVal : 1.618,
-                skipGoldenRatioClasses : ['no-gold-ratio'],
-                disableGRUnder : 767,//in pixels
                 useImgAttr:false,//uses the img height and width attributes if not visible (typically used for the customizr slider hidden images)
                 setOpacityWhenCentered : false,//this can be used to hide the image during the time it is centered
                 addCenteredClassWithDelay : 0,//<= a small delay can be required when we rely on the v-centered or h-centered css classes to set the opacity for example
@@ -768,23 +789,9 @@ jQuery( function($){
             var self = this,
                 _do = function( _event_ ) {
                     _event_ = _event_ || 'init';
-                    //applies golden ratio to all containers ( even if there are no images in container )
-                    self._maybe_apply_golden_r();
 
                     //parses imgs ( if any ) in current container
                     var $_imgs = $( self.options.imgSel , self.container );
-
-                    //WINDOW RESIZE EVENT ACTIONS
-                    //GOLDEN RATIO (before image centering)
-                    //creates a golden ratio fn on resize
-                    if ( self.options.enableGoldenRatio ) {
-                          $(window).bind(
-                                'resize',
-                                {},
-                                _utils_.debounce( function( evt ) { self._maybe_apply_golden_r( evt ); }, 200 )
-                          );
-                    }
-
 
                     //if no images or centering is not active, only handle the golden ratio on resize event
                     if ( 1 <= $_imgs.length && self.options.enableCentering ) {
@@ -809,43 +816,6 @@ jQuery( function($){
                         });
                   } );
             }
-      };
-
-
-      //@return void
-      Plugin.prototype._maybe_apply_golden_r = function() {
-            //check if options are valids
-            if ( ! this.options.enableGoldenRatio || ! this.options.goldenRatioVal || 0 === this.options.goldenRatioVal )
-              return;
-
-            //make sure the container has not a forbidden class
-            if ( ! this._is_selector_allowed() )
-              return;
-            //check if golden ratio can be applied under custom window width
-            if ( ! this._is_window_width_allowed() ) {
-                  //reset inline style for the container
-                  $(this.container).attr('style' , '');
-                  return;
-            }
-
-            var new_height = Math.round( $(this.container).width() / this.options.goldenRatioVal );
-            //check if the new height does not exceed the goldenRatioLimitHeightTo option
-            new_height = new_height > this.options.goldenRatioLimitHeightTo ? this.options.goldenRatioLimitHeightTo : new_height;
-            $(this.container)
-                  .css({
-                        'line-height' : new_height + 'px',
-                        height : new_height + 'px'
-                  })
-                  .trigger('golden-ratio-applied');
-      };
-
-
-      /*
-      * @params string : ids or classes
-      * @return boolean
-      */
-      Plugin.prototype._is_window_width_allowed = function() {
-            return $(window).width() > this.options.disableGRUnder - 15;
       };
 
 
@@ -985,12 +955,8 @@ jQuery( function($){
             if ( ! $(this.container).attr( 'class' ) )
               return true;
 
-            //check if option is well formed
-            if ( ! this.options.skipGoldenRatioClasses || ! $.isArray( this.options.skipGoldenRatioClasses )  )
-              return true;
-
             var _elSels       = $(this.container).attr( 'class' ).split(' '),
-                _selsToSkip   = this.options.skipGoldenRatioClasses,
+                _selsToSkip   = [],
                 _filtered     = _elSels.filter( function(classe) { return -1 != $.inArray( classe , _selsToSkip ) ;});
 
             //check if the filtered selectors array with the non authorized selectors is empty or not
