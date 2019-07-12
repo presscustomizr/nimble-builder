@@ -21,6 +21,15 @@
                         template_name = 'simpleselect';
                   break;
 
+                  case 'simpleselectWithDeviceSwitcher':
+                        template_name = 'simpleselect_deviceswitcher';
+                  break;
+
+                  case 'multiselect':
+                  case 'category_picker':
+                        template_name = 'multiselect';
+                  break;
+
                   case 'h_alignment' :
                   case 'horizAlignmentWithDeviceSwitcher' :
                         template_name = 'h_alignment';
@@ -56,11 +65,6 @@
                   case 'bg_position' :
                   case 'bgPositionWithDeviceSwitcher' :
                         template_name = 'bg_position';
-                  break;
-
-                  case 'multiselect':
-                  case 'category_picker':
-                        template_name = 'multiselect';
                   break;
 
                   case 'verticalAlignWithDeviceSwitcher' :

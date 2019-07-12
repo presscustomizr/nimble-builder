@@ -280,7 +280,15 @@ function sek_print_nimble_input_templates() {
         <select data-czrtype="{{data.input_id}}"></select>
       </script>
 
-
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  SIMPLE SELECT WITH DEVICE SWITCHER
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___simpleselect_deviceswitcher">
+        <input data-czrtype="{{data.input_id}}" type="hidden"/>
+        <select></select>
+      </script>
 
 
       <?php
