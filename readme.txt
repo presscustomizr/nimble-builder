@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.2
-Stable tag: 1.8.9-alpha
+Stable tag: 1.8.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -52,6 +52,7 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * Button
 * Icon
 * Post Grid
+* Image Carousel
 * [Contact Form](https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page)
 * [Google Map](https://docs.presscustomizr.com/article/387-how-to-insert-google-maps-in-your-wordpress-pages-with-the-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page)
 * Menu
@@ -109,10 +110,14 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.8.8 =
-This releases fixes a regression introduced in version 1.8.7, leading to a stylesheet not loaded on page refresh.
+= 1.8.9 =
+This releases introduces a new Image Carousel module.
 
 == Changelog ==
+= 1.8.9 : July 12th 2019 =
+* fixed : wrong initial unit for font-size and line-height inputs.
+* added : a new Image Carousel module
+
 = 1.8.8 : July 6th 2019 =
 * fixed : Nimble dyn stylesheet gets removed on refresh
 * fixed : don't print nimble-global-breakpoint-options style if no global breakpoint set

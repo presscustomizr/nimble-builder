@@ -1682,9 +1682,27 @@ function sek_get_module_collection() {
         ),
         array(
           'content-type' => 'module',
+          'content-id' => 'czr_img_slider_module',
+          'title' => __( 'Image Carousel', 'text_doma' ),
+          'icon' => 'Nimble_slideshow_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_simple_html_module',
+          'title' => __( 'Html Content', 'text_doma' ),
+          'icon' => 'Nimble_html_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
           'content-id' => 'czr_post_grid_module',
           'title' => __( 'Post Grid', 'text_doma' ),
           'icon' => 'Nimble_posts-list_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_map_module',
+          'title' => __( 'Map', 'text_doma' ),
+          'icon' => 'Nimble_map_icon.svg'
         ),
         array(
           'content-type' => 'preset_section',
@@ -1703,24 +1721,6 @@ function sek_get_module_collection() {
           'content-id' => 'four_columns',
           'title' => __( 'Four Columns', 'text_doma' ),
           'icon' => 'Nimble_4-columns_icon.svg'
-        ),
-        array(
-          'content-type' => 'module',
-          'content-id' => 'czr_simple_html_module',
-          'title' => __( 'Html Content', 'text_doma' ),
-          'icon' => 'Nimble_html_icon.svg'
-        ),
-        array(
-          'content-type' => 'module',
-          'content-id' => 'czr_img_slider_module',
-          'title' => __( 'Image carousel', 'text_doma' ),
-          'icon' => 'Nimble_slideshow_icon.svg'
-        ),
-        array(
-          'content-type' => 'module',
-          'content-id' => 'czr_map_module',
-          'title' => __( 'Map', 'text_doma' ),
-          'icon' => 'Nimble_map_icon.svg'
         ),
         array(
           'content-type' => 'module',
@@ -11765,7 +11765,7 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
         'dynamic_registration' => true,
         'module_type' => 'czr_img_slider_collection_child',
         'is_crud' => true,
-        'name' => __( 'Slides collection', 'text_doma' ),
+        'name' => __( 'Slide collection', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' => array( '.sek-social-icon' ),//array( '.sek-icon i' ),
         'tmpl' => array(
@@ -12076,7 +12076,7 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                                 'title'       => __('Custom height', 'text_doma'),
                                 'min' => 0,
                                 'max' => 500,
-                                'default'     => array( 'desktop' => '350px', 'mobile' => '200px' ),
+                                'default'     => array( 'desktop' => '400px', 'mobile' => '200px' ),
                                 'width-100'   => true,
                                 'title_width' => 'width-100',
                                 'refresh_markup'     => false,
@@ -12093,12 +12093,19 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                                 'width-100'   => true,
                                 'default' => 'arrows_dots',
                                 'choices'     => array(
-                                    'arrows_dots' => __('Arrows and dots', 'text_doma'),
-                                    'arrows' => __('Arrows', 'text_doma'),
-                                    'dots' => __('Dots', 'text_doma'),
+                                    'arrows_dots' => __('Arrows and bullets', 'text_doma'),
+                                    'arrows' => __('Arrows only', 'text_doma'),
+                                    'dots' => __('Bullets only', 'text_doma'),
                                     'none' => __('None', 'text_doma')
                                 ),
                                 'html_before' => '<hr/><h3>' . __('NAVIGATION') .'</h3>'
+                            ),
+                            'hide_nav_on_mobiles' => array(
+                                'input_type'  => 'nimblecheck',
+                                'title'       => __('Hide arrows and bullets on mobiles', 'text_doma'),
+                                'default'     => false,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20'
                             ),
                             // 'arrows_size'  => array(
                             //     'input_type'  => 'range_simple_device_switcher',
@@ -12186,8 +12193,6 @@ add_filter( 'sek_add_css_rules_for_single_item_in_module_type___czr_img_slider_c
 
 // )
 function sek_add_css_rules_for_items_in_czr_img_slider_collection_child( $rules, $params ) {
-    //sek_error_log('SLIDER ITEMS PARAMS?', $params );
-
     // $item_input_list = wp_parse_args( $item_input_list, $default_value_model );
     $item_model = isset( $params['input_list'] ) ? $params['input_list'] : array();
 
@@ -12279,26 +12284,30 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
                 sek_error_log( __FUNCTION__ . ' => error => the height option should be an array( {device} => {number}{unit} )', $custom_user_height);
             }
             $custom_user_height = is_array( $custom_user_height ) ? $custom_user_height : array();
-            $custom_user_height = wp_parse_args( $custom_user_height, array(
-                'desktop' => '350px',
+            $defaults = array(
+                'desktop' => '400px',
                 'tablet' => '',
                 'mobile' => '200px'
-            ));
-            $height_value = $custom_user_height;
-            foreach ( $custom_user_height as $device => $num_unit ) {
-                $numeric = sek_extract_numeric_value( $num_unit );
-                if ( ! empty( $numeric ) ) {
-                    $unit = sek_extract_unit( $num_unit );
-                    $unit = '%' === $unit ? 'vh' : $unit;
-                    $height_value[$device] = $numeric . $unit;
-                }
-            }
+            );
+            $custom_user_height = wp_parse_args( $custom_user_height, $defaults );
 
-            $rules = sek_set_mq_css_rules(array(
-                'value' => $height_value,
-                'css_property' => 'height',
-                'selector' => $selector
-            ), $rules );
+            if ( $defaults != $custom_user_height ) {
+                $height_value = $custom_user_height;
+                foreach ( $custom_user_height as $device => $num_unit ) {
+                    $numeric = sek_extract_numeric_value( $num_unit );
+                    if ( ! empty( $numeric ) ) {
+                        $unit = sek_extract_unit( $num_unit );
+                        $unit = '%' === $unit ? 'vh' : $unit;
+                        $height_value[$device] = $numeric . $unit;
+                    }
+                }
+
+                $rules = sek_set_mq_css_rules(array(
+                    'value' => $height_value,
+                    'css_property' => 'height',
+                    'selector' => $selector
+                ), $rules );
+            }
         }// if custom height
         else {
             $rules[] = array(
