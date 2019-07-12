@@ -678,13 +678,12 @@ jQuery( function($){
 
 
     // Action on click
-    $( 'body').on( 'click', '[data-sek-module-type="czr_img_slider_module"]', function(evt ) {
-            console.log('on click ??', evt );
-            // $(this).find('[data-sek-swiper-id]').each( function() {
-            //       $(this).trigger('sek-nimble-refreshed');
-            // });
-          }
-    );
+    // $( 'body').on( 'click', '[data-sek-module-type="czr_img_slider_module"]', function(evt ) {
+    //         // $(this).find('[data-sek-swiper-id]').each( function() {
+    //         //       $(this).trigger('sek-nimble-refreshed');
+    //         // });
+    //       }
+    // );
 
 
     // Behaviour on mouse hover
@@ -804,13 +803,11 @@ jQuery( function($){
                   _do();
             }
 
-            //console.log('$( self.container )', $( self.container ) );
             //bind the container element with custom events if any
             //( the images will also be bound )
             if ( $.isArray( self._customEvt ) ) {
                   self._customEvt.map( function( evt ) {
                         var $_containerToListen = ( self.options.$containerToListen instanceof $ && 1 < self.options.$containerToListen.length ) ? self.options.$containerToListen : $( self.container );
-                        //console.log('container to listen',$_containerToListen, evt  );
                         $_containerToListen.bind( evt, {} , function() {
                               _do( evt );
                         });

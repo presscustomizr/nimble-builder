@@ -87,8 +87,9 @@ if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
       $pause_on_hover = true === sek_booleanize_checkbox_val( $slider_options['pause_on_hover'] ) ? "true" : "false";;
       $loop_on = true === sek_booleanize_checkbox_val( $slider_options['infinite_loop'] ) ? "true" : "false";
       $nav_type = ( is_string( $slider_options['nav_type'] ) && !empty( $slider_options['nav_type'] ) ) ? $slider_options['nav_type'] : 'arrows_dots';
+      $hide_nav_on_mobiles = true === sek_booleanize_checkbox_val( $slider_options['hide_nav_on_mobiles'] );
       ?>
-        <?php printf('<div class="swiper-container sek-swiper%1$s" data-sek-swiper-id="%1$s" data-sek-autoplay="%2$s" data-sek-autoplay-delay="%3$s" data-sek-pause-on-hover="%4$s" data-sek-loop="%5$s" data-sek-image-layout="%6$s" data-sek-navtype="%7$s" data-sek-is-multislide="%8$s">',
+        <?php printf('<div class="swiper-container sek-swiper%1$s" data-sek-swiper-id="%1$s" data-sek-autoplay="%2$s" data-sek-autoplay-delay="%3$s" data-sek-pause-on-hover="%4$s" data-sek-loop="%5$s" data-sek-image-layout="%6$s" data-sek-navtype="%7$s" data-sek-is-multislide="%8$s" data-sek-hide-nav-on-mobile="%9$s">',
             $model['id'],
             $autoplay,
             $autoplay_delay,
@@ -96,7 +97,8 @@ if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
             $loop_on,
             $slider_options['image-layout'],
             $nav_type,
-            $is_multislide ? 'true' : 'false'
+            $is_multislide ? 'true' : 'false',
+            $hide_nav_on_mobiles ? 'true' : 'false'
           ); ?>
           <?php if ( is_array( $img_collection ) && count( $img_collection ) > 0 ) : ?>
             <div class="swiper-wrapper">
@@ -150,8 +152,9 @@ if ( !empty( $img_collection ) ) {
     sek_print_img_slider( $img_collection, $slider_options, $model );
 } else {
     if ( skp_is_customizing() ) {
-        printf( '<div class="sek-slider-placeholder"><i>%1$s</i></div>',
-            __('Click to start adding images.', 'hueman')
+        printf( '<div class="sek-slider-placeholder"><div class="sek-slider-ph-text" style="%2$s"><p>%1$s</p></div></div>',
+            __('Click to start adding images.', 'hueman'),
+            'background: url(' . NIMBLE_MODULE_ICON_PATH . 'Nimble_slideshow_icon.svg) no-repeat 50% 75%;background-size: 200px;'
         );
     }
 }

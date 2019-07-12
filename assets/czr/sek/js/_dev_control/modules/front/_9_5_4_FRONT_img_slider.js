@@ -3,7 +3,6 @@
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
-                  //console.log('INITIALIZING FP MODULE', id, options );
                   var module = this;
 
 
@@ -411,7 +410,6 @@
 ( function ( api, $, _ ) {
       var Constructor = {
             initialize: function( id, options ) {
-                  //console.log('INITIALIZING FP MODULE', id, options );
                   var module = this;
 
 

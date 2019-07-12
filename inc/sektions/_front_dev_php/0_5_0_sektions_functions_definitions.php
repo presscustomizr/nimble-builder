@@ -1682,9 +1682,27 @@ function sek_get_module_collection() {
         ),
         array(
           'content-type' => 'module',
+          'content-id' => 'czr_img_slider_module',
+          'title' => __( 'Image Carousel', 'text_doma' ),
+          'icon' => 'Nimble_slideshow_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_simple_html_module',
+          'title' => __( 'Html Content', 'text_doma' ),
+          'icon' => 'Nimble_html_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
           'content-id' => 'czr_post_grid_module',
           'title' => __( 'Post Grid', 'text_doma' ),
           'icon' => 'Nimble_posts-list_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_map_module',
+          'title' => __( 'Map', 'text_doma' ),
+          'icon' => 'Nimble_map_icon.svg'
         ),
         array(
           'content-type' => 'preset_section',
@@ -1703,24 +1721,6 @@ function sek_get_module_collection() {
           'content-id' => 'four_columns',
           'title' => __( 'Four Columns', 'text_doma' ),
           'icon' => 'Nimble_4-columns_icon.svg'
-        ),
-        array(
-          'content-type' => 'module',
-          'content-id' => 'czr_simple_html_module',
-          'title' => __( 'Html Content', 'text_doma' ),
-          'icon' => 'Nimble_html_icon.svg'
-        ),
-        array(
-          'content-type' => 'module',
-          'content-id' => 'czr_img_slider_module',
-          'title' => __( 'Image carousel', 'text_doma' ),
-          'icon' => 'Nimble_slideshow_icon.svg'
-        ),
-        array(
-          'content-type' => 'module',
-          'content-id' => 'czr_map_module',
-          'title' => __( 'Map', 'text_doma' ),
-          'icon' => 'Nimble_map_icon.svg'
         ),
         array(
           'content-type' => 'module',
