@@ -278,7 +278,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   complete : function( params ) {
                                         api.previewer.trigger( 'sek-refresh-level', {
                                               level : 'location',
-                                              id :  params.apiParams.location
+                                              id :  params.apiParams.location,
+
+                                              // added for https://github.com/presscustomizr/nimble-builder/issues/471
+                                              original_action : 'sek-move-section-up',
+                                              moved_level_id : params.apiParams.id
                                         });
                                   }
                             },
@@ -300,7 +304,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   complete : function( params ) {
                                         api.previewer.trigger( 'sek-refresh-level', {
                                               level : 'location',
-                                              id :  params.apiParams.location
+                                              id :  params.apiParams.location,
+
+                                              // added for https://github.com/presscustomizr/nimble-builder/issues/471
+                                              original_action : 'sek-move-section-down',
+                                              moved_level_id : params.apiParams.id
                                         });
                                   }
                             },
@@ -645,7 +653,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         apiParams = {
                                               action : 'sek-refresh-level',
                                               level : params.level,
-                                              id : params.id
+                                              id : params.id,
+
+                                              // added for https://github.com/presscustomizr/nimble-builder/issues/471
+                                              original_action : params.original_action,
+                                              moved_level_id : params.moved_level_id
                                         };
                                         uiParams = {};
                                         // always pass the local or global skope of the currently customized location id when resolving the promise.
