@@ -34,11 +34,17 @@ if ( ! function_exists( 'Nimble\sek_print_social_links' ) ) {
                   }
               }
 
+              $link_attr = array();
+              // target attr.
+              $link_attr[] = false != $item['link_target'] ? 'target="_blank"' : '';
+              // rel attr.
+              $link_attr[] = false != $item['link_target'] ? 'rel="nofollow noopener noreferrer"' : 'rel="nofollow"';
+
               // Put them together
-              printf( '<li data-sek-item-id="%5$s"><a rel="nofollow" title="%1$s" aria-label="%1$s" href="%2$s" %3$s>%4$s</a></li>',
+              printf( '<li data-sek-item-id="%5$s"><a title="%1$s" aria-label="%1$s" href="%2$s" %3$s>%4$s</a></li>',
                   esc_attr( $item['title_attr'] ),
                   $social_link,
-                  false != $item['link_target'] ? 'target="_blank"' : '',
+                  implode( ' ', $link_attr ),
                   ( ( empty( $item['icon'] ) || ! is_string( $item['icon'] ) ) && skp_is_customizing() ) ? '<i class="material-icons">pan_tool</i>' : '<i class="sek-social-icon ' . $item['icon'] .'"></i>',
                   $item['id']
               );
