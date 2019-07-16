@@ -792,11 +792,17 @@ function sek_print_nimble_customizer_tmpl() {
           <div class="sek-feedback-step-two-enjoying">
             <span class="sek-stars" data-sek-feedback-action="go_review">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
             <p>Awesome! Could you please leave a rating on WordPress.org ?<br/>
-            This would encourage other users to discover Nimble Builder and help me improve the plugin. A huge thanks in advance!</p>
+            This would encourage other users discovering Nimble Builder. A huge thanks in advance!</p>
             <p class="sek-signature">-Nicolas, Founder and Lead Developer of Nimble Builder</p>
-            <button class="button sek-feedback-btn sek-neg" data-sek-feedback-action="maybe_later" type="button">
-              <?php _e('No thanks, maybe later', 'text_domain'); ?>
-            </button>
+            <?php
+              // Hidden since July 2019
+              // @see https://github.com/presscustomizr/nimble-builder/issues/481
+              //<button class="button sek-feedback-btn sek-neg" data-sek-feedback-action="maybe_later" type="button">
+              //
+            ?>
+                <?php //_e('No thanks, maybe later', 'text_domain'); ?>
+              <?php //</button>
+            ?>
             <button class="button sek-feedback-btn sek-pos" data-sek-feedback-action="go_review" type="button">
               <?php _e('OK, you deserve it', 'text_domain'); ?>
             </button>
