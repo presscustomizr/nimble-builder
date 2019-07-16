@@ -1683,7 +1683,7 @@ function sek_get_module_collection() {
         array(
           'content-type' => 'module',
           'content-id' => 'czr_img_slider_module',
-          'title' => __( 'Image Carousel', 'text_doma' ),
+          'title' => __( 'Image & Text Carousel', 'text_doma' ),
           'icon' => 'Nimble_slideshow_icon.svg'
         ),
         array(
@@ -1820,8 +1820,8 @@ function sek_get_feedback_notif_status() {
     $start_version = get_option( 'nimble_started_with_version', NIMBLE_VERSION );
     //sek_error_log('START VERSION ?' . $start_version, version_compare( $start_version, '1.6.0', '<=' ) );
 
-    // Bail if user did not start before 1.7.4, May 10th 2019
-    if ( ! version_compare( $start_version, '1.7.4', '<=' ) )
+    // Bail if user did not start before 1.8.3, June 20th 2019
+    if ( ! version_compare( $start_version, '1.8.3', '<=' ) )
       return;
 
     $sek_post_query_vars = array(
