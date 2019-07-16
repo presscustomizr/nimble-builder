@@ -360,7 +360,7 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'title'       => __('Custom height', 'text_doma'),
                                 'min' => 0,
-                                'max' => 500,
+                                'max' => 1000,
                                 'default'     => array( 'desktop' => '400px', 'mobile' => '200px' ),
                                 'width-100'   => true,
                                 'title_width' => 'width-100',
