@@ -64,12 +64,6 @@ if ( ! function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
             // => this is needed because this image has no specific dimensions set. And therefore can create false javascript computations of other element's distance to top on page load.
             // in particular when calculting if is_visible() to decide if we smart load.
             $html = sprintf( '<img alt="default img" data-sek-smartload="false" src="%1$s"/>', esc_url(  $item['img'] )  );
-        } else {
-            //falls back on an a placeholder
-            // if ( skp_is_customizing() ) {
-            //     $html = Nimble_Manager() -> sek_get_input_placeholder_content( 'upload' );
-            // }
-            $html = sprintf( '<img alt="default img" data-sek-smartload="false" src="%1$s"/>', NIMBLE_BASE_URL . '/assets/img/default-img.png'  );
         }
         return $html;
         //return apply_filters( 'nimble_parse_for_smart_load', sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', $visual_effect_class, $html, esc_html( $title ) ) );

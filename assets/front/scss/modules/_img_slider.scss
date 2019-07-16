@@ -99,7 +99,8 @@
         text-align: center;//consistent with defaults in module registration
         z-index: 3;
         overflow: hidden;
-        color: #ffffff;//consistent with defaults in module registration
+        //why this light grey text color ? => if set to white ( #fff ), the text is not visible when no image is picked, which might be difficult to understand for users
+        color: #e2e2e2;//consistent with defaults in module registration
         font-size:16px;//consistent with defaults in module registration
         line-height:1.5em;//consistent with defaults in module registration
         * {

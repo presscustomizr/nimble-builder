@@ -45,6 +45,9 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
         'module_type' => 'czr_img_slider_collection_child',
         'is_crud' => true,
         'name' => __( 'Slide collection', 'text_doma' ),
+        'starting_value' => array(
+            'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
+        ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' => array( '.sek-social-icon' ),//array( '.sek-icon i' ),
         'tmpl' => array(
@@ -117,7 +120,8 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
                                 'title'       => __('Add text content', 'text_doma'),
                                 'default'     => false,
                                 'title_width' => 'width-80',
-                                'input_width' => 'width-20'
+                                'input_width' => 'width-20',
+                                'notice_after' => __('Note : you can adjust the text color and / or use a color overlay to improve accessibility of your text content.', 'text_doma')
                             ),
                             'text_content' => array(
                                 'input_type'        => 'nimble_tinymce_editor',
@@ -131,6 +135,18 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
                                 'refresh_markup'    => '.sek-slider-text-content',
                                 'notice_before' => sprintf( __('You may use some html tags in the "text" tab of the editor. You can also use the following template tags referring to the image attributes : %1$s', 'text_domain_to_be_replaced'), '&#123;&#123;title&#125;&#125;, &#123;&#123;caption&#125;&#125;, &#123;&#123;description&#125;&#125;' )
                             ),
+
+                            'color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_doma' ),
+                                'default'     => '#e2e2e2',// why this light grey ? => if set to white ( #fff ), the text is not visible when no image is picked, which might be difficult to understand for users
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => $text_content_selector,
+                            ),//"#000000",
+
                             'font_family_css' => array(
                                 'input_type'  => 'font_picker',
                                 'title'       => __( 'Font family', 'text_doma' ),
@@ -168,16 +184,6 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
                                 'css_identifier' => 'line_height',
                                 'css_selectors' => $text_content_selector,
                             ),//24,//"20px",
-                            'color_css'           => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
-                                'default'     => '#ffffff',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'css_identifier' => 'color',
-                                'css_selectors' => $text_content_selector,
-                            ),//"#000000",
 
                             'h_alignment_css' => array(
                                 'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',

@@ -1539,3 +1539,30 @@ li[id^="accordion-section-__nimble__"] > h3 {
   margin: 4px 0;
   font-size: 12px!important;
 }
+
+
+/* SLIDE MODULE */
+.sek-slide-thumb {
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -ms-flex-align: center;
+  align-items: center;
+      float: left;
+}
+.sek-slide-title {
+  color: #4b4a4a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 120px;
+  height: 32px;
+  line-height: 32px;
+  font-size: 13px;
+  float: left;
+  padding-left: 10px;
+}
