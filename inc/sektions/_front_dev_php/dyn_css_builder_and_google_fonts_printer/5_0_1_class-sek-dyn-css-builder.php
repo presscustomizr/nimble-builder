@@ -277,7 +277,7 @@ class Sek_Dyn_CSS_Builder {
         $item_id = null;
         if ( $params['is_multi_items'] ) {
             if ( !is_array( $params['input_list'] ) || !isset($params['input_list']['id']) ) {
-                sek_error_log( __FUNCTION__ . ' => Error => eact item of a multi-item module must have an id', $params );
+                sek_error_log( __FUNCTION__ . ' => Error => each item of a multi-item module must have an id', $params );
             } else {
                 $item_id = $params['input_list']['id'];
             }

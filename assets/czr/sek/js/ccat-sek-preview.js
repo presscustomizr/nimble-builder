@@ -1684,6 +1684,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                                         //=> 'sek-level-refreshed' is listened to ( for example ) clean the loader overlay in time
                                         $( '[data-sek-id="' + params.apiParams.id + '"]' ).trigger( 'sek-level-refreshed', { level : params.apiParams.level, id : params.apiParams.id } );
+
+                                        // When completing actions 'sek-move-section-down' && 'sek-move-section-up', a 'sek-refresh-level' is triggered.
+                                        // We pass the moved_level_id so we can focus on it after it's been re-located in the DOM
+                                        // implemented for https://github.com/presscustomizr/nimble-builder/issues/471
+                                        if ( params.apiParams.moved_level_id ) {
+                                              api.preview.trigger( 'sek-animate-to-level', { id : params.apiParams.moved_level_id } );
+                                        }
                                   });
                             },
 

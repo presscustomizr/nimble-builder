@@ -2638,7 +2638,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   complete : function( params ) {
                                         api.previewer.trigger( 'sek-refresh-level', {
                                               level : 'location',
-                                              id :  params.apiParams.location
+                                              id :  params.apiParams.location,
+
+                                              // added for https://github.com/presscustomizr/nimble-builder/issues/471
+                                              original_action : 'sek-move-section-up',
+                                              moved_level_id : params.apiParams.id
                                         });
                                   }
                             },
@@ -2660,7 +2664,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   complete : function( params ) {
                                         api.previewer.trigger( 'sek-refresh-level', {
                                               level : 'location',
-                                              id :  params.apiParams.location
+                                              id :  params.apiParams.location,
+
+                                              // added for https://github.com/presscustomizr/nimble-builder/issues/471
+                                              original_action : 'sek-move-section-down',
+                                              moved_level_id : params.apiParams.id
                                         });
                                   }
                             },
@@ -3005,7 +3013,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         apiParams = {
                                               action : 'sek-refresh-level',
                                               level : params.level,
-                                              id : params.id
+                                              id : params.id,
+
+                                              // added for https://github.com/presscustomizr/nimble-builder/issues/471
+                                              original_action : params.original_action,
+                                              moved_level_id : params.moved_level_id
                                         };
                                         uiParams = {};
                                         // always pass the local or global skope of the currently customized location id when resolving the promise.
@@ -16504,6 +16516,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//_makeItemsSortable
 
 
+            // Overrides core FMK method
+            // introduced in July 2019 to solve the problem of the default image for the items
+            // @see https://github.com/presscustomizr/nimble-builder/issues/479
+            getPreItem : function() {
+                  var rawStartingValue = api.czr_sektions.getRegisteredModuleProperty( 'czr_img_slider_collection_child', 'starting_value' ),
+                      preItemValue = $.extend( true, {}, this.preItem() );//create a new detached clones object
+
+                  if ( _.isObject( rawStartingValue ) ) {
+                        var startingValue = $.extend( true, {}, rawStartingValue );//create a new detached clones object
+                        return $.extend( preItemValue, startingValue );
+                  }
+
+                  return this.preItem();
+            },
+
             //////////////////////////////////////////////////////////
             /// ITEM CONSTRUCTOR
             //////////////////////////////////////////
@@ -16552,22 +16579,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-                //overrides the default parent method by a custom one
-                //at this stage, the model passed in the obj is up to date
+                  //overrides the default parent method by a custom one
+                  //at this stage, the model passed in the obj is up to date
                   writeItemViewTitle : function( model, data ) {
                         var item = this,
                             index = 1,
                             module  = item.module,
                             _model = model || item(),
                             _title = '',
-                            _slideBg,
+                            _slideBg = '',
                             _src = 'not_set',
                             _areDataSet = ! _.isUndefined( data ) && _.isObject( data );
 
                         //When shall we update the item title ?
                         //=> when the slide title or the thumbnail have been updated
                         //=> on module model initialized
-                        if ( _areDataSet && data.input_changed && ! _.contains( [ 'img' ], data.input_changed ) )
+                        if ( _areDataSet && data.input_changed && ! _.contains( [ 'img', 'text_content' ], data.input_changed ) )
                           return;
 
                         //set title with index
@@ -16585,23 +16612,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //if the slide title is set, use it
                         _title = api.CZR_Helpers.truncate( _title, 15 );
 
-                        //make sure the slide bg id is a number
-                        _slideBg = ( _model['img'] && _.isString( _model['img'] ) ) ? parseInt( _model['img'], 10 ) : _model['img'];
-
-                        // _title = [
-                        //       '<div class="slide-thumb"></div>',
-                        //       '<div class="slide-title">' + _title + '</div>',,
-                        // ].join('');
+                        if ( _model['img'] ) {
+                              _slideBg = _model['img'];
+                              if ( _.isString( _model['img'] ) ) {
+                                    // if the img is already an url, typically the default image
+                                    if ( -1 !==  _model['img'].indexOf( 'http' ) ) {
+                                          _slideBg = _model['img'];
+                                    // else, cast to an int
+                                    } else {
+                                          _slideBg = parseInt( _model['img'], 10 );
+                                    }
+                              }
+                        }
 
                         var _getThumbSrc = function() {
                               return $.Deferred( function() {
                                     var dfd = this;
+                                    if ( _.isUndefined( _slideBg ) || _.isEmpty( '' + _slideBg ) ) { //<= always cast to a string when using _.isEmpty
+                                          dfd.resolve( '' );
+                                    }
                                     //try to set the default src
-                                    // if ( huemanSlideModuleParams && huemanSlideModuleParams.defaultThumb ) {
-                                    //       _src = huemanSlideModuleParams.defaultThumb;
-                                    // }
-                                    if ( ! _.isNumber( _slideBg ) ) {
-                                          dfd.resolve( _src );
+                                    else if ( _.isString( _slideBg ) && -1 !== _slideBg.indexOf( 'http' ) ) {
+                                          dfd.resolve( _slideBg );
                                     } else {
                                           wp.media.attachment( _slideBg ).fetch()
                                                 .always( function() {
@@ -16616,49 +16648,55 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         };
 
 
-                        var $slideTitleEl = $( '.' + module.control.css_attr.item_title , item.container ).find('.slide-title'),
-                            $slideThumbEl = $( '.' + module.control.css_attr.item_title , item.container ).find( '.slide-thumb');
+                        var $slideTitleEl = $( '.' + module.control.css_attr.item_title , item.container ).find('.sek-slide-title'),
+                            $slideThumbEl = $( '.' + module.control.css_attr.item_title , item.container ).find( '.sek-slide-thumb');
 
                         //TITLE
                         //always write the title
-                        // if ( 1 > $slideTitleEl.length ) {
-                        //       //remove the default item title
-                        //       $( '.' + module.control.css_attr.item_title , item.container ).html( '' );
-                        //       //write the new one
-                        //       $( '.' + module.control.css_attr.item_title , item.container ).append( $( '<div/>',
-                        //             {
-                        //                 class : 'slide-title',
-                        //                 html : _title
-                        //             }
-                        //       ) );
-                        // } else {
-                        //       $slideTitleEl.html( _title );
-                        // }
+                        var _text = _model['text_content'] ? _model['text_content'] : '';
+                        // Strip all html tags and keep only first characters
+                        _text = $("<div>").html(_text).text();
+                        _text = _text.substring(0,60);
+                        if ( 1 > $slideTitleEl.length ) {
+                              //remove the default item title
+                              $( '.' + module.control.css_attr.item_title , item.container ).html( '' );
+                              //write the new one
+                              $( '.' + module.control.css_attr.item_title , item.container ).append( $( '<div/>',
+                                    {
+                                        class : 'sek-slide-title',
+                                        html : _text
+                                    }
+                              ) );
+                        } else {
+                              $slideTitleEl.html( _text );
+                        }
 
                         //THUMB
                         //When shall we append the item thumb ?
-                        //=>IF the slide-thumb element is not set
+                        //=>IF the sek-slide-thumb element is not set
                         //=>OR in the case where data have been provided and the input_changed is 'img'
                         //=>OR if no data is provided ( we are in the initialize phase )
                         var _isBgChange = _areDataSet && data.input_changed && 'img' === data.input_changed;
+
+                        var _getThumbHtml = function( src ) {
+                            return ( _.isEmpty( '' + src ) || 'not_set' === src ) ? '' : '<img src="' + src + '" width="32" alt="' + _title + '" />';
+                        };
+
                         $( '.' + module.control.css_attr.item_title, item.container ).css('padding', '0 4px');
+
+
                         if ( 1 > $slideThumbEl.length ) {
                               _getThumbSrc().done( function( src ) {
-                                    if ( 'not_set' != src ) {
-                                          $( '.' + module.control.css_attr.item_title, item.container ).prepend( $('<div/>',
-                                                {
-                                                      class : 'slide-thumb',
-                                                      html : '<img src="' + src + '" width="32" alt="' + _title + '" />',
-                                                      style : 'width:32px;height:32px;overflow:hidden;'
-                                                }
-                                          ));
-                                    }
+                                    $( '.' + module.control.css_attr.item_title, item.container ).prepend( $('<div/>',
+                                          {
+                                                class : 'sek-slide-thumb',
+                                                html : _getThumbHtml( src )
+                                          }
+                                    ));
                               });
                         } else if ( _isBgChange || ! _areDataSet ) {
                               _getThumbSrc().done( function( src ) {
-                                    if ( 'not_set' != src ) {
-                                          $slideThumbEl.html( '<img src="' + src + '" width="32" height="32" alt="' + _title + '" />' );
-                                    }
+                                    $slideThumbEl.html( _getThumbHtml( src ) );
                               });
                         }
                   },

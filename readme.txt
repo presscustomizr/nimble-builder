@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.2
-Stable tag: 1.8.9
+Stable tag: 1.8.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -47,7 +47,7 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 
 = Content modules =
 * Headings
-* WordPress text editor
+* WordPress text editor ( support blocks and shortcodes )
 * [Image](https://docs.presscustomizr.com/article/381-how-to-enable-lightbox-on-your-images-with-the-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page)
 * Button
 * Icon
@@ -62,7 +62,8 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * Columns
 * Quote
 * Widget zone
-* Accordion ( under development )
+* Accordion ( coming soon )
+* Tabs ( coming soon )
 * ... and more to come !
 
 = Getting started =
@@ -110,10 +111,16 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.8.9 =
-This releases introduces a new Image Carousel module.
+= 1.8.10 =
+Improved links options for the social icons module. Simplified the use of text without image for the carousel module. Various improvements made to the user interface.
 
 == Changelog ==
+= 1.8.10 : July 15th 2019 =
+* improved : when moving section up / down => keep focus on the moved section
+* improved : [Social icons module] set rel="noopener noreferrer" to social links opening in a new tab
+* improved : [Social icons module] better support for additional protocols in social links urls
+* improved : [Carousel module] don't use a placeholder image when the default image has been removed + various ui improvements
+
 = 1.8.9 : July 12th 2019 =
 * fixed : wrong initial unit for font-size and line-height inputs.
 * added : a new Image Carousel module
