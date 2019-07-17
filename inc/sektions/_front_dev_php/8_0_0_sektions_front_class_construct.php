@@ -224,6 +224,12 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'czr_img_slider_collection_child',
             'czr_img_slider_opts_child'
           ),
+
+          'czr_accordion_module' => array(
+            'czr_accordion_module',
+            'czr_accordion_collection_child',
+            'czr_accordion_opts_child'
+          ),
         ];
 
         // Is merged with front module when sek_is_header_footer_enabled() === true
