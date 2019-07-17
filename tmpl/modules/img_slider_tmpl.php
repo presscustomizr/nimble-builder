@@ -127,8 +127,8 @@ if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
 
           <?php if ( in_array($nav_type,array('arrows_dots', 'arrows') ) && $is_multislide ) : ?>
             <div class="sek-swiper-nav">
-              <span class="sek-swiper-arrows sek-swiper-prev sek-swiper-prev<?php echo $model['id']; ?>" title="<?php _e('previous', 'textdom'); ?>"><i class="fas fa-chevron-left"></i></span>
-              <span class="sek-swiper-arrows sek-swiper-next sek-swiper-next<?php echo $model['id']; ?>" title="<?php _e('next', 'textdom'); ?>"><i class="fas fa-chevron-right"></i></span>
+              <div class="sek-swiper-arrows sek-swiper-prev sek-swiper-prev<?php echo $model['id']; ?>" title="<?php _e('previous', 'textdom'); ?>"><div class="sek-chevron"></div></div>
+              <div class="sek-swiper-arrows sek-swiper-next sek-swiper-next<?php echo $model['id']; ?>" title="<?php _e('next', 'textdom'); ?>"><div class="sek-chevron"></div></div>
             </div>
           <?php endif; ?>
         </div><?php //.swiper-container ?>

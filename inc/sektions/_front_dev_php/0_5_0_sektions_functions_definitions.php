@@ -1017,7 +1017,7 @@ function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
             $recursive_data = array_merge( $local_collection, $global_collection );
         }
 
-        $font_awesome_dependant_modules = array( 'czr_button_module', 'czr_icon_module', 'czr_menu_module', 'czr_img_slider_module' );
+        $font_awesome_dependant_modules = array( 'czr_button_module', 'czr_icon_module', 'czr_menu_module' );
 
         foreach ($recursive_data as $key => $value) {
             if ( is_array( $value ) && array_key_exists('module_type', $value) && in_array($value['module_type'], $font_awesome_dependant_modules ) ) {

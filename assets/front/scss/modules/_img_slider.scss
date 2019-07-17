@@ -34,6 +34,7 @@
         }
       }
     }//.swiper-container
+
     .swiper-slide {
       text-align: center;
       font-size: 18px;
@@ -116,51 +117,75 @@
     }
 
     /* SWIPER ARROWS */
-    .sek-swiper-nav { cursor: pointer;}
-    .sek-swiper-nav .sek-swiper-prev {
+    .sek-swiper-nav {
+      cursor: pointer;
+
+      // Chevron inspired by the pen shared by @wksy on Codepen
+      // @see https://codepen.io/wsky/pen/BKoKxV
+      .sek-chevron {
+        display: inline-block;
+        border-right: 2px solid #ffffff;//consistent with defaults registration param
+        border-bottom: 2px solid #ffffff;//consistent with defaults registration param
+        width: 11px;
+        height: 11px;
+      }
+
+      .sek-swiper-prev {
         left: 0;
         border-top-left-radius: 0px;
         border-top-right-radius: 2px;
         border-bottom-right-radius: 2px;
         border-bottom-left-radius: 0px;
-    }
-    .sek-swiper-nav .sek-swiper-next {
+        .sek-chevron {
+          -webkit-transform: rotate(-225deg);
+          -ms-transform: rotate(-225deg);
+          transform: rotate(-225deg);
+        }
+      }
+      .sek-swiper-next {
         right: 0;
         border-top-left-radius: 2px;
         border-top-right-radius: 0px;
         border-bottom-right-radius: 0px;
         border-bottom-left-radius: 2px;
-    }
+        .sek-chevron {
+          -webkit-transform: rotate(-45deg);
+          -ms-transform: rotate(-45deg);
+          transform: rotate(-45deg);
+        }
+      }
 
-    .sek-swiper-nav .sek-swiper-prev, .sek-swiper-nav .sek-swiper-next{
-        position: absolute;
-        z-index: 2;
-        top: calc((100% - 60px)/2);
-        text-align: center;
-        margin-top: 0px;
-        -webkit-backface-visibility: hidden;
-        -moz-backface-visibility: hidden;
-        -ms-backface-visibility: hidden;
-        -o-backface-visibility: hidden;
-        backface-visibility: hidden;
-        display: block;
-        color: #ffffff;//consistent with defaults registration param
-        height: 60px;
-        width: 50px;
-        opacity: 0.6;
-        background-color: rgba(32, 32, 32, 0.4);
-        -webkit-transition: all 0.3s cubic-bezier(0.39, 0.575, 0.565, 1);
-        transition: all 0.3s cubic-bezier(0.39, 0.575, 0.565, 1);
-        line-height: 64px;
-        cursor: pointer;
-        font-size: 18px;
-    }
 
-    .sek-swiper-nav .sek-swiper-prev:hover, .sek-swiper-nav .sek-swiper-next:hover {
-        background-color: rgba(32, 32, 32, 0.7);
-        opacity: 1;
-        width: 100px;
-    }
+      .sek-swiper-prev, .sek-swiper-next{
+          position: absolute;
+          z-index: 2;
+          top: calc((100% - 60px)/2);
+          text-align: center;
+          margin-top: 0px;
+          -webkit-backface-visibility: hidden;
+          -moz-backface-visibility: hidden;
+          -ms-backface-visibility: hidden;
+          -o-backface-visibility: hidden;
+          backface-visibility: hidden;
+          display: block;
+          height: 60px;
+          width: 50px;
+          opacity: 0.6;
+          background-color: rgba(32, 32, 32, 0.4);
+          -webkit-transition: all 0.3s cubic-bezier(0.39, 0.575, 0.565, 1);
+          transition: all 0.3s cubic-bezier(0.39, 0.575, 0.565, 1);
+          line-height: 64px;
+          cursor: pointer;
+          font-size: 18px;
+      }
+
+      .sek-swiper-prev:hover, .sek-swiper-next:hover {
+          background-color: rgba(32, 32, 32, 0.7);
+          opacity: 1;
+          width: 100px;
+      }
+    }//.sek-swiper-nav
+
 
     @include media-breakpoint-only(xs) {
       [data-sek-hide-nav-on-mobile="true"] {

@@ -404,14 +404,14 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                             // ),//null,
                             'arrows_color_css' => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Color ot the navigation arrows', 'text_doma'),
+                                'title'       => __('Color of the navigation arrows', 'text_doma'),
                                 'width-100'   => true,
                                 'title_width' => 'width-100',
                                 'default'    => '#ffffff',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'color',
-                                'css_selectors' => array('.sek-swiper-nav .sek-swiper-arrows')
+                                'css_identifier' => 'border_color',
+                                'css_selectors' => array('.sek-swiper-nav .sek-swiper-arrows .sek-chevron')
                             ),
                             // 'dots_size'  => array(
                             //     'input_type'  => 'range_simple_device_switcher',
