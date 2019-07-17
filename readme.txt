@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.2
-Stable tag: 1.8.10
+Stable tag: 1.8.11
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -111,10 +111,13 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.8.10 =
-Improved links options for the social icons module. Simplified the use of text without image for the carousel module. Various improvements made to the user interface.
+= 1.8.11 =
+This version fixes the problem of right and left arrows not printed in slider module.
 
 == Changelog ==
+= 1.8.11 : July 17th 2019 =
+* fixed : Slider module => implemented pure CSS right / left chevrons
+
 = 1.8.10 : July 15th 2019 =
 * improved : when moving section up / down => keep focus on the moved section
 * improved : [Social icons module] set rel="noopener noreferrer" to social links opening in a new tab

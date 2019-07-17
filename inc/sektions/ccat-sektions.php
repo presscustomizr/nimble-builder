@@ -1862,7 +1862,7 @@ function sek_get_feedback_notif_status() {
     // sek_error_log('$modules_used ?? ' . count($modules_used), $modules_used );
     // sek_error_log('$customized_pages ??', $customized_pages );
     //version_compare( $this->wp_version, '4.1', '>=' )
-    return $customized_pages > 0 && $nb_section_created > 2 && count($modules_used) > 3;
+    return $customized_pages > 0 && $nb_section_created > 2 && count($modules_used) > 2;
 }
 
 // recursive helper to count the number of sections in a given set of sections data
@@ -12125,14 +12125,14 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                             // ),//null,
                             'arrows_color_css' => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Color ot the navigation arrows', 'text_doma'),
+                                'title'       => __('Color of the navigation arrows', 'text_doma'),
                                 'width-100'   => true,
                                 'title_width' => 'width-100',
                                 'default'    => '#ffffff',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
-                                'css_identifier' => 'color',
-                                'css_selectors' => array('.sek-swiper-nav .sek-swiper-arrows')
+                                'css_identifier' => 'border_color',
+                                'css_selectors' => array('.sek-swiper-nav .sek-swiper-arrows .sek-chevron')
                             ),
                             // 'dots_size'  => array(
                             //     'input_type'  => 'range_simple_device_switcher',

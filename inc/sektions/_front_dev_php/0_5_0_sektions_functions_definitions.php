@@ -1862,7 +1862,7 @@ function sek_get_feedback_notif_status() {
     // sek_error_log('$modules_used ?? ' . count($modules_used), $modules_used );
     // sek_error_log('$customized_pages ??', $customized_pages );
     //version_compare( $this->wp_version, '4.1', '>=' )
-    return $customized_pages > 0 && $nb_section_created > 2 && count($modules_used) > 3;
+    return $customized_pages > 0 && $nb_section_created > 2 && count($modules_used) > 2;
 }
 
 // recursive helper to count the number of sections in a given set of sections data

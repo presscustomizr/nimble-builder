@@ -2014,6 +2014,14 @@ button.sek-btn,
   cursor: pointer;
 }
 
+[data-sek-module-type="czr_img_slider_module"] .sek-swiper-nav .sek-chevron {
+  display: inline-block;
+  border-right: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+  width: 11px;
+  height: 11px;
+}
+
 [data-sek-module-type="czr_img_slider_module"] .sek-swiper-nav .sek-swiper-prev {
   left: 0;
   border-top-left-radius: 0px;
@@ -2022,12 +2030,22 @@ button.sek-btn,
   border-bottom-left-radius: 0px;
 }
 
+[data-sek-module-type="czr_img_slider_module"] .sek-swiper-nav .sek-swiper-prev .sek-chevron {
+  -webkit-transform: rotate(-225deg);
+  transform: rotate(-225deg);
+}
+
 [data-sek-module-type="czr_img_slider_module"] .sek-swiper-nav .sek-swiper-next {
   right: 0;
   border-top-left-radius: 2px;
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
   border-bottom-left-radius: 2px;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .sek-swiper-nav .sek-swiper-next .sek-chevron {
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
 }
 
 [data-sek-module-type="czr_img_slider_module"] .sek-swiper-nav .sek-swiper-prev, [data-sek-module-type="czr_img_slider_module"] .sek-swiper-nav .sek-swiper-next {
@@ -2039,7 +2057,6 @@ button.sek-btn,
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   display: block;
-  color: #ffffff;
   height: 60px;
   width: 50px;
   opacity: 0.6;
