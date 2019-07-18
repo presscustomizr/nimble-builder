@@ -13,7 +13,7 @@ function sek_get_module_params_for_czr_accordion_module() {
             'accord_collec' => 'czr_accordion_collection_child',
             'accord_opts' => 'czr_accordion_opts_child'
         ),
-        'name' => __('Image Carousel', 'text_doma'),
+        'name' => __('Accordion', 'text_doma'),
         // 'starting_value' => array(
         //     'img_collection' => array(
         //         'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
@@ -21,7 +21,7 @@ function sek_get_module_params_for_czr_accordion_module() {
         // ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
-        'css_selectors' => array( '.sek-social-icons-wrapper' ),//array( '.sek-icon i' ),
+        'css_selectors' => array( '[data-sek-accordion-id]' ),//array( '.sek-icon i' ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/accordion_tmpl.php",
         // 'front_assets' => array(
         //       'czr-font-awesome' => array(
@@ -65,64 +65,40 @@ function sek_get_module_params_for_czr_accordion_collection_child() {
             'item-inputs' => array(
                 'tabs' => array(
                     array(
-                        'title' => __( 'Image', 'text_doma' ),
+                        'title' => __( 'Title', 'text_doma' ),
                         'inputs' => array(
-                            'img' => array(
-                                'input_type'  => 'upload',
-                                'title'       => __('Pick an image', 'text_doma'),
-                                'default'     => ''
+                            'title_text' => array(
+                                'input_type'        => 'nimble_tinymce_editor',
+                                'editor_params'     => array(
+                                    'media_button' => false,
+                                    'includedBtns' => 'basic_btns',
+                                    'height' => 50
+                                ),
+                                'title'              => __( 'Heading text', 'text_doma' ),
+                                'default'            => '',
+                                'width-100'         => true,
+                                'refresh_markup'    => '[data-sek-input-type="textarea"]',
+                                'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
                             ),
                             'title_attr'  => array(
                                 'input_type'  => 'text',
                                 'default'     => '',
                                 'title'       => __('Title', 'text_domain_to_be_replaced'),
-                                'notice_after' => sprintf( __('This is the text displayed on mouse over. You can use the following template tags referring to the image attributes : %1$s', 'text_domain_to_be_replaced'), '&#123;&#123;title&#125;&#125;, &#123;&#123;caption&#125;&#125;, &#123;&#123;description&#125;&#125;' )
+                                'notice_after' => __('This is the text displayed on mouse over.' )
                             ),
-                            // 'link-to' => array(
-                            //     'input_type'  => 'simpleselect',
-                            //     'title'       => __('Schedule an action on click or tap', 'text_doma'),
-                            //     'default'     => 'no-link',
-                            //     'choices'     => array(
-                            //         'no-link' => __('No click action', 'text_doma' ),
-                            //         'url' => __('Link to site content or custom url', 'text_doma' ),
-                            //         'img-file' => __('Link to image file', 'text_doma' ),
-                            //         'img-page' =>__('Link to image page', 'text_doma' )
-                            //     ),
-                            //     'title_width' => 'width-100',
-                            //     'width-100'   => true,
-                            //     'html_before' => '<hr/><h3>' . __('ACTION ON CLICK') .'</h3>',
-                            //     'notice_after' => __('Note that some click actions are disabled during customization.', 'text_doma' ),
-                            // ),
-                            // 'link-pick-url' => array(
-                            //     'input_type'  => 'content_picker',
-                            //     'title'       => __('Link url', 'text_doma'),
-                            //     'default'     => array()
-                            // ),
-                            // 'link-custom-url' => array(
-                            //     'input_type'  => 'text',
-                            //     'title'       => __('Custom link url', 'text_doma'),
-                            //     'default'     => ''
-                            // ),
-                            // 'link-target' => array(
-                            //     'input_type'  => 'nimblecheck',
-                            //     'title'       => __('Open link in a new browser tab', 'text_doma'),
-                            //     'default'     => false,
-                            //     'title_width' => 'width-80',
-                            //     'input_width' => 'width-20',
-                            // )
                         )
                     ),
                     array(
-                        'title' => __( 'Text', 'text_doma' ),
+                        'title' => __( 'Content', 'text_doma' ),
                         'inputs' => array(
-                            'enable_text' => array(
-                                'input_type'  => 'nimblecheck',
-                                'title'       => __('Add text content', 'text_doma'),
-                                'default'     => false,
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20',
-                                'notice_after' => __('Note : you can adjust the text color and / or use a color overlay to improve accessibility of your text content.', 'text_doma')
-                            ),
+                            // 'enable_text' => array(
+                            //     'input_type'  => 'nimblecheck',
+                            //     'title'       => __('Add text content', 'text_doma'),
+                            //     'default'     => false,
+                            //     'title_width' => 'width-80',
+                            //     'input_width' => 'width-20',
+                            //     'notice_after' => __('Note : you can adjust the text color and / or use a color overlay to improve accessibility of your text content.', 'text_doma')
+                            // ),
                             'text_content' => array(
                                 'input_type'        => 'nimble_tinymce_editor',
                                 'editor_params'     => array(
@@ -133,7 +109,7 @@ function sek_get_module_params_for_czr_accordion_collection_child() {
                                 'default'           => '',
                                 'width-100'         => true,
                                 'refresh_markup'    => '.sek-slider-text-content',
-                                'notice_before' => sprintf( __('You may use some html tags in the "text" tab of the editor. You can also use the following template tags referring to the image attributes : %1$s', 'text_domain_to_be_replaced'), '&#123;&#123;title&#125;&#125;, &#123;&#123;caption&#125;&#125;, &#123;&#123;description&#125;&#125;' )
+                                'notice_before' => __('You may use some html tags in the "text" tab of the editor.', 'text_domain_to_be_replaced')
                             ),
 
                             'color_css'           => array(
@@ -227,41 +203,6 @@ function sek_get_module_params_for_czr_accordion_collection_child() {
                             )
                         )
                     ),
-                    array(
-                        'title' => __( 'Color overlay', 'text_doma' ),
-                        'inputs' => array(
-                            'apply-overlay' => array(
-                                'input_type'  => 'nimblecheck',
-                                'notice_after' => __('A color overlay is usually recommended when displaying text content on top of the image. You can customize the color and transparency in the global design settings of the carousel.', 'text_doma' ),
-                                'title'       => __('Apply a color overlay', 'text_doma'),
-                                'default'     => false,
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20',
-                                'html_before' => '<hr/><h3>' . __('COLOR OVERLAY') .'</h3>'
-                            ),
-                            'color-overlay' => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Overlay Color', 'text_doma'),
-                                'width-100'   => true,
-                                'default'     => '#000000',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true
-                            ),
-                            'opacity-overlay' => array(
-                                'input_type'  => 'range_simple',
-                                'title'       => __('Opacity (in percents)', 'text_doma'),
-                                'orientation' => 'horizontal',
-                                'min' => 0,
-                                'max' => 100,
-                                // 'unit' => '%',
-                                'default'  => '30',
-                                'width-100'   => true,
-                                'title_width' => 'width-100',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true
-                            )
-                        )
-                    )
                 )//'tabs'
             )//'item-inputs'
         ),

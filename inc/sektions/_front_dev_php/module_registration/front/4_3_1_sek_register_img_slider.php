@@ -21,7 +21,7 @@ function sek_get_module_params_for_czr_img_slider_module() {
         // ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
-        'css_selectors' => array( '.sek-social-icons-wrapper' ),//array( '.sek-icon i' ),
+        'css_selectors' => array( '[data-sek-swiper-id]' ),//array( '.sek-icon i' ),
         'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/img_slider_tmpl.php",
         // 'front_assets' => array(
         //       'czr-font-awesome' => array(
@@ -77,39 +77,7 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
                                 'default'     => '',
                                 'title'       => __('Title', 'text_domain_to_be_replaced'),
                                 'notice_after' => sprintf( __('This is the text displayed on mouse over. You can use the following template tags referring to the image attributes : %1$s', 'text_domain_to_be_replaced'), '&#123;&#123;title&#125;&#125;, &#123;&#123;caption&#125;&#125;, &#123;&#123;description&#125;&#125;' )
-                            ),
-                            // 'link-to' => array(
-                            //     'input_type'  => 'simpleselect',
-                            //     'title'       => __('Schedule an action on click or tap', 'text_doma'),
-                            //     'default'     => 'no-link',
-                            //     'choices'     => array(
-                            //         'no-link' => __('No click action', 'text_doma' ),
-                            //         'url' => __('Link to site content or custom url', 'text_doma' ),
-                            //         'img-file' => __('Link to image file', 'text_doma' ),
-                            //         'img-page' =>__('Link to image page', 'text_doma' )
-                            //     ),
-                            //     'title_width' => 'width-100',
-                            //     'width-100'   => true,
-                            //     'html_before' => '<hr/><h3>' . __('ACTION ON CLICK') .'</h3>',
-                            //     'notice_after' => __('Note that some click actions are disabled during customization.', 'text_doma' ),
-                            // ),
-                            // 'link-pick-url' => array(
-                            //     'input_type'  => 'content_picker',
-                            //     'title'       => __('Link url', 'text_doma'),
-                            //     'default'     => array()
-                            // ),
-                            // 'link-custom-url' => array(
-                            //     'input_type'  => 'text',
-                            //     'title'       => __('Custom link url', 'text_doma'),
-                            //     'default'     => ''
-                            // ),
-                            // 'link-target' => array(
-                            //     'input_type'  => 'nimblecheck',
-                            //     'title'       => __('Open link in a new browser tab', 'text_doma'),
-                            //     'default'     => false,
-                            //     'title_width' => 'width-80',
-                            //     'input_width' => 'width-20',
-                            // )
+                            )
                         )
                     ),
                     array(

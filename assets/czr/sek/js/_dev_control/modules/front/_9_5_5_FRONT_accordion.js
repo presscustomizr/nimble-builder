@@ -32,7 +32,7 @@
             },//initialize
 
 
-            // overrides the default fmk method which generates a too long id for each item, like : "czr_img_slider_collection_child_2"
+            // overrides the default fmk method which generates a too long id for each item, like : "czr_accordion_collection_child_2"
             // this method generates a uniq GUID id for each item
             generateItemId : function() {
                     return api.czr_sektions.guid();
@@ -88,7 +88,7 @@
             // introduced in July 2019 to solve the problem of the default image for the items
             // @see https://github.com/presscustomizr/nimble-builder/issues/479
             getPreItem : function() {
-                  var rawStartingValue = api.czr_sektions.getRegisteredModuleProperty( 'czr_img_slider_collection_child', 'starting_value' ),
+                  var rawStartingValue = api.czr_sektions.getRegisteredModuleProperty( 'czr_accordion_collection_child', 'starting_value' ),
                       preItemValue = $.extend( true, {}, this.preItem() );//create a new detached clones object
 
                   if ( _.isObject( rawStartingValue ) ) {
@@ -410,16 +410,16 @@
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            czr_img_slider_collection_child : {
+            czr_accordion_collection_child : {
                   mthds : Constructor,
-                  crud : true,//api.czr_sektions.getRegisteredModuleProperty( 'czr_img_slider_collection_child', 'is_crud' ),
+                  crud : true,//api.czr_sektions.getRegisteredModuleProperty( 'czr_accordion_collection_child', 'is_crud' ),
                   hasPreItem : false,//a crud module has a pre item by default
                   refresh_on_add_item : false,// the preview is refreshed on item add
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_img_slider_collection_child', 'name' ),
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_accordion_collection_child', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : false,
                   ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_img_slider_collection_child' )
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_accordion_collection_child' )
             },
       });
 })( wp.customize , jQuery, _ );
@@ -524,14 +524,14 @@
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            czr_img_slider_opts_child : {
+            czr_accordion_opts_child : {
                   mthds : Constructor,
                   crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_img_slider_opts_child', 'name' ),
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_accordion_opts_child', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : false,
                   ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_img_slider_opts_child' )
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_accordion_opts_child' )
             }
       });
 })( wp.customize , jQuery, _ );
