@@ -18,6 +18,12 @@
           overflow: hidden;
           img {
             max-width: none;
+            opacity:0;
+            -webkit-transition: opacity 0.15s ease-in-out;
+            -moz-transition: opacity, 0.15s ease-in-out;
+            -ms-transition: opacity, 0.15s ease-in-out;
+            -o-transition: opacity, 0.15s ease-in-out;
+            transition: opacity 0.15s ease-in-out;
           }
         }
       }
@@ -54,7 +60,25 @@
       align-items: center;
       .sek-carousel-img {
         width: 100%;
-        img { width: 100%; }
+        img {
+          width: 100%;
+          // When Nimble Wizard is enabled
+          &.sek-h-centrd {
+            width: auto !important;
+            max-width: none !important;
+            position: relative;
+            opacity: 1;
+          }
+          &.sek-v-centrd {
+            height: auto !important;
+            max-height: none !important;
+            vertical-align: top;
+            position: relative;
+            max-width: none !important;
+            opacity: 1;
+          }
+        }
+
       }
       &[data-sek-has-overlay="true"] .sek-carousel-img::after {
         content: '';

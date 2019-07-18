@@ -765,10 +765,10 @@ jQuery( function($){
                 leftAdjust : 0,
                 zeroLeftAdjust : 0,
                 topAdjust : 0,
-                zeroTopAdjust : -2,//<= top ajustement for h-centered
+                zeroTopAdjust : -2,//<= top ajustement for sek-h-centrd
                 useImgAttr:false,//uses the img height and width attributes if not visible (typically used for the customizr slider hidden images)
                 setOpacityWhenCentered : false,//this can be used to hide the image during the time it is centered
-                addCenteredClassWithDelay : 0,//<= a small delay can be required when we rely on the v-centered or h-centered css classes to set the opacity for example
+                addCenteredClassWithDelay : 0,//<= a small delay can be required when we rely on the sek-v-centrd or sek-h-centrd css classes to set the opacity for example
                 opacity : 1
           };
 
@@ -911,12 +911,12 @@ jQuery( function($){
                   h : {
                         dim : { name : 'height', val : c_y },
                         dir : { name : 'left', val : ( c_x - up_i_x ) / 2 + ( this.options.leftAdjust || 0 ) },
-                        _class : 'h-centered'
+                        _class : 'sek-h-centrd'
                   },
                   v : {
                         dim : { name : 'width', val : c_x },
                         dir : { name : 'top', val : ( c_y - up_i_y ) / 2 + ( this.options.topAdjust || 0 ) },
-                        _class : 'v-centered'
+                        _class : 'sek-v-centrd'
                   }
             };
 
