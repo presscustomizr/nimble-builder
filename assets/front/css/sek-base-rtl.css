@@ -1923,6 +1923,8 @@ button.sek-btn,
 
 [data-sek-module-type="czr_img_slider_module"] .swiper-container[data-sek-image-layout="nimble-wizard"] .sek-carousel-img img {
   max-width: none;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
 }
 
 [data-sek-module-type="czr_img_slider_module"] .swiper-container[data-sek-image-layout="height-100"] .sek-carousel-img {
@@ -1956,6 +1958,22 @@ button.sek-btn,
 
 [data-sek-module-type="czr_img_slider_module"] .swiper-slide .sek-carousel-img img {
   width: 100%;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-slide .sek-carousel-img img.sek-h-centrd {
+  width: auto !important;
+  max-width: none !important;
+  position: relative;
+  opacity: 1;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-slide .sek-carousel-img img.sek-v-centrd {
+  height: auto !important;
+  max-height: none !important;
+  vertical-align: top;
+  position: relative;
+  max-width: none !important;
+  opacity: 1;
 }
 
 [data-sek-module-type="czr_img_slider_module"] .swiper-slide[data-sek-has-overlay="true"] .sek-carousel-img::after {
