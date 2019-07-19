@@ -44,7 +44,7 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
         'dynamic_registration' => true,
         'module_type' => 'czr_img_slider_collection_child',
         'is_crud' => true,
-        'name' => __( 'Slide collection', 'text_doma' ),
+        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">photo_library</i> %1$s', __( 'Slide collection', 'text_doma' ) ),
         'starting_value' => array(
             'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
         ),
@@ -277,7 +277,7 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_img_slider_opts_child',
-        'name' => __( 'Slider options : height, autoplay, navigation...', 'text_doma' ),
+        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">tune</i> %1$s', __( 'Slider options : height, autoplay, navigation...', 'text_doma' ) ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_doma'),

@@ -966,6 +966,14 @@ credits : Gutenberg team @wordpress */
   text-underline-position: under;
 }
 
+/* style the icon if there's one next to the title */
+.customize-control-title .sek-ctrl-accordion-title > i {
+  font-size: 1.2em;
+  position: relative;
+  top: 4px;
+  padding-right: 4px;
+}
+
 /* STYLE FOR THE LEVEL ICON NEXT TO THE CONTROL TITLE */
 .sek-level-option-icon {
   padding-right: 5px;
