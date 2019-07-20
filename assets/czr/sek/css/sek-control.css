@@ -616,6 +616,11 @@ div[data-sek-grid-layout].selected {
     background: #f7f7f7;
     box-shadow: inset 0 -1px 0 #ccc;
     vertical-align: top;
+    -webkit-transition: opacity 0.2s ease-in-out;
+    -moz-transition: opacity 0.2s ease-in-out;
+    -ms-transition: opacity 0.2s ease-in-out;
+    -o-transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.2s ease-in-out;
 }
 
 
@@ -624,6 +629,7 @@ div[data-sek-grid-layout].selected {
     border-color: #999;
     box-shadow: inset 0 -1px 0 #999;
     color: #23282d;
+    opacity: 1!important;
 }
 .sek-ui-button:active:not(:disabled) {
     background: #eee;
@@ -678,8 +684,33 @@ div[data-sek-grid-layout].selected {
     text-transform: uppercase;
 }
 
+/* Button style for the option type switcher */
 
-
+[data-input-type="module_option_switcher"] .sek-ui-button {
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+}
+[data-input-type="module_option_switcher"] .sek-content-type-wrapper { margin-bottom: 0}
+[data-input-type="module_option_switcher"] [aria-pressed="false"] {
+  opacity: 0.7;
+}
+[data-input-type="module_option_switcher"] [data-sek-option-type] {
+  position: relative;
+}
+[data-input-type="module_option_switcher"] [data-sek-option-type] > i {
+  position: absolute;
+  left: 10px;
+  font-size: 21px;
+  line-height: 24px;
+}
+[data-input-type="module_option_switcher"] [data-sek-option-type] > span {
+  position: relative;
+  padding-left: 36px;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
 
 
 /* CATEGORY PICKER */

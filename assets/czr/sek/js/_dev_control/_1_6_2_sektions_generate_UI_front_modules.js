@@ -260,7 +260,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.control( setCtrlId, function( _control_ ) {
                               _control_.deferred.embedded.done( function() {
                                     // Hide the control label
-                                    _control_.container.find('.customize-control-title').first().hide();
+                                    _control_.container.find('.customize-control-title').hide();
                                     // don't setup the accordion
                                     _control_.container.attr('data-sek-accordion', 'no');
                               });
