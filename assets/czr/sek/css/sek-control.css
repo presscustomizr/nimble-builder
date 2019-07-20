@@ -685,12 +685,6 @@ div[data-sek-grid-layout].selected {
 }
 
 /* Button style for the option type switcher */
-
-[data-input-type="module_option_switcher"] .sek-ui-button {
-  display: -webkit-inline-box;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-}
 [data-input-type="module_option_switcher"] .sek-content-type-wrapper { margin-bottom: 0}
 [data-input-type="module_option_switcher"] [aria-pressed="false"] {
   opacity: 0.7;
@@ -698,18 +692,30 @@ div[data-sek-grid-layout].selected {
 [data-input-type="module_option_switcher"] [data-sek-option-type] {
   position: relative;
 }
-[data-input-type="module_option_switcher"] [data-sek-option-type] > i {
-  position: absolute;
-  left: 10px;
+.sek-wrap-opt-switch-btn {
+  display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    flex: 0 0 100%;
+    max-width: 100%;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+[data-input-type="module_option_switcher"] [data-sek-option-type] .sek-wrap-opt-switch-btn > i {
   font-size: 21px;
   line-height: 24px;
 }
-[data-input-type="module_option_switcher"] [data-sek-option-type] > span {
+[data-input-type="module_option_switcher"] [data-sek-option-type] .sek-wrap-opt-switch-btn > span {
   position: relative;
-  padding-left: 36px;
+  padding-left: 10px;
   overflow: hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
+  text-align: center;
 }
 
 

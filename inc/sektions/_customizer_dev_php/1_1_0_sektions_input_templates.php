@@ -489,8 +489,8 @@ function sek_print_nimble_input_templates() {
         <input data-czrtype="{{data.input_id}}" type="hidden"/>
         <div class="sek-content-type-wrapper">
             <div aria-label="<?php _e('Option type', 'text_doma'); ?>" class="sek-ui-button-group" role="group">
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Module Content', 'text_doma'); ?>" data-sek-option-type="content"><i class="material-icons">create</i><span><?php _e('Module Content', 'text_doma'); ?></span></button>
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Module Settings', 'text_doma'); ?>" data-sek-option-type="settings"><i class="material-icons">tune</i><span><?php _e('Module Settings', 'text_doma'); ?></span></button>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Module Content', 'text_doma'); ?>" data-sek-option-type="content"><span class="sek-wrap-opt-switch-btn"><i class="material-icons">create</i><span><?php _e('Module Content', 'text_doma'); ?></span></span></button>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Module Settings', 'text_doma'); ?>" data-sek-option-type="settings"><span class="sek-wrap-opt-switch-btn"><i class="material-icons">tune</i><span><?php _e('Module Settings', 'text_doma'); ?></span></span></button>
             </div>
         </div>
       </script>
