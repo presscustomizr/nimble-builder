@@ -13,7 +13,7 @@ function sek_get_module_params_for_czr_img_slider_module() {
             'img_collection' => 'czr_img_slider_collection_child',
             'slider_options' => 'czr_img_slider_opts_child'
         ),
-        'name' => __('Image Carousel', 'text_doma'),
+        'name' => __('Image & Text Carousel', 'text_doma'),
         // 'starting_value' => array(
         //     'img_collection' => array(
         //         'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
