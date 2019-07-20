@@ -222,6 +222,9 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_8_0_sektions_instantiate.js',
 
       // Inputs
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_0_0_0_content_type_switcher_input.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_0_0_1_module_and_section_picker_inputs.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_0_0_2_module_option_switcher_input.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_0_spacing_input.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_1_bg_position_input.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_2_vert_and_horiz_alignment_inputs.js',
@@ -246,6 +249,7 @@ module.exports = {
       // Content pickers
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js',
 
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_0_0_0_UI_sek_mod_option_switcher_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_anchor_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_bg_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_border_module.js',
@@ -359,6 +363,8 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php',
 
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/10_0_1_sek_register_module_and_section_pickers.php',
+
+      '<%= paths.sektions %>_front_dev_php/module_registration/ui/_1_level/4_0_0_sek_register_mod_option_switcher.php',
 
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_background.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_border.php',

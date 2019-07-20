@@ -19,8 +19,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             property : 'options',
                             id : params.id
                       });
-                  levelOptionValues = _.isObject( levelOptionValues ) ? levelOptionValues : {};
 
+                  levelOptionValues = _.isObject( levelOptionValues ) ? levelOptionValues : {};
 
                   // Prepare the module map to register
                   var modulesRegistrationParams = {};
@@ -207,7 +207,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     type : 'czr_module',//sekData.controlType,
                                     module_type : optionData.module_type,
                                     section : params.id,
-                                    priority : 0,
+                                    priority : 20,
                                     settings : { default : optionData.settingControlId }
                               }).done( function() {});
 
@@ -266,6 +266,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // - Implement the module visibility
                   api.section( params.id, function( _section_ ) {
                         _do_register_();
+                        // Generate the UI for module option switcher
+                        // introduded in july 2019 for https://github.com/presscustomizr/nimble-builder/issues/135
+                        if ( 'module' === params.level ) {
+                              self.generateModuleOptionSwitcherUI( params.id, params.action );
+                        }
+
                         // don't display the clickable section title in the nimble root panel
                         _section_.container.find('.accordion-section-title').first().hide();
 

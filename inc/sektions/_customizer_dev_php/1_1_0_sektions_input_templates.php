@@ -480,6 +480,20 @@ function sek_print_nimble_input_templates() {
       </script>
 
 
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  MODULE OPTION SWITCHER
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___module_option_switcher">
+        <input data-czrtype="{{data.input_id}}" type="hidden"/>
+        <div class="sek-content-type-wrapper">
+            <div aria-label="<?php _e('Option type', 'text_doma'); ?>" class="sek-ui-button-group" role="group">
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Module Content', 'text_doma'); ?>" data-sek-option-type="content"><i class="material-icons">create</i>&nbsp;<?php _e('Module Content', 'text_doma'); ?></button>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Module Settings', 'text_doma'); ?>" data-sek-option-type="settings"><i class="material-icons">tune</i>&nbsp;<?php _e('Module Settings', 'text_doma'); ?></button>
+            </div>
+        </div>
+      </script>
 
 
       <?php

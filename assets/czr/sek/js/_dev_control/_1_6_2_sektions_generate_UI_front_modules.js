@@ -142,7 +142,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     type : 'czr_module',//sekData.controlType,
                                     module_type : optionData.module_type,
                                     section : params.id,
-                                    priority : 10,
+                                    priority : 20,
                                     settings : { default : optionData.settingControlId }
                               }).done( function() {});
 
@@ -176,10 +176,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+
                   // Defer the registration when the parent section gets added to the api
                   api.section.when( params.id, function() {
                         api.section(params.id).focus();
                         _do_register_();
+                        // Generate the UI for module option switcher
+                        // introduded in july 2019 for https://github.com/presscustomizr/nimble-builder/issues/135
+                        self.generateModuleOptionSwitcherUI( params.id, params.action );
                   });
 
 
@@ -211,6 +215,58 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
                   });
                   return dfd;
-            }
+            },
+
+            // Generate the UI for module option switcher
+            // introduded in july 2019 for https://github.com/presscustomizr/nimble-builder/issues/135
+            // REGISTER MODULE OPTION SWITCHER SETTING AND CONTROL
+            generateModuleOptionSwitcherUI : function( module_id, ui_action ) {
+                  var setCtrlId = module_id + '__' + 'option_switcher';
+
+                  if ( ! api.has( setCtrlId ) ) {
+                        // synchronize the module setting with the main collection setting
+                        api( setCtrlId, function( _setting_ ) {
+                              _setting_.bind( function( to, from ) {
+                                    api.errare('generateUIforDraggableContent => the setting() should not changed');
+                              });
+                        });
+                        api.CZR_Helpers.register( {
+                              origin : 'nimble',
+                              level : 'module',
+                              what : 'setting',
+                              id : setCtrlId,
+                              dirty : false,
+                              value : '',
+                              transport : 'postMessage',// 'refresh',
+                              type : '_nimble_ui_'//will be dynamically registered but not saved in db as option// columnData.settingType
+                        });
+                  }
+
+                  api.CZR_Helpers.register( {
+                        origin : 'nimble',
+                        level : 'module',
+                        what : 'control',
+                        module_id : module_id,// <= the id of the corresponding module level as saved in DB
+                        id : setCtrlId,
+                        label : '',
+                        type : 'czr_module',//sekData.controlType,
+                        module_type : 'sek_mod_option_switcher_module',
+                        section : module_id,
+                        priority : 10,
+                        settings : { default : setCtrlId },
+                        has_accordion : false,
+                        ui_action : ui_action // 'sek-generate-module-ui' or 'sek-generate-level-options-ui' // <= will be used to determine which button is selected
+                  }).done( function() {
+                        api.control( setCtrlId, function( _control_ ) {
+                              _control_.deferred.embedded.done( function() {
+                                    // Hide the control label
+                                    _control_.container.find('.customize-control-title').first().hide();
+                                    // don't setup the accordion
+                                    _control_.container.attr('data-sek-accordion', 'no');
+                              });
+                        });
+                  });
+            }//generateModuleOptionSwitcherUI
+
       });//$.extend()
 })( wp.customize, jQuery );

@@ -97,7 +97,8 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         ];
 
         public static $ui_level_modules = [
-            // UI LEVEL MODULES
+          // UI LEVEL MODULES
+          'sek_mod_option_switcher_module',
           'sek_level_bg_module',
           'sek_level_border_module',
           //'sek_level_section_layout_module',<// deactivated for now. Replaced by sek_level_width_section

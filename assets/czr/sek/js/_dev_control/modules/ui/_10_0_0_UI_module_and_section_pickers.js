@@ -26,58 +26,6 @@
                   )
             },
       });
-
-      api.czrInputMap = api.czrInputMap || {};
-      //input_type => callback fn to fire in the Input constructor on initialize
-      //the callback can receive specific params define in each module constructor
-      //For example, a content picker can be given params to display only taxonomies
-      $.extend( api.czrInputMap, {
-            content_type_switcher : function( input_options ) {
-                  var input = this,
-                      _section_,
-                      initial_content_type;
-
-                  if ( ! api.section.has( input.module.control.section() ) ) {
-                        throw new Error( 'api.czrInputMap.content_type_switcher => section not registered' );
-                  }
-                  _section_ = api.section( input.module.control.section() );
-
-                  // attach click event on data-sek-content-type buttons
-                  input.container.on('click', '[data-sek-content-type]', function( evt ) {
-                        evt.preventDefault();
-                        // handle the is-selected css class toggling
-                        input.container.find('[data-sek-content-type]').removeClass('is-selected').attr( 'aria-pressed', false );
-                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        api.czr_sektions.currentContentPickerType( $(this).data( 'sek-content-type') );
-                  });
-
-
-                  var _do_ = function( contentType ) {
-                        input.container.find( '[data-sek-content-type="' + ( contentType || 'module' ) + '"]').trigger('click');
-                        _.each( _section_.controls(), function( _control_ ) {
-                              if ( ! _.isUndefined( _control_.content_type ) ) {
-                                    _control_.active( contentType === _control_.content_type );
-                              }
-                        });
-                  };
-
-                  // Initialize
-                  // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
-                  api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value( input() );
-                  // This event is emitted by ::generateUIforDraggableContent()
-                  // this way we are sure that all controls for modules and sections are instantiated
-                  // and we can use _section_.controls() to set the visibility of module / section controls when switching
-                  api.bind('nimble-modules-and-sections-controls-registered', function() {
-                        _do_( api.czr_sektions.currentContentPickerType() );
-                  });
-
-
-                  // Schedule a reaction to changes
-                  api.czr_sektions.currentContentPickerType.bind( function( contentType ) {
-                        _do_( contentType );
-                  });
-            }
-      });
 })( wp.customize , jQuery, _ );
 
 
@@ -111,32 +59,6 @@
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_module_picker_module' )
                   )
             },
-      });
-
-      api.czrInputMap = api.czrInputMap || {};
-
-      //input_type => callback fn to fire in the Input constructor on initialize
-      //the callback can receive specific params define in each module constructor
-      //For example, a content picker can be given params to display only taxonomies
-      $.extend( api.czrInputMap, {
-            module_picker : function( input_options ) {
-                var input = this;
-                // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
-                // input.container.find('[draggable]').each( function() {
-                //       $(this).on( 'mousedown mouseup', function( evt ) {
-                //             switch( evt.type ) {
-                //                   case 'mousedown' :
-                //                         //$(this).addClass('sek-grabbing');
-                //                   break;
-                //                   case 'mouseup' :
-                //                         //$(this).removeClass('sek-grabbing');
-                //                   break;
-                //             }
-                //       });
-                // });
-                api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'module', input_container : input.container } );
-                //console.log( this.id, input_options );
-            }
       });
 })( wp.customize , jQuery, _ );
 
@@ -295,39 +217,4 @@
                   },
             });
       }
-})( wp.customize , jQuery, _ );
-
-
-
-
-
-
-
-/* ------------------------------------------------------------------------- *
- *  SECTION PICKER INPUT
-/* ------------------------------------------------------------------------- */
-( function ( api, $, _ ) {
-      api.czrInputMap = api.czrInputMap || {};
-      //input_type => callback fn to fire in the Input constructor on initialize
-      //the callback can receive specific params define in each module constructor
-      //For example, a content picker can be given params to display only taxonomies
-      $.extend( api.czrInputMap, {
-            section_picker : function( input_options ) {
-                  var input = this;
-                  // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
-                  // input.container.find('[draggable]').each( function() {
-                  //       $(this).on( 'mousedown mouseup', function( evt ) {
-                  //             switch( evt.type ) {
-                  //                   case 'mousedown' :
-                  //                         //$(this).addClass('sek-grabbing');
-                  //                   break;
-                  //                   case 'mouseup' :
-                  //                         //$(this).removeClass('sek-grabbing');
-                  //                   break;
-                  //             }
-                  //       });
-                  // });
-                  api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
-            }
-      });
 })( wp.customize , jQuery, _ );

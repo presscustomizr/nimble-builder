@@ -865,7 +865,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Expand the first module if requested
                   if ( params.expand_first_control ) {
-                        var firstControl = _.first( _section_.controls() );
+                        // we want to exclude controls for which the accordion is not scheduled
+                        // introduced when implementing the module option switcher in july 2019. @see https://github.com/presscustomizr/nimble-builder/issues/135
+                        var _eligibleControls = _.filter( _section_.controls(), function( _ctrl_ ) {
+                              if ( _ctrl_.params && _ctrl_.params.sek_registration_params ) {
+                                  return false !== _ctrl_.params.sek_registration_params.has_accordion;
+                              }
+                              return true;
+                        });
+                        var firstControl = _.first( _eligibleControls );
                         if ( _.isObject( firstControl ) && ! _.isEmpty( firstControl.id ) ) {
                               api.control( firstControl.id, function( _ctrl_ ) {
                                     // this event is triggered by the control fmk in module.isReady.done( function() {} )

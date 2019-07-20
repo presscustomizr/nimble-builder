@@ -658,6 +658,8 @@ div[data-sek-grid-layout].selected {
     outline: none;
 }
 
+
+
 /* Button style for the content type switcher */
 .sek-content-type-wrapper {
   margin-bottom: 8px;
@@ -675,6 +677,9 @@ div[data-sek-grid-layout].selected {
     height: auto;
     text-transform: uppercase;
 }
+
+
+
 
 
 /* CATEGORY PICKER */
