@@ -161,7 +161,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         // @see https://stackoverflow.com/questions/1147359/how-to-decode-html-entities-using-jquery
                                         _titleContent = $("<div/>").html( $title.html() ).text();
 
-                                    $title.html( ['<span class="sek-ctrl-accordion-title">', , '</span>' ].join('') );
+                                    $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent , '</span>' ].join('') );
                                     // if this level has an icon, let's prepend it to the title
                                     if ( ! _.isUndefined( optionData.icon ) ) {
                                           $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
