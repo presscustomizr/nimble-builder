@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.2
-Stable tag: 1.8.12
+Stable tag: 1.8.13
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -111,10 +111,13 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.8.12 =
-Two minor improvements for the Carousel module when the Nimble wizard option is enabled for the images positionning.
+= 1.8.13 =
+User interface improvement : addition of an option switcher for the modules between content options and general settings.
 
 == Changelog ==
+= 1.8.13 : July 20th 2019 =
+* improved : in the ui, addition of an option switcher for the modules between content options and general settings.
+
 = 1.8.12 : July 18th 2019 =
 * fixed : [Carousel module] CSS classes added dynamically by javascript centering, .sek-h-centrd and .sek-v-centrd, were not styled. In particular missing the position:relative rule
 * improved : [Carousel module] added an animated opacity to hide the possible move of image while being re-positionned on centering actions
