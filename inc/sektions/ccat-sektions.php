@@ -4505,6 +4505,28 @@ function sek_get_module_params_for_sek_module_picker_module() {
 // }
 ?><?php
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+function sek_get_module_params_for_sek_mod_option_switcher_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_mod_option_switcher_module',
+        'name' => __('Option switcher', 'text_doma'),
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'tmpl' => array(
+            'item-inputs' => array(
+                'content_type' => array(
+                    'input_type'  => 'module_option_switcher',
+                    'title'       => '',//__('Which type of content would you like to drop in your page ?', 'text_doma'),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                )
+            )
+        )
+    );
+}
+
+?><?php
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 function sek_get_module_params_for_sek_level_bg_module() {
     return array(
         'dynamic_registration' => true,
@@ -11734,7 +11756,7 @@ function sek_get_module_params_for_czr_img_slider_module() {
             'img_collection' => 'czr_img_slider_collection_child',
             'slider_options' => 'czr_img_slider_opts_child'
         ),
-        'name' => __('Image Carousel', 'text_doma'),
+        'name' => __('Image & Text Carousel', 'text_doma'),
         // 'starting_value' => array(
         //     'img_collection' => array(
         //         'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
@@ -11765,7 +11787,7 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
         'dynamic_registration' => true,
         'module_type' => 'czr_img_slider_collection_child',
         'is_crud' => true,
-        'name' => __( 'Slide collection', 'text_doma' ),
+        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">photo_library</i> %1$s', __( 'Slide collection', 'text_doma' ) ),
         'starting_value' => array(
             'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
         ),
@@ -11998,7 +12020,7 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_img_slider_opts_child',
-        'name' => __( 'Slider options : height, autoplay, navigation...', 'text_doma' ),
+        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">tune</i> %1$s', __( 'Slider options : height, autoplay, navigation...', 'text_doma' ) ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_doma'),
@@ -14257,7 +14279,8 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         ];
 
         public static $ui_level_modules = [
-            // UI LEVEL MODULES
+          // UI LEVEL MODULES
+          'sek_mod_option_switcher_module',
           'sek_level_bg_module',
           'sek_level_border_module',
           //'sek_level_section_layout_module',<// deactivated for now. Replaced by sek_level_width_section

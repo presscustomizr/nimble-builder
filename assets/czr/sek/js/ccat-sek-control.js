@@ -4270,7 +4270,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     type : 'czr_module',//sekData.controlType,
                                     module_type : optionData.module_type,
                                     section : params.id,
-                                    priority : 10,
+                                    priority : 20,
                                     settings : { default : optionData.settingControlId }
                               }).done( function() {});
 
@@ -4285,9 +4285,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     _control_.container.attr('data-sek-expanded', "false" );
 
                                     var $title = _control_.container.find('label > .customize-control-title'),
-                                        _titleContent = $title.html();
+                                        // store the title text in a var + decode html entities ( added by WP )
+                                        // @see https://stackoverflow.com/questions/1147359/how-to-decode-html-entities-using-jquery
+                                        _titleContent = $("<div/>").html( $title.html() ).text();
 
-                                    $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
+                                    $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent , '</span>' ].join('') );
                                     // if this level has an icon, let's prepend it to the title
                                     if ( ! _.isUndefined( optionData.icon ) ) {
                                           $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
@@ -4302,10 +4304,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+
                   // Defer the registration when the parent section gets added to the api
                   api.section.when( params.id, function() {
                         api.section(params.id).focus();
                         _do_register_();
+                        // Generate the UI for module option switcher
+                        // introduded in july 2019 for https://github.com/presscustomizr/nimble-builder/issues/135
+                        self.generateModuleOptionSwitcherUI( params.id, params.action );
                   });
 
 
@@ -4337,7 +4343,59 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
                   });
                   return dfd;
-            }
+            },
+
+            // Generate the UI for module option switcher
+            // introduded in july 2019 for https://github.com/presscustomizr/nimble-builder/issues/135
+            // REGISTER MODULE OPTION SWITCHER SETTING AND CONTROL
+            generateModuleOptionSwitcherUI : function( module_id, ui_action ) {
+                  var setCtrlId = module_id + '__' + 'option_switcher';
+
+                  if ( ! api.has( setCtrlId ) ) {
+                        // synchronize the module setting with the main collection setting
+                        api( setCtrlId, function( _setting_ ) {
+                              _setting_.bind( function( to, from ) {
+                                    api.errare('generateUIforDraggableContent => the setting() should not changed');
+                              });
+                        });
+                        api.CZR_Helpers.register( {
+                              origin : 'nimble',
+                              level : 'module',
+                              what : 'setting',
+                              id : setCtrlId,
+                              dirty : false,
+                              value : '',
+                              transport : 'postMessage',// 'refresh',
+                              type : '_nimble_ui_'//will be dynamically registered but not saved in db as option// columnData.settingType
+                        });
+                  }
+
+                  api.CZR_Helpers.register( {
+                        origin : 'nimble',
+                        level : 'module',
+                        what : 'control',
+                        module_id : module_id,// <= the id of the corresponding module level as saved in DB
+                        id : setCtrlId,
+                        label : '',
+                        type : 'czr_module',//sekData.controlType,
+                        module_type : 'sek_mod_option_switcher_module',
+                        section : module_id,
+                        priority : 10,
+                        settings : { default : setCtrlId },
+                        has_accordion : false,
+                        ui_action : ui_action // 'sek-generate-module-ui' or 'sek-generate-level-options-ui' // <= will be used to determine which button is selected
+                  }).done( function() {
+                        api.control( setCtrlId, function( _control_ ) {
+                              _control_.deferred.embedded.done( function() {
+                                    // Hide the control label
+                                    _control_.container.find('.customize-control-title').hide();
+                                    // don't setup the accordion
+                                    _control_.container.attr('data-sek-accordion', 'no');
+                              });
+                        });
+                  });
+            }//generateModuleOptionSwitcherUI
+
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
@@ -4360,8 +4418,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             property : 'options',
                             id : params.id
                       });
-                  levelOptionValues = _.isObject( levelOptionValues ) ? levelOptionValues : {};
 
+                  levelOptionValues = _.isObject( levelOptionValues ) ? levelOptionValues : {};
 
                   // Prepare the module map to register
                   var modulesRegistrationParams = {};
@@ -4548,7 +4606,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     type : 'czr_module',//sekData.controlType,
                                     module_type : optionData.module_type,
                                     section : params.id,
-                                    priority : 0,
+                                    priority : 20,
                                     settings : { default : optionData.settingControlId }
                               }).done( function() {});
 
@@ -4607,6 +4665,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // - Implement the module visibility
                   api.section( params.id, function( _section_ ) {
                         _do_register_();
+                        // Generate the UI for module option switcher
+                        // introduded in july 2019 for https://github.com/presscustomizr/nimble-builder/issues/135
+                        if ( 'module' === params.level ) {
+                              self.generateModuleOptionSwitcherUI( params.id, params.action );
+                        }
+
                         // don't display the clickable section title in the nimble root panel
                         _section_.container.find('.accordion-section-title').first().hide();
 
@@ -7529,7 +7593,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Expand the first module if requested
                   if ( params.expand_first_control ) {
-                        var firstControl = _.first( _section_.controls() );
+                        // we want to exclude controls for which the accordion is not scheduled
+                        // introduced when implementing the module option switcher in july 2019. @see https://github.com/presscustomizr/nimble-builder/issues/135
+                        var _eligibleControls = _.filter( _section_.controls(), function( _ctrl_ ) {
+                              if ( _ctrl_.params && _ctrl_.params.sek_registration_params ) {
+                                  return false !== _ctrl_.params.sek_registration_params.has_accordion;
+                              }
+                              return true;
+                        });
+                        var firstControl = _.first( _eligibleControls );
                         if ( _.isObject( firstControl ) && ! _.isEmpty( firstControl.id ) ) {
                               api.control( firstControl.id, function( _ctrl_ ) {
                                     // this event is triggered by the control fmk in module.isReady.done( function() {} )
@@ -8750,6 +8822,160 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             api.errare( 'api.czr_sektions => problem on instantiation', er );
       }
 })( wp.customize, jQuery );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+      //input_type => callback fn to fire in the Input constructor on initialize
+      //the callback can receive specific params define in each module constructor
+      //For example, a content picker can be given params to display only taxonomies
+      $.extend( api.czrInputMap, {
+            content_type_switcher : function( input_options ) {
+                  var input = this,
+                      _section_,
+                      initial_content_type;
+
+                  if ( ! api.section.has( input.module.control.section() ) ) {
+                        throw new Error( 'api.czrInputMap.content_type_switcher => section not registered' );
+                  }
+                  _section_ = api.section( input.module.control.section() );
+
+                  // attach click event on data-sek-content-type buttons
+                  input.container.on('click', '[data-sek-content-type]', function( evt ) {
+                        evt.preventDefault();
+                        // handle the is-selected css class toggling
+                        input.container.find('[data-sek-content-type]').removeClass('is-selected').attr( 'aria-pressed', false );
+                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
+                        api.czr_sektions.currentContentPickerType( $(this).data( 'sek-content-type') );
+                  });
+
+
+                  var _do_ = function( contentType ) {
+                        input.container.find( '[data-sek-content-type="' + ( contentType || 'module' ) + '"]').trigger('click');
+                        _.each( _section_.controls(), function( _control_ ) {
+                              if ( ! _.isUndefined( _control_.content_type ) ) {
+                                    _control_.active( contentType === _control_.content_type );
+                              }
+                        });
+                  };
+
+                  // Initialize
+                  // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
+                  api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value( input() );
+                  // This event is emitted by ::generateUIforDraggableContent()
+                  // this way we are sure that all controls for modules and sections are instantiated
+                  // and we can use _section_.controls() to set the visibility of module / section controls when switching
+                  api.bind('nimble-modules-and-sections-controls-registered', function() {
+                        _do_( api.czr_sektions.currentContentPickerType() );
+                  });
+
+
+                  // Schedule a reaction to changes
+                  api.czr_sektions.currentContentPickerType.bind( function( contentType ) {
+                        _do_( contentType );
+                  });
+            }
+      });
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+      $.extend( api.czrInputMap, {
+            module_picker : function( input_options ) {
+                var input = this;
+                // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
+                // input.container.find('[draggable]').each( function() {
+                //       $(this).on( 'mousedown mouseup', function( evt ) {
+                //             switch( evt.type ) {
+                //                   case 'mousedown' :
+                //                         //$(this).addClass('sek-grabbing');
+                //                   break;
+                //                   case 'mouseup' :
+                //                         //$(this).removeClass('sek-grabbing');
+                //                   break;
+                //             }
+                //       });
+                // });
+                api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'module', input_container : input.container } );
+                //console.log( this.id, input_options );
+            },
+
+            section_picker : function( input_options ) {
+                  var input = this;
+                  // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
+                  // input.container.find('[draggable]').each( function() {
+                  //       $(this).on( 'mousedown mouseup', function( evt ) {
+                  //             switch( evt.type ) {
+                  //                   case 'mousedown' :
+                  //                         //$(this).addClass('sek-grabbing');
+                  //                   break;
+                  //                   case 'mouseup' :
+                  //                         //$(this).removeClass('sek-grabbing');
+                  //                   break;
+                  //             }
+                  //       });
+                  // });
+                  api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
+            }
+      });
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+      $.extend( api.czrInputMap, {
+            module_option_switcher : function( input_options ) {
+                  var input = this,
+                      _section_,
+                      initial_content_type;
+
+                  if ( ! api.section.has( input.module.control.section() ) ) {
+                        throw new Error( input.input_type + ' => section not registered' );
+                  }
+                  _section_ = api.section( input.module.control.section() );
+
+                  var module_id = '',
+                      requested_ui_action,
+                      controlRegistrationParams = input.module.control.params.sek_registration_params;
+
+                  if ( _.isUndefined( controlRegistrationParams ) ) {
+                        throw new Error( input.input_type + ' => missing registration params' );
+                  }
+                  if ( controlRegistrationParams && controlRegistrationParams.module_id ) {
+                        module_id = controlRegistrationParams.module_id;
+                        requested_ui_action = controlRegistrationParams.ui_action;
+                  }
+                  if ( _.isEmpty( module_id ) ) {
+                        throw new Error( input.input_type + ' => missing module id' );
+                  }
+
+                  // attach click event on data-sek-option-type buttons
+                  input.container.on('click', '[data-sek-option-type]', function( evt ) {
+                        evt.preventDefault();
+                        // handle the is-selected css class toggling
+                        input.container.find('[data-sek-option-type]').removeClass('is-selected').attr( 'aria-pressed', false );
+                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
+
+                        api.previewer.trigger( 'settings' === $(this).data( 'sek-option-type') ? 'sek-edit-options' : 'sek-edit-module',
+                              {
+                                    id : module_id,
+                                    level : 'module'
+                              }
+                        );
+                  });
+
+                  // handle the is-selected css class toggling
+                  var _requestedOptionType = 'sek-generate-level-options-ui' === requested_ui_action ? 'settings' : 'content';
+
+                  input.container
+                        .find('[data-sek-option-type]')
+                        .removeClass('is-selected')
+                        .attr( 'aria-pressed', false );
+                  input.container
+                        .find('[data-sek-option-type="'+ _requestedOptionType +'"]')
+                        .addClass('is-selected')
+                        .attr( 'aria-pressed', true );
+            }
+      });
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
 ( function ( api, $, _ ) {
       // all available input type as a map
       api.czrInputMap = api.czrInputMap || {};
@@ -12179,58 +12405,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   )
             },
       });
-
-      api.czrInputMap = api.czrInputMap || {};
-      //input_type => callback fn to fire in the Input constructor on initialize
-      //the callback can receive specific params define in each module constructor
-      //For example, a content picker can be given params to display only taxonomies
-      $.extend( api.czrInputMap, {
-            content_type_switcher : function( input_options ) {
-                  var input = this,
-                      _section_,
-                      initial_content_type;
-
-                  if ( ! api.section.has( input.module.control.section() ) ) {
-                        throw new Error( 'api.czrInputMap.content_type_switcher => section not registered' );
-                  }
-                  _section_ = api.section( input.module.control.section() );
-
-                  // attach click event on data-sek-content-type buttons
-                  input.container.on('click', '[data-sek-content-type]', function( evt ) {
-                        evt.preventDefault();
-                        // handle the is-selected css class toggling
-                        input.container.find('[data-sek-content-type]').removeClass('is-selected').attr( 'aria-pressed', false );
-                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        api.czr_sektions.currentContentPickerType( $(this).data( 'sek-content-type') );
-                  });
-
-
-                  var _do_ = function( contentType ) {
-                        input.container.find( '[data-sek-content-type="' + ( contentType || 'module' ) + '"]').trigger('click');
-                        _.each( _section_.controls(), function( _control_ ) {
-                              if ( ! _.isUndefined( _control_.content_type ) ) {
-                                    _control_.active( contentType === _control_.content_type );
-                              }
-                        });
-                  };
-
-                  // Initialize
-                  // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
-                  api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value( input() );
-                  // This event is emitted by ::generateUIforDraggableContent()
-                  // this way we are sure that all controls for modules and sections are instantiated
-                  // and we can use _section_.controls() to set the visibility of module / section controls when switching
-                  api.bind('nimble-modules-and-sections-controls-registered', function() {
-                        _do_( api.czr_sektions.currentContentPickerType() );
-                  });
-
-
-                  // Schedule a reaction to changes
-                  api.czr_sektions.currentContentPickerType.bind( function( contentType ) {
-                        _do_( contentType );
-                  });
-            }
-      });
 })( wp.customize , jQuery, _ );
 
 
@@ -12264,32 +12438,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_module_picker_module' )
                   )
             },
-      });
-
-      api.czrInputMap = api.czrInputMap || {};
-
-      //input_type => callback fn to fire in the Input constructor on initialize
-      //the callback can receive specific params define in each module constructor
-      //For example, a content picker can be given params to display only taxonomies
-      $.extend( api.czrInputMap, {
-            module_picker : function( input_options ) {
-                var input = this;
-                // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
-                // input.container.find('[draggable]').each( function() {
-                //       $(this).on( 'mousedown mouseup', function( evt ) {
-                //             switch( evt.type ) {
-                //                   case 'mousedown' :
-                //                         //$(this).addClass('sek-grabbing');
-                //                   break;
-                //                   case 'mouseup' :
-                //                         //$(this).removeClass('sek-grabbing');
-                //                   break;
-                //             }
-                //       });
-                // });
-                api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'module', input_container : input.container } );
-                //console.log( this.id, input_options );
-            }
       });
 })( wp.customize , jQuery, _ );
 
@@ -12449,39 +12597,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             });
       }
 })( wp.customize , jQuery, _ );
-
-
-
-
-
-
-
+//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
 /* ------------------------------------------------------------------------- *
- *  SECTION PICKER INPUT
+ *  MODULE OPTION SWITCHER
 /* ------------------------------------------------------------------------- */
 ( function ( api, $, _ ) {
-      api.czrInputMap = api.czrInputMap || {};
-      //input_type => callback fn to fire in the Input constructor on initialize
-      //the callback can receive specific params define in each module constructor
-      //For example, a content picker can be given params to display only taxonomies
-      $.extend( api.czrInputMap, {
-            section_picker : function( input_options ) {
-                  var input = this;
-                  // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
-                  // input.container.find('[draggable]').each( function() {
-                  //       $(this).on( 'mousedown mouseup', function( evt ) {
-                  //             switch( evt.type ) {
-                  //                   case 'mousedown' :
-                  //                         //$(this).addClass('sek-grabbing');
-                  //                   break;
-                  //                   case 'mouseup' :
-                  //                         //$(this).removeClass('sek-grabbing');
-                  //                   break;
-                  //             }
-                  //       });
-                  // });
-                  api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
-            }
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_mod_option_switcher_module : {
+                  //mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_mod_option_switcher_module', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_mod_option_switcher_module' )
+                  )
+            },
       });
 })( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
