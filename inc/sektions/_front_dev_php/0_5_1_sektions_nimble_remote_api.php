@@ -31,8 +31,13 @@ if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2", 
 function sek_get_nimble_api_data( $force_update = false ) {
     $api_data_transient_name = 'nimble_api_data_' . NIMBLE_VERSION;
     $info_data = get_transient( $api_data_transient_name );
+    $theme_slug = sek_get_parent_theme_slug();
+    $pc_theme_name = sek_maybe_get_presscustomizr_theme_name( $theme_slug );
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
+    if ( true === $force_update && sek_is_dev_mode() ) {
+          sek_error_log('API is in force update mode');
+    }
 
     // Refresh every 12 hours, unless force_update set to true
     if ( $force_update || false === $info_data ) {
@@ -42,7 +47,8 @@ function sek_get_nimble_api_data( $force_update = false ) {
           'body' => [
             'api_version' => NIMBLE_VERSION,
             'site_lang' => get_bloginfo( 'language' ),
-            'theme_name' => sek_maybe_get_presscustomizr_theme_name( sek_get_parent_theme_slug() )
+            'theme_name' => $pc_theme_name,
+            'start_ver' => sek_get_th_start_ver( $pc_theme_name )
           ],
         ) );
 
@@ -133,19 +139,18 @@ function sek_get_latest_posts_api_data( $force_update = false ) {
 }
 
 // @return html string
-function sek_get_cta_message_from_api( $theme_name, $force_update = false ) {
+function sek_start_msg_from_api( $theme_name, $force_update = false ) {
     $info_data = sek_get_nimble_api_data( $force_update );
-    if ( !sek_is_presscustomizr_theme( $theme_name ) || ! is_array( $info_data ) ) {
+    if ( !sek_is_presscustomizr_theme( $theme_name ) || !is_array( $info_data ) ) {
         return '';
     }
-    $message = '';
-    $cta_data = isset( $info_data['cta'] ) ? $info_data['cta'] : null;
+    $msg = '';
+    $api_msg = isset( $info_data['start_msg'] ) ? $info_data['start_msg'] : null;
 
-    $fn = 'customizr' === sek_maybe_get_presscustomizr_theme_name( $theme_name ) ? 'czr_fn_user_started_before_version' : 'hu_user_started_before_version';
-    if ( function_exists($fn) && !is_null($cta_data) && isset( $cta_data['started_before'] ) && call_user_func_array( $fn, array( $cta_data['started_before'] ) ) ) {
-        $message = !empty( $cta_data['html'] ) ? $cta_data['html'] : '';
+    if ( !is_null($api_msg) && is_string($api_msg) ) {
+        $msg = $api_msg;
     }
-    return $message;
+    return $msg;
 }
 
 // Refresh the api data on plugin update and theme switch

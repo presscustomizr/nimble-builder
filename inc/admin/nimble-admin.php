@@ -659,20 +659,20 @@ function sek_nimble_dashboard_callback_fn() {
             'link' => 'https://docs.presscustomizr.com/?ref=a&amp;utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=dashboard',
           ),
         );
-        $cta_link = array();
+        $start_msg_array = array();
         $theme_name = sek_get_parent_theme_slug();
 
         if ( sek_is_presscustomizr_theme( $theme_name ) ) {
-            $cta = sek_get_cta_message_from_api( $theme_name, false );
-            if ( !empty( $cta ) ) {
-              $cta_link = array(
-                'cta' => array(
-                  'html' => $cta,
+            $start_msg = sek_start_msg_from_api( $theme_name, false );
+            if ( !empty( $start_msg ) ) {
+              $start_msg_array = array(
+                'start_msg' => array(
+                  'html' => $start_msg,
                 ),
               );
             }
         }
-        $footer_links = array_merge($footer_links,$cta_link);
+        $footer_links = array_merge($footer_links,$start_msg_array);
       ?>
       <div class="nimble-db-footer">
           <?php foreach ( $footer_links as $link_id => $link_data ) : ?>

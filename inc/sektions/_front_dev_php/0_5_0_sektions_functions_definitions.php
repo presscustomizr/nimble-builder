@@ -1948,6 +1948,21 @@ function sek_maybe_get_presscustomizr_theme_name( $theme_name ) {
   return $theme_name;
 }
 
+// @return a string
+function sek_get_th_start_ver( $theme_name ) {
+  if ( !in_array( $theme_name, ['customizr', 'hueman'] ) )
+    return '';
+  $start_ver = '';
+  switch( $theme_name ) {
+      case 'customizr' :
+          $start_ver = defined( 'CZR_USER_STARTED_USING_FREE_THEME' ) ? CZR_USER_STARTED_USING_FREE_THEME : '';
+      break;
+      case 'hueman' :
+          $start_ver = get_transient( 'started_using_hueman' );
+      break;
+  }
+  return $start_ver;
+}
 
 
 
