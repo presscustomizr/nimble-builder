@@ -112,11 +112,11 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 
 == Upgrade Notice ==
 = 1.8.13 =
-User interface improvement : addition of an option switcher for the modules between content options and general settings.
+User interface improvements for modules, by adding an option switcher between content options and general settings.
 
 == Changelog ==
 = 1.8.13 : July 20th 2019 =
-* improved : in the ui, addition of an option switcher for the modules between content options and general settings.
+* improved : in the modules ui, addition of an option switcher between content options and general settings
 
 = 1.8.12 : July 18th 2019 =
 * fixed : [Carousel module] CSS classes added dynamically by javascript centering, .sek-h-centrd and .sek-v-centrd, were not styled. In particular missing the position:relative rule

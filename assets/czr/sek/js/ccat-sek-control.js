@@ -4303,31 +4303,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };//_do_register()
 
 
-
-
                   // Defer the registration when the parent section gets added to the api
-                  api.section.when( params.id, function() {
+                  api.section( params.id, function( _section_ ) {
                         api.section(params.id).focus();
-                        _do_register_();
                         // Generate the UI for module option switcher
                         // introduded in july 2019 for https://github.com/presscustomizr/nimble-builder/issues/135
                         self.generateModuleOptionSwitcherUI( params.id, params.action );
-                  });
+                        _do_register_();
 
-
-                  // MAIN CONTENT SECTION
-                  api.CZR_Helpers.register({
-                        origin : 'nimble',
-                        what : 'section',
-                        id : params.id,
-                        title: sektionsLocalizedData.i18n['Content for'] + ' ' + moduleName,
-                        panel : sektionsLocalizedData.sektionsPanelId,
-                        priority : 1000,
-                        //track : false//don't register in the self.registered()
-                        //constructWith : MainSectionConstructor,
-                  }).done( function() {});
-
-                  api.section( params.id, function( _section_ ) {
                         // don't display the clickable section title in the nimble root panel
                         _section_.container.find('.accordion-section-title').first().hide();
 
@@ -4342,6 +4325,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // Schedule the accordion behaviour
                         self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
                   });
+
+                  // Register the module content section
+                  api.CZR_Helpers.register({
+                        origin : 'nimble',
+                        what : 'section',
+                        id : params.id,
+                        title: sektionsLocalizedData.i18n['Content for'] + ' ' + moduleName,
+                        panel : sektionsLocalizedData.sektionsPanelId,
+                        priority : 1000,
+                        //track : false//don't register in the self.registered()
+                        //constructWith : MainSectionConstructor,
+                  }).done( function() {});
+
                   return dfd;
             },
 
@@ -4641,26 +4637,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });//_.each()
                   };//_do_register_()
 
-                  // The section won't be tracked <= not removed on each ui update
-                  // Note : the check on api.section.has( params.id ) is also performd on api.CZR_Helpers.register(), but here we use it to avoid setting up the click listeners more than once.
-                  if ( ! api.section.has( params.id ) ) {
-                        api.section( params.id, function( _section_ ) {
-                              // Schedule the accordion behaviour
-                              self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
-                        });
-                  }
-
-                  api.CZR_Helpers.register({
-                        origin : 'nimble',
-                        what : 'section',
-                        id : params.id,
-                        title: sektionsLocalizedData.i18n['Settings for the'] + ' ' + params.level,
-                        panel : sektionsLocalizedData.sektionsPanelId,
-                        priority : 10,
-                        //track : false//don't register in the self.registered()
-                        //constructWith : MainSectionConstructor,
-                  }).done( function() {});
-
                   // - Defer the registration when the parent section gets added to the api
                   // - Implement the module visibility
                   api.section( params.id, function( _section_ ) {
@@ -4681,7 +4657,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
                               $panelTitleEl.find('.customize-action').after( '<i class="fas fa-sliders-h sek-level-option-icon"></i>' );
                         }
+
+                        // Schedule the accordion behaviour
+                        self.scheduleModuleAccordion.call( _section_, { expand_first_control : false } );
                   });
+
+                  // Register the level settings section
+                  api.CZR_Helpers.register({
+                        origin : 'nimble',
+                        what : 'section',
+                        id : params.id,
+                        title: sektionsLocalizedData.i18n['Settings for the'] + ' ' + params.level,
+                        panel : sektionsLocalizedData.sektionsPanelId,
+                        priority : 10,
+                        //track : false//don't register in the self.registered()
+                        //constructWith : MainSectionConstructor,
+                  }).done( function() {});
 
                   return dfd;
             }
@@ -7570,6 +7561,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             scheduleModuleAccordion : function( params ) {
                   params = params || { expand_first_control : true };
                   var _section_ = this;
+                  // Void if already done
+                  if( true === _section_.container.data('sek-module-accordion-has-been-setup') )
+                    return;
+
                   // Attach event on click
                   $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
                         //evt.preventDefault();
@@ -7591,6 +7586,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $control.trigger( "true" == $control.attr('data-sek-expanded') ? 'sek-accordion-expanded' : 'sek-accordion-collapsed' );
                   });
 
+                  _section_.container.data('sek-module-accordion-has-been-setup', true );
+
                   // Expand the first module if requested
                   if ( params.expand_first_control ) {
                         // we want to exclude controls for which the accordion is not scheduled
@@ -7601,7 +7598,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               return true;
                         });
+
                         var firstControl = _.first( _eligibleControls );
+
                         if ( _.isObject( firstControl ) && ! _.isEmpty( firstControl.id ) ) {
                               api.control( firstControl.id, function( _ctrl_ ) {
                                     // this event is triggered by the control fmk in module.isReady.done( function() {} )
@@ -7609,7 +7608,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // because the item collection can be ready after the module.isReady() has been resolved.
                                     // see also https://github.com/presscustomizr/themes-customizer-fmk/commit/1f9fb0045d12dd3af9f4fdd880210dc3183fd63a
                                     _ctrl_.container.one('items-collection-populated', function() {
-                                          _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
+                                          $(this).find('label > .customize-control-title').trigger('click');
                                     });
 
                                     // remotely request a module.ready()
