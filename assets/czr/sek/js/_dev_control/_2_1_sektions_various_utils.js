@@ -842,6 +842,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             scheduleModuleAccordion : function( params ) {
                   params = params || { expand_first_control : true };
                   var _section_ = this;
+                  // Void if already done
+                  if( true === _section_.container.data('sek-module-accordion-has-been-setup') )
+                    return;
+
                   // Attach event on click
                   $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
                         //evt.preventDefault();
@@ -863,6 +867,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $control.trigger( "true" == $control.attr('data-sek-expanded') ? 'sek-accordion-expanded' : 'sek-accordion-collapsed' );
                   });
 
+                  _section_.container.data('sek-module-accordion-has-been-setup', true );
+
                   // Expand the first module if requested
                   if ( params.expand_first_control ) {
                         // we want to exclude controls for which the accordion is not scheduled
@@ -873,7 +879,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               return true;
                         });
+
                         var firstControl = _.first( _eligibleControls );
+
                         if ( _.isObject( firstControl ) && ! _.isEmpty( firstControl.id ) ) {
                               api.control( firstControl.id, function( _ctrl_ ) {
                                     // this event is triggered by the control fmk in module.isReady.done( function() {} )
@@ -881,7 +889,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // because the item collection can be ready after the module.isReady() has been resolved.
                                     // see also https://github.com/presscustomizr/themes-customizer-fmk/commit/1f9fb0045d12dd3af9f4fdd880210dc3183fd63a
                                     _ctrl_.container.one('items-collection-populated', function() {
-                                          _section_.container.find('.customize-control').first().find('label > .customize-control-title').trigger('click');
+                                          $(this).find('label > .customize-control-title').trigger('click');
                                     });
 
                                     // remotely request a module.ready()

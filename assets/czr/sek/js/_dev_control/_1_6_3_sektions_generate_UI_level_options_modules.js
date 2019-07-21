@@ -242,26 +242,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });//_.each()
                   };//_do_register_()
 
-                  // The section won't be tracked <= not removed on each ui update
-                  // Note : the check on api.section.has( params.id ) is also performd on api.CZR_Helpers.register(), but here we use it to avoid setting up the click listeners more than once.
-                  if ( ! api.section.has( params.id ) ) {
-                        api.section( params.id, function( _section_ ) {
-                              // Schedule the accordion behaviour
-                              self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
-                        });
-                  }
-
-                  api.CZR_Helpers.register({
-                        origin : 'nimble',
-                        what : 'section',
-                        id : params.id,
-                        title: sektionsLocalizedData.i18n['Settings for the'] + ' ' + params.level,
-                        panel : sektionsLocalizedData.sektionsPanelId,
-                        priority : 10,
-                        //track : false//don't register in the self.registered()
-                        //constructWith : MainSectionConstructor,
-                  }).done( function() {});
-
                   // - Defer the registration when the parent section gets added to the api
                   // - Implement the module visibility
                   api.section( params.id, function( _section_ ) {
@@ -282,7 +262,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( 0 < $panelTitleEl.length && $panelTitleEl.find('.sek-level-option-icon').length < 1 ) {
                               $panelTitleEl.find('.customize-action').after( '<i class="fas fa-sliders-h sek-level-option-icon"></i>' );
                         }
+
+                        // Schedule the accordion behaviour
+                        self.scheduleModuleAccordion.call( _section_, { expand_first_control : false } );
                   });
+
+                  // Register the level settings section
+                  api.CZR_Helpers.register({
+                        origin : 'nimble',
+                        what : 'section',
+                        id : params.id,
+                        title: sektionsLocalizedData.i18n['Settings for the'] + ' ' + params.level,
+                        panel : sektionsLocalizedData.sektionsPanelId,
+                        priority : 10,
+                        //track : false//don't register in the self.registered()
+                        //constructWith : MainSectionConstructor,
+                  }).done( function() {});
 
                   return dfd;
             }

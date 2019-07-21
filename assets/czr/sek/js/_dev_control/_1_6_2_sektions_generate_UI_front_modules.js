@@ -175,31 +175,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };//_do_register()
 
 
-
-
                   // Defer the registration when the parent section gets added to the api
-                  api.section.when( params.id, function() {
+                  api.section( params.id, function( _section_ ) {
                         api.section(params.id).focus();
-                        _do_register_();
                         // Generate the UI for module option switcher
                         // introduded in july 2019 for https://github.com/presscustomizr/nimble-builder/issues/135
                         self.generateModuleOptionSwitcherUI( params.id, params.action );
-                  });
+                        _do_register_();
 
-
-                  // MAIN CONTENT SECTION
-                  api.CZR_Helpers.register({
-                        origin : 'nimble',
-                        what : 'section',
-                        id : params.id,
-                        title: sektionsLocalizedData.i18n['Content for'] + ' ' + moduleName,
-                        panel : sektionsLocalizedData.sektionsPanelId,
-                        priority : 1000,
-                        //track : false//don't register in the self.registered()
-                        //constructWith : MainSectionConstructor,
-                  }).done( function() {});
-
-                  api.section( params.id, function( _section_ ) {
                         // don't display the clickable section title in the nimble root panel
                         _section_.container.find('.accordion-section-title').first().hide();
 
@@ -214,6 +197,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // Schedule the accordion behaviour
                         self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
                   });
+
+                  // Register the module content section
+                  api.CZR_Helpers.register({
+                        origin : 'nimble',
+                        what : 'section',
+                        id : params.id,
+                        title: sektionsLocalizedData.i18n['Content for'] + ' ' + moduleName,
+                        panel : sektionsLocalizedData.sektionsPanelId,
+                        priority : 1000,
+                        //track : false//don't register in the self.registered()
+                        //constructWith : MainSectionConstructor,
+                  }).done( function() {});
+
                   return dfd;
             },
 
