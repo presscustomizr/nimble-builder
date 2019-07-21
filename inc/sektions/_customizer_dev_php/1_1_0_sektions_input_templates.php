@@ -205,7 +205,7 @@ function sek_print_nimble_input_templates() {
               input_id = data.input_id,
               value = _.has( item_model, input_id ) ? item_model[input_id] : null;
         #>
-        <textarea id="textarea-{{data.control_id}}" data-czrtype="{{input_id}}" class="width-100" name="textarea" rows="10" cols=""></textarea>
+        <textarea id="textarea-{{input_id}}" data-czrtype="{{input_id}}" class="width-100" name="textarea" rows="10" cols=""></textarea>
       </script>
 
 
