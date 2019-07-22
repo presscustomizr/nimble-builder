@@ -1,0 +1,116 @@
+// synchronized with default on registration
+// [data-sek-module-type="czr_accordion_module"] .#{$project-prefix}module-inner {
+//   text-align: center;
+// }
+
+.sek-accord-wrapper {
+  text-align: left;
+  .sek-accord-item {
+    border: 1px solid #e3e3e3;
+    overflow: hidden;
+    &:not(:last-child) {
+      margin-bottom: 10px;
+    }
+    .sek-accord-title {
+      cursor: pointer;
+      color: #1e261f;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+          -ms-flex-align: center;
+              align-items: center;
+      -webkit-box-pack: justify;
+     -ms-flex-pack: justify;
+     justify-content: space-between;
+
+      padding: 15px 20px;
+
+      border-top: none;
+      border-right: none;
+      border-left: none;
+      border-bottom: 1px solid #e3e3e3;
+      font-size: 16px;
+      line-height: 1.5em;
+      font-weight: 600;
+      flex-grow: 1;
+      .sek-inner-accord-title {
+        padding-right: 10px;
+        max-width: calc(100% - 30px);//
+      }
+
+      // morphing + / -
+      button {
+        color: #1e261f;
+        width: 30px;
+        height: 30px;
+        // reset some properties
+        padding: 0;
+        margin: 0;
+        outline: none;
+        border: 0;
+        background: none;
+
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        font-size: 1.5em;
+        position: relative;
+      }
+
+      button span {
+        position: absolute;
+        transition: .3s;
+        background: #1e261f;
+        border-radius: 2px;
+      }
+
+      button span:first-of-type {
+        top: 25%;
+        bottom: 25%;
+        width: 10%;
+        left: 45%;
+      }
+
+      button span:last-of-type {
+        left: 25%;
+        right: 25%;
+        height: 10%;
+        top: 45%;
+      }
+
+      @at-root [data-sek-expanded="true"] {
+        button span:first-of-type, button span:last-of-type {
+          transform: rotate(90deg);
+        }
+        button span:last-of-type {
+          left: 50%;
+          right: 50%;
+        }
+      }
+    }//.sek-accord-title
+
+
+    &[data-sek-expanded="true"] .sek-accord-title {
+      button span:first-of-type, button span:last-of-type {
+        transform: rotate(90deg);
+      }
+      button span:last-of-type {
+        left: 50%;
+        right: 50%;
+      }
+    }
+
+    .sek-accord-content {
+      padding: 15px 20px;
+      background: #f2f2f2;
+      color: #1e261f;
+      font-size: 16px;
+      line-height: 1.5em;
+    }
+
+    &[data-sek-expanded="false"] > .sek-accord-content {
+      display: none;
+    }
+
+  }
+}

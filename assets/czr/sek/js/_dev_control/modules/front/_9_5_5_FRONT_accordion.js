@@ -143,6 +143,11 @@
 
                         // when the module requests a focus after a preview update
                         item.bind('sek-request-item-focus-in-preview', requestFocusToPreview );
+
+                        // rewriteItemTitle when item are sorted, so that the placeholder title ( based in item DOM index ) get refreshed
+                        item.module.bind('item-collection-sorted', function() {
+                              item.writeItemViewTitle( item(), { input_changed : 'title_text'} );
+                        });
                   },
 
 
@@ -155,14 +160,12 @@
                             module  = item.module,
                             _model = model || item(),
                             _title = '',
-                            _slideBg = '',
-                            _src = 'not_set',
                             _areDataSet = ! _.isUndefined( data ) && _.isObject( data );
 
                         //When shall we update the item title ?
                         //=> when the slide title or the thumbnail have been updated
                         //=> on module model initialized
-                        if ( _areDataSet && data.input_changed && ! _.contains( [ 'img', 'text_content' ], data.input_changed ) )
+                        if ( _areDataSet && data.input_changed && ! _.contains( [ 'title_text' ], data.input_changed ) )
                           return;
 
                         //set title with index
@@ -178,94 +181,33 @@
                         }
 
                         //if the slide title is set, use it
-                        _title = api.CZR_Helpers.truncate( _title, 15 );
+                        _title = api.CZR_Helpers.truncate( _title, 25 );
 
-                        if ( _model['img'] ) {
-                              _slideBg = _model['img'];
-                              if ( _.isString( _model['img'] ) ) {
-                                    // if the img is already an url, typically the default image
-                                    if ( -1 !==  _model['img'].indexOf( 'http' ) ) {
-                                          _slideBg = _model['img'];
-                                    // else, cast to an int
-                                    } else {
-                                          _slideBg = parseInt( _model['img'], 10 );
-                                    }
-                              }
-                        }
-
-                        var _getThumbSrc = function() {
-                              return $.Deferred( function() {
-                                    var dfd = this;
-                                    if ( _.isUndefined( _slideBg ) || _.isEmpty( '' + _slideBg ) ) { //<= always cast to a string when using _.isEmpty
-                                          dfd.resolve( '' );
-                                    }
-                                    //try to set the default src
-                                    else if ( _.isString( _slideBg ) && -1 !== _slideBg.indexOf( 'http' ) ) {
-                                          dfd.resolve( _slideBg );
-                                    } else {
-                                          wp.media.attachment( _slideBg ).fetch()
-                                                .always( function() {
-                                                      var attachment = this;
-                                                      if ( _.isObject( attachment ) && _.has( attachment, 'attributes' ) && _.has( attachment.attributes, 'sizes' ) ) {
-                                                            _src = this.get('sizes').thumbnail.url;
-                                                            dfd.resolve( _src );
-                                                      }
-                                                });
-                                    }
-                              }).promise();
-                        };
-
-
-                        var $slideTitleEl = $( '.' + module.control.css_attr.item_title , item.container ).find('.sek-slide-title'),
-                            $slideThumbEl = $( '.' + module.control.css_attr.item_title , item.container ).find( '.sek-slide-thumb');
+                        var $itemTitleEl = $( '.' + module.control.css_attr.item_title , item.container ).find('.sek-accord-title');
 
                         //TITLE
                         //always write the title
-                        var _text = _model['text_content'] ? _model['text_content'] : '';
+                        var _text = _model['title_text'] ? _model['title_text'] : '';
                         // Strip all html tags and keep only first characters
                         _text = $("<div>").html(_text).text();
+
+                        // placeholder text, consistent with the php one in tmpl/accordion_tmpl.php
+                        var item_index = item.module.container.find( '.czr-items-wrapper > li').index( item.container );
+                        _text = _.isEmpty( _text ) ? sektionsLocalizedData.i18n['Accordion title'] + ' #' + ( +item_index+1 ) : _text;
+
                         _text = _text.substring(0,60);
-                        if ( 1 > $slideTitleEl.length ) {
+                        if ( 1 > $itemTitleEl.length ) {
                               //remove the default item title
                               $( '.' + module.control.css_attr.item_title , item.container ).html( '' );
                               //write the new one
                               $( '.' + module.control.css_attr.item_title , item.container ).append( $( '<div/>',
                                     {
-                                        class : 'sek-slide-title',
+                                        class : 'sek-accord-title',
                                         html : _text
                                     }
                               ) );
                         } else {
-                              $slideTitleEl.html( _text );
-                        }
-
-                        //THUMB
-                        //When shall we append the item thumb ?
-                        //=>IF the sek-slide-thumb element is not set
-                        //=>OR in the case where data have been provided and the input_changed is 'img'
-                        //=>OR if no data is provided ( we are in the initialize phase )
-                        var _isBgChange = _areDataSet && data.input_changed && 'img' === data.input_changed;
-
-                        var _getThumbHtml = function( src ) {
-                            return ( _.isEmpty( '' + src ) || 'not_set' === src ) ? '' : '<img src="' + src + '" width="32" alt="' + _title + '" />';
-                        };
-
-                        $( '.' + module.control.css_attr.item_title, item.container ).css('padding', '0 4px');
-
-
-                        if ( 1 > $slideThumbEl.length ) {
-                              _getThumbSrc().done( function( src ) {
-                                    $( '.' + module.control.css_attr.item_title, item.container ).prepend( $('<div/>',
-                                          {
-                                                class : 'sek-slide-thumb',
-                                                html : _getThumbHtml( src )
-                                          }
-                                    ));
-                              });
-                        } else if ( _isBgChange || ! _areDataSet ) {
-                              _getThumbSrc().done( function( src ) {
-                                    $slideThumbEl.html( _getThumbHtml( src ) );
-                              });
+                              $itemTitleEl.html( _text );
                         }
                   },
 
@@ -532,37 +474,6 @@
                   ready_on_section_expanded : false,
                   ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_accordion_opts_child' )
-            }
-      });
-})( wp.customize , jQuery, _ );
-
-
-
-
-
-
-/* ------------------------------------------------------------------------- *
- *  SLIDER DESIGN OPTIONS
-/* ------------------------------------------------------------------------- */
-( function ( api, $, _ ) {
-      //provides a description of each module
-      //=> will determine :
-      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
-      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
-      //   , if crud, the item shall be removable
-      //3) how to render : if multi item, the item content is rendered when user click on edit button.
-      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
-      //4) some DOM behaviour. For example, a multi item shall be sortable.
-      api.czrModuleMap = api.czrModuleMap || {};
-      $.extend( api.czrModuleMap, {
-            czr_img_slider_fonts_child : {
-                  //mthds : Constructor,
-                  crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_img_slider_fonts_child', 'name' ),
-                  has_mod_opt : false,
-                  ready_on_section_expanded : false,
-                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_img_slider_fonts_child' )
             }
       });
 })( wp.customize , jQuery, _ );

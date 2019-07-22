@@ -1690,7 +1690,7 @@ function sek_get_module_collection() {
           'content-type' => 'module',
           'content-id' => 'czr_accordion_module',
           'title' => __( 'Accordion', 'text_doma' ),
-          'icon' => ''
+          'icon' => 'Nimble_accordion_icon.svg'
         ),
         array(
           'content-type' => 'module',

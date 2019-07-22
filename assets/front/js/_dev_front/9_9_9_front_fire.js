@@ -535,7 +535,29 @@ jQuery( function($){
 
 
 
+/* ------------------------------------------------------------------------- *
+ *  ACCORDION MODULE
+/* ------------------------------------------------------------------------- */
+jQuery( function($){
+    $( '.sektion-wrapper' ).on( 'click', '.sek-accord-item > .sek-accord-title', function( evt ) {
+        //evt.preventDefault();
+        //evt.stopPropagation();
+        var $item = $(this).closest( '.sek-accord-item'),
+            $accordion = $(this).closest( '.sek-accord-wrapper');
 
+        $accordion.find('.sek-accord-item').not( $item ).each( function() {
+              $(this).attr('data-sek-expanded', "false" );
+              $(this).find('.sek-accord-content').stop( true, true ).slideUp( 200 );
+        });
+        $item.find('.sek-accord-content').stop( true, true ).slideToggle({
+              duration : 200,
+              start : function() {
+                    $item.attr('data-sek-expanded', "false" === $item.attr('data-sek-expanded') ? "true" : "false" );
+                    $item.trigger( "true" == $item.attr('data-sek-expanded') ? 'sek-accordion-expanded' : 'sek-accordion-collapsed' );
+              }
+        });
+    });
+});
 
 
 
