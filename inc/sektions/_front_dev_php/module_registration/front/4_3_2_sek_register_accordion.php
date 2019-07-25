@@ -203,7 +203,8 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'background_color',
-                                'css_selectors' => '.sek-accord-wrapper .sek-accord-item .sek-accord-title'
+                                'css_selectors' => '.sek-accord-wrapper .sek-accord-item .sek-accord-title',
+                                'html_before' => '<hr/><h3>' . __('COLOR AND BACKGROUND') .'</h3>'
                             ),
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -225,7 +226,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'refresh_stylesheet' => true,
                                 'width-100'   => true,
                                 'css_identifier' => 'color',
-                                'css_selectors' => array( '.sek-accord-item .sek-accord-title:hover *')
+                                'css_selectors' => array( '.sek-accord-item .sek-accord-title:hover *', '[data-sek-expanded="true"] .sek-accord-title *')
                             ),//"#000000",
 
                             'font_family_css' => array(
@@ -490,7 +491,7 @@ function sek_add_css_rules_for_czr_accordion_module( $rules, $complete_modul_mod
     // ACTIVE / HOVER TEXT COLOR ( for the plus / minus icon )
     if ( ! empty( $accord_opts[ 'color_active_css' ] ) && $accord_defaults[ 'color_active_css' ] != $accord_opts[ 'color_active_css' ] ) {
         $rules[] = array(
-            'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item .sek-accord-title:hover button span', $complete_modul_model['id'] ),
+            'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper [data-sek-expanded="true"] .sek-accord-title button span, [data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item .sek-accord-title:hover button span', $complete_modul_model['id'] ),
             'css_rules' => sprintf('background:%s;', $accord_opts[ 'color_active_css' ] ),
             'mq' =>null
         );

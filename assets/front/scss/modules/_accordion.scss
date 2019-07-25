@@ -37,12 +37,23 @@
       -ms-flex-positive: 1;
       flex-grow: 1;
 
+      // Default active color and button bg
       &:hover * {
           color: #1e261f;//consistent with default on registration
       }
       &:hover button span {
           background:#1e261f//consistent with default on registration
       }
+      @at-root [data-sek-expanded="true"] {
+        .sek-accord-title * {
+            color: #1e261f;//consistent with default on registration
+        }
+        .sek-accord-title button span {
+            background:#1e261f//consistent with default on registration
+        }
+      }
+
+
       .sek-inner-accord-title {
         padding-right: 10px;
         max-width: calc(100% - 30px);
