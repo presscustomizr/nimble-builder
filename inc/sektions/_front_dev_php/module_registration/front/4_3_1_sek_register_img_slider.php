@@ -448,9 +448,14 @@ add_filter( 'sek_add_css_rules_for_single_item_in_module_type___czr_img_slider_c
 function sek_add_css_rules_for_items_in_czr_img_slider_collection_child( $rules, $params ) {
     // $item_input_list = wp_parse_args( $item_input_list, $default_value_model );
     $item_model = isset( $params['input_list'] ) ? $params['input_list'] : array();
-
+    $all_defaults = sek_get_default_module_model( 'czr_img_slider_collection_child');
+    // Default :
+    // [v_alignment] => Array
+    // (
+    //     [desktop] => center
+    // )
     // VERTICAL ALIGNMENT
-    if ( ! empty( $item_model[ 'v_alignment' ] ) ) {
+    if ( ! empty( $item_model[ 'v_alignment' ] ) && $all_defaults['v_alignment'] != $item_model[ 'v_alignment' ] ) {
         if ( ! is_array( $item_model[ 'v_alignment' ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the v_alignment option should be an array( {device} => {alignment} )');
         }
@@ -528,6 +533,7 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
 
     $selector = '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .swiper-container .swiper-wrapper';
 
+
     // CUSTOM HEIGHT BY DEVICE
     if ( ! empty( $slider_options[ 'height-type' ] ) ) {
         if ( 'custom' === $slider_options[ 'height-type' ] ) {
@@ -537,11 +543,17 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
                 sek_error_log( __FUNCTION__ . ' => error => the height option should be an array( {device} => {number}{unit} )', $custom_user_height);
             }
             $custom_user_height = is_array( $custom_user_height ) ? $custom_user_height : array();
-            $defaults = array(
-                'desktop' => '400px',
-                'tablet' => '',
-                'mobile' => '200px'
-            );
+
+            // DEFAULTS :
+            // array(
+            //     'desktop' => '400px',
+            //     'tablet' => '',
+            //     'mobile' => '200px'
+            // );
+            $all_defaults = sek_get_default_module_model( 'czr_img_slider_module');
+            $slider_defaults = $all_defaults['slider_options'];
+            $defaults = $slider_defaults['custom-height'];
+
             $custom_user_height = wp_parse_args( $custom_user_height, $defaults );
 
             if ( $defaults != $custom_user_height ) {
