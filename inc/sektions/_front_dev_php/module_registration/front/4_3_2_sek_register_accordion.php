@@ -127,7 +127,7 @@ function sek_get_module_params_for_czr_accordion_collection_child() {
  *  ACCORDION OPTIONS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_accordion_opts_child() {
-    $title_content_selector = array( '.sek-accord-item .sek-accord-title', '.sek-accord-item .sek-accord-title *' );
+    $title_content_selector = array( '.sek-accord-item .sek-accord-title *' );
     $main_content_selector = array( '.sek-accord-item .sek-accord-content', '.sek-accord-item .sek-accord-content *' );
     return array(
         'dynamic_registration' => true,
@@ -166,18 +166,6 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20'
                             ),
-                            'space_between_items' => array(
-                                'input_type'  => 'range_with_unit_picker_device_switcher',
-                                'title'       => __('Space between items', 'text_doma'),
-                                'min' => 1,
-                                'max' => 100,
-                                //'unit' => 'px',
-                                'default' => array( 'desktop' => '15px' ),
-                                'width-100'   => true,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'title_width' => 'width-100'
-                            ),
                             'border_width_css' => array(
                                 'input_type'  => 'range_with_unit_picker',
                                 'title'       => __( 'Border weight', 'text_doma' ),
@@ -185,7 +173,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'max' => 80,
                                 'default' => '1px',
                                 'width-100'   => true,
-                                'refresh_markup' => false,
+                                //'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'border_width',
                                 'css_selectors' => '.sek-accord-wrapper .sek-accord-item',
@@ -220,7 +208,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __( 'Text color', 'text_doma' ),
-                                'default'     => '#1e261f',
+                                'default'     => '#565656',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'width-100'   => true,
@@ -230,13 +218,14 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
 
                             'color_active_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
+                                'title_width' => 'width-100',
                                 'title'       => __( 'Text color when active', 'text_doma' ),
-                                'default'     => '#e2e2e2',
+                                'default'     => '#1e261f',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'width-100'   => true,
                                 'css_identifier' => 'color',
-                                'css_selectors' => $title_content_selector
+                                'css_selectors' => array( '.sek-accord-item .sek-accord-title:hover *')
                             ),//"#000000",
 
                             'font_family_css' => array(
@@ -295,7 +284,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'title'       => __( 'Border bottom color', 'text_doma' ),
                                 'width-100'   => true,
                                 'default'     => '#e3e3e3',
-                                'refresh_markup' => false,
+                                //'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'border_color',
                                 'css_selectors' => '.sek-accord-wrapper .sek-accord-item .sek-accord-title'
@@ -483,14 +472,15 @@ function sek_add_css_rules_for_czr_accordion_module( $rules, $complete_modul_mod
       return $rules;
 
     $value = $complete_modul_model['value'];
+    $defaults = sek_get_default_module_model( 'czr_accordion_module');
+    $accord_defaults = $defaults['accord_opts'];
+
     $accord_opts = $value['accord_opts'];
 
-    $selector = '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .swiper-container .swiper-wrapper';
-
-    sek_error_log('????' . sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-inner-accord-title button span', $complete_modul_model['id'] ), $accord_opts );
+    //sek_error_log('sek_get_default_module_model() ?', sek_get_default_module_model( 'czr_accordion_module') );
 
     // TEXT COLOR ( for the plus / minus icon )
-    if ( ! empty( $accord_opts[ 'color_css' ] ) ) {
+    if ( ! empty( $accord_opts[ 'color_css' ] ) && $accord_defaults[ 'color_css' ] != $accord_opts[ 'color_css' ] ) {
         $rules[] = array(
             'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item button span', $complete_modul_model['id'] ),
             'css_rules' => 'background:'. $accord_opts[ 'color_css' ] .';',
@@ -498,52 +488,13 @@ function sek_add_css_rules_for_czr_accordion_module( $rules, $complete_modul_mod
         );
     }
     // ACTIVE / HOVER TEXT COLOR ( for the plus / minus icon )
-    if ( ! empty( $accord_opts[ 'color_active_css' ] ) ) {
-
+    if ( ! empty( $accord_opts[ 'color_active_css' ] ) && $accord_defaults[ 'color_active_css' ] != $accord_opts[ 'color_active_css' ] ) {
+        $rules[] = array(
+            'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item .sek-accord-title:hover button span', $complete_modul_model['id'] ),
+            'css_rules' => sprintf('background:%s;', $accord_opts[ 'color_active_css' ] ),
+            'mq' =>null
+        );
     }
-
-    // CUSTOM HEIGHT BY DEVICE
-    // if ( ! empty( $accord_opts[ 'height-type' ] ) ) {
-    //     if ( 'custom' === $accord_opts[ 'height-type' ] ) {
-    //         $custom_user_height = array_key_exists( 'custom-height', $accord_opts ) ? $accord_opts[ 'custom-height' ] : array();
-
-    //         if ( ! is_array( $custom_user_height ) ) {
-    //             sek_error_log( __FUNCTION__ . ' => error => the height option should be an array( {device} => {number}{unit} )', $custom_user_height);
-    //         }
-    //         $custom_user_height = is_array( $custom_user_height ) ? $custom_user_height : array();
-    //         $defaults = array(
-    //             'desktop' => '400px',
-    //             'tablet' => '',
-    //             'mobile' => '200px'
-    //         );
-    //         $custom_user_height = wp_parse_args( $custom_user_height, $defaults );
-
-    //         if ( $defaults != $custom_user_height ) {
-    //             $height_value = $custom_user_height;
-    //             foreach ( $custom_user_height as $device => $num_unit ) {
-    //                 $numeric = sek_extract_numeric_value( $num_unit );
-    //                 if ( ! empty( $numeric ) ) {
-    //                     $unit = sek_extract_unit( $num_unit );
-    //                     $unit = '%' === $unit ? 'vh' : $unit;
-    //                     $height_value[$device] = $numeric . $unit;
-    //                 }
-    //             }
-
-    //             $rules = sek_set_mq_css_rules(array(
-    //                 'value' => $height_value,
-    //                 'css_property' => 'height',
-    //                 'selector' => $selector
-    //             ), $rules );
-    //         }
-    //     }// if custom height
-    //     else {
-    //         $rules[] = array(
-    //             'selector' => $selector,
-    //             'css_rules' => 'height:auto;',
-    //             'mq' =>null
-    //         );
-    //     }
-    // }// Custom height rules
 
     return $rules;
 }

@@ -10,12 +10,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! function_exists( 'Nimble\sek_print_accordion' ) ) {
   function sek_print_accordion( $accord_collec = array(), $accord_opts, $model ) {
       $accord_collec = is_array( $accord_collec ) ? $accord_collec : array();
+
       $is_accordion_multi_item = count( $accord_collec ) > 1;
-      //$hide_nav_on_mobiles = true === sek_booleanize_checkbox_val( $accord_opts['hide_nav_on_mobiles'] );
+      $first_expanded = true === sek_booleanize_checkbox_val( $accord_opts['first_expanded'] ) ? "true" : "false";
+
+      //sek_error_log('$accord_opts??' . $first_expanded, $accord_opts );
+
+      $global_border_width = sek_extract_numeric_value( $accord_opts['border_width_css']);
+      $title_border_width = sek_extract_numeric_value( $accord_opts['title_border_w_css']);
+
       ?>
-        <?php printf('<div class="sek-accord-wrapper data-sek-accord-id="%1$s" data-sek-is-multi-item="%2$s" role="tablist">',
+        <?php printf('<div class="sek-accord-wrapper data-sek-accord-id="%1$s" data-sek-is-multi-item="%2$s" data-sek-first-expanded="%3$s" data-sek-one-expanded="%4$s" data-sek-has-global-border="%5$s" data-sek-has-title-border="%6$s" role="tablist">',
             $model['id'],
-            $is_accordion_multi_item ? 'true' : 'false'
+            $is_accordion_multi_item ? "true" : "false",
+            $first_expanded,
+            true === sek_booleanize_checkbox_val( $accord_opts['one_expanded'] ) ? "true" : "false",
+            $global_border_width > 0 ? "true" : "false",
+            $title_border_width > 0 ? "true" : "false"
           ); ?>
           <?php if ( is_array( $accord_collec ) && count( $accord_collec ) > 0 ) : ?>
               <?php
@@ -23,13 +34,12 @@ if ( ! function_exists( 'Nimble\sek_print_accordion' ) ) {
               foreach( $accord_collec as $key => $item ) {
                   $title = !empty( $item['title_text'] ) ? $item['title_text'] : sprintf( '%s %s', __('Accordion title', 'text_dom'), '#' . $ind );
                   // Put them together
-                  printf( '<div class="sek-accord-item" title="%1$s" data-sek-item-id="%2$s" data-sek-expanded="%5$s"><div class="sek-accord-title" role="tab" aria-controls="sek-tab-content-%2$s"><span class="sek-inner-accord-title">%3$s</span><button>
-  <span></span><span></span></button></div><div class="sek-accord-content" role="tabpanel" aria-labelledby="sek-tab-content-%2$s">%4$s</div></div>',
+                  printf( '<div class="sek-accord-item" title="%1$s" data-sek-item-id="%2$s" data-sek-expanded="%5$s"><div class="sek-accord-title" role="tab" aria-controls="sek-tab-content-%2$s"><span class="sek-inner-accord-title">%3$s</span><button><span></span><span></span></button></div><div class="sek-accord-content" role="tabpanel" aria-labelledby="sek-tab-content-%2$s">%4$s</div></div>',
                       esc_html( esc_attr( $item['title_attr'] ) ),
                       $item['id'],
                       $title,
                       $item['text_content'],
-                      'false'
+                      ( 'true' === $first_expanded && 1 === $ind ) ? "true" : "false"
                   );
                   $ind++;
               }//foreach

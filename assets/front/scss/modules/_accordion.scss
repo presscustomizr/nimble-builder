@@ -6,14 +6,14 @@
 .sek-accord-wrapper {
   text-align: left;
   .sek-accord-item {
-    border: 1px solid #e3e3e3;
+    border: 1px solid #e3e3e3;//consistent with default on registration
     overflow: hidden;
     &:not(:last-child) {
-      margin-bottom: 10px;
+      margin-bottom: 0px;//space between items, consistent with defaults on registration
     }
     .sek-accord-title {
       cursor: pointer;
-      color: #1e261f;
+      color: #565656;//consistent with default on registration
       display: -webkit-box;
       display: -ms-flexbox;
       display: flex;
@@ -29,19 +29,36 @@
       border-top: none;
       border-right: none;
       border-left: none;
-      border-bottom: 1px solid #e3e3e3;
+      border-bottom: 1px solid #e3e3e3;//consistent with default on registration
       font-size: 16px;
       line-height: 1.5em;
       font-weight: 600;
+      -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
       flex-grow: 1;
+
+      &:hover * {
+          color: #1e261f;//consistent with default on registration
+      }
+      &:hover button span {
+          background:#1e261f//consistent with default on registration
+      }
       .sek-inner-accord-title {
         padding-right: 10px;
-        max-width: calc(100% - 30px);//
+        max-width: calc(100% - 30px);
       }
 
+      .sek-inner-accord-title, button span {
+          -webkit-transition: all 0.15s ease-in-out;
+          -moz-transition: all, 0.15s ease-in-out;
+          -ms-transition: all, 0.15s ease-in-out;
+          -o-transition: all, 0.15s ease-in-out;
+          transition: all 0.15s ease-in-out;
+      }
       // morphing + / -
+      // inspired from https://stackoverflow.com/questions/38136077/how-to-morph-a-plus-sign-to-a-minus-sign-using-css-transition
       button {
-        color: #1e261f;
+        color: #1e261f;//consistent with default on registration
         width: 30px;
         height: 30px;
         // reset some properties
@@ -59,8 +76,10 @@
 
       button span {
         position: absolute;
-        transition: .3s;
-        background: #1e261f;
+        -webkit-transition: .3s;
+          -o-transition: .3s;
+              transition: .3s;
+        background: #565656;//consistent with default on registration
         border-radius: 2px;
       }
 
@@ -80,7 +99,9 @@
 
       @at-root [data-sek-expanded="true"] {
         button span:first-of-type, button span:last-of-type {
-          transform: rotate(90deg);
+          -webkit-transform: rotate(90deg);
+            -ms-transform: rotate(90deg);
+                transform: rotate(90deg);
         }
         button span:last-of-type {
           left: 50%;
@@ -90,9 +111,20 @@
     }//.sek-accord-title
 
 
+    // make sure we don't have a double bottom border when the item is collapsed
+    @at-root [data-sek-has-global-border="true"][data-sek-has-title-border="true"] [data-sek-expanded="false"] .sek-accord-title {
+      border-bottom: none;
+    }
+
+    @at-root [data-sek-has-global-border="true"][data-sek-has-title-border="true"] .sek-accord-item:not(:last-child) {
+      border-bottom: none;
+    }
+
     &[data-sek-expanded="true"] .sek-accord-title {
       button span:first-of-type, button span:last-of-type {
-        transform: rotate(90deg);
+        -webkit-transform: rotate(90deg);
+            -ms-transform: rotate(90deg);
+                transform: rotate(90deg);
       }
       button span:last-of-type {
         left: 50%;
@@ -107,7 +139,9 @@
       font-size: 16px;
       line-height: 1.5em;
     }
-
+    &[data-sek-expanded="true"] > .sek-accord-content {
+      display: block;
+    }
     &[data-sek-expanded="false"] > .sek-accord-content {
       display: none;
     }
