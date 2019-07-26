@@ -1690,7 +1690,7 @@ function sek_get_module_collection() {
           'content-type' => 'module',
           'content-id' => 'czr_accordion_module',
           'title' => __( 'Accordion', 'text_doma' ),
-          'icon' => ''
+          'icon' => 'Nimble_accordion_icon.svg'
         ),
         array(
           'content-type' => 'module',
@@ -12174,9 +12174,14 @@ add_filter( 'sek_add_css_rules_for_single_item_in_module_type___czr_img_slider_c
 function sek_add_css_rules_for_items_in_czr_img_slider_collection_child( $rules, $params ) {
     // $item_input_list = wp_parse_args( $item_input_list, $default_value_model );
     $item_model = isset( $params['input_list'] ) ? $params['input_list'] : array();
-
+    $all_defaults = sek_get_default_module_model( 'czr_img_slider_collection_child');
+    // Default :
+    // [v_alignment] => Array
+    // (
+    //     [desktop] => center
+    // )
     // VERTICAL ALIGNMENT
-    if ( ! empty( $item_model[ 'v_alignment' ] ) ) {
+    if ( ! empty( $item_model[ 'v_alignment' ] ) && $all_defaults['v_alignment'] != $item_model[ 'v_alignment' ] ) {
         if ( ! is_array( $item_model[ 'v_alignment' ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the v_alignment option should be an array( {device} => {alignment} )');
         }
@@ -12254,6 +12259,7 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
 
     $selector = '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .swiper-container .swiper-wrapper';
 
+
     // CUSTOM HEIGHT BY DEVICE
     if ( ! empty( $slider_options[ 'height-type' ] ) ) {
         if ( 'custom' === $slider_options[ 'height-type' ] ) {
@@ -12263,11 +12269,17 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
                 sek_error_log( __FUNCTION__ . ' => error => the height option should be an array( {device} => {number}{unit} )', $custom_user_height);
             }
             $custom_user_height = is_array( $custom_user_height ) ? $custom_user_height : array();
-            $defaults = array(
-                'desktop' => '400px',
-                'tablet' => '',
-                'mobile' => '200px'
-            );
+
+            // DEFAULTS :
+            // array(
+            //     'desktop' => '400px',
+            //     'tablet' => '',
+            //     'mobile' => '200px'
+            // );
+            $all_defaults = sek_get_default_module_model( 'czr_img_slider_module');
+            $slider_defaults = $all_defaults['slider_options'];
+            $defaults = $slider_defaults['custom-height'];
+
             $custom_user_height = wp_parse_args( $custom_user_height, $defaults );
 
             if ( $defaults != $custom_user_height ) {
@@ -12317,11 +12329,13 @@ function sek_get_module_params_for_czr_accordion_module() {
             'accord_opts' => 'czr_accordion_opts_child'
         ),
         'name' => __('Accordion', 'text_doma'),
-        // 'starting_value' => array(
-        //     'img_collection' => array(
-        //         'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
-        //     )
-        // ),
+        'starting_value' => array(
+            'accord_collec' => array(
+                array('text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'),
+                array('text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'),
+                array('text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.')
+            )
+        ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '[data-sek-accordion-id]' ),//array( '.sek-icon i' ),
@@ -12342,14 +12356,13 @@ function sek_get_module_params_for_czr_accordion_module() {
  *  MAIN SETTINGS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_accordion_collection_child() {
-    $text_content_selector = array( '.sek-slider-text-content', '.sek-slider-text-content *' );
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_accordion_collection_child',
         'is_crud' => true,
-        'name' => __( 'Slide collection', 'text_doma' ),
+        'name' => __( 'Item collection', 'text_doma' ),
         'starting_value' => array(
-            'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
+            'text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
         ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' => array( '.sek-social-icon' ),//array( '.sek-icon i' ),
@@ -12380,13 +12393,13 @@ function sek_get_module_params_for_czr_accordion_collection_child() {
                                 'title'              => __( 'Heading text', 'text_doma' ),
                                 'default'            => '',
                                 'width-100'         => true,
-                                'refresh_markup'    => '[data-sek-input-type="textarea"]',
+                                'refresh_markup'    => '.sek-inner-accord-title',
                                 'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
                             ),
                             'title_attr'  => array(
                                 'input_type'  => 'text',
                                 'default'     => '',
-                                'title'       => __('Title', 'text_domain_to_be_replaced'),
+                                'title'       => __('Title on mouse over', 'text_domain_to_be_replaced'),
                                 'notice_after' => __('This is the text displayed on mouse over.' )
                             ),
                         )
@@ -12394,76 +12407,18 @@ function sek_get_module_params_for_czr_accordion_collection_child() {
                     array(
                         'title' => __( 'Content', 'text_doma' ),
                         'inputs' => array(
-                            // 'enable_text' => array(
-                            //     'input_type'  => 'nimblecheck',
-                            //     'title'       => __('Add text content', 'text_doma'),
-                            //     'default'     => false,
-                            //     'title_width' => 'width-80',
-                            //     'input_width' => 'width-20',
-                            //     'notice_after' => __('Note : you can adjust the text color and / or use a color overlay to improve accessibility of your text content.', 'text_doma')
-                            // ),
                             'text_content' => array(
                                 'input_type'        => 'nimble_tinymce_editor',
                                 'editor_params'     => array(
-                                    'media_button' => false,
-                                    'includedBtns' => 'basic_btns',
+                                    'media_button' => true,
+                                    'includedBtns' => 'basic_btns_with_lists',
                                 ),
                                 'title'             => __( 'Text content', 'text_doma' ),
                                 'default'           => '',
                                 'width-100'         => true,
-                                'refresh_markup'    => '.sek-slider-text-content',
+                                'refresh_markup'    => '.sek-accord-content',
                                 'notice_before' => __('You may use some html tags in the "text" tab of the editor.', 'text_domain_to_be_replaced')
                             ),
-
-                            'color_css'           => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
-                                'default'     => '#e2e2e2',// why this light grey ? => if set to white ( #fff ), the text is not visible when no image is picked, which might be difficult to understand for users
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'css_identifier' => 'color',
-                                'css_selectors' => $text_content_selector,
-                            ),//"#000000",
-
-                            'font_family_css' => array(
-                                'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_doma' ),
-                                'default'     => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'refresh_fonts' => true,
-                                'css_identifier' => 'font_family',
-                                'css_selectors' => $text_content_selector,
-                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>'
-                            ),
-                            'font_size_css'       => array(
-                                'input_type'  => 'range_with_unit_picker_device_switcher',
-                                'default'     => array( 'desktop' => '16px' ),
-                                'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_doma' ),
-                                'min' => 0,
-                                'max' => 100,
-                                'width-100'         => true,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_size',
-                                'css_selectors' => $text_content_selector,
-                            ),//16,//"14px",
-                            'line_height_css'     => array(
-                                'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_doma' ),
-                                'default'     => '1.5em',
-                                'min' => 0,
-                                'max' => 10,
-                                'step' => 0.1,
-                                'width-100'         => true,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'line_height',
-                                'css_selectors' => $text_content_selector,
-                            ),//24,//"20px",
-
                             'h_alignment_css' => array(
                                 'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
                                 'title'       => __('Horizontal alignment', 'text_doma'),
@@ -12473,36 +12428,7 @@ function sek_get_module_params_for_czr_accordion_collection_child() {
                                 'css_identifier' => 'h_alignment',
                                 'title_width' => 'width-100',
                                 'width-100'   => true,
-                                'css_selectors' => array( '.sek-slider-text-content' ),
-                                'html_before' => '<hr/><h3>' . __('ALIGNMENTS') .'</h3>'
-                            ),
-                            'v_alignment' => array(
-                                'input_type'  => 'verticalAlignWithDeviceSwitcher',
-                                'title'       => __('Vertical alignment', 'text_doma'),
-                                'default'     => array( 'desktop' => 'center' ),
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                //'css_identifier' => 'v_alignment',
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                            ),
-                            'spacing_css'     => array(
-                                'input_type'  => 'spacingWithDeviceSwitcher',
-                                'title'       => __( 'Spacing of the text content', 'text_doma' ),
-                                'default'     => array('desktop' => array(
-                                    'padding-bottom' => '5',
-                                    'padding-top' => '5',
-                                    'padding-right' => '5',
-                                    'padding-left' => '5',
-                                    'unit' => '%')
-                                ),//consistent with SCSS
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                                'refresh_markup'     => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'spacing_with_device_switcher',
-                                'css_selectors' => array( '.sek-slider-text-content' ),
-                                'html_before' => '<hr/><h3>' . __('SPACING') .'</h3>'
+                                'css_selectors' => array( '.sek-accord-content' )
                             )
                         )
                     ),
@@ -12515,13 +12441,15 @@ function sek_get_module_params_for_czr_accordion_collection_child() {
 
 
 /* ------------------------------------------------------------------------- *
- *  SLIDER OPTIONS
+ *  ACCORDION OPTIONS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_accordion_opts_child() {
+    $title_content_selector = array( '.sek-accord-item .sek-accord-title *' );
+    $main_content_selector = array( '.sek-accord-item .sek-accord-content', '.sek-accord-item .sek-accord-content *' );
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_accordion_opts_child',
-        'name' => __( 'Slider options : height, autoplay, navigation...', 'text_doma' ),
+        'name' => __( 'Accordion options : font style, borders, background, ...', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_doma'),
@@ -12541,143 +12469,230 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                     array(
                         'title' => __( 'General', 'text_doma' ),
                         'inputs' => array(
-                            'image-layout' => array(
-                                'input_type'  => 'simpleselect',
-                                'title'       => __('Image layout', 'text_doma'),
-                                'default'     => 'nimble-wizard',
-                                'choices'     => array(
-                                    'nimble-wizard' => __('Nimble wizard', 'text_doma' ),
-                                    'width-100' => __('Adapt images to carousel\'s width', 'text_doma' ),
-                                    'height-100' => __('Adapt images to carousel\'s height', 'text_doma' ),
-                                ),
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                                'notice_before' => __('Nimble wizard ensures that the images fill all available space of the carousel in any devices, without blank spaces on the edges, and without stretching the images.', 'text_doma' ),
-                            ),
-                            'autoplay' => array(
+                            'first_expanded' => array(
                                 'input_type'  => 'nimblecheck',
-                                'title'       => __('Autoplay', 'text_doma'),
-                                'default'     => true,
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20',
-                                'notice_after' => __('Note that the autoplay is disabled during customization.', 'text_doma' ),
-                            ),
-                            'autoplay_delay' => array(
-                                'input_type'  => 'range_simple',
-                                'title'       => __( 'Delay between each slide in milliseconds (ms)', 'text_doma' ),
-                                'min' => 1,
-                                'max' => 10000,
-                                'unit' => '',
-                                'default' => 3000,
-                                'width-100'   => true,
-                                'title_width' => 'width-100'
-                            ),
-                            'infinite_loop' => array(
-                                'input_type'  => 'nimblecheck',
-                                'title'       => __('Infinite loop', 'text_doma'),
+                                'title'       => __('Show first item expanded', 'text_doma'),
                                 'default'     => true,
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20'
                             ),
-                            'pause_on_hover' => array(
+                            'one_expanded' => array(
                                 'input_type'  => 'nimblecheck',
-                                'title'       => __('Pause autoplay on mouse over', 'text_doma'),
+                                'title'       => __('Show one item expanded at a time', 'text_doma'),
                                 'default'     => true,
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20'
-                            )
+                            ),
+                            'border_width_css' => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Border weight', 'text_doma' ),
+                                'min' => 0,
+                                'max' => 80,
+                                'default' => '1px',
+                                'width-100'   => true,
+                                //'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'border_width',
+                                'css_selectors' => '.sek-accord-wrapper .sek-accord-item',
+                                'html_before' => '<hr/><h3>' . __('BORDER') .'</h3>'
+                            ),
+                            'border_color_css' => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Border color', 'text_doma' ),
+                                'width-100'   => true,
+                                'default'     => '#e3e3e3',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'border_color',
+                                'css_selectors' => '.sek-accord-wrapper .sek-accord-item'
+                            ),
                         )//inputs
                     ),
                     array(
-                        'title' => __( 'Height', 'text_doma' ),
+                        'title' => __( 'Title style', 'text_doma' ),
                         'inputs' => array(
-                            'height-type' => array(
-                                'input_type'  => 'simpleselect',
-                                'title'       => __('Height : auto or custom', 'text_doma'),
-                                'default'     => 'custom',
-                                'choices'     => sek_get_select_options_for_input_id( 'height-type' ),// auto, custom
-                                'refresh_markup'     => false,
-                                'refresh_stylesheet' => true,
-                                'html_before' => '<hr/><h3>' . __('SLIDER HEIGHT') .'</h3>'
-                            ),
-                            'custom-height' => array(
-                                'input_type'  => 'range_with_unit_picker_device_switcher',
-                                'title'       => __('Custom height', 'text_doma'),
-                                'min' => 0,
-                                'max' => 1000,
-                                'default'     => array( 'desktop' => '400px', 'mobile' => '200px' ),
-                                'width-100'   => true,
-                                'title_width' => 'width-100',
-                                'refresh_markup'     => false,
-                                'refresh_stylesheet' => true,
-                            )
-                        )
-                    ),
-                    array(
-                        'title' => __( 'Navigation', 'text_doma' ),
-                        'inputs' => array(
-                            'nav_type' => array(
-                                'input_type'  => 'simpleselect',
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                                'default' => 'arrows_dots',
-                                'choices'     => array(
-                                    'arrows_dots' => __('Arrows and bullets', 'text_doma'),
-                                    'arrows' => __('Arrows only', 'text_doma'),
-                                    'dots' => __('Bullets only', 'text_doma'),
-                                    'none' => __('None', 'text_doma')
-                                ),
-                                'html_before' => '<hr/><h3>' . __('NAVIGATION') .'</h3>'
-                            ),
-                            'hide_nav_on_mobiles' => array(
-                                'input_type'  => 'nimblecheck',
-                                'title'       => __('Hide arrows and bullets on mobiles', 'text_doma'),
-                                'default'     => false,
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20'
-                            ),
-                            // 'arrows_size'  => array(
-                            //     'input_type'  => 'range_simple_device_switcher',
-                            //     'title'       => __( 'Size of the arrows', 'text_doma' ),
-                            //     'default'     => array( 'desktop' => '18'),
-                            //     'min'         => 1,
-                            //     'max'         => 50,
-                            //     'step'        => 1,
-                            //     'width-100'   => true,
-                            //     'title_width' => 'width-100'
-                            // ),//null,
-                            'arrows_color_css' => array(
+                            'title_bg_css' => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Color ot the navigation arrows', 'text_doma'),
-                                'width-100'   => true,
-                                'title_width' => 'width-100',
-                                'default'    => '#ffffff',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'color',
-                                'css_selectors' => array('.sek-swiper-nav .sek-swiper-arrows')
-                            ),
-                            // 'dots_size'  => array(
-                            //     'input_type'  => 'range_simple_device_switcher',
-                            //     'title'       => __( 'Size of the dots', 'text_doma' ),
-                            //     'default'     => array( 'desktop' => '16'),
-                            //     'min'         => 1,
-                            //     'max'         => 50,
-                            //     'step'        => 1,
-                            //     'width-100'   => true,
-                            //     'title_width' => 'width-100'
-                            // ),//null,
-                            'dots_color_css' => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Color of the active pagination bullet', 'text_doma'),
+                                'title'       => __('Backround color', 'text_doma'),
                                 'width-100'   => true,
                                 'title_width' => 'width-100',
                                 'default'    => '#ffffff',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'background_color',
-                                'css_selectors' => array('.swiper-pagination-bullet-active')
+                                'css_selectors' => '.sek-accord-wrapper .sek-accord-item .sek-accord-title',
+                                'html_before' => '<hr/><h3>' . __('COLOR AND BACKGROUND') .'</h3>'
                             ),
+                            'color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_doma' ),
+                                'default'     => '#565656',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => $title_content_selector
+                            ),//"#000000",
+
+                            'color_active_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title_width' => 'width-100',
+                                'title'       => __( 'Text color when active', 'text_doma' ),
+                                'default'     => '#1e261f',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => array( '.sek-accord-item .sek-accord-title:hover *', '[data-sek-expanded="true"] .sek-accord-title *')
+                            ),//"#000000",
+
+                            'font_family_css' => array(
+                                'input_type'  => 'font_picker',
+                                'title'       => __( 'Font family', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'refresh_fonts' => true,
+                                'css_identifier' => 'font_family',
+                                'css_selectors' => $title_content_selector,
+                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>'
+                            ),
+                            'font_size_css'       => array(
+                                'input_type'  => 'range_with_unit_picker_device_switcher',
+                                'default'     => array( 'desktop' => '16px' ),
+                                'title_width' => 'width-100',
+                                'title'       => __( 'Font size', 'text_doma' ),
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size',
+                                'css_selectors' => $title_content_selector
+                            ),//16,//"14px",
+                            'line_height_css'     => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Line height', 'text_doma' ),
+                                'default'     => '1.5em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100' => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'line_height',
+                                'css_selectors' => $title_content_selector
+                            ),//24,//"20px",
+                            'title_border_w_css' => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Border bottom weight', 'text_doma' ),
+                                'min' => 0,
+                                'max' => 80,
+                                'default' => '1px',
+                                'title_width' => 'width-100',
+                                'width-100'   => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'border_width',
+                                'css_selectors' => '.sek-accord-wrapper .sek-accord-item .sek-accord-title',
+                                'html_before' => '<hr/><h3>' . __('BORDER BOTTOM') .'</h3>'
+                            ),
+                            'title_border_c_css' => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Border bottom color', 'text_doma' ),
+                                'width-100'   => true,
+                                'default'     => '#e3e3e3',
+                                //'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'border_color',
+                                'css_selectors' => '.sek-accord-wrapper .sek-accord-item .sek-accord-title'
+                            ),
+                            'spacing_css'     => array(
+                                'input_type'  => 'spacingWithDeviceSwitcher',
+                                'title'       => __( 'Spacing', 'text_doma' ),
+                                'default'     => array('desktop' => array('padding-top' => '15', 'padding-right' => '20', 'padding-left' => '20', 'padding-bottom' => '15', 'unit' => 'px')),//consistent with SCSS
+                                'title_width' => 'width-100',
+                                'width-100'   => true,
+                                'refresh_markup'     => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'spacing_with_device_switcher',
+                                'css_selectors'      => '.sek-accord-item .sek-accord-title'
+                            )
+                        )
+                    ),
+                    array(
+                        'title' => __( 'Content style', 'text_doma' ),
+                        'inputs' => array(
+                            'ct_bg_css' => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __('Backround color', 'text_doma'),
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'default'    => '#f2f2f2',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'background_color',
+                                'css_selectors' => array('.sek-accord-item .sek-accord-content')
+                            ),
+                            'ct_color_css'           => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Text color', 'text_doma' ),
+                                'default'     => '#1e261f',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'width-100'   => true,
+                                'css_identifier' => 'color',
+                                'css_selectors' => $main_content_selector
+                            ),//"#000000",
+
+                            'ct_font_family_css' => array(
+                                'input_type'  => 'font_picker',
+                                'title'       => __( 'Font family', 'text_doma' ),
+                                'default'     => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'refresh_fonts' => true,
+                                'css_identifier' => 'font_family',
+                                'css_selectors' => $main_content_selector,
+                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>'
+                            ),
+                            'ct_font_size_css'       => array(
+                                'input_type'  => 'range_with_unit_picker_device_switcher',
+                                'default'     => array( 'desktop' => '16px' ),
+                                'title_width' => 'width-100',
+                                'title'       => __( 'Font size', 'text_doma' ),
+                                'min' => 0,
+                                'max' => 100,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'font_size',
+                                'css_selectors' => $main_content_selector
+                            ),//16,//"14px",
+                            'ct_line_height_css'     => array(
+                                'input_type'  => 'range_with_unit_picker',
+                                'title'       => __( 'Line height', 'text_doma' ),
+                                'default'     => '1.5em',
+                                'min' => 0,
+                                'max' => 10,
+                                'step' => 0.1,
+                                'width-100'         => true,
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'line_height',
+                                'css_selectors' => $main_content_selector
+                            ),//24,//"20px",
+                            'ct_spacing_css'     => array(
+                                'input_type'  => 'spacingWithDeviceSwitcher',
+                                'title'       => __( 'Spacing', 'text_doma' ),
+                                'default'     => array('desktop' => array('padding-top' => '15', 'padding-right' => '20', 'padding-left' => '20', 'padding-bottom' => '15', 'unit' => 'px')),//consistent with SCSS
+                                'title_width' => 'width-100',
+                                'width-100'   => true,
+                                'refresh_markup'     => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'spacing_with_device_switcher',
+                                'css_selectors'      => '.sek-accord-item .sek-accord-content'
+                            )
                         )//inputs
                     )
                 )//tabs
@@ -12726,63 +12741,37 @@ function sek_add_css_rules_for_items_in_czr_accordion_collection_child( $rules, 
     $item_model = isset( $params['input_list'] ) ? $params['input_list'] : array();
 
     // VERTICAL ALIGNMENT
-    if ( ! empty( $item_model[ 'v_alignment' ] ) ) {
-        if ( ! is_array( $item_model[ 'v_alignment' ] ) ) {
-            sek_error_log( __FUNCTION__ . ' => error => the v_alignment option should be an array( {device} => {alignment} )');
-        }
-        $v_alignment_value = is_array( $item_model[ 'v_alignment' ] ) ? $item_model[ 'v_alignment' ] : array();
-        $v_alignment_value = wp_parse_args( $v_alignment_value, array(
-            'desktop' => 'center',
-            'tablet' => '',
-            'mobile' => ''
-        ));
-        $mapped_values = array();
-        foreach ( $v_alignment_value as $device => $align_val ) {
-            switch ( $align_val ) {
-                case 'top' :
-                    $mapped_values[$device] = "flex-start";
-                break;
-                case 'center' :
-                    $mapped_values[$device] = "center";
-                break;
-                case 'bottom' :
-                    $mapped_values[$device] = "flex-end";
-                break;
-            }
-        }
-        $rules = sek_set_mq_css_rules( array(
-            'value' => $mapped_values,
-            'css_property' => 'align-items',
-            'selector' => sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"] .sek-slider-text-wrapper', $params['parent_module_id'], $item_model['id'] )
-        ), $rules );
-    }//Vertical alignment
+    // if ( ! empty( $item_model[ 'v_alignment' ] ) ) {
+    //     if ( ! is_array( $item_model[ 'v_alignment' ] ) ) {
+    //         sek_error_log( __FUNCTION__ . ' => error => the v_alignment option should be an array( {device} => {alignment} )');
+    //     }
+    //     $v_alignment_value = is_array( $item_model[ 'v_alignment' ] ) ? $item_model[ 'v_alignment' ] : array();
+    //     $v_alignment_value = wp_parse_args( $v_alignment_value, array(
+    //         'desktop' => 'center',
+    //         'tablet' => '',
+    //         'mobile' => ''
+    //     ));
+    //     $mapped_values = array();
+    //     foreach ( $v_alignment_value as $device => $align_val ) {
+    //         switch ( $align_val ) {
+    //             case 'top' :
+    //                 $mapped_values[$device] = "flex-start";
+    //             break;
+    //             case 'center' :
+    //                 $mapped_values[$device] = "center";
+    //             break;
+    //             case 'bottom' :
+    //                 $mapped_values[$device] = "flex-end";
+    //             break;
+    //         }
+    //     }
+    //     $rules = sek_set_mq_css_rules( array(
+    //         'value' => $mapped_values,
+    //         'css_property' => 'align-items',
+    //         'selector' => sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"] .sek-slider-text-wrapper', $params['parent_module_id'], $item_model['id'] )
+    //     ), $rules );
+    // }//Vertical alignment
 
-    //Background overlay?
-    // 1) a background image should be set
-    // 2) the option should be checked
-    if ( sek_is_checked( $item_model[ 'apply-overlay'] ) ) {
-        //(needs validation: we need a sanitize hex or rgba color)
-        $bg_color_overlay = isset( $item_model[ 'color-overlay' ] ) ? $item_model[ 'color-overlay' ] : null;
-        if ( $bg_color_overlay ) {
-            //overlay pseudo element
-            $bg_overlay_css_rules = 'background-color:'.$bg_color_overlay;
-
-            //opacity
-            //validate/sanitize
-            $bg_overlay_opacity     = isset( $item_model[ 'opacity-overlay' ] ) ? filter_var( $item_model[ 'opacity-overlay' ], FILTER_VALIDATE_INT, array( 'options' =>
-                array( "min_range"=>0, "max_range"=>100 ) )
-            ) : FALSE;
-            $bg_overlay_opacity     = FALSE !== $bg_overlay_opacity ? filter_var( $bg_overlay_opacity / 100, FILTER_VALIDATE_FLOAT ) : $bg_overlay_opacity;
-
-            $bg_overlay_css_rules = FALSE !== $bg_overlay_opacity ? $bg_overlay_css_rules . ';opacity:' . $bg_overlay_opacity . ';' : $bg_overlay_css_rules;
-
-            $rules[]     = array(
-                'selector' => sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"][data-sek-has-overlay="true"] .sek-carousel-img::after', $params['parent_module_id'], $item_model['id'] ),
-                'css_rules' => $bg_overlay_css_rules,
-                'mq' =>null
-            );
-        }
-    }// BG Overlay
 
     return $rules;
 }
@@ -12791,7 +12780,7 @@ function sek_add_css_rules_for_items_in_czr_accordion_collection_child( $rules, 
 
 
 // GLOBAL CSS DESIGN => FILTERING OF THE ENTIRE MODULE MODEL
-//add_filter( 'sek_add_css_rules_for_module_type___czr_accordion_module', '\Nimble\sek_add_css_rules_for_czr_accordion_module', 10, 2 );
+add_filter( 'sek_add_css_rules_for_module_type___czr_accordion_module', '\Nimble\sek_add_css_rules_for_czr_accordion_module', 10, 2 );
 
 // filter documented in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker
 // Note : $complete_modul_model has been normalized
@@ -12801,52 +12790,29 @@ function sek_add_css_rules_for_czr_accordion_module( $rules, $complete_modul_mod
       return $rules;
 
     $value = $complete_modul_model['value'];
-    $slider_options = $value['slider_options'];
+    $defaults = sek_get_default_module_model( 'czr_accordion_module');
+    $accord_defaults = $defaults['accord_opts'];
 
-    $selector = '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .swiper-container .swiper-wrapper';
+    $accord_opts = $value['accord_opts'];
 
-    // CUSTOM HEIGHT BY DEVICE
-    if ( ! empty( $slider_options[ 'height-type' ] ) ) {
-        if ( 'custom' === $slider_options[ 'height-type' ] ) {
-            $custom_user_height = array_key_exists( 'custom-height', $slider_options ) ? $slider_options[ 'custom-height' ] : array();
+    //sek_error_log('sek_get_default_module_model() ?', sek_get_default_module_model( 'czr_accordion_module') );
 
-            if ( ! is_array( $custom_user_height ) ) {
-                sek_error_log( __FUNCTION__ . ' => error => the height option should be an array( {device} => {number}{unit} )', $custom_user_height);
-            }
-            $custom_user_height = is_array( $custom_user_height ) ? $custom_user_height : array();
-            $defaults = array(
-                'desktop' => '400px',
-                'tablet' => '',
-                'mobile' => '200px'
-            );
-            $custom_user_height = wp_parse_args( $custom_user_height, $defaults );
-
-            if ( $defaults != $custom_user_height ) {
-                $height_value = $custom_user_height;
-                foreach ( $custom_user_height as $device => $num_unit ) {
-                    $numeric = sek_extract_numeric_value( $num_unit );
-                    if ( ! empty( $numeric ) ) {
-                        $unit = sek_extract_unit( $num_unit );
-                        $unit = '%' === $unit ? 'vh' : $unit;
-                        $height_value[$device] = $numeric . $unit;
-                    }
-                }
-
-                $rules = sek_set_mq_css_rules(array(
-                    'value' => $height_value,
-                    'css_property' => 'height',
-                    'selector' => $selector
-                ), $rules );
-            }
-        }// if custom height
-        else {
-            $rules[] = array(
-                'selector' => $selector,
-                'css_rules' => 'height:auto;',
-                'mq' =>null
-            );
-        }
-    }// Custom height rules
+    // TEXT COLOR ( for the plus / minus icon )
+    if ( ! empty( $accord_opts[ 'color_css' ] ) && $accord_defaults[ 'color_css' ] != $accord_opts[ 'color_css' ] ) {
+        $rules[] = array(
+            'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item button span', $complete_modul_model['id'] ),
+            'css_rules' => 'background:'. $accord_opts[ 'color_css' ] .';',
+            'mq' =>null
+        );
+    }
+    // ACTIVE / HOVER TEXT COLOR ( for the plus / minus icon )
+    if ( ! empty( $accord_opts[ 'color_active_css' ] ) && $accord_defaults[ 'color_active_css' ] != $accord_opts[ 'color_active_css' ] ) {
+        $rules[] = array(
+            'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper [data-sek-expanded="true"] .sek-accord-title button span, [data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item .sek-accord-title:hover button span', $complete_modul_model['id'] ),
+            'css_rules' => sprintf('background:%s;', $accord_opts[ 'color_active_css' ] ),
+            'mq' =>null
+        );
+    }
 
     return $rules;
 }
@@ -14427,7 +14393,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         /* Quote border */
         case 'border_width' :
             $numeric = sek_extract_numeric_value( $value );
-            if ( ! empty( $numeric ) ) {
+            if ( 0 === intval($numeric) || ! empty( $numeric ) ) {
                 $unit = sek_extract_unit( $value );
                 $properties_to_render['border-width'] = $numeric . $unit;
             }
