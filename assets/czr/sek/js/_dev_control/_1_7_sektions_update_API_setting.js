@@ -143,6 +143,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           break;
                                     }
 
+                                    // items id of multi-items module must always be unique
+                                    // this recursive method sniff and does the job
+                                    self.maybeGenerateNewItemIdsForCrudModules( deepClonedSektion );
+
                                     var _position_ = self.getLevelPositionInCollection( params.id, newSetValue.collection );
                                     // Is this a nested sektion ?
                                     if ( true === params.is_nested ) {
@@ -379,6 +383,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           api.errare( 'updateAPISetting => ' + params.action, er );
                                           break;
                                     }
+
+                                    // items id of multi-items module must always be unique
+                                    // this recursive method sniff and does the job
+                                    self.maybeGenerateNewItemIdsForCrudModules( deepClonedColumn );
+
                                     var _position = self.getLevelPositionInCollection( params.id, newSetValue.collection );
                                     cloneId = deepClonedColumn.id;//will be passed in resolve()
                                     sektionCandidate.collection.splice( parseInt( _position + 1, 10 ), 0, deepClonedColumn );
@@ -609,10 +618,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => error when cloning the level');
                                           break;
                                     }
+                                    var before = $.extend( true, {}, deepClonedModule );
+
+                                    // items id of multi-items module must always be unique
+                                    // this recursive method sniff and does the job
+                                    self.maybeGenerateNewItemIdsForCrudModules( deepClonedModule );
+
                                     var insertInposition = self.getLevelPositionInCollection( params.id, newSetValue.collection );
                                     cloneId = deepClonedModule.id;//will be passed in resolve()
                                     columnCandidate.collection.splice( parseInt( insertInposition + 1, 10 ), 0, deepClonedModule );
-
                               break;
 
                               case 'sek-remove-module' :
@@ -1459,6 +1473,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     deferreds = {},
                     preparedSection = {},
                     _dfd_ = $.Deferred();
+
+                // items id of multi-items module must always be unique
+                // this recursive method sniff and does the job
+                self.maybeGenerateNewItemIdsForCrudModules( columnCollection );
 
                 // walk the column collection and populates the deferreds object recursively
                 var _sniffImg = function( data ) {
