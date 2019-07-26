@@ -67,20 +67,19 @@ function sek_add_css_rules_for_module_width( $rules, $module ) {
         foreach ( $h_alignment_value as $device => $align_val ) {
             switch ( $align_val ) {
                 case 'left' :
-                    $mapped_values[$device] = "flex-start";
+                    $mapped_values[$device] = "align-self:flex-start;-ms-grid-row-align:start;-ms-flex-item-align:start;";
                 break;
                 case 'center' :
-                    $mapped_values[$device] = "center";
+                    $mapped_values[$device] = "align-self:center;-ms-grid-row-align:center;-ms-flex-item-align:center;";
                 break;
                 case 'right' :
-                    $mapped_values[$device] = "flex-end";
+                    $mapped_values[$device] = "align-self:flex-end;-ms-grid-row-align:end;-ms-flex-item-align:end;";
                 break;
             }
         }
 
-        $rules = sek_set_mq_css_rules( array(
-            'value' => $mapped_values,
-            'css_property' => 'align-self',
+        $rules = sek_set_mq_css_rules_new_version( array(
+            'css_rules_by_device' => $mapped_values,
             'selector' => '[data-sek-id="'.$module['id'].'"]'
         ), $rules );
     }

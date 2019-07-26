@@ -82,19 +82,18 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
         foreach ( $v_alignment_value as $device => $align_val ) {
             switch ( $align_val ) {
                 case 'top' :
-                    $mapped_values[$device] = "flex-start";
+                    $mapped_values[$device] = "align-items:flex-start;-webkit-box-align:start;-ms-flex-align:start;";
                 break;
                 case 'center' :
-                    $mapped_values[$device] = "center";
+                    $mapped_values[$device] = "align-items:center;-webkit-box-align:center;-ms-flex-align:center;";
                 break;
                 case 'bottom' :
-                    $mapped_values[$device] = "flex-end";
+                    $mapped_values[$device] = "align-items:flex-end;-webkit-box-align:end;-ms-flex-align:end";
                 break;
             }
         }
-        $rules = sek_set_mq_css_rules( array(
-            'value' => $mapped_values,
-            'css_property' => 'align-items',
+        $rules = sek_set_mq_css_rules_new_version( array(
+            'css_rules_by_device' => $mapped_values,
             'selector' => '[data-sek-id="'.$level['id'].'"]'
         ), $rules );
     }

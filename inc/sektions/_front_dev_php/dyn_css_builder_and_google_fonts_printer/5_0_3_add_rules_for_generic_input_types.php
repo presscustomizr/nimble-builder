@@ -191,16 +191,16 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
             foreach( $value as $device => $val ) {
                 switch ( $val ) {
                     case 'left' :
-                        $h_align_value = "flex-start";
+                        $h_align_value = sprintf('justify-content:flex-start%1$s;-webkit-box-pack:start%1$s;-ms-flex-pack:start%1$s;', $important ? '!important' : '' );
                     break;
                     case 'center' :
-                        $h_align_value = "center";
+                        $h_align_value = sprintf('justify-content:center%1$s;-webkit-box-pack:center%1$s;-ms-flex-pack:center%1$s;', $important ? '!important' : '' );
                     break;
                     case 'right' :
-                        $h_align_value = "flex-end";
+                        $h_align_value = sprintf('justify-content:flex-end%1$s;-webkit-box-pack:end%1$s;-ms-flex-pack:end%1$s;', $important ? '!important' : '' );
                     break;
                     default :
-                        $h_align_value = "center";
+                        $h_align_value = sprintf('justify-content:center%1$s;-webkit-box-pack:center%1$s;-ms-flex-pack:center%1$s;', $important ? '!important' : '' );
                     break;
                 }
                 $flex_ready_value[$device] = $h_align_value;
@@ -211,13 +211,12 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                 'mobile' => ''
             ));
 
-            $rules = sek_set_mq_css_rules( array(
-                'value' => $flex_ready_value,
-                'css_property' => 'justify-content',
-                'selector' => $selector,
-                'is_important' => $important,
+            $rules = sek_set_mq_css_rules_new_version( array(
+                'css_rules_by_device' => $flex_ready_value,
+                'selector' => $selector
             ), $rules );
         break;
+
         // handles simple or by device option
         case 'h_alignment' :
             if ( is_string( $value ) ) {// <= simple
@@ -240,22 +239,32 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                   ), $rules );
             }
         break;
+
+        // -webkit-box-align:end;
+        // -ms-flex-align:end;
+        // align-items:flex-end;
         case 'v_alignment' :
             switch ( $value ) {
                 case 'top' :
                     $v_align_value = "flex-start";
+                    $v_vendor_value = "start";
                 break;
                 case 'center' :
                     $v_align_value = "center";
+                    $v_vendor_value = "center";
                 break;
                 case 'bottom' :
                     $v_align_value = "flex-end";
+                    $v_vendor_value = "end";
                 break;
                 default :
                     $v_align_value = "center";
+                    $v_vendor_value = "center";
                 break;
             }
             $properties_to_render['align-items'] = $v_align_value;
+            $properties_to_render['-webkit-box-align'] = $v_vendor_value;
+            $properties_to_render['-ms-flex-align'] = $v_vendor_value;
         break;
         case 'font_family' :
             $properties_to_render['font-family'] = sek_extract_css_font_family_from_customizer_option( $value );
