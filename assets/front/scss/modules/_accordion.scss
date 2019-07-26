@@ -1,0 +1,193 @@
+// synchronized with default on registration
+// [data-sek-module-type="czr_accordion_module"] .#{$project-prefix}module-inner {
+//   text-align: center;
+// }
+
+.sek-accord-wrapper {
+  text-align: left;
+  .sek-accord-item {
+    border: 1px solid #e3e3e3;//consistent with default on registration
+    overflow: hidden;
+    &:not(:last-child) {
+      margin-bottom: 0px;//space between items, consistent with defaults on registration
+    }
+    .sek-accord-title {
+      cursor: pointer;
+      color: #565656;//consistent with default on registration
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+          -ms-flex-align: center;
+              align-items: center;
+      -webkit-box-pack: justify;
+     -ms-flex-pack: justify;
+     justify-content: space-between;
+
+      padding: 15px 20px;
+
+      border-top: none;
+      border-right: none;
+      border-left: none;
+      border-bottom: 1px solid #e3e3e3;//consistent with default on registration
+      font-size: 16px;
+      line-height: 1.5em;
+      font-weight: 600;
+      -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+      flex-grow: 1;
+
+      // Default active color and button bg
+      &:hover * {
+          color: #1e261f;//consistent with default on registration
+      }
+      &:hover button span {
+          background:#1e261f//consistent with default on registration
+      }
+      @at-root [data-sek-expanded="true"] {
+        .sek-accord-title * {
+            color: #1e261f;//consistent with default on registration
+        }
+        .sek-accord-title button span {
+            background:#1e261f//consistent with default on registration
+        }
+      }
+
+
+      .sek-inner-accord-title {
+        padding-right: 10px;
+        max-width: calc(100% - 30px);
+      }
+
+      .sek-inner-accord-title, button span {
+          -webkit-transition: all 0.15s ease-in-out;
+          -moz-transition: all, 0.15s ease-in-out;
+          -ms-transition: all, 0.15s ease-in-out;
+          -o-transition: all, 0.15s ease-in-out;
+          transition: all 0.15s ease-in-out;
+      }
+      // morphing + / -
+      // inspired from https://stackoverflow.com/questions/38136077/how-to-morph-a-plus-sign-to-a-minus-sign-using-css-transition
+      button {
+        color: #1e261f;//consistent with default on registration
+        width: 30px;
+        height: 30px;
+        // reset some properties
+        padding: 0;
+        margin: 0;
+        outline: none;
+        border: 0;
+        background: none;
+
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        font-size: 1.5em;
+        position: relative;
+      }
+
+      button span {
+        position: absolute;
+        -webkit-transition: .3s;
+          -o-transition: .3s;
+              transition: .3s;
+        background: #565656;//consistent with default on registration
+        border-radius: 2px;
+      }
+
+      button span:first-of-type {
+        top: 25%;
+        bottom: 25%;
+        width: 10%;
+        left: 45%;
+      }
+
+      button span:last-of-type {
+        left: 25%;
+        right: 25%;
+        height: 10%;
+        top: 45%;
+      }
+
+      @at-root [data-sek-expanded="true"] {
+        button span:first-of-type, button span:last-of-type {
+          -webkit-transform: rotate(90deg);
+            -ms-transform: rotate(90deg);
+                transform: rotate(90deg);
+        }
+        button span:last-of-type {
+          left: 50%;
+          right: 50%;
+        }
+      }
+    }//.sek-accord-title
+
+
+    // make sure we don't have a double bottom border when the item is collapsed
+    @at-root [data-sek-has-global-border="true"][data-sek-has-title-border="true"] [data-sek-expanded="false"] .sek-accord-title {
+      border-bottom: none;
+    }
+
+    @at-root [data-sek-has-global-border="true"][data-sek-has-title-border="true"] .sek-accord-item:not(:last-child) {
+      border-bottom: none;
+    }
+
+    &[data-sek-expanded="true"] .sek-accord-title {
+      button span:first-of-type, button span:last-of-type {
+        -webkit-transform: rotate(90deg);
+            -ms-transform: rotate(90deg);
+                transform: rotate(90deg);
+      }
+      button span:last-of-type {
+        left: 50%;
+        right: 50%;
+      }
+    }
+
+    .sek-accord-content {
+      padding: 15px 20px;
+      background: #f2f2f2;
+      color: #1e261f;
+      font-size: 16px;
+      line-height: 1.5em;
+    }
+    &[data-sek-expanded="true"] > .sek-accord-content {
+      display: block;
+    }
+    &[data-sek-expanded="false"] > .sek-accord-content {
+      display: none;
+    }
+
+  }
+}
+[data-sek-module-type="czr_accordion_module"] {
+  .sek-accordion-placeholder {
+    height: 150px;
+    background: #eee;
+    .sek-accordion-ph-text{
+      font-size:25px;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-pack: center;
+      justify-content: center;
+      -ms-flex-align: flex-end;
+      align-items: flex-end;
+      // the background image is set server side
+      // 'background: url(' . NIMBLE_MODULE_ICON_PATH . 'Nimble_slideshow_icon.svg) no-repeat 50% 75%;background-size: 30%;'
+      > p { padding: 10px;position: relative;margin: 0;color:#767676}
+      &::before {
+        content: '';
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        position: absolute;
+        background-color: #ffffff;
+        opacity: 0.6;
+      }
+    }
+  }
+}

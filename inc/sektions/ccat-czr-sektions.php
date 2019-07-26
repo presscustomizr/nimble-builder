@@ -180,6 +180,8 @@ function sek_enqueue_controls_js_css() {
                 // basic btns are used for the heading, the quote content and quote cite
                 'basic_btns' => array('forecolor','bold','italic','underline','strikethrough','link','unlink'),
                 'basic_btns_nolink' => array('forecolor','bold','italic','underline','strikethrough'),
+                // with list introduced for the accordion module https://github.com/presscustomizr/nimble-builder/issues/482
+                'basic_btns_with_lists' => array('forecolor','bold','italic','underline','strikethrough','link','unlink', 'bullist', 'numlist'),
 
                 'eligibleForFeedbackNotification' => sek_get_feedback_notif_status(),
 
@@ -625,7 +627,8 @@ function nimble_add_i18n_localized_control_params( $params ) {
             // Column width
             'This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.' => __('This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.', 'text_doma'),
 
-
+            // Accordion module
+            'Accordion title' => __('Accordion title', 'text_dom')
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
@@ -1115,7 +1118,7 @@ function sek_print_nimble_input_templates() {
               input_id = data.input_id,
               value = _.has( item_model, input_id ) ? item_model[input_id] : null;
         #>
-        <textarea id="textarea-{{data.control_id}}" data-czrtype="{{input_id}}" class="width-100" name="textarea" rows="10" cols=""></textarea>
+        <textarea id="textarea-{{input_id}}" data-czrtype="{{input_id}}" class="width-100" name="textarea" rows="10" cols=""></textarea>
       </script>
 
 

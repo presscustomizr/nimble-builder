@@ -8,6 +8,7 @@
         line-height: 1.5em;
         font-style: inherit;
     }
+    &[data-sek-quote-design="none"] { border-left: none;}//<= make sure the blockquote doesn't inherit another border style from the theme or a plugin
     &.#{$project-prefix}quote-design {
         //reset
         background: none;

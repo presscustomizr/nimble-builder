@@ -1616,3 +1616,17 @@ li[id^="accordion-section-__nimble__"] > h3 {
   float: left;
   padding-left: 10px;
 }
+
+/* ACCORDION MODULE */
+.sek-accord-title {
+  color: #4b4a4a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 120px;
+  height: 23px;
+  line-height: 22px;
+  font-size: 13px;
+  float: left;
+  padding-left: 10px;
+}

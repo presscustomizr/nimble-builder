@@ -1688,6 +1688,12 @@ function sek_get_module_collection() {
         ),
         array(
           'content-type' => 'module',
+          'content-id' => 'czr_accordion_module',
+          'title' => __( 'Accordion', 'text_doma' ),
+          'icon' => 'Nimble_accordion_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
           'content-id' => 'czr_simple_html_module',
           'title' => __( 'Html Content', 'text_doma' ),
           'icon' => 'Nimble_html_icon.svg'

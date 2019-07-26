@@ -7363,11 +7363,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-
-
-
-
-
             // @return the item(s) ( array of items if multi-item module ) that we should use when adding the module to the main setting
             getModuleStartingValue : function( module_type ) {
                   if ( ! sektionsLocalizedData.registeredModules ) {
@@ -7378,8 +7373,89 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'getModuleStartingValue => the module type ' + module_type + ' is not registered' );
                         return 'no_starting_value';
                   }
-                  var starting_value = sektionsLocalizedData.registeredModules[ module_type ].starting_value;
-                  return _.isEmpty( starting_value ) ? 'no_starting_value' : starting_value;
+                  var getStartingValues = function(mod_type ) {
+                          return ( sektionsLocalizedData.registeredModules[ mod_type ] && sektionsLocalizedData.registeredModules[ mod_type ].starting_value ) ? sektionsLocalizedData.registeredModules[ mod_type ].starting_value : {};
+                      },
+                      getChildModuleStartingValues = function(childModType, optGroupName, fatherStartingValues ) {
+                            var rawStartValues,
+                                readyStartValues;
+
+                            rawStartValues = fatherStartingValues[optGroupName] ? fatherStartingValues[optGroupName] : {};
+
+                            if ( isMultiItemModule(childModType) && _.isArray( rawStartValues ) ) {
+                                  readyStartValues = buildMultiItemStartingValues( rawStartValues );
+                            } else {
+                                  readyStartValues = rawStartValues;
+                            }
+                            return readyStartValues;
+                      },
+                      buildMultiItemStartingValues = function( rawStartValues ) {
+                            // Exemple of the accordion module
+                            // 'children' => array(
+                            //     'accord_collec' => 'czr_accordion_collection_child',
+                            //     'accord_opts' => 'czr_accordion_opts_child'
+                            // ),
+                            // => The multi-item module czr_accordion_collection_child will populate the 'accord_collec' option group
+                            // We set a 3 items starting value
+                            // And we need to generate unique id before injection in the API
+                            // 'starting_value' => array(
+                            //  'accord_collec' => array(
+                            //     array( 'text_content' => 'Lorem ipsum dolor sit amet' ),
+                            //     array( 'text_content' => 'Lorem ipsum dolor sit amet' ),
+                            //     array( 'text_content' => 'Lorem ipsum dolor sit amet' )
+                            //  ),
+                            //  'accord_opts' => array()
+                            // )
+                            readyStartValues = [];
+                            _.each( rawStartValues, function( item ) {
+                                  if ( ! _.isObject( item ) ) {
+                                        api.errare( 'getModuleStartingValue => multi-item module => items should be objects for module ' + mod_type );
+                                        return;
+                                  }
+                                  var clonedItem = $.extend( true, {}, item );
+                                  clonedItem.id = api.czr_sektions.guid();
+                                  readyStartValues.push( clonedItem );
+                            });
+                            return readyStartValues;
+                      },
+                      isMultiItemModule = function(mod_type) {
+                            return sektionsLocalizedData.registeredModules[ mod_type ] && true === sektionsLocalizedData.registeredModules[ mod_type ].is_crud;
+                      },
+                      isFatherModule = function(mod_type) {
+                            return sektionsLocalizedData.registeredModules[ mod_type ] && true === sektionsLocalizedData.registeredModules[ mod_type ].is_father;
+                      },
+                      getChildren = function(mod_type) {
+                            return ( sektionsLocalizedData.registeredModules[ mod_type ] && sektionsLocalizedData.registeredModules[ mod_type ].children ) ? sektionsLocalizedData.registeredModules[ mod_type ].children : {};
+                      };
+
+                  var startingValueCandidate = {},
+                      rawMaybeFatherModuleStartingValue = getStartingValues( module_type );
+
+                  // Prepare starting value
+                  // If a module is crud ( multi-items ), we need to generate a unique id for each item
+                  // => implemented for https://github.com/presscustomizr/nimble-builder/issues/486
+                  // If module_type is a father module, let's loop on the data structure
+                  if ( isFatherModule( module_type ) ) {
+                        // Structure :
+                        // 'children' => array(
+                        //     'accord_collec' => 'czr_accordion_collection_child',
+                        //     'accord_opts' => 'czr_accordion_opts_child'
+                        // ),
+                        _.each( getChildren( module_type ), function( childModType, optGroupName ) {
+                              var normalizedStartingValues = getChildModuleStartingValues( childModType, optGroupName, rawMaybeFatherModuleStartingValue );
+                              if ( ! _.isEmpty( normalizedStartingValues ) ) {
+                                    startingValueCandidate[optGroupName] = normalizedStartingValues;
+                              }
+                        });
+                  } else {
+                        if ( isMultiItemModule(module_type) && _.isArray( rawMaybeFatherModuleStartingValue ) ) {
+                              startingValueCandidate = buildMultiItemStartingValues( rawMaybeFatherModuleStartingValue );
+                        } else {
+                              startingValueCandidate = rawMaybeFatherModuleStartingValue;
+                        }
+                  }
+
+                  return _.isEmpty( startingValueCandidate ) ? 'no_starting_value' : startingValueCandidate;
             },
 
 
@@ -17107,17 +17183,286 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_img_slider_opts_child' )
             }
       });
-})( wp.customize , jQuery, _ );
-
-
-
-
-
-
-/* ------------------------------------------------------------------------- *
- *  SLIDER DESIGN OPTIONS
-/* ------------------------------------------------------------------------- */
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
 ( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  var module = this;
+
+
+                  module.crudModulePart = 'nimble-crud-module-part';
+                  module.rudItemPart = 'nimble-rud-item-part';
+
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
+
+                  // run the parent initialize
+                  // Note : must be always invoked always after the input / item class extension
+                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+                  // module.isReady.then( function() {
+                  //       if ( _.isUndefined( module.preItem ) )
+                  //         return;
+                  //       //specific update for the item preModel on social-icon change
+                  //       module.preItem.bind( function( to, from ) {
+                  //             if ( ! _.has(to, 'icon') )
+                  //               return;
+                  //             if ( _.isEqual( to['icon'], from['icon'] ) )
+                  //               return;
+                  //             module.updateItemModel( module.preItem, true );
+                  //       });
+                  // });
+            },//initialize
+
+
+            // overrides the default fmk method which generates a too long id for each item, like : "czr_accordion_collection_child_2"
+            // this method generates a uniq GUID id for each item
+            generateItemId : function() {
+                    return api.czr_sektions.guid();
+            },
+
+            // Overrides the default fmk method, to disable the default preview refresh
+            _makeItemsSortable : function(obj) {
+                  if ( wp.media.isTouchDevice || ! $.fn.sortable )
+                    return;
+                  var module = this;
+                  $( '.' + module.control.css_attr.items_wrapper, module.container ).sortable( {
+                        handle: '.' + module.control.css_attr.item_sort_handle,
+                        start: function() {},
+                        update: function( event, ui ) {
+                              var _sortedCollectionReact = function() {
+                                    if ( _.has(module, 'preItem') ) {
+                                          module.preItemExpanded.set(false);
+                                    }
+
+                                    module.closeAllItems().closeRemoveDialogs();
+                                    // var refreshPreview = function() {
+                                    //       api.previewer.refresh();
+                                    // };
+                                    // //refreshes the preview frame  :
+                                    // //1) only needed if transport is postMessage, because is triggered by wp otherwise
+                                    // //2) only needed when : add, remove, sort item(s).
+                                    // //var isItemUpdate = ( _.size(from) == _.size(to) ) && ! _.isEmpty( _.difference(from, to) );
+                                    // if ( 'postMessage' == api(module.control.id).transport  && ! api.CZR_Helpers.hasPartRefresh( module.control.id ) ) {
+                                    //       refreshPreview = _.debounce( refreshPreview, 500 );//500ms are enough
+                                    //       refreshPreview();
+                                    // }
+
+                                    module.trigger( 'item-collection-sorted' );
+                              };
+                              module._getSortedDOMItemCollection()
+                                    .done( function( _collection_ ) {
+                                          module.itemCollection.set( _collection_ );
+                                    })
+                                    .then( function() {
+                                          _sortedCollectionReact();
+                                    });
+                              //refreshes the preview frame, only if the associated setting is a postMessage transport one, with no partial refresh
+                              // if ( 'postMessage' == api( module.control.id ).transport && ! api.CZR_Helpers.hasPartRefresh( module.control.id ) ) {
+                              //         _.delay( function() { api.previewer.refresh(); }, 100 );
+                              // }
+                        }//update
+                      }
+                  );
+            },//_makeItemsSortable
+
+
+            // Overrides core FMK method
+            // introduced in July 2019 to solve the problem of the default image for the items
+            // @see https://github.com/presscustomizr/nimble-builder/issues/479
+            getPreItem : function() {
+                  var rawStartingValue = api.czr_sektions.getRegisteredModuleProperty( 'czr_accordion_collection_child', 'starting_value' ),
+                      preItemValue = $.extend( true, {}, this.preItem() );//create a new detached clones object
+
+                  if ( _.isObject( rawStartingValue ) ) {
+                        var startingValue = $.extend( true, {}, rawStartingValue );//create a new detached clones object
+                        return $.extend( preItemValue, startingValue );
+                  }
+
+                  return this.preItem();
+            },
+
+            //////////////////////////////////////////////////////////
+            /// ITEM CONSTRUCTOR
+            //////////////////////////////////////////
+            CZRItemConstructor : {
+                  //overrides the parent ready
+                  ready : function() {
+                        var item = this;
+                        //wait for the input collection to be populated,
+                        //and then set the input visibility dependencies
+                        // item.inputCollection.bind( function( col ) {
+                        //       if( _.isEmpty( col ) )
+                        //         return;
+                        //       try { item.setInputVisibilityDeps(); } catch( er ) {
+                        //             api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                        //       }
+                        // });//item.inputCollection.bind()
+
+                        // //update the item model on social-icon change
+                        // item.bind('icon:changed', function(){
+                        //       //item.module.updateItemModel( item );
+                        // });
+                        //fire the parent
+                        api.CZRItem.prototype.ready.call( item );
+
+                        // FOCUS ON CURRENTLY EXPANDED / EDITED ITEM
+                        var requestFocusToPreview = function() {
+                              api.previewer.send( 'sek-item-focus', {
+                                    control_id : item.module.control.id,
+                                    item_id : item.id,
+                                    item_value : item()
+                              });
+                        };
+                        // when the item get expanded
+                        item.viewState.callbacks.add( function( to, from ) {
+                              if ( 'expanded' === to ) {
+                                    requestFocusToPreview();
+                              }
+                        });
+
+                        // when the item value is changed
+                        item.callbacks.add( requestFocusToPreview );
+
+                        // when the module requests a focus after a preview update
+                        item.bind('sek-request-item-focus-in-preview', requestFocusToPreview );
+
+                        // rewriteItemTitle when item are sorted, so that the placeholder title ( based in item DOM index ) get refreshed
+                        item.module.bind('item-collection-sorted', function() {
+                              item.writeItemViewTitle( item(), { input_changed : 'title_text'} );
+                        });
+                  },
+
+
+
+                  //overrides the default parent method by a custom one
+                  //at this stage, the model passed in the obj is up to date
+                  writeItemViewTitle : function( model, data ) {
+                        var item = this,
+                            index = 1,
+                            module  = item.module,
+                            _model = model || item(),
+                            _title = '',
+                            _areDataSet = ! _.isUndefined( data ) && _.isObject( data );
+
+                        //When shall we update the item title ?
+                        //=> when the slide title or the thumbnail have been updated
+                        //=> on module model initialized
+                        if ( _areDataSet && data.input_changed && ! _.contains( [ 'title_text' ], data.input_changed ) )
+                          return;
+
+                        //set title with index
+                        if ( ! _.isEmpty( _model.title ) ) {
+                              _title = _model.title;
+                        } else {
+                              //find the current item index in the collection
+                              var _index = _.findIndex( module.itemCollection(), function( _itm ) {
+                                    return _itm.id === item.id;
+                              });
+                              _index = _.isUndefined( _index ) ? index : _index + 1;
+                              //_title = [ '@missi18n Slide', _index ].join( ' ' );
+                        }
+
+                        //if the slide title is set, use it
+                        _title = api.CZR_Helpers.truncate( _title, 25 );
+
+                        var $itemTitleEl = $( '.' + module.control.css_attr.item_title , item.container ).find('.sek-accord-title');
+
+                        //TITLE
+                        //always write the title
+                        var _text = _model['title_text'] ? _model['title_text'] : '';
+                        // Strip all html tags and keep only first characters
+                        _text = $("<div>").html(_text).text();
+
+                        // placeholder text, consistent with the php one in tmpl/accordion_tmpl.php
+                        var item_index = item.module.container.find( '.czr-items-wrapper > li').index( item.container );
+                        _text = _.isEmpty( _text ) ? sektionsLocalizedData.i18n['Accordion title'] + ' #' + ( +item_index+1 ) : _text;
+
+                        _text = _text.substring(0,60);
+                        if ( 1 > $itemTitleEl.length ) {
+                              //remove the default item title
+                              $( '.' + module.control.css_attr.item_title , item.container ).html( '' );
+                              //write the new one
+                              $( '.' + module.control.css_attr.item_title , item.container ).append( $( '<div/>',
+                                    {
+                                        class : 'sek-accord-title',
+                                        html : _text
+                                    }
+                              ) );
+                        } else {
+                              $itemTitleEl.html( _text );
+                        }
+                  },
+
+
+
+
+
+                  //Fired when the input collection is populated
+                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                  //setInputVisibilityDeps : function() {},
+
+                  // Overrides the default fmk method in order to disable the remove dialog box
+                  toggleRemoveAlert : function() {
+                        this.removeItem();
+                  },
+
+                  // Overrides the default fmk method, to disable the default preview refresh
+                  //fired on click dom event
+                  //for dynamic multi input modules
+                  //@return void()
+                  //@param params : { dom_el : {}, dom_event : {}, event : {}, model {} }
+                  removeItem : function( params ) {
+                        params = params || {};
+                        var item = this,
+                            module = this.module,
+                            _new_collection = _.clone( module.itemCollection() );
+
+                        //hook here
+                        module.trigger('pre_item_dom_remove', item() );
+
+                        //destroy the Item DOM el
+                        item._destroyView();
+
+                        //new collection
+                        //say it
+                        _new_collection = _.without( _new_collection, _.findWhere( _new_collection, {id: item.id }) );
+                        module.itemCollection.set( _new_collection );
+                        //hook here
+                        module.trigger('pre_item_api_remove', item() );
+
+                        var _item_ = $.extend( true, {}, item() );
+
+                        // <REMOVE THE ITEM FROM THE COLLECTION>
+                        module.czr_Item.remove( item.id );
+                        // </REMOVE THE ITEM FROM THE COLLECTION>
+
+                        //refresh the preview frame (only needed if transport is postMessage && has no partial refresh set )
+                        //must be a dom event not triggered
+                        //otherwise we are in the init collection case where the items are fetched and added from the setting in initialize
+                        if ( 'postMessage' == api(module.control.id).transport && _.has( params, 'dom_event') && ! _.has( params.dom_event, 'isTrigger' ) && ! api.CZR_Helpers.hasPartRefresh( module.control.id ) ) {
+                              // api.previewer.refresh().done( function() {
+                              //       _dfd_.resolve();
+                              // });
+                              // It would be better to wait for the refresh promise
+                              // The following approach to bind and unbind when refreshing the preview is similar to the one coded in module::addItem()
+                              var triggerEventWhenPreviewerReady = function() {
+                                    api.previewer.unbind( 'ready', triggerEventWhenPreviewerReady );
+                                    module.trigger( 'item-removed', _item_ );
+                              };
+                              api.previewer.bind( 'ready', triggerEventWhenPreviewerReady );
+                              //api.previewer.refresh();
+                        } else {
+                              module.trigger( 'item-removed', _item_ );
+                              module.control.trigger( 'item-removed', _item_ );
+                        }
+
+                  },
+            },//CZRItemConstructor
+      };//Constructor
+
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -17128,14 +17473,101 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            czr_img_slider_fonts_child : {
-                  //mthds : Constructor,
-                  crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_img_slider_fonts_child', 'name' ),
+            czr_accordion_collection_child : {
+                  mthds : Constructor,
+                  crud : true,//api.czr_sektions.getRegisteredModuleProperty( 'czr_accordion_collection_child', 'is_crud' ),
+                  hasPreItem : false,//a crud module has a pre item by default
+                  refresh_on_add_item : false,// the preview is refreshed on item add
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_accordion_collection_child', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : false,
                   ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_img_slider_fonts_child' )
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_accordion_collection_child' )
+            },
+      });
+})( wp.customize , jQuery, _ );
+
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  SLIDER OPTIONS
+/* ------------------------------------------------------------------------- */
+( function ( api, $, _ ) {
+      var Constructor = {
+            initialize: function( id, options ) {
+                  var module = this;
+
+
+                  module.crudModulePart = 'nimble-crud-module-part';
+                  module.rudItemPart = 'nimble-rud-item-part';
+
+                  // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
+                  module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
+
+                  // module.isReady.then( function() {
+                  //       if ( _.isUndefined( module.preItem ) )
+                  //         return;
+                  //       //specific update for the item preModel on social-icon change
+                  //       module.preItem.bind( function( to, from ) {
+                  //             if ( ! _.has(to, 'icon') )
+                  //               return;
+                  //             if ( _.isEqual( to['icon'], from['icon'] ) )
+                  //               return;
+                  //             module.updateItemModel( module.preItem, true );
+                  //       });
+                  // });
+
+
+                  // run the parent initialize
+                  // Note : must be always invoked always after the input / item class extension
+                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+            },//initialize
+
+            CZRItemConstructor : {
+                  //overrides the parent ready
+                  ready : function() {
+                        var item = this;
+                        //wait for the input collection to be populated,
+                        //and then set the input visibility dependencies
+                        // item.inputCollection.bind( function( col ) {
+                        //       if( _.isEmpty( col ) )
+                        //         return;
+                        //       try { item.setInputVisibilityDeps(); } catch( er ) {
+                        //             api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                        //       }
+                        // });//item.inputCollection.bind()
+
+                        api.CZRItem.prototype.ready.call( item );
+                  },
+
+                  //Fired when the input collection is populated
+                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                  //setInputVisibilityDeps : function() {},
+            },//CZRItemConstructor
+      };//Constructor
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            czr_accordion_opts_child : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'czr_accordion_opts_child', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_accordion_opts_child' )
             }
       });
 })( wp.customize , jQuery, _ );

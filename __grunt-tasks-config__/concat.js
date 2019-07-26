@@ -306,7 +306,8 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_1_FRONT_widget_area.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_3_FRONT_social_icons.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_4_FRONT_img_slider.js'
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_4_FRONT_img_slider.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_5_FRONT_accordion.js'
       // PRO MODULES
       //'<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_5_2_FRONT_nimble_special_image.js'
     ],
@@ -420,6 +421,7 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_2_1_sek_register_widget_area.php',
 
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php',
+      '<%= paths.sektions %>_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php',
 
 
 

@@ -54,7 +54,6 @@ function sek_get_module_params_for_czr_heading_child() {
                     'width-100'         => true,
                     'refresh_markup'    => '.sek-heading [data-sek-input-type="textarea"]'
                     //'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
-
                 ),
                 'heading_tag' => array(
                     'input_type'         => 'simpleselect',

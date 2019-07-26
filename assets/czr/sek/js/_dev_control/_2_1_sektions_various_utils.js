@@ -644,11 +644,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-
-
-
-
-
             // @return the item(s) ( array of items if multi-item module ) that we should use when adding the module to the main setting
             getModuleStartingValue : function( module_type ) {
                   if ( ! sektionsLocalizedData.registeredModules ) {
@@ -659,8 +654,89 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'getModuleStartingValue => the module type ' + module_type + ' is not registered' );
                         return 'no_starting_value';
                   }
-                  var starting_value = sektionsLocalizedData.registeredModules[ module_type ].starting_value;
-                  return _.isEmpty( starting_value ) ? 'no_starting_value' : starting_value;
+                  var getStartingValues = function(mod_type ) {
+                          return ( sektionsLocalizedData.registeredModules[ mod_type ] && sektionsLocalizedData.registeredModules[ mod_type ].starting_value ) ? sektionsLocalizedData.registeredModules[ mod_type ].starting_value : {};
+                      },
+                      getChildModuleStartingValues = function(childModType, optGroupName, fatherStartingValues ) {
+                            var rawStartValues,
+                                readyStartValues;
+
+                            rawStartValues = fatherStartingValues[optGroupName] ? fatherStartingValues[optGroupName] : {};
+
+                            if ( isMultiItemModule(childModType) && _.isArray( rawStartValues ) ) {
+                                  readyStartValues = buildMultiItemStartingValues( rawStartValues );
+                            } else {
+                                  readyStartValues = rawStartValues;
+                            }
+                            return readyStartValues;
+                      },
+                      buildMultiItemStartingValues = function( rawStartValues ) {
+                            // Exemple of the accordion module
+                            // 'children' => array(
+                            //     'accord_collec' => 'czr_accordion_collection_child',
+                            //     'accord_opts' => 'czr_accordion_opts_child'
+                            // ),
+                            // => The multi-item module czr_accordion_collection_child will populate the 'accord_collec' option group
+                            // We set a 3 items starting value
+                            // And we need to generate unique id before injection in the API
+                            // 'starting_value' => array(
+                            //  'accord_collec' => array(
+                            //     array( 'text_content' => 'Lorem ipsum dolor sit amet' ),
+                            //     array( 'text_content' => 'Lorem ipsum dolor sit amet' ),
+                            //     array( 'text_content' => 'Lorem ipsum dolor sit amet' )
+                            //  ),
+                            //  'accord_opts' => array()
+                            // )
+                            readyStartValues = [];
+                            _.each( rawStartValues, function( item ) {
+                                  if ( ! _.isObject( item ) ) {
+                                        api.errare( 'getModuleStartingValue => multi-item module => items should be objects for module ' + mod_type );
+                                        return;
+                                  }
+                                  var clonedItem = $.extend( true, {}, item );
+                                  clonedItem.id = api.czr_sektions.guid();
+                                  readyStartValues.push( clonedItem );
+                            });
+                            return readyStartValues;
+                      },
+                      isMultiItemModule = function(mod_type) {
+                            return sektionsLocalizedData.registeredModules[ mod_type ] && true === sektionsLocalizedData.registeredModules[ mod_type ].is_crud;
+                      },
+                      isFatherModule = function(mod_type) {
+                            return sektionsLocalizedData.registeredModules[ mod_type ] && true === sektionsLocalizedData.registeredModules[ mod_type ].is_father;
+                      },
+                      getChildren = function(mod_type) {
+                            return ( sektionsLocalizedData.registeredModules[ mod_type ] && sektionsLocalizedData.registeredModules[ mod_type ].children ) ? sektionsLocalizedData.registeredModules[ mod_type ].children : {};
+                      };
+
+                  var startingValueCandidate = {},
+                      rawMaybeFatherModuleStartingValue = getStartingValues( module_type );
+
+                  // Prepare starting value
+                  // If a module is crud ( multi-items ), we need to generate a unique id for each item
+                  // => implemented for https://github.com/presscustomizr/nimble-builder/issues/486
+                  // If module_type is a father module, let's loop on the data structure
+                  if ( isFatherModule( module_type ) ) {
+                        // Structure :
+                        // 'children' => array(
+                        //     'accord_collec' => 'czr_accordion_collection_child',
+                        //     'accord_opts' => 'czr_accordion_opts_child'
+                        // ),
+                        _.each( getChildren( module_type ), function( childModType, optGroupName ) {
+                              var normalizedStartingValues = getChildModuleStartingValues( childModType, optGroupName, rawMaybeFatherModuleStartingValue );
+                              if ( ! _.isEmpty( normalizedStartingValues ) ) {
+                                    startingValueCandidate[optGroupName] = normalizedStartingValues;
+                              }
+                        });
+                  } else {
+                        if ( isMultiItemModule(module_type) && _.isArray( rawMaybeFatherModuleStartingValue ) ) {
+                              startingValueCandidate = buildMultiItemStartingValues( rawMaybeFatherModuleStartingValue );
+                        } else {
+                              startingValueCandidate = rawMaybeFatherModuleStartingValue;
+                        }
+                  }
+
+                  return _.isEmpty( startingValueCandidate ) ? 'no_starting_value' : startingValueCandidate;
             },
 
 

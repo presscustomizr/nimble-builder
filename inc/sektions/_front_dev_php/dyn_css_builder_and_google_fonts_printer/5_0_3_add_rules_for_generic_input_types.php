@@ -303,7 +303,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         /* Quote border */
         case 'border_width' :
             $numeric = sek_extract_numeric_value( $value );
-            if ( ! empty( $numeric ) ) {
+            if ( 0 === intval($numeric) || ! empty( $numeric ) ) {
                 $unit = sek_extract_unit( $value );
                 $properties_to_render['border-width'] = $numeric . $unit;
             }
