@@ -300,52 +300,134 @@ function sek_set_mq_css_rules( $params, $rules ) {
         'selector' => '',
         'is_important' => false
     ));
-    if ( ! empty( $params['value'][ 'desktop' ] ) ) {
-        $_font_size_mq[ 'desktop' ] = null;
+
+    $css_value_by_devices = $params['value'];
+    $_font_size_mq = array('desktop' => null , 'tablet' => null , 'mobile' => null );
+
+    if ( !empty( $css_value_by_devices ) ) {
+          if ( ! empty( $css_value_by_devices[ 'desktop' ] ) ) {
+              $_font_size_mq[ 'desktop' ] = null;
+          }
+
+          if ( ! empty( $css_value_by_devices[ 'tablet' ] ) ) {
+              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
+          }
+
+          if ( ! empty( $css_value_by_devices[ 'mobile' ] ) ) {
+              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
+          }
+
+          // $css_value_by_devices looks like
+          // array(
+          //     'desktop' => '30px',
+          //     'tablet' => '',
+          //     'mobile' => ''
+          // );
+          foreach ( $css_value_by_devices as $device => $val ) {
+              if ( ! in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
+                  sek_error_log( __FUNCTION__ . ' => error => unknown device : ' . $device );
+                  continue;
+              }
+              if ( ! empty(  $val ) ) {
+                  // the css_property can be an array
+                  // this is needed for example to write properties supporting several vendor prefixes
+                  $css_property = $params['css_property'];
+                  if ( is_array( $css_property ) ) {
+                      $css_rules_array = array();
+                      foreach ( $css_property as $property ) {
+                          $css_rules_array[] = sprintf( '%1$s:%2$s%3$s;', $property, $val, $params['is_important'] ? '!important' : '' );
+                      }
+                      $css_rules = implode( '', $css_rules_array );
+                  } else {
+                      $css_rules = sprintf( '%1$s:%2$s%3$s;', $css_property, $val, $params['is_important'] ? '!important' : '' );
+                  }
+                  $rules[] = array(
+                      'selector' => $params['selector'],
+                      'css_rules' => $css_rules,
+                      'mq' => $_font_size_mq[ $device ]
+                  );
+              }
+          }
+    } else {
+        sek_error_log( __FUNCTION__ . ' Error => missing css rules ');
     }
 
-    if ( ! empty( $params['value'][ 'tablet' ] ) ) {
-        $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
-    }
-
-    if ( ! empty( $params['value'][ 'mobile' ] ) ) {
-        $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
-    }
-    // $params['value'] looks like
-    // array(
-    //     'desktop' => '30px',
-    //     'tablet' => '',
-    //     'mobile' => ''
-    // );
-    foreach ( $params['value'] as $device => $val ) {
-        if ( ! in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
-            sek_error_log( __FUNCTION__ . ' => error => unknown device : ' . $device );
-            continue;
-        }
-        if ( ! empty(  $val ) ) {
-            // the css_property can be an array
-            // this is needed for example to write properties supporting several vendor prefixes
-            $css_property = $params['css_property'];
-            if ( is_array( $css_property ) ) {
-                $css_rules_array = array();
-                foreach ( $css_property as $property ) {
-                    $css_rules_array[] = sprintf( '%1$s:%2$s%3$s;', $property, $val, $params['is_important'] ? '!important' : '' );
-                }
-                $css_rules = implode( '', $css_rules_array );
-            } else {
-                $css_rules = sprintf( '%1$s:%2$s%3$s;', $css_property, $val, $params['is_important'] ? '!important' : '' );
-            }
-            $rules[] = array(
-                'selector' => $params['selector'],
-                'css_rules' => $css_rules,
-                'mq' => $_font_size_mq[ $device ]
-            );
-        }
-    }
     return $rules;
 }
 
 
+// New version of sek_set_mq_css_rules() created in July 2019
+// => this version uses a param "css_rules_by_device" which describe the complete rule ( like padding-top:5em; ) for each device, instead of spliting value and property like the previous one
+// => it fixes the problem of vendor prefixes for which the value is not written the same.
+// For example, a top alignment in flex is written this way :
+// -webkit-box-align:start;
+// -ms-flex-align:start;
+//     align-items:flex-start;
+//
+// In this case, the param css_rules_by_device will be : "align-items:flex-start;-webkit-box-align:start;-ms-flex-align:start;";
+//
+// This function is invoked when sniffing the input rules.
+// It's a generic helper to generate media query css rule
+// @return an array of css rules looking like
+// $rules[] = array(
+//     'selector'    => $selector,
+//     'css_rules'   => $css_rules,
+//     'mq'          => $mq
+// );
+// @params params(array). Example
+// array(
+//     'css_rules_by_device' => array of css rules by devices
+//     'selector' => $selector,(string)
+//     'is_important' => $important,(bool)
+// )
+// params['value'] = Array
+// (
+//     [desktop] => padding-top:5em;
+//     [tablet] => padding-top:4em
+//     [mobile] => padding-top:25px
+// )
+function sek_set_mq_css_rules_new_version( $params, $rules ) {
+    // TABLETS AND MOBILES WILL INHERIT UPPER MQ LEVELS IF NOT OTHERWISE SPECIFIED
+    // Sek_Dyn_CSS_Builder::$breakpoints = [
+    //     'xs' => 0,
+    //     'sm' => 576,
+    //     'md' => 768,
+    //     'lg' => 992,
+    //     'xl' => 1200
+    // ];
+    $params = wp_parse_args( $params, array(
+        'css_rules_by_device' => array(),
+        'selector' => ''
+    ));
+
+    $css_rules_by_device = $params['css_rules_by_device'];
+    $_font_size_mq = array('desktop' => null , 'tablet' => null , 'mobile' => null );
+
+    if ( !empty( $css_rules_by_device ) ) {
+          if ( ! empty( $css_rules_by_device[ 'desktop' ] ) ) {
+              $_font_size_mq[ 'desktop' ] = null;
+          }
+
+          if ( ! empty( $css_rules_by_device[ 'tablet' ] ) ) {
+              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
+          }
+
+          if ( ! empty( $css_rules_by_device[ 'mobile' ] ) ) {
+              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
+          }
+          foreach ( $css_rules_by_device as $device => $rules_for_device ) {
+              $rules[] = array(
+                  'selector' => $params['selector'],
+                  'css_rules' => $rules_for_device,
+                  'mq' => $_font_size_mq[ $device ]
+              );
+          }
+    } else {
+        sek_error_log( __FUNCTION__ . ' Error => missing css rules ');
+    }
+
+    return $rules;
+}
 
 
 
