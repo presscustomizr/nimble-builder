@@ -62,7 +62,7 @@ if ( !empty( $accord_collec ) ) {
     if ( skp_is_customizing() ) {
         printf( '<div class="sek-accordion-placeholder"><div class="sek-accordion-ph-text" style="%2$s"><p>%1$s</p></div></div>',
             __('Click to start adding items.', 'text_doma'),
-            'background: url(' . NIMBLE_MODULE_ICON_PATH . 'Nimble_accordion_icon.svg) no-repeat 50% 75%;background-size: 200px;'
+            'background: url(' . NIMBLE_MODULE_ICON_PATH . 'Nimble_accordion_icon.svg) no-repeat 50% 75%;background-size: 170px;'
         );
     }
 }
