@@ -1896,6 +1896,43 @@ button.sek-btn,
   transition: all 0.2s ease-in-out;
 }
 
+[data-sek-module-type="czr_social_icons_module"] .sek-social-icons-placeholder {
+  height: 150px;
+  background: #eee;
+}
+
+[data-sek-module-type="czr_social_icons_module"] .sek-social-icons-placeholder .sek-social-icons-ph-text {
+  font-size: 25px;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
+}
+
+[data-sek-module-type="czr_social_icons_module"] .sek-social-icons-placeholder .sek-social-icons-ph-text > p {
+  padding: 10px;
+  position: relative;
+  margin: 0;
+  color: #767676;
+}
+
+[data-sek-module-type="czr_social_icons_module"] .sek-social-icons-placeholder .sek-social-icons-ph-text::before {
+  content: '';
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  position: absolute;
+  background-color: #ffffff;
+  opacity: 0.6;
+}
+
 [data-sek-module-type="czr_img_slider_module"] {
   /* SWIPER BULLETS */
   /* SWIPER ARROWS */

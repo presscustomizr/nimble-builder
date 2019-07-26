@@ -62,7 +62,7 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * Columns
 * Quote
 * Widget zone
-* Accordion ( coming soon )
+* Accordion
 * Tabs ( coming soon )
 * ... and more to come !
 
@@ -111,10 +111,20 @@ Nimble builder works with any WordPress theme. If you experience any problem wit
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
 == Upgrade Notice ==
-= 1.8.14 =
-User interface improvements for modules, by adding an option switcher between content options and general settings.
+= 1.8.15 =
+Introduction of a new Accordion module + other minor fixes.
 
 == Changelog ==
+= 1.8.15 : July 26th 2019 =
+* fixed : allow a value of 0 when generating the border-width css rules
+* fixed : multi-items modules => fix item ids becoming not unique on duplication or pre-build section injection
+* fixed : missing vendor prefixes for some dynamically added CSS rules like vertical alignment in flex columns
+* added : introduction of an Accordion module
+* added : [Slider module] => introduction of a 3 slides starting value
+* added : [Social profiles module] => introduction of a starting value collection with Twitter, Facebook, Instagram
+* improved : [Blockquote module] => make sure the blockquote doesn't inherit another border style from the theme or a plugin
+* improved : allow multi-item modules to use multi-item starting values
+
 = 1.8.14 : July 21st 2019 =
 * improved : in the modules ui, addition of an option switcher between content options and general settings
 * minor improvements of the remote api requests

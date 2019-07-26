@@ -1650,6 +1650,24 @@ function sek_is_customize_previewing_a_changeset_post() {
 function sek_get_module_collection() {
     return array(
         array(
+          'content-type' => 'preset_section',
+          'content-id' => 'two_columns',
+          'title' => __( 'Two Columns', 'text_doma' ),
+          'icon' => 'Nimble_2-columns_icon.svg'
+        ),
+        array(
+          'content-type' => 'preset_section',
+          'content-id' => 'three_columns',
+          'title' => __( 'Three Columns', 'text_doma' ),
+          'icon' => 'Nimble_3-columns_icon.svg'
+        ),
+        array(
+          'content-type' => 'preset_section',
+          'content-id' => 'four_columns',
+          'title' => __( 'Four Columns', 'text_doma' ),
+          'icon' => 'Nimble_4-columns_icon.svg'
+        ),
+        array(
           'content-type' => 'module',
           'content-id' => 'czr_tiny_mce_editor_module',
           'title' => __( 'WordPress Editor', 'text_doma' ),
@@ -1706,44 +1724,6 @@ function sek_get_module_collection() {
         ),
         array(
           'content-type' => 'module',
-          'content-id' => 'czr_map_module',
-          'title' => __( 'Map', 'text_doma' ),
-          'icon' => 'Nimble_map_icon.svg'
-        ),
-        array(
-          'content-type' => 'preset_section',
-          'content-id' => 'two_columns',
-          'title' => __( 'Two Columns', 'text_doma' ),
-          'icon' => 'Nimble_2-columns_icon.svg'
-        ),
-        array(
-          'content-type' => 'preset_section',
-          'content-id' => 'three_columns',
-          'title' => __( 'Three Columns', 'text_doma' ),
-          'icon' => 'Nimble_3-columns_icon.svg'
-        ),
-        array(
-          'content-type' => 'preset_section',
-          'content-id' => 'four_columns',
-          'title' => __( 'Four Columns', 'text_doma' ),
-          'icon' => 'Nimble_4-columns_icon.svg'
-        ),
-        array(
-          'content-type' => 'module',
-          'content-id' => 'czr_widget_area_module',
-          'title' => __( 'WordPress widget area', 'text_doma' ),
-          'font_icon' => '<i class="fab fa-wordpress-simple"></i>'
-          //'active' => sek_are_beta_features_enabled()
-        ),
-        array(
-          'content-type' => 'module',
-          'content-id' => 'czr_social_icons_module',
-          'title' => __( 'Social Profiles', 'text_doma' ),
-          'icon' => 'Nimble_social_icon.svg'
-        ),
-
-        array(
-          'content-type' => 'module',
           'content-id' => 'czr_quote_module',
           'title' => __( 'Quote', 'text_doma' ),
           'icon' => 'Nimble_quote_icon.svg'
@@ -1759,6 +1739,26 @@ function sek_get_module_collection() {
           'content-id' => 'czr_divider_module',
           'title' => __( 'Divider', 'text_doma' ),
           'icon' => 'Nimble__divider_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_map_module',
+          'title' => __( 'Map', 'text_doma' ),
+          'icon' => 'Nimble_map_icon.svg'
+        ),
+
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_widget_area_module',
+          'title' => __( 'WordPress widget area', 'text_doma' ),
+          'font_icon' => '<i class="fab fa-wordpress-simple"></i>'
+          //'active' => sek_are_beta_features_enabled()
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_social_icons_module',
+          'title' => __( 'Social Profiles', 'text_doma' ),
+          'icon' => 'Nimble_social_icon.svg'
         ),
         array(
           'content-type' => 'module',
@@ -3591,52 +3591,134 @@ function sek_set_mq_css_rules( $params, $rules ) {
         'selector' => '',
         'is_important' => false
     ));
-    if ( ! empty( $params['value'][ 'desktop' ] ) ) {
-        $_font_size_mq[ 'desktop' ] = null;
+
+    $css_value_by_devices = $params['value'];
+    $_font_size_mq = array('desktop' => null , 'tablet' => null , 'mobile' => null );
+
+    if ( !empty( $css_value_by_devices ) ) {
+          if ( ! empty( $css_value_by_devices[ 'desktop' ] ) ) {
+              $_font_size_mq[ 'desktop' ] = null;
+          }
+
+          if ( ! empty( $css_value_by_devices[ 'tablet' ] ) ) {
+              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
+          }
+
+          if ( ! empty( $css_value_by_devices[ 'mobile' ] ) ) {
+              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
+          }
+
+          // $css_value_by_devices looks like
+          // array(
+          //     'desktop' => '30px',
+          //     'tablet' => '',
+          //     'mobile' => ''
+          // );
+          foreach ( $css_value_by_devices as $device => $val ) {
+              if ( ! in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
+                  sek_error_log( __FUNCTION__ . ' => error => unknown device : ' . $device );
+                  continue;
+              }
+              if ( ! empty(  $val ) ) {
+                  // the css_property can be an array
+                  // this is needed for example to write properties supporting several vendor prefixes
+                  $css_property = $params['css_property'];
+                  if ( is_array( $css_property ) ) {
+                      $css_rules_array = array();
+                      foreach ( $css_property as $property ) {
+                          $css_rules_array[] = sprintf( '%1$s:%2$s%3$s;', $property, $val, $params['is_important'] ? '!important' : '' );
+                      }
+                      $css_rules = implode( '', $css_rules_array );
+                  } else {
+                      $css_rules = sprintf( '%1$s:%2$s%3$s;', $css_property, $val, $params['is_important'] ? '!important' : '' );
+                  }
+                  $rules[] = array(
+                      'selector' => $params['selector'],
+                      'css_rules' => $css_rules,
+                      'mq' => $_font_size_mq[ $device ]
+                  );
+              }
+          }
+    } else {
+        sek_error_log( __FUNCTION__ . ' Error => missing css rules ');
     }
 
-    if ( ! empty( $params['value'][ 'tablet' ] ) ) {
-        $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
-    }
-
-    if ( ! empty( $params['value'][ 'mobile' ] ) ) {
-        $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
-    }
-    // $params['value'] looks like
-    // array(
-    //     'desktop' => '30px',
-    //     'tablet' => '',
-    //     'mobile' => ''
-    // );
-    foreach ( $params['value'] as $device => $val ) {
-        if ( ! in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
-            sek_error_log( __FUNCTION__ . ' => error => unknown device : ' . $device );
-            continue;
-        }
-        if ( ! empty(  $val ) ) {
-            // the css_property can be an array
-            // this is needed for example to write properties supporting several vendor prefixes
-            $css_property = $params['css_property'];
-            if ( is_array( $css_property ) ) {
-                $css_rules_array = array();
-                foreach ( $css_property as $property ) {
-                    $css_rules_array[] = sprintf( '%1$s:%2$s%3$s;', $property, $val, $params['is_important'] ? '!important' : '' );
-                }
-                $css_rules = implode( '', $css_rules_array );
-            } else {
-                $css_rules = sprintf( '%1$s:%2$s%3$s;', $css_property, $val, $params['is_important'] ? '!important' : '' );
-            }
-            $rules[] = array(
-                'selector' => $params['selector'],
-                'css_rules' => $css_rules,
-                'mq' => $_font_size_mq[ $device ]
-            );
-        }
-    }
     return $rules;
 }
 
 
+// New version of sek_set_mq_css_rules() created in July 2019
+// => this version uses a param "css_rules_by_device" which describe the complete rule ( like padding-top:5em; ) for each device, instead of spliting value and property like the previous one
+// => it fixes the problem of vendor prefixes for which the value is not written the same.
+// For example, a top alignment in flex is written this way :
+// -webkit-box-align:start;
+// -ms-flex-align:start;
+//     align-items:flex-start;
+//
+// In this case, the param css_rules_by_device will be : "align-items:flex-start;-webkit-box-align:start;-ms-flex-align:start;";
+//
+// This function is invoked when sniffing the input rules.
+// It's a generic helper to generate media query css rule
+// @return an array of css rules looking like
+// $rules[] = array(
+//     'selector'    => $selector,
+//     'css_rules'   => $css_rules,
+//     'mq'          => $mq
+// );
+// @params params(array). Example
+// array(
+//     'css_rules_by_device' => array of css rules by devices
+//     'selector' => $selector,(string)
+//     'is_important' => $important,(bool)
+// )
+// params['value'] = Array
+// (
+//     [desktop] => padding-top:5em;
+//     [tablet] => padding-top:4em
+//     [mobile] => padding-top:25px
+// )
+function sek_set_mq_css_rules_new_version( $params, $rules ) {
+    // TABLETS AND MOBILES WILL INHERIT UPPER MQ LEVELS IF NOT OTHERWISE SPECIFIED
+    // Sek_Dyn_CSS_Builder::$breakpoints = [
+    //     'xs' => 0,
+    //     'sm' => 576,
+    //     'md' => 768,
+    //     'lg' => 992,
+    //     'xl' => 1200
+    // ];
+    $params = wp_parse_args( $params, array(
+        'css_rules_by_device' => array(),
+        'selector' => ''
+    ));
+
+    $css_rules_by_device = $params['css_rules_by_device'];
+    $_font_size_mq = array('desktop' => null , 'tablet' => null , 'mobile' => null );
+
+    if ( !empty( $css_rules_by_device ) ) {
+          if ( ! empty( $css_rules_by_device[ 'desktop' ] ) ) {
+              $_font_size_mq[ 'desktop' ] = null;
+          }
+
+          if ( ! empty( $css_rules_by_device[ 'tablet' ] ) ) {
+              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
+          }
+
+          if ( ! empty( $css_rules_by_device[ 'mobile' ] ) ) {
+              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
+          }
+          foreach ( $css_rules_by_device as $device => $rules_for_device ) {
+              $rules[] = array(
+                  'selector' => $params['selector'],
+                  'css_rules' => $rules_for_device,
+                  'mq' => $_font_size_mq[ $device ]
+              );
+          }
+    } else {
+        sek_error_log( __FUNCTION__ . ' Error => missing css rules ');
+    }
+
+    return $rules;
+}
 
 
 
@@ -5104,19 +5186,18 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
         foreach ( $v_alignment_value as $device => $align_val ) {
             switch ( $align_val ) {
                 case 'top' :
-                    $mapped_values[$device] = "flex-start";
+                    $mapped_values[$device] = "align-items:flex-start;-webkit-box-align:start;-ms-flex-align:start;";
                 break;
                 case 'center' :
-                    $mapped_values[$device] = "center";
+                    $mapped_values[$device] = "align-items:center;-webkit-box-align:center;-ms-flex-align:center;";
                 break;
                 case 'bottom' :
-                    $mapped_values[$device] = "flex-end";
+                    $mapped_values[$device] = "align-items:flex-end;-webkit-box-align:end;-ms-flex-align:end";
                 break;
             }
         }
-        $rules = sek_set_mq_css_rules( array(
-            'value' => $mapped_values,
-            'css_property' => 'align-items',
+        $rules = sek_set_mq_css_rules_new_version( array(
+            'css_rules_by_device' => $mapped_values,
             'selector' => '[data-sek-id="'.$level['id'].'"]'
         ), $rules );
     }
@@ -5386,20 +5467,19 @@ function sek_add_css_rules_for_module_width( $rules, $module ) {
         foreach ( $h_alignment_value as $device => $align_val ) {
             switch ( $align_val ) {
                 case 'left' :
-                    $mapped_values[$device] = "flex-start";
+                    $mapped_values[$device] = "align-self:flex-start;-ms-grid-row-align:start;-ms-flex-item-align:start;";
                 break;
                 case 'center' :
-                    $mapped_values[$device] = "center";
+                    $mapped_values[$device] = "align-self:center;-ms-grid-row-align:center;-ms-flex-item-align:center;";
                 break;
                 case 'right' :
-                    $mapped_values[$device] = "flex-end";
+                    $mapped_values[$device] = "align-self:flex-end;-ms-grid-row-align:end;-ms-flex-item-align:end;";
                 break;
             }
         }
 
-        $rules = sek_set_mq_css_rules( array(
-            'value' => $mapped_values,
-            'css_property' => 'align-self',
+        $rules = sek_set_mq_css_rules_new_version( array(
+            'css_rules_by_device' => $mapped_values,
             'selector' => '[data-sek-id="'.$module['id'].'"]'
         ), $rules );
     }
@@ -7620,9 +7700,13 @@ function sek_get_module_params_for_czr_social_icons_module() {
             'icons_style' => 'czr_social_icons_style_child'
         ),
         'name' => __('Social Icons', 'text_doma'),
-        // 'starting_value' => array(
-        //     'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
-        // ),
+        'starting_value' => array(
+            'icons_collection' => array(
+                array( 'icon' => 'fab fa-facebook', 'color_css' => '#3b5998' ),
+                array( 'icon' => 'fab fa-twitter', 'color_css' => '#1da1f2' ),
+                array( 'icon' => 'fab fa-instagram', 'color_css' => '#262626' )
+            )
+        ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '.sek-social-icons-wrapper' ),//array( '.sek-icon i' ),
@@ -11782,11 +11866,13 @@ function sek_get_module_params_for_czr_img_slider_module() {
             'slider_options' => 'czr_img_slider_opts_child'
         ),
         'name' => __('Image & Text Carousel', 'text_doma'),
-        // 'starting_value' => array(
-        //     'img_collection' => array(
-        //         'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
-        //     )
-        // ),
+        'starting_value' => array(
+            'img_collection' => array(
+                array( 'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png' ),
+                array( 'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png' ),
+                array( 'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png' )
+            )
+        ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '[data-sek-swiper-id]' ),//array( '.sek-icon i' ),
@@ -12237,19 +12323,18 @@ function sek_add_css_rules_for_items_in_czr_img_slider_collection_child( $rules,
         foreach ( $v_alignment_value as $device => $align_val ) {
             switch ( $align_val ) {
                 case 'top' :
-                    $mapped_values[$device] = "flex-start";
+                    $mapped_values[$device] = "align-items:flex-start;-webkit-box-align:start;-ms-flex-align:start;";
                 break;
                 case 'center' :
-                    $mapped_values[$device] = "center";
+                    $mapped_values[$device] = "align-items:center;-webkit-box-align:center;-ms-flex-align:center;";
                 break;
                 case 'bottom' :
-                    $mapped_values[$device] = "flex-end";
+                    $mapped_values[$device] = "align-items:flex-end;-webkit-box-align:end;-ms-flex-align:end";
                 break;
             }
         }
-        $rules = sek_set_mq_css_rules( array(
-            'value' => $mapped_values,
-            'css_property' => 'align-items',
+        $rules = sek_set_mq_css_rules_new_version( array(
+            'css_rules_by_device' => $mapped_values,
             'selector' => sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"] .sek-slider-text-wrapper', $params['parent_module_id'], $item_model['id'] )
         ), $rules );
     }//Vertical alignment
@@ -12358,7 +12443,7 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
 ?><?php
 
 /* ------------------------------------------------------------------------- *
- *  LOAD AND REGISTER IMG SLIDER MODULE
+ *  LOAD AND REGISTER ACCORDION MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 function sek_get_module_params_for_czr_accordion_module() {
@@ -12402,7 +12487,7 @@ function sek_get_module_params_for_czr_accordion_collection_child() {
         'dynamic_registration' => true,
         'module_type' => 'czr_accordion_collection_child',
         'is_crud' => true,
-        'name' => __( 'Item collection', 'text_doma' ),
+        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">toc</i> %1$s', __( 'Item collection', 'text_doma' ) ),
         'starting_value' => array(
             'text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
         ),
@@ -12491,7 +12576,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_accordion_opts_child',
-        'name' => __( 'Accordion options : font style, borders, background, ...', 'text_doma' ),
+        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">tune</i> %1$s', __( 'Accordion options : font style, borders, background, ...', 'text_doma' ) ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_doma'),
@@ -12513,14 +12598,14 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                         'inputs' => array(
                             'first_expanded' => array(
                                 'input_type'  => 'nimblecheck',
-                                'title'       => __('Show first item expanded', 'text_doma'),
+                                'title'       => __('Display first item expanded', 'text_doma'),
                                 'default'     => true,
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20'
                             ),
                             'one_expanded' => array(
                                 'input_type'  => 'nimblecheck',
-                                'title'       => __('Show one item expanded at a time', 'text_doma'),
+                                'title'       => __('Display one item expanded at a time', 'text_doma'),
                                 'default'     => true,
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20'
@@ -12563,7 +12648,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'background_color',
                                 'css_selectors' => '.sek-accord-wrapper .sek-accord-item .sek-accord-title',
-                                'html_before' => '<hr/><h3>' . __('COLOR AND BACKGROUND') .'</h3>'
+                                'html_before' => '<h3>' . __('COLOR AND BACKGROUND') .'</h3>'
                             ),
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -12658,7 +12743,8 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'refresh_markup'     => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'spacing_with_device_switcher',
-                                'css_selectors'      => '.sek-accord-item .sek-accord-title'
+                                'css_selectors'      => '.sek-accord-item .sek-accord-title',
+                                'html_before' => '<hr/><h3>' . __('SPACING') .'</h3>'
                             )
                         )
                     ),
@@ -12674,7 +12760,8 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'background_color',
-                                'css_selectors' => array('.sek-accord-item .sek-accord-content')
+                                'css_selectors' => array('.sek-accord-item .sek-accord-content'),
+                                'html_before' => '<h3>' . __('COLOR AND BACKGROUND') .'</h3>'
                             ),
                             'ct_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -12733,7 +12820,8 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'refresh_markup'     => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'spacing_with_device_switcher',
-                                'css_selectors'      => '.sek-accord-item .sek-accord-content'
+                                'css_selectors'      => '.sek-accord-item .sek-accord-content',
+                                'html_before' => '<hr/><h3>' . __('SPACING') .'</h3>'
                             )
                         )//inputs
                     )
@@ -14323,16 +14411,16 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
             foreach( $value as $device => $val ) {
                 switch ( $val ) {
                     case 'left' :
-                        $h_align_value = "flex-start";
+                        $h_align_value = sprintf('justify-content:flex-start%1$s;-webkit-box-pack:start%1$s;-ms-flex-pack:start%1$s;', $important ? '!important' : '' );
                     break;
                     case 'center' :
-                        $h_align_value = "center";
+                        $h_align_value = sprintf('justify-content:center%1$s;-webkit-box-pack:center%1$s;-ms-flex-pack:center%1$s;', $important ? '!important' : '' );
                     break;
                     case 'right' :
-                        $h_align_value = "flex-end";
+                        $h_align_value = sprintf('justify-content:flex-end%1$s;-webkit-box-pack:end%1$s;-ms-flex-pack:end%1$s;', $important ? '!important' : '' );
                     break;
                     default :
-                        $h_align_value = "center";
+                        $h_align_value = sprintf('justify-content:center%1$s;-webkit-box-pack:center%1$s;-ms-flex-pack:center%1$s;', $important ? '!important' : '' );
                     break;
                 }
                 $flex_ready_value[$device] = $h_align_value;
@@ -14343,13 +14431,12 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                 'mobile' => ''
             ));
 
-            $rules = sek_set_mq_css_rules( array(
-                'value' => $flex_ready_value,
-                'css_property' => 'justify-content',
-                'selector' => $selector,
-                'is_important' => $important,
+            $rules = sek_set_mq_css_rules_new_version( array(
+                'css_rules_by_device' => $flex_ready_value,
+                'selector' => $selector
             ), $rules );
         break;
+
         // handles simple or by device option
         case 'h_alignment' :
             if ( is_string( $value ) ) {// <= simple
@@ -14372,22 +14459,32 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                   ), $rules );
             }
         break;
+
+        // -webkit-box-align:end;
+        // -ms-flex-align:end;
+        // align-items:flex-end;
         case 'v_alignment' :
             switch ( $value ) {
                 case 'top' :
                     $v_align_value = "flex-start";
+                    $v_vendor_value = "start";
                 break;
                 case 'center' :
                     $v_align_value = "center";
+                    $v_vendor_value = "center";
                 break;
                 case 'bottom' :
                     $v_align_value = "flex-end";
+                    $v_vendor_value = "end";
                 break;
                 default :
                     $v_align_value = "center";
+                    $v_vendor_value = "center";
                 break;
             }
             $properties_to_render['align-items'] = $v_align_value;
+            $properties_to_render['-webkit-box-align'] = $v_vendor_value;
+            $properties_to_render['-ms-flex-align'] = $v_vendor_value;
         break;
         case 'font_family' :
             $properties_to_render['font-family'] = sek_extract_css_font_family_from_customizer_option( $value );

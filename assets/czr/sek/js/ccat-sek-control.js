@@ -5274,6 +5274,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           break;
                                     }
 
+                                    // items id of multi-items module must always be unique
+                                    // this recursive method sniff and does the job
+                                    self.maybeGenerateNewItemIdsForCrudModules( deepClonedSektion );
+
                                     var _position_ = self.getLevelPositionInCollection( params.id, newSetValue.collection );
                                     // Is this a nested sektion ?
                                     if ( true === params.is_nested ) {
@@ -5510,6 +5514,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           api.errare( 'updateAPISetting => ' + params.action, er );
                                           break;
                                     }
+
+                                    // items id of multi-items module must always be unique
+                                    // this recursive method sniff and does the job
+                                    self.maybeGenerateNewItemIdsForCrudModules( deepClonedColumn );
+
                                     var _position = self.getLevelPositionInCollection( params.id, newSetValue.collection );
                                     cloneId = deepClonedColumn.id;//will be passed in resolve()
                                     sektionCandidate.collection.splice( parseInt( _position + 1, 10 ), 0, deepClonedColumn );
@@ -5740,10 +5749,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => error when cloning the level');
                                           break;
                                     }
+                                    // items id of multi-items module must always be unique
+                                    // this recursive method sniff and does the job
+                                    self.maybeGenerateNewItemIdsForCrudModules( deepClonedModule );
+
                                     var insertInposition = self.getLevelPositionInCollection( params.id, newSetValue.collection );
                                     cloneId = deepClonedModule.id;//will be passed in resolve()
                                     columnCandidate.collection.splice( parseInt( insertInposition + 1, 10 ), 0, deepClonedModule );
-
                               break;
 
                               case 'sek-remove-module' :
@@ -6591,6 +6603,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     preparedSection = {},
                     _dfd_ = $.Deferred();
 
+                // items id of multi-items module must always be unique
+                // this recursive method sniff and does the job
+                self.maybeGenerateNewItemIdsForCrudModules( columnCollection );
+
                 // walk the column collection and populates the deferreds object recursively
                 var _sniffImg = function( data ) {
                       _.each( data, function( val, key ) {
@@ -7078,6 +7094,43 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return sektionsLocalizedData.registeredModules && ! _.isUndefined( sektionsLocalizedData.registeredModules[ moduleType ] );
             },
 
+            isMultiItemsModule : function(mod_type) {
+                  return sektionsLocalizedData.registeredModules[ mod_type ] && true === sektionsLocalizedData.registeredModules[ mod_type ].is_crud;
+            },
+
+
+            // This method is used to re-generate new unique item ids for multi-items modules.
+            // This is needed when a module is duplicated ( or its parent column or section )
+            // This is also needed when a pre-build section is injected.
+            // @Introduced in July 2019 when coding the accordion module
+            //
+            // @param data is an object or an array
+            // we know we are in an item when :
+            // - the item belongs to an array ( the collection of items )
+            // - the item is described as an object
+            // - the item has an id
+            //
+            // // additional checkes
+            // - the item does not have a level property <= makes sure we don't regenerate ids of level
+            // - the id does not start with __nimble__ ( sektionsLocalizedData.optPrefixForSektionsNotSaved ), which is the characteristic of a level
+            maybeGenerateNewItemIdsForCrudModules : function( data ) {
+                  var self = this;
+                  if ( _.isArray( data ) || _.isObject( data ) ) {
+                        _.each( data, function( value ) {
+                              if ( _.isArray( data ) && _.isObject( value ) && value.id && !_.has( value, 'level') ) {
+                                    if ( -1 === value.id.indexOf(sektionsLocalizedData.optPrefixForSektionsNotSaved) ) {
+                                          value.id = self.guid();
+                                    }
+                              } else {
+                                    if ( _.isArray( value ) || _.isObject( value ) ) {
+                                          self.maybeGenerateNewItemIdsForCrudModules( value );
+                                    }
+                              }
+                        });
+                  }
+                  return data;
+            },
+
 
             // Walk the main sektion setting and populate an array of google fonts
             // This method is used when processing the 'sek-update-fonts' action to update the .fonts property
@@ -7365,6 +7418,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // @return the item(s) ( array of items if multi-item module ) that we should use when adding the module to the main setting
             getModuleStartingValue : function( module_type ) {
+                  var self = this;
                   if ( ! sektionsLocalizedData.registeredModules ) {
                         api.errare( 'getModuleStartingValue => missing sektionsLocalizedData.registeredModules' );
                         return 'no_starting_value';
@@ -7382,7 +7436,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             rawStartValues = fatherStartingValues[optGroupName] ? fatherStartingValues[optGroupName] : {};
 
-                            if ( isMultiItemModule(childModType) && _.isArray( rawStartValues ) ) {
+                            if ( self.isMultiItemsModule(childModType) && _.isArray( rawStartValues ) ) {
                                   readyStartValues = buildMultiItemStartingValues( rawStartValues );
                             } else {
                                   readyStartValues = rawStartValues;
@@ -7418,9 +7472,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             });
                             return readyStartValues;
                       },
-                      isMultiItemModule = function(mod_type) {
-                            return sektionsLocalizedData.registeredModules[ mod_type ] && true === sektionsLocalizedData.registeredModules[ mod_type ].is_crud;
-                      },
                       isFatherModule = function(mod_type) {
                             return sektionsLocalizedData.registeredModules[ mod_type ] && true === sektionsLocalizedData.registeredModules[ mod_type ].is_father;
                       },
@@ -7448,7 +7499,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                   } else {
-                        if ( isMultiItemModule(module_type) && _.isArray( rawMaybeFatherModuleStartingValue ) ) {
+                        if ( self.isMultiItemsModule(module_type) && _.isArray( rawMaybeFatherModuleStartingValue ) ) {
                               startingValueCandidate = buildMultiItemStartingValues( rawMaybeFatherModuleStartingValue );
                         } else {
                               startingValueCandidate = rawMaybeFatherModuleStartingValue;
