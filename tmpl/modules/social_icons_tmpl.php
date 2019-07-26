@@ -60,8 +60,9 @@ if ( !empty( $icons_collection ) ) {
     sek_print_social_links( $icons_collection, $icons_style );
 } else {
     if ( skp_is_customizing() ) {
-        printf( '<ul class="sek-social-icons-wrapper"><li class="sek-social-icons-placeholder"><span><i>%1$s</i></span></li></ul>',
-            __('Click to start adding social icons.', 'hueman')
+        printf( '<div class="sek-social-icons-placeholder"><div class="sek-social-icons-ph-text" style="%2$s"><p>%1$s</p></div></div>',
+            __('Click to start adding social icons.', 'text_doma'),
+            'background: url(' . NIMBLE_MODULE_ICON_PATH . 'Nimble_social_icon.svg) no-repeat 50% 75%;background-size: 150px;'
         );
     }
 }
