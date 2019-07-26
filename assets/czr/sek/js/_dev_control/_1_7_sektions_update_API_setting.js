@@ -618,8 +618,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => error when cloning the level');
                                           break;
                                     }
-                                    var before = $.extend( true, {}, deepClonedModule );
-
                                     // items id of multi-items module must always be unique
                                     // this recursive method sniff and does the job
                                     self.maybeGenerateNewItemIdsForCrudModules( deepClonedModule );
