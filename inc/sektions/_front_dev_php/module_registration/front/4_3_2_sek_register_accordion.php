@@ -1,7 +1,7 @@
 <?php
 
 /* ------------------------------------------------------------------------- *
- *  LOAD AND REGISTER IMG SLIDER MODULE
+ *  LOAD AND REGISTER ACCORDION MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 function sek_get_module_params_for_czr_accordion_module() {
@@ -45,7 +45,7 @@ function sek_get_module_params_for_czr_accordion_collection_child() {
         'dynamic_registration' => true,
         'module_type' => 'czr_accordion_collection_child',
         'is_crud' => true,
-        'name' => __( 'Item collection', 'text_doma' ),
+        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">toc</i> %1$s', __( 'Item collection', 'text_doma' ) ),
         'starting_value' => array(
             'text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
         ),
@@ -134,7 +134,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_accordion_opts_child',
-        'name' => __( 'Accordion options : font style, borders, background, ...', 'text_doma' ),
+        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">tune</i> %1$s', __( 'Accordion options : font style, borders, background, ...', 'text_doma' ) ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_doma'),
@@ -156,14 +156,14 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                         'inputs' => array(
                             'first_expanded' => array(
                                 'input_type'  => 'nimblecheck',
-                                'title'       => __('Show first item expanded', 'text_doma'),
+                                'title'       => __('Display first item expanded', 'text_doma'),
                                 'default'     => true,
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20'
                             ),
                             'one_expanded' => array(
                                 'input_type'  => 'nimblecheck',
-                                'title'       => __('Show one item expanded at a time', 'text_doma'),
+                                'title'       => __('Display one item expanded at a time', 'text_doma'),
                                 'default'     => true,
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20'
@@ -206,7 +206,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'background_color',
                                 'css_selectors' => '.sek-accord-wrapper .sek-accord-item .sek-accord-title',
-                                'html_before' => '<hr/><h3>' . __('COLOR AND BACKGROUND') .'</h3>'
+                                'html_before' => '<h3>' . __('COLOR AND BACKGROUND') .'</h3>'
                             ),
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -301,7 +301,8 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'refresh_markup'     => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'spacing_with_device_switcher',
-                                'css_selectors'      => '.sek-accord-item .sek-accord-title'
+                                'css_selectors'      => '.sek-accord-item .sek-accord-title',
+                                'html_before' => '<hr/><h3>' . __('SPACING') .'</h3>'
                             )
                         )
                     ),
@@ -317,7 +318,8 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'background_color',
-                                'css_selectors' => array('.sek-accord-item .sek-accord-content')
+                                'css_selectors' => array('.sek-accord-item .sek-accord-content'),
+                                'html_before' => '<h3>' . __('COLOR AND BACKGROUND') .'</h3>'
                             ),
                             'ct_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -376,7 +378,8 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'refresh_markup'     => false,
                                 'refresh_stylesheet' => true,
                                 'css_identifier' => 'spacing_with_device_switcher',
-                                'css_selectors'      => '.sek-accord-item .sek-accord-content'
+                                'css_selectors'      => '.sek-accord-item .sek-accord-content',
+                                'html_before' => '<hr/><h3>' . __('SPACING') .'</h3>'
                             )
                         )//inputs
                     )
