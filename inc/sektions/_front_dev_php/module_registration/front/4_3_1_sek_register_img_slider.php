@@ -14,11 +14,13 @@ function sek_get_module_params_for_czr_img_slider_module() {
             'slider_options' => 'czr_img_slider_opts_child'
         ),
         'name' => __('Image & Text Carousel', 'text_doma'),
-        // 'starting_value' => array(
-        //     'img_collection' => array(
-        //         'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
-        //     )
-        // ),
+        'starting_value' => array(
+            'img_collection' => array(
+                array( 'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png' ),
+                array( 'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png' ),
+                array( 'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png' )
+            )
+        ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '[data-sek-swiper-id]' ),//array( '.sek-icon i' ),
