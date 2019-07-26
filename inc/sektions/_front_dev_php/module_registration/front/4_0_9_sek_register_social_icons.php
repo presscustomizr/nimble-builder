@@ -13,9 +13,13 @@ function sek_get_module_params_for_czr_social_icons_module() {
             'icons_style' => 'czr_social_icons_style_child'
         ),
         'name' => __('Social Icons', 'text_doma'),
-        // 'starting_value' => array(
-        //     'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
-        // ),
+        'starting_value' => array(
+            'icons_collection' => array(
+                array( 'icon' => 'fab fa-facebook', 'color_css' => '#3b5998' ),
+                array( 'icon' => 'fab fa-twitter', 'color_css' => '#1da1f2' ),
+                array( 'icon' => 'fab fa-instagram', 'color_css' => '#262626' )
+            )
+        ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '.sek-social-icons-wrapper' ),//array( '.sek-icon i' ),
