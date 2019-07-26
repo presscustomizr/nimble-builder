@@ -14,11 +14,13 @@ function sek_get_module_params_for_czr_accordion_module() {
             'accord_opts' => 'czr_accordion_opts_child'
         ),
         'name' => __('Accordion', 'text_doma'),
-        // 'starting_value' => array(
-        //     'img_collection' => array(
-        //         'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png'
-        //     )
-        // ),
+        'starting_value' => array(
+            'accord_collec' => array(
+                array('text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'),
+                array('text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'),
+                array('text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.')
+            )
+        ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '[data-sek-accordion-id]' ),//array( '.sek-icon i' ),

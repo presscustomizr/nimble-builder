@@ -12,6 +12,11 @@
                   // //EXTEND THE DEFAULT CONSTRUCTORS FOR MONOMODEL
                   module.itemConstructor = api.CZRItem.extend( module.CZRItemConstructor || {} );
 
+                  // run the parent initialize
+                  // Note : must be always invoked always after the input / item class extension
+                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
+                  api.CZRDynModule.prototype.initialize.call( module, id, options );
+
                   // module.isReady.then( function() {
                   //       if ( _.isUndefined( module.preItem ) )
                   //         return;
@@ -24,11 +29,6 @@
                   //             module.updateItemModel( module.preItem, true );
                   //       });
                   // });
-
-                  // run the parent initialize
-                  // Note : must be always invoked always after the input / item class extension
-                  // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
-                  api.CZRDynModule.prototype.initialize.call( module, id, options );
             },//initialize
 
 
@@ -108,13 +108,13 @@
                         var item = this;
                         //wait for the input collection to be populated,
                         //and then set the input visibility dependencies
-                        item.inputCollection.bind( function( col ) {
-                              if( _.isEmpty( col ) )
-                                return;
-                              try { item.setInputVisibilityDeps(); } catch( er ) {
-                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
-                              }
-                        });//item.inputCollection.bind()
+                        // item.inputCollection.bind( function( col ) {
+                        //       if( _.isEmpty( col ) )
+                        //         return;
+                        //       try { item.setInputVisibilityDeps(); } catch( er ) {
+                        //             api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                        //       }
+                        // });//item.inputCollection.bind()
 
                         // //update the item model on social-icon change
                         // item.bind('icon:changed', function(){
@@ -217,71 +217,7 @@
 
                   //Fired when the input collection is populated
                   //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
-                  setInputVisibilityDeps : function() {
-                        var item = this,
-                            module = item.module;
-
-                        //Internal item dependencies
-                        item.czr_Input.each( function( input ) {
-                              switch( input.id ) {
-                                    case 'link-to' :
-                                          _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
-                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      var bool = false;
-                                                      switch( _inputId_ ) {
-                                                            case 'link-custom-url' :
-                                                                  bool = 'url' === input() && '_custom_' == item.czr_Input('link-pick-url')().id;
-                                                            break;
-                                                            case 'link-pick-url' :
-                                                                  bool = 'url' === input();
-                                                            break;
-                                                            case 'link-target' :
-                                                                  bool = ! _.contains( [ 'no-link'], input() );
-                                                            break;
-                                                      }
-                                                      return bool;
-                                                }); } catch( er ) {
-                                                      api.errare( 'Image module => error in setInputVisibilityDeps', er );
-                                                }
-                                          });
-                                    break;
-                                    case 'link-pick-url' :
-                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
-                                                return '_custom_' == input().id && 'url' == item.czr_Input('link-to')();
-                                          });
-                                    break;
-
-                                    case 'apply-overlay' :
-                                          _.each( [ 'color-overlay', 'opacity-overlay' ] , function(_inputId_ ) {
-                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      return api.CZR_Helpers.isChecked( input() );
-                                                }); } catch( er ) {
-                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
-                                                }
-                                          });
-                                    break;
-
-                                    case 'enable_text' :
-                                          _.each( [ 'text_content', 'font_family_css', 'font_size_css', 'line_height_css', 'color_css', 'h_alignment_css', 'v_alignment', 'spacing_css'] , function(_inputId_ ) {
-                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      return api.CZR_Helpers.isChecked( input() );
-                                                }); } catch( er ) {
-                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
-                                                }
-                                          });
-                                    break;
-                                    case 'apply_overlay' :
-                                          _.each( [ 'color-overlay', 'opacity-overlay' ] , function(_inputId_ ) {
-                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      return api.CZR_Helpers.isChecked( input() );
-                                                }); } catch( er ) {
-                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
-                                                }
-                                          });
-                                    break;
-                              }
-                        });
-                  },
+                  //setInputVisibilityDeps : function() {},
 
                   // Overrides the default fmk method in order to disable the remove dialog box
                   toggleRemoveAlert : function() {
@@ -413,47 +349,20 @@
                         var item = this;
                         //wait for the input collection to be populated,
                         //and then set the input visibility dependencies
-                        item.inputCollection.bind( function( col ) {
-                              if( _.isEmpty( col ) )
-                                return;
-                              try { item.setInputVisibilityDeps(); } catch( er ) {
-                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
-                              }
-                        });//item.inputCollection.bind()
+                        // item.inputCollection.bind( function( col ) {
+                        //       if( _.isEmpty( col ) )
+                        //         return;
+                        //       try { item.setInputVisibilityDeps(); } catch( er ) {
+                        //             api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                        //       }
+                        // });//item.inputCollection.bind()
 
                         api.CZRItem.prototype.ready.call( item );
                   },
 
                   //Fired when the input collection is populated
                   //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
-                  setInputVisibilityDeps : function() {
-                        var item = this,
-                            module = item.module;
-
-                        //Internal item dependencies
-                        item.czr_Input.each( function( input ) {
-                              switch( input.id ) {
-                                    case 'height-type' :
-                                          _.each( [ 'custom-height' ] , function(_inputId_ ) {
-                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      return 'custom' === input();
-                                                }); } catch( er ) {
-                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
-                                                }
-                                          });
-                                    break;
-                                    case 'autoplay' :
-                                          _.each( [ 'autoplay_delay' ] , function(_inputId_ ) {
-                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      return api.CZR_Helpers.isChecked( input() );
-                                                }); } catch( er ) {
-                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
-                                                }
-                                          });
-                                    break;
-                              }
-                        });
-                  },
+                  //setInputVisibilityDeps : function() {},
             },//CZRItemConstructor
       };//Constructor
       //provides a description of each module
