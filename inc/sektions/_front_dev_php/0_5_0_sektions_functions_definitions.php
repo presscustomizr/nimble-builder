@@ -1650,6 +1650,24 @@ function sek_is_customize_previewing_a_changeset_post() {
 function sek_get_module_collection() {
     return array(
         array(
+          'content-type' => 'preset_section',
+          'content-id' => 'two_columns',
+          'title' => __( 'Two Columns', 'text_doma' ),
+          'icon' => 'Nimble_2-columns_icon.svg'
+        ),
+        array(
+          'content-type' => 'preset_section',
+          'content-id' => 'three_columns',
+          'title' => __( 'Three Columns', 'text_doma' ),
+          'icon' => 'Nimble_3-columns_icon.svg'
+        ),
+        array(
+          'content-type' => 'preset_section',
+          'content-id' => 'four_columns',
+          'title' => __( 'Four Columns', 'text_doma' ),
+          'icon' => 'Nimble_4-columns_icon.svg'
+        ),
+        array(
           'content-type' => 'module',
           'content-id' => 'czr_tiny_mce_editor_module',
           'title' => __( 'WordPress Editor', 'text_doma' ),
@@ -1706,44 +1724,6 @@ function sek_get_module_collection() {
         ),
         array(
           'content-type' => 'module',
-          'content-id' => 'czr_map_module',
-          'title' => __( 'Map', 'text_doma' ),
-          'icon' => 'Nimble_map_icon.svg'
-        ),
-        array(
-          'content-type' => 'preset_section',
-          'content-id' => 'two_columns',
-          'title' => __( 'Two Columns', 'text_doma' ),
-          'icon' => 'Nimble_2-columns_icon.svg'
-        ),
-        array(
-          'content-type' => 'preset_section',
-          'content-id' => 'three_columns',
-          'title' => __( 'Three Columns', 'text_doma' ),
-          'icon' => 'Nimble_3-columns_icon.svg'
-        ),
-        array(
-          'content-type' => 'preset_section',
-          'content-id' => 'four_columns',
-          'title' => __( 'Four Columns', 'text_doma' ),
-          'icon' => 'Nimble_4-columns_icon.svg'
-        ),
-        array(
-          'content-type' => 'module',
-          'content-id' => 'czr_widget_area_module',
-          'title' => __( 'WordPress widget area', 'text_doma' ),
-          'font_icon' => '<i class="fab fa-wordpress-simple"></i>'
-          //'active' => sek_are_beta_features_enabled()
-        ),
-        array(
-          'content-type' => 'module',
-          'content-id' => 'czr_social_icons_module',
-          'title' => __( 'Social Profiles', 'text_doma' ),
-          'icon' => 'Nimble_social_icon.svg'
-        ),
-
-        array(
-          'content-type' => 'module',
           'content-id' => 'czr_quote_module',
           'title' => __( 'Quote', 'text_doma' ),
           'icon' => 'Nimble_quote_icon.svg'
@@ -1759,6 +1739,26 @@ function sek_get_module_collection() {
           'content-id' => 'czr_divider_module',
           'title' => __( 'Divider', 'text_doma' ),
           'icon' => 'Nimble__divider_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_map_module',
+          'title' => __( 'Map', 'text_doma' ),
+          'icon' => 'Nimble_map_icon.svg'
+        ),
+
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_widget_area_module',
+          'title' => __( 'WordPress widget area', 'text_doma' ),
+          'font_icon' => '<i class="fab fa-wordpress-simple"></i>'
+          //'active' => sek_are_beta_features_enabled()
+        ),
+        array(
+          'content-type' => 'module',
+          'content-id' => 'czr_social_icons_module',
+          'title' => __( 'Social Profiles', 'text_doma' ),
+          'icon' => 'Nimble_social_icon.svg'
         ),
         array(
           'content-type' => 'module',
