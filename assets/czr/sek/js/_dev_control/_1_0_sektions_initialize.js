@@ -345,8 +345,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   message : [
                                         '<span style="color:#0075a2">',
                                           sektionsLocalizedData.i18n['You seem to be using a cache plugin.'],
-                                          '<strong> (' + sektionsLocalizedData.hasActiveCachePlugin + ')</strong><br/>',
-                                          '<strong>',
+                                          ( ! _.isString( sektionsLocalizedData.hasActiveCachePlugin ) || sektionsLocalizedData.hasActiveCachePlugin.length < 2 ) ? '' : '<strong> (' + sektionsLocalizedData.hasActiveCachePlugin + ')</strong><br/>',
+                                          ' <strong>',
                                           sektionsLocalizedData.i18n['It is recommended to disable your cache plugin when customizing your website.'],
                                           '</strong>',
                                         '</span>'
