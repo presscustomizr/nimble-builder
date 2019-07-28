@@ -399,6 +399,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   return self.updateAPISetting( apiParams );
                             },
 
+
+
+
+
+
+
+
+
+
                             // @params {
                             //       drop_target_element : $(this),
                             //       position : _position,
@@ -493,7 +502,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         //       });
                                         // }, 1000 );
                                   }
-                            },
+                            },//'sek-add-content-in-new-sektion'
 
 
                             // @params {
@@ -510,11 +519,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         uiParams = {};
                                         apiParams = params;
                                         apiParams.action = 'sek-add-preset-section-in-new-nested-sektion';
-                                        apiParams.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
                                         api.previewer.send( 'sek-maybe-print-loader', { loader_located_in_level_id : params.location });
                                         return self.updateAPISetting( apiParams );
                                   },
                                   complete : function( params ) {
+                                        // Always update the root fonts property after a module addition
+                                        // => because there might be a google font specified in the starting value or in a preset section
+                                        self.updateAPISetting({
+                                              action : 'sek-update-fonts',
+                                              is_global_location : self.isGlobalLocation( params.apiParams )
+                                        });
                                         // Refresh the stylesheet to generate the css rules of the clone
                                         // api.previewer.send( 'sek-refresh-stylesheet', {
                                         //       location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
@@ -524,12 +538,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               location_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                         });
 
-                                        // Always update the root fonts property after a module addition
-                                        // => because there might be a google font specified in the starting value or in a preset section
-                                        self.updateAPISetting({
-                                              action : 'sek-update-fonts',
-                                              is_global_location : self.isGlobalLocation( params.apiParams )
-                                        });
 
                                         api.previewer.trigger( 'sek-refresh-level', {
                                               level : 'section',
@@ -537,6 +545,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         });
                                   }
                             },
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -757,7 +776,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
                                                             apiParams : apiParams,
                                                             uiParams : uiParams,
-                                                            cloneId : ! _.isEmpty( promiseParams.cloneId ) ? promiseParams.cloneId : false
+                                                            cloneId : ! _.isEmpty( promiseParams.cloneId ) ? promiseParams.cloneId : false,
+
+                                                            // all_params has been introduced when implementing support for multi-section pre-build sections
+                                                            // it includes all_params.collection_of_preset_section_id, which is an array of section id used server side to fetch the content when rendering
+                                                            // 'collection_of_preset_section_id' is populated when updating the setting API with the preset_section actions like 'sek-add-content-in-new-sektion'
+                                                            // @see https://github.com/presscustomizr/nimble-builder/issues/489
+                                                            all_params : params
                                                       }
                                                 );
                                           } else {
