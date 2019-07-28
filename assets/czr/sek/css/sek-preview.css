@@ -391,6 +391,20 @@
   z-index: 1001;
   bottom: 3px;
 }
+/* when a column has nested section(s), its ui might be hidden by deeper columns.*/
+/* that's why a CSS class is added to position it on the top right corner, instead of bottom right*/
+/* @see https://github.com/presscustomizr/nimble-builder/issues/488*/
+.sek-column > .sek-dyn-ui-wrapper.sek-col-has-nested-section .sek-dyn-ui-location-type {
+    top: 0px;
+    bottom: auto;
+}
+.sek-column > .sek-column-dyn-ui.sek-col-has-nested-section .sek-dyn-ui-inner {
+  top: 0%;
+  bottom: auto;
+  z-index: 1002;
+  display: none;
+}
+
 .sek-column-dyn-ui {
     border: 2px dotted #00b846;
     /* was 1rem, fixes https://github.com/presscustomizr/nimble-builder/issues/270 */

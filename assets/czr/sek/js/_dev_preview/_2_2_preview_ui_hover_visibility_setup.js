@@ -77,7 +77,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               params = _.extend( params, {
                                     parent_can_have_more_columns : $parent_sektion.find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 12,
                                     parent_is_single_column : $parent_sektion.find('.sek-sektion-inner').first().children( 'div[data-sek-level="column"]' ).length < 2,
-                                    parent_is_last_allowed_nested : true === $parent_sektion.data('sek-is-nested')
+                                    parent_is_last_allowed_nested : true === $parent_sektion.data('sek-is-nested'),
+                                    has_nested_section : $levelEl.find('[data-sek-is-nested="true"]').length > 0
                               });
                         break;
                         case 'module' :
