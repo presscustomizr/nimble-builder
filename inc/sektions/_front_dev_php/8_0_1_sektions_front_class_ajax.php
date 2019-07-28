@@ -167,9 +167,49 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 }
             }
 
+            $html = '';
             // is this action possible ?
             if ( in_array( $sek_action, $this -> ajax_action_map ) ) {
-                $html = $this -> sek_ajax_fetch_content( $sek_action );
+                $content_type = null;
+                if ( array_key_exists( 'content_type', $_POST ) && is_string( $_POST['content_type'] ) ) {
+                    $content_type = $_POST['content_type'];
+                }
+
+                // This 'preset_section' === $content_type statement has been introduced when implementing support for multi-section pre-build sections
+                // @see https://github.com/presscustomizr/nimble-builder/issues/489
+                if ( 'preset_section' === $content_type ) {
+                    $collection_of_preset_section_id = null;
+                    if ( array_key_exists( 'collection_of_preset_section_id', $_POST ) && is_array( $_POST['collection_of_preset_section_id'] ) ) {
+                        $collection_of_preset_section_id = $_POST['collection_of_preset_section_id'];
+                    }
+
+                    switch ( $sek_action ) {
+                        // when 'sek-add-content-in-new-sektion' is fired, the section has already been populated with a column and a module
+                        case 'sek-add-content-in-new-sektion' :
+                        case 'sek-add-content-in-new-nested-sektion' :
+                            if ( 'preset_section' === $content_type ) {
+                                if ( !is_array( $collection_of_preset_section_id ) || empty( $collection_of_preset_section_id ) ) {
+                                    wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing param collection_of_preset_section_id when injecting a preset section' );
+                                    break;
+                                }
+                                foreach ( $_POST['collection_of_preset_section_id'] as $preset_section_id ) {
+                                    $html .= $this -> sek_ajax_fetch_content( $sek_action, $preset_section_id );
+                                }
+                            // 'module' === $content_type
+                            } else {
+                                $html = $this -> sek_ajax_fetch_content( $sek_action );
+                            }
+
+                        break;
+
+                        default :
+                            $html = $this -> sek_ajax_fetch_content( $sek_action );
+                        break;
+                    }
+                } else {
+                      $html = $this -> sek_ajax_fetch_content( $sek_action );
+                }
+
                 //sek_error_log(__CLASS__ . '::' . __FUNCTION__ , $html );
                 if ( is_wp_error( $html ) ) {
                     wp_send_json_error( $html );
@@ -201,7 +241,8 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         // )
         // @return string
         // @param $sek_action is $_POST['sek_action']
-        private function sek_ajax_fetch_content( $sek_action = '' ) {
+        // @param $maybe_preset_section_id is used when injecting a collection of preset sections
+        private function sek_ajax_fetch_content( $sek_action = '', $maybe_preset_section_id = '' ) {
             //sek_error_log( __CLASS__ . '::' . __FUNCTION__ , $_POST );
             // the $_POST['customized'] has already been updated
             // so invoking sek_get_skoped_seks() will ensure that we get the latest data
@@ -229,37 +270,61 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
             switch ( $sek_action ) {
                 case 'sek-add-section' :
-                // when 'sek-add-content-in-new-sektion' is fired, the section has already been populated with a column and a module
-                case 'sek-add-content-in-new-sektion' :
-                case 'sek-add-content-in-new-nested-sektion' :
+                case 'sek-duplicate-section' :
                     if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
                         // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
                         $this -> parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
                         $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
                     } else {
+                        //$level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
                         $level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
+                    }
+                break;
+
+                // This $content_type var has been introduced when implementing support for multi-section pre-build sections
+                // @see https://github.com/presscustomizr/nimble-builder/issues/489
+                // when 'sek-add-content-in-new-sektion' is fired, the section has already been populated with a column and a module
+                case 'sek-add-content-in-new-sektion' :
+                case 'sek-add-content-in-new-nested-sektion' :
+                    $content_type = null;
+                    if ( array_key_exists( 'content_type', $_POST ) && is_string( $_POST['content_type'] ) ) {
+                        $content_type = $_POST['content_type'];
+                    }
+                    if ( 'preset_section' === $content_type ) {
+                        if ( ! array_key_exists( 'collection_of_preset_section_id', $_POST ) || ! is_array( $_POST['collection_of_preset_section_id'] ) ) {
+                            wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing param collection_of_preset_section_id when injecting a preset section' );
+                            break;
+                        }
+                        if ( ! is_string( $maybe_preset_section_id ) || empty( $maybe_preset_section_id ) ) {
+                            wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => inavalid preset section id' );
+                            break;
+                        }
+                        $level_id = $maybe_preset_section_id;
+                    // module content type case.
+                    // the level id has been passed the regular way
+                    } else {
+                        $level_id = $_POST[ 'id' ];
+                    }
+
+                    if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
+                        // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
+                        $this -> parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
+                        $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
+                    } else {
+                        //$level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
+                        $level_model = sek_get_level_model( $level_id, $sektion_collection );
                     }
                 break;
 
                 //only used for nested section
                 case 'sek-remove-section' :
                     if ( ! array_key_exists( 'is_nested', $_POST ) || true !== json_decode( $_POST['is_nested'] ) ) {
-                        wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' sek-remove-section => the section must be nested in this ajax action' );
+                        wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => the section must be nested in this ajax action' );
                         break;
                     } else {
                         // we need to set the parent_model here to access it later in the ::render method to calculate the column width.
                         $this -> parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
                         $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
-                    }
-                break;
-
-                case 'sek-duplicate-section' :
-                    if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
-                        // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
-                        $this -> parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
-                        $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
-                    } else {
-                        $level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
                     }
                 break;
 
