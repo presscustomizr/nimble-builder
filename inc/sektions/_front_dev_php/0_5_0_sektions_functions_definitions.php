@@ -1730,6 +1730,12 @@ function sek_get_module_collection() {
         ),
         array(
           'content-type' => 'module',
+          'content-id' => 'czr_shortcode_module',
+          'title' => __( 'Shortcode', 'text_doma' ),
+          'icon' => 'Nimble_shortcode_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
           'content-id' => 'czr_spacer_module',
           'title' => __( 'Spacer', 'text_doma' ),
           'icon' => 'Nimble__spacer_icon.svg'
