@@ -146,7 +146,7 @@ if ( !empty( $img_collection ) ) {
     sek_print_img_slider( $img_collection, $slider_options, $model );
 } else {
     if ( skp_is_customizing() ) {
-        printf( '<div class="sek-slider-placeholder"><div class="sek-slider-ph-text" style="%2$s"><p>%1$s</p></div></div>',
+        printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',
             __('Click to start adding images.', 'hueman'),
             'background: url(' . NIMBLE_MODULE_ICON_PATH . 'Nimble_slideshow_icon.svg) no-repeat 50% 75%;background-size: 200px;'
         );
