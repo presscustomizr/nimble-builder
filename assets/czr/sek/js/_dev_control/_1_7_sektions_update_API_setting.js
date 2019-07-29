@@ -71,7 +71,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 break;
                                           }
                                           if ( true === parentSektionCandidate.is_nested ) {
-                                                __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ]);
+                                                __updateAPISettingDeferred__.reject('');
+                                                api.previewer.trigger('sek-notify', {
+                                                      type : 'info',
+                                                      duration : 30000,
+                                                      message : [
+                                                            '<span style="font-size:0.95em">',
+                                                              '<strong>' + sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ] + '</strong>',
+                                                            '</span>'
+                                                      ].join('')
+                                                });
+
                                                 break;
                                           }
                                           if ( 'no_match' == columnCandidate ) {
@@ -1057,7 +1067,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           break;
                                     }
                                     if ( true === parentSektionCandidate.is_nested ) {
-                                          __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ]);
+                                          __updateAPISettingDeferred__.reject('');
+                                          api.previewer.trigger('sek-notify', {
+                                                type : 'info',
+                                                duration : 30000,
+                                                message : [
+                                                      '<span style="font-size:0.95em">',
+                                                        '<strong>' + sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ] + '</strong>',
+                                                      '</span>'
+                                                ].join('')
+                                          });
                                           break;
                                     }
                                     if ( 'no_match' == columnCandidate ) {
