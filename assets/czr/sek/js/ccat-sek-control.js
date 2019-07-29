@@ -3152,12 +3152,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // say it
                                           self.trigger( [ msgId, 'done' ].join('_'), params );
                                     })
-                                    .fail( function( er ) {
-                                          api.errare( 'reactToPreviewMsg => error when firing ' + msgId, er );
+                                    .fail( function( errorMsg ) {
+                                          api.errare( 'reactToPreviewMsg => problem or error when running action ' + msgId, errorMsg );
                                           // api.panel( sektionsLocalizedData.sektionsPanelId, function( __main_panel__ ) {
                                           //       api.notifications.add( new api.Notification( 'sek-react-to-preview', {
                                           //             type: 'info',
-                                          //             message:  er,
+                                          //             message:  errorMsg,
                                           //             dismissible: true
                                           //       } ) );
 
@@ -3166,13 +3166,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           //             api.notifications.remove( 'sek-react-to-preview' );
                                           //       }, 5000 );
                                           // });
-                                          if ( sektionsLocalizedData.isDevMode ) {
+
+                                          if ( !_.isEmpty( errorMsg ) && sektionsLocalizedData.isDevMode ) {
                                                 api.previewer.trigger('sek-notify', {
                                                       type : 'error',
                                                       duration : 30000,
                                                       message : [
                                                             '<span style="font-size:0.95em">',
-                                                              '<strong>' + er + '</strong>',
+                                                              '<strong>' + errorMsg + '</strong>',
                                                               '<br>',
                                                               sektionsLocalizedData.i18n['If this problem locks Nimble Builder, you can try resetting the sections of this page.'],
                                                               '<br>',
@@ -5227,7 +5228,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 break;
                                           }
                                           if ( true === parentSektionCandidate.is_nested ) {
-                                                __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ]);
+                                                __updateAPISettingDeferred__.reject('');
+                                                api.previewer.trigger('sek-notify', {
+                                                      type : 'info',
+                                                      duration : 30000,
+                                                      message : [
+                                                            '<span style="font-size:0.95em">',
+                                                              '<strong>' + sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ] + '</strong>',
+                                                            '</span>'
+                                                      ].join('')
+                                                });
+
                                                 break;
                                           }
                                           if ( 'no_match' == columnCandidate ) {
@@ -6213,7 +6224,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           break;
                                     }
                                     if ( true === parentSektionCandidate.is_nested ) {
-                                          __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ]);
+                                          __updateAPISettingDeferred__.reject('');
+                                          api.previewer.trigger('sek-notify', {
+                                                type : 'info',
+                                                duration : 30000,
+                                                message : [
+                                                      '<span style="font-size:0.95em">',
+                                                        '<strong>' + sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ] + '</strong>',
+                                                      '</span>'
+                                                ].join('')
+                                          });
                                           break;
                                     }
                                     if ( 'no_match' == columnCandidate ) {
