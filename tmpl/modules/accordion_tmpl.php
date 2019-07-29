@@ -33,12 +33,16 @@ if ( ! function_exists( 'Nimble\sek_print_accordion' ) ) {
               $ind = 1;
               foreach( $accord_collec as $key => $item ) {
                   $title = !empty( $item['title_text'] ) ? $item['title_text'] : sprintf( '%s %s', __('Accordion title', 'text_dom'), '#' . $ind );
+                  $item_html_content = $item['text_content'];
+                  if ( ! skp_is_customizing() ) {
+                      $item_html_content = apply_filters( 'nimble_parse_for_smart_load', $item_html_content );
+                  }
                   // Put them together
                   printf( '<div class="sek-accord-item" title="%1$s" data-sek-item-id="%2$s" data-sek-expanded="%5$s"><div class="sek-accord-title" role="tab" aria-controls="sek-tab-content-%2$s"><span class="sek-inner-accord-title">%3$s</span><button><span></span><span></span></button></div><div class="sek-accord-content" role="tabpanel" aria-labelledby="sek-tab-content-%2$s">%4$s</div></div>',
                       esc_html( esc_attr( $item['title_attr'] ) ),
                       $item['id'],
                       $title,
-                      $item['text_content'],
+                      $item_html_content,
                       ( 'true' === $first_expanded && 1 === $ind ) ? "true" : "false"
                   );
                   $ind++;
@@ -60,7 +64,7 @@ if ( !empty( $accord_collec ) ) {
     sek_print_accordion( $accord_collec, $accord_opts, $model );
 } else {
     if ( skp_is_customizing() ) {
-        printf( '<div class="sek-accordion-placeholder"><div class="sek-accordion-ph-text" style="%2$s"><p>%1$s</p></div></div>',
+        printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',
             __('Click to start adding items.', 'text_doma'),
             'background: url(' . NIMBLE_MODULE_ICON_PATH . 'Nimble_accordion_icon.svg) no-repeat 50% 75%;background-size: 170px;'
         );
