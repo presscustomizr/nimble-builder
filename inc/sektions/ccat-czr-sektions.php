@@ -856,6 +856,10 @@ function sek_print_nimble_customizer_tmpl() {
 
 // Introduced for https://github.com/presscustomizr/nimble-builder/issues/395
 function sek_has_active_cache_plugin() {
+    if ( defined( 'WP_CACHE' ) && WP_CACHE ) {
+        return true;
+    }
+
     $cache_plugins = array(
         'WP Fastest Cache' => 'wp-fastest-cache/wpFastestCache.php',
         'W3 Total Cache' => 'w3-total-cache/w3-total-cache.php',

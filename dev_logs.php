@@ -47,12 +47,12 @@ function render_test_logs( $query = null ) {
         </pre>
       </div>
 
-      <div>
+      <!-- <div>
         <h2>LOCAL SKOPE REVISIONS</h2>
         <pre style="font-size: 11px;overflow:visible;">
-          <?php print_r( sek_get_revision_history_from_posts() ); ?>
+          <?php //print_r( sek_get_revision_history_from_posts() ); ?>
         </pre>
-      </div>
+      </div> -->
     <?php
     do_action('nimble_logs_rendered');
 }

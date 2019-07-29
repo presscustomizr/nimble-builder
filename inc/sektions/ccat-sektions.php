@@ -1730,6 +1730,12 @@ function sek_get_module_collection() {
         ),
         array(
           'content-type' => 'module',
+          'content-id' => 'czr_shortcode_module',
+          'title' => __( 'Shortcode', 'text_doma' ),
+          'icon' => 'Nimble_shortcode_icon.svg'
+        ),
+        array(
+          'content-type' => 'module',
           'content-id' => 'czr_spacer_module',
           'title' => __( 'Spacer', 'text_doma' ),
           'icon' => 'Nimble__spacer_icon.svg'
@@ -12949,6 +12955,40 @@ function sek_add_css_rules_for_czr_accordion_module( $rules, $complete_modul_mod
 
 
 ?><?php
+/* ------------------------------------------------------------------------- *
+ *  LOAD AND REGISTER SHORTCODE MODULE
+/* ------------------------------------------------------------------------- */
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+function sek_get_module_params_for_czr_shortcode_module() {
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'czr_shortcode_module',
+        'name' => __('Shortcode', 'text_doma'),
+        'css_selectors' => array( '.sek-module-inner > *' ),
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'tmpl' => array(
+            'item-inputs' => array(
+                'text_content' => array(
+                    'input_type'        => 'nimble_tinymce_editor',
+                    'editor_params'     => array(
+                        'media_button' => true,
+                        'includedBtns' => 'basic_btns_with_lists',
+                    ),
+                    'title'             => __( 'Write the shortcode(s) in the text editor', 'text_doma' ),
+                    'default'           => '',
+                    'width-100'         => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup'    => '.sek-shortcode-content',
+                    'notice_before' => __('A shortcode is a WordPress-specific code that lets you display predefined items. For example a trivial shortcode for a gallery looks like this [gallery].') . '<br/><br/>',
+                    'notice_after' => __('You may use some html tags in the "text" tab of the editor.', 'text_domain_to_be_replaced')
+                )
+            )
+        ),
+        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/shortcode_module_tmpl.php",
+    );
+}
+?><?php
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -15020,6 +15060,8 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'czr_accordion_collection_child',
             'czr_accordion_opts_child'
           ),
+
+          'czr_shortcode_module',
         ];
 
         // Is merged with front module when sek_is_header_footer_enabled() === true
@@ -15247,9 +15289,49 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 }
             }
 
+            $html = '';
             // is this action possible ?
             if ( in_array( $sek_action, $this -> ajax_action_map ) ) {
-                $html = $this -> sek_ajax_fetch_content( $sek_action );
+                $content_type = null;
+                if ( array_key_exists( 'content_type', $_POST ) && is_string( $_POST['content_type'] ) ) {
+                    $content_type = $_POST['content_type'];
+                }
+
+                // This 'preset_section' === $content_type statement has been introduced when implementing support for multi-section pre-build sections
+                // @see https://github.com/presscustomizr/nimble-builder/issues/489
+                if ( 'preset_section' === $content_type ) {
+                    $collection_of_preset_section_id = null;
+                    if ( array_key_exists( 'collection_of_preset_section_id', $_POST ) && is_array( $_POST['collection_of_preset_section_id'] ) ) {
+                        $collection_of_preset_section_id = $_POST['collection_of_preset_section_id'];
+                    }
+
+                    switch ( $sek_action ) {
+                        // when 'sek-add-content-in-new-sektion' is fired, the section has already been populated with a column and a module
+                        case 'sek-add-content-in-new-sektion' :
+                        case 'sek-add-content-in-new-nested-sektion' :
+                            if ( 'preset_section' === $content_type ) {
+                                if ( !is_array( $collection_of_preset_section_id ) || empty( $collection_of_preset_section_id ) ) {
+                                    wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing param collection_of_preset_section_id when injecting a preset section' );
+                                    break;
+                                }
+                                foreach ( $_POST['collection_of_preset_section_id'] as $preset_section_id ) {
+                                    $html .= $this -> sek_ajax_fetch_content( $sek_action, $preset_section_id );
+                                }
+                            // 'module' === $content_type
+                            } else {
+                                $html = $this -> sek_ajax_fetch_content( $sek_action );
+                            }
+
+                        break;
+
+                        default :
+                            $html = $this -> sek_ajax_fetch_content( $sek_action );
+                        break;
+                    }
+                } else {
+                      $html = $this -> sek_ajax_fetch_content( $sek_action );
+                }
+
                 //sek_error_log(__CLASS__ . '::' . __FUNCTION__ , $html );
                 if ( is_wp_error( $html ) ) {
                     wp_send_json_error( $html );
@@ -15281,7 +15363,8 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         // )
         // @return string
         // @param $sek_action is $_POST['sek_action']
-        private function sek_ajax_fetch_content( $sek_action = '' ) {
+        // @param $maybe_preset_section_id is used when injecting a collection of preset sections
+        private function sek_ajax_fetch_content( $sek_action = '', $maybe_preset_section_id = '' ) {
             //sek_error_log( __CLASS__ . '::' . __FUNCTION__ , $_POST );
             // the $_POST['customized'] has already been updated
             // so invoking sek_get_skoped_seks() will ensure that we get the latest data
@@ -15309,37 +15392,61 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
             switch ( $sek_action ) {
                 case 'sek-add-section' :
-                // when 'sek-add-content-in-new-sektion' is fired, the section has already been populated with a column and a module
-                case 'sek-add-content-in-new-sektion' :
-                case 'sek-add-content-in-new-nested-sektion' :
+                case 'sek-duplicate-section' :
                     if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
                         // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
                         $this -> parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
                         $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
                     } else {
+                        //$level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
                         $level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
+                    }
+                break;
+
+                // This $content_type var has been introduced when implementing support for multi-section pre-build sections
+                // @see https://github.com/presscustomizr/nimble-builder/issues/489
+                // when 'sek-add-content-in-new-sektion' is fired, the section has already been populated with a column and a module
+                case 'sek-add-content-in-new-sektion' :
+                case 'sek-add-content-in-new-nested-sektion' :
+                    $content_type = null;
+                    if ( array_key_exists( 'content_type', $_POST ) && is_string( $_POST['content_type'] ) ) {
+                        $content_type = $_POST['content_type'];
+                    }
+                    if ( 'preset_section' === $content_type ) {
+                        if ( ! array_key_exists( 'collection_of_preset_section_id', $_POST ) || ! is_array( $_POST['collection_of_preset_section_id'] ) ) {
+                            wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing param collection_of_preset_section_id when injecting a preset section' );
+                            break;
+                        }
+                        if ( ! is_string( $maybe_preset_section_id ) || empty( $maybe_preset_section_id ) ) {
+                            wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => inavalid preset section id' );
+                            break;
+                        }
+                        $level_id = $maybe_preset_section_id;
+                    // module content type case.
+                    // the level id has been passed the regular way
+                    } else {
+                        $level_id = $_POST[ 'id' ];
+                    }
+
+                    if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
+                        // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
+                        $this -> parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
+                        $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
+                    } else {
+                        //$level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
+                        $level_model = sek_get_level_model( $level_id, $sektion_collection );
                     }
                 break;
 
                 //only used for nested section
                 case 'sek-remove-section' :
                     if ( ! array_key_exists( 'is_nested', $_POST ) || true !== json_decode( $_POST['is_nested'] ) ) {
-                        wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' sek-remove-section => the section must be nested in this ajax action' );
+                        wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => the section must be nested in this ajax action' );
                         break;
                     } else {
                         // we need to set the parent_model here to access it later in the ::render method to calculate the column width.
                         $this -> parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
                         $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
-                    }
-                break;
-
-                case 'sek-duplicate-section' :
-                    if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
-                        // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
-                        $this -> parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
-                        $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
-                    } else {
-                        $level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
                     }
                 break;
 
@@ -16196,7 +16303,13 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
               <script type="text/html" id="sek-dyn-ui-tmpl-column">
                   <?php //<# console.log( 'data', data ); #> ?>
-                  <div class="sek-dyn-ui-wrapper sek-column-dyn-ui">
+                  <?php
+                    // when a column has nested section(s), its ui might be hidden by deeper columns.
+                    // that's why a CSS class is added to position it on the top right corner, instead of bottom right
+                    // @see https://github.com/presscustomizr/nimble-builder/issues/488
+                  ?>
+                  <# var has_nested_section_class = true === data.has_nested_section ? 'sek-col-has-nested-section' : ''; #>
+                  <div class="sek-dyn-ui-wrapper sek-column-dyn-ui {{has_nested_section_class}}">
                     <div class="sek-dyn-ui-inner <?php echo $icon_right_side_class; ?>">
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move column', 'text_domain' ); ?>"></i>

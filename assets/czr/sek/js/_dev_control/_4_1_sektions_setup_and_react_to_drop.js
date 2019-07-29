@@ -755,17 +755,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
 
                               case 'content-in-a-section-to-create' :
-                                    api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
-                              break;
-                              // this case fixes https://github.com/presscustomizr/nimble-builder/issues/139
+                               // this case fixes https://github.com/presscustomizr/nimble-builder/issues/139
                               case 'content-in-a-section-to-replace' :
-                                    api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
-                              break;
-                              case 'preset-section-in-a-nested-section-to-create' :
-                                    api.previewer.trigger( 'sek-add-preset-section-in-new-nested-sektion', params );
-                              break;
                               case 'content-in-empty-location' :
                                     api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
+                              break;
+
+                              case 'preset-section-in-a-nested-section-to-create' :
+                                    api.previewer.trigger( 'sek-add-preset-section-in-new-nested-sektion', params );
                               break;
 
                               default :

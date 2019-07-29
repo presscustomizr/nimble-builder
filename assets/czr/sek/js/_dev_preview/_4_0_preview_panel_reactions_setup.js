@@ -509,18 +509,18 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               $('body').addClass( msgId );
                               try {
                                     $.when( _.isFunction( callbackFn ) ? callbackFn( params ) : self[callbackFn].call( self, params ) )
-                                    .done( function( _ajaxResponse_ ) {
-                                          sendSuccessDataToPanel( _ajaxResponse_ );
-                                    })
-                                    .fail( function() {
-                                          api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
-                                    })
-                                    .always( function( _ajaxResponse_ ) {
-                                          $('body').removeClass( msgId );
-                                    })
-                                    .then( function() {
-                                          api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
-                                    });
+                                          .done( function( _ajaxResponse_ ) {
+                                                sendSuccessDataToPanel( _ajaxResponse_ );
+                                          })
+                                          .fail( function() {
+                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
+                                          })
+                                          .always( function( _ajaxResponse_ ) {
+                                                $('body').removeClass( msgId );
+                                          })
+                                          .then( function() {
+                                                api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
+                                          });
                               } catch( _er_ ) {
                                     self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
                                     $('body').removeClass( msgId );
