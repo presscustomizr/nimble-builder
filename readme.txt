@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.2
-Stable tag: 1.8.16
+Stable tag: 1.8.17
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,13 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.8.16 =
-Introduction of a new Shortcode module. Fixed various minor issues.
+= 1.8.17 =
+[Menu module] Fixed menu items alignment broken on mobile devices.
 
 == Changelog ==
+= 1.8.17 : August 29th 2019 =
+* fixed : [Menu module] menu items alignment broken on mobile devices.
+
 = 1.8.16 : July 29th 2019 =
 * fixed : Google fonts not updated when injecting a pre-build section in a new nested section
 * fixed : preview level ui => overlapping problem => the ui of column with a nested section can not be accessed easily

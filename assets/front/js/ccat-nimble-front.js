@@ -1994,6 +1994,240 @@
                   }
             });
       };
+})( jQuery, window );/* ===================================================
+ * jquerynimbleCenterImages.js v1.0.0
+ * ( inspired by Customizr theme jQuery plugin )
+ * ===================================================
+ * (c) 2019 Nicolas Guillaume, Nice, France
+ * CenterImages plugin may be freely distributed under the terms of the GNU GPL v2.0 or later license.
+ *
+ * License URI: http://www.gnu.org/licenses/gpl-2.0.html
+ *
+ * Center images in a specified container
+ *
+ * =================================================== */
+(function ( $, window ) {
+      //defaults
+      var pluginName = 'nimbleCenterImages',
+          defaults = {
+                enableCentering : true,
+                onresize : true,
+                onInit : true,//<= shall we smartload on init or wait for a custom event, typically smartload ?
+                oncustom : [],//list of event here
+                $containerToListen : null,//<= we might want to listen to custom event trigger to a parent container.Should be a jQuery obj
+                imgSel : 'img',
+                defaultCSSVal : { width : 'auto' , height : 'auto' },
+                leftAdjust : 0,
+                zeroLeftAdjust : 0,
+                topAdjust : 0,
+                zeroTopAdjust : -2,//<= top ajustement for sek-h-centrd
+                useImgAttr:false,//uses the img height and width attributes if not visible (typically used for the customizr slider hidden images)
+                setOpacityWhenCentered : false,//this can be used to hide the image during the time it is centered
+                addCenteredClassWithDelay : 0,//<= a small delay can be required when we rely on the sek-v-centrd or sek-h-centrd css classes to set the opacity for example
+                opacity : 1
+          };
+
+      function Plugin( element, options ) {
+            var self = this;
+            this.container  = element;
+            this.options    = $.extend( {}, defaults, options) ;
+            this._defaults  = defaults;
+            this._name      = pluginName;
+            this._customEvt = $.isArray(self.options.oncustom) ? self.options.oncustom : self.options.oncustom.split(' ');
+            this.init();
+      }
+
+      //can access this.element and this.option
+      //@return void
+      Plugin.prototype.init = function () {
+            var self = this,
+                _do = function( _event_ ) {
+                    _event_ = _event_ || 'init';
+
+                    //parses imgs ( if any ) in current container
+                    var $_imgs = $( self.options.imgSel , self.container );
+
+                    //if no images or centering is not active, only handle the golden ratio on resize event
+                    if ( 1 <= $_imgs.length && self.options.enableCentering ) {
+                          self._parse_imgs( $_imgs, _event_ );
+                    }
+                };
+
+            //fire
+            if ( self.options.onInit ) {
+                  _do();
+            }
+
+            //bind the container element with custom events if any
+            //( the images will also be bound )
+            if ( $.isArray( self._customEvt ) ) {
+                  self._customEvt.map( function( evt ) {
+                        var $_containerToListen = ( self.options.$containerToListen instanceof $ && 1 < self.options.$containerToListen.length ) ? self.options.$containerToListen : $( self.container );
+                        $_containerToListen.bind( evt, {} , function() {
+                              _do( evt );
+                        });
+                  } );
+            }
+      };
+
+
+      //@return void
+      Plugin.prototype._parse_imgs = function( $_imgs, _event_ ) {
+            var self = this;
+            $_imgs.each(function ( ind, img ) {
+                  var $_img = $(img);
+                  self._pre_img_cent( $_img, _event_ );
+
+                  // IMG CENTERING FN ON RESIZE ?
+                  // Parse Img can be fired several times, so bind once
+                  if ( self.options.onresize && ! $_img.data('resize-react-bound' ) ) {
+                        $_img.data('resize-react-bound', true );
+                        $(window).resize( _utils_.debounce( function() {
+                              self._pre_img_cent( $_img, 'resize');
+                        }, 100 ) );
+                  }
+
+            });//$_imgs.each()
+
+            // Mainly designed to check if a container is not getting parsed too many times
+            if ( $(self.container).attr('data-img-centered-in-container') ) {
+                  var _n = parseInt( $(self.container).attr('data-img-centered-in-container'), 10 ) + 1;
+                  $(self.container).attr('data-img-centered-in-container', _n );
+            } else {
+                  $(self.container).attr('data-img-centered-in-container', 1 );
+            }
+      };
+
+
+
+      //@return void
+      Plugin.prototype._pre_img_cent = function( $_img ) {
+
+            var _state = this._get_current_state( $_img ),
+                self = this,
+                _case  = _state.current,
+                _p     = _state.prop[_case],
+                _not_p = _state.prop[ 'h' == _case ? 'v' : 'h'],
+                _not_p_dir_val = 'h' == _case ? ( this.options.zeroTopAdjust || 0 ) : ( this.options.zeroLeftAdjust || 0 );
+
+            var _centerImg = function( $_img ) {
+                  $_img
+                      .css( _p.dim.name , _p.dim.val )
+                      .css( _not_p.dim.name , self.options.defaultCSSVal[ _not_p.dim.name ] || 'auto' )
+                      .css( _p.dir.name, _p.dir.val ).css( _not_p.dir.name, _not_p_dir_val );
+
+                  if ( 0 !== self.options.addCenteredClassWithDelay && _utils_.isNumber( self.options.addCenteredClassWithDelay ) ) {
+                        _utils_.delay( function() {
+                              $_img.addClass( _p._class ).removeClass( _not_p._class );
+                        }, self.options.addCenteredClassWithDelay );
+                  } else {
+                        $_img.addClass( _p._class ).removeClass( _not_p._class );
+                  }
+
+                  // Mainly designed to check if a single image is not getting parsed too many times
+                  if ( $_img.attr('data-img-centered') ) {
+                        var _n = parseInt( $_img.attr('data-img-centered'), 10 ) + 1;
+                        $_img.attr('data-img-centered', _n );
+                  } else {
+                        $_img.attr('data-img-centered', 1 );
+                  }
+                  return $_img;
+            };
+            if ( this.options.setOpacityWhenCentered ) {
+                  $.when( _centerImg( $_img ) ).done( function( $_img ) {
+                        $_img.css( 'opacity', self.options.opacity );
+                  });
+            } else {
+                  _utils_.delay(function() { _centerImg( $_img ); }, 0 );
+            }
+      };
+
+
+
+
+      /********
+      * HELPERS
+      *********/
+      //@return object with initial conditions : { current : 'h' or 'v', prop : {} }
+      Plugin.prototype._get_current_state = function( $_img ) {
+            var c_x     = $_img.closest(this.container).outerWidth(),
+                c_y     = $(this.container).outerHeight(),
+                i_x     = this._get_img_dim( $_img , 'x'),
+                i_y     = this._get_img_dim( $_img , 'y'),
+                up_i_x  = i_y * c_y !== 0 ? Math.round( i_x / i_y * c_y ) : c_x,
+                up_i_y  = i_x * c_x !== 0 ? Math.round( i_y / i_x * c_x ) : c_y,
+                current = 'h';
+            //avoid dividing by zero if c_x or i_x === 0
+            if ( 0 !== c_x * i_x ) {
+                  current = ( c_y / c_x ) >= ( i_y / i_x ) ? 'h' : 'v';
+            }
+
+            var prop    = {
+                  h : {
+                        dim : { name : 'height', val : c_y },
+                        dir : { name : 'left', val : ( c_x - up_i_x ) / 2 + ( this.options.leftAdjust || 0 ) },
+                        _class : 'sek-h-centrd'
+                  },
+                  v : {
+                        dim : { name : 'width', val : c_x },
+                        dir : { name : 'top', val : ( c_y - up_i_y ) / 2 + ( this.options.topAdjust || 0 ) },
+                        _class : 'sek-v-centrd'
+                  }
+            };
+
+            return { current : current , prop : prop };
+      };
+
+      //@return img height or width
+      //uses the img height and width if not visible and set in options
+      Plugin.prototype._get_img_dim = function( $_img, _dim ) {
+            if ( ! this.options.useImgAttr )
+              return 'x' == _dim ? $_img.outerWidth() : $_img.outerHeight();
+
+            if ( $_img.is(":visible") ) {
+                  return 'x' == _dim ? $_img.outerWidth() : $_img.outerHeight();
+            } else {
+                  if ( 'x' == _dim ){
+                        var _width = $_img.originalWidth();
+                        return typeof _width === undefined ? 0 : _width;
+                  }
+                  if ( 'y' == _dim ){
+                        var _height = $_img.originalHeight();
+                        return typeof _height === undefined ? 0 : _height;
+                  }
+            }
+      };
+
+      /*
+      * @params string : ids or classes
+      * @return boolean
+      */
+      Plugin.prototype._is_selector_allowed = function() {
+            //has requested sel ?
+            if ( ! $(this.container).attr( 'class' ) )
+              return true;
+
+            var _elSels       = $(this.container).attr( 'class' ).split(' '),
+                _selsToSkip   = [],
+                _filtered     = _elSels.filter( function(classe) { return -1 != $.inArray( classe , _selsToSkip ) ;});
+
+            //check if the filtered selectors array with the non authorized selectors is empty or not
+            //if empty => all selectors are allowed
+            //if not, at least one is not allowed
+            return 0 === _filtered.length;
+      };
+
+
+      // prevents against multiple instantiations
+      $.fn[pluginName] = function ( options ) {
+            return this.each(function () {
+                if (!$.data(this, 'plugin_' + pluginName)) {
+                    $.data(this, 'plugin_' + pluginName,
+                    new Plugin( this, options ));
+                }
+            });
+      };
+
 })( jQuery, window );// global sekFrontLocalized
 /* ===================================================
  * jquery.fn.parallaxBg v1.0.0
@@ -2144,163 +2378,6 @@
           });
       };
 })( jQuery, window );// global sekFrontLocalized
-/* ------------------------------------------------------------------------- *
- *  LIGHT BOX WITH MAGNIFIC POPUP
-/* ------------------------------------------------------------------------- */
-jQuery(function($){
-      $('[data-sek-module-type="czr_image_module"]').each( function() {
-            $linkCandidate = $(this).find('.sek-link-to-img-lightbox');
-            // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
-            if ( $linkCandidate.length < 1 || 'string' !== typeof( $linkCandidate[0].protocol ) || -1 !== $linkCandidate[0].protocol.indexOf('javascript') )
-              return;
-            if ( 'function' !== typeof( $.fn.magnificPopup ) )
-              return;
-            try { $linkCandidate.magnificPopup({
-                type: 'image',
-                closeOnContentClick: true,
-                closeBtnInside: true,
-                fixedContentPos: true,
-                mainClass: 'mfp-no-margins mfp-with-zoom', // class to remove default margin from left and right side
-                image: {
-                  verticalFit: true
-                },
-                zoom: {
-                  enabled: true,
-                  duration: 300 // don't foget to change the duration also in CSS
-                }
-            }); } catch( er ) {
-                  if ( typeof window.console.log === 'function' ) {
-                        console.log( er );
-                  }
-            }
-      });
-});
-
-
-/* ------------------------------------------------------------------------- *
- *  SMARTLOAD
-/* ------------------------------------------------------------------------- */
-jQuery(function($){
-      $('.sektion-wrapper').each( function() {
-            try { $(this).nimbleLazyLoad(); } catch( er ) {
-                  if ( typeof window.console.log === 'function' ) {
-                        console.log( er );
-                  }
-            }
-      });
-});
-
-
-/* ------------------------------------------------------------------------- *
- *  BG PARALLAX
-/* ------------------------------------------------------------------------- */
-jQuery(function($){
-      $('[data-sek-bg-parallax="true"]').each( function() {
-            $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
-      });
-      var _setParallaxWhenCustomizing = function() {
-            $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
-            // hack => always trigger a 'resize' event with a small delay to make sure bg positions are ok
-            setTimeout( function() {
-                 $('body').trigger('resize');
-            }, 500 );
-      };
-      // When previewing, react to level refresh
-      // This can occur to any level. We listen to the bubbling event on 'body' tag
-      // and salmon up to maybe instantiate any missing candidate
-      // Example : when a preset_section is injected
-      $('body').on('sek-level-refreshed sek-section-added', function( evt ){
-            if ( "true" === $(this).data('sek-bg-parallax') ) {
-                  _setParallaxWhenCustomizing.call(this);
-            } else {
-                  $(this).find('[data-sek-bg-parallax="true"]').each( function() {
-                        _setParallaxWhenCustomizing.call(this);
-                  });
-            }
-      });
-});
-
-
-/* ------------------------------------------------------------------------- *
- *  FITTEXT
-/* ------------------------------------------------------------------------- */
-jQuery( function($){
-    var doFitText = function() {
-          $(".sek-module-placeholder").each( function() {
-                $(this).fitText( 0.4, { minFontSize: '50px', maxFontSize: '300px' } ).data('sek-fittext-done', true );
-          });
-          // Delegate instantiation
-          $('.sektion-wrapper').on(
-                'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-level-refreshed',
-                'div[data-sek-level="section"]',
-                function( evt ) {
-                      $(this).find(".sek-module-placeholder").fitText( 0.4, { minFontSize: '50px', maxFontSize: '300px' } ).data('sek-fittext-done', true );
-                }
-          );
-
-    };
-    //doFitText();
-    // if ( 'function' == typeof(_) && ! _utils_.isUndefined( wp.customize ) ) {
-    //     wp.customize.selectiveRefresh.bind('partial-content-rendered' , function() {
-    //         doFitText();
-    //     });
-    // }
-
-    // does the same as new URL(url)
-    // but support IE.
-    // @see https://stackoverflow.com/questions/736513/how-do-i-parse-a-url-into-hostname-and-path-in-javascript
-    // @see https://gist.github.com/acdcjunior/9820040
-    // @see https://developer.mozilla.org/en-US/docs/Web/API/URL#Properties
-    var parseURL = function(url) {
-          var parser = document.createElement("a");
-          parser.href = url;
-          // IE 8 and 9 dont load the attributes "protocol" and "host" in case the source URL
-          // is just a pathname, that is, "/example" and not "http://domain.com/example".
-          parser.href = parser.href;
-
-          // copies all the properties to this object
-          var properties = ['host', 'hostname', 'hash', 'href', 'port', 'protocol', 'search'];
-          for (var i = 0, n = properties.length; i < n; i++) {
-            this[properties[i]] = parser[properties[i]];
-          }
-
-          // pathname is special because IE takes the "/" of the starting of pathname
-          this.pathname = (parser.pathname.charAt(0) !== "/" ? "/" : "") + parser.pathname;
-    };
-
-    var $root = $('html, body');
-    var maybeScrollToAnchor = function( evt ){
-          // problem to solve : users want to define anchor links that work inside a page, but also from other pages.
-          // @see https://github.com/presscustomizr/nimble-builder/issues/413
-          var clickedItemUrl = $(this).attr('href');
-          if ( '' === clickedItemUrl || null === clickedItemUrl || 'string' !== typeof( clickedItemUrl ) || -1 === clickedItemUrl.indexOf('#') )
-            return;
-
-          // an anchor link looks like this : http://mysite.com/contact/#anchor
-          var itemURLObject = new parseURL( clickedItemUrl ),
-              _currentPageUrl = new parseURL( window.document.location.href );
-
-          if( itemURLObject.pathname !== _currentPageUrl.pathname )
-            return;
-          if( 'string' !== typeof(itemURLObject.hash) || '' === itemURLObject.hash )
-            return;
-          var $nimbleTargetCandidate = $('[data-sek-level="location"]' ).find( '[id="' + itemURLObject.hash.replace('#','') + '"]');
-          if ( 1 !== $nimbleTargetCandidate.length )
-            return;
-
-          evt.preventDefault();
-          $root.animate({ scrollTop : $nimbleTargetCandidate.offset().top - 150 }, 400 );
-    };
-
-    // animate menu item to Nimble anchors
-    $('body').find('.menu-item' ).on( 'click', 'a', maybeScrollToAnchor );
-
-    // animate an anchor link inside Nimble sections
-    // fixes https://github.com/presscustomizr/nimble-builder/issues/443
-    $('[data-sek-level="location"]' ).on( 'click', 'a', maybeScrollToAnchor );
-});
-
-
 /* ------------------------------------------------------------------------- *
  *  MENU
 /* ------------------------------------------------------------------------- */
@@ -2658,6 +2735,9 @@ jQuery( function($){
 
                         // assign the new id to the mobile nav collapse
                         $( '.sek-nav-collapse', '#'+_new_id+'-wrapper' ).attr( 'id', _new_id );
+                        // add a data attribute so we can target the mobile menu with dynamic css rules
+                        // @needed when coding : https://github.com/presscustomizr/nimble-builder/issues/491
+                        $( '.sek-nav-wrap', '#'+_new_id+'-wrapper' ).attr('data-sek-is-mobile-menu', 'yes');
                         // remove the duplicate button
                         $( '.sek-nav-toggler', '#'+_new_id+'-wrapper' ).detach();
                         // update the toggler button so that will now refer to the "cloned" mobile menu
@@ -2676,10 +2756,7 @@ jQuery( function($){
                     _doMobileMenuSetup();
             });
     });
-});
-
-
-
+});// global sekFrontLocalized
 /* ------------------------------------------------------------------------- *
  *  ACCORDION MODULE
 /* ------------------------------------------------------------------------- */
@@ -2739,13 +2816,10 @@ jQuery( function($){
           });
     }
 });
-
-
-
-
-
+// global sekFrontLocalized
 /* ------------------------------------------------------------------------- *
- *  SWIPER CAROUSEL
+ *  SWIPER CAROUSEL implemented for the simple slider module czr_img_slider_module
+ *  dependency : $.fn.nimbleCenterImages()
 /* ------------------------------------------------------------------------- */
 jQuery( function($){
     var mySwipers = [];
@@ -2931,249 +3005,159 @@ jQuery( function($){
     }
 });
 
-
-
-
-
-
-
-
-
-
-
-
-/* ===================================================
- * jquerynimbleCenterImages.js v1.0.0
- * ( inspired by Customizr theme jQuery plugin )
- * ===================================================
- * (c) 2019 Nicolas Guillaume, Nice, France
- * CenterImages plugin may be freely distributed under the terms of the GNU GPL v2.0 or later license.
- *
- * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- *
- * Center images in a specified container
- *
- * =================================================== */
-(function ( $, window ) {
-      //defaults
-      var pluginName = 'nimbleCenterImages',
-          defaults = {
-                enableCentering : true,
-                onresize : true,
-                onInit : true,//<= shall we smartload on init or wait for a custom event, typically smartload ?
-                oncustom : [],//list of event here
-                $containerToListen : null,//<= we might want to listen to custom event trigger to a parent container.Should be a jQuery obj
-                imgSel : 'img',
-                defaultCSSVal : { width : 'auto' , height : 'auto' },
-                leftAdjust : 0,
-                zeroLeftAdjust : 0,
-                topAdjust : 0,
-                zeroTopAdjust : -2,//<= top ajustement for sek-h-centrd
-                useImgAttr:false,//uses the img height and width attributes if not visible (typically used for the customizr slider hidden images)
-                setOpacityWhenCentered : false,//this can be used to hide the image during the time it is centered
-                addCenteredClassWithDelay : 0,//<= a small delay can be required when we rely on the sek-v-centrd or sek-h-centrd css classes to set the opacity for example
-                opacity : 1
-          };
-
-      function Plugin( element, options ) {
-            var self = this;
-            this.container  = element;
-            this.options    = $.extend( {}, defaults, options) ;
-            this._defaults  = defaults;
-            this._name      = pluginName;
-            this._customEvt = $.isArray(self.options.oncustom) ? self.options.oncustom : self.options.oncustom.split(' ');
-            this.init();
-      }
-
-      //can access this.element and this.option
-      //@return void
-      Plugin.prototype.init = function () {
-            var self = this,
-                _do = function( _event_ ) {
-                    _event_ = _event_ || 'init';
-
-                    //parses imgs ( if any ) in current container
-                    var $_imgs = $( self.options.imgSel , self.container );
-
-                    //if no images or centering is not active, only handle the golden ratio on resize event
-                    if ( 1 <= $_imgs.length && self.options.enableCentering ) {
-                          self._parse_imgs( $_imgs, _event_ );
-                    }
-                };
-
-            //fire
-            if ( self.options.onInit ) {
-                  _do();
-            }
-
-            //bind the container element with custom events if any
-            //( the images will also be bound )
-            if ( $.isArray( self._customEvt ) ) {
-                  self._customEvt.map( function( evt ) {
-                        var $_containerToListen = ( self.options.$containerToListen instanceof $ && 1 < self.options.$containerToListen.length ) ? self.options.$containerToListen : $( self.container );
-                        $_containerToListen.bind( evt, {} , function() {
-                              _do( evt );
-                        });
-                  } );
-            }
-      };
-
-
-      //@return void
-      Plugin.prototype._parse_imgs = function( $_imgs, _event_ ) {
-            var self = this;
-            $_imgs.each(function ( ind, img ) {
-                  var $_img = $(img);
-                  self._pre_img_cent( $_img, _event_ );
-
-                  // IMG CENTERING FN ON RESIZE ?
-                  // Parse Img can be fired several times, so bind once
-                  if ( self.options.onresize && ! $_img.data('resize-react-bound' ) ) {
-                        $_img.data('resize-react-bound', true );
-                        $(window).resize( _utils_.debounce( function() {
-                              self._pre_img_cent( $_img, 'resize');
-                        }, 100 ) );
-                  }
-
-            });//$_imgs.each()
-
-            // Mainly designed to check if a container is not getting parsed too many times
-            if ( $(self.container).attr('data-img-centered-in-container') ) {
-                  var _n = parseInt( $(self.container).attr('data-img-centered-in-container'), 10 ) + 1;
-                  $(self.container).attr('data-img-centered-in-container', _n );
-            } else {
-                  $(self.container).attr('data-img-centered-in-container', 1 );
-            }
-      };
-
-
-
-      //@return void
-      Plugin.prototype._pre_img_cent = function( $_img ) {
-
-            var _state = this._get_current_state( $_img ),
-                self = this,
-                _case  = _state.current,
-                _p     = _state.prop[_case],
-                _not_p = _state.prop[ 'h' == _case ? 'v' : 'h'],
-                _not_p_dir_val = 'h' == _case ? ( this.options.zeroTopAdjust || 0 ) : ( this.options.zeroLeftAdjust || 0 );
-
-            var _centerImg = function( $_img ) {
-                  $_img
-                      .css( _p.dim.name , _p.dim.val )
-                      .css( _not_p.dim.name , self.options.defaultCSSVal[ _not_p.dim.name ] || 'auto' )
-                      .css( _p.dir.name, _p.dir.val ).css( _not_p.dir.name, _not_p_dir_val );
-
-                  if ( 0 !== self.options.addCenteredClassWithDelay && _utils_.isNumber( self.options.addCenteredClassWithDelay ) ) {
-                        _utils_.delay( function() {
-                              $_img.addClass( _p._class ).removeClass( _not_p._class );
-                        }, self.options.addCenteredClassWithDelay );
-                  } else {
-                        $_img.addClass( _p._class ).removeClass( _not_p._class );
-                  }
-
-                  // Mainly designed to check if a single image is not getting parsed too many times
-                  if ( $_img.attr('data-img-centered') ) {
-                        var _n = parseInt( $_img.attr('data-img-centered'), 10 ) + 1;
-                        $_img.attr('data-img-centered', _n );
-                  } else {
-                        $_img.attr('data-img-centered', 1 );
-                  }
-                  return $_img;
-            };
-            if ( this.options.setOpacityWhenCentered ) {
-                  $.when( _centerImg( $_img ) ).done( function( $_img ) {
-                        $_img.css( 'opacity', self.options.opacity );
-                  });
-            } else {
-                  _utils_.delay(function() { _centerImg( $_img ); }, 0 );
-            }
-      };
-
-
-
-
-      /********
-      * HELPERS
-      *********/
-      //@return object with initial conditions : { current : 'h' or 'v', prop : {} }
-      Plugin.prototype._get_current_state = function( $_img ) {
-            var c_x     = $_img.closest(this.container).outerWidth(),
-                c_y     = $(this.container).outerHeight(),
-                i_x     = this._get_img_dim( $_img , 'x'),
-                i_y     = this._get_img_dim( $_img , 'y'),
-                up_i_x  = i_y * c_y !== 0 ? Math.round( i_x / i_y * c_y ) : c_x,
-                up_i_y  = i_x * c_x !== 0 ? Math.round( i_y / i_x * c_x ) : c_y,
-                current = 'h';
-            //avoid dividing by zero if c_x or i_x === 0
-            if ( 0 !== c_x * i_x ) {
-                  current = ( c_y / c_x ) >= ( i_y / i_x ) ? 'h' : 'v';
-            }
-
-            var prop    = {
-                  h : {
-                        dim : { name : 'height', val : c_y },
-                        dir : { name : 'left', val : ( c_x - up_i_x ) / 2 + ( this.options.leftAdjust || 0 ) },
-                        _class : 'sek-h-centrd'
-                  },
-                  v : {
-                        dim : { name : 'width', val : c_x },
-                        dir : { name : 'top', val : ( c_y - up_i_y ) / 2 + ( this.options.topAdjust || 0 ) },
-                        _class : 'sek-v-centrd'
-                  }
-            };
-
-            return { current : current , prop : prop };
-      };
-
-      //@return img height or width
-      //uses the img height and width if not visible and set in options
-      Plugin.prototype._get_img_dim = function( $_img, _dim ) {
-            if ( ! this.options.useImgAttr )
-              return 'x' == _dim ? $_img.outerWidth() : $_img.outerHeight();
-
-            if ( $_img.is(":visible") ) {
-                  return 'x' == _dim ? $_img.outerWidth() : $_img.outerHeight();
-            } else {
-                  if ( 'x' == _dim ){
-                        var _width = $_img.originalWidth();
-                        return typeof _width === undefined ? 0 : _width;
-                  }
-                  if ( 'y' == _dim ){
-                        var _height = $_img.originalHeight();
-                        return typeof _height === undefined ? 0 : _height;
-                  }
-            }
-      };
-
-      /*
-      * @params string : ids or classes
-      * @return boolean
-      */
-      Plugin.prototype._is_selector_allowed = function() {
-            //has requested sel ?
-            if ( ! $(this.container).attr( 'class' ) )
-              return true;
-
-            var _elSels       = $(this.container).attr( 'class' ).split(' '),
-                _selsToSkip   = [],
-                _filtered     = _elSels.filter( function(classe) { return -1 != $.inArray( classe , _selsToSkip ) ;});
-
-            //check if the filtered selectors array with the non authorized selectors is empty or not
-            //if empty => all selectors are allowed
-            //if not, at least one is not allowed
-            return 0 === _filtered.length;
-      };
-
-
-      // prevents against multiple instantiations
-      $.fn[pluginName] = function ( options ) {
-            return this.each(function () {
-                if (!$.data(this, 'plugin_' + pluginName)) {
-                    $.data(this, 'plugin_' + pluginName,
-                    new Plugin( this, options ));
+// global sekFrontLocalized
+/* ------------------------------------------------------------------------- *
+ *  LIGHT BOX WITH MAGNIFIC POPUP
+/* ------------------------------------------------------------------------- */
+jQuery(function($){
+      $('[data-sek-module-type="czr_image_module"]').each( function() {
+            $linkCandidate = $(this).find('.sek-link-to-img-lightbox');
+            // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
+            if ( $linkCandidate.length < 1 || 'string' !== typeof( $linkCandidate[0].protocol ) || -1 !== $linkCandidate[0].protocol.indexOf('javascript') )
+              return;
+            if ( 'function' !== typeof( $.fn.magnificPopup ) )
+              return;
+            try { $linkCandidate.magnificPopup({
+                type: 'image',
+                closeOnContentClick: true,
+                closeBtnInside: true,
+                fixedContentPos: true,
+                mainClass: 'mfp-no-margins mfp-with-zoom', // class to remove default margin from left and right side
+                image: {
+                  verticalFit: true
+                },
+                zoom: {
+                  enabled: true,
+                  duration: 300 // don't foget to change the duration also in CSS
                 }
-            });
-      };
+            }); } catch( er ) {
+                  if ( typeof window.console.log === 'function' ) {
+                        console.log( er );
+                  }
+            }
+      });
+});
 
-})( jQuery, window );
+
+/* ------------------------------------------------------------------------- *
+ *  SMARTLOAD
+/* ------------------------------------------------------------------------- */
+jQuery(function($){
+      $('.sektion-wrapper').each( function() {
+            try { $(this).nimbleLazyLoad(); } catch( er ) {
+                  if ( typeof window.console.log === 'function' ) {
+                        console.log( er );
+                  }
+            }
+      });
+});
+
+
+/* ------------------------------------------------------------------------- *
+ *  BG PARALLAX
+/* ------------------------------------------------------------------------- */
+jQuery(function($){
+      $('[data-sek-bg-parallax="true"]').each( function() {
+            $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
+      });
+      var _setParallaxWhenCustomizing = function() {
+            $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
+            // hack => always trigger a 'resize' event with a small delay to make sure bg positions are ok
+            setTimeout( function() {
+                 $('body').trigger('resize');
+            }, 500 );
+      };
+      // When previewing, react to level refresh
+      // This can occur to any level. We listen to the bubbling event on 'body' tag
+      // and salmon up to maybe instantiate any missing candidate
+      // Example : when a preset_section is injected
+      $('body').on('sek-level-refreshed sek-section-added', function( evt ){
+            if ( "true" === $(this).data('sek-bg-parallax') ) {
+                  _setParallaxWhenCustomizing.call(this);
+            } else {
+                  $(this).find('[data-sek-bg-parallax="true"]').each( function() {
+                        _setParallaxWhenCustomizing.call(this);
+                  });
+            }
+      });
+});
+
+
+/* ------------------------------------------------------------------------- *
+ *  FITTEXT
+/* ------------------------------------------------------------------------- */
+jQuery( function($){
+    var doFitText = function() {
+          $(".sek-module-placeholder").each( function() {
+                $(this).fitText( 0.4, { minFontSize: '50px', maxFontSize: '300px' } ).data('sek-fittext-done', true );
+          });
+          // Delegate instantiation
+          $('.sektion-wrapper').on(
+                'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-level-refreshed',
+                'div[data-sek-level="section"]',
+                function( evt ) {
+                      $(this).find(".sek-module-placeholder").fitText( 0.4, { minFontSize: '50px', maxFontSize: '300px' } ).data('sek-fittext-done', true );
+                }
+          );
+
+    };
+    //doFitText();
+    // if ( 'function' == typeof(_) && ! _utils_.isUndefined( wp.customize ) ) {
+    //     wp.customize.selectiveRefresh.bind('partial-content-rendered' , function() {
+    //         doFitText();
+    //     });
+    // }
+
+    // does the same as new URL(url)
+    // but support IE.
+    // @see https://stackoverflow.com/questions/736513/how-do-i-parse-a-url-into-hostname-and-path-in-javascript
+    // @see https://gist.github.com/acdcjunior/9820040
+    // @see https://developer.mozilla.org/en-US/docs/Web/API/URL#Properties
+    var parseURL = function(url) {
+          var parser = document.createElement("a");
+          parser.href = url;
+          // IE 8 and 9 dont load the attributes "protocol" and "host" in case the source URL
+          // is just a pathname, that is, "/example" and not "http://domain.com/example".
+          parser.href = parser.href;
+
+          // copies all the properties to this object
+          var properties = ['host', 'hostname', 'hash', 'href', 'port', 'protocol', 'search'];
+          for (var i = 0, n = properties.length; i < n; i++) {
+            this[properties[i]] = parser[properties[i]];
+          }
+
+          // pathname is special because IE takes the "/" of the starting of pathname
+          this.pathname = (parser.pathname.charAt(0) !== "/" ? "/" : "") + parser.pathname;
+    };
+
+    var $root = $('html, body');
+    var maybeScrollToAnchor = function( evt ){
+          // problem to solve : users want to define anchor links that work inside a page, but also from other pages.
+          // @see https://github.com/presscustomizr/nimble-builder/issues/413
+          var clickedItemUrl = $(this).attr('href');
+          if ( '' === clickedItemUrl || null === clickedItemUrl || 'string' !== typeof( clickedItemUrl ) || -1 === clickedItemUrl.indexOf('#') )
+            return;
+
+          // an anchor link looks like this : http://mysite.com/contact/#anchor
+          var itemURLObject = new parseURL( clickedItemUrl ),
+              _currentPageUrl = new parseURL( window.document.location.href );
+
+          if( itemURLObject.pathname !== _currentPageUrl.pathname )
+            return;
+          if( 'string' !== typeof(itemURLObject.hash) || '' === itemURLObject.hash )
+            return;
+          var $nimbleTargetCandidate = $('[data-sek-level="location"]' ).find( '[id="' + itemURLObject.hash.replace('#','') + '"]');
+          if ( 1 !== $nimbleTargetCandidate.length )
+            return;
+
+          evt.preventDefault();
+          $root.animate({ scrollTop : $nimbleTargetCandidate.offset().top - 150 }, 400 );
+    };
+
+    // animate menu item to Nimble anchors
+    $('body').find('.menu-item' ).on( 'click', 'a', maybeScrollToAnchor );
+
+    // animate an anchor link inside Nimble sections
+    // fixes https://github.com/presscustomizr/nimble-builder/issues/443
+    $('[data-sek-level="location"]' ).on( 'click', 'a', maybeScrollToAnchor );
+});

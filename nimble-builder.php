@@ -2,7 +2,7 @@
 /**
 * Plugin Name: Nimble Page Builder
 * Description: Powerful drag and drop page builder using the native WordPress customizer.
-* Version: 1.8.16
+* Version: 1.8.17
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://nimblebuilder.com/?utm_source=wp-plugins&utm_medium=wp-dashboard&utm_campaign=author-uri
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
-$current_version = "1.8.16";
+$current_version = "1.8.17";
 
 if ( !defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version ); }
 if ( !defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }

@@ -1,4 +1,4 @@
-# Nimble Builder v1.8.16 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+# Nimble Builder v1.8.17 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 ![Nimble Builder](/nimble.jpg)
 
 > Powerful drag and drop page builder using the native WordPress customizer.
