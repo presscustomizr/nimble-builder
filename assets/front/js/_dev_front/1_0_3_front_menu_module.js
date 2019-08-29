@@ -356,6 +356,9 @@ jQuery( function($){
 
                         // assign the new id to the mobile nav collapse
                         $( '.sek-nav-collapse', '#'+_new_id+'-wrapper' ).attr( 'id', _new_id );
+                        // add a data attribute so we can target the mobile menu with dynamic css rules
+                        // @needed when coding : https://github.com/presscustomizr/nimble-builder/issues/491
+                        $( '.sek-nav-wrap', '#'+_new_id+'-wrapper' ).attr('data-sek-is-mobile-menu', 'yes');
                         // remove the duplicate button
                         $( '.sek-nav-toggler', '#'+_new_id+'-wrapper' ).detach();
                         // update the toggler button so that will now refer to the "cloned" mobile menu
