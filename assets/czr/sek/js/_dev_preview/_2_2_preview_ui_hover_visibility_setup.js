@@ -102,6 +102,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
             },//printLevelUI()
 
+
+
+
+
+
+
+
+
             // Fired on Dom Ready, in ::initialize()
             setupUiHoverVisibility : function() {
                   var self = this;
@@ -331,20 +339,24 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // If the ui is expanded, remove after a delay to let user access all ui buttons, even those outside the $level.
                   // => the ui can be "outside" ( <=> out vertically and horizontally ) when columns are narrow.
                   var _sniffLevelsAndPrintUI = function( position, $candidateForRemoval ) {
-                        var $levelsToWalk, sniffCase;
+                        var collectionOfLevelsToWalk = [], sniffCase;
                         if ( _.isUndefined( $candidateForRemoval ) || $candidateForRemoval.length < 1 ) {
-                              $levelsToWalk = $('body').find('[data-sek-level]');
+                              // data-sek-preview-level-guid has been introduced in https://github.com/presscustomizr/nimble-builder/issues/494
+                              // to fix a wrong UI generation leading to user unable to edit content
+                              $('body').find('[data-sek-level][data-sek-preview-level-guid="' + sekPreviewLocalized.previewLevelGuid +'"]').each( function() {
+                                    collectionOfLevelsToWalk.push( $(this) );
+                              });
                               sniffCase = 'printOrScheduleRemoval';
                         } else {
-                              $levelsToWalk = $candidateForRemoval;
+                              collectionOfLevelsToWalk.push( $candidateForRemoval );
                               sniffCase = 'mayBeRemove';
                         }
 
-                        $levelsToWalk.each( function() {
-                              var levelWrapperRect = $(this)[0].getBoundingClientRect(),
+                        _.each( collectionOfLevelsToWalk, function( $levelToWalk ) {
+                              var levelWrapperRect = $levelToWalk[0].getBoundingClientRect(),
                                 isInHorizontally = position.x <= levelWrapperRect.right && levelWrapperRect.left <= position.x,
                                 isInVertically = position.y >= levelWrapperRect.top && levelWrapperRect.bottom >= position.y,
-                                $levelEl = $(this);
+                                $levelEl = $levelToWalk;
 
                               switch( sniffCase ) {
                                     case 'mayBeRemove' :
@@ -374,7 +386,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           }
                                     break;
                               }
-                        });
+                        });//collectionOfLevelsToWalk.each
                   };
 
 

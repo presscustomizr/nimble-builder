@@ -11,15 +11,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         // implemented for double-click insertion https://github.com/presscustomizr/nimble-builder/issues/317
                         api.preview.send( 'sek-clean-target-drop-zone' );
 
-                        var clickedOn = '',
+                        var clickedOn = 'inactiveZone',
                             $el = $(evt.target),
-                            $hook_location = $el.closest('[data-sek-level="location"]'),
-                            $closestLevelWrapper = $el.closest('[data-sek-level]'),
+                            $hookLocation = $el.closest('[data-sek-level="location"][data-sek-preview-level-guid="' + sekPreviewLocalized.previewLevelGuid +'"]'),
+                            $closestLevelWrapper = $el.closest('[data-sek-preview-level-guid="' + sekPreviewLocalized.previewLevelGuid +'"]'),
                             $closestActionIcon = $el.closest('[data-sek-click-on]'),
                             _action,
-                            _location = $hook_location.data('sek-id'),
+                            _location_id = $hookLocation.data('sek-id'),
                             _level = $closestLevelWrapper.data('sek-level'),
                             _id = $closestLevelWrapper.data('sek-id');
+
                         if ( 'add-content' == $el.data('sek-click-on') || ( $el.closest('[data-sek-click-on]').length > 0 && 'add-content' == $el.closest('[data-sek-click-on]').data('sek-click-on') ) ) {
                               clickedOn = 'addContentButton';
                         } else if ( ! _.isEmpty( $el.data( 'sek-click-on' ) ) || $closestActionIcon.length > 0 ) {
@@ -44,12 +45,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               clickedOn = 'inactiveZone';
                         }
 
+                        if ( _.isEmpty( _location_id ) ) {
+                            self.errare( '::scheduleUiClickReactions => error location id can not be empty' );
+                        }
+
                         switch( clickedOn ) {
                               case 'addContentButton' :
                                     var is_first_section = true === $el.closest('[data-sek-is-first-section]').data('sek-is-first-section');
 
                                     api.preview.send( 'sek-add-section', {
-                                          location : _location,
+                                          location : _location_id,
                                           level : 'section',
                                           before_section : $el.closest('[data-sek-before-section]').data('sek-before-section'),
                                           after_section : $el.closest('[data-sek-after-section]').data('sek-after-section'),
@@ -58,7 +63,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     });
                               break;
                               case 'UIIcon' :
-
                                     if ( 1 > $closestLevelWrapper.length ) {
                                         throw new Error( 'ERROR => sek-front-preview => No valid level dom element found' );
                                     }
@@ -72,7 +76,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     }
                                     self._send_( $el, {
                                           action : _action,
-                                          location : _location,
+                                          location : _location_id,
                                           level : _level,
                                           id : _id,
                                           was_triggered : false //<= indicates that the user clicked.
@@ -100,14 +104,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               case 'sectionOutsideColumns' :
                                     self._send_( $el, {
                                         action : 'edit-options',
-                                        location : _location,
+                                        location : _location_id,
                                         level : _level,
                                         id : _id
                                     });
                               break;
                               case 'addSektion' :
                                     api.preview.send( 'sek-add-section', {
-                                          location : _location,
+                                          location : _location_id,
                                           level : $el.data('sek-add')
                                     });
                               break;

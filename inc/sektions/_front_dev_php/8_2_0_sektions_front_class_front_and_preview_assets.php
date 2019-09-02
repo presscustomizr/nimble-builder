@@ -189,6 +189,14 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
 
                     'registeredModules' => CZR_Fmk_Base()->registered_modules,
+
+                    // introduced for https://github.com/presscustomizr/nimble-builder/issues/494
+                    // september 2019
+                    // this guid is used to differentiate dynamically rendered content from static content that may include a Nimble generated HTML structure
+                    // an attribute "data-sek-preview-level-guid" is added to each rendered level when customizing or ajaxing
+                    // when generating the ui, we check if the localized guid matches the one rendered server side
+                    // otherwise the preview UI can be broken
+                    'previewLevelGuid' => $this->sek_get_preview_level_guid()
                 )
             );
 

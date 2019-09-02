@@ -141,6 +141,15 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
             }
 
+            // introduced for https://github.com/presscustomizr/nimble-builder/issues/494
+            // september 2019
+            // this guid is used to differentiate dynamically rendered content from static content that may include a Nimble generated HTML structure
+            // an attribute "data-sek-preview-level-guid" is added to each rendered level when customizing or ajaxing
+            // otherwise the preview UI can be broken
+            if ( ! isset( $_POST['preview-level-guid'] ) || empty( $_POST['preview-level-guid'] ) ) {
+                wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing preview-level-guid' );
+            }
+
             if ( ! isset( $_POST['sek_action'] ) || empty( $_POST['sek_action'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing sek_action' );
             }

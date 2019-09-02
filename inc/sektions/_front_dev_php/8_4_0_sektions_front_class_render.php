@@ -391,11 +391,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                             <?php
                               $is_header_location = true === sek_get_registered_location_property( $id, 'is_header_location' );
                               $is_footer_location = true === sek_get_registered_location_property( $id, 'is_footer_location' );
-                              printf( '<div class="sektion-wrapper" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s>',
+                              printf( '<div class="sektion-wrapper" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s %5$s>',
                                   $id,
                                   sprintf('data-sek-is-global-location="%1$s"', sek_is_global_location( $id ) ? 'true' : 'false'),
                                   $is_header_location ? 'data-sek-is-header-location="true"' : '',
-                                  $is_footer_location ? 'data-sek-is-footer-location="true"' : ''
+                                  $is_footer_location ? 'data-sek-is-footer-location="true"' : '',
+                                  $this->sek_maybe_print_preview_level_guid_html()//<= added for #494
                               );
                             ?>
                             <?php
@@ -435,15 +436,18 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     }
 
                     ?>
-                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %7$s" %5$s %6$s>',
+                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s" %6$s %7$s %8$s>',
                         $id,
                         $is_nested ? 'data-sek-is-nested="true"' : '',
                         $has_at_least_one_module ? 'sek-has-modules' : '',
                         $this->get_level_visibility_css_class( $model ),
+                        is_null( $custom_css_classes ) ? '' : $custom_css_classes,
+
                         is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
                         // add smartload + parallax attributes
                         $this -> sek_maybe_add_bg_attributes( $model ),
-                        is_null( $custom_css_classes ) ? '' : $custom_css_classes
+
+                        $this->sek_maybe_print_preview_level_guid_html()//<= added for #494
                     ); ?>
                           <div class="<?php echo $column_container_class; ?>">
                             <div class="sek-row sek-sektion-inner">
@@ -491,15 +495,18 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     }
                     ?>
                       <?php
-                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %7$s" %4$s %5$s %6$s>',
+                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s" %5$s %6$s %7$s %8$s>',
                               $id,
                               $grid_column_class,
                               $this->get_level_visibility_css_class( $model ),
+                              is_null( $custom_css_classes ) ? '' : $custom_css_classes,
+
                               empty( $collection ) ? 'data-sek-no-modules="true"' : '',
                               // add smartload + parallax attributes
                               $this -> sek_maybe_add_bg_attributes( $model ),
                               is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
-                              is_null( $custom_css_classes ) ? '' : $custom_css_classes
+
+                              $this->sek_maybe_print_preview_level_guid_html()//<= added for #494
                           );
                       ?>
                         <?php
@@ -554,15 +561,18 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $title_attribute = 'title="'.$title_attribute.'"';
                     }
                     ?>
-                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %7$s" %4$s %5$s %6$s>',
+                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s>',
                           $id,
                           $module_type,
                           $this->get_level_visibility_css_class( $model ),
+                          is_null( $custom_css_classes ) ? '' : $custom_css_classes,
+
                           $title_attribute,
                           // add smartload + parallax attributes
                           $this -> sek_maybe_add_bg_attributes( $model ),
                           is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
-                          is_null( $custom_css_classes ) ? '' : $custom_css_classes
+
+                          $this->sek_maybe_print_preview_level_guid_html() //<= added for #494
                         );?>
                             <div class="sek-module-inner">
                               <?php $this -> sek_print_module_tmpl( $model ); ?>
@@ -1094,6 +1104,35 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $wp_query->found_posts = $wp_query->post_count > 0;
         }// sek_maybe_include_nimble_content_in_search_results
 
+
+        // @return html string
+        // introduced for https://github.com/presscustomizr/nimble-builder/issues/494
+        function sek_maybe_print_preview_level_guid_html() {
+              if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
+                  return sprintf( 'data-sek-preview-level-guid="%1$s"', $this->sek_get_preview_level_guid() );
+              }
+              return '';
+        }
+
+        // @return unique guid()
+        // inspired from https://stackoverflow.com/questions/21671179/how-to-generate-a-new-guid#26163679
+        // introduced for https://github.com/presscustomizr/nimble-builder/issues/494
+        function sek_get_preview_level_guid() {
+              if ( '_preview_level_guid_not_set_' === $this->preview_level_guid ) {
+                  // When ajaxing, typically creating content, we need to make sure that we use the initial guid generated last time the preview was refreshed
+                  // @see preview::doAjax()
+                  if ( isset( $_POST['preview-level-guid'] ) ) {
+                      if ( empty( $_POST['preview-level-guid'] ) ) {
+                            sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => error, preview-level-guid can not be empty' );
+                      }
+                      $this->preview_level_guid = $_POST['preview-level-guid'];
+                  } else {
+                      $this->preview_level_guid = sprintf('%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535) );
+                  }
+
+              }
+              return $this->preview_level_guid;
+        }
     }//class
 endif;
 ?>

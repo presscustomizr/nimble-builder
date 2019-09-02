@@ -119,6 +119,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         return dfd.resolve().promise();
                   }
 
+                  // introduced for https://github.com/presscustomizr/nimble-builder/issues/494
+                  // september 2019
+                  // this guid is used to differentiate dynamically rendered content from static content that may include a Nimble generated HTML structure
+                  // an attribute "data-sek-preview-level-guid" is added to each rendered level when customizing or ajaxing
+                  // otherwise the preview UI can be broken
+                  _query_[ 'preview-level-guid' ] = sekPreviewLocalized.previewLevelGuid;
+
                   $.post( ajaxUrl, _query_ )
                         .done( function( _r ) {
                               // Check if the user is logged out.
