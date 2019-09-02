@@ -3,7 +3,7 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-$model = Nimble_Manager() -> model;
+$model = Nimble_Manager()->model;
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $main_settings = $value['grid_main'];
 $metas_settings = $value['grid_metas'];
@@ -88,7 +88,7 @@ if ( ! function_exists( 'Nimble\sek_render_post') ) {
 // filters @hook 'excerpt_length'
 if ( ! function_exists( 'Nimble\sek_pg_get_excerpt_length') ) {
   function sek_pg_get_excerpt_length( $original_length ) {
-    $model = Nimble_Manager() -> model;
+    $model = Nimble_Manager()->model;
     $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
     $main_settings = $value['grid_main'];
     $_custom = (int)$main_settings['excerpt_length'];

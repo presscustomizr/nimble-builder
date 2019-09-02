@@ -258,19 +258,19 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             $this->registered_locations = $this->default_locations;
 
             // AJAX
-            $this -> _schedule_front_ajax_actions();
-            $this -> _schedule_img_import_ajax_actions();
+            $this->_schedule_front_ajax_actions();
+            $this->_schedule_img_import_ajax_actions();
             if ( defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) && NIMBLE_SAVED_SECTIONS_ENABLED ) {
-                $this -> _schedule_section_saving_ajax_actions();
+                $this->_schedule_section_saving_ajax_actions();
             }
             // ASSETS
-            $this -> _schedule_front_and_preview_assets_printing();
+            $this->_schedule_front_and_preview_assets_printing();
             // RENDERING
-            $this -> _schedule_front_rendering();
+            $this->_schedule_front_rendering();
             // RENDERING
-            $this -> _setup_hook_for_front_css_printing_or_enqueuing();
+            $this->_setup_hook_for_front_css_printing_or_enqueuing();
             // LOADS SIMPLE FORM
-            $this -> _setup_simple_forms();
+            $this->_setup_simple_forms();
             // REGISTER NIMBLE WIDGET ZONES
             add_action( 'widgets_init', array( $this, 'sek_nimble_widgets_init' ) );
         }//__construct

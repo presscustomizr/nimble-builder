@@ -20,7 +20,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'nimble_parse_for_smart_load', array( $this, 'sek_maybe_process_img_for_js_smart_load') );
 
             // SETUP OUR the_content FILTER for the Tiny MCE module
-            $this -> sek_setup_tiny_mce_content_filters();
+            $this->sek_setup_tiny_mce_content_filters();
 
             // REGISTER HEADER AND FOOTER GLOBAL LOCATIONS
             add_action( 'nimble_front_classes_ready', array( $this, 'sek_register_nimble_global_locations') );
@@ -165,7 +165,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             //   return $html;
 
             do_action( 'sek_before_location_before_content' );
-            return $this -> _filter_the_content( $html, 'before_content' );
+            return $this->_filter_the_content( $html, 'before_content' );
         }
 
         // hook : 'the_content'::9999
@@ -177,7 +177,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             //   return $html;
 
             do_action( 'sek_before_location_after_content' );
-            return $this -> _filter_the_content( $html, 'after_content' );
+            return $this->_filter_the_content( $html, 'after_content' );
         }
 
         private function _filter_the_content( $html, $where ) {
@@ -362,8 +362,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             // Cache the parent model
             // => used when calculating the width of the column to be added
-            $parent_model = $this -> parent_model;
-            $this -> model = $model;
+            $parent_model = $this->parent_model;
+            $this->model = $model;
 
             $collection = array_key_exists( 'collection', $model ) ? $model['collection'] : array();
 
@@ -400,8 +400,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                               );
                             ?>
                             <?php
-                              $this -> parent_model = $model;
-                              foreach ( $collection as $_key => $sec_model ) { $this -> render( $sec_model ); }
+                              $this->parent_model = $model;
+                              foreach ( $collection as $_key => $sec_model ) { $this->render( $sec_model ); }
                             ?>
                             <?php
                               // empty global locations placeholders are only printed when customizing But not previewing a changeset post
@@ -445,7 +445,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                         is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
                         // add smartload + parallax attributes
-                        $this -> sek_maybe_add_bg_attributes( $model ),
+                        $this->sek_maybe_add_bg_attributes( $model ),
 
                         $this->sek_maybe_print_preview_level_guid_html()//<= added for #494
                     ); ?>
@@ -453,8 +453,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                             <div class="sek-row sek-sektion-inner">
                                 <?php
                                   // Set the parent model now
-                                  $this -> parent_model = $model;
-                                  foreach ( $collection as $col_model ) {$this -> render( $col_model ); }
+                                  $this->parent_model = $model;
+                                  foreach ( $collection as $col_model ) {$this->render( $col_model ); }
                                 ?>
                             </div>
                           </div>
@@ -503,7 +503,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                               empty( $collection ) ? 'data-sek-no-modules="true"' : '',
                               // add smartload + parallax attributes
-                              $this -> sek_maybe_add_bg_attributes( $model ),
+                              $this->sek_maybe_add_bg_attributes( $model ),
                               is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
 
                               $this->sek_maybe_print_preview_level_guid_html()//<= added for #494
@@ -531,11 +531,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                   <?php
                               } else {
                                   // Set the parent model now
-                                  $this -> parent_model = $model;
+                                  $this->parent_model = $model;
                                   foreach ( $collection as $module_or_nested_section_model ) {
                                       ?>
                                       <?php
-                                      $this -> render( $module_or_nested_section_model );
+                                      $this->render( $module_or_nested_section_model );
                                   }
                                   ?>
                                   <?php
@@ -554,7 +554,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $module_type = $model['module_type'];
                     $model = sek_normalize_module_value_with_defaults( $model );
                     // update the current cached model
-                    $this -> model = $model;
+                    $this->model = $model;
                     $title_attribute = '';
                     if ( skp_is_customizing() ) {
                         $title_attribute = __('Edit module settings', 'text-domain');
@@ -569,13 +569,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                           $title_attribute,
                           // add smartload + parallax attributes
-                          $this -> sek_maybe_add_bg_attributes( $model ),
+                          $this->sek_maybe_add_bg_attributes( $model ),
                           is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
 
                           $this->sek_maybe_print_preview_level_guid_html() //<= added for #494
                         );?>
                             <div class="sek-module-inner">
-                              <?php $this -> sek_print_module_tmpl( $model ); ?>
+                              <?php $this->sek_print_module_tmpl( $model ); ?>
                             </div>
                       </div><?php //data-sek-level="module" ?>
                     <?php
@@ -586,7 +586,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 break;
             }
 
-            $this -> parent_model = $parent_model;
+            $this->parent_model = $parent_model;
         }//render
 
 
@@ -770,7 +770,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     }
                 } else {
                     if ( array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
-                        $enqueuing_candidates = $this -> sek_sniff_assets_to_enqueue( $level_data['collection'], $enqueuing_candidates );
+                        $enqueuing_candidates = $this->sek_sniff_assets_to_enqueue( $level_data['collection'], $enqueuing_candidates );
                     }
                 }
             }//foreach

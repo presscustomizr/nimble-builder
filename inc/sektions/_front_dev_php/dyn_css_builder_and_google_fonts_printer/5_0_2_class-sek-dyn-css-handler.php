@@ -279,7 +279,7 @@ class Sek_Dyn_CSS_Handler {
             }
         }
 
-        if ( empty( $this -> skope_id ) ) {
+        if ( empty( $this->skope_id ) ) {
             sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' => __construct => skope_id not provided' );
             return;
         }
@@ -299,7 +299,7 @@ class Sek_Dyn_CSS_Handler {
         //    the normal behaviour is that the css file is enqueued.
         //    It should have been written when saving in the customizer. If no file available, we try to write it. If writing a css file is not possible, we fallback on inline printing.
         if ( is_customize_preview() || ! $this->_sek_dyn_css_file_exists() || $this->force_rewrite || $this->customizer_save ) {
-            $this->sek_model = sek_get_skoped_seks( $this -> skope_id );
+            $this->sek_model = sek_get_skoped_seks( $this->skope_id );
 
             //  on front, when no stylesheet is available, the fallback hook must be set to wp_head, because the hook property might be empty
             // fixes https://github.com/presscustomizr/nimble-builder/issues/328

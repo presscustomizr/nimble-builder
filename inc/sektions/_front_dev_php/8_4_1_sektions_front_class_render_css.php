@@ -45,10 +45,10 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             if ( !empty( $google_fonts_print_candidates ) ) {
                 // When customizing
                 if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-                    $this -> sek_gfont_print( $google_fonts_print_candidates );
+                    $this->sek_gfont_print( $google_fonts_print_candidates );
                 } else {
                     if ( in_array( current_filter(), array( 'wp_footer', 'wp_head' ) ) ) {
-                        $this -> sek_gfont_print( $google_fonts_print_candidates );
+                        $this->sek_gfont_print( $google_fonts_print_candidates );
                     } else {
                         wp_enqueue_style(
                             'sek-gfonts-local-and-global',

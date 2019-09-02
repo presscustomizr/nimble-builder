@@ -74,7 +74,7 @@ class Sek_Dyn_CSS_Builder {
 
         // The parent level is set when the function is invoked recursively, from a level where we actually have a 'level' property
         if ( ! empty( $parent_level ) ) {
-            $this -> parent_level_model = $parent_level;
+            $this->parent_level_model = $parent_level;
         }
 
         foreach ( $level as $key => $entry ) {
@@ -240,7 +240,7 @@ class Sek_Dyn_CSS_Builder {
 
             // Reset the parent level model because it might have been modified after walking the sublevels
             if ( ! empty( $parent_level ) ) {
-                $this -> parent_level_model = $parent_level;
+                $this->parent_level_model = $parent_level;
             }
 
         }//foreach

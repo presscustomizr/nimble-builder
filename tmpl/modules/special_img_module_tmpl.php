@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 //     'link-target' : '',
 //     'lightbox' : true
 // };
-$model = Nimble_Manager() -> model;
+$model = Nimble_Manager()->model;
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $main_settings = $value['main_settings'];
 //$borders_corners_settings = $value['borders_corners'];
@@ -39,7 +39,7 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
         } else {
             //falls back on an icon if previewing
             if ( skp_is_customizing() ) {
-                $html = Nimble_Manager() -> sek_get_input_placeholder_content( 'upload' );
+                $html = Nimble_Manager()->sek_get_input_placeholder_content( 'upload' );
             }
         }
 

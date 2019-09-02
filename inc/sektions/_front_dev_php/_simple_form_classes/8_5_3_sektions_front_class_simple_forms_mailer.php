@@ -125,7 +125,7 @@ class Sek_Mailer {
         //sek_error_log( '$module_model', $module_model );
         $submission_options = empty( $module_user_values['form_submission'] ) ? array() : $module_user_values['form_submission'];
 
-        //<-allow html? -> TODO: turn into option
+        //<-allow html?->TODO: turn into option
         $allow_html     = true;
 
         $sender_email   = $this->form->get_field('nimble_email')->get_input()->get_value();

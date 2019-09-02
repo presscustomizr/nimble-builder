@@ -51,7 +51,7 @@ if ( ! function_exists( 'Nimble\sek_print_social_links' ) ) {
   }
 }
 
-$model = Nimble_Manager() -> model;
+$model = Nimble_Manager()->model;
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $icons_collection = !empty($value['icons_collection']) ? $value['icons_collection'] : array();
 $icons_style = !empty($value['icons_style']) ? $value['icons_style'] : array();

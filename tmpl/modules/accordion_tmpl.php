@@ -55,7 +55,7 @@ if ( ! function_exists( 'Nimble\sek_print_accordion' ) ) {
   }
 }
 
-$model = Nimble_Manager() -> model;
+$model = Nimble_Manager()->model;
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $accord_collec = !empty($value['accord_collec']) ? $value['accord_collec'] : array();
 $accord_opts = !empty($value['accord_opts']) ? $value['accord_opts'] : array();

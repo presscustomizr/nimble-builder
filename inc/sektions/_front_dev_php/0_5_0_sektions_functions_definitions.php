@@ -1808,8 +1808,8 @@ function sek_get_parent_theme_slug() {
 
     //gets the theme name (or parent if child)
     $theme_data = wp_get_theme( $theme_slug );
-    if ( $theme_data -> parent() ) {
-        $theme_slug = $theme_data -> parent() -> Name;
+    if ( $theme_data->parent() ) {
+        $theme_slug = $theme_data->parent()->Name;
     }
 
     return sanitize_file_name( strtolower( $theme_slug ) );
@@ -2021,7 +2021,7 @@ function sek_sideload_img_and_return_attachment_id( $img_url ) {
     //error_log( print_r( $get_attachment->posts, true ) );
     if ( is_array( $get_attachment->posts ) && array_key_exists(0, $get_attachment->posts) ) {
         //wp_send_json_error( __CLASS__ . '::' . __CLASS__ . '::' . __FUNCTION__ . ' => file already uploaded : ' . $relative_path );
-        $img_id_already_uploaded = $get_attachment->posts[0] -> ID;
+        $img_id_already_uploaded = $get_attachment->posts[0]->ID;
     }
     // stop now and return the id if the attachment was already uploaded
     if ( isset($img_id_already_uploaded) ) {

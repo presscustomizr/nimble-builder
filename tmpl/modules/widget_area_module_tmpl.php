@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$model = Nimble_Manager() -> model;
+$model = Nimble_Manager()->model;
 $module_type = $model['module_type'];
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $widget_area_has_at_least_one_widget = is_active_sidebar( $value['widget-area-id'] );

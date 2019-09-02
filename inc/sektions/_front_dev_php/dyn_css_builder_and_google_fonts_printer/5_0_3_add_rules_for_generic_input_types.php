@@ -1,6 +1,6 @@
 <?php
 // filter declared in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker()
-// $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this -> parent_level );
+// $rules = apply_filters( "sek_add_css_rules_for_input_id", $rules, $key, $entry, $this->parent_level );
 // the rules are filtered if ( false !== strpos( $input_id_candidate, '_css') )
 // Example of input id candidate filtered : 'h_alignment_css'
 // @see function sek_loop_on_input_candidates_and_maybe_generate_css_rules( $params ) {}

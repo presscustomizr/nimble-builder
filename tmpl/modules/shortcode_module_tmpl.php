@@ -13,7 +13,7 @@ if ( ! function_exists( 'Nimble\sek_print_shortcode_module_content' ) ) {
   }
 }
 
-$model = Nimble_Manager() -> model;
+$model = Nimble_Manager()->model;
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 
 if ( !empty( $value['text_content'] ) ) {

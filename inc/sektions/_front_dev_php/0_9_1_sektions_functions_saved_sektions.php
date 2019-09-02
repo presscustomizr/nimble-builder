@@ -37,7 +37,7 @@ function sek_get_saved_sektion_data( $saved_section_id ) {
     $sek_post = sek_get_saved_seks_post( $saved_section_id );
     $section_data = array();
     if ( $sek_post ) {
-        $section_data_decoded = maybe_unserialize( $sek_post -> post_content );
+        $section_data_decoded = maybe_unserialize( $sek_post->post_content );
         // The section data are described as an array
         // array(
         //     'title' => '',

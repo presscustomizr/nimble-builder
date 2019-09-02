@@ -3,7 +3,7 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-$model = Nimble_Manager() -> model;
+$model = Nimble_Manager()->model;
 $module_type = $model['module_type'];
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 /* $value looks like
@@ -39,7 +39,7 @@ if ( ! function_exists( 'Nimble\sek_get_icon_module_icon_html') ) {
         } else {
             //falls back on an icon if previewing
             if ( skp_is_customizing() ) {
-                $html = Nimble_Manager() -> sek_get_input_placeholder_content( 'icon' );
+                $html = Nimble_Manager()->sek_get_input_placeholder_content( 'icon' );
             }
         }
         return $html;

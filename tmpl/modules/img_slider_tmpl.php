@@ -137,7 +137,7 @@ if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
   }
 }
 
-$model = Nimble_Manager() -> model;
+$model = Nimble_Manager()->model;
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $img_collection = !empty($value['img_collection']) ? $value['img_collection'] : array();
 $slider_options = !empty($value['slider_options']) ? $value['slider_options'] : array();

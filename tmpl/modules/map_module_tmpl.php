@@ -3,7 +3,7 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-$model = Nimble_Manager() -> model;
+$model = Nimble_Manager()->model;
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 
 
