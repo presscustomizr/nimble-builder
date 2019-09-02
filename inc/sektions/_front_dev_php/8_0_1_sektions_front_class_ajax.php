@@ -40,7 +40,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
 
             // This is the list of accepted actions
-            $this -> ajax_action_map = array(
+            $this->ajax_action_map = array(
                   'sek-add-section',
                   'sek-remove-section',
                   'sek-duplicate-section',
@@ -169,7 +169,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
             $html = '';
             // is this action possible ?
-            if ( in_array( $sek_action, $this -> ajax_action_map ) ) {
+            if ( in_array( $sek_action, $this->ajax_action_map ) ) {
                 $content_type = null;
                 if ( array_key_exists( 'content_type', $_POST ) && is_string( $_POST['content_type'] ) ) {
                     $content_type = $_POST['content_type'];
@@ -193,21 +193,21 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                                     break;
                                 }
                                 foreach ( $_POST['collection_of_preset_section_id'] as $preset_section_id ) {
-                                    $html .= $this -> sek_ajax_fetch_content( $sek_action, $preset_section_id );
+                                    $html .= $this->sek_ajax_fetch_content( $sek_action, $preset_section_id );
                                 }
                             // 'module' === $content_type
                             } else {
-                                $html = $this -> sek_ajax_fetch_content( $sek_action );
+                                $html = $this->sek_ajax_fetch_content( $sek_action );
                             }
 
                         break;
 
                         default :
-                            $html = $this -> sek_ajax_fetch_content( $sek_action );
+                            $html = $this->sek_ajax_fetch_content( $sek_action );
                         break;
                     }
                 } else {
-                      $html = $this -> sek_ajax_fetch_content( $sek_action );
+                      $html = $this->sek_ajax_fetch_content( $sek_action );
                 }
 
                 //sek_error_log(__CLASS__ . '::' . __FUNCTION__ , $html );
@@ -273,7 +273,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 case 'sek-duplicate-section' :
                     if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
                         // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
-                        $this -> parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
+                        $this->parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
                         $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
                     } else {
                         //$level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
@@ -308,7 +308,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
                     if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
                         // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
-                        $this -> parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
+                        $this->parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
                         $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
                     } else {
                         //$level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
@@ -323,7 +323,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                         break;
                     } else {
                         // we need to set the parent_model here to access it later in the ::render method to calculate the column width.
-                        $this -> parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
+                        $this->parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
                         $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
                     }
                 break;
@@ -351,9 +351,9 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                         break;
                     }
                     if ( ! array_key_exists( 'in_sektion', $_POST ) || empty( $_POST[ 'in_sektion' ] ) ) {
-                        $this -> parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
+                        $this->parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
                     } else {
-                        $this -> parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
+                        $this->parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
                     }
                     $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
                 break;
@@ -377,7 +377,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                     }
                     if ( !empty( $_POST['level'] ) && 'column' === $_POST['level'] ) {
                         // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
-                        $this -> parent_model = sek_get_parent_level_model( $_POST['id'], $sektion_collection );
+                        $this->parent_model = sek_get_parent_level_model( $_POST['id'], $sektion_collection );
                     }
                     $level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
                 break;
@@ -388,7 +388,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             ob_start();
 
             if ( $is_stylesheet ) {
-                $r = $this -> print_or_enqueue_seks_style( $_POST['location_skope_id'] );
+                $r = $this->print_or_enqueue_seks_style( $_POST['location_skope_id'] );
             } else {
                 if ( 'no_match' == $level_model ) {
                     wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action . ' => missing level model' );
@@ -401,7 +401,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                     return;
                 }
                 // note that in the case of a sektion nested inside a column, the parent_model has been set in the switch{ case : ... } above ,so we can access it in the ::render method to calculate the column width.
-                $r = $this -> render( $level_model );
+                $r = $this->render( $level_model );
             }
             $html = ob_get_clean();
             if ( is_wp_error( $r ) ) {
@@ -497,7 +497,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 wp_send_json_error( __FUNCTION__ . ' => error when invoking sek_update_saved_seks_post()' );
             } else {
                 // sek_error_log( 'ALORS CE POST?', $saved_section_post );
-                wp_send_json_success( [ 'section_post_id' => $saved_section_post -> ID ] );
+                wp_send_json_success( [ 'section_post_id' => $saved_section_post->ID ] );
             }
 
             //sek_error_log( __FUNCTION__ . '$_POST' ,  $_POST);
@@ -788,7 +788,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
           // $subsets['all-subsets'] = sprintf( '%1$s ( %2$s %3$s )',
           //   __( 'All languages' , 'text_doma' ),
-          //   count($gfonts_decoded['items']) + count( $this -> get_cfonts() ),
+          //   count($gfonts_decoded['items']) + count( $this->get_cfonts() ),
           //   __('fonts' , 'text_doma' )
           // );
 
@@ -875,8 +875,8 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 return;
             }
             // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
-            $this -> parent_model = sek_get_parent_level_model( $_POST[ 'id' ], $sektionSettingValue['collection'] );
-            $this -> model = sek_get_level_model( $_POST[ 'id' ], $sektionSettingValue['collection'] );
+            $this->parent_model = sek_get_parent_level_model( $_POST[ 'id' ], $sektionSettingValue['collection'] );
+            $this->model = sek_get_level_model( $_POST[ 'id' ], $sektionSettingValue['collection'] );
 
             $level = $_POST['level'];
 
