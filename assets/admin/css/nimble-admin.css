@@ -90,6 +90,9 @@ a.czr-rating-link:hover {
   display: inline-block;
 }
 #wpadminbar .sek-nimble-icon img {
+  width:28px;
+  position:absolute;
+  top: 2px;
   -webkit-filter: grayscale(100%);
   filter: grayscale(100%);
   -webkit-filter: gray;
@@ -99,17 +102,14 @@ a.czr-rating-link:hover {
   -ms-transition: all, 0.3s ease-in-out;
   -o-transition: all, 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
+  -webkit-box-shadow: none;
+  box-shadow: none;
 }
 #wpadminbar .sek-nimble-icon:hover img {
   -webkit-filter: none;
   filter: none;
   -webkit-filter: none;
   filter: none;
-}
-#wpadminbar .sek-nimble-icon img {
-  width:28px;
-  position:absolute;
-  top: 2px;
 }
 #wpadminbar .sek-nimble-icon .sek-nimble-admin-bar-title{
   padding-left:30px
