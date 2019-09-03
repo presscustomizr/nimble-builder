@@ -922,6 +922,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
             },//printLevelUI()
 
+
+
+
+
+
+
+
+
             // Fired on Dom Ready, in ::initialize()
             setupUiHoverVisibility : function() {
                   var self = this;
@@ -1151,20 +1159,24 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // If the ui is expanded, remove after a delay to let user access all ui buttons, even those outside the $level.
                   // => the ui can be "outside" ( <=> out vertically and horizontally ) when columns are narrow.
                   var _sniffLevelsAndPrintUI = function( position, $candidateForRemoval ) {
-                        var $levelsToWalk, sniffCase;
+                        var collectionOfLevelsToWalk = [], sniffCase;
                         if ( _.isUndefined( $candidateForRemoval ) || $candidateForRemoval.length < 1 ) {
-                              $levelsToWalk = $('body').find('[data-sek-level]');
+                              // data-sek-preview-level-guid has been introduced in https://github.com/presscustomizr/nimble-builder/issues/494
+                              // to fix a wrong UI generation leading to user unable to edit content
+                              $('body').find('[data-sek-level][data-sek-preview-level-guid="' + sekPreviewLocalized.previewLevelGuid +'"]').each( function() {
+                                    collectionOfLevelsToWalk.push( $(this) );
+                              });
                               sniffCase = 'printOrScheduleRemoval';
                         } else {
-                              $levelsToWalk = $candidateForRemoval;
+                              collectionOfLevelsToWalk.push( $candidateForRemoval );
                               sniffCase = 'mayBeRemove';
                         }
 
-                        $levelsToWalk.each( function() {
-                              var levelWrapperRect = $(this)[0].getBoundingClientRect(),
+                        _.each( collectionOfLevelsToWalk, function( $levelToWalk ) {
+                              var levelWrapperRect = $levelToWalk[0].getBoundingClientRect(),
                                 isInHorizontally = position.x <= levelWrapperRect.right && levelWrapperRect.left <= position.x,
                                 isInVertically = position.y >= levelWrapperRect.top && levelWrapperRect.bottom >= position.y,
-                                $levelEl = $(this);
+                                $levelEl = $levelToWalk;
 
                               switch( sniffCase ) {
                                     case 'mayBeRemove' :
@@ -1194,7 +1206,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           }
                                     break;
                               }
-                        });
+                        });//collectionOfLevelsToWalk.each
                   };
 
 
@@ -1270,15 +1282,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         // implemented for double-click insertion https://github.com/presscustomizr/nimble-builder/issues/317
                         api.preview.send( 'sek-clean-target-drop-zone' );
 
-                        var clickedOn = '',
+                        var clickedOn = 'inactiveZone',
                             $el = $(evt.target),
-                            $hook_location = $el.closest('[data-sek-level="location"]'),
-                            $closestLevelWrapper = $el.closest('[data-sek-level]'),
+                            $hookLocation = $el.closest('[data-sek-level="location"][data-sek-preview-level-guid="' + sekPreviewLocalized.previewLevelGuid +'"]'),
+                            $closestLevelWrapper = $el.closest('[data-sek-preview-level-guid="' + sekPreviewLocalized.previewLevelGuid +'"]'),
                             $closestActionIcon = $el.closest('[data-sek-click-on]'),
                             _action,
-                            _location = $hook_location.data('sek-id'),
+                            _location_id = $hookLocation.data('sek-id'),
                             _level = $closestLevelWrapper.data('sek-level'),
                             _id = $closestLevelWrapper.data('sek-id');
+
                         if ( 'add-content' == $el.data('sek-click-on') || ( $el.closest('[data-sek-click-on]').length > 0 && 'add-content' == $el.closest('[data-sek-click-on]').data('sek-click-on') ) ) {
                               clickedOn = 'addContentButton';
                         } else if ( ! _.isEmpty( $el.data( 'sek-click-on' ) ) || $closestActionIcon.length > 0 ) {
@@ -1303,12 +1316,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               clickedOn = 'inactiveZone';
                         }
 
+                        if ( _.isEmpty( _location_id ) ) {
+                            self.errare( '::scheduleUiClickReactions => error location id can not be empty' );
+                        }
+
                         switch( clickedOn ) {
                               case 'addContentButton' :
                                     var is_first_section = true === $el.closest('[data-sek-is-first-section]').data('sek-is-first-section');
 
                                     api.preview.send( 'sek-add-section', {
-                                          location : _location,
+                                          location : _location_id,
                                           level : 'section',
                                           before_section : $el.closest('[data-sek-before-section]').data('sek-before-section'),
                                           after_section : $el.closest('[data-sek-after-section]').data('sek-after-section'),
@@ -1317,7 +1334,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     });
                               break;
                               case 'UIIcon' :
-
                                     if ( 1 > $closestLevelWrapper.length ) {
                                         throw new Error( 'ERROR => sek-front-preview => No valid level dom element found' );
                                     }
@@ -1331,7 +1347,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     }
                                     self._send_( $el, {
                                           action : _action,
-                                          location : _location,
+                                          location : _location_id,
                                           level : _level,
                                           id : _id,
                                           was_triggered : false //<= indicates that the user clicked.
@@ -1359,14 +1375,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               case 'sectionOutsideColumns' :
                                     self._send_( $el, {
                                         action : 'edit-options',
-                                        location : _location,
+                                        location : _location_id,
                                         level : _level,
                                         id : _id
                                     });
                               break;
                               case 'addSektion' :
                                     api.preview.send( 'sek-add-section', {
-                                          location : _location,
+                                          location : _location_id,
                                           level : $el.data('sek-add')
                                     });
                               break;
@@ -2506,6 +2522,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         self.errare( 'self.doAjax : unproper nonce' );
                         return dfd.resolve().promise();
                   }
+
+                  // introduced for https://github.com/presscustomizr/nimble-builder/issues/494
+                  // september 2019
+                  // this guid is used to differentiate dynamically rendered content from static content that may include a Nimble generated HTML structure
+                  // an attribute "data-sek-preview-level-guid" is added to each rendered level when customizing or ajaxing
+                  // otherwise the preview UI can be broken
+                  _query_[ 'preview-level-guid' ] = sekPreviewLocalized.previewLevelGuid;
 
                   $.post( ajaxUrl, _query_ )
                         .done( function( _r ) {

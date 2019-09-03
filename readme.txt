@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.2
-Stable tag: 1.8.17
+Stable tag: 1.8.18
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -121,9 +121,12 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 
 == Upgrade Notice ==
 = 1.8.17 =
-[Menu module] Fixed menu items alignment broken on mobile devices.
+Fixed : using Nimble generated Html structure in a module content can break the UI generation in the preview frame when customizing.
 
 == Changelog ==
+= 1.8.18 : September 3rd 2019 =
+* fixed : using Nimble generated Html structure in a module content can break the UI generation in the preview frame when customizing.
+
 = 1.8.17 : August 29th 2019 =
 * fixed : [Menu module] menu items alignment broken on mobile devices.
 

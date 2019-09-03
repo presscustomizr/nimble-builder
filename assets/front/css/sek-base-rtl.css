@@ -2415,11 +2415,15 @@ body .sek-module-inner h1:before, body .sek-module-inner h2:before, body .sek-mo
 }
 
 #wpadminbar .sek-nimble-icon img {
+  width: 28px;
+  position: absolute;
+  top: 2px;
   -webkit-filter: grayscale(100%);
   filter: grayscale(100%);
   -webkit-filter: gray;
   filter: gray;
   transition: all 0.3s ease-in-out;
+  box-shadow: none;
 }
 
 #wpadminbar .sek-nimble-icon:hover img {
@@ -2427,12 +2431,6 @@ body .sek-module-inner h1:before, body .sek-module-inner h2:before, body .sek-mo
   filter: none;
   -webkit-filter: none;
   filter: none;
-}
-
-#wpadminbar .sek-nimble-icon img {
-  width: 28px;
-  position: absolute;
-  top: 2px;
 }
 
 #wpadminbar .sek-nimble-icon .sek-nimble-admin-bar-title {
