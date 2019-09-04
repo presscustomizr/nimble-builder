@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.2
-Stable tag: 1.8.18
+Stable tag: 1.8.19
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,13 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.8.17 =
-Fixed : using Nimble generated Html structure in a module content can break the UI generation in the preview frame when customizing.
+= 1.8.19 =
+Added informations in relevant admin screens when the current post/page has been built with Nimble.
 
 == Changelog ==
+= 1.8.19 : September 4th 2019 =
+* added : informations in relevant admin screens when the current post/page has been built with Nimble.
+
 = 1.8.18 : September 3rd 2019 =
 * fixed : using Nimble generated Html structure in a module content can break the UI generation in the preview frame when customizing.
 

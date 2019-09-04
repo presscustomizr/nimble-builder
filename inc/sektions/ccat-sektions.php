@@ -165,7 +165,7 @@ function sek_get_default_location_model( $skope_id = null ) {
 //@return string
 function sek_get_seks_setting_id( $skope_id = '' ) {
   if ( empty( $skope_id ) ) {
-      sek_error_log( 'sek_get_seks_setting_id => empty skope id or location => collection setting id impossible to build' );
+      sek_error_log( __FUNCTION__ . ' => empty skope id or location => collection setting id impossible to build' );
   }
   return NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . "[{$skope_id}]";
 }
@@ -180,6 +180,18 @@ function sek_has_global_sections() {
 }
 
 
+// @return bool
+// added for https://github.com/presscustomizr/nimble-builder/issues/436
+// initially used to determine if a post or a page has been customized with Nimble Builder => if so, we add an edit link in the post/page list
+// when used in admin, the skope_id must be provided
+function sek_local_skope_has_nimble_sections( $skope_id = '' ) {
+    if ( empty( $skope_id ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing skope id' );
+        return false;
+    }
+    $post = sek_get_seks_post( $skope_id );
+    return $post ? true : false;
+}
 
 
 
@@ -2457,13 +2469,12 @@ function sek_add_customize_link() {
 
 // returns a customize link when is_admin() for posts and terms
 // inspired from wp-includes/admin-bar.php#wp_admin_bar_edit_menu()
-function sek_get_customize_url_when_is_admin( $ajax_server_request_uri = '') {
+// @param $post is a post object
+function sek_get_customize_url_when_is_admin( $post = null ) {
     global $tag, $user_id;
-
     $customize_url = '';
-
     $current_screen = get_current_screen();
-    $post = get_post();
+    $post = is_null( $post ) ? get_post() : $post;
 
     // July 2019 => Don't display the admin button in post and pages, where we already have the edit button next to the post title
     // if ( 'post' == $current_screen->base
@@ -2508,6 +2519,28 @@ function sek_get_customize_url_when_is_admin( $ajax_server_request_uri = '') {
         $return_customize_url = add_query_arg( 'return', urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) ), wp_customize_url() );
         $customize_url = add_query_arg( 'url', urlencode( $customize_url ), $return_customize_url );
     }
+    return $customize_url;
+}
+
+// introduced for https://github.com/presscustomizr/nimble-builder/issues/436
+function sek_get_customize_url_for_post_id( $post_id, $return_url = '' ) {
+    // Build customize_url
+    // @see function sek_get_customize_url_when_is_admin()
+    $customize_url = get_permalink( $post_id );
+    $return_url = empty( $return_url ) ? $customize_url : $return_url;
+    $return_customize_url = add_query_arg(
+        'return',
+        urlencode(
+            remove_query_arg( wp_removable_query_args(), wp_unslash( $return_url ) )
+        ),
+        wp_customize_url()
+    );
+    $customize_url = add_query_arg( 'url', urlencode( $customize_url ), $return_customize_url );
+    $customize_url = add_query_arg(
+        array( 'autofocus' => array( 'section' => '__content_picker__' ) ),
+        $customize_url
+    );
+
     return $customize_url;
 }
 
@@ -15779,21 +15812,8 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
             // Build customize_url
             // @see function sek_get_customize_url_when_is_admin()
-            $ajax_server_request_uri = "/wp-admin/post.php?post={$post_id}&action=edit";
-            $customize_url = get_permalink( $post_id );
-            $return_customize_url = add_query_arg(
-                'return',
-                urlencode(
-                    remove_query_arg( wp_removable_query_args(), wp_unslash( $ajax_server_request_uri ) )
-                ),
-                wp_customize_url()
-            );
-            $customize_url = add_query_arg( 'url', urlencode( $customize_url ), $return_customize_url );
-            $customize_url = add_query_arg(
-                array( 'autofocus' => array( 'section' => '__content_picker__' ) ),
-                $customize_url
-            );
-
+            $return_url_after_customization = '';//"/wp-admin/post.php?post={$post_id}&action=edit";
+            $customize_url = sek_get_customize_url_for_post_id( $post_id, $return_url_after_customization );
             wp_send_json_success( $customize_url );
         }
 
