@@ -775,7 +775,6 @@ function sek_print_js_for_nimble_edit_btn() {
           $('body').on( 'click', '#sek-edit-with-nimble', function(evt) {
               evt.preventDefault();
               var _url = $(this).data('cust-url');
-
               if ( _.isEmpty( _url ) ) {
                   // for new post, the url is empty, let's generate it server side with an ajax call
                   var post_id = $('#post_ID').val();
@@ -814,7 +813,9 @@ function sek_print_js_for_nimble_edit_btn() {
 // => when using the classical editor, the html is printed with add_action( 'edit_form_after_title', ... )
 // => when using gutenberg, we render the button with a js template @see assets/admin/js/nimble-gutenberg.js
 function sek_print_nb_btn_edit_with_nimble( $editor_type ) {
-    $customize_url = sek_get_customize_url_when_is_admin();
+    $post = get_post();
+    $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
+    $customize_url = sek_get_customize_url_when_is_admin( $post );
     if ( ! empty( $customize_url ) ) {
         $customize_url = add_query_arg(
             array( 'autofocus' => array( 'section' => '__content_picker__' ) ),
@@ -827,7 +828,7 @@ function sek_print_nb_btn_edit_with_nimble( $editor_type ) {
       <?php //_e( 'Edit with Nimble Builder', 'text_doma' ); ?>
       <?php printf( '<span class="sek-nimble-icon" title="%3$s"><img src="%1$s" alt="%2$s"/><span class="sek-nimble-admin-bar-title">%2$s</span><span class="sek-nimble-mobile-admin-bar-title">%3$s</span></span>',
           NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
-          __('Build with Nimble Builder','text_domain'),
+          sek_local_skope_has_nimble_sections( $manually_built_skope_id ) ? __('Continue building with Nimble','text_domain') : __('Build with Nimble Builder','text_domain'),
           __('Build','text_domain'),
           __('Build sections in live preview with Nimble Builder', 'text_domain')
       ); ?>
@@ -859,4 +860,32 @@ function sek_current_user_can_edit( $post_id = 0 ) {
       return false;
     }
     return true;
-  }
+}
+
+// WP core filter documented in wp-admin/includes/template.php
+// Allows us to add a 'Nimble Builder' status next to posts, pages and CPT when displayed in posts list table
+// introduced in sept 2019 for https://github.com/presscustomizr/nimble-builder/issues/436
+add_filter( 'display_post_states', '\Nimble\sek_add_nimble_post_state', 10, 2 );
+function sek_add_nimble_post_state( $post_states, $post ) {
+    $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
+    if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_nimble_sections( $manually_built_skope_id ) ) {
+        $post_states['nimble'] = __( 'Nimble Builder', 'text-doma' );
+    }
+    return $post_states;
+}
+
+// WP core filters documented in wp-admin\includes\class-wp-posts-list-table.php
+// Allows us to add an edit link below posts, pages and CPT when displayed in posts list table
+// introduced in sept 2019 for https://github.com/presscustomizr/nimble-builder/issues/436
+add_filter( 'post_row_actions', '\Nimble\sek_filter_post_row_actions', 11, 2 );
+add_filter( 'page_row_actions', '\Nimble\sek_filter_post_row_actions', 11, 2 );
+function sek_filter_post_row_actions( $actions, $post ) {
+    $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
+    if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_nimble_sections( $manually_built_skope_id ) ) {
+        $actions['edit_with_nimble_builder'] = sprintf( '<a href="%1$s" title="%2$s">%2$s</a>',
+            sek_get_customize_url_for_post_id( $post->ID ),
+            __( 'Edit with Nimble Builder', 'text-doma' )
+        );
+    }
+    return $actions;
+}

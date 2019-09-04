@@ -165,7 +165,7 @@ function sek_get_default_location_model( $skope_id = null ) {
 //@return string
 function sek_get_seks_setting_id( $skope_id = '' ) {
   if ( empty( $skope_id ) ) {
-      sek_error_log( 'sek_get_seks_setting_id => empty skope id or location => collection setting id impossible to build' );
+      sek_error_log( __FUNCTION__ . ' => empty skope id or location => collection setting id impossible to build' );
   }
   return NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . "[{$skope_id}]";
 }
@@ -180,6 +180,18 @@ function sek_has_global_sections() {
 }
 
 
+// @return bool
+// added for https://github.com/presscustomizr/nimble-builder/issues/436
+// initially used to determine if a post or a page has been customized with Nimble Builder => if so, we add an edit link in the post/page list
+// when used in admin, the skope_id must be provided
+function sek_local_skope_has_nimble_sections( $skope_id = '' ) {
+    if ( empty( $skope_id ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing skope id' );
+        return false;
+    }
+    $post = sek_get_seks_post( $skope_id );
+    return $post ? true : false;
+}
 
 
 

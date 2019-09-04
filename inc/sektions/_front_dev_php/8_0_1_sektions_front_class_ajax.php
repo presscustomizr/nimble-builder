@@ -638,21 +638,8 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
             // Build customize_url
             // @see function sek_get_customize_url_when_is_admin()
-            $ajax_server_request_uri = "/wp-admin/post.php?post={$post_id}&action=edit";
-            $customize_url = get_permalink( $post_id );
-            $return_customize_url = add_query_arg(
-                'return',
-                urlencode(
-                    remove_query_arg( wp_removable_query_args(), wp_unslash( $ajax_server_request_uri ) )
-                ),
-                wp_customize_url()
-            );
-            $customize_url = add_query_arg( 'url', urlencode( $customize_url ), $return_customize_url );
-            $customize_url = add_query_arg(
-                array( 'autofocus' => array( 'section' => '__content_picker__' ) ),
-                $customize_url
-            );
-
+            $return_url_after_customization = '';//"/wp-admin/post.php?post={$post_id}&action=edit";
+            $customize_url = sek_get_customize_url_for_post_id( $post_id, $return_url_after_customization );
             wp_send_json_success( $customize_url );
         }
 
