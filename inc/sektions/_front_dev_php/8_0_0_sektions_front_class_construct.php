@@ -68,6 +68,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             'recaptcha' => 'sek_global_recaptcha',
             'global_revisions' => 'sek_global_revisions',
             'global_reset' => 'sek_global_reset',
+            'global_imp_exp' => 'sek_global_imp_exp',
             'beta_features' => 'sek_global_beta_features'
         ];
         // option key as saved in db => module_type
@@ -132,6 +133,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
           'sek_global_recaptcha',
           'sek_global_revisions',
           'sek_global_reset',
+          'sek_global_imp_exp',
           'sek_global_beta_features'
         ];
 

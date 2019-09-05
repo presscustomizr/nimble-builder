@@ -283,6 +283,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_5_UI_global_google_recaptcha.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_6_UI_global_revisions.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_7_UI_global_reset.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_8_UI_global_imp_exp.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_9_UI_global_beta_features.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_0_FRONT_image.js',
@@ -401,7 +402,8 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_4_sek_register_global_performances.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_5_sek_register_global_header_footer.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php',
-      '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_7_sek_register_global_revisions.php',
+      '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_7_sek_register_global_imp_exp.php',
+      '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_8_sek_register_global_revisions.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_9_sek_register_beta_features.php',
 
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php',

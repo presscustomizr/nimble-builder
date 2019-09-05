@@ -91,6 +91,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">history</i>'
                                     };
                               break;
+                              case 'global_imp_exp' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__global_imp_exp',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Export / Import'],
+                                          icon : '<i class="material-icons sek-level-option-icon">import_export</i>'
+                                    };
+                              break;
                               case 'global_reset' :
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__global_reset',

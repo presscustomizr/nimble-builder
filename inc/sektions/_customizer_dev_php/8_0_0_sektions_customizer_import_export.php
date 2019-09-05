@@ -35,9 +35,10 @@ function sek_maybe_export() {
         sek_error_log( __FUNCTION__ . ' => missing customize capabilities.');
         return;
     }
+
     $seks_data = sek_get_skoped_seks( $_REQUEST['skope_id'] );
 
-    //sek_error_log('EXPORT BEFORE FILTER ? ' . $_REQUEST['skope_id'] , $seks_data );
+    sek_error_log('EXPORT BEFORE FILTER ? ' . $_REQUEST['skope_id'] , $seks_data );
     // the filter 'nimble_pre_export' is used to :
     // replace image id by the absolute url
     // clean level ids and replace them with a placeholder string

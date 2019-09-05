@@ -13,8 +13,13 @@
                       $pre_import_button = input.container.find('button[data-czr-action="sek-pre-import"]'),
                       $file_input = input.container.find('input[name=sek-import-file]'),
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                      currentScope = inputRegistrationParams.scope,
                       currentSetId = 'local' === inputRegistrationParams.scope ? api.czr_sektions.localSectionsSettingId() : api.czr_sektions.getGlobalSectionsSettingId();
 
+                  if ( !_.contains(['local', 'global'], currentScope ) ) {
+                        api.errare('api.czrInputMap.import_export => invalid currentScope', currentScope );
+                  }
+                  console.log('currentSetId', currentSetId, currentScope, inputRegistrationParams );
                   // Add event listener to set the button state
                   $file_input.on('change', function( evt ) {
                         $pre_import_button.toggleClass( 'disabled', _.isEmpty( $(this).val() ) );
@@ -66,7 +71,7 @@
                                           alert(sektionsLocalizedData.i18n['Nothing to export.']);
                                           break;
                                     }
-                                    _export();
+                                    _export( { scope : currentScope } );// local or global
                               break;//'sek-export'
 
                               case 'sek-pre-import' :
@@ -459,11 +464,12 @@
                   ////////////////////////////////////////////////////////
                   // EXPORT
                   ////////////////////////////////////////////////////////
-                  var _export = function() {
+                  //@params { scope : 'local' or 'global' }
+                  var _export = function( params ) {
                           var query = [],
                               query_params = {
                                     sek_export_nonce : api.settings.nonce.save,
-                                    skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                                    skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
                                     active_locations : api.czr_sektions.activeLocations()
                               };
                           _.each( query_params, function(v,k) {
@@ -475,7 +481,7 @@
                           wp.ajax.post( 'sek_pre_export_checks', {
                                 nonce: api.settings.nonce.save,
                                 sek_export_nonce : api.settings.nonce.save,
-                                skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                                skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
                                 active_locations : api.czr_sektions.activeLocations()
                           }).done( function() {
                                 // disable the 'beforeunload' listeners generating popup window when the changeset is dirty
