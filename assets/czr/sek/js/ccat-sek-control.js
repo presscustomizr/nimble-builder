@@ -5034,7 +5034,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__global_imp_exp',
                                           module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Export / Import'],
+                                          controlLabel : sektionsLocalizedData.i18n['Export / Import global sections'],
                                           icon : '<i class="material-icons sek-level-option-icon">import_export</i>'
                                     };
                               break;
