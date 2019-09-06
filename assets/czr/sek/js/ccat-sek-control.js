@@ -5030,6 +5030,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">history</i>'
                                     };
                               break;
+                              case 'global_imp_exp' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__global_imp_exp',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Export / Import'],
+                                          icon : '<i class="material-icons sek-level-option-icon">import_export</i>'
+                                    };
+                              break;
                               case 'global_reset' :
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__global_reset',
@@ -6432,6 +6440,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                                     // SHALL WE MERGE ?
+                                    // Sept 2019 note : for local import only. Not implemented for global https://github.com/presscustomizr/nimble-builder/issues/495
                                     // loop on each location of the imported content
                                     // if the current setting value has sections in a location, add them before the imported ones
                                     // keep_existing_sections is a user check option
@@ -11812,7 +11821,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       $pre_import_button = input.container.find('button[data-czr-action="sek-pre-import"]'),
                       $file_input = input.container.find('input[name=sek-import-file]'),
                       inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( input.id, input.module.module_type ),
+                      currentScope = inputRegistrationParams.scope,
                       currentSetId = 'local' === inputRegistrationParams.scope ? api.czr_sektions.localSectionsSettingId() : api.czr_sektions.getGlobalSectionsSettingId();
+
+                  if ( !_.contains(['local', 'global'], currentScope ) ) {
+                        api.errare('api.czrInputMap.import_export => invalid currentScope', currentScope );
+                  }
 
                   // Add event listener to set the button state
                   $file_input.on('change', function( evt ) {
@@ -11865,7 +11879,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           alert(sektionsLocalizedData.i18n['Nothing to export.']);
                                           break;
                                     }
-                                    _export();
+                                    _export( { scope : currentScope } );// local or global
                               break;//'sek-export'
 
                               case 'sek-pre-import' :
@@ -11898,6 +11912,62 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });//input.container.on( 'click' .. )
 
 
+
+                  ////////////////////////////////////////////////////////
+                  // PRE EXPORT CHECKS
+                  ////////////////////////////////////////////////////////
+                  //@params { scope : 'local' or 'global' }
+                  var _export = function( params ) {
+                          var query = [],
+                              query_params = {
+                                    sek_export_nonce : api.settings.nonce.save,
+                                    skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
+                                    active_locations : api.czr_sektions.activeLocations()
+                              };
+                          _.each( query_params, function(v,k) {
+                                query.push( encodeURIComponent(k) + '=' + encodeURIComponent(v) );
+                          });
+
+                          // The ajax action is used to make a pre-check
+                          // the idea is to avoid a white screen when generating the download window afterwards
+                          wp.ajax.post( 'sek_pre_export_checks', {
+                                nonce: api.settings.nonce.save,
+                                sek_export_nonce : api.settings.nonce.save,
+                                skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
+                                active_locations : api.czr_sektions.activeLocations()
+                          }).done( function() {
+                                // disable the 'beforeunload' listeners generating popup window when the changeset is dirty
+                                $( window ).off( 'beforeunload' );
+                                // Generate a download window
+                                // @see add_action( 'customize_register', '\Nimble\sek_catch_export_action', PHP_INT_MAX );
+                                window.location.href = [
+                                      sektionsLocalizedData.customizerURL,
+                                      '?',
+                                      query.join('&')
+                                ].join('');
+                                // re-enable the listeners
+                                $( window ).on( 'beforeunload' );
+                          }).fail( function( error_resp ) {
+                                api.previewer.trigger('sek-notify', {
+                                      notif_id : 'import-failed',
+                                      type : 'error',
+                                      duration : 30000,
+                                      message : [
+                                            '<span>',
+                                              '<strong>',
+                                              [ sektionsLocalizedData.i18n['Export failed'], encodeURIComponent( error_resp ) ].join(' '),
+                                              '</strong>',
+                                            '</span>'
+                                      ].join('')
+                                });
+                          });
+                  };//_export()
+
+
+
+
+
+
                   ////////////////////////////////////////////////////////
                   // PRE-IMPORT
                   ////////////////////////////////////////////////////////
@@ -11919,7 +11989,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               if ( !_.isEmpty( importedActiveLocationsNotAvailableInCurrentActiveLocations ) ) {
                                     $pre_import_button.hide();
-                                    input.container.find('.czr-import-dialog').slideToggle();
+                                    // Different messages for local and global
+                                    // since sept 2019 for https://github.com/presscustomizr/nimble-builder/issues/495
+                                    // @see tmpl-nimble-input___import_export input php template for messages
+                                    if ( 'local' === currentScope ) {
+                                          input.container.find('.czr-import-dialog.czr-local-import').slideToggle();
+                                    } else {
+                                          input.container.find('.czr-import-dialog.czr-global-import').slideToggle();
+                                    }
+
                                     api.infoLog('sek-pre-import => imported locations missing in current page.', importedActiveLocationsNotAvailableInCurrentActiveLocations );
                               } else {
                                     _import();
@@ -12189,11 +12267,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // the scope will determine the setting id, local or global
                         api.czr_sektions.updateAPISetting({
                               action : 'sek-import-from-file',
-                              scope : 'global' === inputRegistrationParams.scope,//<= will determine which setting will be updated,
+                              scope : currentScope,//'global' or 'local'<= will determine which setting will be updated,
                               // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
                               imported_content : server_resp.data,
                               assign_missing_locations : params.assign_missing_locations,
-                              keep_existing_sections : input.input_parent.czr_Input('keep_existing_sections')()
+                              keep_existing_sections : 'local' === currentScope ? input.input_parent.czr_Input('keep_existing_sections')() : false
                         }).done( function() {
                               // Clean an regenerate the local option setting
                               // Settings are normally registered once and never cleaned, unlike controls.
@@ -12250,60 +12328,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // display back the pre import button
                         $pre_import_button.show();
                   };
-
-
-
-
-
-                  ////////////////////////////////////////////////////////
-                  // EXPORT
-                  ////////////////////////////////////////////////////////
-                  var _export = function() {
-                          var query = [],
-                              query_params = {
-                                    sek_export_nonce : api.settings.nonce.save,
-                                    skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
-                                    active_locations : api.czr_sektions.activeLocations()
-                              };
-                          _.each( query_params, function(v,k) {
-                                query.push( encodeURIComponent(k) + '=' + encodeURIComponent(v) );
-                          });
-
-                          // The ajax action is used to make a pre-check
-                          // the idea is to avoid a white screen when generating the download window afterwards
-                          wp.ajax.post( 'sek_pre_export_checks', {
-                                nonce: api.settings.nonce.save,
-                                sek_export_nonce : api.settings.nonce.save,
-                                skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
-                                active_locations : api.czr_sektions.activeLocations()
-                          }).done( function() {
-                                // disable the 'beforeunload' listeners generating popup window when the changeset is dirty
-                                $( window ).off( 'beforeunload' );
-                                // Generate a download window
-                                // @see add_action( 'customize_register', '\Nimble\sek_catch_export_action', PHP_INT_MAX );
-                                window.location.href = [
-                                      sektionsLocalizedData.customizerURL,
-                                      '?',
-                                      query.join('&')
-                                ].join('');
-                                // re-enable the listeners
-                                $( window ).on( 'beforeunload' );
-                          }).fail( function( error_resp ) {
-                                api.previewer.trigger('sek-notify', {
-                                      notif_id : 'import-failed',
-                                      type : 'error',
-                                      duration : 30000,
-                                      message : [
-                                            '<span>',
-                                              '<strong>',
-                                              [ sektionsLocalizedData.i18n['Export failed'], encodeURIComponent( error_resp ) ].join(' '),
-                                              '</strong>',
-                                            '</span>'
-                                      ].join('')
-                                });
-                          });
-                  };//_export()
-
             }//import_export()
       });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
@@ -14394,6 +14418,31 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
                         api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_reset' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_global_imp_exp : {
+                  //mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_global_imp_exp', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_global_imp_exp' )
                   )
             },
       });
