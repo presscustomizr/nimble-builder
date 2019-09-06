@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_global_imp_exp() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_imp_exp',
-        'name' => __('Export / Import', 'text_doma'),
+        'name' => __('Export / Import global sections', 'text_doma'),
         // 'starting_value' => array(
         //     'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) )
         // ),
@@ -20,7 +20,7 @@ function sek_get_module_params_for_sek_global_imp_exp() {
                     'refresh_stylesheet' => false,
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                    //'notice_before' => __('Make sure you import a file generated with Nimble Builder export system.', 'text_doma'),
+                    'html_before' => sprintf('<span class="czr-notice">%1$s</span><br/>',__('These options allows you to export and import global sections like a global header-footer.', 'text_doma') )
                     // 'notice_after' => __('Select a revision from the drop-down list to preview it. You can then restore it by clicking the Publish button at the top of the page.', 'text_doma')
                 ),
                 // 'keep_existing_sections' => array(
