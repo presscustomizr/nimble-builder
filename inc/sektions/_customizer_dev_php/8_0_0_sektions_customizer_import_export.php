@@ -38,7 +38,7 @@ function sek_maybe_export() {
 
     $seks_data = sek_get_skoped_seks( $_REQUEST['skope_id'] );
 
-    sek_error_log('EXPORT BEFORE FILTER ? ' . $_REQUEST['skope_id'] , $seks_data );
+    //sek_error_log('EXPORT BEFORE FILTER ? ' . $_REQUEST['skope_id'] , $seks_data );
     // the filter 'nimble_pre_export' is used to :
     // replace image id by the absolute url
     // clean level ids and replace them with a placeholder string
@@ -57,7 +57,7 @@ function sek_maybe_export() {
             'theme' => $theme_name
         )
     );
-    // sek_error_log('$_REQUEST ?', $_REQUEST );
+
     //sek_error_log('$export ?', $export );
 
     $skope_id = str_replace('skp__', '',  $_REQUEST['skope_id'] );
@@ -80,6 +80,7 @@ function sek_maybe_export() {
 // This is to avoid a white screen when generating the download window afterwards
 add_action( 'wp_ajax_sek_pre_export_checks', '\Nimble\sek_ajax_pre_export_checks' );
 function sek_ajax_pre_export_checks() {
+    //sek_error_log('PRE EXPORT CHECKS ?', $_POST );
     $action = 'save-customize_' . get_stylesheet();
     if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
         wp_send_json_error( 'check_ajax_referer_failed' );
@@ -106,6 +107,37 @@ function sek_ajax_pre_export_checks() {
     wp_send_json_success();
 }
 
+
+
+
+
+
+// EXPORT FILTER
+add_filter( 'nimble_pre_export', '\Nimble\sek_parse_img_and_clean_id' );
+function sek_parse_img_and_clean_id( $seks_data ) {
+    $new_seks_data = array();
+    foreach ( $seks_data as $key => $value ) {
+        if ( is_array($value) ) {
+            $new_seks_data[$key] = sek_parse_img_and_clean_id( $value );
+        } else {
+            switch( $key ) {
+                case 'bg-image' :
+                case 'img' :
+                    if ( is_int( $value ) && (int)$value > 0 ) {
+                        $value = '__img_url__' . wp_get_attachment_url((int)$value);
+                    }
+                break;
+                case 'id' :
+                    if ( is_string( $value ) && false !== strpos( $value, '__nimble__' ) ) {
+                        $value = '__rep__me__';
+                    }
+                break;
+            }
+            $new_seks_data[$key] = $value;
+        }
+    }
+    return $new_seks_data;
+}
 
 
 
@@ -231,36 +263,6 @@ function sek_ajax_get_imported_file_content() {
     wp_send_json_success( $imported_content );
 }
 
-
-
-
-
-// EXPORT FILTER
-add_filter( 'nimble_pre_export', '\Nimble\sek_parse_img_and_clean_id' );
-function sek_parse_img_and_clean_id( $seks_data ) {
-    $new_seks_data = array();
-    foreach ( $seks_data as $key => $value ) {
-        if ( is_array($value) ) {
-            $new_seks_data[$key] = sek_parse_img_and_clean_id( $value );
-        } else {
-            switch( $key ) {
-                case 'bg-image' :
-                case 'img' :
-                    if ( is_int( $value ) && (int)$value > 0 ) {
-                        $value = '__img_url__' . wp_get_attachment_url((int)$value);
-                    }
-                break;
-                case 'id' :
-                    if ( is_string( $value ) && false !== strpos( $value, '__nimble__' ) ) {
-                        $value = '__rep__me__';
-                    }
-                break;
-            }
-            $new_seks_data[$key] = $value;
-        }
-    }
-    return $new_seks_data;
-}
 
 // IMPORT FILTER
 add_filter( 'nimble_pre_import', '\Nimble\sek_sniff_imported_img_url' );

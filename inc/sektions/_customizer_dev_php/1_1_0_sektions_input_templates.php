@@ -802,12 +802,21 @@ function sek_print_nimble_input_templates() {
           <div class="customize-control-title width-100"><?php _e('IMPORT', 'text_doma'); ?></div>
           <span class="czr-notice"><?php _e('Select the file to import and click on Import button.', 'text_doma' ); ?></span>
           <span class="czr-notice"><?php _e('Be sure to import a file generated with Nimble Builder export system.', 'text_doma' ); ?></span>
-          <div class="czr-import-dialog notice notice-info">
+          <?php // <DIALOG FOR LOCAL IMPORT> ?>
+          <div class="czr-import-dialog czr-local-import notice notice-info">
               <div class="czr-import-message"><?php _e('Some of the imported sections need a location that is not active on this page. Sections in missing locations will not be rendered. You can continue importing or assign those sections to a contextually active location.', 'text_doma' ); ?></div>
               <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-import-as-is"><?php _e('Import without modification', 'text_doma' ); ?></button>
               <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-import-assign"><?php _e('Import in existing locations', 'text_doma' ); ?></button>
               <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-cancel-import"><?php _e('Cancel import', 'text_doma' ); ?></button>
           </div>
+          <?php // </DIALOG FOR LOCAL IMPORT> ?>
+          <?php // <DIALOG FOR GLOBAL IMPORT> ?>
+          <div class="czr-import-dialog czr-global-import notice notice-info">
+              <div class="czr-import-message"><?php _e('Some of the imported sections need a location that is not active on this page. For example, if you are importing a global header footer, you need to activate the Nimble site wide header and footer, in "Site wide header and footer" options.', 'text_doma' ); ?></div>
+               <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-import-as-is"><?php _e('Import', 'text_doma' ); ?></button>
+              <button type="button" class="button" data-czr-control-id="{{ data.control_id }}" data-czr-input-id="{{data.input_id}}" data-czr-action="sek-cancel-import"><?php _e('Cancel import', 'text_doma' ); ?></button>
+          </div>
+          <?php // </DIALOG FOR GLOBAL IMPORT> ?>
           <div class="sek-uploading"><?php _e( 'Uploading...', 'text_doma' ); ?></div>
           <input type="file" name="sek-import-file" class="sek-import-file" />
           <input type="hidden" name="sek-skope" value="{{data.input_data.scope}}" />

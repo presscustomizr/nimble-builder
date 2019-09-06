@@ -1275,6 +1275,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                                     // SHALL WE MERGE ?
+                                    // Sept 2019 note : for local import only. Not implemented for global https://github.com/presscustomizr/nimble-builder/issues/495
                                     // loop on each location of the imported content
                                     // if the current setting value has sections in a location, add them before the imported ones
                                     // keep_existing_sections is a user check option

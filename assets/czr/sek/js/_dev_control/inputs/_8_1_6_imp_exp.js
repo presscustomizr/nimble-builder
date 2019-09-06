@@ -19,7 +19,7 @@
                   if ( !_.contains(['local', 'global'], currentScope ) ) {
                         api.errare('api.czrInputMap.import_export => invalid currentScope', currentScope );
                   }
-                  console.log('currentSetId', currentSetId, currentScope, inputRegistrationParams );
+
                   // Add event listener to set the button state
                   $file_input.on('change', function( evt ) {
                         $pre_import_button.toggleClass( 'disabled', _.isEmpty( $(this).val() ) );
@@ -104,6 +104,62 @@
                   });//input.container.on( 'click' .. )
 
 
+
+                  ////////////////////////////////////////////////////////
+                  // PRE EXPORT CHECKS
+                  ////////////////////////////////////////////////////////
+                  //@params { scope : 'local' or 'global' }
+                  var _export = function( params ) {
+                          var query = [],
+                              query_params = {
+                                    sek_export_nonce : api.settings.nonce.save,
+                                    skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
+                                    active_locations : api.czr_sektions.activeLocations()
+                              };
+                          _.each( query_params, function(v,k) {
+                                query.push( encodeURIComponent(k) + '=' + encodeURIComponent(v) );
+                          });
+
+                          // The ajax action is used to make a pre-check
+                          // the idea is to avoid a white screen when generating the download window afterwards
+                          wp.ajax.post( 'sek_pre_export_checks', {
+                                nonce: api.settings.nonce.save,
+                                sek_export_nonce : api.settings.nonce.save,
+                                skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
+                                active_locations : api.czr_sektions.activeLocations()
+                          }).done( function() {
+                                // disable the 'beforeunload' listeners generating popup window when the changeset is dirty
+                                $( window ).off( 'beforeunload' );
+                                // Generate a download window
+                                // @see add_action( 'customize_register', '\Nimble\sek_catch_export_action', PHP_INT_MAX );
+                                window.location.href = [
+                                      sektionsLocalizedData.customizerURL,
+                                      '?',
+                                      query.join('&')
+                                ].join('');
+                                // re-enable the listeners
+                                $( window ).on( 'beforeunload' );
+                          }).fail( function( error_resp ) {
+                                api.previewer.trigger('sek-notify', {
+                                      notif_id : 'import-failed',
+                                      type : 'error',
+                                      duration : 30000,
+                                      message : [
+                                            '<span>',
+                                              '<strong>',
+                                              [ sektionsLocalizedData.i18n['Export failed'], encodeURIComponent( error_resp ) ].join(' '),
+                                              '</strong>',
+                                            '</span>'
+                                      ].join('')
+                                });
+                          });
+                  };//_export()
+
+
+
+
+
+
                   ////////////////////////////////////////////////////////
                   // PRE-IMPORT
                   ////////////////////////////////////////////////////////
@@ -125,7 +181,15 @@
 
                               if ( !_.isEmpty( importedActiveLocationsNotAvailableInCurrentActiveLocations ) ) {
                                     $pre_import_button.hide();
-                                    input.container.find('.czr-import-dialog').slideToggle();
+                                    // Different messages for local and global
+                                    // since sept 2019 for https://github.com/presscustomizr/nimble-builder/issues/495
+                                    // @see tmpl-nimble-input___import_export input php template for messages
+                                    if ( 'local' === currentScope ) {
+                                          input.container.find('.czr-import-dialog.czr-local-import').slideToggle();
+                                    } else {
+                                          input.container.find('.czr-import-dialog.czr-global-import').slideToggle();
+                                    }
+
                                     api.infoLog('sek-pre-import => imported locations missing in current page.', importedActiveLocationsNotAvailableInCurrentActiveLocations );
                               } else {
                                     _import();
@@ -395,11 +459,11 @@
                         // the scope will determine the setting id, local or global
                         api.czr_sektions.updateAPISetting({
                               action : 'sek-import-from-file',
-                              scope : 'global' === inputRegistrationParams.scope,//<= will determine which setting will be updated,
+                              scope : currentScope,//'global' or 'local'<= will determine which setting will be updated,
                               // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
                               imported_content : server_resp.data,
                               assign_missing_locations : params.assign_missing_locations,
-                              keep_existing_sections : input.input_parent.czr_Input('keep_existing_sections')()
+                              keep_existing_sections : 'local' === currentScope ? input.input_parent.czr_Input('keep_existing_sections')() : false
                         }).done( function() {
                               // Clean an regenerate the local option setting
                               // Settings are normally registered once and never cleaned, unlike controls.
@@ -456,61 +520,6 @@
                         // display back the pre import button
                         $pre_import_button.show();
                   };
-
-
-
-
-
-                  ////////////////////////////////////////////////////////
-                  // EXPORT
-                  ////////////////////////////////////////////////////////
-                  //@params { scope : 'local' or 'global' }
-                  var _export = function( params ) {
-                          var query = [],
-                              query_params = {
-                                    sek_export_nonce : api.settings.nonce.save,
-                                    skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
-                                    active_locations : api.czr_sektions.activeLocations()
-                              };
-                          _.each( query_params, function(v,k) {
-                                query.push( encodeURIComponent(k) + '=' + encodeURIComponent(v) );
-                          });
-
-                          // The ajax action is used to make a pre-check
-                          // the idea is to avoid a white screen when generating the download window afterwards
-                          wp.ajax.post( 'sek_pre_export_checks', {
-                                nonce: api.settings.nonce.save,
-                                sek_export_nonce : api.settings.nonce.save,
-                                skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
-                                active_locations : api.czr_sektions.activeLocations()
-                          }).done( function() {
-                                // disable the 'beforeunload' listeners generating popup window when the changeset is dirty
-                                $( window ).off( 'beforeunload' );
-                                // Generate a download window
-                                // @see add_action( 'customize_register', '\Nimble\sek_catch_export_action', PHP_INT_MAX );
-                                window.location.href = [
-                                      sektionsLocalizedData.customizerURL,
-                                      '?',
-                                      query.join('&')
-                                ].join('');
-                                // re-enable the listeners
-                                $( window ).on( 'beforeunload' );
-                          }).fail( function( error_resp ) {
-                                api.previewer.trigger('sek-notify', {
-                                      notif_id : 'import-failed',
-                                      type : 'error',
-                                      duration : 30000,
-                                      message : [
-                                            '<span>',
-                                              '<strong>',
-                                              [ sektionsLocalizedData.i18n['Export failed'], encodeURIComponent( error_resp ) ].join(' '),
-                                              '</strong>',
-                                            '</span>'
-                                      ].join('')
-                                });
-                          });
-                  };//_export()
-
             }//import_export()
       });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );
