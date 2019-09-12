@@ -514,6 +514,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             'Layout settings for the' => __('Layout settings for the', 'text_doma'),
             'Background settings for the' => __('Background settings for the', 'text_doma'),
+            'Text settings for the' => __('Text settings for the', 'text_doma'),
             'Borders settings for the' => __('Borders settings for the', 'text_doma'),
             'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_doma'),
             'Height and vertical alignment for the' => __('Height and vertical alignment for the', 'text_doma'),
