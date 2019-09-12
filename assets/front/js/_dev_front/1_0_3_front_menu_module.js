@@ -333,7 +333,7 @@ jQuery( function($){
           });
 
     // How to have a logo plus an hamburger in mobiles on the same line?
-    // => clone the menu module, and append it to the closest sektion-inner wrapper
+    // => clone the menu module, and append it to the "ancient" sektion-inner wrapper ancestor
     // => this way it will occupy 100% of the width
     // => and also the clone inherits the style of the module
     // https://github.com/presscustomizr/nimble-builder/issues/368
@@ -349,8 +349,8 @@ jQuery( function($){
                             _new_id = $( '.sek-nav-collapse', this ).attr('id') + '-mobile';
 
                         $_mobile_menu_module
-                              /// place the mobile menu at the end of this sektion inner
-                              .appendTo( $(this).closest( '.sek-sektion-inner' ) )
+                              // place the mobile menu at the end of the "ancient" sektion inner ancestor
+                              .appendTo( $(this).parents( '.sek-sektion-inner:last' ) )
                               //wrap in a convenient div for styling and targeting
                               .wrap( '<div class="sek-col-base sek-mobile-menu-expanded-below" id="'+_new_id+'-wrapper"></div>');
 
