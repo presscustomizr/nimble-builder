@@ -184,6 +184,45 @@ class Sek_Dyn_CSS_Builder {
             }//if
 
 
+            // INPUT TEXT LEVEL CSS RULES
+            // @added in sept 2019 for https://github.com/presscustomizr/nimble-builder/issues/499
+            // When we are inside the associative arrays of the level 'options'
+            // the keys are not integer.
+            // We want to filter each input
+            // which makes it possible to target for example the font-family. Either in module values or in level options
+            if ( is_string( $key ) && 1 < strlen( $key ) && 'options' === $key ) {
+                // we need to have a level model set
+                if ( !empty( $parent_level ) && is_array( $parent_level ) ) {
+                    if ( is_array( $entry ) ) {
+
+                        // Level options are structured as an associative array of option groups
+                        // $entry = array(
+                        //    'text' => array(
+                        //        font_size_css => ...
+                        //        color_css => ...
+                        //    ),
+                        //    'bg' => array(),
+                        //    ...
+                        // )
+                        foreach ( $entry as $opt_group_type => $input_candidates ) {
+                            if ( 'level_text' !== $opt_group_type )
+                              continue;
+                            //sek_error_log('?$registered_input_list?', $registered_input_list);
+
+                            $level_text_registered_input_list = sek_get_registered_module_input_list( 'sek_level_text_module' );
+                            $level_text_css_selectors = sek_get_registered_module_type_property( 'sek_level_text_module', 'css_selectors' );
+                            $rules = $this->sek_loop_on_input_candidates_and_maybe_generate_css_rules( $rules, array(
+                                'input_list' => $input_candidates,
+                                'registered_input_list' => $level_text_registered_input_list,// <= the full list of input for the module
+                                'parent_module_level' => $parent_level,// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+                                'module_css_selector' => $level_text_css_selectors //a default set of css_selectors might have been specified on module registration
+                            ));
+                        }
+                    }//if
+                }//if
+            }//if
+
+
             // LEVEL CSS RULES
             if ( is_array( $entry ) ) {
                 // Populate rules for sections / columns / modules
