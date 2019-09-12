@@ -4989,6 +4989,20 @@ function sek_get_module_params_for_sek_level_text_module() {
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
+                'h_alignment_css' => array(
+                    'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
+                    'title'       => __('Alignment', 'text_doma'),
+                    'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier' => 'h_alignment',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                    'html_before' => sprintf( '<span class="czr-notice">%1$s<br/>%2$s</span><hr>',
+                        __('Note : some modules have text settings in their module content tab. Those settings are applied first, before those below.'),
+                        __('Text styling is always inherited in this order : section > column > module settings > module content')
+                    )
+                ),
                 'font_family_css' => array(
                     'input_type'  => 'font_picker',
                     'title'       => __('Font family', 'text_doma'),
@@ -4996,11 +5010,7 @@ function sek_get_module_params_for_sek_level_text_module() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'refresh_fonts' => true,
-                    'css_identifier' => 'font_family',
-                    'html_before' => sprintf( '<span class="czr-notice">%1$s<br/>%2$s</span><hr>',
-                        __('Note : some modules have text settings in their module content tab. Those settings are applied first, before those below.'),
-                        __('Text styling is always inherited in this order : section > column > module settings > module content')
-                    )
+                    'css_identifier' => 'font_family'
                 ),
                 'font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
