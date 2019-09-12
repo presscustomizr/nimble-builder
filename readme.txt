@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.3
-Stable tag: 1.8.20
+Stable tag: 1.8.21
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,13 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.8.20 =
-Added a new option to export / import global sections like header-footer.
+= 1.8.21 =
+Added text options, like font size, color, font family, to sections, columns and modules.
 
 == Changelog ==
+= 1.8.21 : September 12th 2019 =
+* added : text options, like font size, color, font family, to sections, columns and modules.
+
 = 1.8.20 : September 6th 2019 =
 * added a new option to export / import global sections like header-footer.
 
