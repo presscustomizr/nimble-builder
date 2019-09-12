@@ -101,6 +101,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
           // UI LEVEL MODULES
           'sek_mod_option_switcher_module',
           'sek_level_bg_module',
+          'sek_level_text_module',
           'sek_level_border_module',
           //'sek_level_section_layout_module',<// deactivated for now. Replaced by sek_level_width_section
           'sek_level_height_module',

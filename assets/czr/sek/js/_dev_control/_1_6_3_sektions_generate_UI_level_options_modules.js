@@ -33,6 +33,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               expandAndFocusOnInit : true,
                               icon : '<i class="material-icons sek-level-option-icon">gradient</i>'//'<i class="material-icons sek-level-option-icon">brush</i>'
                         },
+                        level_text : {
+                              settingControlId : params.id + '__text_options',
+                              module_type : 'sek_level_text_module',
+                              controlLabel : sektionsLocalizedData.i18n['Text settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                              expandAndFocusOnInit : true,
+                              icon : '<i class="material-icons sek-level-option-icon">text_format</i>'//'<i class="material-icons sek-level-option-icon">brush</i>'
+                        },
                         border : {
                               settingControlId : params.id + '__border_options',
                               module_type : 'sek_level_border_module',
