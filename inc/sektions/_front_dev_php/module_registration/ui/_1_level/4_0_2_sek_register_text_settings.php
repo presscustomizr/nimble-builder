@@ -11,6 +11,8 @@ function sek_get_module_params_for_sek_level_text_module() {
         // ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'css_selectors' => array( '', // <= this first empty selector generates a selector looking like [data-sek-id="__nimble__27f2dc680c0c"], which allows us to style text not wrapped in any specific html tags
+          'p', 'a', '.sek-btn', 'button', 'input', 'select', 'optgroup', 'textarea' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'h_alignment_css' => array(

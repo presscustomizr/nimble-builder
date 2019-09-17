@@ -207,10 +207,10 @@ class Sek_Dyn_CSS_Builder {
                         foreach ( $entry as $opt_group_type => $input_candidates ) {
                             if ( 'level_text' !== $opt_group_type )
                               continue;
-                            //sek_error_log('?$registered_input_list?', $registered_input_list);
 
                             $level_text_registered_input_list = sek_get_registered_module_input_list( 'sek_level_text_module' );
                             $level_text_css_selectors = sek_get_registered_module_type_property( 'sek_level_text_module', 'css_selectors' );
+
                             $rules = $this->sek_loop_on_input_candidates_and_maybe_generate_css_rules( $rules, array(
                                 'input_list' => $input_candidates,
                                 'registered_input_list' => $level_text_registered_input_list,// <= the full list of input for the module

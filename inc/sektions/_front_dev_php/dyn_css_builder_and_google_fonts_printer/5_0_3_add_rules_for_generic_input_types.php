@@ -51,7 +51,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
     // implemented to allow CSS rules to be generated on a per-item basis
     // for https://github.com/presscustomizr/nimble-builder/issues/78
     if ( $is_multi_items ) {
-        $selector = sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"]', $parent_level['id'], $item_id );
+        $selector = sprintf( '[data-sek-id="%1$s"] [data-sek-item-id="%2$s"]', $parent_level['id'], $item_id );
     }
     $css_identifier = $input_registration_params['css_identifier'];
 
@@ -267,7 +267,10 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
             $properties_to_render['-ms-flex-align'] = $v_vendor_value;
         break;
         case 'font_family' :
-            $properties_to_render['font-family'] = sek_extract_css_font_family_from_customizer_option( $value );
+            $ffamily = sek_extract_css_font_family_from_customizer_option( $value );
+            if ( !empty( $ffamily ) ) {
+                $properties_to_render['font-family'] = $ffamily;
+            }
         break;
 
         /* Spacer */

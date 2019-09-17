@@ -367,8 +367,9 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/0_9_1_sektions_functions_saved_sektions.php',
       '<%= paths.sektions %>_front_dev_php/0_9_2_sektions_functions_revision_history.php',
 
+      '<%= paths.sektions %>_front_dev_php/dyn_css_builder_and_google_fonts_printer/9_0_0_sek_module_helpers_for_css_rules_generation.php',
+
       // MODULE REGISTRATION
-      '<%= paths.sektions %>_front_dev_php/module_registration/10_0_0_sek_module_helpers_for_css_rules_generation.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php',
 
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/10_0_1_sek_register_module_and_section_pickers.php',
