@@ -121,11 +121,12 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 
 == Upgrade Notice ==
 = 1.8.21 =
-Added text options, like font size, color, font family, to sections.
+Added text options, like font size, color, font family, to sections. Added a set of text options to the HTML module.
 
 == Changelog ==
 = 1.8.21 : September 17th 2019 =
 * added : text options, like font size, color, font family, to sections.
+* added : a set of text options to the HTML module
 
 = 1.8.20 : September 6th 2019 =
 * added a new option to export / import global sections like header-footer.
