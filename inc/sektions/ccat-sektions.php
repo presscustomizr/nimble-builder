@@ -4987,6 +4987,8 @@ function sek_get_module_params_for_sek_level_text_module() {
         // ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        'css_selectors' => array( '', // <= this first empty selector generates a selector looking like [data-sek-id="__nimble__27f2dc680c0c"], which allows us to style text not wrapped in any specific html tags
+          'p', 'a', '.sek-btn', 'button', 'input', 'select', 'optgroup', 'textarea' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'h_alignment_css' => array(
@@ -13443,10 +13445,10 @@ class Sek_Dyn_CSS_Builder {
                         foreach ( $entry as $opt_group_type => $input_candidates ) {
                             if ( 'level_text' !== $opt_group_type )
                               continue;
-                            //sek_error_log('?$registered_input_list?', $registered_input_list);
 
                             $level_text_registered_input_list = sek_get_registered_module_input_list( 'sek_level_text_module' );
                             $level_text_css_selectors = sek_get_registered_module_type_property( 'sek_level_text_module', 'css_selectors' );
+
                             $rules = $this->sek_loop_on_input_candidates_and_maybe_generate_css_rules( $rules, array(
                                 'input_list' => $input_candidates,
                                 'registered_input_list' => $level_text_registered_input_list,// <= the full list of input for the module
@@ -14596,7 +14598,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
     // implemented to allow CSS rules to be generated on a per-item basis
     // for https://github.com/presscustomizr/nimble-builder/issues/78
     if ( $is_multi_items ) {
-        $selector = sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"]', $parent_level['id'], $item_id );
+        $selector = sprintf( '[data-sek-id="%1$s"] [data-sek-item-id="%2$s"]', $parent_level['id'], $item_id );
     }
     $css_identifier = $input_registration_params['css_identifier'];
 
@@ -14812,7 +14814,10 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
             $properties_to_render['-ms-flex-align'] = $v_vendor_value;
         break;
         case 'font_family' :
-            $properties_to_render['font-family'] = sek_extract_css_font_family_from_customizer_option( $value );
+            $ffamily = sek_extract_css_font_family_from_customizer_option( $value );
+            if ( !empty( $ffamily ) ) {
+                $properties_to_render['font-family'] = $ffamily;
+            }
         break;
 
         /* Spacer */
