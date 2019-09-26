@@ -2805,7 +2805,7 @@ jQuery( function($){
 
     // When customizing, expand the currently edited item
     // @see CZRItemConstructor in api.czrModuleMap.czr_img_slider_collection_child
-    if ( ! _utils_.isUndefined( wp.customize ) ) {
+    if ( window.wp && ! _utils_.isUndefined( wp.customize ) ) {
           wp.customize.preview.bind('sek-item-focus', function( params ) {
 
                 var $itemEl = $('[data-sek-item-id="' + params.item_id +'"]', '.sek-accord-wrapper').first();
@@ -2981,7 +2981,7 @@ jQuery( function($){
 
     // When customizing, focus on the currently expanded / edited item
     // @see CZRItemConstructor in api.czrModuleMap.czr_img_slider_collection_child
-    if ( ! _utils_.isUndefined( wp.customize ) ) {
+    if ( window.wp && ! _utils_.isUndefined( wp.customize ) ) {
           wp.customize.preview.bind('sek-item-focus', function( params ) {
 
                 var $itemEl = $('[data-sek-item-id="' + params.item_id +'"]', '.swiper-container').first();
@@ -3102,7 +3102,7 @@ jQuery( function($){
 
     };
     //doFitText();
-    // if ( 'function' == typeof(_) && ! _utils_.isUndefined( wp.customize ) ) {
+    // if ( 'function' == typeof(_) && window.wp && ! _utils_.isUndefined( wp.customize ) ) {
     //     wp.customize.selectiveRefresh.bind('partial-content-rendered' , function() {
     //         doFitText();
     //     });

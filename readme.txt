@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.3
-Stable tag: 1.8.21
+Stable tag: 1.8.21-beta
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -124,7 +124,8 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 Added text options, like font size, color, font family, to sections. Added a set of text options to the HTML module.
 
 == Changelog ==
-= 1.8.21 : September 17th 2019 =
+= 1.8.21 : September 26th 2019 =
+* fixed : [WooCommerce] possible js error at checkout when using credit card payment
 * added : text options, like font size, color, font family, to sections.
 * added : a set of text options to the HTML module
 
