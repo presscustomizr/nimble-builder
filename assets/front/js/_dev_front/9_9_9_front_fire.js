@@ -95,7 +95,7 @@ jQuery( function($){
 
     };
     //doFitText();
-    // if ( 'function' == typeof(_) && ! _utils_.isUndefined( wp.customize ) ) {
+    // if ( 'function' == typeof(_) && window.wp && ! _utils_.isUndefined( wp.customize ) ) {
     //     wp.customize.selectiveRefresh.bind('partial-content-rendered' , function() {
     //         doFitText();
     //     });

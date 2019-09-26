@@ -163,7 +163,7 @@ jQuery( function($){
 
     // When customizing, focus on the currently expanded / edited item
     // @see CZRItemConstructor in api.czrModuleMap.czr_img_slider_collection_child
-    if ( ! _utils_.isUndefined( wp.customize ) ) {
+    if ( window.wp && ! _utils_.isUndefined( wp.customize ) ) {
           wp.customize.preview.bind('sek-item-focus', function( params ) {
 
                 var $itemEl = $('[data-sek-item-id="' + params.item_id +'"]', '.swiper-container').first();
