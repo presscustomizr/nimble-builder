@@ -300,15 +300,48 @@ body .block-editor .sek-nimble-mobile-admin-bar-title { display: none; }
   body .block-editor .sek-nimble-admin-bar-title{ display: none;}
   body .block-editor .sek-nimble-mobile-admin-bar-title{ display: inline-block;}
 }
+
 /* Classic editor style */
 #sek-edit-with-nimble .sek-nimble-icon img {
-    width: 28px;
-    position: relative;
-    top: 8px;
-    /*left: 8px;*/
+    width: 24px;
+    top: 3px;
+    left: 8px;
+    position: absolute;
 }
 #sek-edit-with-nimble.classic-ed {
+  margin: 2px;
+  height: 33px;
+  font-size: 13px;
+  line-height: 1;
   position: relative;
   padding: 0 15px!important;
   margin: 10px 0!important;
+}
+#sek-edit-with-nimble.classic-ed .sek-nimble-mobile-admin-bar-title, #sek-edit-with-nimble.classic-ed .sek-nimble-admin-bar-title {
+  padding-left: 22px;
+}
+
+/* loading icon introduced for https://github.com/presscustomizr/nimble-builder/issues/509 */
+#sek-edit-with-nimble .sek-spinner {
+    transition: .18s margin ease-in-out;
+    display: none;
+}
+#sek-edit-with-nimble .sek-spinner {
+    background: url(../img/spinner.gif) no-repeat;
+    background-size: 20px 20px;
+    position: absolute;
+    left: 10px;
+    top: 6px;
+    width: 20px;
+    height: 20px;
+}
+#sek-edit-with-nimble.sek-loading-customizer .sek-spinner {
+  display: block;
+     /* display: inline-block;*/
+}
+#sek-edit-with-nimble.sek-loading-customizer .sek-nimble-icon img {
+  display: none;
+}
+#sek-edit-with-nimble.sek-loading-customizer {
+  background: #30a5d4!important;
 }

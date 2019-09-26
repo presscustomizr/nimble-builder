@@ -29,7 +29,8 @@
     // When creating a new post, the customizer url is generated with an ajax call
     $('body').on( 'click', '#sek-edit-with-nimble', function(evt) {
         evt.preventDefault();
-        var _url = $(this).data('cust-url'),
+        var $clickedEl = $(this),
+            _url = $clickedEl.data('cust-url'),
             attempts = 0,
             _openCustomizer = function( customizer_url ) {
                 // We don't want to enter in an infinite loop, that's why the number of attempts is limited to 5 if isSavingPost()
@@ -41,9 +42,13 @@
                 } else {
                     location.href = customizer_url;
                 }
+                //$clickedEl.removeClass('sek-loading-customizer');
             };
 
         if ( _.isEmpty( _url ) ) {
+            // introduced for https://github.com/presscustomizr/nimble-builder/issues/509
+            $clickedEl.addClass('sek-loading-customizer');
+
             // for new post, the url is empty, let's generate it server side with an ajax call
             var post_id = wp.data.select('core/editor').getCurrentPostId();
             wp.ajax.post( 'sek_get_customize_url_for_nimble_edit_button', {
@@ -51,6 +56,8 @@
             }).done( function( resp ) {
                 _openCustomizer( resp );
             }).fail( function( resp ) {
+                $clickedEl.removeClass('sek-loading-customizer');
+
                 // If the ajax request fails, let's save the draft with a Nimble Builder title, and refresh the page, so the url is generated server side on next load.
                 var post_title = wp.data.select('core/editor').getEditedPostAttribute('title');
                 if ( !post_title ) {

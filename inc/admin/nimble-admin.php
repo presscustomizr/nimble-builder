@@ -774,15 +774,22 @@ function sek_print_js_for_nimble_edit_btn() {
           // Attach event listener with delegation
           $('body').on( 'click', '#sek-edit-with-nimble', function(evt) {
               evt.preventDefault();
-              var _url = $(this).data('cust-url');
+              var $clickedEl = $(this),
+                  _url = $clickedEl.data('cust-url');
               if ( _.isEmpty( _url ) ) {
+                  // introduced for https://github.com/presscustomizr/nimble-builder/issues/509
+                  $clickedEl.addClass('sek-loading-customizer');
+
                   // for new post, the url is empty, let's generate it server side with an ajax call
                   var post_id = $('#post_ID').val();
                   wp.ajax.post( 'sek_get_customize_url_for_nimble_edit_button', {
                       nimble_edit_post_id : post_id
                   }).done( function( resp ) {
+                      //$clickedEl.removeClass('sek-loading-customizer');
                       location.href = resp;
                   }).fail( function( resp ) {
+                      $clickedEl.removeClass('sek-loading-customizer');
+
                       // If the ajax request fails, let's save the draft with a Nimble Builder title, and refresh the page, so the url is generated server side on next load.
                       // var $postTitle = $('#title');
                       //     post_title = $postTitle.val();
@@ -826,7 +833,7 @@ function sek_print_nb_btn_edit_with_nimble( $editor_type ) {
     ?>
     <button id="sek-edit-with-nimble" type="button" class="<?php echo $btn_css_classes; ?>" data-cust-url="<?php echo esc_url( $customize_url ); ?>">
       <?php //_e( 'Edit with Nimble Builder', 'text_doma' ); ?>
-      <?php printf( '<span class="sek-nimble-icon" title="%3$s"><img src="%1$s" alt="%2$s"/><span class="sek-nimble-admin-bar-title">%2$s</span><span class="sek-nimble-mobile-admin-bar-title">%3$s</span></span>',
+      <?php printf( '<span class="sek-spinner"></span><span class="sek-nimble-icon" title="%3$s"><img src="%1$s" alt="%2$s"/><span class="sek-nimble-admin-bar-title">%2$s</span><span class="sek-nimble-mobile-admin-bar-title">%3$s</span></span>',
           NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
           sek_local_skope_has_nimble_sections( $manually_built_skope_id ) ? __('Continue building with Nimble','text_domain') : __('Build with Nimble Builder','text_domain'),
           __('Build','text_domain'),
