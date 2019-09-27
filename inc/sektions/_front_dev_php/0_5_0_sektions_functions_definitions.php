@@ -1594,9 +1594,9 @@ function sek_is_nimble_widget_id( $id ) {
  *  Dynamic variables parsing
 /* ------------------------------------------------------------------------- */
 function sek_find_pattern_match($matches) {
-    $replace_values = array(
+    $replace_values = apply_filters( 'sek_template_tags', array(
       'home_url' => 'home_url'
-    );
+    ));
 
     if ( array_key_exists( $matches[1], $replace_values ) ) {
       $dyn_content = $replace_values[$matches[1]];
