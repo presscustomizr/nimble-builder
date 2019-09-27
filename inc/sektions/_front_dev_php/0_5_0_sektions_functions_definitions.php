@@ -1660,7 +1660,7 @@ function sek_is_customize_previewing_a_changeset_post() {
 /* ------------------------------------------------------------------------- */
 // introduced when implementing the level tree #359
 function sek_get_module_collection() {
-    return array(
+    return apply_filters( 'sek_get_module_collection', array(
         array(
           'content-type' => 'preset_section',
           'content-id' => 'two_columns',
@@ -1807,7 +1807,7 @@ function sek_get_module_collection() {
         // ),
 
 
-    );
+    ));
 }
 
 // @return string theme name

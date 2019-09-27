@@ -28,7 +28,7 @@ function sek_register_modules_when_customizing_or_ajaxing() {
         SEK_Front_Construct::$ui_picker_modules,
         SEK_Front_Construct::$ui_level_modules,
         SEK_Front_Construct::$ui_local_global_options_modules,
-        SEK_Front_Construct::$ui_front_modules
+        SEK_Front_Construct::sek_get_front_module_collection()
     );
 
     // widgets module, menu module have been beta tested during 5 months and released in June 2019, in version 1.8.0
@@ -47,7 +47,7 @@ function sek_register_modules_when_not_customizing_and_not_ajaxing() {
     sek_populate_contextually_active_module_list();
 
     $contextually_actives = array();
-    $front_modules = array_merge( SEK_Front_Construct::$ui_front_modules, SEK_Front_Construct::$ui_front_beta_modules );
+    $front_modules = array_merge( SEK_Front_Construct::sek_get_front_module_collection(), SEK_Front_Construct::$ui_front_beta_modules );
 
     // we need to get all children when the module is a father.
     // This will be flatenized afterwards
@@ -56,7 +56,7 @@ function sek_register_modules_when_not_customizing_and_not_ajaxing() {
         // Parent module with children
         if ( array_key_exists( $module_name, $front_modules ) ) {
             // get the list of childrent, includes the parent too.
-            // @see ::$ui_front_modules
+            // @see ::sek_get_front_module_collection()
             $contextually_actives[] = $front_modules[ $module_name ];
         }
         // Simple module with no children

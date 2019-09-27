@@ -138,106 +138,6 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
           'sek_global_beta_features'
         ];
 
-        public static $ui_front_modules = [
-          // FRONT MODULES
-          'czr_simple_html_module',
-
-          'czr_tiny_mce_editor_module' => array(
-            'czr_tiny_mce_editor_module',
-            'czr_tinymce_child',
-            'czr_font_child'
-          ),
-
-          'czr_image_module' => array(
-            'czr_image_module',
-            'czr_image_main_settings_child',
-            'czr_image_borders_corners_child'
-          ),
-
-          //'czr_featured_pages_module',
-          'czr_heading_module'  => array(
-            'czr_heading_module',
-            'czr_heading_child',
-            'czr_heading_spacing_child',
-            'czr_font_child'
-          ),
-
-          'czr_spacer_module',
-          'czr_divider_module',
-
-          'czr_icon_module' => array(
-            'czr_icon_module',
-            'czr_icon_settings_child',
-            'czr_icon_spacing_border_child',
-          ),
-
-
-          'czr_map_module',
-
-          'czr_quote_module' => array(
-            'czr_quote_module',
-            'czr_quote_quote_child',
-            'czr_quote_cite_child',
-            'czr_quote_design_child',
-          ),
-
-          'czr_button_module' => array(
-            'czr_button_module',
-            'czr_btn_content_child',
-            'czr_btn_design_child',
-            'czr_font_child'
-          ),
-
-          // simple form father + children
-          'czr_simple_form_module' => array(
-            'czr_simple_form_module',
-            'czr_simple_form_fields_child',
-            'czr_simple_form_button_child',
-            'czr_simple_form_design_child',
-            'czr_simple_form_fonts_child',
-            'czr_simple_form_submission_child'
-          ),
-
-          'czr_post_grid_module' => array(
-            'czr_post_grid_module',
-            'czr_post_grid_main_child',
-            'czr_post_grid_thumb_child',
-            'czr_post_grid_metas_child',
-            'czr_post_grid_fonts_child'
-          ),
-
-          // widgets module, menu module have been beta tested during 5 months and released in June 2019, in version 1.8.0
-          'czr_menu_module' => array(
-            'czr_menu_module',
-            'czr_menu_content_child',
-            'czr_menu_mobile_options',
-            'czr_font_child'
-          ),
-          //'czr_menu_design_child',
-
-          'czr_widget_area_module',
-
-          'czr_social_icons_module' => array(
-            'czr_social_icons_module',
-            'czr_social_icons_settings_child',
-            'czr_social_icons_style_child'
-          ),
-
-          'czr_img_slider_module' => array(
-            'czr_img_slider_module',
-            'czr_img_slider_collection_child',
-            'czr_img_slider_opts_child'
-          ),
-
-          'czr_accordion_module' => array(
-            'czr_accordion_module',
-            'czr_accordion_collection_child',
-            'czr_accordion_opts_child'
-          ),
-
-          'czr_shortcode_module',
-        ];
-
         // Is merged with front module when sek_is_header_footer_enabled() === true
         // @see sek_register_modules_when_customizing_or_ajaxing
         // and sek_register_modules_when_not_customizing_and_not_ajaxing
@@ -300,6 +200,110 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
                 register_sidebar( $args );
             }
         }
+
+        // Invoked @'after_setup_theme'
+        static function sek_get_front_module_collection() {
+            return apply_filters( 'sek_get_front_module_collection', [
+              // FRONT MODULES
+              'czr_simple_html_module',
+
+              'czr_tiny_mce_editor_module' => array(
+                'czr_tiny_mce_editor_module',
+                'czr_tinymce_child',
+                'czr_font_child'
+              ),
+
+              'czr_image_module' => array(
+                'czr_image_module',
+                'czr_image_main_settings_child',
+                'czr_image_borders_corners_child'
+              ),
+
+              //'czr_featured_pages_module',
+              'czr_heading_module'  => array(
+                'czr_heading_module',
+                'czr_heading_child',
+                'czr_heading_spacing_child',
+                'czr_font_child'
+              ),
+
+              'czr_spacer_module',
+              'czr_divider_module',
+
+              'czr_icon_module' => array(
+                'czr_icon_module',
+                'czr_icon_settings_child',
+                'czr_icon_spacing_border_child',
+              ),
+
+
+              'czr_map_module',
+
+              'czr_quote_module' => array(
+                'czr_quote_module',
+                'czr_quote_quote_child',
+                'czr_quote_cite_child',
+                'czr_quote_design_child',
+              ),
+
+              'czr_button_module' => array(
+                'czr_button_module',
+                'czr_btn_content_child',
+                'czr_btn_design_child',
+                'czr_font_child'
+              ),
+
+              // simple form father + children
+              'czr_simple_form_module' => array(
+                'czr_simple_form_module',
+                'czr_simple_form_fields_child',
+                'czr_simple_form_button_child',
+                'czr_simple_form_design_child',
+                'czr_simple_form_fonts_child',
+                'czr_simple_form_submission_child'
+              ),
+
+              'czr_post_grid_module' => array(
+                'czr_post_grid_module',
+                'czr_post_grid_main_child',
+                'czr_post_grid_thumb_child',
+                'czr_post_grid_metas_child',
+                'czr_post_grid_fonts_child'
+              ),
+
+              // widgets module, menu module have been beta tested during 5 months and released in June 2019, in version 1.8.0
+              'czr_menu_module' => array(
+                'czr_menu_module',
+                'czr_menu_content_child',
+                'czr_menu_mobile_options',
+                'czr_font_child'
+              ),
+              //'czr_menu_design_child',
+
+              'czr_widget_area_module',
+
+              'czr_social_icons_module' => array(
+                'czr_social_icons_module',
+                'czr_social_icons_settings_child',
+                'czr_social_icons_style_child'
+              ),
+
+              'czr_img_slider_module' => array(
+                'czr_img_slider_module',
+                'czr_img_slider_collection_child',
+                'czr_img_slider_opts_child'
+              ),
+
+              'czr_accordion_module' => array(
+                'czr_accordion_module',
+                'czr_accordion_collection_child',
+                'czr_accordion_opts_child'
+              ),
+
+              'czr_shortcode_module',
+            ]);
+        }
+
     }//class
 endif;
 ?>
