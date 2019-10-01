@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.3
-Stable tag: 1.8.21-beta
+Stable tag: 1.9.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,14 +120,17 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.8.21 =
-Added text options, like font size, color, font family, to sections. Added a set of text options to the HTML module.
+= 1.9.0 =
+Added text options, like font size, color, font family, to sections. Added a set of text options to the HTML module. Nimble Builder api has been improved for developers, allowing them to add module from a theme or a plugin, and allowing custom template tags like {template_tag}.
 
 == Changelog ==
-= 1.8.21 : September 26th 2019 =
+= 1.9.0 : October 1st 2019 =
 * fixed : [WooCommerce] possible js error at checkout when using credit card payment
+* improved : Nimble edit button style for post and page admin screens
 * added : text options, like font size, color, font family, to sections.
 * added : a set of text options to the HTML module
+* added : template tags => implement a way to add custom template tags
+* added : filters allowing developers to add a module from a theme or a plugin
 
 = 1.8.20 : September 6th 2019 =
 * added a new option to export / import global sections like header-footer.
