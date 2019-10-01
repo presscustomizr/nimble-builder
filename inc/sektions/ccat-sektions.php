@@ -19049,7 +19049,14 @@ class Sek_Mailer {
         $allow_html     = true;
 
         $sender_email   = $this->form->get_field('nimble_email')->get_input()->get_value();
-        $sender_name    = sprintf( '%1$s', $this->form->get_field('nimble_name')->get_input()->get_value() );
+
+        // Define a default sender name + make sure the field exists
+        // fixes https://github.com/presscustomizr/nimble-builder/issues/513
+        $sender_name    = __('Someone', 'text_doma');
+        if ( array_key_exists( 'nimble_name', $submission_options ) ) {
+            $sender_name    = sprintf( '%1$s', $this->form->get_field('nimble_name')->get_input()->get_value() );
+        }
+
         $sender_body_message = null === $this->form->get_field('nimble_message') ? '' : $this->form->get_field('nimble_message')->get_input()->get_value();
 
         if ( array_key_exists( 'recipients', $submission_options ) ) {
