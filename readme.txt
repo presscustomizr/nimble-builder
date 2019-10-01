@@ -121,11 +121,13 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 
 == Upgrade Notice ==
 = 1.9.0 =
-Added text options, like font size, color, font family, to sections. Added a set of text options to the HTML module. Nimble Builder api has been improved for developers, allowing them to add module from a theme or a plugin, and allowing custom template tags like {template_tag}.
+Fixed a php error in the form module, occuring when the form only has the email field. Fixed a possible error at checkout when using credit card payment in WooCommerce. Added text options, like font size, color, font family, to sections. Added a set of text options to the HTML module. Nimble Builder api has been improved for developers, allowing them to add module from a theme or a plugin, and allowing custom template tags like {template_tag}.
 
 == Changelog ==
 = 1.9.0 : October 1st 2019 =
 * fixed : [WooCommerce] possible js error at checkout when using credit card payment
+* fixed : When switching device => always focus the preview on the currently edited section
+* fixed : [Form module] submitting a form which only has the email field produces a fatal PHP error
 * improved : Nimble edit button style for post and page admin screens
 * improved : when switching device during customization => always focus the preview on the currently edited section
 * added : text options, like font size, color, font family, to sections.
