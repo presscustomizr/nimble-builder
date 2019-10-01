@@ -127,6 +127,7 @@ Added text options, like font size, color, font family, to sections. Added a set
 = 1.9.0 : October 1st 2019 =
 * fixed : [WooCommerce] possible js error at checkout when using credit card payment
 * improved : Nimble edit button style for post and page admin screens
+* improved : when switching device during customization => always focus the preview on the currently edited section
 * added : text options, like font size, color, font family, to sections.
 * added : a set of text options to the HTML module
 * added : template tags => implement a way to add custom template tags

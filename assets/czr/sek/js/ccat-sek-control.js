@@ -7796,6 +7796,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.errare( 'maybeSetupDeviceSwitcherForInput => error when setting the previewed device', er );
                         }
                         input.previewedDevice( device );
+                        var sectionIdToBeFocusedOn;
+
+                        // focus on the parent section
+                        // only when really clicked (not triggered)
+                        // fixes https://github.com/presscustomizr/nimble-builder/issues/512
+                        if ( _.isUndefined( evt.isTrigger ) && input.module && input.module.control && input.module.control.params.section ) {
+                              sectionIdToBeFocusedOn = input.module.control.params.section;
+                              _.delay( function() {
+                                    api.previewer.send('sek-animate-to-level', { id : sectionIdToBeFocusedOn });
+                              }, 300 );
+                        }
+
+
                   };
                   // react on device click
                   input.container.on( 'click', '[data-sek-device]', syncWithPreviewedDevice );
