@@ -1430,6 +1430,10 @@ button.sek-btn,
   color: #ffffff;
 }
 
+[data-sek-module-type="czr_button_module"] .sek-module-inner .sek-btn:focus, [data-sek-module-type="czr_button_module"] .sek-module-inner .sek-btn:hover {
+  text-decoration: none;
+}
+
 .sek-btn-inner {
   display: -ms-flexbox;
   display: flex;
@@ -2457,5 +2461,19 @@ body .sek-module-inner h1:before, body .sek-module-inner h2:before, body .sek-mo
 [data-sek-level="location"] [data-sek-level] {
   transition: 0s linear;
   transition-property: background-position;
+}
+
+.sek-module .sek-module-inner .alx-tab.thumbs-enabled > li {
+  padding-left: 94px;
+}
+
+.sek-module .sek-module-inner .widget_hu_tabs ul,
+.sek-module .sek-module-inner .widget_hu_tabs ol {
+  margin-left: 0;
+  margin-bottom: 0;
+}
+
+.sek-module .sek-module-inner .widget_hu_tabs .alx-tabs-nav {
+  margin-bottom: 10px;
 }
 /*# sourceMappingURL=sek-base-rtl.css.map */

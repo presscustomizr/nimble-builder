@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.3
-Stable tag: 1.9.0
+Stable tag: 1.9.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,14 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.9.0 =
-Fixed a php error in the form module, occuring when the form only has the email field. Fixed a possible error at checkout when using credit card payment in WooCommerce. Added text options, like font size, color, font family, to sections. Added a set of text options to the HTML module. Nimble Builder api has been improved for developers, allowing them to add module from a theme or a plugin, and allowing custom template tags like {template_tag}.
+= 1.9.1 =
+Improved compatibility with the Hueman Dynamic tabs widget of Hueman theme. Improved button module style.
 
 == Changelog ==
+= 1.9.1 : October 3rd 2019 =
+* fixed : Hueman Dynamic tabs => missing thumbnail when using Nimble Builder
+* fixed : [Button module] Icon => make sure the icon is not underlined on hover/focus
+
 = 1.9.0 : October 1st 2019 =
 * fixed : [WooCommerce] possible js error at checkout when using credit card payment
 * fixed : When switching device => always focus the preview on the currently edited section
