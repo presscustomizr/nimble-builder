@@ -224,3 +224,18 @@
   -o-transition-property: background-position;
   transition-property: background-position;
 }
+
+
+// COMPATIBILITY WITH HUEMAN THEME
+// fixes https://github.com/presscustomizr/nimble-builder/issues/511
+.sek-module .sek-module-inner .alx-tab.thumbs-enabled > li {
+    padding-left: 94px;
+}
+.sek-module .sek-module-inner .widget_hu_tabs ul,
+.sek-module .sek-module-inner .widget_hu_tabs ol {
+    margin-left: 0;
+    margin-bottom: 0;
+}
+.sek-module .sek-module-inner .widget_hu_tabs .alx-tabs-nav {
+    margin-bottom: 10px;
+}
