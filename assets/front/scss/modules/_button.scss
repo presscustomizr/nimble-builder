@@ -15,7 +15,11 @@
     }
   }
 }
-
+// more specific rule ( than the default _buttons.scss style ) to make sure there's no underline when hovering/focusing
+// fixes https://github.com/presscustomizr/nimble-builder/issues/514
+[data-sek-module-type="czr_button_module"] .sek-module-inner .sek-btn:focus, [data-sek-module-type="czr_button_module"] .sek-module-inner .sek-btn:hover {
+  text-decoration: none;
+}
 
 .#{$project-prefix}btn-inner {
     display: flex;
