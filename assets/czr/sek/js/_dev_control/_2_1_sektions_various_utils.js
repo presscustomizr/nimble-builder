@@ -939,7 +939,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               sectionIdToBeFocusedOn = input.module.control.params.section;
                               _.delay( function() {
                                     api.previewer.send('sek-animate-to-level', { id : sectionIdToBeFocusedOn });
-                              }, 300 );
+                              }, 600 );
                         }
 
 
