@@ -298,16 +298,16 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                                 'width-100'   => true,
                                 'title_width' => 'width-100'
                             ),
-                            'infinite_loop' => array(
+                            'pause_on_hover' => array(
                                 'input_type'  => 'nimblecheck',
-                                'title'       => __('Infinite loop', 'text_doma'),
+                                'title'       => __('Pause autoplay on mouse over', 'text_doma'),
                                 'default'     => true,
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20'
                             ),
-                            'pause_on_hover' => array(
+                            'infinite_loop' => array(
                                 'input_type'  => 'nimblecheck',
-                                'title'       => __('Pause autoplay on mouse over', 'text_doma'),
+                                'title'       => __('Infinite loop', 'text_doma'),
                                 'default'     => true,
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20'

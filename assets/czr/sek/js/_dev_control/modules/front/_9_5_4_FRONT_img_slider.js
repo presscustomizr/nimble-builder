@@ -501,7 +501,7 @@
                                           });
                                     break;
                                     case 'autoplay' :
-                                          _.each( [ 'autoplay_delay' ] , function(_inputId_ ) {
+                                          _.each( [ 'autoplay_delay', 'pause_on_hover' ] , function(_inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return api.CZR_Helpers.isChecked( input() );
                                                 }); } catch( er ) {
