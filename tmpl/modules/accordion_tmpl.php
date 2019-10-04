@@ -37,6 +37,10 @@ if ( ! function_exists( 'Nimble\sek_print_accordion' ) ) {
                   if ( ! skp_is_customizing() ) {
                       $item_html_content = apply_filters( 'nimble_parse_for_smart_load', $item_html_content );
                   }
+
+                  // added Oct. 2019 when revamping presscustomizr.com
+                  $item_html_content = sek_parse_template_tags( $item_html_content );
+
                   // Put them together
                   printf( '<div class="sek-accord-item" title="%1$s" data-sek-item-id="%2$s" data-sek-expanded="%5$s"><div class="sek-accord-title" role="tab" aria-controls="sek-tab-content-%2$s"><span class="sek-inner-accord-title">%3$s</span><button><span></span><span></span></button></div><div class="sek-accord-content" role="tabpanel" aria-labelledby="sek-tab-content-%2$s">%4$s</div></div>',
                       esc_html( esc_attr( $item['title_attr'] ) ),
