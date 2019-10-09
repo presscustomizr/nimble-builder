@@ -194,6 +194,10 @@
     display: grid;
     -ms-grid-columns: minmax(0,1fr);
     grid-template-columns: minmax(0,1fr);
+    // Fix for ie11. @see https://github.com/presscustomizr/nimble-builder/issues/450
+    @media all and (-ms-high-contrast:none) {
+      display: block!important;
+    }
   }
   .sek-list-layout article {
     display: -ms-grid;
@@ -203,6 +207,11 @@
     -ms-grid-rows: 1fr;
     grid-template-rows: 1fr;
     grid-column-gap: 20px;
+    // Fix for ie11. @see https://github.com/presscustomizr/nimble-builder/issues/450
+    @media all and (-ms-high-contrast:none) {
+      display: block!important;
+      padding-top: 10px;
+    }
   }
   // The following has been added automatically when autoprefixing with https://autoprefixer.github.io/
   // not sure why...
