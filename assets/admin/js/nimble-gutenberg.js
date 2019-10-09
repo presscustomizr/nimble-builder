@@ -47,7 +47,7 @@
 
         if ( _.isEmpty( _url ) ) {
             // introduced for https://github.com/presscustomizr/nimble-builder/issues/509
-            $clickedEl.addClass('sek-loading-customizer');
+            $clickedEl.addClass('sek-loading-customizer').removeClass('button-primary');
 
             // for new post, the url is empty, let's generate it server side with an ajax call
             var post_id = wp.data.select('core/editor').getCurrentPostId();
@@ -56,7 +56,7 @@
             }).done( function( resp ) {
                 _openCustomizer( resp );
             }).fail( function( resp ) {
-                $clickedEl.removeClass('sek-loading-customizer');
+                $clickedEl.removeClass('sek-loading-customizer').addClass('button-primary');
 
                 // If the ajax request fails, let's save the draft with a Nimble Builder title, and refresh the page, so the url is generated server side on next load.
                 var post_title = wp.data.select('core/editor').getEditedPostAttribute('title');

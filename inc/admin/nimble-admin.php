@@ -778,7 +778,7 @@ function sek_print_js_for_nimble_edit_btn() {
                   _url = $clickedEl.data('cust-url');
               if ( _.isEmpty( _url ) ) {
                   // introduced for https://github.com/presscustomizr/nimble-builder/issues/509
-                  $clickedEl.addClass('sek-loading-customizer');
+                  $clickedEl.addClass('sek-loading-customizer').removeClass('button-primary');
 
                   // for new post, the url is empty, let's generate it server side with an ajax call
                   var post_id = $('#post_ID').val();
@@ -788,7 +788,7 @@ function sek_print_js_for_nimble_edit_btn() {
                       //$clickedEl.removeClass('sek-loading-customizer');
                       location.href = resp;
                   }).fail( function( resp ) {
-                      $clickedEl.removeClass('sek-loading-customizer');
+                      $clickedEl.removeClass('sek-loading-customizer').addClass('button-primary');
 
                       // If the ajax request fails, let's save the draft with a Nimble Builder title, and refresh the page, so the url is generated server side on next load.
                       // var $postTitle = $('#title');
