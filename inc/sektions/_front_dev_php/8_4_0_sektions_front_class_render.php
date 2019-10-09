@@ -1101,7 +1101,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             // Make sure the post_count and found_posts are updated
             $wp_query->post_count = count($wp_query->posts);
-            $wp_query->found_posts = $wp_query->post_count > 0;
+            $wp_query->found_posts = $wp_query->post_count;
         }// sek_maybe_include_nimble_content_in_search_results
 
 
