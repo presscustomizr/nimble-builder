@@ -128,6 +128,7 @@ Improved compatibility with IE11 for the Grid module. Fixed a bug on search resu
 * fixed : [Slider module] the option "autoplay pause on hover" should not be displayed when autoplay is off
 * fixed : in a search results page, $wp_query->found_posts is always set to 1
 * fixed : [Grid module] compatibility patch for IE11 when using the list layout
+* fixed : better style for Nimble edit button (grey loading icon)
 * added : [Accordion module] implemented template tags parsing to items content
 
 = 1.9.1 : October 3rd 2019 =
