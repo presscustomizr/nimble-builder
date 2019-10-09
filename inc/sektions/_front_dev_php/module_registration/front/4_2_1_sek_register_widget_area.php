@@ -20,12 +20,12 @@ function sek_get_module_params_for_czr_widget_area_module() {
                     'default'     => 'no-link',
                     'choices'     => array(),
                     'refresh_preview' => true,// <= so that the partial refresh links are displayed
-                    'notice_after' => sprintf( __( 'Once you have added a widget area to a section, you can add and edit the WordPress widgets in it in the %1$s.', 'text_doma'),
-                        sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
+                    'html_before' => '<span class="czr-notice">' . __('This module allows you to embed any WordPress widgets in your Nimble sections.', 'text_doma') . '<br/>' . __('1) Select a widget area in the dropdown list,', 'text_doma') . '<br/>' . sprintf( __( '2) once selected an area, you can add and edit the WordPress widgets in it in the %1$s.', 'text_doma'),
+                        sprintf( '<a href="#" onclick="%1$s"><strong>%2$s</strong></a>',
                             "javascript:wp.customize.panel('widgets', function( _p_ ){ _p_.focus(); })",
                             __('widget panel', 'text_doma')
                         )
-                    ),
+                    ) . '</span><br/>'
                 )
             )
         ),
