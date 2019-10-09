@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.3
-Stable tag: 1.9.1
+Stable tag: 1.9.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,16 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.9.1 =
-Improved compatibility with the Hueman Dynamic tabs widget of Hueman theme. Improved button module style.
+= 1.9.2 =
+Improved compatibility with IE11 for the Grid module. Fixed a bug on search results page.
 
 == Changelog ==
+= 1.9.2 October 9th 2019 =
+* fixed : [Slider module] the option "autoplay pause on hover" should not be displayed when autoplay is off
+* fixed : in a search results page, $wp_query->found_posts is always set to 1
+* fixed : [Grid module] compatibility patch for IE11 when using the list layout
+* added : [Accordion module] implemented template tags parsing to items content
+
 = 1.9.1 : October 3rd 2019 =
 * fixed : Hueman Dynamic tabs => missing thumbnail when using Nimble Builder
 * fixed : [Button module] Icon => make sure the icon is not underlined on hover/focus
