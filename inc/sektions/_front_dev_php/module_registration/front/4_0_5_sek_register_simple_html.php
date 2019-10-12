@@ -18,6 +18,18 @@ function sek_get_module_params_for_czr_simple_html_module() {
                     'refresh_markup' => '.sek-module-inner'
                     //'code_type' => 'text/html' //<= use 'text/css' to instantiate the code mirror as CSS editor, which by default will be an HTML editor
                 ),
+                'h_alignment_css'        => array(
+                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
+                    'title'              => __( 'Horizontal alignment', 'text_doma' ),
+                    'default'     => array( 'desktop' => 'left' ),
+                    'refresh_markup'     => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier'     => 'h_alignment',
+                    //'css_selectors'      => '.sek-module-inner',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                    'html_before' => '<hr/><h3>' . __('ALIGNMENT') .'</h3>'
+                ),
                 'font_family_css' => array(
                     'input_type'  => 'font_picker',
                     'title'       => __('Font family', 'text_doma'),
