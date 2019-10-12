@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.3
-Stable tag: 1.9.2
+Stable tag: 1.9.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,13 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.9.2 =
-Improved compatibility with IE11 for the Grid module. Fixed a bug on search results page.
+= 1.9.3 =
+Added an horizontal alignment option to the HTML module.
 
 == Changelog ==
+= 1.9.3 October 12th 2019 =
+* added : [HTML module] an horizontal alignment option
+
 = 1.9.2 October 9th 2019 =
 * fixed : [Slider module] the option "autoplay pause on hover" should not be displayed when autoplay is off
 * fixed : in a search results page, $wp_query->found_posts is always set to 1
