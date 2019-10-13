@@ -96,6 +96,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               $( 'div[data-sek-id="' + params.cloneId + '"]' ).trigger('sek-section-added', params );
                         }
                         $( 'div[data-sek-id="' + params.apiParams.id + '"]' ).trigger('sek-section-added', params );
+
+                        // added to fix resizable not instantiated when adding column modules
+                        // @see https://github.com/presscustomizr/nimble-builder/issues/523
+                        $( 'div[data-sek-id="' + params.apiParams.location + '"]' ).trigger('sek-location-refreshed', params );
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR in sek_get_html_for_injection ? ' , _r_ );
                         $( '[data-sek-id="' + params.apiParams.id + '"]' )
