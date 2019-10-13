@@ -696,7 +696,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // Let the event bubble up to the location, and then visit all children section to maybe re-instantiate resizable
                   // @fixes https://github.com/presscustomizr/nimble-builder/issues/165
                   $('body').on(
-                        'sek-level-refreshed sek-modules-refreshed sek-columns-refreshed sek-section-added',
+                        'sek-level-refreshed sek-modules-refreshed sek-columns-refreshed sek-section-added sek-location-refreshed',
                         '[data-sek-level="location"]',
                         function( evt ) {
                               $(this).find('[data-sek-level="section"]').each( function() {
@@ -2184,6 +2184,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               $( 'div[data-sek-id="' + params.cloneId + '"]' ).trigger('sek-section-added', params );
                         }
                         $( 'div[data-sek-id="' + params.apiParams.id + '"]' ).trigger('sek-section-added', params );
+
+                        // added to fix resizable not instantiated when adding column modules
+                        // @see https://github.com/presscustomizr/nimble-builder/issues/523
+                        $( 'div[data-sek-id="' + params.apiParams.location + '"]' ).trigger('sek-location-refreshed', params );
                   }).fail( function( _r_ ) {
                         self.errare( 'ERROR in sek_get_html_for_injection ? ' , _r_ );
                         $( '[data-sek-id="' + params.apiParams.id + '"]' )
