@@ -121,21 +121,25 @@ $post_nb = $post_nb < 0 ? 0 : $post_nb;
 $post_collection = null;
 
 if ( $post_nb > 0 ) {
-  // Query featured entries
-  $post_collection = new \WP_Query(
-    array(
-      'no_found_rows'          => false,
-      'update_post_meta_cache' => false,
-      'update_post_term_cache' => false,
-      'ignore_sticky_posts'    => 1,
-      'post_status'            => 'publish',// fixes https://github.com/presscustomizr/nimble-builder/issues/466
-      'posts_per_page'         => $main_settings['post_number'],
-      //@see https://codex.wordpress.org/Class_Reference/WP_Query#Category_Parameters
-      'category_name'          => $categories_in,
-      'order'                  => $order,
-      'orderby'                => $orderby
-    )
-  );
+  $query_params = apply_filters( 'nimble_post_grid_module_query_params', [
+    'no_found_rows'          => false,
+    'update_post_meta_cache' => false,
+    'update_post_term_cache' => false,
+    'ignore_sticky_posts'    => 1,
+    'post_status'            => 'publish',// fixes https://github.com/presscustomizr/nimble-builder/issues/466
+    'posts_per_page'         => $main_settings['post_number'],
+    //@see https://codex.wordpress.org/Class_Reference/WP_Query#Category_Parameters
+    'category_name'          => $categories_in,
+    'order'                  => $order,
+    'orderby'                => $orderby
+  ], Nimble_Manager()->model );
+
+  if ( is_array( $query_params ) ) {
+    // Query featured entries
+    $post_collection = new \WP_Query($query_params);
+  } else {
+    sek_error_log('post_grid_module_tmpl => query params is invalid');
+  }
 }
 
 // Copy of WP_Query::have_post(), without do_action_ref_array( 'loop_start', array( &$this ) );
