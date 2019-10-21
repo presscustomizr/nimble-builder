@@ -19065,8 +19065,13 @@ class Sek_Mailer {
         // Define a default sender name + make sure the field exists
         // fixes https://github.com/presscustomizr/nimble-builder/issues/513
         $sender_name    = __('Someone', 'text_doma');
-        if ( array_key_exists( 'nimble_name', $submission_options ) ) {
-            $sender_name    = sprintf( '%1$s', $this->form->get_field('nimble_name')->get_input()->get_value() );
+        $sender_name_is_set = false;
+        if ( is_array( $form_composition ) && array_key_exists( 'nimble_name', $form_composition ) ) {
+            $sender_name_candidate  = sprintf( '%1$s', $this->form->get_field('nimble_name')->get_input()->get_value() );
+            if ( !empty( $sender_name_candidate ) ) {
+                $sender_name = $sender_name_candidate;
+                $sender_name_is_set = true;
+            }
         }
 
         $sender_body_message = null === $this->form->get_field('nimble_message') ? '' : $this->form->get_field('nimble_message')->get_input()->get_value();
@@ -19079,6 +19084,8 @@ class Sek_Mailer {
 
         if ( array_key_exists( 'nimble_subject' , $form_composition ) ) {
             $subject = $this->form->get_field('nimble_subject')->get_input()->get_value();
+        } else if ( $sender_name_is_set ) {
+            $subject = sprintf( __( '%1$s sent a message from %2$s', 'text_doma' ), $sender_name, get_bloginfo( 'name' ) );
         } else {
             $subject = sprintf( __( 'Someone sent a message from %1$s', 'text_doma' ), get_bloginfo( 'name' ) );
         }
