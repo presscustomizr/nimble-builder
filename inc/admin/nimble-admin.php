@@ -86,7 +86,7 @@ function sek_config_infos() {
     $return .= 'Home URL:                 ' . home_url() . "\n";
     $return .= 'Multisite:                ' . ( is_multisite() ? 'Yes' : 'No' ) . "\n";
 
-    // Browser ingos
+    // Browser infos
     $return .= "\n\n" . '------------ USER BROWSER' . "\n";
     $return .= $browser;
 
