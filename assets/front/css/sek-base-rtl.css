@@ -2394,6 +2394,13 @@ button.sek-btn,
   box-shadow: none;
 }
 
+[data-sek-module-type="czr_tiny_mce_editor_module"] .sek-module-inner a,
+[data-sek-module-type="czr_shortcode_module"] .sek-module-inner a,
+[data-sek-module-type="czr_accordion_module"] .sek-module-inner a,
+[data-sek-module-type="czr_simple_html_module"] .sek-module-inner a {
+  text-decoration: underline;
+}
+
 body .sek-module-inner h1:before, body .sek-module-inner h2:before, body .sek-module-inner h3:before, body .sek-module-inner h4:before, body .sek-module-inner h5:before, body .sek-module-inner h6:before {
   content: none;
   background: none;

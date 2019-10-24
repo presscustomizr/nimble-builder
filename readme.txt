@@ -121,11 +121,13 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 
 == Upgrade Notice ==
 = 1.9.6 =
-Added optional pagination links to the Grid module.
+Added an optional pagination links option to the Grid module. Better compatibility with Advanced Custom Fields plugin
 
 == Changelog ==
 = 1.9.6 October 24th 2019 =
-* added : [Grid module] optional pagination links. fixes #490
+* added : [Grid module] optional pagination links
+* fixed : Links underlined by default modules using text
+* fixed : ACF plugin compat => remove Nimble Builder button on field group post type.
 
 = 1.9.5 October 21st 2019 =
 * fixed : [Contact form module] bug displaying always "someone" in place of the sender name
