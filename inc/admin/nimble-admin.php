@@ -696,10 +696,23 @@ function sek_nimble_dashboard_callback_fn() {
 // *  EDIT WITH NIMBLE BUILDER
 // Introduced for https://github.com/presscustomizr/nimble-builder/issues/449
 // /* ------------------------------------------------------------------------- */
+// introduced to fix https://github.com/presscustomizr/nimble-builder/issues/528
+function sek_is_forbidden_post_type_for_nimble_edit_button( $post_type = '' ) {
+    $forbidden_post_types = apply_filters('nimble_forbidden_post_type', [
+        'acf-field-group'
+    ]);
+
+    return is_array( $forbidden_post_types ) && in_array( $post_type, $forbidden_post_types );
+}
+
 // When using classic editor
 add_action( 'edit_form_after_title', '\Nimble\sek_print_edit_with_nimble_btn_for_classic_editor' );
 // @hook 'edit_form_after_title'
 function sek_print_edit_with_nimble_btn_for_classic_editor( $post ) {
+  // introduced to fix https://github.com/presscustomizr/nimble-builder/issues/528
+  if ( is_object($post) && sek_is_forbidden_post_type_for_nimble_edit_button( $post->post_type ) )
+    return;
+
   // Void if ( 'post' != $current_screen->base ) <= only printed when editing posts, CPTs, and pages
   $current_screen = get_current_screen();
   if ( 'post' !== $current_screen->base )
@@ -756,6 +769,9 @@ function sek_print_js_for_nimble_edit_btn() {
     return;
 
   $post = get_post();
+  // introduced to fix https://github.com/presscustomizr/nimble-builder/issues/528
+  if ( is_object($post) && sek_is_forbidden_post_type_for_nimble_edit_button( $post->post_type ) )
+    return;
   // Void if user can't edit the post or can't customize
   if ( ! sek_current_user_can_edit( $post->ID ) || ! current_user_can( 'customize' ) ) {
     return;
