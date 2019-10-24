@@ -391,6 +391,14 @@
   margin-bottom: 0;
 }
 
+.sek-text-right {
+  text-align: right !important;
+}
+
+.sek-text-left {
+  text-align: left !important;
+}
+
 .sek-module-inner .sek-btn {
   display: inline-block;
   font-weight: normal;
@@ -1800,6 +1808,106 @@ button.sek-btn,
   }
 }
 
+.sek-post-navigation {
+  background-color: #f7f8f9;
+  margin-top: 20px;
+}
+
+.sek-post-navigation .sek-pagination {
+  text-align: center;
+}
+
+.sek-post-navigation .sek-pagination ul {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0;
+}
+
+.sek-post-navigation .sek-pagination .current {
+  font-weight: 600;
+}
+
+.sek-post-navigation .sek-pagination .sek-pag-list > * {
+  margin: 0 5px;
+}
+
+.sek-post-navigation .sek-pagination .sek-pag-list {
+  margin: 0 -5px;
+}
+
+.sek-post-navigation nav {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.sek-post-navigation ul.sek-czr-pager {
+  margin: 0;
+}
+
+.sek-post-navigation li {
+  display: inline-block;
+}
+
+.sek-post-navigation a {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #5A5A5A;
+}
+
+.sek-post-navigation a:hover, .sek-post-navigation a:visited {
+  color: #3b3b3b;
+}
+
+.sek-post-navigation .sek-czr-pager > li {
+  display: block;
+}
+
+.sek-post-navigation .sek-nav-dir {
+  display: block;
+}
+
+.sek-post-navigation .sek-nav-dir > a {
+  max-width: 100%;
+}
+
+.sek-post-navigation a i.arrow {
+  font-size: 0.9em;
+}
+
+.sek-post-navigation .page-numbers, .sek-post-navigation a {
+  font-family: inherit;
+  line-height: 30px;
+  height: 30px;
+  display: inline-block;
+  vertical-align: middle;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.sek-post-navigation .page-numbers {
+  font-family: inherit;
+}
+
+.sek-post-navigation .sek-meta-nav {
+  display: -ms-flexbox;
+  display: flex;
+  transition: all .2s,.6s ease;
+  opacity: .7;
+}
+
+.sek-post-navigation a:hover .sek-meta-nav {
+  opacity: 1;
+}
+
+.sek-post-navigation .sek-meta-nav-title {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+  font-size: 0.9em;
+}
+
 .sek-simple-form-wrapper input[type=text], .sek-simple-form-wrapper textarea {
   font-size: 16px;
   width: 100% !important;
@@ -2412,9 +2520,11 @@ body .sek-module-inner h1:before, body .sek-module-inner h2:before, body .sek-mo
 /* NIMBLE TEMPLATE GENERAL STYLING */
 /* <inspired by Twenty Seventeed WP theme> */
 .sek-screen-reader-text {
-  clip: rect(1px, 1px, 1px, 1px);
+  border: 0;
+  clip: rect(0, 0, 0, 0);
   height: 1px;
   overflow: hidden;
+  padding: 0;
   position: absolute !important;
   width: 1px;
   word-wrap: normal !important;

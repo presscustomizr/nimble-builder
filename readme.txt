@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.3
-Stable tag: 1.9.5
+Stable tag: 1.9.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,13 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.9.5 =
-Fixed a contact form bug displaying always "someone" in place of the sender name.
+= 1.9.6 =
+Added optional pagination links to the Grid module.
 
 == Changelog ==
+= 1.9.6 October 24th 2019 =
+* added : [Grid module] optional pagination links. fixes #490
+
 = 1.9.5 October 21st 2019 =
 * fixed : [Contact form module] bug displaying always "someone" in place of the sender name
 * improved : [Grid module] allow developers to filter the WordPress query

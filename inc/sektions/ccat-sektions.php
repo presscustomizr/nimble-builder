@@ -10975,6 +10975,24 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'step'        => 1,
                     'width-100'   => true
                 ),//0,
+                'display_pagination' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Display pagination links', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                    //'html_before' => '<hr>'
+                ),
+                'posts_per_page'  => array(
+                    'input_type'  => 'range_simple',
+                    'title'       => __( 'Number of posts per page', 'text_doma' ),
+                    'default'     => 10,
+                    'min'         => 1,
+                    'max'         => 50,
+                    'step'        => 1,
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
+                ),//0,
                 'categories'  => array(
                     'input_type'  => 'category_picker',
                     'title'       => __( 'Filter posts by category', 'text_doma' ),

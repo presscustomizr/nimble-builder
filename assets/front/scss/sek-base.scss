@@ -150,9 +150,11 @@
 /* NIMBLE TEMPLATE GENERAL STYLING */
 /* <inspired by Twenty Seventeed WP theme> */
 .sek-screen-reader-text {
-    clip: rect(1px, 1px, 1px, 1px);
+    border: 0;
+    clip: rect(0, 0, 0, 0);
     height: 1px;
     overflow: hidden;
+    padding: 0;
     position: absolute !important;
     width: 1px;
     word-wrap: normal !important;
