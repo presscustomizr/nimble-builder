@@ -418,3 +418,104 @@
     // }
   }
 }
+
+
+// PAGINATION LINKS
+// added for https://github.com/presscustomizr/nimble-builder/issues/490
+.sek-post-navigation {
+  background-color: #f7f8f9;
+  margin-top: 20px;
+  .sek-pagination {
+    text-align: center;
+    ul {
+      display: inline-block;
+      vertical-align:
+      middle;
+      margin: 0
+    }
+
+    // &.sek-post-pagination {
+    //   @extend .small;
+    // }
+
+    .current { font-weight: 600;}
+
+    .sek-pag-list > * {
+      margin: 0 5px;
+    }
+    .sek-pag-list {
+      margin: 0 -5px;
+    }
+  }
+  nav {
+    padding-top: 20px;;
+    padding-bottom: 20px;;
+  }
+  ul.sek-czr-pager {
+    margin: 0;
+  }
+  li {
+    display: inline-block;
+  }
+  a {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #5A5A5A;
+    &:hover, &:visited{
+      color: #3b3b3b;
+    }
+  }
+  .sek-czr-pager > li {
+    display: block;
+  }
+  .sek-nav-dir {
+    display: block;
+    > a {
+      max-width: 100%;
+    }
+  }
+  a i.arrow {
+    font-size: 0.9em;
+  }
+  .page-numbers, a {
+    font-family: inherit;
+    line-height: 30px;
+    height: 30px;
+    display: inline-block;
+    vertical-align: middle;
+    transition: all 0.3s ease;
+    position: relative;
+    // @extend .demi-small;
+    // @extend .caps;
+    // @extend .letter-spacing-2;
+  }
+  .page-numbers {
+    font-family: inherit;
+  }
+  //.post-prev a {
+  //  left: $base-line-height;
+  //}
+  //.post-next a {
+  //  right: $base-line-height;
+  //}
+  .sek-meta-nav {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    transition: all .2s,.6s ease;
+    opacity: .7;
+  }
+  a:hover {
+    .sek-meta-nav {
+      opacity: 1;
+    }
+  }
+  .sek-meta-nav-title {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+    font-size: 0.9em;
+  }
+}
