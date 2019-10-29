@@ -21,7 +21,7 @@ function sek_get_module_params_for_czr_special_img_module() {
         ),
         // 'sanitize_callback' => '\Nimble\czr_special_img_module_sanitize_validate',
         // 'validate_callback' => '\Nimble\czr_special_img_module_sanitize_validate',
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/special_img_module_tmpl.php"
+        'render_tmpl_path' => "special_img_module_tmpl.php"
     );
 }
 

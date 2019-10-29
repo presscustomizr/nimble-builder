@@ -30,7 +30,7 @@ function sek_get_module_params_for_czr_quote_module() {
             )
         ),
         'css_selectors' => array( '.sek-module-inner' ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/quote_module_tmpl.php",
+        'render_tmpl_path' => "quote_module_tmpl.php",
         'front_assets' => array(
               'czr-font-awesome' => array(
                   'type' => 'css',

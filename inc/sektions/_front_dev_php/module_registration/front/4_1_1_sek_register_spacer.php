@@ -31,7 +31,7 @@ function sek_get_module_params_for_czr_spacer_module() {
                 ),
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/spacer_module_tmpl.php",
+        'render_tmpl_path' => "spacer_module_tmpl.php",
     );
 }
 ?>

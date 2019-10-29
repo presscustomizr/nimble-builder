@@ -14,7 +14,7 @@ function sek_get_module_params_for_czr_post_grid_module() {
             'grid_metas'  => 'czr_post_grid_metas_child',
             'grid_fonts'  => 'czr_post_grid_fonts_child',
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/post_grid_module_tmpl.php"
+        'render_tmpl_path' => "post_grid_module_tmpl.php"
     );
 }
 

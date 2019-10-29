@@ -38,7 +38,7 @@ function sek_get_module_params_for_czr_menu_module() {
             // )
         ),
         'css_selectors' => array( '.sek-menu-module > li > a' ),//<=@see tmpl/modules/menu_module_tmpl.php
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/menu_module_tmpl.php"
+        'render_tmpl_path' => "menu_module_tmpl.php"
     );
 }
 

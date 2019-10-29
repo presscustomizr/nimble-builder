@@ -48,7 +48,7 @@ function sek_get_module_params_for_czr_simple_form_module() {
             )
         ),
         'css_selectors' => array( '.sek-module-inner' ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/simple_form_module_tmpl.php",
+        'render_tmpl_path' => "simple_form_module_tmpl.php",
     );
 }
 

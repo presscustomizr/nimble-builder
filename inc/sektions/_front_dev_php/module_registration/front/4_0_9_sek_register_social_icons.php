@@ -23,7 +23,7 @@ function sek_get_module_params_for_czr_social_icons_module() {
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '.sek-social-icons-wrapper' ),//array( '.sek-icon i' ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/social_icons_tmpl.php",
+        'render_tmpl_path' => "social_icons_tmpl.php",
         'front_assets' => array(
               'czr-font-awesome' => array(
                   'type' => 'css',

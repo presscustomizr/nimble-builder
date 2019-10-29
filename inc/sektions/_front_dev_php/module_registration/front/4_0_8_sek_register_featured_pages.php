@@ -86,7 +86,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                 )
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/featured_pages_module_tmpl.php",
+        'render_tmpl_path' => "featured_pages_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     );
 }

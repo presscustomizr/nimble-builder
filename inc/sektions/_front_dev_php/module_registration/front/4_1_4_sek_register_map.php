@@ -60,7 +60,7 @@ function sek_get_module_params_for_czr_map_module() {
                 )
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/map_module_tmpl.php",
+        'render_tmpl_path' => "map_module_tmpl.php",
     );
 }
 ?>

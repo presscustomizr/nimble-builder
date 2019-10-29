@@ -22,7 +22,7 @@ function sek_get_module_params_for_czr_image_module() {
         ),
         // 'sanitize_callback' => '\Nimble\czr_image_module_sanitize_validate',
         // 'validate_callback' => '\Nimble\czr_image_module_sanitize_validate',
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/image_module_tmpl.php",
+        'render_tmpl_path' => "image_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     );
 }

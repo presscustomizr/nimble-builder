@@ -28,7 +28,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
             '.sek-module-inner a',
             '.sek-module-inner li'
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/tinymce_editor_module_tmpl.php",
+        'render_tmpl_path' => "tinymce_editor_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     );
 }

@@ -29,7 +29,7 @@ function sek_get_module_params_for_czr_widget_area_module() {
                 )
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/widget_area_module_tmpl.php",
+        'render_tmpl_path' => "widget_area_module_tmpl.php",
     );
 }
 

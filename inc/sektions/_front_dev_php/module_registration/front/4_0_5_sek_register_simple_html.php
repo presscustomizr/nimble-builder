@@ -160,7 +160,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
                 )
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/simple_html_module_tmpl.php",
+        'render_tmpl_path' => "simple_html_module_tmpl.php",
         'placeholder_icon' => 'code'
     );
 }
