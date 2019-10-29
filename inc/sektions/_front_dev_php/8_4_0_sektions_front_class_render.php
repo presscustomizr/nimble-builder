@@ -560,24 +560,48 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $title_attribute = __('Edit module settings', 'text-domain');
                         $title_attribute = 'title="'.$title_attribute.'"';
                     }
-                    ?>
-                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s>',
-                          $id,
-                          $module_type,
-                          $this->get_level_visibility_css_class( $model ),
-                          is_null( $custom_css_classes ) ? '' : $custom_css_classes,
 
-                          $title_attribute,
-                          // add smartload + parallax attributes
-                          $this->sek_maybe_add_bg_attributes( $model ),
-                          is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+                    // SETUP MODULE TEMPLATE PATH
+                    // introduced for #532, october 2019
+                    // Default tmpl path looks like : NIMBLE_BASE_PATH . "/tmpl/modules/image_module_tmpl.php",
+                    $template_name = sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' );
+                    $template_name = ltrim( $template_name, '/' );
+                    $template_path = $this->sek_get_templates_dir() . "/modules/{$template_name}";
 
-                          $this->sek_maybe_print_preview_level_guid_html() //<= added for #494
-                        );?>
-                            <div class="sek-module-inner">
-                              <?php $this->sek_print_module_tmpl( $model ); ?>
-                            </div>
-                      </div><?php //data-sek-level="module" ?>
+                    $overriden_template_path = $this->sek_maybe_get_overriden_template_path_for_module( $template_name );
+                    $is_module_template_overriden = false;
+                    if ( !empty( $overriden_template_path ) ) {
+                        $template_path = $overriden_template_path;
+                        $is_module_template_overriden = true;
+                    }
+
+                    $render_tmpl_path = apply_filters( 'nimble_module_tmpl_path', $template_path, $module_type );
+
+                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s %9$s>',
+                        $id,
+                        $module_type,
+                        $this->get_level_visibility_css_class( $model ),
+                        is_null( $custom_css_classes ) ? '' : $custom_css_classes,
+
+                        $title_attribute,
+                        // add smartload + parallax attributes
+                        $this->sek_maybe_add_bg_attributes( $model ),
+                        is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+
+                        $this->sek_maybe_print_preview_level_guid_html(), //<= added for #494
+                        $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': ''// <= added for #532
+                      );
+                      ?>
+                        <div class="sek-module-inner">
+                          <?php
+                            if ( !empty( $render_tmpl_path ) ) {
+                                load_template( $render_tmpl_path, false );
+                            } else {
+                                error_log( __FUNCTION__ . ' => no template found for module type ' . $module_type  );
+                            }
+                          ?>
+                        </div>
+                    </div><?php //data-sek-level="module" ?>
                     <?php
                 break;
 
@@ -622,41 +646,66 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         }
 
 
+        // TEMPLATES PATH
+        // added for #532, october 2019
+        /**
+         * Returns the path to the NIMBLE templates directory
+         * inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
+         */
+        function sek_get_templates_dir() {
+          return NIMBLE_BASE_PATH . "/tmpl";
+        }
 
+        // added for #532, october 2019
+        /* Returns the template directory name.
+         * inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
+        */
+        function sek_get_theme_template_dir_name() {
+          return trailingslashit( apply_filters( 'nimble_templates_dir', 'nimble_templates' ) );
+        }
 
+        // added for #532, october 2019
+        /**
+         * Returns a list of paths to check for template locations
+         * inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
+         */
+        function sek_get_theme_template_paths() {
 
+          $template_dir = $this->sek_get_theme_template_dir_name();
+
+          $file_paths = array(
+            1 => trailingslashit( get_stylesheet_directory() ) . $template_dir,
+            10 => trailingslashit( get_template_directory() ) . $template_dir
+          );
+
+          $file_paths = apply_filters( 'nimble_template_paths', $file_paths );
+
+          // sort the file paths based on priority
+          ksort( $file_paths, SORT_NUMERIC );
+
+          return array_map( 'trailingslashit', $file_paths );
+        }
 
 
 
         /* MODULE AND PLACEHOLDER */
-        // Fires the render callback of the module
-        // The placeholder(s) rendering is delegated to each module template
-        private function sek_print_module_tmpl( $model ) {
-            if ( ! is_array( $model ) ) {
-                error_log( __FUNCTION__ . ' => $model param should be an array' );
-                return;
-            }
-            if ( ! array_key_exists( 'module_type', $model ) ) {
-                error_log( __FUNCTION__ . ' => a module type must be provided' );
-                return;
-            }
-            $module_type = $model['module_type'];
-            $render_tmpl_path = apply_filters( 'nimble_module_tmpl_path', sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' ), $module_type );
-            if ( !empty( $render_tmpl_path ) ) {
-                load_template( $render_tmpl_path, false );
-            } else {
-                error_log( __FUNCTION__ . ' => no template found for module type ' . $module_type  );
+        // module templates can be overriden from a child theme when located in nimble_templates/modules/{template_name}.php
+        // for example /wp-content/themes/twenty-nineteen-child/nimble_templates/modules/image_module_tmpl.php
+        // added for #532, october 2019
+        private function sek_maybe_get_overriden_template_path_for_module( $template_name = '') {
+            if ( empty( $template_name ) )
+              return;
+            $overriden_template_path = '';
+            // try locating this template file by looping through the template paths
+            // inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
+            foreach( $this->sek_get_theme_template_paths() as $path_candidate ) {
+              if( file_exists( $path_candidate . 'modules/' . $template_name ) ) {
+                $overriden_template_path = $path_candidate . 'modules/' . $template_name;
+                break;
+              }
             }
 
-            //$placeholder_icon = sek_get_registered_module_type_property( $module_type, 'placeholder_icon' );
-
-            // if ( is_string( $render_callback ) && function_exists( $render_callback ) ) {
-            //     call_user_func_array( $render_callback, array( $model ) );
-            // } else {
-            //     error_log( __FUNCTION__ . ' => not render_callback defined for ' . $model['module_type'] );
-            //     return;
-            // }
-
+            return $overriden_template_path;
         }
 
 
