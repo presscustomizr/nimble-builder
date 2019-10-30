@@ -566,13 +566,15 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     // Default tmpl path looks like : NIMBLE_BASE_PATH . "/tmpl/modules/image_module_tmpl.php",
                     $template_name = sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' );
                     $template_name = ltrim( $template_name, '/' );
-                    $template_path = $this->sek_get_templates_dir() . "/modules/{$template_name}";
 
+                    $template_path = '';
                     $overriden_template_path = $this->sek_maybe_get_overriden_template_path_for_module( $template_name );
                     $is_module_template_overriden = false;
                     if ( !empty( $overriden_template_path ) ) {
                         $template_path = $overriden_template_path;
                         $is_module_template_overriden = true;
+                    } else {
+                        $template_path = sek_get_templates_dir() . "/modules/{$template_name}";
                     }
 
                     $render_tmpl_path = apply_filters( 'nimble_module_tmpl_path', $template_path, $module_type );
@@ -646,45 +648,6 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         }
 
 
-        // TEMPLATES PATH
-        // added for #532, october 2019
-        /**
-         * Returns the path to the NIMBLE templates directory
-         * inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
-         */
-        function sek_get_templates_dir() {
-          return NIMBLE_BASE_PATH . "/tmpl";
-        }
-
-        // added for #532, october 2019
-        /* Returns the template directory name.
-         * inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
-        */
-        function sek_get_theme_template_dir_name() {
-          return trailingslashit( apply_filters( 'nimble_templates_dir', 'nimble_templates' ) );
-        }
-
-        // added for #532, october 2019
-        /**
-         * Returns a list of paths to check for template locations
-         * inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
-         */
-        function sek_get_theme_template_paths() {
-
-          $template_dir = $this->sek_get_theme_template_dir_name();
-
-          $file_paths = array(
-            1 => trailingslashit( get_stylesheet_directory() ) . $template_dir,
-            10 => trailingslashit( get_template_directory() ) . $template_dir
-          );
-
-          $file_paths = apply_filters( 'nimble_template_paths', $file_paths );
-
-          // sort the file paths based on priority
-          ksort( $file_paths, SORT_NUMERIC );
-
-          return array_map( 'trailingslashit', $file_paths );
-        }
 
 
 
@@ -698,7 +661,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $overriden_template_path = '';
             // try locating this template file by looping through the template paths
             // inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
-            foreach( $this->sek_get_theme_template_paths() as $path_candidate ) {
+            foreach( sek_get_theme_template_base_paths() as $path_candidate ) {
               if( file_exists( $path_candidate . 'modules/' . $template_name ) ) {
                 $overriden_template_path = $path_candidate . 'modules/' . $template_name;
                 break;
