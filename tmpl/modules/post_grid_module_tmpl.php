@@ -10,12 +10,6 @@ $metas_settings = $value['grid_metas'];
 $thumb_settings = $value['grid_thumb'];
 
 
-
-
-
-
-
-
 /**
  * The template for displaying the pagination links
  */
@@ -84,13 +78,6 @@ if ( ! function_exists( 'Nimble\sek_render_post_navigation') ) {
     <?php endif;
   }
 }//sek_render_post_navigation
-
-
-
-
-
-
-
 
 
 
@@ -204,12 +191,40 @@ if ( ! function_exists( 'Nimble\sek_pg_get_excerpt_length') ) {
   }
 }
 
-$categories_in = '';
-if ( is_array( $main_settings['categories'] ) ) {
-    // https://codex.wordpress.org/Class_Reference/WP_Query#Category_Parameters
-    $glue = true === sek_booleanize_checkbox_val( $main_settings['must_have_all_cats'] ) ? '+':',';
-    $categories_in = implode( $glue, $main_settings['categories'] );
+$user_selected_cat_slugs = $main_settings['categories'];
+$must_have_all_cats = sek_booleanize_checkbox_val( $main_settings['must_have_all_cats'] );
+
+// October 2019
+// To solve the problem of children cats being displayed when picking the parent, we introduced 'category__in' Query param
+// But we need to keep the "category_name" param when user checks "must have all cats" option because 'category__in' does not allow to do a + statement
+// @see https://developer.wordpress.org/reference/classes/wp_query/#category-parameters
+$category_names = null;
+$categories_in = null;
+
+$categories_id_raw = [];
+foreach ($user_selected_cat_slugs as $cat_slug ) {
+    $cat_object = get_category_by_slug( $cat_slug );
+    if ( is_object($cat_object) ) {
+      $categories_id_raw[] = $cat_object->term_id;
+    }
 }
+
+if ( is_array( $user_selected_cat_slugs ) ) {
+  if ( count( $user_selected_cat_slugs ) > 1 ) {
+    if ( $must_have_all_cats ) {
+      // https://codex.wordpress.org/Class_Reference/WP_Query#Category_Parameters
+      $category_names = implode( '+', $user_selected_cat_slugs );
+    } else {
+      $categories_in = $categories_id_raw;
+    }
+  } else {
+    // https://codex.wordpress.org/Class_Reference/WP_Query#Category_Parameters
+    $categories_in = $categories_id_raw;
+  }
+}//is_array( $main_settings['categories'] )
+
+
+
 $order = 'DESC';
 $orderby = 'title';
 
@@ -232,7 +247,8 @@ $query_params = $default_query_params = [
   'post_status'            => 'publish',// fixes https://github.com/presscustomizr/nimble-builder/issues/466
   'posts_per_page'         => $post_nb,
   //@see https://codex.wordpress.org/Class_Reference/WP_Query#Category_Parameters
-  'category_name'          => $categories_in,
+  'category_name'          => $category_names,
+  'category__in'           => $categories_in,
   'order'                  => $order,
   'orderby'                => $orderby
 ];
