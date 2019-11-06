@@ -1,4 +1,5 @@
 <?php
+/* Developers : you can override this template from a theme with a file that has this path : 'nimble_templates/page-templates/nimble_template.php' */
 namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) {
   exit;
