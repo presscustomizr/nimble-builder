@@ -892,17 +892,20 @@ function sek_get_locale_template(){
     $local_template_data = sek_get_local_option_value( 'template' );
     if ( ! empty( $local_template_data ) && ! empty( $local_template_data['local_template'] ) && 'default' !== $local_template_data['local_template'] ) {
         $template_file_name = $local_template_data['local_template'];
-        $template_file_name = $template_file_name . '.php';
+        $template_file_name_with_php_extension = $template_file_name . '.php';
 
+        // Set the default template_path first
+        $template_path = sek_get_templates_dir() . "/page-templates/{$template_file_name_with_php_extension}";
+        // Make this filtrable
+        // (this filter is used in Hueman theme to assign a specific template)
+        $template_path = apply_filters( 'nimble_get_locale_template_path', $template_path, $template_file_name );
+
+        // Use an override if any
         // Default page tmpl path looks like : NIMBLE_BASE_PATH . "/tmpl/page-template/nimble_template.php",
-        $overriden_template_path = sek_maybe_get_overriden_local_template_path( $template_file_name );
+        $overriden_template_path = sek_maybe_get_overriden_local_template_path( $template_file_name_with_php_extension );
         if ( !empty( $overriden_template_path ) ) {
             $template_path = $overriden_template_path;
-        } else {
-            $template_path = sek_get_templates_dir() . "/page-templates/{$template_file_name}";
         }
-
-        $template_path = apply_filters( 'nimble_get_locale_template_path', $template_path, $template_file_name );
 
         if ( ! file_exists( $template_path ) ) {
             sek_error_log( __FUNCTION__ .' the custom template does not exist', $template_path );
