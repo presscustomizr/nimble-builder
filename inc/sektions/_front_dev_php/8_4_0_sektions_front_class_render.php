@@ -567,17 +567,20 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $template_name = sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' );
                     $template_name = ltrim( $template_name, '/' );
 
-                    $template_path = '';
+                    // first define the default template path
+                    $template_path = sek_get_templates_dir() . "/modules/{$template_name}";
+                    // make this filtrable
+                    $render_tmpl_path = apply_filters( 'nimble_module_tmpl_path', $template_path, $module_type );
+
+                    // Then check if there's an override
                     $overriden_template_path = $this->sek_maybe_get_overriden_template_path_for_module( $template_name );
+
                     $is_module_template_overriden = false;
                     if ( !empty( $overriden_template_path ) ) {
-                        $template_path = $overriden_template_path;
+                        $render_tmpl_path = $overriden_template_path;
                         $is_module_template_overriden = true;
-                    } else {
-                        $template_path = sek_get_templates_dir() . "/modules/{$template_name}";
                     }
 
-                    $render_tmpl_path = apply_filters( 'nimble_module_tmpl_path', $template_path, $module_type );
 
                     printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s %9$s>',
                         $id,
