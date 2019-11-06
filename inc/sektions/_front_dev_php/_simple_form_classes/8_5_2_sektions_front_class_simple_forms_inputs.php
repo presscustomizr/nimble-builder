@@ -69,13 +69,13 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
             $field_name = $this->get_data('name');
             switch( $field_name ) {
                 case 'nimble_name' :
-                    $value = __('John Doe', 'text-domain');
+                    $value = '';
                 break;
                 case 'nimble_email' :
-                    $value = __('john@doe.com', 'text-domain');
+                    $value = '';
                 break;
                 case 'nimble_subject' :
-                    $value = __('An email subject', 'text-domain');
+                    $value = '';
                 break;
                 // case 'nimble_message' :
                 //     $value = __('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.', 'text-domain');
