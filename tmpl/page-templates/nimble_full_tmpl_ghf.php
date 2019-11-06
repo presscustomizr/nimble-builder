@@ -1,6 +1,6 @@
 <?php
 // DEPRECATED SINCE v1.4.0
-// Was introduced in v1.3.2 to allow user creating pages from a blank canvase, with a global header and footer.
+// Was introduced in v1.3.2 to allow user creating pages from a blank canvas, with a global header and footer.
 //
 // Since v1.4.0, header and footer are handled with a separate and more flexible set of options, globally ( site wide ) and locally ( on a by-page basis )
 //
