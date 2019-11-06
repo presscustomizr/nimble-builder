@@ -820,7 +820,67 @@ function sek_booleanize_checkbox_val( $val ) {
 }
 
 
+/* ------------------------------------------------------------------------- *
+ *   TEMPLATE OVERRIDE HELPERS
+/* ------------------------------------------------------------------------- */
+// TEMPLATES PATH
+// added for #532, october 2019
+/**
+ * Returns the path to the NIMBLE templates directory
+ * inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
+ */
+function sek_get_templates_dir() {
+  return NIMBLE_BASE_PATH . "/tmpl";
+}
 
+// added for #532, october 2019
+/* Returns the template directory name.
+ * inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
+*/
+function sek_get_theme_template_dir_name() {
+  return trailingslashit( apply_filters( 'nimble_templates_dir', 'nimble_templates' ) );
+}
+
+
+// added for #532, october 2019
+/**
+ * Returns a list of paths to check for template locations
+ * inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
+ */
+function sek_get_theme_template_base_paths() {
+
+  $template_dir = sek_get_theme_template_dir_name();
+
+  $file_paths = array(
+    1 => trailingslashit( get_stylesheet_directory() ) . $template_dir,
+    10 => trailingslashit( get_template_directory() ) . $template_dir
+  );
+
+  $file_paths = apply_filters( 'nimble_template_paths', $file_paths );
+
+  // sort the file paths based on priority
+  ksort( $file_paths, SORT_NUMERIC );
+
+  return array_map( 'trailingslashit', $file_paths );
+}
+
+
+// @return path string
+// added for #400
+function sek_maybe_get_overriden_local_template_path( $template_name = '') {
+    if ( empty( $template_name ) )
+      return;
+    $overriden_template_path = '';
+    // try locating this template file by looping through the template paths
+    // inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
+    foreach( sek_get_theme_template_base_paths() as $path_candidate ) {
+      if( file_exists( $path_candidate . 'page-templates/' . $template_name ) ) {
+        $overriden_template_path = $path_candidate . 'page-templates/' . $template_name;
+        break;
+      }
+    }
+    return $overriden_template_path;
+}
 
 
 /* ------------------------------------------------------------------------- *
@@ -828,20 +888,31 @@ function sek_booleanize_checkbox_val( $val ) {
 /* ------------------------------------------------------------------------- */
 // @return mixed null || string
 function sek_get_locale_template(){
-    $path = null;
+    $template_path = null;
     $local_template_data = sek_get_local_option_value( 'template' );
     if ( ! empty( $local_template_data ) && ! empty( $local_template_data['local_template'] ) && 'default' !== $local_template_data['local_template'] ) {
         $template_file_name = $local_template_data['local_template'];
-        $path = apply_filters( 'nimble_get_locale_template_path', NIMBLE_BASE_PATH . '/tmpl/page-templates/' . $template_file_name . '.php', $template_file_name );
-        if ( file_exists( $path ) ) {
-            $template = $path;
+        $template_file_name = $template_file_name . '.php';
+
+        // Default page tmpl path looks like : NIMBLE_BASE_PATH . "/tmpl/page-template/nimble_template.php",
+        $overriden_template_path = sek_maybe_get_overriden_local_template_path( $template_file_name );
+        if ( !empty( $overriden_template_path ) ) {
+            $template_path = $overriden_template_path;
         } else {
-            sek_error_log( __FUNCTION__ .' the custom template does not exist', $path );
-            $path = null;
+            $template_path = sek_get_templates_dir() . "/page-templates/{$template_file_name}";
+        }
+
+        $template_path = apply_filters( 'nimble_get_locale_template_path', $template_path, $template_file_name );
+
+        if ( ! file_exists( $template_path ) ) {
+            sek_error_log( __FUNCTION__ .' the custom template does not exist', $template_path );
+            $template_path = null;
         }
     }
-    return $path;
+    return $template_path;
 }
+
+
 
 
 // @param $option_name = string
@@ -1595,13 +1666,19 @@ function sek_is_nimble_widget_id( $id ) {
 /* ------------------------------------------------------------------------- */
 function sek_find_pattern_match($matches) {
     $replace_values = apply_filters( 'sek_template_tags', array(
-      'home_url' => 'home_url'
+      'home_url' => 'home_url',
+      'the_title' => 'sek_get_the_title',
+      'the_content' => 'sek_get_the_content'
     ));
 
     if ( array_key_exists( $matches[1], $replace_values ) ) {
       $dyn_content = $replace_values[$matches[1]];
-      if ( function_exists( $dyn_content ) ) {
-        return $dyn_content();//<= use call_user_func() here + handle the case when the callback is a method
+      $fn_name = $dyn_content;// <= typically not namespaced if WP core function, or function added with a filter from a child theme for example
+      $namespaced_fn_name = __NAMESPACE__ . '\\' . $dyn_content; // <= namespaced if Nimble Builder function, introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
+      if ( function_exists( $namespaced_fn_name ) ) {
+        return $namespaced_fn_name();//<= @TODO use call_user_func() here + handle the case when the callback is a method
+      } else if ( function_exists( $fn_name ) ) {
+        return $fn_name();//<= @TODO use call_user_func() here + handle the case when the callback is a method
       } else if ( is_string($dyn_content) ) {
         return $dyn_content;
       } else {
@@ -1617,6 +1694,51 @@ function sek_parse_template_tags( $val ) {
     return is_string( $val ) ? preg_replace_callback( '!\{\{\s?(\w+)\s?\}\}!', '\Nimble\sek_find_pattern_match', $val) : $val;
 }
 add_filter( 'nimble_parse_template_tags', '\Nimble\sek_parse_template_tags' );
+
+// introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
+function sek_get_the_title() {
+  if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+      $post_id = sek_get_posted_query_param_when_customizing( 'post_id' );
+      return is_int($post_id) ? get_the_title($post_id) : null;
+  } else {
+      return get_the_title();
+  }
+}
+
+// introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
+function sek_get_the_content() {
+  if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+      $post_id = sek_get_posted_query_param_when_customizing( 'post_id' );
+      $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+      if ( $is_singular && is_int($post_id) ) {
+          $post_object = get_post( $post_id );
+          return ! empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
+      }
+  } else {
+      if( is_singular() ) {
+        $post_object = get_post();
+        return ! empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
+      }
+  }
+}
+
+// introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
+// Possible params as of October 2019
+// @see inc/czr-skope/_dev/1_1_0_skop_customizer_preview_load_assets.php::
+// 'is_singular' => $wp_query->is_singular,
+// 'post_id' => get_the_ID()
+function sek_get_posted_query_param_when_customizing( $param ) {
+  if ( isset( $_POST['czr_query_params'] ) ) {
+      $query_params = json_decode( wp_unslash( $_POST['czr_query_params'] ), true );
+      if ( array_key_exists( $param, $query_params ) ) {
+          return $query_params[$param];
+      } else {
+          sek_error_log( __FUNCTION__ . ' => invalid param requested');
+          return null;
+      }
+  }
+  return null;
+}
 
 
 /* ------------------------------------------------------------------------- *
@@ -7559,7 +7681,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
                 )
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/simple_html_module_tmpl.php",
+        'render_tmpl_path' => "simple_html_module_tmpl.php",
         'placeholder_icon' => 'code'
     );
 }
@@ -7603,7 +7725,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
             '.sek-module-inner a',
             '.sek-module-inner li'
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/tinymce_editor_module_tmpl.php",
+        'render_tmpl_path' => "tinymce_editor_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     );
 }
@@ -7678,7 +7800,7 @@ function sek_get_module_params_for_czr_image_module() {
         ),
         // 'sanitize_callback' => '\Nimble\czr_image_module_sanitize_validate',
         // 'validate_callback' => '\Nimble\czr_image_module_sanitize_validate',
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/image_module_tmpl.php",
+        'render_tmpl_path' => "image_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     );
 }
@@ -8063,7 +8185,7 @@ function sek_get_module_params_for_czr_featured_pages_module() {
                 )
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/featured_pages_module_tmpl.php",
+        'render_tmpl_path' => "featured_pages_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     );
 }
@@ -8093,7 +8215,7 @@ function sek_get_module_params_for_czr_social_icons_module() {
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '.sek-social-icons-wrapper' ),//array( '.sek-icon i' ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/social_icons_tmpl.php",
+        'render_tmpl_path' => "social_icons_tmpl.php",
         'front_assets' => array(
               'czr-font-awesome' => array(
                   'type' => 'css',
@@ -8415,7 +8537,7 @@ function sek_get_module_params_for_czr_heading_module() {
         'css_selectors' => array( '.sek-module-inner > .sek-heading' ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/heading_module_tmpl.php",
+        'render_tmpl_path' => "heading_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     );
 }
@@ -8589,7 +8711,7 @@ function sek_get_module_params_for_czr_spacer_module() {
                 ),
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/spacer_module_tmpl.php",
+        'render_tmpl_path' => "spacer_module_tmpl.php",
     );
 }
 ?><?php
@@ -8686,7 +8808,7 @@ function sek_get_module_params_for_czr_divider_module() {
                 ),
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/divider_module_tmpl.php",
+        'render_tmpl_path' => "divider_module_tmpl.php",
     );
 }
 ?><?php
@@ -8716,7 +8838,7 @@ function sek_get_module_params_for_czr_icon_module() {
         // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_icon_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '.sek-icon-wrapper' ),//array( '.sek-icon i' ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/icon_module_tmpl.php",
+        'render_tmpl_path' => "icon_module_tmpl.php",
         'front_assets' => array(
               'czr-font-awesome' => array(
                   'type' => 'css',
@@ -9062,7 +9184,7 @@ function sek_get_module_params_for_czr_map_module() {
                 )
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/map_module_tmpl.php",
+        'render_tmpl_path' => "map_module_tmpl.php",
     );
 }
 ?><?php
@@ -9097,7 +9219,7 @@ function sek_get_module_params_for_czr_quote_module() {
             )
         ),
         'css_selectors' => array( '.sek-module-inner' ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/quote_module_tmpl.php",
+        'render_tmpl_path' => "quote_module_tmpl.php",
         'front_assets' => array(
               'czr-font-awesome' => array(
                   'type' => 'css',
@@ -9589,7 +9711,7 @@ function sek_get_module_params_for_czr_button_module() {
             )
         ),
         'css_selectors' => array( '.sek-module-inner .sek-btn' ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/button_module_tmpl.php"
+        'render_tmpl_path' => "button_module_tmpl.php"
     );
 }
 
@@ -9919,7 +10041,7 @@ function sek_get_module_params_for_czr_simple_form_module() {
             )
         ),
         'css_selectors' => array( '.sek-module-inner' ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/simple_form_module_tmpl.php",
+        'render_tmpl_path' => "simple_form_module_tmpl.php",
     );
 }
 
@@ -10938,7 +11060,7 @@ function sek_get_module_params_for_czr_post_grid_module() {
             'grid_metas'  => 'czr_post_grid_metas_child',
             'grid_fonts'  => 'czr_post_grid_fonts_child',
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/post_grid_module_tmpl.php"
+        'render_tmpl_path' => "post_grid_module_tmpl.php"
     );
 }
 
@@ -11991,7 +12113,7 @@ function sek_get_module_params_for_czr_menu_module() {
             // )
         ),
         'css_selectors' => array( '.sek-menu-module > li > a' ),//<=@see tmpl/modules/menu_module_tmpl.php
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/menu_module_tmpl.php"
+        'render_tmpl_path' => "menu_module_tmpl.php"
     );
 }
 
@@ -12258,7 +12380,7 @@ function sek_get_module_params_for_czr_widget_area_module() {
                 )
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/widget_area_module_tmpl.php",
+        'render_tmpl_path' => "widget_area_module_tmpl.php",
     );
 }
 
@@ -12288,7 +12410,7 @@ function sek_get_module_params_for_czr_img_slider_module() {
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '[data-sek-swiper-id]' ),//array( '.sek-icon i' ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/img_slider_tmpl.php",
+        'render_tmpl_path' => "img_slider_tmpl.php",
         // 'front_assets' => array(
         //       'czr-font-awesome' => array(
         //           'type' => 'css',
@@ -12878,7 +13000,7 @@ function sek_get_module_params_for_czr_accordion_module() {
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '[data-sek-accordion-id]' ),//array( '.sek-icon i' ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/accordion_tmpl.php",
+        'render_tmpl_path' => "accordion_tmpl.php",
         // 'front_assets' => array(
         //       'czr-font-awesome' => array(
         //           'type' => 'css',
@@ -13391,7 +13513,7 @@ function sek_get_module_params_for_czr_shortcode_module() {
                 )
             )
         ),
-        'render_tmpl_path' => NIMBLE_BASE_PATH . "/tmpl/modules/shortcode_module_tmpl.php",
+        'render_tmpl_path' => "shortcode_module_tmpl.php",
     );
 }
 ?><?php
@@ -17412,24 +17534,50 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $title_attribute = __('Edit module settings', 'text-domain');
                         $title_attribute = 'title="'.$title_attribute.'"';
                     }
-                    ?>
-                      <?php printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s>',
-                          $id,
-                          $module_type,
-                          $this->get_level_visibility_css_class( $model ),
-                          is_null( $custom_css_classes ) ? '' : $custom_css_classes,
 
-                          $title_attribute,
-                          // add smartload + parallax attributes
-                          $this->sek_maybe_add_bg_attributes( $model ),
-                          is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+                    // SETUP MODULE TEMPLATE PATH
+                    // introduced for #532, october 2019
+                    // Default tmpl path looks like : NIMBLE_BASE_PATH . "/tmpl/modules/image_module_tmpl.php",
+                    $template_name = sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' );
+                    $template_name = ltrim( $template_name, '/' );
 
-                          $this->sek_maybe_print_preview_level_guid_html() //<= added for #494
-                        );?>
-                            <div class="sek-module-inner">
-                              <?php $this->sek_print_module_tmpl( $model ); ?>
-                            </div>
-                      </div><?php //data-sek-level="module" ?>
+                    $template_path = '';
+                    $overriden_template_path = $this->sek_maybe_get_overriden_template_path_for_module( $template_name );
+                    $is_module_template_overriden = false;
+                    if ( !empty( $overriden_template_path ) ) {
+                        $template_path = $overriden_template_path;
+                        $is_module_template_overriden = true;
+                    } else {
+                        $template_path = sek_get_templates_dir() . "/modules/{$template_name}";
+                    }
+
+                    $render_tmpl_path = apply_filters( 'nimble_module_tmpl_path', $template_path, $module_type );
+
+                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s %9$s>',
+                        $id,
+                        $module_type,
+                        $this->get_level_visibility_css_class( $model ),
+                        is_null( $custom_css_classes ) ? '' : $custom_css_classes,
+
+                        $title_attribute,
+                        // add smartload + parallax attributes
+                        $this->sek_maybe_add_bg_attributes( $model ),
+                        is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+
+                        $this->sek_maybe_print_preview_level_guid_html(), //<= added for #494
+                        $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': ''// <= added for #532
+                      );
+                      ?>
+                        <div class="sek-module-inner">
+                          <?php
+                            if ( !empty( $render_tmpl_path ) ) {
+                                load_template( $render_tmpl_path, false );
+                            } else {
+                                error_log( __FUNCTION__ . ' => no template found for module type ' . $module_type  );
+                            }
+                          ?>
+                        </div>
+                    </div><?php //data-sek-level="module" ?>
                     <?php
                 break;
 
@@ -17477,38 +17625,24 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
 
-
-
-
         /* MODULE AND PLACEHOLDER */
-        // Fires the render callback of the module
-        // The placeholder(s) rendering is delegated to each module template
-        private function sek_print_module_tmpl( $model ) {
-            if ( ! is_array( $model ) ) {
-                error_log( __FUNCTION__ . ' => $model param should be an array' );
-                return;
-            }
-            if ( ! array_key_exists( 'module_type', $model ) ) {
-                error_log( __FUNCTION__ . ' => a module type must be provided' );
-                return;
-            }
-            $module_type = $model['module_type'];
-            $render_tmpl_path = apply_filters( 'nimble_module_tmpl_path', sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' ), $module_type );
-            if ( !empty( $render_tmpl_path ) ) {
-                load_template( $render_tmpl_path, false );
-            } else {
-                error_log( __FUNCTION__ . ' => no template found for module type ' . $module_type  );
+        // module templates can be overriden from a child theme when located in nimble_templates/modules/{template_name}.php
+        // for example /wp-content/themes/twenty-nineteen-child/nimble_templates/modules/image_module_tmpl.php
+        // added for #532, october 2019
+        private function sek_maybe_get_overriden_template_path_for_module( $template_name = '') {
+            if ( empty( $template_name ) )
+              return;
+            $overriden_template_path = '';
+            // try locating this template file by looping through the template paths
+            // inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
+            foreach( sek_get_theme_template_base_paths() as $path_candidate ) {
+              if( file_exists( $path_candidate . 'modules/' . $template_name ) ) {
+                $overriden_template_path = $path_candidate . 'modules/' . $template_name;
+                break;
+              }
             }
 
-            //$placeholder_icon = sek_get_registered_module_type_property( $module_type, 'placeholder_icon' );
-
-            // if ( is_string( $render_callback ) && function_exists( $render_callback ) ) {
-            //     call_user_func_array( $render_callback, array( $model ) );
-            // } else {
-            //     error_log( __FUNCTION__ . ' => not render_callback defined for ' . $model['module_type'] );
-            //     return;
-            // }
-
+            return $overriden_template_path;
         }
 
 
@@ -18748,13 +18882,13 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
             $field_name = $this->get_data('name');
             switch( $field_name ) {
                 case 'nimble_name' :
-                    $value = __('John Doe', 'text-domain');
+                    $value = '';
                 break;
                 case 'nimble_email' :
-                    $value = __('john@doe.com', 'text-domain');
+                    $value = '';
                 break;
                 case 'nimble_subject' :
-                    $value = __('An email subject', 'text-domain');
+                    $value = '';
                 break;
                 // case 'nimble_message' :
                 //     $value = __('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.', 'text-domain');

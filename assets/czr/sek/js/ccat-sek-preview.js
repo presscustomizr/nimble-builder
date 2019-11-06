@@ -2534,6 +2534,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // otherwise the preview UI can be broken
                   _query_[ 'preview-level-guid' ] = sekPreviewLocalized.previewLevelGuid;
 
+                  // introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
+                  // Those query params are used for template tags related to the WP Query.
+                  // Like "{{the_title}}" => in this case, using "get_the_title()" as callback when ajaxing with Nimble will return nothing. We need get_the_title( $post_id )
+                  // That's why those static query params are written in the preview frame, and used as ajax params that we can access server side via php $_POST.
+                  _query_.czr_query_params = JSON.stringify( _.isObject( _wpCustomizeSettings.czr_query_params ) ? _wpCustomizeSettings.czr_query_params : [] );
+
                   $.post( ajaxUrl, _query_ )
                         .done( function( _r ) {
                               // Check if the user is logged out.

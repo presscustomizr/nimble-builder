@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.2.3
-Stable tag: 1.9.6
+Stable tag: 1.9.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,18 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.9.6 =
-Added an optional pagination links option to the Grid module. Better compatibility with Advanced Custom Fields plugin
+= 1.9.7 =
+Successfully tested with WordPress v5.3 coming soon. [Grid Module] => posts belonging to children categories should not been displayed when picking the parent category alone. [Form module] => removed placeholders like "John Doe" that could be misleading when customizing. Nimble Builder developer API : introduced a way to override module and page templates from a child theme (documented on top of each templates).
 
 == Changelog ==
+= 1.9.7 November 6th 2019 =
+* fixed : [Grid Module] posts belonging to children categories should not been displayed when picking the parent category alone
+* fixed : [Form module] Placeholders like "John Doe" can be misleading because displayed only when customizing.
+* fixed : javascript compatibility issue with WP 5.3-RC3
+* added : [developer API] a way to override Nimble Builder module templates from a child theme (documented on top of each templates)
+* added : [developer API] page template => added a way to add page templates from a child theme (documented on top of each templates)
+* added : template tags allowing users to print dynamic elements of a page. First added are {{the_title}} and {{the_content}}. More will follow.
+
 = 1.9.6 October 24th 2019 =
 * added : [Grid module] optional pagination links
 * fixed : Links underlined by default modules using text

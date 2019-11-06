@@ -1444,7 +1444,7 @@ function sek_print_nimble_input_templates() {
 
             _.each( sektionsLocalizedData.moduleCollection, function( rawModData ) {
                 //normalizes the module params
-                var modData = $.extend( true, {}, rawModData ),
+                var modData = jQuery.extend( true, {}, rawModData ),
                 defaultModParams = {
                   'content-type' : 'module',
                   'content-id' : '',
@@ -1453,7 +1453,7 @@ function sek_print_nimble_input_templates() {
                   'font_icon' : '',
                   'active' : true
                 },
-                modData = $.extend( defaultModParams, modData );
+                modData = jQuery.extend( defaultModParams, modData );
 
                 if ( ! _.isEmpty( modData['icon'] ) ) {
                     icon_img_src = sektionsLocalizedData.moduleIconPath + modData['icon'];
@@ -1494,7 +1494,7 @@ function sek_print_nimble_input_templates() {
             _.each( section_collection, function( rawSecParams ) {
                 //normalizes the params
                 var section_type = 'content',
-                secParams = $.extend( true, {}, rawSecParams ),
+                secParams = jQuery.extend( true, {}, rawSecParams ),
                 defaultParams = {
                   'content-id' : '',
                   'thumb' : '',
@@ -1502,7 +1502,7 @@ function sek_print_nimble_input_templates() {
                   'section_type' : '',
                   'height': ''
                 },
-                modData = $.extend( defaultParams, secParams );
+                modData = jQuery.extend( defaultParams, secParams );
 
                 if ( ! _.isEmpty( secParams['section_type'] ) ) {
                     section_type = secParams['section_type'];
