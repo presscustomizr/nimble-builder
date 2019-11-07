@@ -17541,11 +17541,31 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     // SETUP MODULE TEMPLATE PATH
                     // introduced for #532, october 2019
                     // Default tmpl path looks like : NIMBLE_BASE_PATH . "/tmpl/modules/image_module_tmpl.php",
-                    $template_name = sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' );
-                    $template_name = ltrim( $template_name, '/' );
+                    //
+                    // Important note :
+                    // @fixes https://github.com/presscustomizr/nimble-builder/issues/537
+                    // since #532, module registered in Nimble Builder core have a render_tmpl_path property looking like 'render_tmpl_path' => "simple_html_module_tmpl.php",
+                    // But if a developer wants to register a custom module with a specific template path, it is still possible by using a full path
+                    // 1) We first check if the file exists, if it is a full path this will return TRUE and the render tmpl path will be set this way
+                    // , for example, we use a custom gif module on presscustomizr.com, for which the render_tmpl_path is a full path:
+                    // 'render_tmpl_path' => TC_BASE_CHILD . "inc/nimble-modules/modules-registration/tmpl/modules/gif_image_module_tmpl.php",
+                    // 2) then we check if there's an override
+                    // 3) finally we use the default Nimble Builder path
 
-                    // first define the default template path
-                    $template_path = sek_get_templates_dir() . "/modules/{$template_name}";
+                    // render_tmpl_path can be
+                    // 1) simple_html_module_tmpl.php <= most common case, the module is registered by Nimble Builder
+                    // 2) srv/www/pc-dev/htdocs/wp-content/themes/tc/inc/nimble-modules/modules-registration/tmpl/modules/gif_image_module_tmpl.php <= case of a custom module
+                    $template_name_or_path = sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' );
+
+                    $template_name = basename( $template_name_or_path );
+                    $template_name = ltrim( $template_name_or_path, '/' );
+
+                    if ( file_exists( $template_name_or_path ) ) {
+                        $template_path = $template_name_or_path;
+                    } else {
+                        $template_path = sek_get_templates_dir() . "/modules/{$template_name}";
+                    }
+
                     // make this filtrable
                     $render_tmpl_path = apply_filters( 'nimble_module_tmpl_path', $template_path, $module_type );
 
@@ -17576,7 +17596,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                       ?>
                         <div class="sek-module-inner">
                           <?php
-                            if ( !empty( $render_tmpl_path ) ) {
+                            if ( !empty( $render_tmpl_path ) && file_exists( $render_tmpl_path ) ) {
                                 load_template( $render_tmpl_path, false );
                             } else {
                                 error_log( __FUNCTION__ . ' => no template found for module type ' . $module_type  );
