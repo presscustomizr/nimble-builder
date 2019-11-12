@@ -599,7 +599,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         controlIsAlreadyRegistered = true;
                         // we should have only one uiCandidate with this very id
                         if ( uiCandidate.length > 1 ) {
-                              api.errare( 'generateUI => why is this control registered more than once ? => ' + uiElementId );
+                              api.errare( 'isUIControlAlreadyRegistered => why is this control registered more than once ? => ' + uiElementId );
                         }
                   }
                   return controlIsAlreadyRegistered;
