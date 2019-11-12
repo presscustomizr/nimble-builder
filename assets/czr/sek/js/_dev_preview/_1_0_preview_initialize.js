@@ -83,6 +83,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                           if ( ! isJavascriptProtocol && api.isLinkPreviewable( $(this)[0] ) ) {
                                 $(this).addClass('nimble-shift-clickable');
                                 $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', 'javascript:void(0)');
+                                // remove target="_blank" if enabled by user
+                                // @fixes issue https://github.com/presscustomizr/nimble-builder/issues/542
+                                $(this).removeAttr('target');
                                 $(this).hover( function() {
                                         $(this).attr( 'title', sekPreviewLocalized.i18n['Shift-click to visit the link']);
                                 }, function() {
