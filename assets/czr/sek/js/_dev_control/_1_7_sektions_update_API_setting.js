@@ -860,7 +860,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // }
                               case 'sek-add-content-in-new-sektion' :
                                     // get the position of the before or after section
-                                    position = 0;
+                                    var positionIndex = 0;
                                     locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
                                     if ( 'no_match' == locationCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
@@ -870,10 +870,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
                                     _.each( locationCandidate.collection, function( secModel, index ) {
                                           if ( params.before_section === secModel.id ) {
-                                                position = index;
+                                                positionIndex = index;
                                           }
                                           if ( params.after_section === secModel.id ) {
-                                                position = index + 1;
+                                                positionIndex = index + 1;
                                           }
                                     });
 
@@ -885,7 +885,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 startingModuleValue = self.getModuleStartingValue( params.content_id );
 
                                                 // insert the section in the collection at the right place
-                                                locationCandidate.collection.splice( position, 0, {
+                                                locationCandidate.collection.splice( positionIndex, 0, {
                                                       id : params.id,
                                                       level : 'section',
                                                       collection : [
@@ -916,8 +916,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 // we use a section index here to display the section in the same order as in the json
                                                 // introduced when implementing multi-section pre-build section
                                                 // @see https://github.com/presscustomizr/nimble-builder/issues/489
-                                                var _injectPresetSectionInLocationOrParentColumn = function( sectionReadyToInject, sectionIndex ) {
-                                                      sectionIndex = sectionIndex || 0;
+                                                var _injectPresetSectionInLocationOrParentColumn = function( sectionReadyToInject, positionIndex ) {
                                                       // If the preset_section is inserted in a an empty nested section, add it at the right place in the parent column of the nested section.
                                                       // Otherwise, add the preset section at the right position in the parent location of the section.
                                                       var insertedInANestedSektion = false;
@@ -939,7 +938,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       params.collection_of_preset_section_id.push( injected_section_id );
 
                                                       if ( ! insertedInANestedSektion ) {
-                                                            locationCandidate.collection.splice( position + sectionIndex, 0, {
+                                                            locationCandidate.collection.splice( positionIndex, 0, {
                                                                   id : injected_section_id,//params.id,//self.guid()
                                                                   level : 'section',
                                                                   collection : sectionReadyToInject.collection,
@@ -958,14 +957,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             // get the position of the before or after module
                                                             _.each( columnCandidate.collection, function( moduleOrSectionModel, index ) {
                                                                   if ( params.before_section === moduleOrSectionModel.id ) {
-                                                                        position = index;
+                                                                        positionIndex = index;
                                                                   }
                                                                   if ( params.after_section === moduleOrSectionModel.id ) {
-                                                                        position = index + 1;
+                                                                        positionIndex = index + 1;
                                                                   }
                                                             });
 
-                                                            columnCandidate.collection.splice( position + sectionIndex, 0, {
+                                                            columnCandidate.collection.splice( positionIndex, 0, {
                                                                   id : injected_section_id,
                                                                   is_nested : true,
                                                                   level : 'section',
@@ -991,11 +990,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                         // we use a section index here to display the section in the same order as in the json
                                                                         var sectionIndex = 0;
                                                                         _.each( maybeMultiSectionReadyToInject.collection, function( sectionReadyToInject ) {
-                                                                              _injectPresetSectionInLocationOrParentColumn( sectionReadyToInject, sectionIndex );
-                                                                              sectionIndex++;
+                                                                              _injectPresetSectionInLocationOrParentColumn( sectionReadyToInject, positionIndex );
+                                                                              positionIndex++;
                                                                         });
                                                                   } else {
-                                                                        _injectPresetSectionInLocationOrParentColumn( maybeMultiSectionReadyToInject, position );
+                                                                        _injectPresetSectionInLocationOrParentColumn( maybeMultiSectionReadyToInject, positionIndex );
                                                                   }
 
                                                                   // Used when updating the setting

@@ -755,10 +755,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           params.in_sektion = $parentSektion.data('sek-id');
                                     }
                               }
+                        }//if ( 'preset_section' === params.content_type ) {
 
-
-
-                        }
 
                         // Now the dropcase is setup, let's say it to the previewer
                         // see in control::reactToPreviewMsg() and then in control::updateAPISetting() how those actions are handled
