@@ -403,20 +403,23 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               // sniff levels and print UI
                               _sniffLevelsAndPrintUI( position );
                         } else {
-                              // Mouse didn't move recently?
-                              // => remove all UIs
-                              $('body').stop( true, true ).find('.sek-add-content-button').each( function() {
-                                    $(this).fadeOut( {
-                                          duration : 200,
-                                          complete : function() { $(this).remove(); }
+                              // when PHP constant NIMBLE_IS_PREVIEW_UI_DEBUG_MODE is true, the levels UI in the preview are not being auto removed, so we can inspect the markup and CSS
+                              if ( ! sekPreviewLocalized.isPreviewUIDebugMode ) {
+                                    // Mouse didn't move recently?
+                                    // => remove all UIs
+                                    $('body').stop( true, true ).find('.sek-add-content-button').each( function() {
+                                          $(this).fadeOut( {
+                                                duration : 200,
+                                                complete : function() { $(this).remove(); }
+                                          });
                                     });
-                              });
-                              $('body').stop( true, true ).find('[data-sek-level]').each( function() {
-                                    // preserve if the ui menu is expanded, otherwise remove
-                                    if ( $(this).children('.sek-dyn-ui-wrapper').find('.sek-is-expanded').length < 1 ) {
-                                          removeLevelUI.call( $(this) );
-                                    }
-                              });
+                                    $('body').stop( true, true ).find('[data-sek-level]').each( function() {
+                                          // preserve if the ui menu is expanded, otherwise remove
+                                          if ( $(this).children('.sek-dyn-ui-wrapper').find('.sek-is-expanded').length < 1 ) {
+                                                removeLevelUI.call( $(this) );
+                                          }
+                                    });
+                              }
                         }
                   });
                   // @return void()
