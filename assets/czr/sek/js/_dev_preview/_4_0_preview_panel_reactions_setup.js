@@ -300,7 +300,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             //'sek-generate-module-ui' : function( params ) {},
 
                             //@params {
-                            //    type : module || preset_section,
+                            //    content_type : module || preset_section,
+                            //    eligible_for_module_dropzones : boolean //<= typically useful for multicolumn "modules" that are in reality preset_section @see https://github.com/presscustomizr/nimble-builder/issues/540
                             // }
                             'sek-drag-start' : function( params ) {
                                   // append the drop zones between sections
@@ -315,13 +316,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         // Print a dropzone before if the previous section and current section are not empty.
                                         if ( canPrintBefore && $('[data-drop-zone-before-section="' + sectionId +'"]').length < 1 ) {
                                               $(this).before(
-                                                '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-before-section="' + sectionId +'"></div>'
+                                                '<div class="sek-content-' + params.content_type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-before-section="' + sectionId +'"></div>'
                                               );
                                         }
                                         // After the last one
                                         if ( ! isEmptySection && i == $('.sektion-wrapper').children('[data-sek-level="section"]').length ) {
                                               $(this).after(
-                                                '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-after-section="' + sectionId +'"></div>'
+                                                '<div class="sek-content-' + params.content_type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-after-section="' + sectionId +'"></div>'
                                               );
                                         }
                                         i++;
@@ -331,12 +332,15 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   // Append the drop zone in empty locations
                                   $('.sek-empty-location-placeholder').each( function() {
                                         $.when( $(this).append(
-                                              '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="in-empty-location"></div>'
+                                              '<div class="sek-content-' + params.content_type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="in-empty-location"></div>'
                                         ));
                                   });
 
                                   // Append a drop zone between modules and nested sections in columns
-                                  if ( 'module' ==  params.type ) {
+                                  // preset_sections like multicolumn structure are part of the module list
+                                  // they fall under the second part of the conditional statement below
+                                  // introduced for https://github.com/presscustomizr/nimble-builder/issues/540
+                                  if ( 'module' == params.content_type || ( 'preset_section' == params.content_type && true === params.eligible_for_module_dropzones ) ) {
                                         $('[data-sek-level="column"]').each( function() {
                                               // Our candidates are the modules and nested section which are direct children of this column
                                               // We don't want to include the modules inserted in the columns of a nested section.
@@ -362,7 +366,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                               });
                                         });
                                   }
-
 
                                   // toggle a parent css classes controlling some css rules @see preview.css
                                   $('body').addClass('sek-dragging');

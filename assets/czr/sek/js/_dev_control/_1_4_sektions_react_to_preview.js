@@ -90,8 +90,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               in_column : params.in_column,
                                               module_type : params.content_id,
 
-                                              before_module : params.before_module,
-                                              after_module : params.after_module
+                                              before_module_or_nested_section : params.before_module_or_nested_section,
+                                              after_module_or_nested_section : params.after_module_or_nested_section
                                         };
                                         return self.updateAPISetting( apiParams );
                                   },
@@ -545,11 +545,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         });
                                   }
                             },
-
-
-
-
-
 
 
 

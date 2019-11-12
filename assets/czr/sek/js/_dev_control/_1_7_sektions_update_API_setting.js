@@ -42,7 +42,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             cloneId, //will be passed in resolve()
                             startingModuleValue,// will be populated by the optional starting value specificied on module registration
                             __presetSectionInjected__ = '_not_injection_scenario_',//this property is turned into a $.Deferred() object in a scenario of section injection
-                            parentSektionCandidate;
+                            parentSektionCandidate,
+                            position;//<= the position of the module or section or nested section in a column or location
 
                         // make sure we have a collection array to populate
                         newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ).collection;
@@ -581,14 +582,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           break;
                                     }
 
-                                    var position = 0;
+                                    position = 0;
                                     columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                    // get the position of the before or after module
-                                    _.each( columnCandidate.collection, function( moduleModel, index ) {
-                                          if ( params.before_module === moduleModel.id ) {
+                                    // get the position of the before or after module or nested section
+                                    _.each( columnCandidate.collection, function( moduleOrNestedSectionModel, index ) {
+                                          if ( params.before_module_or_nested_section === moduleOrNestedSectionModel.id ) {
                                                 position = index;
                                           }
-                                          if ( params.after_module === moduleModel.id ) {
+                                          if ( params.after_module_or_nested_section === moduleOrNestedSectionModel.id ) {
                                                 position = index + 1;
                                           }
                                     });
@@ -1057,7 +1058,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //   content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
                               // }
                               case 'sek-add-preset-section-in-new-nested-sektion' :
+
                                     columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
+                                    if ( 'no_match' === columnCandidate ) {
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                                          break;
+                                    }
+
+                                    var positionIndexInColumn = 0;
+                                    columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+                                     // get the position of the before or after module or nested section
+                                    _.each( columnCandidate.collection, function( moduleOrNestedSectionModel, index ) {
+                                          if ( params.before_module_or_nested_section === moduleOrNestedSectionModel.id ) {
+                                                positionIndexInColumn = index;
+                                          }
+                                          if ( params.after_module_or_nested_section === moduleOrNestedSectionModel.id ) {
+                                                positionIndexInColumn = index + 1;
+                                          }
+                                    });
 
                                     // can we add this nested sektion ?
                                     // if the parent sektion of the column has is_nested = true, then we can't
@@ -1079,14 +1098,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                           break;
                                     }
-                                    if ( 'no_match' == columnCandidate ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
-                                          break;
-                                    }
-                                    columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
 
-                                    // insert the section in the collection at the right place
+                                    // insert the nested section in the collection at the right place
                                     var presetColumnOrSectionCollection;
                                     __presetSectionInjected__ = $.Deferred();//defined at the beginning of the method
 
@@ -1099,7 +1112,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       __presetSectionInjected__.reject( _er_ );
                                                 })
                                                 .done( function( maybeMultiSectionReadyToInject ) {
-                                                      var _injectNestedSectionInParentColumn = function( sectionReadyToInject ) {
+
+                                                      var _injectNestedSectionInParentColumn = function( sectionReadyToInject, positionIndexInColumn  ) {
+                                                            positionIndexInColumn = positionIndexInColumn || 0;
+
                                                             // The following param "collection_of_preset_section_id" has been introduced when implementing support for multi-section pre-build sections
                                                             // @see https://github.com/presscustomizr/nimble-builder/issues/489
                                                             // It is sent to the preview with ::reactToPreviewMsg, see bottom of the method.
@@ -1107,7 +1123,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             params.collection_of_preset_section_id = params.collection_of_preset_section_id || [];
                                                             params.collection_of_preset_section_id.push( injected_section_id );
 
-                                                            columnCandidate.collection.push({
+                                                            columnCandidate.collection.splice( positionIndexInColumn, 0, {
                                                                   id : injected_section_id,
                                                                   level : 'section',
                                                                   collection : sectionReadyToInject.collection,
@@ -1122,10 +1138,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       var is_multi_section = 'section' === maybeMultiSectionReadyToInject.collection[0].level;
                                                       if ( is_multi_section ) {
                                                             _.each( maybeMultiSectionReadyToInject.collection, function( sectionReadyToInject ) {
-                                                                  _injectNestedSectionInParentColumn( sectionReadyToInject );
+                                                                  _injectNestedSectionInParentColumn( sectionReadyToInject, positionIndexInColumn );
+                                                                  positionIndexInColumn++;
                                                             });
                                                       } else {
-                                                            _injectNestedSectionInParentColumn( maybeMultiSectionReadyToInject );
+                                                            _injectNestedSectionInParentColumn( maybeMultiSectionReadyToInject, positionIndexInColumn );
                                                       }
 
                                                       // Used when updating the setting
@@ -1154,9 +1171,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 _doWhenPresetSectionCollectionFetched( presetColumnOrSectionCollection );
                                           });//self.getPresetSectionCollection().done()
                               break;
-
-
-
 
 
 

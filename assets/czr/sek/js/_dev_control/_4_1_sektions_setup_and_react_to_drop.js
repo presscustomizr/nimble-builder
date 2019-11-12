@@ -100,6 +100,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.lastClickedTargetInPreview({});
 
                         evt.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
+                        evt.originalEvent.dataTransfer.setData( "sek-eligible-for-module-dropzones", $(this).data('sek-eligible-for-module-dropzones') ); //<= introduced for https://github.com/presscustomizr/nimble-builder/issues/540
                         evt.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
                         evt.originalEvent.dataTransfer.setData( "sek-section-type", $(this).data('sek-section-type') );
                         evt.originalEvent.dataTransfer.setData( "sek-is-user-section", $(this).data('sek-is-user-section') );
@@ -108,6 +109,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // => we will need it for example to access the object property when checking if "can drop"
                         self.dndData = {
                               content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                              eligible_for_module_dropzones : "true" === evt.originalEvent.dataTransfer.getData( "sek-eligible-for-module-dropzones" ), //<= introduced for https://github.com/presscustomizr/nimble-builder/issues/540
                               content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" ),
                               section_type : evt.originalEvent.dataTransfer.getData( "sek-section-type" ),
                               // Saved sections
@@ -136,7 +138,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         $(this).addClass('sek-dragged');
                         $('body').addClass('sek-dragging');
-                        api.previewer.send( 'sek-drag-start', { type : self.dndData.content_type } );//fires the rendering of the dropzones
+
+                        // Say it to the preview
+                        // @see 'sek-drag-start' case in preview::schedulePanelMsgReactions()
+                        api.previewer.send( 'sek-drag-start', {
+                              content_type : self.dndData.content_type,
+                              eligible_for_module_dropzones : self.dndData.eligible_for_module_dropzones//<= added for https://github.com/presscustomizr/nimble-builder/issues/540
+                        });//fires the rendering of the dropzones
                   };
                   // $(this) is the dragged element
                   var _onEnd = function( evt ) {
@@ -161,8 +169,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     drop_target_element : $dropTarget,
                                     location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
                                     // when inserted between modules
-                                    before_module : $dropTarget.data('drop-zone-before-module-or-nested-section'),
-                                    after_module : $dropTarget.data('drop-zone-after-module-or-nested-section'),
+                                    before_module_or_nested_section : $dropTarget.data('drop-zone-before-module-or-nested-section'),
+                                    after_module_or_nested_section : $dropTarget.data('drop-zone-after-module-or-nested-section'),
 
                                     // When inserted between sections
                                     before_section : $dropTarget.data('drop-zone-before-section'),
@@ -257,11 +265,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }, 100 );
                                     }
 
-                                    if ( ! self.dnd_canDrop( { targetEl : $(this), evt : evt } ) )
-                                      return;
-
-                                    evt.stopPropagation();
-                                    self.dnd_OnEnterOver( $(this), evt );
+                                    if ( self.dnd_canDrop( { targetEl : $(this), evt : evt } ) ) {
+                                          evt.stopPropagation();
+                                          self.dnd_OnEnterOver( $(this), evt );
+                                    }
                               })
                               .on( 'dragleave drop', sektionsLocalizedData.dropSelectors, function( evt ) {
                                     switch( evt.type ) {
@@ -274,14 +281,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 // Reset the this.$cachedDropZoneCandidates now
                                                 this.$cachedDropZoneCandidates = null;//has been declared on enter over
 
-                                                if ( ! self.dnd_canDrop( { targetEl : $(this), evt : evt } ) )
-                                                  return;
-                                                evt.preventDefault();//@see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drop
-                                                self.dnd_onDrop( $(this), evt );
-                                                self.dnd_cleanOnLeaveDrop( $(this), evt );
-                                                // this event will fire another cleaner
-                                                // also sent on dragend
-                                                api.previewer.send( 'sek-drag-stop' );
+                                                if ( self.dnd_canDrop( { targetEl : $(this), evt : evt } ) ) {
+                                                      evt.preventDefault();//@see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drop
+                                                      self.dnd_onDrop( $(this), evt );
+                                                      self.dnd_cleanOnLeaveDrop( $(this), evt );
+                                                      // this event will fire another cleaner
+                                                      // also sent on dragend
+                                                      api.previewer.send( 'sek-drag-stop' );
+                                                }
                                           break;
                                     }
                               })
@@ -471,6 +478,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( $dropTarget.closest('[data-sek-level="location"]').length < 1 )
                     return false;
 
+                  //console.log('params in control::dnd_canDrop', params, self.dndData );
+
                   var isSectionDropZone   = $dropTarget.hasClass( 'sek-content-preset_section-drop-zone' ),
                       sectionHasNoModule  = $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' ),
                       isHeaderLocation    = true === $dropTarget.closest('[data-sek-level="location"]').data('sek-is-header-location'),
@@ -489,6 +498,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   };
 
+                  if ( ! $dropTarget.hasClass('sek-drop-zone') ) {
+                        return false;
+                  }
                   if ( ( isHeaderLocation || isFooterLocation ) && isContentSectionCandidate ) {
                         msg = isHeaderLocation ? sektionsLocalizedData.i18n['Header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['Footer location only accepts modules and pre-built footer sections'];
                         maybePrintErrorMessage( msg );
@@ -506,8 +518,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return false;
                   }
 
-                  return $dropTarget.hasClass('sek-drop-zone') && ( ( 'preset_section' === self.dndData.content_type && isSectionDropZone ) || ( 'module' === self.dndData.content_type && ! isSectionDropZone ) || ( 'preset_section' === self.dndData.content_type && sectionHasNoModule ) );
-            },
+
+                  // case of multicolumn preset section dragged from the module list
+                  // introduced for https://github.com/presscustomizr/nimble-builder/issues/540
+                  if ( 'preset_section' === self.dndData.content_type && true === self.dndData.eligible_for_module_dropzones && ! isSectionDropZone  ) {
+                      return true;
+                  }
+
+                  return ( ( 'preset_section' === self.dndData.content_type && isSectionDropZone ) || ( 'module' === self.dndData.content_type && ! isSectionDropZone ) || ( 'preset_section' === self.dndData.content_type && sectionHasNoModule ) );
+            },// dnd_canDrop()
 
             // @return void()
             dnd_OnEnterOver : function( $dropTarget, evt ) {
@@ -624,15 +643,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.czr_sektions.trigger( 'sek-content-dropped', {
                         drop_target_element : $dropTarget,
                         location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
-                        // when inserted between modules
-                        before_module : $dropTarget.data('drop-zone-before-module-or-nested-section'),
-                        after_module : $dropTarget.data('drop-zone-after-module-or-nested-section'),
+                        // when inserted between modules or nested sections
+                        before_module_or_nested_section : $dropTarget.data('drop-zone-before-module-or-nested-section'),
+                        after_module_or_nested_section : $dropTarget.data('drop-zone-after-module-or-nested-section'),
 
                         // When inserted between sections
                         before_section : $dropTarget.data('drop-zone-before-section'),
                         after_section : $dropTarget.data('drop-zone-after-section'),
 
                         content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                        eligible_for_module_dropzones : "true" === evt.originalEvent.dataTransfer.getData( "sek-eligible-for-module-dropzones" ), //<= introduced for https://github.com/presscustomizr/nimble-builder/issues/540
                         content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" ),
 
                         section_type : evt.originalEvent.dataTransfer.getData( "sek-section-type" ),
@@ -678,8 +698,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               throw new Error( 'Invalid drop_target_element' );
                         }
 
-                        var $dropTarget = params.drop_target_element,
-                            dropCase = 'content-in-column';
+                        var $dropTarget = params.drop_target_element;
+
+                        // IMPORTANT : the dropcase var is declared with a default value
+                        // then, depending on the content_type and the target location, it will be overriden, see below
+                        var dropCase = 'content-in-column';
 
                         // If the data('sek-location') is available, let's use it
                         switch( $dropTarget.data('sek-location') ) {
@@ -698,8 +721,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // case of a preset_section content_type being added to an existing but empty section
                         if ( 'preset_section' === params.content_type ) {
+                              var $parentSektion;
                               if ( $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' ) ) {
-                                    var $parentSektion = $dropTarget.closest('div[data-sek-level="section"]');
+                                    $parentSektion = $dropTarget.closest('div[data-sek-level="section"]');
                                     //calculate the number of column in this section, excluding the columns inside nested sections if any
                                     var colNumber = $parentSektion.find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ).length;
                                     // if the parent section has more than 1 column, we will need to inject the preset_section inside a nested_section
@@ -720,12 +744,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( 'between-sections' === $dropTarget.data('sek-location') ) {
                                           dropCase = 'content-in-a-section-to-create';
                                     }
+                                    // introduced for https://github.com/presscustomizr/nimble-builder/issues/540
+                                    // this is typically the case of a multi-columns "module" drop, which is actually a preset_section from Nimble standpoint
+                                    if ( 'between-modules-and-nested-sections' && $dropTarget.data('sek-location') && params.eligible_for_module_dropzones ) {
+                                          dropCase = 'preset-section-eligible-for-module-dropzones-in-new-nested-sektion';
+                                          params.is_nested = true;
+                                          params.in_column = $dropTarget.closest('[data-sek-level="column"]').data('sek-id');
+                                          $parentSektion = $dropTarget.closest('div[data-sek-level="section"]');
+                                          params.in_sektion = $parentSektion.data('sek-id');
+                                    }
                               }
 
 
 
                         }
 
+                        // Now the dropcase is setup, let's say it to the previewer
+                        // see in control::reactToPreviewMsg() and then in control::updateAPISetting() how those actions are handled
                         var focusOnAddedContentEditor;
                         switch( dropCase ) {
                               case 'content-in-column' :
@@ -746,8 +781,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           in_column : $dropTarget.closest('div[data-sek-level="column"]').data( 'sek-id'),
                                           in_sektion : $dropTarget.closest('div[data-sek-level="section"]').data( 'sek-id'),
 
-                                          before_module : params.before_module,
-                                          after_module : params.after_module,
+                                          before_module_or_nested_section : params.before_module_or_nested_section,
+                                          after_module_or_nested_section : params.after_module_or_nested_section,
 
                                           content_type : params.content_type,
                                           content_id : params.content_id
@@ -763,6 +798,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               case 'preset-section-in-a-nested-section-to-create' :
                                     api.previewer.trigger( 'sek-add-preset-section-in-new-nested-sektion', params );
+                              break;
+
+                              // introduced for https://github.com/presscustomizr/nimble-builder/issues/540
+                              // this is typically the case of a multi-columns "module" drop, which is actually a preset_section from Nimble standpoint
+                              case 'preset-section-eligible-for-module-dropzones-in-new-nested-sektion' :
+                                    var newParams = $.extend( true, {}, params );
+                                    newParams = $.extend( newParams, {
+                                          before_module_or_nested_section : params.before_module_or_nested_section,
+                                          after_module_or_nested_section : params.after_module_or_nested_section
+                                    });
+                                    api.previewer.trigger( 'sek-add-preset-section-in-new-nested-sektion', newParams );
                               break;
 
                               default :
