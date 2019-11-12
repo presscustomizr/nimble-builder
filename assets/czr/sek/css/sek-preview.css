@@ -966,6 +966,7 @@
   opacity: 1;
 }
 .sek-add-content-button-wrapper .sek-add-content-btn {
+    text-decoration: none;
     margin: auto;
     padding: 0;
     display: -webkit-inline-box;
