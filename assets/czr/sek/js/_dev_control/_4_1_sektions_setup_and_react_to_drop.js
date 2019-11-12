@@ -746,7 +746,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                                     // introduced for https://github.com/presscustomizr/nimble-builder/issues/540
                                     // this is typically the case of a multi-columns "module" drop, which is actually a preset_section from Nimble standpoint
-                                    if ( 'between-modules-and-nested-sections' && $dropTarget.data('sek-location') && params.eligible_for_module_dropzones ) {
+                                    // @see 'between-modules-and-nested-sections' is addded by 'sek-drag-start' case in preview::schedulePanelMsgReactions()
+                                    if ( 'between-modules-and-nested-sections' === $dropTarget.data('sek-location') && params.eligible_for_module_dropzones ) {
                                           dropCase = 'preset-section-eligible-for-module-dropzones-in-new-nested-sektion';
                                           params.is_nested = true;
                                           params.in_column = $dropTarget.closest('[data-sek-level="column"]').data('sek-id');
