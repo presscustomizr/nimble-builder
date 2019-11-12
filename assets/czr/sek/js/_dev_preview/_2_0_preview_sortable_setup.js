@@ -72,6 +72,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
+                  // added to fix impossibility to move an already inserted module in a freshly added multicolumn section
+                  // @see https://github.com/presscustomizr/nimble-builder/issues/538
+                  $( 'body').on( 'sek-location-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                        $(this).find( '[data-sek-level="column"]' ).each( function() {
+                              self.makeModulesSortableInColumn( $(this).data('sek-id') );
+                        });
+                  });
 
                   // NESTED SEKTIONS
                   // $('.sek-column-inner', '[data-sek-level="section"]').children( '[data-sek-level="section"]' ).each( function() {
@@ -509,6 +516,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               $('body').removeClass( 'sek-dragging-element' );
                         }
                   }));
+
+                  $( '[data-sek-id="' + columnId + '"]').addClass('sek-module-sortable-setup');
             },//makeModulesSortableInColumn
       });//$.extend()
 })( wp.customize, jQuery, _ );
