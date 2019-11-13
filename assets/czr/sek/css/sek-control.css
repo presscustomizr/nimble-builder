@@ -731,6 +731,9 @@ div[data-sek-grid-layout].selected {
   padding: 0 5px 1px;
   line-height: 18px;
   height: 25px;
+  min-height: 25px;
+  color: #555;
+  border-color: #ccc;
 }
 
 /* DEVICE SWITCHER */

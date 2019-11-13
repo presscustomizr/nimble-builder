@@ -160,8 +160,10 @@ a.czr-rating-link:hover {
   justify-content: space-between;
 }
 #presscustomizr-dashboard .nimble-db-header .button-hero {
+  /*
+  commented since wp v5.3, nov 2019
   height: 34px;
-  line-height: 33px;
+  line-height: 33px;*/
   padding: 0 15px;
 }
 #presscustomizr-dashboard .nimble-logo {
@@ -311,6 +313,7 @@ body .block-editor .sek-nimble-mobile-admin-bar-title { display: none; }
 #sek-edit-with-nimble.classic-ed {
   margin: 2px;
   height: 33px;
+  min-height: 33px;
   font-size: 13px;
   line-height: 1;
   position: relative;
