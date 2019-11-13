@@ -83,6 +83,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                           if ( ! isJavascriptProtocol && api.isLinkPreviewable( $(this)[0] ) ) {
                                 $(this).addClass('nimble-shift-clickable');
                                 $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', 'javascript:void(0)');
+                                // remove target="_blank" if enabled by user
+                                // @fixes issue https://github.com/presscustomizr/nimble-builder/issues/542
+                                $(this).removeAttr('target');
                                 $(this).hover( function() {
                                         $(this).attr( 'title', sekPreviewLocalized.i18n['Shift-click to visit the link']);
                                 }, function() {
@@ -239,6 +242,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
                   });
                   $( 'body').on( 'sek-section-added', '[data-sek-level="location"]', function( evt, params  ) {
+                        $(this).find( '[data-sek-level="column"]' ).each( function() {
+                              self.makeModulesSortableInColumn( $(this).data('sek-id') );
+                        });
+                  });
+                  // added to fix impossibility to move an already inserted module in a freshly added multicolumn section
+                  // @see https://github.com/presscustomizr/nimble-builder/issues/538
+                  $( 'body').on( 'sek-location-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         $(this).find( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
@@ -680,6 +690,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               $('body').removeClass( 'sek-dragging-element' );
                         }
                   }));
+
+                  $( '[data-sek-id="' + columnId + '"]').addClass('sek-module-sortable-setup');
             },//makeModulesSortableInColumn
       });//$.extend()
 })( wp.customize, jQuery, _ );//global sekPreviewLocalized
@@ -1223,20 +1235,23 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               // sniff levels and print UI
                               _sniffLevelsAndPrintUI( position );
                         } else {
-                              // Mouse didn't move recently?
-                              // => remove all UIs
-                              $('body').stop( true, true ).find('.sek-add-content-button').each( function() {
-                                    $(this).fadeOut( {
-                                          duration : 200,
-                                          complete : function() { $(this).remove(); }
+                              // when PHP constant NIMBLE_IS_PREVIEW_UI_DEBUG_MODE is true, the levels UI in the preview are not being auto removed, so we can inspect the markup and CSS
+                              if ( ! sekPreviewLocalized.isPreviewUIDebugMode ) {
+                                    // Mouse didn't move recently?
+                                    // => remove all UIs
+                                    $('body').stop( true, true ).find('.sek-add-content-button').each( function() {
+                                          $(this).fadeOut( {
+                                                duration : 200,
+                                                complete : function() { $(this).remove(); }
+                                          });
                                     });
-                              });
-                              $('body').stop( true, true ).find('[data-sek-level]').each( function() {
-                                    // preserve if the ui menu is expanded, otherwise remove
-                                    if ( $(this).children('.sek-dyn-ui-wrapper').find('.sek-is-expanded').length < 1 ) {
-                                          removeLevelUI.call( $(this) );
-                                    }
-                              });
+                                    $('body').stop( true, true ).find('[data-sek-level]').each( function() {
+                                          // preserve if the ui menu is expanded, otherwise remove
+                                          if ( $(this).children('.sek-dyn-ui-wrapper').find('.sek-is-expanded').length < 1 ) {
+                                                removeLevelUI.call( $(this) );
+                                          }
+                                    });
+                              }
                         }
                   });
                   // @return void()
@@ -1856,7 +1871,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             //'sek-generate-module-ui' : function( params ) {},
 
                             //@params {
-                            //    type : module || preset_section,
+                            //    content_type : module || preset_section,
+                            //    eligible_for_module_dropzones : boolean //<= typically useful for multicolumn "modules" that are in reality preset_section @see https://github.com/presscustomizr/nimble-builder/issues/540
                             // }
                             'sek-drag-start' : function( params ) {
                                   // append the drop zones between sections
@@ -1871,13 +1887,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         // Print a dropzone before if the previous section and current section are not empty.
                                         if ( canPrintBefore && $('[data-drop-zone-before-section="' + sectionId +'"]').length < 1 ) {
                                               $(this).before(
-                                                '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-before-section="' + sectionId +'"></div>'
+                                                '<div class="sek-content-' + params.content_type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-before-section="' + sectionId +'"></div>'
                                               );
                                         }
                                         // After the last one
                                         if ( ! isEmptySection && i == $('.sektion-wrapper').children('[data-sek-level="section"]').length ) {
                                               $(this).after(
-                                                '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-after-section="' + sectionId +'"></div>'
+                                                '<div class="sek-content-' + params.content_type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="between-sections" data-drop-zone-after-section="' + sectionId +'"></div>'
                                               );
                                         }
                                         i++;
@@ -1887,12 +1903,15 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   // Append the drop zone in empty locations
                                   $('.sek-empty-location-placeholder').each( function() {
                                         $.when( $(this).append(
-                                              '<div class="sek-content-' + params.type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="in-empty-location"></div>'
+                                              '<div class="sek-content-' + params.content_type + '-drop-zone sek-dynamic-drop-zone sek-drop-zone" data-sek-location="in-empty-location"></div>'
                                         ));
                                   });
 
                                   // Append a drop zone between modules and nested sections in columns
-                                  if ( 'module' ==  params.type ) {
+                                  // preset_sections like multicolumn structure are part of the module list
+                                  // they fall under the second part of the conditional statement below
+                                  // introduced for https://github.com/presscustomizr/nimble-builder/issues/540
+                                  if ( 'module' == params.content_type || ( 'preset_section' == params.content_type && true === params.eligible_for_module_dropzones ) ) {
                                         $('[data-sek-level="column"]').each( function() {
                                               // Our candidates are the modules and nested section which are direct children of this column
                                               // We don't want to include the modules inserted in the columns of a nested section.
@@ -1918,7 +1937,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                               });
                                         });
                                   }
-
 
                                   // toggle a parent css classes controlling some css rules @see preview.css
                                   $('body').addClass('sek-dragging');
@@ -2183,6 +2201,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         if ( params.cloneId ) {
                               $( 'div[data-sek-id="' + params.cloneId + '"]' ).trigger('sek-section-added', params );
                         }
+                        // @todo is the params.apiParams.id correct ? Does it actually exists in the DOM?
                         $( 'div[data-sek-id="' + params.apiParams.id + '"]' ).trigger('sek-section-added', params );
 
                         // added to fix resizable not instantiated when adding column modules

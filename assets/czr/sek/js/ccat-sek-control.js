@@ -2450,8 +2450,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               in_column : params.in_column,
                                               module_type : params.content_id,
 
-                                              before_module : params.before_module,
-                                              after_module : params.after_module
+                                              before_module_or_nested_section : params.before_module_or_nested_section,
+                                              after_module_or_nested_section : params.after_module_or_nested_section
                                         };
                                         return self.updateAPISetting( apiParams );
                                   },
@@ -2905,11 +2905,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         });
                                   }
                             },
-
-
-
-
-
 
 
 
@@ -3842,7 +3837,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         controlIsAlreadyRegistered = true;
                         // we should have only one uiCandidate with this very id
                         if ( uiCandidate.length > 1 ) {
-                              api.errare( 'generateUI => why is this control registered more than once ? => ' + uiElementId );
+                              api.errare( 'isUIControlAlreadyRegistered => why is this control registered more than once ? => ' + uiElementId );
                         }
                   }
                   return controlIsAlreadyRegistered;
@@ -5224,7 +5219,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             cloneId, //will be passed in resolve()
                             startingModuleValue,// will be populated by the optional starting value specificied on module registration
                             __presetSectionInjected__ = '_not_injection_scenario_',//this property is turned into a $.Deferred() object in a scenario of section injection
-                            parentSektionCandidate;
+                            parentSektionCandidate,
+                            position;//<= the position of the module or section or nested section in a column or location
 
                         // make sure we have a collection array to populate
                         newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ).collection;
@@ -5763,14 +5759,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           break;
                                     }
 
-                                    var position = 0;
+                                    position = 0;
                                     columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                    // get the position of the before or after module
-                                    _.each( columnCandidate.collection, function( moduleModel, index ) {
-                                          if ( params.before_module === moduleModel.id ) {
+                                    // get the position of the before or after module or nested section
+                                    _.each( columnCandidate.collection, function( moduleOrNestedSectionModel, index ) {
+                                          if ( params.before_module_or_nested_section === moduleOrNestedSectionModel.id ) {
                                                 position = index;
                                           }
-                                          if ( params.after_module === moduleModel.id ) {
+                                          if ( params.after_module_or_nested_section === moduleOrNestedSectionModel.id ) {
                                                 position = index + 1;
                                           }
                                     });
@@ -6041,7 +6037,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // }
                               case 'sek-add-content-in-new-sektion' :
                                     // get the position of the before or after section
-                                    position = 0;
+                                    var positionIndex = 0;
                                     locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
                                     if ( 'no_match' == locationCandidate ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
@@ -6051,10 +6047,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
                                     _.each( locationCandidate.collection, function( secModel, index ) {
                                           if ( params.before_section === secModel.id ) {
-                                                position = index;
+                                                positionIndex = index;
                                           }
                                           if ( params.after_section === secModel.id ) {
-                                                position = index + 1;
+                                                positionIndex = index + 1;
                                           }
                                     });
 
@@ -6066,7 +6062,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 startingModuleValue = self.getModuleStartingValue( params.content_id );
 
                                                 // insert the section in the collection at the right place
-                                                locationCandidate.collection.splice( position, 0, {
+                                                locationCandidate.collection.splice( positionIndex, 0, {
                                                       id : params.id,
                                                       level : 'section',
                                                       collection : [
@@ -6097,8 +6093,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 // we use a section index here to display the section in the same order as in the json
                                                 // introduced when implementing multi-section pre-build section
                                                 // @see https://github.com/presscustomizr/nimble-builder/issues/489
-                                                var _injectPresetSectionInLocationOrParentColumn = function( sectionReadyToInject, sectionIndex ) {
-                                                      sectionIndex = sectionIndex || 0;
+                                                var _injectPresetSectionInLocationOrParentColumn = function( sectionReadyToInject, positionIndex ) {
                                                       // If the preset_section is inserted in a an empty nested section, add it at the right place in the parent column of the nested section.
                                                       // Otherwise, add the preset section at the right position in the parent location of the section.
                                                       var insertedInANestedSektion = false;
@@ -6120,7 +6115,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       params.collection_of_preset_section_id.push( injected_section_id );
 
                                                       if ( ! insertedInANestedSektion ) {
-                                                            locationCandidate.collection.splice( position + sectionIndex, 0, {
+                                                            locationCandidate.collection.splice( positionIndex, 0, {
                                                                   id : injected_section_id,//params.id,//self.guid()
                                                                   level : 'section',
                                                                   collection : sectionReadyToInject.collection,
@@ -6139,14 +6134,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             // get the position of the before or after module
                                                             _.each( columnCandidate.collection, function( moduleOrSectionModel, index ) {
                                                                   if ( params.before_section === moduleOrSectionModel.id ) {
-                                                                        position = index;
+                                                                        positionIndex = index;
                                                                   }
                                                                   if ( params.after_section === moduleOrSectionModel.id ) {
-                                                                        position = index + 1;
+                                                                        positionIndex = index + 1;
                                                                   }
                                                             });
 
-                                                            columnCandidate.collection.splice( position + sectionIndex, 0, {
+                                                            columnCandidate.collection.splice( positionIndex, 0, {
                                                                   id : injected_section_id,
                                                                   is_nested : true,
                                                                   level : 'section',
@@ -6172,11 +6167,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                         // we use a section index here to display the section in the same order as in the json
                                                                         var sectionIndex = 0;
                                                                         _.each( maybeMultiSectionReadyToInject.collection, function( sectionReadyToInject ) {
-                                                                              _injectPresetSectionInLocationOrParentColumn( sectionReadyToInject, sectionIndex );
-                                                                              sectionIndex++;
+                                                                              _injectPresetSectionInLocationOrParentColumn( sectionReadyToInject, positionIndex );
+                                                                              positionIndex++;
                                                                         });
                                                                   } else {
-                                                                        _injectPresetSectionInLocationOrParentColumn( maybeMultiSectionReadyToInject, position );
+                                                                        _injectPresetSectionInLocationOrParentColumn( maybeMultiSectionReadyToInject, positionIndex );
                                                                   }
 
                                                                   // Used when updating the setting
@@ -6239,7 +6234,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //   content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
                               // }
                               case 'sek-add-preset-section-in-new-nested-sektion' :
+
                                     columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
+                                    if ( 'no_match' === columnCandidate ) {
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                                          break;
+                                    }
+
+                                    var positionIndexInColumn = 0;
+                                    columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+                                     // get the position of the before or after module or nested section
+                                    _.each( columnCandidate.collection, function( moduleOrNestedSectionModel, index ) {
+                                          if ( params.before_module_or_nested_section === moduleOrNestedSectionModel.id ) {
+                                                positionIndexInColumn = index;
+                                          }
+                                          if ( params.after_module_or_nested_section === moduleOrNestedSectionModel.id ) {
+                                                positionIndexInColumn = index + 1;
+                                          }
+                                    });
 
                                     // can we add this nested sektion ?
                                     // if the parent sektion of the column has is_nested = true, then we can't
@@ -6261,14 +6274,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                           break;
                                     }
-                                    if ( 'no_match' == columnCandidate ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
-                                          break;
-                                    }
-                                    columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
 
-                                    // insert the section in the collection at the right place
+                                    // insert the nested section in the collection at the right place
                                     var presetColumnOrSectionCollection;
                                     __presetSectionInjected__ = $.Deferred();//defined at the beginning of the method
 
@@ -6281,7 +6288,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       __presetSectionInjected__.reject( _er_ );
                                                 })
                                                 .done( function( maybeMultiSectionReadyToInject ) {
-                                                      var _injectNestedSectionInParentColumn = function( sectionReadyToInject ) {
+
+                                                      var _injectNestedSectionInParentColumn = function( sectionReadyToInject, positionIndexInColumn  ) {
+                                                            positionIndexInColumn = positionIndexInColumn || 0;
+
                                                             // The following param "collection_of_preset_section_id" has been introduced when implementing support for multi-section pre-build sections
                                                             // @see https://github.com/presscustomizr/nimble-builder/issues/489
                                                             // It is sent to the preview with ::reactToPreviewMsg, see bottom of the method.
@@ -6289,7 +6299,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             params.collection_of_preset_section_id = params.collection_of_preset_section_id || [];
                                                             params.collection_of_preset_section_id.push( injected_section_id );
 
-                                                            columnCandidate.collection.push({
+                                                            columnCandidate.collection.splice( positionIndexInColumn, 0, {
                                                                   id : injected_section_id,
                                                                   level : 'section',
                                                                   collection : sectionReadyToInject.collection,
@@ -6304,10 +6314,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       var is_multi_section = 'section' === maybeMultiSectionReadyToInject.collection[0].level;
                                                       if ( is_multi_section ) {
                                                             _.each( maybeMultiSectionReadyToInject.collection, function( sectionReadyToInject ) {
-                                                                  _injectNestedSectionInParentColumn( sectionReadyToInject );
+                                                                  _injectNestedSectionInParentColumn( sectionReadyToInject, positionIndexInColumn );
+                                                                  positionIndexInColumn++;
                                                             });
                                                       } else {
-                                                            _injectNestedSectionInParentColumn( maybeMultiSectionReadyToInject );
+                                                            _injectNestedSectionInParentColumn( maybeMultiSectionReadyToInject, positionIndexInColumn );
                                                       }
 
                                                       // Used when updating the setting
@@ -6336,9 +6347,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 _doWhenPresetSectionCollectionFetched( presetColumnOrSectionCollection );
                                           });//self.getPresetSectionCollection().done()
                               break;
-
-
-
 
 
 
@@ -8119,6 +8127,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.lastClickedTargetInPreview({});
 
                         evt.originalEvent.dataTransfer.setData( "sek-content-type", $(this).data('sek-content-type') );
+                        evt.originalEvent.dataTransfer.setData( "sek-eligible-for-module-dropzones", $(this).data('sek-eligible-for-module-dropzones') ); //<= introduced for https://github.com/presscustomizr/nimble-builder/issues/540
                         evt.originalEvent.dataTransfer.setData( "sek-content-id", $(this).data('sek-content-id') );
                         evt.originalEvent.dataTransfer.setData( "sek-section-type", $(this).data('sek-section-type') );
                         evt.originalEvent.dataTransfer.setData( "sek-is-user-section", $(this).data('sek-is-user-section') );
@@ -8127,6 +8136,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // => we will need it for example to access the object property when checking if "can drop"
                         self.dndData = {
                               content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                              eligible_for_module_dropzones : "true" === evt.originalEvent.dataTransfer.getData( "sek-eligible-for-module-dropzones" ), //<= introduced for https://github.com/presscustomizr/nimble-builder/issues/540
                               content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" ),
                               section_type : evt.originalEvent.dataTransfer.getData( "sek-section-type" ),
                               // Saved sections
@@ -8155,7 +8165,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         $(this).addClass('sek-dragged');
                         $('body').addClass('sek-dragging');
-                        api.previewer.send( 'sek-drag-start', { type : self.dndData.content_type } );//fires the rendering of the dropzones
+
+                        // Say it to the preview
+                        // @see 'sek-drag-start' case in preview::schedulePanelMsgReactions()
+                        api.previewer.send( 'sek-drag-start', {
+                              content_type : self.dndData.content_type,
+                              eligible_for_module_dropzones : self.dndData.eligible_for_module_dropzones//<= added for https://github.com/presscustomizr/nimble-builder/issues/540
+                        });//fires the rendering of the dropzones
                   };
                   // $(this) is the dragged element
                   var _onEnd = function( evt ) {
@@ -8180,8 +8196,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     drop_target_element : $dropTarget,
                                     location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
                                     // when inserted between modules
-                                    before_module : $dropTarget.data('drop-zone-before-module-or-nested-section'),
-                                    after_module : $dropTarget.data('drop-zone-after-module-or-nested-section'),
+                                    before_module_or_nested_section : $dropTarget.data('drop-zone-before-module-or-nested-section'),
+                                    after_module_or_nested_section : $dropTarget.data('drop-zone-after-module-or-nested-section'),
 
                                     // When inserted between sections
                                     before_section : $dropTarget.data('drop-zone-before-section'),
@@ -8276,11 +8292,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }, 100 );
                                     }
 
-                                    if ( ! self.dnd_canDrop( { targetEl : $(this), evt : evt } ) )
-                                      return;
-
-                                    evt.stopPropagation();
-                                    self.dnd_OnEnterOver( $(this), evt );
+                                    if ( self.dnd_canDrop( { targetEl : $(this), evt : evt } ) ) {
+                                          evt.stopPropagation();
+                                          self.dnd_OnEnterOver( $(this), evt );
+                                    }
                               })
                               .on( 'dragleave drop', sektionsLocalizedData.dropSelectors, function( evt ) {
                                     switch( evt.type ) {
@@ -8293,14 +8308,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 // Reset the this.$cachedDropZoneCandidates now
                                                 this.$cachedDropZoneCandidates = null;//has been declared on enter over
 
-                                                if ( ! self.dnd_canDrop( { targetEl : $(this), evt : evt } ) )
-                                                  return;
-                                                evt.preventDefault();//@see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drop
-                                                self.dnd_onDrop( $(this), evt );
-                                                self.dnd_cleanOnLeaveDrop( $(this), evt );
-                                                // this event will fire another cleaner
-                                                // also sent on dragend
-                                                api.previewer.send( 'sek-drag-stop' );
+                                                if ( self.dnd_canDrop( { targetEl : $(this), evt : evt } ) ) {
+                                                      evt.preventDefault();//@see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drop
+                                                      self.dnd_onDrop( $(this), evt );
+                                                      self.dnd_cleanOnLeaveDrop( $(this), evt );
+                                                      // this event will fire another cleaner
+                                                      // also sent on dragend
+                                                      api.previewer.send( 'sek-drag-stop' );
+                                                }
                                           break;
                                     }
                               })
@@ -8490,6 +8505,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( $dropTarget.closest('[data-sek-level="location"]').length < 1 )
                     return false;
 
+                  //console.log('params in control::dnd_canDrop', params, self.dndData );
+
                   var isSectionDropZone   = $dropTarget.hasClass( 'sek-content-preset_section-drop-zone' ),
                       sectionHasNoModule  = $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' ),
                       isHeaderLocation    = true === $dropTarget.closest('[data-sek-level="location"]').data('sek-is-header-location'),
@@ -8508,6 +8525,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   };
 
+                  if ( ! $dropTarget.hasClass('sek-drop-zone') ) {
+                        return false;
+                  }
                   if ( ( isHeaderLocation || isFooterLocation ) && isContentSectionCandidate ) {
                         msg = isHeaderLocation ? sektionsLocalizedData.i18n['Header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['Footer location only accepts modules and pre-built footer sections'];
                         maybePrintErrorMessage( msg );
@@ -8525,8 +8545,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return false;
                   }
 
-                  return $dropTarget.hasClass('sek-drop-zone') && ( ( 'preset_section' === self.dndData.content_type && isSectionDropZone ) || ( 'module' === self.dndData.content_type && ! isSectionDropZone ) || ( 'preset_section' === self.dndData.content_type && sectionHasNoModule ) );
-            },
+
+                  // case of multicolumn preset section dragged from the module list
+                  // introduced for https://github.com/presscustomizr/nimble-builder/issues/540
+                  if ( 'preset_section' === self.dndData.content_type && true === self.dndData.eligible_for_module_dropzones && ! isSectionDropZone  ) {
+                      return true;
+                  }
+
+                  return ( ( 'preset_section' === self.dndData.content_type && isSectionDropZone ) || ( 'module' === self.dndData.content_type && ! isSectionDropZone ) || ( 'preset_section' === self.dndData.content_type && sectionHasNoModule ) );
+            },// dnd_canDrop()
 
             // @return void()
             dnd_OnEnterOver : function( $dropTarget, evt ) {
@@ -8643,15 +8670,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.czr_sektions.trigger( 'sek-content-dropped', {
                         drop_target_element : $dropTarget,
                         location : $dropTarget.closest('[data-sek-level="location"]').data('sek-id'),
-                        // when inserted between modules
-                        before_module : $dropTarget.data('drop-zone-before-module-or-nested-section'),
-                        after_module : $dropTarget.data('drop-zone-after-module-or-nested-section'),
+                        // when inserted between modules or nested sections
+                        before_module_or_nested_section : $dropTarget.data('drop-zone-before-module-or-nested-section'),
+                        after_module_or_nested_section : $dropTarget.data('drop-zone-after-module-or-nested-section'),
 
                         // When inserted between sections
                         before_section : $dropTarget.data('drop-zone-before-section'),
                         after_section : $dropTarget.data('drop-zone-after-section'),
 
                         content_type : evt.originalEvent.dataTransfer.getData( "sek-content-type" ),
+                        eligible_for_module_dropzones : "true" === evt.originalEvent.dataTransfer.getData( "sek-eligible-for-module-dropzones" ), //<= introduced for https://github.com/presscustomizr/nimble-builder/issues/540
                         content_id : evt.originalEvent.dataTransfer.getData( "sek-content-id" ),
 
                         section_type : evt.originalEvent.dataTransfer.getData( "sek-section-type" ),
@@ -8697,8 +8725,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               throw new Error( 'Invalid drop_target_element' );
                         }
 
-                        var $dropTarget = params.drop_target_element,
-                            dropCase = 'content-in-column';
+                        var $dropTarget = params.drop_target_element;
+
+                        // IMPORTANT : the dropcase var is declared with a default value
+                        // then, depending on the content_type and the target location, it will be overriden, see below
+                        var dropCase = 'content-in-column';
 
                         // If the data('sek-location') is available, let's use it
                         switch( $dropTarget.data('sek-location') ) {
@@ -8717,8 +8748,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // case of a preset_section content_type being added to an existing but empty section
                         if ( 'preset_section' === params.content_type ) {
+                              var $parentSektion;
                               if ( $dropTarget.hasClass( 'sek-module-drop-zone-for-first-module' ) ) {
-                                    var $parentSektion = $dropTarget.closest('div[data-sek-level="section"]');
+                                    $parentSektion = $dropTarget.closest('div[data-sek-level="section"]');
                                     //calculate the number of column in this section, excluding the columns inside nested sections if any
                                     var colNumber = $parentSektion.find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ).length;
                                     // if the parent section has more than 1 column, we will need to inject the preset_section inside a nested_section
@@ -8739,12 +8771,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( 'between-sections' === $dropTarget.data('sek-location') ) {
                                           dropCase = 'content-in-a-section-to-create';
                                     }
+                                    // introduced for https://github.com/presscustomizr/nimble-builder/issues/540
+                                    // this is typically the case of a multi-columns "module" drop, which is actually a preset_section from Nimble standpoint
+                                    // @see 'between-modules-and-nested-sections' is addded by 'sek-drag-start' case in preview::schedulePanelMsgReactions()
+                                    if ( 'between-modules-and-nested-sections' === $dropTarget.data('sek-location') && params.eligible_for_module_dropzones ) {
+                                          dropCase = 'preset-section-eligible-for-module-dropzones-in-new-nested-sektion';
+                                          params.is_nested = true;
+                                          params.in_column = $dropTarget.closest('[data-sek-level="column"]').data('sek-id');
+                                          $parentSektion = $dropTarget.closest('div[data-sek-level="section"]');
+                                          params.in_sektion = $parentSektion.data('sek-id');
+                                    }
                               }
+                        }//if ( 'preset_section' === params.content_type ) {
 
 
-
-                        }
-
+                        // Now the dropcase is setup, let's say it to the previewer
+                        // see in control::reactToPreviewMsg() and then in control::updateAPISetting() how those actions are handled
                         var focusOnAddedContentEditor;
                         switch( dropCase ) {
                               case 'content-in-column' :
@@ -8765,8 +8807,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           in_column : $dropTarget.closest('div[data-sek-level="column"]').data( 'sek-id'),
                                           in_sektion : $dropTarget.closest('div[data-sek-level="section"]').data( 'sek-id'),
 
-                                          before_module : params.before_module,
-                                          after_module : params.after_module,
+                                          before_module_or_nested_section : params.before_module_or_nested_section,
+                                          after_module_or_nested_section : params.after_module_or_nested_section,
 
                                           content_type : params.content_type,
                                           content_id : params.content_id
@@ -8782,6 +8824,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               case 'preset-section-in-a-nested-section-to-create' :
                                     api.previewer.trigger( 'sek-add-preset-section-in-new-nested-sektion', params );
+                              break;
+
+                              // introduced for https://github.com/presscustomizr/nimble-builder/issues/540
+                              // this is typically the case of a multi-columns "module" drop, which is actually a preset_section from Nimble standpoint
+                              case 'preset-section-eligible-for-module-dropzones-in-new-nested-sektion' :
+                                    var newParams = $.extend( true, {}, params );
+                                    newParams = $.extend( newParams, {
+                                          before_module_or_nested_section : params.before_module_or_nested_section,
+                                          after_module_or_nested_section : params.after_module_or_nested_section
+                                    });
+                                    api.previewer.trigger( 'sek-add-preset-section-in-new-nested-sektion', newParams );
                               break;
 
                               default :

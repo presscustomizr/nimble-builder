@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.3
-Stable tag: 1.9.9-beta
+Stable tag: 1.9.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -121,11 +121,15 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 
 == Upgrade Notice ==
 = 1.9.9 =
-fixed : the template path of a custom module is broken since v1.9.7. fixes #537
+Successfully tested with WordPress v5.3. It is now possible to drop a multicolumn structure in an existing section, which automatically creates a new nested section. Various improvements in the customization UI.
 
 == Changelog ==
-= 1.9.9 November 7th 2019 =
-* fixed : the template path of a custom module is broken since v1.9.7
+= 1.9.9 November 13th 2019 =
+* added : compatibility with WordPress 5.3
+* fixed : when customizing _blank target links open a blank browser tab
+* fixed : when dropping a pre-build section in a location, it can be wrongly located in last position in some cases
+* fixed : impossible to move an already inserted module in a freshly added multicolumn section
+* improved : allow multicolumn preset sections to be dropped between modules without having to manually create the parent nested section first.
 
 = 1.9.8 November 6th 2019 =
 * fixed : bug when using Nimble template in Hueman theme

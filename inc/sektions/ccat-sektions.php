@@ -6807,7 +6807,7 @@ function sek_get_module_params_for_sek_global_text() {
                     'refresh_stylesheet' => true,
                     'refresh_preview' => false,
                     'choices'            => array(
-                        'inherit' => __('Inherit theme', 'text_doma'),
+                        'inherit' => __('Default', 'text_doma'),
                         'underlined' => __( 'Underlined', 'text_doma'),
                         'not_underlined' => __( 'Not underlined', 'text_doma'),
                     )
@@ -6819,7 +6819,7 @@ function sek_get_module_params_for_sek_global_text() {
                     'refresh_stylesheet' => true,
                     'refresh_preview' => false,
                     'choices'            => array(
-                        'inherit' => __('Inherit theme', 'text_doma'),
+                        'inherit' => __('Default', 'text_doma'),
                         'underlined' => __( 'Underlined', 'text_doma'),
                         'not_underlined' => __( 'Not underlined', 'text_doma'),
                     )

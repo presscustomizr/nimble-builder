@@ -95,6 +95,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         if ( params.cloneId ) {
                               $( 'div[data-sek-id="' + params.cloneId + '"]' ).trigger('sek-section-added', params );
                         }
+                        // @todo is the params.apiParams.id correct ? Does it actually exists in the DOM?
                         $( 'div[data-sek-id="' + params.apiParams.id + '"]' ).trigger('sek-section-added', params );
 
                         // added to fix resizable not instantiated when adding column modules
