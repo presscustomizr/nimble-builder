@@ -61,7 +61,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
                 'posts_per_page'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Number of posts per page', 'text_doma' ),
+                    'title'       => __( 'Posts per page', 'text_doma' ),
                     'default'     => 10,
                     'min'         => 1,
                     'max'         => 50,
