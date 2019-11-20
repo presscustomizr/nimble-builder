@@ -1,6 +1,54 @@
+// Reset
+// Inspired from Twentytwenty
+.sek-module-inner {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  blockquote,
+  address,
+  big,
+  cite,
+  code,
+  em,
+  font,
+  img,
+  small,
+  strike,
+  sub,
+  sup,
+  li,
+  ol,
+  ul,
+  fieldset,
+  form,
+  label,
+  legend,
+  button,
+  table,
+  caption,
+  tr,
+  th,
+  td {
+    border: none;
+    font-size: inherit;
+    line-height: inherit;
+    margin: 0;
+    padding: 0;
+    text-align: inherit;
+  }
+}
+
 .#{$project-base-wrapper} {
     word-wrap: break-word;
 }
+
+// Helpers
+.sek-text-right { text-align: right !important; }
+.sek-text-left { text-align: left !important; }
 
 // LIST FORMATTING
 // Conservative
@@ -26,7 +74,7 @@
           margin: 0 0 1.5rem 1.5rem;
       }
       & > li {
-        padding: 0;
+        padding: .25rem .5rem;
       }
     }
     li > ul, li > ol {
@@ -34,8 +82,77 @@
     }
 }
 
-.sek-text-right { text-align: right !important; }
-.sek-text-left { text-align: left !important; }
+
+// VARIOUS
+// mostly inspired from Customizr
+.sek-module-inner {
+  dl {
+    dt {
+      overflow: hidden;
+      clear: left;
+      text-align: left;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding: 1.25em 1.25em .625em 1.25em;
+      position: relative;
+      &::before {
+        content: "";
+        position: absolute;
+        width: $base-line-height;
+        height: 2px;
+        bottom: calc(#{$base-line-height} - 6px);
+        left: 0;
+        background: $black;
+      }
+    }
+    .wp-caption-dt::before { content: none }
+    dd { padding-left: $base-line-height; }
+  }
+
+  pre code, tt {
+    @include box-sizing(border-box);
+    font-size: inherit;
+    white-space: pre-wrap !important;
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-family: $monotypeFont;
+  }
+  pre {
+    background: $grey-lightest;
+    padding: $base-line-height*2;
+    word-wrap: normal;
+    white-space: pre-wrap !important;
+    color: $black;
+    font-family: $monotypeFont !important;
+  }
+
+  figure { text-align: center; }
+  figcaption { text-align:center; }
+  cite {
+    color:$black;
+    font-weight: 300;
+    font-style: normal;
+    position: relative;
+    display: inline-block;
+  }
+  // inspired from twentytwenty
+  caption, code, code, kbd, samp, .wp-block-table.is-style-stripes tbody tr:nth-child(odd), :root .has-subtle-background-background-color {
+    background-color: #dbdbdb;
+  }
+  sub {
+    bottom: -0.25em;
+  }
+  sub, sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+}//.sek-module-inner
+
+
+
 
 // INSPIRED FROM CUSTOMIZR THEME
 // implemented in nov 2019 for https://github.com/presscustomizr/nimble-builder/issues/525
@@ -65,6 +182,9 @@
     @extend %table-style;
   }
 }
+
+
+
 
 
 // customizr like
