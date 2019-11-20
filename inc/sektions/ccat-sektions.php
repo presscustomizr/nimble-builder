@@ -1969,8 +1969,8 @@ function sek_get_feedback_notif_status() {
     $start_version = get_option( 'nimble_started_with_version', NIMBLE_VERSION );
     //sek_error_log('START VERSION ?' . $start_version, version_compare( $start_version, '1.6.0', '<=' ) );
 
-    // Bail if user did not start before 1.8.3, June 20th 2019
-    if ( ! version_compare( $start_version, '1.8.3', '<=' ) )
+    // Bail if user did not start before 1.9.5, October 21st 2019 ( set on November 18th 2019 )
+    if ( ! version_compare( $start_version, '1.9.5', '<=' ) )
       return;
 
     $sek_post_query_vars = array(
@@ -11110,7 +11110,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
                 'posts_per_page'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Number of posts per page', 'text_doma' ),
+                    'title'       => __( 'Posts per page', 'text_doma' ),
                     'default'     => 10,
                     'min'         => 1,
                     'max'         => 50,
