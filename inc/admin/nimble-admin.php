@@ -31,14 +31,14 @@ function sek_versionning() {
 
 
 // /* ------------------------------------------------------------------------- *
-// *  SYSTEM INFOS
+// *  SYSTEM INFO
 // /* ------------------------------------------------------------------------- */
 add_action('admin_menu', '\Nimble\sek_plugin_menu');
 function sek_plugin_menu() {
     if ( ! current_user_can( 'update_plugins' ) )
       return;
     // system infos should be displayed to users with admin capabilities only
-    add_plugins_page(__( 'System infos', 'text_domain' ), __( 'System infos', 'text_domain' ), 'read', 'nimble-builder', '\Nimble\sek_plugin_page');
+    add_plugins_page(__( 'System info', 'text_domain' ), __( 'System info', 'text_domain' ), 'read', 'nimble-builder', '\Nimble\sek_plugin_page');
 }
 
 function sek_plugin_page() {
@@ -46,7 +46,7 @@ function sek_plugin_page() {
     <div class="wrap">
       <h3><?php _e( 'System Informations', 'text_domain_to_be_chg' ); ?></h3>
       <h4 style="text-align: left"><?php _e( 'Please include your system informations when posting support requests.' , 'text_domain_to_be_chg' ) ?></h4>
-      <textarea readonly="readonly" onclick="this.focus();this.select()" id="system-info-textarea" name="tc-sysinfo" title="<?php _e( 'To copy the system infos, click below then press Ctrl + C (PC) or Cmd + C (Mac).', 'text_domain_to_be_chg' ); ?>" style="width: 800px;min-height: 800px;font-family: Menlo,Monaco,monospace;background: 0 0;white-space: pre;overflow: auto;display:block;"><?php echo sek_config_infos(); ?></textarea>
+      <textarea readonly="readonly" onclick="this.focus();this.select()" id="system-info-textarea" name="tc-sysinfo" title="<?php _e( 'To copy the system info, click below then press Ctrl + C (PC) or Cmd + C (Mac).', 'text_domain_to_be_chg' ); ?>" style="width: 800px;min-height: 800px;font-family: Menlo,Monaco,monospace;background: 0 0;white-space: pre;overflow: auto;display:block;"><?php echo sek_config_infos(); ?></textarea>
     </div>
     <?php
 }
@@ -78,7 +78,7 @@ function sek_config_infos() {
       $parent_theme      = $parent_theme_data->Name . ' ' . $parent_theme_data->Version;
     }
 
-    $return  = '### Begin System Infos (Generated ' . date( 'Y-m-d H:i:s' ) . ') ###' . "";
+    $return  = '### Begin System Info (Generated ' . date( 'Y-m-d H:i:s' ) . ') ###' . "";
 
     // Site infos
     $return .= "\n" .'------------ SITE INFO' . "\n";
@@ -208,7 +208,7 @@ function sek_config_infos() {
     // $return .= 'SOAP Client:              ' . ( class_exists( 'SoapClient' ) ? 'Installed' : 'Not Installed' ) . "\n";
     // $return .= 'Suhosin:                  ' . ( extension_loaded( 'suhosin' ) ? 'Installed' : 'Not Installed' ) . "\n";
 
-    $return .= "\n\n" . '### End System Infos ###';
+    $return .= "\n\n" . '### End System Info ###';
 
     return $return;
 }

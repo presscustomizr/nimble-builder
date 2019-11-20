@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.3
-Stable tag: 1.9.9
+Stable tag: 1.9.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,13 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.9.9 =
-Successfully tested with WordPress v5.3. It is now possible to drop a multicolumn structure in an existing section, which automatically creates a new nested section. Various improvements in the customization UI.
+= 1.9.10 =
+Better default base style for tables, lists, codes, definitions, and various minor CSS improvements.
 
 == Changelog ==
+= 1.9.10 November 20th 2019 =
+* improved : better default base style for tables, lists, codes, definitions, and various minor CSS improvements
+
 = 1.9.9 November 13th 2019 =
 * added : compatibility with WordPress 5.3
 * fixed : when customizing _blank target links open a blank browser tab
@@ -396,7 +399,7 @@ make sure api data are refreshed on installation and plugin update
 * improved : the preview of a changeset on front
 
 = 1.4.8 : February 13th, 2019 =
-* fixed : the system infos should be displayed to users with admin capabilities only
+* fixed : the system info should be displayed to users with admin capabilities only
 * improved : increase the specificity of CSS selectors for the font customization of the WP editor module
 
 = 1.4.7 : February 2nd, 2019 =
