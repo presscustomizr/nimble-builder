@@ -36,6 +36,37 @@
 
 .sek-text-right { text-align: right !important; }
 .sek-text-left { text-align: left !important; }
+
+// INSPIRED FROM CUSTOMIZR THEME
+// implemented in nov 2019 for https://github.com/presscustomizr/nimble-builder/issues/525
+%table-base {
+  width: 100%;
+  border-collapse: collapse;
+  @include media-breakpoint-down(sm) {
+    table-layout: fixed;
+  }
+  /*&:not([id^=wp-calendar]) {
+    border: 2px solid $grey-lightest;
+    th { @extend .caps; @extend  .letter-spacing-2; font-family: $serviceFont; }
+    th, td { @extend .demi-small; padding: $base-line-height; border: 1px solid $grey-lightest; }
+    td { color: $grey-dark; }
+  }*/
+}
+%table-style {
+    border: 2px solid $grey-light;
+    th { text-transform: uppercase; letter-spacing: 2px; font-family: $serviceFont; }
+    th, td { font-size: 0.95em;; padding: $base-line-height; border: 1px solid $grey-light; }
+    td { color: $grey-dark; }
+}
+
+.sek-module-inner table {
+  @extend %table-base;
+  &:not([id^=wp-calendar]):not(.ui-datepicker-calendar):not(.tribe-mini-calendar) {
+    @extend %table-style;
+  }
+}
+
+
 // customizr like
 // .#{$project-prefix}module .#{$project-prefix}module-inner {
 //     ul, ol {

@@ -94,3 +94,14 @@ $serviceFont  : sans-serif !default;
 $transition-base:             all .2s ease-in-out !default;
 $transition-fade:             opacity .15s linear !default;
 $transition-collapse:         height .35s ease !default;
+
+
+// Colors
+$grey-mid-light : #aaa;
+$grey-light    : #eceeef;
+$grey-lightest : #f7f8f9;
+$grey-dark     : #777;
+
+// Typography
+$serviceFont : sans-serif;
+$base-line-height: 1em * 1.25;
