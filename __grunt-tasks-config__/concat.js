@@ -180,6 +180,7 @@ module.exports = {
   //
   sektions_front_js : {
     src: [
+      '<%= paths.front_assets %>js/_dev_front/0_0_0_0_pre_front_global_definition.js',
       '<%= paths.front_assets %>js/_dev_front/0_0_0_front_underscore.js',
       '<%= paths.front_assets %>js/_dev_front/0_0_1_front_fittext.js',
       '<%= paths.front_assets %>js/_dev_front/0_0_2_jquery_front_smartload.js',
@@ -188,6 +189,7 @@ module.exports = {
       '<%= paths.front_assets %>js/_dev_front/1_0_3_front_menu_module.js',
       '<%= paths.front_assets %>js/_dev_front/1_0_4_front_accordion_module.js',
       '<%= paths.front_assets %>js/_dev_front/1_0_5_front_simple_slider_module.js',
+      '<%= paths.front_assets %>js/_dev_front/2_0_0_front_video_bg.js',
       '<%= paths.front_assets %>js/_dev_front/9_9_9_front_fire.js'
     ],
     dest: '<%= paths.front_assets %>js/ccat-nimble-front.js',
@@ -235,7 +237,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_5_font_picker_input.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_6_font_awesome_icon_picker.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_0_7_code_editor.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_1_0_range_simple.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_1_0_range_simple_and_number_simple.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_1_1_range_simple_device_switcher.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_1_2_range_with_unit_picker.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_7_1_3_range_with_unit_picker_device_switcher.js',

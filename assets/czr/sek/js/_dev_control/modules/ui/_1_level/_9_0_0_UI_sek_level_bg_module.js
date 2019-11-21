@@ -113,6 +113,15 @@
                                                 }
                                           });
                                     break;
+                                    case 'bg-use-video' :
+                                          _.each( [ 'bg-video', 'bg-video-loop', 'bg-video-on-mobile', 'bg-video-start-time', 'bg-video-end-time' ] , function( _inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return api.CZR_Helpers.isChecked( input() );
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
                               }
                         });
                   }

@@ -241,3 +241,70 @@
 .sek-module .sek-module-inner .widget_hu_tabs .alx-tabs-nav {
     margin-bottom: 10px;
 }
+
+
+
+// VIDEO BG
+[data-sek-level][data-sek-video-bg-src] {
+  position: relative;
+}
+
+[data-sek-level] embed,
+[data-sek-level] iframe,
+[data-sek-level] object,
+[data-sek-level] video {
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
+  line-height: 1;
+  border: none;
+}
+[data-sek-level] .sek-custom-embed {
+  line-height: 0;
+}
+[data-sek-level] .sek-background-video-container,
+[data-sek-level] .sek-background-holder,
+[data-sek-level] .sek-background {
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+  overflow: hidden;
+  z-index: 0;
+  direction: ltr;
+}
+[data-sek-level] .sek-background-video-container {
+  -webkit-transition: opacity 1s;
+  -o-transition: opacity 1s;
+  transition: opacity 1s;
+  pointer-events: none;
+}
+  [data-sek-level] .sek-background-video-container.sek-bg-loading {
+    opacity: 0;
+    visibility: hidden;
+  }
+[data-sek-level] .sek-background-video-embed {
+  max-width: none;
+}
+[data-sek-level] .sek-background-video-embed, [data-sek-level] .sek-background-video-hosted {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translateX(-50%) translateY(-50%);
+      -ms-transform: translateX(-50%) translateY(-50%);
+          transform: translateX(-50%) translateY(-50%);
+}
+[data-sek-level] .sek-background-video {
+  position: absolute;
+  max-width: none;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translateY(-50%) translateX(-50%);
+      -ms-transform: translateY(-50%) translateX(-50%);
+          transform: translateY(-50%) translateX(-50%);
+}
+[data-sek-level] .sek-html5-video {
+  -o-object-fit: cover;
+     object-fit: cover;
+}

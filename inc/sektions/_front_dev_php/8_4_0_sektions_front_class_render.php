@@ -828,10 +828,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $fixed_bg_enabled = false;
             $width = '';
             $height = '';
+            $video_bg_url = '';
 
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
-                if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
+                if ( !empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
                     $attributes .= 'data-sek-has-bg="true"';
                     if ( sek_is_img_smartload_enabled() ) {
                         $bg_url_for_lazy_load = wp_get_attachment_url( $bg_options[ 'bg-image'] );
@@ -846,9 +847,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         }
                     }
                 }
+                if ( !empty( $bg_options[ 'bg-use-video'] ) && sek_booleanize_checkbox_val( $bg_options[ 'bg-use-video'] ) ) {
+                    if ( !empty( $bg_options[ 'bg-video' ] ) ) {
+                        $video_bg_url = $bg_options[ 'bg-video' ];
+                    }
+                }
             }
 
-            if ( ! empty( $bg_url_for_lazy_load ) ) {
+            if ( !empty( $bg_url_for_lazy_load ) ) {
                 $attributes .= sprintf('%1$s data-sek-lazy-bg="true" data-sek-src="%2$s"', $attributes, $bg_url_for_lazy_load );
             }
             // data-sek-bg-fixed attribute has been added for https://github.com/presscustomizr/nimble-builder/issues/414
@@ -867,6 +873,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     array_key_exists('bg-parallax-force', $bg_options) ? $bg_options['bg-parallax-force'] : '40'
                     //!empty( $bg_options['bg-parallax-force'] ) ? $bg_options['bg-parallax-force'] : '40'
                 );
+            }
+
+            if ( !empty( $video_bg_url ) ) {
+                $attributes .= sprintf('%1$s data-sek-video-bg-src="%2$s"', $attributes, $video_bg_url );
             }
             return $attributes;
         }

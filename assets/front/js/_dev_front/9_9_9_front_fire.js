@@ -57,14 +57,14 @@ jQuery(function($){
             $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
             // hack => always trigger a 'resize' event with a small delay to make sure bg positions are ok
             setTimeout( function() {
-                 $('body').trigger('resize');
+                 nimbleFront.cachedElements.$body.trigger('resize');
             }, 500 );
       };
       // When previewing, react to level refresh
       // This can occur to any level. We listen to the bubbling event on 'body' tag
       // and salmon up to maybe instantiate any missing candidate
       // Example : when a preset_section is injected
-      $('body').on('sek-level-refreshed sek-section-added', function( evt ){
+      nimbleFront.cachedElements.$body.on('sek-level-refreshed sek-section-added', function( evt ){
             if ( "true" === $(this).data('sek-bg-parallax') ) {
                   _setParallaxWhenCustomizing.call(this);
             } else {
@@ -148,9 +148,22 @@ jQuery( function($){
     };
 
     // animate menu item to Nimble anchors
-    $('body').find('.menu-item' ).on( 'click', 'a', maybeScrollToAnchor );
+    nimbleFront.cachedElements.$body.find('.menu-item' ).on( 'click', 'a', maybeScrollToAnchor );
 
     // animate an anchor link inside Nimble sections
     // fixes https://github.com/presscustomizr/nimble-builder/issues/443
     $('[data-sek-level="location"]' ).on( 'click', 'a', maybeScrollToAnchor );
+});
+
+/* ------------------------------------------------------------------------- *
+ *  VIDEO BACKGROUND
+/* ------------------------------------------------------------------------- */
+// - insert bg video container
+// - inject player api script
+// - print video iframe
+// - on api ready, do stuff
+jQuery( function($){
+    $('[data-sek-video-bg-src]').each(function() {
+        $(this).nimbleLoadVideoBg();
+    });
 });

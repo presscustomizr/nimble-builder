@@ -29,8 +29,10 @@ function sek_get_module_params_for_sek_level_bg_module() {
                           __('site wide options', 'text_doma')
                       )
                     ),
-                    'refresh_markup' => true
+                    'refresh_markup' => true,
+                    'html_before' => '<hr/><h3>' . __('Image background', 'text-doma') .'</h3>'
                 ),
+
                 'bg-position' => array(
                     'input_type'  => 'bgPositionWithDeviceSwitcher',
                     'title'       => __('Image position', 'text_doma'),
@@ -91,11 +93,6 @@ function sek_get_module_params_for_sek_level_bg_module() {
                         'space' => __('Space', 'text_dom'),
                     )
                 ),
-                // 'bg-video' => array(
-                //     'input_type'  => 'text',
-                //     'title'       => __('Video', 'text_doma'),
-                //     'default'     => ''
-                // ),
                 'bg-apply-overlay' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Apply a background overlay', 'text_doma'),
@@ -119,7 +116,55 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'default'  => '40',
                     'width-100'   => true,
                     'title_width' => 'width-100'
-                )
+                ),
+                'bg-use-video' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Use a video background', 'text_doma'),
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'default'     => 0,
+                    //'notice_after' => __('', 'text_doma'),
+                    'refresh_markup' => true,
+                    'html_before' => '<hr/><h3>' . __('Video background', 'text-doma') .'</h3>'
+                ),
+                'bg-video' => array(
+                    'input_type'  => 'text',
+                    'title'       => __('Video link', 'text_doma'),
+                    'default'     => '',
+                    'refresh_markup' => true,
+                    'notice_after' => __('Video link from YouTube, Vimeo, or a self hosted file ( mp4 format is recommended )', 'text_doma'),
+                ),
+                'bg-video-loop' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Loop infinitely', 'text_doma'),
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'default'     => 1,
+                    //'notice_after' => __('', 'text_doma'),
+                    'refresh_markup' => true,
+                ),
+                'bg-video-on-mobile' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Play on mobile devices', 'text_doma'),
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'default'     => 0,
+                    'notice_after' => __('Not recommended if you don\'t use a self hosted video file', 'text_doma'),
+                    'refresh_markup' => true,
+                ),
+                'bg-video-start-time' => array(
+                    'input_type'  => 'number_simple',
+                    'title'       => __('Start time', 'text_doma'),
+                    'default'     => '',
+                    'refresh_markup' => true
+                ),
+                'bg-video-end-time' => array(
+                    'input_type'  => 'number_simple',
+                    'title'       => __('End time', 'text_doma'),
+                    'default'     => '',
+                    'refresh_markup' => true,
+                    'notice_after' => __('Set an optional start and end time in seconds', 'text-doma')
+                ),
             )//item-inputs
         )//tmpl
     );
@@ -267,8 +312,9 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
 
             $bg_overlay_css_rules = FALSE !== $bg_overlay_opacity ? $bg_overlay_css_rules . ';opacity:' . $bg_overlay_opacity : $bg_overlay_css_rules;
 
+            // nov 2019 : added new selector '> .sek-background-video-container' for https://github.com/presscustomizr/nimble-builder/issues/287
             $rules[]     = array(
-                    'selector' => '[data-sek-id="'.$level['id'].'"]::before',
+                    'selector' => implode(',', array( '[data-sek-id="'.$level['id'].'"]::before', '[data-sek-id="'.$level['id'].'"] > .sek-background-video-container::after' ) ),
                     'css_rules' => $bg_overlay_css_rules,
                     'mq' =>null
             );
