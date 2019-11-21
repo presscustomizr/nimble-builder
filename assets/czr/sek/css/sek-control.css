@@ -855,11 +855,13 @@ credits : Gutenberg team @wordpress */
 .sek-no-unit-picker .sek-range-wrapper {
   width: 70%;
 }
-.sek-number-wrapper {
+.sek-number-wrapper, .sek-simple-number-wrapper {
   width: 50px;
   margin-right: 5px;
 }
-
+.sek-simple-number-wrapper {
+  text-align: right;
+}
 
 .sek-range-input{
     flex:1;

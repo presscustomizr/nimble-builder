@@ -27,6 +27,15 @@
                   $rangeInput.val( $numberInput.val() || 0 );
             },
 
+            number_simple : function( params ) {
+                  var input = this,
+                      $numberInput = input.container.find( 'input[type="number"]');
+
+                  $numberInput.on('input', function( evt ) {
+                        input( $(this).val() );
+                  });
+            },
+
       });//$.extend( api.czrInputMap, {})
 
 
