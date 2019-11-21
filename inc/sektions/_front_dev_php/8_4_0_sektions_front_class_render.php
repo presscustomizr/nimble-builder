@@ -828,7 +828,15 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $fixed_bg_enabled = false;
             $width = '';
             $height = '';
+            $level_type = array_key_exists( 'level', $model ) ? $model['level'] : 'section';
+
+            // will be used for sections (not columns and modules ) that have a video background
+            // implemented for video bg https://github.com/presscustomizr/nimble-builder/issues/287
             $video_bg_url = '';
+            $video_bg_loop = true;
+            $video_bg_on_mobile = false;
+            $video_bg_start_time = null;
+            $video_bg_end_time = null;
 
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
@@ -847,9 +855,25 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         }
                     }
                 }
-                if ( !empty( $bg_options[ 'bg-use-video'] ) && sek_booleanize_checkbox_val( $bg_options[ 'bg-use-video'] ) ) {
+
+                // Nov 2019, for video background https://github.com/presscustomizr/nimble-builder/issues/287
+                // should be added for sections only
+                if ( 'section' === $level_type && !empty( $bg_options[ 'bg-use-video'] ) && sek_booleanize_checkbox_val( $bg_options[ 'bg-use-video'] ) ) {
                     if ( !empty( $bg_options[ 'bg-video' ] ) ) {
                         $video_bg_url = $bg_options[ 'bg-video' ];
+                    }
+
+                    if ( array_key_exists( 'bg-video-loop', $bg_options ) ) {
+                        $video_bg_loop = sek_booleanize_checkbox_val( $bg_options[ 'bg-video-loop' ] );
+                    }
+                    if ( array_key_exists( 'bg-video-on-mobile', $bg_options ) ) {
+                        $video_bg_on_mobile = sek_booleanize_checkbox_val( $bg_options[ 'bg-video-on-mobile' ] );
+                    }
+                    if ( !empty( $bg_options[ 'bg-video-start-time' ] ) ) {
+                        $video_bg_start_time = (int)$bg_options[ 'bg-video-start-time' ];
+                    }
+                    if ( !empty( $bg_options[ 'bg-video-end-time' ] ) ) {
+                        $video_bg_end_time = (int)$bg_options[ 'bg-video-end-time' ];
                     }
                 }
             }
@@ -875,8 +899,19 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 );
             }
 
-            if ( !empty( $video_bg_url ) ) {
-                $attributes .= sprintf('%1$s data-sek-video-bg-src="%2$s"', $attributes, $video_bg_url );
+            // video background insertion can only be done for sections
+            if ( 'section' === $level_type ) {
+                if ( !empty( $video_bg_url ) && is_string( $video_bg_url ) ) {
+                    $attributes .= sprintf('%1$s data-sek-video-bg-src="%2$s"', $attributes, $video_bg_url );
+                }
+                $attributes .= sprintf('%1$s data-sek-video-bg-loop="%2$s"', $attributes, $video_bg_loop ? 'true' : 'false' );
+                $attributes .= sprintf('%1$s data-sek-video-bg-on-mobile="%2$s"', $attributes, $video_bg_on_mobile ? 'true' : 'false' );
+                if ( !is_null( $video_bg_start_time ) && $video_bg_start_time >= 0 ) {
+                    $attributes .= sprintf('%1$s data-sek-video-start-at="%2$s"', $attributes, $video_bg_start_time );
+                }
+                if ( !is_null( $video_bg_end_time ) && $video_bg_end_time >= 0 ) {
+                    $attributes .= sprintf('%1$s data-sek-video-end-at="%2$s"', $attributes, $video_bg_end_time );
+                }
             }
             return $attributes;
         }

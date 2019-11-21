@@ -38,6 +38,7 @@
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
+
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
@@ -123,7 +124,16 @@
                                           });
                                     break;
                               }
-                        });
+                        });//item.czr_Input.each
+
+                        // Video background should only be available for sections
+                        if ( module.control && module.control.params && module.control.params.sek_registration_params ) {
+                              if ( 'section' !== module.control.params.sek_registration_params.level ) {
+                                    _.each( [ 'bg-use-video', 'bg-video', 'bg-video-loop', 'bg-video-on-mobile', 'bg-video-start-time', 'bg-video-end-time' ], function( _inputId_ ) {
+                                          item.czr_Input( _inputId_ ).visible( false );
+                                    });
+                              }
+                        }
                   }
             }//CZRItemConstructor
       };

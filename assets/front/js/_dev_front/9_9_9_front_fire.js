@@ -156,7 +156,7 @@ jQuery( function($){
 });
 
 /* ------------------------------------------------------------------------- *
- *  VIDEO BACKGROUND
+ *  VIDEO BACKGROUND FOR SECTIONS
 /* ------------------------------------------------------------------------- */
 // - insert bg video container
 // - inject player api script
@@ -164,6 +164,8 @@ jQuery( function($){
 // - on api ready, do stuff
 jQuery( function($){
     $('[data-sek-video-bg-src]').each(function() {
-        $(this).nimbleLoadVideoBg();
+        if ( 'section' === $(this).data('sek-level') ) {
+            $(this).nimbleLoadVideoBg();
+        }
     });
 });

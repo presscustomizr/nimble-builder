@@ -5,12 +5,12 @@
       //defaults
       var pluginName = 'nimbleLoadVideoBg',
           defaults = {
-                videoUrl : '',
                 backgroundVideoContainer: '.sek-background-video-container',
                 backgroundVideoEmbed: '.sek-background-video-embed',
-                backgroundVideoHosted: '.sek-background-video-hosted',
-                playOnce:false,
-                playOnMobile:false
+                loop:true,
+                activeOnMobile:false,
+                startAt:null,
+                endAt:null
                 //enableCentering : true,
                 // onresize : true,
                 // onInit : true,//<= shall we smartload on init or wait for a custom event, typically smartload ?
@@ -32,9 +32,26 @@
             var self = this;
             this.$element   = $(element);
             this.$window    = nimbleFront.cachedElements.$window;
-            this.options    = $.extend( {}, defaults, options) ;
             this._defaults  = defaults;
             this._name      = pluginName;
+            this.options    = options || {};
+
+            // set options from data attributes
+            if ( ! _utils_.isUndefined( self.$element.data('sek-video-bg-loop') ) ) {
+                this.options.loop = self.$element.data('sek-video-bg-loop');
+            }
+            if ( ! _utils_.isUndefined( self.$element.data('sek-video-bg-on-mobile') ) ) {
+                this.options.activeOnMobile = self.$element.data('sek-video-bg-on-mobile');
+            }
+            if ( ! _utils_.isUndefined( self.$element.data('sek-video-start-at') ) ) {
+                this.options.startAt = self.$element.data('sek-video-start-at');
+            }
+            if ( ! _utils_.isUndefined( self.$element.data('sek-video-end-at') ) ) {
+                this.options.endAt = self.$element.data('sek-video-end-at');
+            }
+
+            this.options    = $.extend( {}, defaults, this.options);
+            console.log('ALORS CES OPTIONS ', this.options , this.$element.data('sek-video-end-at'));
             this.init();
       }
 
@@ -42,7 +59,7 @@
       //@return void
       Plugin.prototype.init = function () {
             var self = this;
-            if ( !this.options.playOnMobile && nimbleFront.isMobile() ) {
+            if ( !this.options.activeOnMobile && nimbleFront.isMobile() ) {
               return;
             }
 
@@ -70,11 +87,9 @@
                 this.videoId = this.apiProvider.getVideoIDFromURL( this.videoUrl );
                 this.apiProvider.onApiReady(function (apiObject) {
                       self.apiObject = apiObject;
-                      console.log('api ready callback', self.videoType, self.apiObject, this.videoId );
                       if ('youtube' === self.videoType) {
                             self.prepareYTVideo();
                       }
-
                       if ('vimeo' === self.videoType) {
                             self.prepareVimeoVideo();
                       }
@@ -82,25 +97,45 @@
             } else {
                 this.videoType = 'hosted';
                 var _attributes = ['autoplay', 'muted', 'playsinline'];
-                if ( !self.options.playOnce ) {
+                if ( self.options.loop ) {
                     _attributes.push('loop');
                 }
                 _attributes = _attributes.join(' ');
                 self.$backgroundVideoContainer.append( '<video ' + _attributes + ' class="sek-background-video-hosted sek-html5-video"></video>');
-                // var startTime = this.getElementSettings('background_video_start'),
-                //     endTime = this.getElementSettings('background_video_end');
+                self.$backgroundVideoHosted = $( '.sek-background-video-hosted', self.$element );
 
-                // if (startTime || endTime) {
-                //   videoUrl += '#t=' + (startTime || 0) + (endTime ? ',' + endTime : '');
-                // }
+                var startTime = self.options.startAt ? parseInt( self.options.startAt, 10 ) : 0,
+                    endTime = self.options.endAt ? parseInt( self.options.endAt, 10 ) : 0;
+
+                // Fragment video if conditions are met
+                if ( startTime || endTime ) {
+                      if ( startTime && endTime < 1 ) {
+                            this.videoUrl += '#t=' + startTime;
+                      } else if ( startTime && endTime && endTime > startTime ) {
+                            this.videoUrl += '#t=' + startTime + ',' + endTime;
+                      } else if ( startTime < 1 && endTime ) {
+                            this.videoUrl += '#t=0,' + endTime;
+                      }
+                }
 
                 self.$backgroundVideoContainer.find('.sek-background-video-hosted').attr('src', this.videoUrl ).one( 'canplay', this.changeVideoSize.bind(this) );
 
-                // if (playOnce) {
-                //   this.elements.$backgroundVideoHosted.on('ended', function () {
-                //     _this5.elements.$backgroundVideoHosted.hide();
-                //   });
-                // }
+                // if video is fragmented and should be looped, we need to hack because when fragmented, looping won't be done automatically
+                var isVideoFragmented = -1 !== this.videoUrl.indexOf('#t=');
+                if ( self.options.loop && isVideoFragmented ) {
+                      // solution found here : https://stackoverflow.com/questions/23304021/loop-video-with-media-fragments
+                      self.$backgroundVideoHosted.on( 'timeupdate', _utils_.throttle( function () {
+                            if( this.currentTime > endTime ) {
+                                  this.currentTime = startTime;
+                                  this.play();
+                            }
+                      }, 100 ) );
+                } else {
+                      // If not looped, remove video after play
+                      self.$backgroundVideoHosted.on( 'ended', function () {
+                            self.$backgroundVideoHosted.hide();
+                      });
+                }
             }
 
             this.$window.on('resize', _.debounce( function() { self.changeVideoSize(); }, 200 ) );
@@ -137,7 +172,7 @@
                                   case self.apiObject.PlayerState.ENDED:
                                         self.player.seekTo(0);
 
-                                        if ( self.options.playOnce ) {
+                                        if ( !self.options.loop ) {
                                               self.player.destroy();
                                         }
                                   break;
@@ -162,7 +197,7 @@
                       id: self.videoId,
                       width: videoSize.width,
                       autoplay: true,
-                      loop: self.options.playOnce,
+                      loop: self.options.loop,
                       transparent: false,
                       playsinline: false,
                       background: true,
@@ -180,24 +215,24 @@
 
 
       Plugin.prototype.changeVideoSize = function() {
-            if ( 'hosted' !== this.videoType && !this.player) {
+            var self = this;
+            if ( 'hosted' !== this.videoType && !this.player )
               return;
-            }
+
             var $video;
             if ('youtube' === this.videoType) {
-              $video = $(this.player.getIframe());
-            } else if ('vimeo' === this.videoType) {
-              $video = $(this.player.element);
-            } else if ('hosted' === this.videoType) {
-              $video = self.$backgroundVideoHosted;
+                $video = $( this.player.getIframe() );
+            } else if ('vimeo' === this.videoType ) {
+                $video = $( this.player.element );
+            } else if ('hosted' === this.videoType ) {
+                $video = self.$backgroundVideoHosted;
             }
 
-            if (!$video) {
+            if ( !$video )
               return;
-            }
 
-            var size = this.calcVideosSize($video);
-            $video.width(size.width).height(size.height);
+            var size = this.calcVideosSize( $video );
+            $video.width( size.width ).height( size.height );
       };
 
 
