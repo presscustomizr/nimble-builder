@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.3
-Stable tag: 1.9.10
+Stable tag: 1.9.11
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -36,7 +36,7 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * Create content, style, move / duplicate / remove elements **in real-time preview**.
 * **Includes many content modules** : classic text editor, image, column layouts, contact form, button, icons, map, html code, WordPress widget area, menu, and more.
 * **Insert engaging [post grids](https://docs.presscustomizr.com/article/393-how-to-add-post-grids-to-any-wordpress-page-with-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** in any page, looking great on desktop and mobile devices.
-* Add image background to your sections, and **[enable a parallax effect](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)**.
+* Use **full width image or video backgrounds** for your sections, and [enable a parallax effect](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link).
 * **Easily [customize your content specifically for mobile devices](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** : change the responsive breakpoint, adapt font-size, spacing, alignment, column layouts, in real-time preview.
 * **Customize any text [with Google Fonts](https://docs.presscustomizr.com/article/364-how-to-use-google-fonts-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)**.
 * **[Export / Import](https://docs.presscustomizr.com/article/391-how-to-export-and-import-templates-with-nimble-builder)** : re-use your sections in other pages and between sites.
@@ -120,10 +120,13 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.9.10 =
-Better default base style for tables, lists, codes, definitions, and various minor CSS improvements.
+= 1.9.11 =
+Added video background for section and column. Supports Vimeo, YouTube and self-hosted videos.
 
 == Changelog ==
+= 1.9.11 November 22nd 2019 =
+* added : video background for section and column. Supports Vimeo, YouTube and self-hosted videos.
+
 = 1.9.10 November 20th 2019 =
 * improved : better default base style for tables, lists, codes, definitions, and various minor CSS improvements
 
