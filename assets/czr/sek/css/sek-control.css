@@ -65,6 +65,10 @@ li[id*="__nimble__"].customize-control span.customize-control-title:first-child 
 
 
 
+/* SECTIONS */
+#customize-theme-controls ul[id*="sub-accordion-section-__nimble__"].open {
+  top: 0!important;
+}
 
 
 
