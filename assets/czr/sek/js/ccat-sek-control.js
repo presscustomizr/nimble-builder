@@ -45,6 +45,10 @@
                         template_name = 'range_simple';
                   break;
 
+                  case 'number_simple' :
+                        template_name = 'number_simple';
+                  break;
+
                   case 'font_size' :
                   case 'line_height' :
                   case 'range_with_unit_picker' :
@@ -10467,6 +10471,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $rangeInput.val( $numberInput.val() || 0 );
             },
 
+            number_simple : function( params ) {
+                  var input = this,
+                      $numberInput = input.container.find( 'input[type="number"]');
+
+                  $numberInput.on('input', function( evt ) {
+                        input( $(this).val() );
+                  });
+            },
+
       });//$.extend( api.czrInputMap, {})
 
 
@@ -13026,18 +13039,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   setInputVisibilityDeps : function() {
                         var item = this,
                             module = item.module;
+
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'bg-image' :
-                                          _.each( [ 'bg-attachment', 'bg-scale', 'bg-repeat', 'bg-apply-overlay', 'bg-color-overlay', 'bg-opacity-overlay', 'bg-parallax', 'bg-parallax-force' ] , function( _inputId_ ) {
+                                          _.each( [ 'bg-attachment', 'bg-scale', 'bg-repeat', 'bg-parallax', 'bg-parallax-force' ] , function( _inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       var bool = false;
                                                       switch( _inputId_ ) {
-                                                            case 'bg-color-overlay' :
-                                                            case 'bg-opacity-overlay' :
-                                                                  bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-apply-overlay')() );
-                                                            break;
+                                                            // case 'bg-color-overlay' :
+                                                            // case 'bg-opacity-overlay' :
+                                                            //       bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-apply-overlay')() );
+                                                            // break;
                                                             case 'bg-parallax-force' :
                                                                   bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-parallax')() );
                                                             break;
@@ -13058,7 +13072,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     case 'bg-apply-overlay' :
                                           _.each( [ 'bg-color-overlay', 'bg-opacity-overlay' ] , function(_inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      return ! _.isEmpty( item.czr_Input('bg-image')() + '' ) && api.CZR_Helpers.isChecked( input() );
+                                                      return api.CZR_Helpers.isChecked( input() );
                                                 }); } catch( er ) {
                                                       api.errare( module.id + ' => error in setInputVisibilityDeps', er );
                                                 }
@@ -13101,8 +13115,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 }
                                           });
                                     break;
+                                    case 'bg-use-video' :
+                                          _.each( [ 'bg-video', 'bg-video-loop', 'bg-video-on-mobile', 'bg-video-start-time', 'bg-video-end-time' ] , function( _inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return api.CZR_Helpers.isChecked( input() );
+                                                }); } catch( er ) {
+                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
                               }
-                        });
+                        });//item.czr_Input.each
+
+                        // Video background should only be available for sections and columns
+                        if ( module.control && module.control.params && module.control.params.sek_registration_params ) {
+                              if ( ! _.contains(  [ 'section', 'column' ], module.control.params.sek_registration_params.level ) ) {
+                                    _.each( [ 'bg-use-video', 'bg-video', 'bg-video-loop', 'bg-video-on-mobile', 'bg-video-start-time', 'bg-video-end-time' ], function( _inputId_ ) {
+                                          item.czr_Input( _inputId_ ).visible( false );
+                                    });
+                              }
+                        }
                   }
             }//CZRItemConstructor
       };
