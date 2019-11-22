@@ -1250,7 +1250,7 @@ function sek_img_sizes_preg_replace_callback( $matches ) {
 
 
 /* ------------------------------------------------------------------------- *
- *  SMART LOAD HELPER
+ *  SMART LOAD HELPER FOR IMAGES AND VIDEOS
 /* ------------------------------------------------------------------------- */
 /**
 * callback of preg_replace_callback in SEK_Front_Render::sek_maybe_process_img_for_js_smart_load
@@ -1314,6 +1314,29 @@ function sek_is_img_smartload_enabled() {
     Nimble_Manager()->img_smartload_enabled = $is_img_smartload_enabled;
 
     return Nimble_Manager()->img_smartload_enabled;
+}
+
+
+// @return boolean
+// video background lazy load can be set globally with 'global-bg-video-lazy-load'
+// implemented in nov 2019 for https://github.com/presscustomizr/nimble-builder/issues/287
+// This option is cached
+function sek_is_video_bg_lazyload_enabled() {
+    // if ( skp_is_customizing() )
+    //   return false;
+    if ( 'not_cached' !== Nimble_Manager()->video_bg_lazyload_enabled ) {
+        return Nimble_Manager()->video_bg_lazyload_enabled;
+    }
+    $is_video_bg_lazyload_enabled = false;
+    $glob_performances_data = sek_get_global_option_value( 'performances' );
+    if ( !is_null( $glob_performances_data ) && is_array( $glob_performances_data ) && !empty( $glob_performances_data['global-bg-video-lazy-load'] ) ) {
+        $is_video_bg_lazyload_enabled = sek_booleanize_checkbox_val( $glob_performances_data['global-bg-video-lazy-load'] );
+    }
+
+    // CACHE THE OPTION
+    Nimble_Manager()->video_bg_lazyload_enabled = $is_video_bg_lazyload_enabled;
+
+    return Nimble_Manager()->video_bg_lazyload_enabled;
 }
 
 

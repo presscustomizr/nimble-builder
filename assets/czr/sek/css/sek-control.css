@@ -66,6 +66,7 @@ li[id*="__nimble__"].customize-control span.customize-control-title:first-child 
 
 
 /* SECTIONS */
+/* nov 2019 => experimental fix for experimental fix for https://github.com/presscustomizr/nimble-builder/issues/539 */
 #customize-theme-controls ul[id*="sub-accordion-section-__nimble__"].open {
   top: 0!important;
 }

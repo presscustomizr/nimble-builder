@@ -19,10 +19,21 @@ function sek_get_module_params_for_sek_global_performances() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'notice_after' => sprintf('%1$s <br/><strong>%2$s</strong>',
-                        __( 'Check this option to delay the loading of non visible images. Images below the window will be dynamically loaded when scrolling. This can improve performance by reducing the weight of long web pages including multiple images.', 'text_dom'),
+                        __( 'Check this option to delay the loading of non visible images. Images outside the window will be dynamically loaded when scrolling. This can improve performance by reducing the weight of long web pages including multiple images.', 'text_dom'),
                         __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
                     )
                 ),
+                'global-bg-video-lazy-load' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Lazy load video backgrounds', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    // 'notice_after' => sprintf('%1$s <br/><strong>%2$s</strong>',
+                    //     __( 'Load video backgrounds when', 'text_dom'),
+                    //     __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
+                    // )
+                )
             )
         )//tmpl
     );

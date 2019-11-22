@@ -857,8 +857,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 }
 
                 // Nov 2019, for video background https://github.com/presscustomizr/nimble-builder/issues/287
-                // should be added for sections only
-                if ( 'section' === $level_type && !empty( $bg_options[ 'bg-use-video'] ) && sek_booleanize_checkbox_val( $bg_options[ 'bg-use-video'] ) ) {
+                // should be added for sections and columns only
+                if ( in_array( $level_type, array( 'section', 'column') ) && !empty( $bg_options[ 'bg-use-video'] ) && sek_booleanize_checkbox_val( $bg_options[ 'bg-use-video'] ) ) {
                     if ( !empty( $bg_options[ 'bg-video' ] ) ) {
                         $video_bg_url = $bg_options[ 'bg-video' ];
                     }
@@ -870,10 +870,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $video_bg_on_mobile = sek_booleanize_checkbox_val( $bg_options[ 'bg-video-on-mobile' ] );
                     }
                     if ( !empty( $bg_options[ 'bg-video-start-time' ] ) ) {
-                        $video_bg_start_time = (int)$bg_options[ 'bg-video-start-time' ];
+                        $video_bg_start_time = abs( (int)$bg_options[ 'bg-video-start-time' ] );
                     }
                     if ( !empty( $bg_options[ 'bg-video-end-time' ] ) ) {
-                        $video_bg_end_time = (int)$bg_options[ 'bg-video-end-time' ];
+                        $video_bg_end_time = abs( (int)$bg_options[ 'bg-video-end-time' ] );
                     }
                 }
             }
@@ -899,8 +899,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 );
             }
 
-            // video background insertion can only be done for sections
-            if ( 'section' === $level_type ) {
+            // video background insertion can only be done for sections and columns
+            if ( in_array( $level_type, array( 'section', 'column') ) ) {
                 if ( !empty( $video_bg_url ) && is_string( $video_bg_url ) ) {
                     $attributes .= sprintf('%1$s data-sek-video-bg-src="%2$s"', $attributes, $video_bg_url );
                 }

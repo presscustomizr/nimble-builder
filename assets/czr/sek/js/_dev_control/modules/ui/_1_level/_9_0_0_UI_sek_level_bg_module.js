@@ -43,14 +43,14 @@
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'bg-image' :
-                                          _.each( [ 'bg-attachment', 'bg-scale', 'bg-repeat', 'bg-apply-overlay', 'bg-color-overlay', 'bg-opacity-overlay', 'bg-parallax', 'bg-parallax-force' ] , function( _inputId_ ) {
+                                          _.each( [ 'bg-attachment', 'bg-scale', 'bg-repeat', 'bg-parallax', 'bg-parallax-force' ] , function( _inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       var bool = false;
                                                       switch( _inputId_ ) {
-                                                            case 'bg-color-overlay' :
-                                                            case 'bg-opacity-overlay' :
-                                                                  bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-apply-overlay')() );
-                                                            break;
+                                                            // case 'bg-color-overlay' :
+                                                            // case 'bg-opacity-overlay' :
+                                                            //       bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-apply-overlay')() );
+                                                            // break;
                                                             case 'bg-parallax-force' :
                                                                   bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-parallax')() );
                                                             break;
@@ -71,7 +71,7 @@
                                     case 'bg-apply-overlay' :
                                           _.each( [ 'bg-color-overlay', 'bg-opacity-overlay' ] , function(_inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      return ! _.isEmpty( item.czr_Input('bg-image')() + '' ) && api.CZR_Helpers.isChecked( input() );
+                                                      return api.CZR_Helpers.isChecked( input() );
                                                 }); } catch( er ) {
                                                       api.errare( module.id + ' => error in setInputVisibilityDeps', er );
                                                 }
@@ -126,9 +126,9 @@
                               }
                         });//item.czr_Input.each
 
-                        // Video background should only be available for sections
+                        // Video background should only be available for sections and columns
                         if ( module.control && module.control.params && module.control.params.sek_registration_params ) {
-                              if ( 'section' !== module.control.params.sek_registration_params.level ) {
+                              if ( ! _.contains(  [ 'section', 'column' ], module.control.params.sek_registration_params.level ) ) {
                                     _.each( [ 'bg-use-video', 'bg-video', 'bg-video-loop', 'bg-video-on-mobile', 'bg-video-start-time', 'bg-video-end-time' ], function( _inputId_ ) {
                                           item.czr_Input( _inputId_ ).visible( false );
                                     });
