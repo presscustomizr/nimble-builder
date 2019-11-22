@@ -45,6 +45,10 @@
                         template_name = 'range_simple';
                   break;
 
+                  case 'number_simple' :
+                        template_name = 'number_simple';
+                  break;
+
                   case 'font_size' :
                   case 'line_height' :
                   case 'range_with_unit_picker' :

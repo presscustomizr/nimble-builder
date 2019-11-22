@@ -100,7 +100,7 @@ jQuery( function($){
                 var isRTL = 'rtl' === $('html').attr('dir'),
                     doingAnimation = false;
 
-                $(window)
+                nimbleFront.cachedElements.$window
                     //on resize trigger Event.PLACE on active dropdowns
                     .on( 'resize', function() {
                             if ( ! doingAnimation ) {
@@ -221,7 +221,7 @@ jQuery( function($){
                       }
 
                       //let's compute on which side open the dropdown
-                      if ( $_dropdown.offset().left + $_dropdown.width() > $(window).width() ) {
+                      if ( $_dropdown.offset().left + $_dropdown.width() > nimbleFront.cachedElements.$window.width() ) {
                             //open on the left
                             _setOpenDirection( 'left' );
                       } else if ( $_dropdown.offset().left < 0 ) {
@@ -329,7 +329,7 @@ jQuery( function($){
           .on( 'mouseleave', '.sek-nav-toggler', function(){ $(this).removeClass( 'hovering' ); } )
           .on( 'show.sek.sekCollapse hide.sek.sekCollapse', '.sek-nav-collapse', function() {
                 $('[data-target=#'+$(this).attr('id')+']').removeClass( 'hovering' );
-                $(window).trigger('scroll');
+                nimbleFront.cachedElements.$window.trigger('scroll');
           });
 
     // How to have a logo plus an hamburger in mobiles on the same line?
@@ -371,7 +371,7 @@ jQuery( function($){
             _doMobileMenuSetup();
             // When previewing, react to level refresh
             // This can occur to any level. We listen to the bubbling event on 'body' tag
-            $('body').on('sek-level-refreshed sek-modules-refreshed sek-columns-refreshed sek-section-added', function( evt ){
+            nimbleFront.cachedElements.$body.on('sek-level-refreshed sek-modules-refreshed sek-columns-refreshed sek-section-added', function( evt ){
                     // clean the previously duplicated menu if any
                     $('.sek-mobile-menu-expanded-below').remove();
                     _doMobileMenuSetup();

@@ -109,7 +109,9 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     'localSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks() ) : '',
                     'globalSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID ) ) : '',
                     'skope_id' => skp_get_skope_id(), //added for debugging purposes
-                    'recaptcha_public_key' => !empty ( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : ''
+                    'recaptcha_public_key' => !empty ( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : '',
+
+                    'video_bg_lazyload_enabled' => sek_is_video_bg_lazyload_enabled()
                 )
             );
 

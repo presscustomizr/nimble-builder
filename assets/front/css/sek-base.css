@@ -2760,4 +2760,69 @@ body .sek-module-inner h1:before, body .sek-module-inner h2:before, body .sek-mo
 .sek-module .sek-module-inner .widget_hu_tabs .alx-tabs-nav {
   margin-bottom: 10px;
 }
+
+[data-sek-level][data-sek-video-bg-src] {
+  position: relative;
+}
+
+[data-sek-level] embed,
+[data-sek-level] iframe,
+[data-sek-level] object,
+[data-sek-level] video {
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
+  line-height: 1;
+  border: none;
+}
+
+[data-sek-level] .sek-custom-embed {
+  line-height: 0;
+}
+
+[data-sek-level] .sek-bg-video-wrapper,
+[data-sek-level] .sek-background {
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  position: absolute !important;
+  overflow: hidden;
+  z-index: 0;
+  direction: ltr;
+}
+
+[data-sek-level] .sek-bg-video-wrapper {
+  transition: opacity 0.5s linear;
+  pointer-events: none;
+  opacity: 0;
+}
+
+[data-sek-level] .sek-bg-video-wrapper.sek-bg-loading {
+  opacity: 0;
+  visibility: hidden;
+}
+
+[data-sek-level] .sek-bg-youtube-video-wrapper, [data-sek-level] .sek-background-vimeo-element {
+  max-width: none;
+}
+
+[data-sek-level] .sek-bg-youtube-video-wrapper, [data-sek-level] .sek-background-video-local, [data-sek-level] .sek-background-vimeo-element {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translateX(-50%) translateY(-50%);
+  transform: translateX(-50%) translateY(-50%);
+}
+
+[data-sek-level] .sek-background-video-local {
+  -o-object-fit: cover;
+  object-fit: cover;
+}
+
+@media (max-width: 575px) {
+  .customizer-preview [data-sek-video-bg-on-mobile="false"] .sek-bg-video-wrapper {
+    display: none;
+  }
+}
 /*# sourceMappingURL=sek-base.css.map */

@@ -1250,7 +1250,7 @@ function sek_img_sizes_preg_replace_callback( $matches ) {
 
 
 /* ------------------------------------------------------------------------- *
- *  SMART LOAD HELPER
+ *  SMART LOAD HELPER FOR IMAGES AND VIDEOS
 /* ------------------------------------------------------------------------- */
 /**
 * callback of preg_replace_callback in SEK_Front_Render::sek_maybe_process_img_for_js_smart_load
@@ -1314,6 +1314,29 @@ function sek_is_img_smartload_enabled() {
     Nimble_Manager()->img_smartload_enabled = $is_img_smartload_enabled;
 
     return Nimble_Manager()->img_smartload_enabled;
+}
+
+
+// @return boolean
+// video background lazy load can be set globally with 'global-bg-video-lazy-load'
+// implemented in nov 2019 for https://github.com/presscustomizr/nimble-builder/issues/287
+// This option is cached
+function sek_is_video_bg_lazyload_enabled() {
+    // if ( skp_is_customizing() )
+    //   return false;
+    if ( 'not_cached' !== Nimble_Manager()->video_bg_lazyload_enabled ) {
+        return Nimble_Manager()->video_bg_lazyload_enabled;
+    }
+    $is_video_bg_lazyload_enabled = false;
+    $glob_performances_data = sek_get_global_option_value( 'performances' );
+    if ( !is_null( $glob_performances_data ) && is_array( $glob_performances_data ) && !empty( $glob_performances_data['global-bg-video-lazy-load'] ) ) {
+        $is_video_bg_lazyload_enabled = sek_booleanize_checkbox_val( $glob_performances_data['global-bg-video-lazy-load'] );
+    }
+
+    // CACHE THE OPTION
+    Nimble_Manager()->video_bg_lazyload_enabled = $is_video_bg_lazyload_enabled;
+
+    return Nimble_Manager()->video_bg_lazyload_enabled;
 }
 
 
@@ -4828,8 +4851,10 @@ function sek_get_module_params_for_sek_level_bg_module() {
                           __('site wide options', 'text_doma')
                       )
                     ),
-                    'refresh_markup' => true
+                    'refresh_markup' => true,
+                    'html_before' => '<hr/><h3>' . __('Image background', 'text-doma') .'</h3>'
                 ),
+
                 'bg-position' => array(
                     'input_type'  => 'bgPositionWithDeviceSwitcher',
                     'title'       => __('Image position', 'text_doma'),
@@ -4890,17 +4915,61 @@ function sek_get_module_params_for_sek_level_bg_module() {
                         'space' => __('Space', 'text_dom'),
                     )
                 ),
-                // 'bg-video' => array(
-                //     'input_type'  => 'text',
-                //     'title'       => __('Video', 'text_doma'),
-                //     'default'     => ''
-                // ),
+                'bg-use-video' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Use a video background', 'text_doma'),
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'default'     => 0,
+                    //'notice_after' => __('', 'text_doma'),
+                    'refresh_markup' => true,
+                    'html_before' => '<hr/><h3>' . __('Video background', 'text-doma') .'</h3>'
+                ),
+                'bg-video' => array(
+                    'input_type'  => 'text',
+                    'title'       => __('Video link', 'text_doma'),
+                    'default'     => '',
+                    'refresh_markup' => true,
+                    'notice_after' => __('Video link from YouTube, Vimeo, or a self-hosted file ( mp4 format is recommended )', 'text_doma'),
+                ),
+                'bg-video-loop' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Loop infinitely', 'text_doma'),
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'default'     => 1,
+                    //'notice_after' => __('', 'text_doma'),
+                    'refresh_markup' => true,
+                ),
+                'bg-video-on-mobile' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Play on mobile devices', 'text_doma'),
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'default'     => 0,
+                    'notice_after' => __('Not recommended if you don\'t use a self-hosted video file', 'text_doma'),
+                    'refresh_markup' => true,
+                ),
+                'bg-video-start-time' => array(
+                    'input_type'  => 'number_simple',
+                    'title'       => __('Start time', 'text_doma'),
+                    'default'     => '',
+                    'refresh_markup' => true
+                ),
+                'bg-video-end-time' => array(
+                    'input_type'  => 'number_simple',
+                    'title'       => __('End time', 'text_doma'),
+                    'default'     => '',
+                    'refresh_markup' => true,
+                    'notice_after' => __('Set an optional start and end time in seconds', 'text-doma')
+                ),
                 'bg-apply-overlay' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Apply a background overlay', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'default'     => 0
+                    'default'     => 0,
+                    'html_before' => '<hr/><h3>' . __('Overlay color', 'text-doma') .'</h3>'
                 ),
                 'bg-color-overlay' => array(
                     'input_type'  => 'wp_color_alpha',
@@ -4918,7 +4987,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'default'  => '40',
                     'width-100'   => true,
                     'title_width' => 'width-100'
-                )
+                ),
             )//item-inputs
         )//tmpl
     );
@@ -5050,7 +5119,7 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     //Background overlay?
     // 1) a background image should be set
     // 2) the option should be checked
-    if ( !empty( $bg_options['bg-image']) && ! empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {
+    if ( !empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {
         //(needs validation: we need a sanitize hex or rgba color)
         $bg_color_overlay = isset( $bg_options[ 'bg-color-overlay' ] ) ? $bg_options[ 'bg-color-overlay' ] : null;
         if ( $bg_color_overlay ) {
@@ -5066,8 +5135,9 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
 
             $bg_overlay_css_rules = FALSE !== $bg_overlay_opacity ? $bg_overlay_css_rules . ';opacity:' . $bg_overlay_opacity : $bg_overlay_css_rules;
 
+            // nov 2019 : added new selector '> .sek-bg-video-wrapper' for https://github.com/presscustomizr/nimble-builder/issues/287
             $rules[]     = array(
-                    'selector' => '[data-sek-id="'.$level['id'].'"]::before',
+                    'selector' => implode(',', array( '[data-sek-id="'.$level['id'].'"]::before', '[data-sek-id="'.$level['id'].'"] > .sek-bg-video-wrapper::after' ) ),
                     'css_rules' => $bg_overlay_css_rules,
                     'mq' =>null
             );
@@ -7294,10 +7364,21 @@ function sek_get_module_params_for_sek_global_performances() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'notice_after' => sprintf('%1$s <br/><strong>%2$s</strong>',
-                        __( 'Check this option to delay the loading of non visible images. Images below the window will be dynamically loaded when scrolling. This can improve performance by reducing the weight of long web pages including multiple images.', 'text_dom'),
+                        __( 'Check this option to delay the loading of non visible images. Images outside the window will be dynamically loaded when scrolling. This can improve performance by reducing the weight of long web pages including multiple images.', 'text_dom'),
                         __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
                     )
                 ),
+                'global-bg-video-lazy-load' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Lazy load video backgrounds', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    // 'notice_after' => sprintf('%1$s <br/><strong>%2$s</strong>',
+                    //     __( 'Load video backgrounds when', 'text_dom'),
+                    //     __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
+                    // )
+                )
             )
         )//tmpl
     );
@@ -15452,6 +15533,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $global_nimble_options = '_not_cached_yet_';
 
         public $img_smartload_enabled = 'not_cached';
+        public $video_bg_lazyload_enabled = 'not_cached';//<= for https://github.com/presscustomizr/nimble-builder/issues/287
 
         public $has_local_header_footer = '_not_cached_yet_';//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()
         public $has_global_header_footer = '_not_cached_yet_';//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()
@@ -16711,7 +16793,9 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     'localSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks() ) : '',
                     'globalSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID ) ) : '',
                     'skope_id' => skp_get_skope_id(), //added for debugging purposes
-                    'recaptcha_public_key' => !empty ( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : ''
+                    'recaptcha_public_key' => !empty ( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : '',
+
+                    'video_bg_lazyload_enabled' => sek_is_video_bg_lazyload_enabled()
                 )
             );
 
@@ -17805,10 +17889,19 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $fixed_bg_enabled = false;
             $width = '';
             $height = '';
+            $level_type = array_key_exists( 'level', $model ) ? $model['level'] : 'section';
+
+            // will be used for sections (not columns and modules ) that have a video background
+            // implemented for video bg https://github.com/presscustomizr/nimble-builder/issues/287
+            $video_bg_url = '';
+            $video_bg_loop = true;
+            $video_bg_on_mobile = false;
+            $video_bg_start_time = null;
+            $video_bg_end_time = null;
 
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
-                if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
+                if ( !empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
                     $attributes .= 'data-sek-has-bg="true"';
                     if ( sek_is_img_smartload_enabled() ) {
                         $bg_url_for_lazy_load = wp_get_attachment_url( $bg_options[ 'bg-image'] );
@@ -17823,9 +17916,30 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         }
                     }
                 }
+
+                // Nov 2019, for video background https://github.com/presscustomizr/nimble-builder/issues/287
+                // should be added for sections and columns only
+                if ( in_array( $level_type, array( 'section', 'column') ) && !empty( $bg_options[ 'bg-use-video'] ) && sek_booleanize_checkbox_val( $bg_options[ 'bg-use-video'] ) ) {
+                    if ( !empty( $bg_options[ 'bg-video' ] ) ) {
+                        $video_bg_url = $bg_options[ 'bg-video' ];
+                    }
+
+                    if ( array_key_exists( 'bg-video-loop', $bg_options ) ) {
+                        $video_bg_loop = sek_booleanize_checkbox_val( $bg_options[ 'bg-video-loop' ] );
+                    }
+                    if ( array_key_exists( 'bg-video-on-mobile', $bg_options ) ) {
+                        $video_bg_on_mobile = sek_booleanize_checkbox_val( $bg_options[ 'bg-video-on-mobile' ] );
+                    }
+                    if ( !empty( $bg_options[ 'bg-video-start-time' ] ) ) {
+                        $video_bg_start_time = abs( (int)$bg_options[ 'bg-video-start-time' ] );
+                    }
+                    if ( !empty( $bg_options[ 'bg-video-end-time' ] ) ) {
+                        $video_bg_end_time = abs( (int)$bg_options[ 'bg-video-end-time' ] );
+                    }
+                }
             }
 
-            if ( ! empty( $bg_url_for_lazy_load ) ) {
+            if ( !empty( $bg_url_for_lazy_load ) ) {
                 $attributes .= sprintf('%1$s data-sek-lazy-bg="true" data-sek-src="%2$s"', $attributes, $bg_url_for_lazy_load );
             }
             // data-sek-bg-fixed attribute has been added for https://github.com/presscustomizr/nimble-builder/issues/414
@@ -17844,6 +17958,21 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     array_key_exists('bg-parallax-force', $bg_options) ? $bg_options['bg-parallax-force'] : '40'
                     //!empty( $bg_options['bg-parallax-force'] ) ? $bg_options['bg-parallax-force'] : '40'
                 );
+            }
+
+            // video background insertion can only be done for sections and columns
+            if ( in_array( $level_type, array( 'section', 'column') ) ) {
+                if ( !empty( $video_bg_url ) && is_string( $video_bg_url ) ) {
+                    $attributes .= sprintf('%1$s data-sek-video-bg-src="%2$s"', $attributes, $video_bg_url );
+                }
+                $attributes .= sprintf('%1$s data-sek-video-bg-loop="%2$s"', $attributes, $video_bg_loop ? 'true' : 'false' );
+                $attributes .= sprintf('%1$s data-sek-video-bg-on-mobile="%2$s"', $attributes, $video_bg_on_mobile ? 'true' : 'false' );
+                if ( !is_null( $video_bg_start_time ) && $video_bg_start_time >= 0 ) {
+                    $attributes .= sprintf('%1$s data-sek-video-start-at="%2$s"', $attributes, $video_bg_start_time );
+                }
+                if ( !is_null( $video_bg_end_time ) && $video_bg_end_time >= 0 ) {
+                    $attributes .= sprintf('%1$s data-sek-video-end-at="%2$s"', $attributes, $video_bg_end_time );
+                }
             }
             return $attributes;
         }

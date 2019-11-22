@@ -1062,6 +1062,11 @@ function sek_print_nimble_input_templates() {
           </div>
       </script>
 
+      <script type="text/html" id="tmpl-nimble-subtemplate___number">
+        <div class="sek-simple-number-wrapper">
+            <input data-czrtype="{{data.input_id}}" class="sek-pm-input" value="{{value}}" type="number"  >
+        </div>
+      </script>
 
 
 
@@ -1209,6 +1214,18 @@ function sek_print_nimble_input_templates() {
         <select></select>
       </script>
 
+
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  NUMBER
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___number_simple">
+        <#
+          var number_tmpl = wp.customize.CZR_Helpers.getInputSubTemplate( 'number' );
+          if ( _.isFunction( number_tmpl ) ) { print( number_tmpl( data ) ); }
+        #>
+      </script>
 
       <?php
       /* ------------------------------------------------------------------------- *

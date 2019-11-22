@@ -65,6 +65,11 @@ li[id*="__nimble__"].customize-control span.customize-control-title:first-child 
 
 
 
+/* SECTIONS */
+/* nov 2019 => experimental fix for experimental fix for https://github.com/presscustomizr/nimble-builder/issues/539 */
+#customize-theme-controls ul[id*="sub-accordion-section-__nimble__"].open {
+  top: 0!important;
+}
 
 
 
@@ -855,11 +860,13 @@ credits : Gutenberg team @wordpress */
 .sek-no-unit-picker .sek-range-wrapper {
   width: 70%;
 }
-.sek-number-wrapper {
+.sek-number-wrapper, .sek-simple-number-wrapper {
   width: 50px;
   margin-right: 5px;
 }
-
+.sek-simple-number-wrapper {
+  text-align: right;
+}
 
 .sek-range-input{
     flex:1;

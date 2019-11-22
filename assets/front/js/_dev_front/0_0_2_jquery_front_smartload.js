@@ -71,11 +71,11 @@
                   .bind( 'sek_load_iframe', {}, function() { self._load_iframe(this); });
 
             //the scroll event gets throttled with the requestAnimationFrame
-            $(window).scroll( function( _evt ) {
+            nimbleFront.cachedElements.$window.scroll( function( _evt ) {
                   self._better_scroll_event_handler( $_ImgOrDivOrIFrameElements, _evt );
             });
             //debounced resize event
-            $(window).resize( _utils_.debounce( function( _evt ) {
+            nimbleFront.cachedElements.$window.resize( _utils_.debounce( function( _evt ) {
                   self._maybe_trigger_load( $_ImgOrDivOrIFrameElements, _evt );
             }, 100 ) );
             //on load
@@ -157,8 +157,8 @@
             if ( !$el_candidate || $el_candidate.length < 1 )
               return false;
 
-            var wt = $(window).scrollTop(),
-                wb = wt + $(window).height(),
+            var wt = nimbleFront.cachedElements.$window.scrollTop(),
+                wb = wt + nimbleFront.cachedElements.$window.height(),
                 it  = $el_candidate.offset().top,
                 ib  = it + $el_candidate.height(),
                 th = this.options.threshold;

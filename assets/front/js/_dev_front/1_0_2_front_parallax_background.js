@@ -32,7 +32,7 @@
       Plugin.prototype.init = function () {
             var self = this;
             //cache some element
-            this.$_window     = $(window);
+            this.$_window     = nimbleFront.cachedElements.$window;
             this.doingAnimation = false;
             this.isVisible = false;
             this.isBefore = false;//the element is before the scroll point

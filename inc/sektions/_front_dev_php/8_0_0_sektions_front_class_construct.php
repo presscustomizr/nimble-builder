@@ -50,6 +50,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $global_nimble_options = '_not_cached_yet_';
 
         public $img_smartload_enabled = 'not_cached';
+        public $video_bg_lazyload_enabled = 'not_cached';//<= for https://github.com/presscustomizr/nimble-builder/issues/287
 
         public $has_local_header_footer = '_not_cached_yet_';//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()
         public $has_global_header_footer = '_not_cached_yet_';//used in sek_maybe_set_local_nimble_header() and sek_maybe_set_local_nimble_footer()

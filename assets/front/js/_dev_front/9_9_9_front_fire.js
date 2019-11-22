@@ -57,14 +57,14 @@ jQuery(function($){
             $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );
             // hack => always trigger a 'resize' event with a small delay to make sure bg positions are ok
             setTimeout( function() {
-                 $('body').trigger('resize');
+                 nimbleFront.cachedElements.$body.trigger('resize');
             }, 500 );
       };
       // When previewing, react to level refresh
       // This can occur to any level. We listen to the bubbling event on 'body' tag
       // and salmon up to maybe instantiate any missing candidate
       // Example : when a preset_section is injected
-      $('body').on('sek-level-refreshed sek-section-added', function( evt ){
+      nimbleFront.cachedElements.$body.on('sek-level-refreshed sek-section-added', function( evt ){
             if ( "true" === $(this).data('sek-bg-parallax') ) {
                   _setParallaxWhenCustomizing.call(this);
             } else {
@@ -148,9 +148,58 @@ jQuery( function($){
     };
 
     // animate menu item to Nimble anchors
-    $('body').find('.menu-item' ).on( 'click', 'a', maybeScrollToAnchor );
+    nimbleFront.cachedElements.$body.find('.menu-item' ).on( 'click', 'a', maybeScrollToAnchor );
 
     // animate an anchor link inside Nimble sections
     // fixes https://github.com/presscustomizr/nimble-builder/issues/443
     $('[data-sek-level="location"]' ).on( 'click', 'a', maybeScrollToAnchor );
+});
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  VIDEO BACKGROUND FOR SECTIONS AND COLUMNS
+/* ------------------------------------------------------------------------- */
+// - insert bg video container
+// - inject player api script
+// - print video iframe
+// - on api ready, do stuff
+jQuery( function($){
+    var _maybeInstantiatePlayers = function() {
+          $('[data-sek-video-bg-src]').each(function() {
+              if ( 'section' === $(this).data('sek-level') || 'column' === $(this).data('sek-level') ) {
+                  if ( ! $(this).data('sek-player-instantiated') ) {
+                      $(this).nimbleLoadVideoBg( { lazyLoad: sekFrontLocalized.video_bg_lazyload_enabled } );
+                  }
+              }
+          });
+    };
+
+    // on page load
+    _maybeInstantiatePlayers();
+
+    // WHEN CUSTOMIZING
+    // on various nimble events when customizing
+    nimbleFront.cachedElements.$body.on('sek-section-added sek-columns-refreshed', function( evt, params ){
+          _maybeInstantiatePlayers();
+    });
+
+    // On module refreshed inside a section, simply trigger a dimensions update
+    nimbleFront.cachedElements.$body.on('sek-modules-refreshed', function( evt, params ){
+          $('[data-sek-video-bg-src]').each(function() {
+              $(this).trigger('refresh-video-dimensions');
+          });
+    });
+
+    // when customizing the level
+    nimbleFront.cachedElements.$body.on('sek-level-refreshed', function( evt, params ){
+          // when removing a level => no params.id
+          if ( !params || !_utils_.isObject( params ) || !params.id )
+            return;
+
+          var $levelRefreshed = $( '[data-sek-id="'+ params.id +'"][data-sek-video-bg-src]' );
+          if ( $levelRefreshed.length > 0 && !$levelRefreshed.data('sek-player-instantiated') ) {
+              $levelRefreshed.nimbleLoadVideoBg( { lazyLoad: sekFrontLocalized.video_bg_lazyload_enabled } );
+          }
+    });
 });
