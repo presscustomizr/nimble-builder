@@ -126,6 +126,7 @@ Added video background for section and column. Supports Vimeo, YouTube and self-
 == Changelog ==
 = 1.9.11 November 22nd 2019 =
 * added : video background for section and column. Supports Vimeo, YouTube and self-hosted videos.
+* updated : swiper.js to latest version 5.2.1
 
 = 1.9.10 November 20th 2019 =
 * improved : better default base style for tables, lists, codes, definitions, and various minor CSS improvements
