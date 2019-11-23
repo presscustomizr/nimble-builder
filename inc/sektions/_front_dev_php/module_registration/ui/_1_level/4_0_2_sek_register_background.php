@@ -119,6 +119,13 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     //'notice_after' => __('', 'text_doma'),
                     'refresh_markup' => true,
                 ),
+                'bg-video-delay-start' => array(
+                    'input_type'  => 'number_simple',
+                    'title'       => __('Play after a delay', 'text_doma'),
+                    'default'     => '',
+                    'refresh_markup' => true,
+                    'notice_after' => __('Set an optional delay in seconds before playing the video', 'text-doma')
+                ),
                 'bg-video-on-mobile' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Play on mobile devices', 'text_doma'),
@@ -295,9 +302,9 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     }
 
     //Background overlay?
-    // 1) a background image should be set
+    // 1) a background image or video should be set
     // 2) the option should be checked
-    if ( !empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {
+    if ( ( !empty( $bg_options['bg-image']) || ( sek_is_checked( $bg_options['bg-use-video'] ) && !empty( $bg_options['bg-video'] ) ) ) && !empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {
         //(needs validation: we need a sanitize hex or rgba color)
         $bg_color_overlay = isset( $bg_options[ 'bg-color-overlay' ] ) ? $bg_options[ 'bg-color-overlay' ] : null;
         if ( $bg_color_overlay ) {
