@@ -26,7 +26,7 @@
 }
 
 
-.#{$project-prefix}nav-wrap {
+.sek-nav-wrap {
     position: relative;
     display: flex;
     flex-wrap: wrap;
@@ -36,23 +36,23 @@
     padding: .5rem 0;
 
     // https://github.com/presscustomizr/nimble-builder/issues/368
-    .#{$project-prefix}mobile-menu-expanded-below & {
+    .sek-mobile-menu-expanded-below & {
         padding: 0;
     }
 }
-.#{$project-prefix}nav-collapse {
+.sek-nav-collapse {
     flex-basis: 100%;
     flex-grow: 1;
     align-items: center;
     // justify-content property should be consistent with the default value in sek_get_module_params_for_czr_menu_content_child()
     justify-content : center;
 }
-.#{$project-prefix}nav {
+.sek-nav {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
 
-    .#{$project-prefix}module .#{$project-prefix}module-inner & {
+    .sek-module .sek-module-inner & {
         &,
         & ul {
             list-style: none !important;
@@ -82,11 +82,11 @@
             justify-content: space-between;
             color: inherit;
             overflow:hidden;
-            .#{$project-prefix}nav-wrap & {
+            .sek-nav-wrap & {
                 text-decoration: none;
             }
             &:hover {
-                .#{$project-prefix}nav__title {
+                .sek-nav__title {
                     text-decoration: underline;
                 }
             }
@@ -138,7 +138,7 @@
     }
 }
 
-.#{$project-prefix}dropdown-submenu {
+.sek-dropdown-submenu {
     & > a{
         &::after {
             @if ( true == $is_rtl ) {
@@ -164,7 +164,7 @@
 }
 
 //Hueman inspired nav toggler
-.#{$project-prefix}nav-toggler {
+.sek-module-inner .sek-nav-toggler {
     -webkit-appearance: none !important;
     cursor: pointer;
     &, &:hover, &:focus {
@@ -189,7 +189,7 @@
     //     margin-left: auto;
     //     margin-right: -10px;
     // }
-    @at-root .#{$project-prefix}ham__span-wrapper {
+    @at-root .sek-ham__span-wrapper {
         height: 12px;
         position: relative;
         .line {
@@ -213,7 +213,7 @@
             top: 100%;
         }
 
-        @at-root .#{$project-prefix}nav-toggler {
+        @at-root .sek-nav-toggler {
             .line-1 {
                 transform: translate(-3px, 6px) rotate(45deg);
                 width: 28px;
@@ -226,26 +226,26 @@
                 width: 28px;
             }
         }
-        @at-root .#{$project-prefix}nav-toggler.#{$project-prefix}collapsed .line {
+        @at-root .sek-nav-toggler.sek-collapsed .line {
             width: 20px;
             transform: translate(0,0) rotate(0);
             opacity: 1;
         }
-        @at-root .#{$project-prefix}nav-toggler.#{$project-prefix}collapsed.hovering .line {
+        @at-root .sek-nav-toggler.sek-collapsed.hovering .line {
             transform: translateX(-3px);
             width: 26px;
         }
     }
 }
 
-.#{$project-prefix}dropdown-menu {
+.sek-dropdown-menu {
     @include dropdown-menu-base();
 
     .show > & {
         display: block;
     }
 
-    .#{$project-prefix}nav__title {
+    .sek-nav__title {
         //the sidemenu and mobile menu should NOT break lines
         word-break: break-word;// was break-all; Fixed in dec-2017 @see https://github.com/presscustomizr/customizr/issues/1339
         white-space: normal;
@@ -294,7 +294,7 @@
 
 //mobile up breakpoint -> min-width:768px
 @include media-breakpoint-up( 'md' ) {
-    .#{$project-prefix}nav {
+    .sek-nav {
         flex-direction: row;
         .menu-item-has-children,
         .page_item_has_children {
@@ -309,22 +309,22 @@
             padding: 5px;
         }
     }
-    .#{$project-prefix}nav-collapse {
+    .sek-nav-collapse {
         display: flex!important;
         flex-basis: auto;
     }
 
     // https://github.com/presscustomizr/nimble-builder/issues/368
-    .#{$project-prefix}mobile-menu-expanded-below {
+    .sek-mobile-menu-expanded-below {
         display: none!important;
     }
-    .#{$project-prefix}nav-toggler {
+    .sek-nav-toggler {
         display: none;
     }
 
-    .#{$project-prefix}dropdown-menu {
+    .sek-dropdown-menu {
 
-        .#{$project-prefix}nav & li {
+        .sek-nav & li {
             padding: 0 10px !important;
             margin: 0 !important;
             a {
@@ -345,22 +345,22 @@
             }
         }
 
-        .#{$project-prefix}menu-link__row-reverse {
+        .sek-menu-link__row-reverse {
             flex-direction: row-reverse !important;
         }
 
 
-        .#{$project-prefix}nav__title {
+        .sek-nav__title {
             word-break:  normal;
             white-space: nowrap;
         }
 
-        .#{$project-prefix}dropdown-submenu & {
+        .sek-dropdown-submenu & {
             top: 15px;
         }
     }
 
-    @at-root .#{$project-prefix}submenu-fade .#{$project-prefix}dropdown-menu a {
+    @at-root .sek-submenu-fade .sek-dropdown-menu a {
         transition: all 0.25s ease;
         transform: translate(0, 0);
         &:hover {
@@ -376,7 +376,7 @@
     // this way the actual visual position of the dropdown will not be impacted
     // though, as fixed element, even if overflowing the tc-page-wrap, will not
     // make the orizontal scrollbar appear!
-    @at-root .#{$project-prefix}submenu-fade {
+    @at-root .sek-submenu-fade {
         .page_item_has_children,
         .menu-item-has-children {
             perspective: 1000px;
