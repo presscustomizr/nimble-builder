@@ -151,6 +151,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
                   };
 
+                  // clean add content buttons on section insertion
+                  // solves the problem of button not being rendered in some case
+                  // @see https://github.com/presscustomizr/nimble-builder/issues/545
+                  self.cachedElements.$body.on( 'sek-location-refreshed sek-section-added sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                        removeAddContentButtons();
+                  });
+
+
                   // UI MENU
                   // React to click and mouse actions. Uses delegation.
                   // + schedule auto collapse after n seconds of ui inactivity
