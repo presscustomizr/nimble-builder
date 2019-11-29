@@ -89,7 +89,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //       api.sekTinyMceEditor.locker = input;
                         // }
 
-                        $(window)[ expanded ? 'on' : 'off' ]('resize', function() {
+                        self.cachedElements.$window[ expanded ? 'on' : 'off' ]('resize', function() {
                                 if ( ! api.sekEditorExpanded() )
                                   return;
                                 _.delay( function() {
@@ -103,7 +103,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // fix wrong height on init https://github.com/presscustomizr/nimble-builder/issues/409
                               // there's probably a smarter way to get the right height on init. But let's be lazy.
                               _.delay( function() {
-                                    $(window).trigger('resize');
+                                    self.cachedElements.$window.trigger('resize');
                               }, 100 );
                         } else {
                               //resize reset

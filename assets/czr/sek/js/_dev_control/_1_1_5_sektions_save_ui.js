@@ -25,7 +25,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   self.saveUIContainer = $_el;
                                   //display
                                   _.delay( function() {
-                                      $('body').addClass('nimble-save-ui-visible');
+                                      self.cachedElements.$body.addClass('nimble-save-ui-visible');
                                   }, 200 );
                                   // set section id input value
                                   $('#sek-saved-section-id').val( sectionId );
@@ -33,7 +33,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       },
                       _hide = function() {
                             var dfd = $.Deferred();
-                            $('body').removeClass('nimble-save-ui-visible');
+                            self.cachedElements.$body.removeClass('nimble-save-ui-visible');
                             if ( $( '#nimble-top-save-ui' ).length > 0 ) {
                                   //remove Dom element after slide up
                                   _.delay( function() {

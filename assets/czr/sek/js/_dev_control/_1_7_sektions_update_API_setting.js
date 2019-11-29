@@ -446,7 +446,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           _candidate_.options = _new_options_values;
 
                                           // Live update the input value ( when rendered )
-                                          $('body').find('[data-sek-width-range-column-id="'+ _candidate_.id +'"]').val( newWidthValue ).trigger('input', { is_resize_column_trigger : true } );
+                                          self.cachedElements.$body.find('[data-sek-width-range-column-id="'+ _candidate_.id +'"]').val( newWidthValue ).trigger('input', { is_resize_column_trigger : true } );
                                           return newWidthValue;
                                     };
                                     ///

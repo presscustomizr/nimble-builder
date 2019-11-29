@@ -137,7 +137,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         }
                         $(this).addClass('sek-dragged');
-                        $('body').addClass('sek-dragging');
+                        self.cachedElements.$body.addClass('sek-dragging');
 
                         // Say it to the preview
                         // @see 'sek-drag-start' case in preview::schedulePanelMsgReactions()
@@ -148,7 +148,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
                   // $(this) is the dragged element
                   var _onEnd = function( evt ) {
-                        $('body').removeClass('sek-dragging');
+                        self.cachedElements.$body.removeClass('sek-dragging');
                         $(this).removeClass('sek-dragged');
                         api.previewer.send( 'sek-drag-stop' );
                   };

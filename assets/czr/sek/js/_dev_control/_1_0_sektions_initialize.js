@@ -2,6 +2,10 @@
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
+            cachedElements : {
+                $body : $('body'),
+                $window : $(window)
+            },
 
             initialize: function() {
                   var self = this;
@@ -310,8 +314,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
 
                         // reset after a delay
-                        clearTimeout( $(window).data('_preview_target_timer_') );
-                        $(window).data('_preview_target_timer_', setTimeout(function() {
+                        clearTimeout( self.cachedElements.$window.data('_preview_target_timer_') );
+                        self.cachedElements.$window.data('_preview_target_timer_', setTimeout(function() {
                               // Reset the click target
                               self.lastClickedTargetInPreview( {} );
                               // Tell the preview to clean the target highlight effect

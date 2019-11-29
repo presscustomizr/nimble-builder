@@ -45,7 +45,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                     if ( _.isEmpty( removeCandidateId ) || 1 > $candidateEl.length ) {
                                                           self.errare( 'reactToPanelMsg => sek-remove => invalid candidate id => ', removeCandidateId );
                                                     }
-                                                    $('body').find( $candidateEl ).remove();
+                                                    self.cachedElements.$body.find( $candidateEl ).remove();
                                                     // say it
                                                     // listened to clean the loader just in time
                                                     $('[data-sek-id="' + params.apiParams.location + '"]').trigger( 'sek-level-refreshed');
@@ -368,7 +368,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   }
 
                                   // toggle a parent css classes controlling some css rules @see preview.css
-                                  $('body').addClass('sek-dragging');
+                                  self.cachedElements.$body.addClass('sek-dragging');
 
                                   // Reveal all dynamic dropzones after a delay
                                   _.delay( function() {
@@ -378,7 +378,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             },
                             // is sent on dragend and drop
                             'sek-drag-stop' : function( params ) {
-                                  $('body').removeClass('sek-dragging');
+                                  self.cachedElements.$body.removeClass('sek-dragging');
                                   // Clean any remaining placeholder
                                   $('.sortable-placeholder').remove();
 
@@ -509,7 +509,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               // the action being processed is added as a css class to the body of the preview
                               // it's used to enable/disable specific css properties during the action
                               // for example, we don't want css transitions while duplicating or removing a column
-                              $('body').addClass( msgId );
+                              self.cachedElements.$body.addClass( msgId );
                               try {
                                     $.when( _.isFunction( callbackFn ) ? callbackFn( params ) : self[callbackFn].call( self, params ) )
                                           .done( function( _ajaxResponse_ ) {
@@ -519,14 +519,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                 api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
                                           })
                                           .always( function( _ajaxResponse_ ) {
-                                                $('body').removeClass( msgId );
+                                                self.cachedElements.$body.removeClass( msgId );
                                           })
                                           .then( function() {
                                                 api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
                                           });
                               } catch( _er_ ) {
                                     self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
-                                    $('body').removeClass( msgId );
+                                    self.cachedElements.$body.removeClass( msgId );
                               }
                         });
                   });

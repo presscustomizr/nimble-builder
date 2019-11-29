@@ -20,12 +20,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   var trackMouseMovements = function( evt ) {
                         self.mouseMovedRecently( { x : evt.clientX, y : evt.clientY } );
-                        clearTimeout( $(window).data('_scroll_move_timer_') );
-                        $(window).data('_scroll_move_timer_', setTimeout(function() {
+                        clearTimeout( self.cachedElements.$window.data('_scroll_move_timer_') );
+                        self.cachedElements.$window.data('_scroll_move_timer_', setTimeout(function() {
                               self.mouseMovedRecently.set( {} );
                         }, 4000 ) );
                   };
-                  $(window).on( 'mousemove scroll,', _.throttle( trackMouseMovements , 50 ) );
+                  self.cachedElements.$window.on( 'mousemove scroll,', _.throttle( trackMouseMovements , 50 ) );
                   api.previewer.bind('ready', function() {
                         $(api.previewer.targetWindow().document ).on( 'mousemove scroll,', _.throttle( trackMouseMovements , 50 ) );
                   });
@@ -47,13 +47,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   self.topBarContainer = $_el;
                                   //display
                                   _.delay( function() {
-                                      $('body').addClass('nimble-top-bar-visible');
+                                      self.cachedElements.$body.addClass('nimble-top-bar-visible');
                                   }, 200 );
                             });
                       },
                       _hide = function() {
                             var dfd = $.Deferred();
-                            $('body').removeClass('nimble-top-bar-visible');
+                            self.cachedElements.$body.removeClass('nimble-top-bar-visible');
                             if ( self.topBarContainer && self.topBarContainer.length ) {
                                   //remove Dom element after slide up
                                   _.delay( function() {

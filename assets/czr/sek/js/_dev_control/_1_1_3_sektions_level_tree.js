@@ -17,7 +17,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // SETUP AND REACT TO LEVEL TREE EXPANSION
                   self.levelTreeExpanded = new api.Value(false);
                   self.levelTreeExpanded.bind( function(expanded) {
-                        $('body').toggleClass( 'sek-level-tree-expanded', expanded );
+                        self.cachedElements.$body.toggleClass( 'sek-level-tree-expanded', expanded );
                         if ( expanded ) {
                               // Set the level tree now
                               self.setLevelTreeValue();
@@ -79,7 +79,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                   // SETUP CLICK EVENTS IN THE TREE
-                  $('body').on('click', '#nimble-level-tree [data-nimb-level]', function(evt) {
+                  self.cachedElements.$body.on('click', '#nimble-level-tree [data-nimb-level]', function(evt) {
                         evt.preventDefault();
                         evt.stopPropagation();
                         var $el = $(evt.target),
@@ -102,7 +102,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }, 100 );
                   });
 
-                  $('body').on('click', '#nimble-level-tree .sek-remove-level', function(evt) {
+                  self.cachedElements.$body.on('click', '#nimble-level-tree .sek-remove-level', function(evt) {
                         evt.preventDefault();
                         evt.stopPropagation();
                         var $el = $(evt.target).closest('[data-nimb-level]');
@@ -119,7 +119,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   // Collapse tree ( also possible by clicking on the tree icon in the top Nimble bar )
-                  $('body').on('click', '.sek-close-level-tree' , function(evt) {
+                  self.cachedElements.$body.on('click', '.sek-close-level-tree' , function(evt) {
                         evt.preventDefault();
                         self.levelTreeExpanded(false);
                   });

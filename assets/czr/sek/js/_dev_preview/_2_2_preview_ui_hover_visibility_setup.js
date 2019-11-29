@@ -110,6 +110,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
 
+
+
+
             // Fired on Dom Ready, in ::initialize()
             setupUiHoverVisibility : function() {
                   var self = this;
@@ -139,7 +142,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   };//removeLevelUI
 
 
-
+                  var removeAddContentButtons = function() {
+                        self.cachedElements.$body.stop( true, true ).find('.sek-add-content-button').each( function() {
+                              $(this).fadeOut( {
+                                    duration : 200,
+                                    complete : function() { $(this).remove(); }
+                              });
+                        });
+                  };
 
                   // UI MENU
                   // React to click and mouse actions. Uses delegation.
@@ -165,7 +175,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   $levelTypeAndMenuWrapper.show();
                             }
                       };
-                  $('body').on( 'click', '.sek-dyn-ui-location-inner', function( evt )  {
+                  self.cachedElements.$body.on( 'click', '.sek-dyn-ui-location-inner', function( evt )  {
                         var $menu = $(this).find('.sek-dyn-ui-hamb-menu-wrapper'),
                             $parentSection = $(this).closest('[data-sek-level="section"]');
                         // Close all other expanded ui menu of the column
@@ -178,7 +188,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         autoCollapser.call( $menu );
                   });
                   // maintain expanded as long as it's being hovered
-                  $('body').on( 'mouseenter mouseover mouseleave', '.sek-dyn-ui-wrapper', _.throttle( function( evt )  {
+                  self.cachedElements.$body.on( 'mouseenter mouseover mouseleave', '.sek-dyn-ui-wrapper', _.throttle( function( evt )  {
                         var $menu = $(this).find('.sek-dyn-ui-hamb-menu-wrapper');
                         if ( _.isUndefined( $menu.data('_toggle_ui_menu_') ) || $menu.hasClass('sek-collapsed') )
                           return;
@@ -190,7 +200,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // minimize on click
                   // solves the problem of a level ui on top of another one
                   // @ee https://github.com/presscustomizr/nimble-builder/issues/138
-                  $('body').on( 'click', '.sek-minimize-ui', function( evt )  {
+                  self.cachedElements.$body.on( 'click', '.sek-minimize-ui', function( evt )  {
                         $(this).closest('.sek-dyn-ui-location-type').slideToggle('fast');
                   });
 
@@ -203,7 +213,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // Generated when is_singular() only
                   // @see SEK_Front::render()
                   var $wpContentEl;
-                  $('body').on( 'mouseenter', '.sek-wp-content-wrapper', function( evt ) {
+                  self.cachedElements.$body.on( 'mouseenter', '.sek-wp-content-wrapper', function( evt ) {
                         $wpContentEl = $(this);
                         // stop here if the .sek-dyn-ui-wrapper is already printed for this level AND is not being faded out.
                         if ( $wpContentEl.children('.sek-dyn-ui-wrapper').length > 0 && true !== $wpContentEl.data( 'UIisFadingOut' ) )
@@ -244,7 +254,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // fired on mousemove and scroll, every 50ms
                   var _printAddContentButtons = function() {
                         var _location, _is_global_location;
-                        $('body').find( 'div[data-sek-level="location"]' ).each( function() {
+                        self.cachedElements.$body.find( 'div[data-sek-level="location"]' ).each( function() {
                               $sectionCollection = $(this).children( 'div[data-sek-level="section"]' );
                               tmpl = self.parseTemplate( '#sek-tmpl-add-content-button' );
                               var $btn_el;
@@ -308,7 +318,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                   // fired on mousemove and scroll, every 50ms
                   var _sniffAndRevealButtons = function( position ) {
-                        $( 'body').find('.sek-add-content-button').each( function() {
+                        self.cachedElements.$body.find('.sek-add-content-button').each( function() {
                               var btnWrapperRect = $(this)[0].getBoundingClientRect(),
                                   yPos = position.y,
                                   xPos = position.x,
@@ -343,7 +353,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         if ( _.isUndefined( $candidateForRemoval ) || $candidateForRemoval.length < 1 ) {
                               // data-sek-preview-level-guid has been introduced in https://github.com/presscustomizr/nimble-builder/issues/494
                               // to fix a wrong UI generation leading to user unable to edit content
-                              $('body').find('[data-sek-level][data-sek-preview-level-guid="' + sekPreviewLocalized.previewLevelGuid +'"]').each( function() {
+                              self.cachedElements.$body.find('[data-sek-level][data-sek-preview-level-guid="' + sekPreviewLocalized.previewLevelGuid +'"]').each( function() {
                                     collectionOfLevelsToWalk.push( $(this) );
                               });
                               sniffCase = 'printOrScheduleRemoval';
@@ -407,13 +417,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               if ( ! sekPreviewLocalized.isPreviewUIDebugMode ) {
                                     // Mouse didn't move recently?
                                     // => remove all UIs
-                                    $('body').stop( true, true ).find('.sek-add-content-button').each( function() {
-                                          $(this).fadeOut( {
-                                                duration : 200,
-                                                complete : function() { $(this).remove(); }
-                                          });
-                                    });
-                                    $('body').stop( true, true ).find('[data-sek-level]').each( function() {
+                                    // 1) add content buttons
+                                    removeAddContentButtons();
+
+                                    // 2) level UI's
+                                    self.cachedElements.$body.stop( true, true ).find('[data-sek-level]').each( function() {
                                           // preserve if the ui menu is expanded, otherwise remove
                                           if ( $(this).children('.sek-dyn-ui-wrapper').find('.sek-is-expanded').length < 1 ) {
                                                 removeLevelUI.call( $(this) );
@@ -424,14 +432,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
                   // @return void()
                   var resetMouseMoveTrack = function() {
-                        clearTimeout( $(window).data('_scroll_move_timer_') );
+                        clearTimeout( self.cachedElements.$window.data('_scroll_move_timer_') );
                         self.mouseMovedRecently.set({});
                   };
 
-                  $(window).on( 'mousemove scroll', _.throttle( function( evt ) {
+                  self.cachedElements.$window.on( 'mousemove scroll', _.throttle( function( evt ) {
                         self.mouseMovedRecently( { x : evt.clientX, y : evt.clientY } );
-                        clearTimeout( $(window).data('_scroll_move_timer_') );
-                        $(window).data('_scroll_move_timer_', setTimeout(function() {
+                        clearTimeout( self.cachedElements.$window.data('_scroll_move_timer_') );
+                        self.cachedElements.$window.data('_scroll_move_timer_', setTimeout(function() {
                               self.mouseMovedRecently.set({});
                         }, 4000 ) );
                   }, 50 ) );
@@ -443,7 +451,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         resetMouseMoveTrack();
                   });
 
-                  $( 'body').on( 'sek-section-added', '[data-sek-level="location"]', function( evt, params  ) {
+                  self.cachedElements.$body.on( 'sek-section-added', '[data-sek-level="location"]', function( evt, params  ) {
                         resetMouseMoveTrack();
                   });
 

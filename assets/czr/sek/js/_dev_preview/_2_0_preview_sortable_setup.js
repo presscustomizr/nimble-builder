@@ -21,7 +21,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
 
                   // Schedule with delegation
-                  $( 'body').on( 'sek-section-added sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                  self.cachedElements.$body.on( 'sek-section-added sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         self.makeSektionsSortableInLocation( $(this).data('sek-id') );
                   });
 
@@ -34,11 +34,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
                   });
                   // Schedule with delegation
-                  $('body').on( 'sek-columns-refreshed sek-section-added', '[data-sek-level="section"]', function( evt ) {
+                  self.cachedElements.$body.on( 'sek-columns-refreshed sek-section-added', '[data-sek-level="section"]', function( evt ) {
                         self.makeColumnsSortableInSektion( $(this).data('sek-id') );
                   });
                   // this case occurs when moving a section from one location to another for example
-                  $( 'body').on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                  self.cachedElements.$body.on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         $(this).find( '[data-sek-level="section"]' ).each( function() {
                               self.makeColumnsSortableInSektion( $(this).data('sek-id') );
                         });
@@ -53,28 +53,28 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
                   });
                   // Schedule with delegation
-                  $('body').on( 'sek-modules-refreshed', '[data-sek-level="column"]', function() {
+                  self.cachedElements.$body.on( 'sek-modules-refreshed', '[data-sek-level="column"]', function() {
                         self.makeModulesSortableInColumn( $(this).data('sek-id') );
                   });
-                  $('body').on( 'sek-columns-refreshed', '[data-sek-level="section"]', function() {
+                  self.cachedElements.$body.on( 'sek-columns-refreshed', '[data-sek-level="section"]', function() {
                         $(this).find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
                   // this case occurs when moving a section from one location to another for example
-                  $( 'body').on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                  self.cachedElements.$body.on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         $(this).find( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
-                  $( 'body').on( 'sek-section-added', '[data-sek-level="location"]', function( evt, params  ) {
+                  self.cachedElements.$body.on( 'sek-section-added', '[data-sek-level="location"]', function( evt, params  ) {
                         $(this).find( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
                   // added to fix impossibility to move an already inserted module in a freshly added multicolumn section
                   // @see https://github.com/presscustomizr/nimble-builder/issues/538
-                  $( 'body').on( 'sek-location-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                  self.cachedElements.$body.on( 'sek-location-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         $(this).find( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
@@ -142,7 +142,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     }
                               },
                               start: function( event, ui ) {
-                                    $('body').addClass('sek-moving-section');
+                                    self.cachedElements.$body.addClass('sek-moving-section');
                                     $sourceLocation = ui.item.closest('[data-sek-level="location"]');
                                     from_location = $sourceLocation.data('sek-id');
 
@@ -152,7 +152,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     });
                               },
                               stop : function( event, ui ) {
-                                    $('body').removeClass('sek-moving-section');
+                                    self.cachedElements.$body.removeClass('sek-moving-section');
 
                                     newOrder = [];
                                     $targetLocation = ui.item.closest('[data-sek-level="location"]');
@@ -469,7 +469,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               startOrder = [];
                               newOrder = [];
 
-                              $('body').addClass( 'sek-dragging-element' );
+                              self.cachedElements.$body.addClass( 'sek-dragging-element' );
                               //$('.sek-column-inner').css( {'min-height' : '20px'});
                               // Set source
                               from_column = ui.item.closest('[data-sek-level="column"]').data( 'sek-id');
@@ -513,7 +513,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               });
 
                               // Clean some css classes
-                              $('body').removeClass( 'sek-dragging-element' );
+                              self.cachedElements.$body.removeClass( 'sek-dragging-element' );
                         }
                   }));
 

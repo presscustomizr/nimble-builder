@@ -47,13 +47,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             $.when( self.renderAndSetupFeedbackTmpl({}) ).done( function( $_el ) {
                                   //display
                                   _.delay( function() {
-                                      $('body').addClass('nimble-feedback-ui-visible');
+                                      self.cachedElements.$body.addClass('nimble-feedback-ui-visible');
                                   }, 200 );
                             });
                       },
                       _hideAndRemove = function() {
                             var dfd = $.Deferred();
-                            $('body').removeClass('nimble-feedback-ui-visible');
+                            self.cachedElements.$body.removeClass('nimble-feedback-ui-visible');
                             if ( $( self.feedbackUIId ).length > 0 ) {
                                   //remove Dom element after slide up
                                   _.delay( function() {
@@ -115,7 +115,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
 
                   // Attach event with delegation
-                  $('body').on('click', '[data-sek-feedback-action]', function(evt) {
+                  self.cachedElements.$body.on('click', '[data-sek-feedback-action]', function(evt) {
                         evt.preventDefault();
 
                         // On each click action, reset the timer

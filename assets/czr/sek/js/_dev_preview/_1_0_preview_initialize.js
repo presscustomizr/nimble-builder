@@ -2,6 +2,11 @@
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
+            cachedElements : {
+                $body : $('body'),
+                $window : $(window)
+            },
+
             initialize: function() {
                   var self = this;
 
@@ -31,7 +36,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // => allow a better previewing experience and more realistic spacing adjustments
                   // The css class .sek-has-modules is also printed server side
                   // @see php SEK_Front_Render::render()
-                  $('body').on('sek-columns-refreshed sek-modules-refreshed', function( evt, params ) {
+                  self.cachedElements.$body.on('sek-columns-refreshed sek-modules-refreshed', function( evt, params ) {
                         if ( !_.isUndefined( params ) && !_.isUndefined( params.in_sektion ) && $('[data-sek-id="' + params.in_sektion +'"]').length > 0 ) {
                               var $updatedSektion = $('[data-sek-id="' + params.in_sektion +'"]');
                               $updatedSektion.toggleClass( 'sek-has-modules', $updatedSektion.find('[data-sek-level="module"]').length > 0 );
@@ -41,7 +46,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // Deactivates the links
                   self.deactivateLinks();
 
-                  $('body').on([
+                  self.cachedElements.$body.on([
                         'sek-modules-refreshed',
                         'sek-columns-refreshed',
                         'sek-section-added',
@@ -111,7 +116,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                 });
                           }
                     };
-                  $('body').find('[data-sek-level="module"]').each( function() {
+                  this.cachedElements.$body.find('[data-sek-level="module"]').each( function() {
                         $(this).find('a').each( function(){
                               try { _doSafe_.call( $(this) ); } catch(er) { api.errare( '::deactivateLinks => error ', er ); }
                         });

@@ -10,7 +10,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                   // Loader Cleaning <= the element printed when refreshing a level
                   // @see ::mayBePrintLoader
-                  $( 'body').on([
+                  self.cachedElements.$body.on([
                         'sek-modules-refreshed',
                         'sek-columns-refreshed',
                         'sek-section-added',
@@ -67,7 +67,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   }
                   if ( true === params.fullPageLoader ) {
                         var $loaderWrapper = $('<div>', { id : 'nimble-full-page-loader-wrapper', class: 'white-loader'} );
-                        $('body').append($loaderWrapper);
+                        self.cachedElements.$body.append($loaderWrapper);
                         $loaderWrapper.fadeIn('fast').append( self._css_loader_html ).find('.sek-css-loader').fadeIn( 'fast' );
                         // Blur locations
                         $('[data-sek-level="location"]').each( function() {
