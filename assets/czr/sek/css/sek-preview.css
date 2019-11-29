@@ -641,6 +641,7 @@
     filter: grayscale(100%);
     -webkit-filter: gray;
     filter: gray;
+    display: inline;/* <= make sure the default behaviour is not overriden by other rules */
 }
 .sek-empty-location-placeholder:hover .sek-nimble-icon img {
     -webkit-filter: none;
