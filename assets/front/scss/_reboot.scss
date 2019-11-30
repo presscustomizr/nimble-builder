@@ -14,6 +14,7 @@
         max-width: 100%;
         vertical-align: middle;
         border-style: none; // Remove the border on images inside links in IE 10-.
+        display: inline;// make sure image are not treated as block by third party css ( this is the case for example in the Twenty Twenty official WP theme )
     }
     svg:not(:root) {
         overflow: hidden; // Hide the overflow in IE
