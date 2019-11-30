@@ -268,7 +268,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // Fired on click on up / down arrows in the section ui menu
                               // This handles the nested sections case
                               case 'sek-move-section-up-down' :
-                                    //api.infoLog('PARAMS in sek-move-section-up', params );
                                     parentCandidate = self.getLevelModel( params.is_nested ? params.in_column : params.location , newSetValue.collection );
                                     if ( _.isEmpty( parentCandidate ) || 'no_match' == parentCandidate ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing target location' );
@@ -288,18 +287,72 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // Swap up <=> down
                                     var direction = params.direction || 'up';
 
-                                    // prevent absurd movements of a section
-                                    // this should not happen because up / down arrows are not displayed when section is positionned top / bottom
-                                    // but safer to add it
-                                    if ( 'up' !== direction && originalCollection.length === _indexInOriginal + 1 ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => bottom reached' );
-                                    } else if ( 'up' === direction && 0 === _indexInOriginal ){
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => top reached' );
-                                    }
+                                    var isLastSectionInLocation = originalCollection.length === _indexInOriginal + 1,
+                                        isFirstSectionInLocation = 0 === _indexInOriginal;
 
-                                    reorderedCollection[ _indexInOriginal ] = originalCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ];
-                                    reorderedCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ] = originalCollection[ _indexInOriginal ];
-                                    parentCandidate.collection = reorderedCollection;
+                                    // When a section is last in location and there's another location below, let's move the section to this sibling location
+                                    // For this is possible only for not nested section.
+                                    var activeLocationsInPage = self.activeLocations();
+                                    var indexOfCurrentLocation = _.findIndex( newSetValue.collection, function( _loc_ ) {
+                                          return _loc_.id === params.location;
+                                    });
+
+                                    var isFirstLocationInPage = 0 === indexOfCurrentLocation,
+                                        isLastLocationInPage = activeLocationsInPage.length === indexOfCurrentLocation + 1,
+                                        newLocationId, newLocationCandidate;
+
+                                    if ( ! params.is_nested && isLastSectionInLocation && 'up' !== direction && ! isLastLocationInPage ) {
+                                          newLocationId = activeLocationsInPage[ indexOfCurrentLocation + 1 ];
+                                          newLocationCandidate = self.getLevelModel( newLocationId , newSetValue.collection );
+
+                                          // Add the section in first position of the section below
+                                          newLocationCandidate.collection.unshift( originalCollection[ _indexInOriginal ] );
+                                          // Removes the section in last position of the original section
+                                          parentCandidate.collection.pop();
+                                          // the new_location param will be used in the 'complete' callback of 'sek-move-section-down' / 'sek-move-section-up'
+                                          params.new_location = newLocationId;
+
+                                    } else if ( ! params.is_nested && isFirstSectionInLocation && 'up' === direction && ! isFirstLocationInPage ) {
+                                          newLocationId = activeLocationsInPage[ indexOfCurrentLocation - 1 ];
+                                          newLocationCandidate = self.getLevelModel( newLocationId , newSetValue.collection );
+
+                                          // Add the section in first position of the section below
+                                          newLocationCandidate.collection.push( originalCollection[ _indexInOriginal ] );
+                                          // Removes the section in last position of the original section
+                                          parentCandidate.collection.shift();
+                                          // the new_location param will be used in the 'complete' callback of 'sek-move-section-down' / 'sek-move-section-up'
+                                          params.new_location = newLocationId;
+                                    } else {
+                                          // prevent absurd movements of a section
+                                          // this should not happen because up / down arrows are not displayed when section is positionned top / bottom
+                                          // but safer to add it
+                                          if ( 'up' !== direction && originalCollection.length === _indexInOriginal + 1 ) {
+                                                //throw new Error( 'updateAPISetting => ' + params.action + ' => bottom reached' );
+                                                api.previewer.trigger('sek-notify', {
+                                                      type : 'info',
+                                                      duration : 30000,
+                                                      message : [
+                                                            '<span style="font-size:0.95em">',
+                                                              '<strong>' + sektionsLocalizedData.i18n[ "This section has reached the lowest possible location on page." ] + '</strong>',
+                                                            '</span>'
+                                                      ].join('')
+                                                });
+                                          } else if ( 'up' === direction && 0 === _indexInOriginal ){
+                                                api.previewer.trigger('sek-notify', {
+                                                      type : 'info',
+                                                      duration : 30000,
+                                                      message : [
+                                                            '<span style="font-size:0.95em">',
+                                                              '<strong>' + sektionsLocalizedData.i18n[ "This section has reached the highest possible location on page." ] + '</strong>',
+                                                            '</span>'
+                                                      ].join('')
+                                                });
+                                          } else {
+                                                reorderedCollection[ _indexInOriginal ] = originalCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ];
+                                                reorderedCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ] = originalCollection[ _indexInOriginal ];
+                                                parentCandidate.collection = reorderedCollection;
+                                          }
+                                    }
                               break;
 
 

@@ -246,12 +246,19 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <?php if ( sek_is_dev_mode() ) : ?>
                           <i class="sek-to-json fas fa-code"></i>
                         <?php endif; ?>
-                        <# if ( true !== data.is_first_section_in_parent ) { #>
+                        <?php
+                          // Code before implementing https://github.com/presscustomizr/nimble-builder/issues/521 :
+                          /* <# if ( true !== data.is_first_section_in_parent ) { #>
                           <i data-sek-click-on="move-section-up" class="material-icons sek-click-on" title="<?php _e( 'Move section up', 'text_domain' ); ?>">keyboard_arrow_up</i>
                         <# } #>
                         <# if ( true !== data.is_last_section_in_parent ) { #>
                           <i data-sek-click-on="move-section-down" class="material-icons sek-click-on" title="<?php _e( 'Move section down', 'text_domain' ); ?>">keyboard_arrow_down</i>
-                        <# } #>
+                        <# } #>*/
+                        ?>
+                        <i data-sek-click-on="move-section-up" class="material-icons sek-click-on" title="<?php _e( 'Move section up', 'text_domain' ); ?>">keyboard_arrow_up</i>
+                        <i data-sek-click-on="move-section-down" class="material-icons sek-click-on" title="<?php _e( 'Move section down', 'text_domain' ); ?>">keyboard_arrow_down</i>
+
+
                         <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it draggable for the moment. @todo ?>
                         <# if ( ! data.is_nested ) { #>
                           <# if ( true !== data.is_global_location ) { #>

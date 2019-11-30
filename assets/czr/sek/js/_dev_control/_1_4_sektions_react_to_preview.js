@@ -284,6 +284,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               original_action : 'sek-move-section-up',
                                               moved_level_id : params.apiParams.id
                                         });
+
+                                        // Introduced for https://github.com/presscustomizr/nimble-builder/issues/521
+                                        if ( params.apiParams.new_location ) {
+                                              api.previewer.trigger( 'sek-refresh-level', {
+                                                    level : 'location',
+                                                    id :  params.apiParams.new_location,
+
+                                                    // added for https://github.com/presscustomizr/nimble-builder/issues/471
+                                                    original_action : 'sek-move-section-down',
+                                                    moved_level_id : params.apiParams.id
+                                              });
+                                        }
                                   }
                             },
 
@@ -310,6 +322,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               original_action : 'sek-move-section-down',
                                               moved_level_id : params.apiParams.id
                                         });
+
+                                        // Introduced for https://github.com/presscustomizr/nimble-builder/issues/521
+                                        if ( params.apiParams.new_location ) {
+                                              api.previewer.trigger( 'sek-refresh-level', {
+                                                    level : 'location',
+                                                    id :  params.apiParams.new_location,
+
+                                                    // added for https://github.com/presscustomizr/nimble-builder/issues/471
+                                                    original_action : 'sek-move-section-down',
+                                                    moved_level_id : params.apiParams.id
+                                              });
+                                        }
                                   }
                             },
 
