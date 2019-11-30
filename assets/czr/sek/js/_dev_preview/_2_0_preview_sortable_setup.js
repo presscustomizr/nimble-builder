@@ -145,8 +145,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         },
                         start: function( event, ui ) {
                               self.cachedElements.$body.addClass('sek-moving-section');
+                              self.isDraggingElement = true;
                               $sourceLocation = ui.item.closest('[data-sek-level="location"]');
                               from_location = $sourceLocation.data('sek-id');
+
+                              // Print all level ui
+                              // fixes slowness when dragging @see https://github.com/presscustomizr/nimble-builder/issues/521
+                              $( 'body' ).find( '[data-sek-level]' ).each( function() {
+                                    self.printLevelUI( $(this) );
+                                    $(this) .find('.sek-dyn-ui-wrapper').stop( true, true ).show();
+                              });
 
                               // store the startOrder
                               // $sourceLocation.children( '[data-sek-level="section"]' ).each( function() {
@@ -155,6 +163,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         },
                         stop : function( event, ui ) {
                               self.cachedElements.$body.removeClass('sek-moving-section');
+                              self.isDraggingElement = false;
 
                               newOrder = [];
                               $targetLocation = ui.item.closest('[data-sek-level="location"]');
