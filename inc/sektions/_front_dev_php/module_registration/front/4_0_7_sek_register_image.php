@@ -106,6 +106,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'css_identifier' => 'h_alignment',
                     'title_width' => 'width-100',
                     'width-100'   => true,
+                    'css_selectors'=> 'figure'
                 ),
                 'use_custom_title_attr' => array(
                     'input_type'  => 'nimblecheck',
