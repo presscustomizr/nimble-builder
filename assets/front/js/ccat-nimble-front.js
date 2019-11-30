@@ -3095,6 +3095,7 @@ jQuery( function($){
                 bgLocalVideoContainerClass: 'sek-background-video-local',
                 bgLoadingClass: 'sek-bg-loading',
                 loop:true,
+                delayBeforeStart:null,
                 activeOnMobile:false,
                 startAt:null,
                 endAt:null,
@@ -3168,6 +3169,9 @@ jQuery( function($){
             if ( ! _utils_.isUndefined( self.$element.data('sek-video-bg-loop') ) ) {
                 this.options.loop = self.$element.data('sek-video-bg-loop');
             }
+            this.options.delayBeforeStart = self.$element.data('sek-video-delay-before');
+            this.options.delayBeforeStart = Math.abs( self.options.delayBeforeStart ? parseInt( self.options.delayBeforeStart, 10 ) : 0 );
+
             if ( ! _utils_.isUndefined( self.$element.data('sek-video-bg-on-mobile') ) ) {
                 this.options.activeOnMobile = self.$element.data('sek-video-bg-on-mobile');
             }
@@ -3195,16 +3199,21 @@ jQuery( function($){
 
             this.options    = $.extend( {}, defaults, this.options );
 
-            // init now
-            this.init();
-            this.$element.on( 'refresh-video-dimensions', _.debounce( function() {
-                _utils_.delay( function() {
-                    self.updatePlayerDimensions();
-                }, 300 );
-            }, 200 ) );
+            var _doInit = function() {
+                  // init now
+                  self.init();
+                  self.$element.on( 'refresh-video-dimensions', _utils_.debounce( function() {
+                      _utils_.delay( function() {
+                          self.updatePlayerDimensions();
+                      }, 300 );
+                  }, 200 ) );
 
-            // Flag
-            this.$element.data('sek-player-instantiated', true );
+                  // Flag
+                  self.$element.data('sek-player-instantiated', true );
+            };
+
+            // maybe delay init if set by user
+            _utils_.delay( _doInit, self.options.delayBeforeStart * 1000 );
       };
 
       /*
@@ -3273,7 +3282,7 @@ jQuery( function($){
             }
 
             // update video dimension for all players on resize
-            this.$window.on('resize', _.debounce( function() { self.updatePlayerDimensions(); }, 200 ) );
+            this.$window.on( 'resize', _utils_.debounce( function() { self.updatePlayerDimensions(); }, 200 ) );
       };
 
 

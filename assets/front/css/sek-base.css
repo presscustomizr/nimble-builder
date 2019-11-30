@@ -8,6 +8,7 @@
   max-width: 100%;
   vertical-align: middle;
   border-style: none;
+  display: inline;
 }
 
 .sektion-wrapper svg:not(:root) {
@@ -832,7 +833,7 @@ button.sek-btn,
   transform: translateZ(0) rotate(-270deg);
 }
 
-.sek-nav-toggler {
+.sek-module-inner .sek-nav-toggler {
   -webkit-appearance: none !important;
   cursor: pointer;
   height: 40px;
@@ -841,7 +842,7 @@ button.sek-btn,
   vertical-align: middle;
 }
 
-.sek-nav-toggler, .sek-nav-toggler:hover, .sek-nav-toggler:focus {
+.sek-module-inner .sek-nav-toggler, .sek-module-inner .sek-nav-toggler:hover, .sek-module-inner .sek-nav-toggler:focus {
   background: 0 0;
   background-color: rgba(0, 0, 0, 0);
   color: black;

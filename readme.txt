@@ -22,8 +22,8 @@ Watch the video below to see how this [demo page](https://demo.presscustomizr.co
 
 [vimeo https://vimeo.com/328473405]
 
-= Works in any page of your site and with all WordPress themes =
-Nimble Builder allows you to insert sections in any context of your site : home page, single post or page, category or tag page, even search results or [404 pages](https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link). No only that, but you can also decide to [start designing from a blank page](https://docs.presscustomizr.com/article/371-how-to-start-building-from-a-blank-page-with-the-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link) in any page of your site, and even create a custom header and footer. Nimble Builder uses native WordPress action hooks, which makes it compatible with all WordPress themes.
+= Works on any page of your site and with all WordPress themes =
+Nimble Builder allows you to insert sections in any context of your site : home page, single post or page, category or tag page, even search results or [404 pages](https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link). No only that, but you can also decide to [start designing from a blank page](https://docs.presscustomizr.com/article/371-how-to-start-building-from-a-blank-page-with-the-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link) on any page of your site, and even create a custom header and footer. Nimble Builder uses native WordPress action hooks, which makes it compatible with all WordPress themes.
 
 = Live demos =
 * Example of [integration with the Customizr theme](https://demo.presscustomizr.com/nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)
@@ -35,7 +35,7 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * **Works in any WordPress contexts** : home, pages, posts, custom post types, archives, author pages, search page, ...
 * Create content, style, move / duplicate / remove elements **in real-time preview**.
 * **Includes many content modules** : classic text editor, image, column layouts, contact form, button, icons, map, html code, WordPress widget area, menu, and more.
-* **Insert engaging [post grids](https://docs.presscustomizr.com/article/393-how-to-add-post-grids-to-any-wordpress-page-with-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** in any page, looking great on desktop and mobile devices.
+* **Insert engaging [post grids](https://docs.presscustomizr.com/article/393-how-to-add-post-grids-to-any-wordpress-page-with-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** on any page, looking great on desktop and mobile devices.
 * Use **full width image or video backgrounds** for your sections, and [enable a parallax effect](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link).
 * **Easily [customize your content specifically for mobile devices](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** : change the responsive breakpoint, adapt font-size, spacing, alignment, column layouts, in real-time preview.
 * **Customize any text [with Google Fonts](https://docs.presscustomizr.com/article/364-how-to-use-google-fonts-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)**.
@@ -126,7 +126,7 @@ Added video background for section and column. Supports Vimeo, YouTube and self-
 == Changelog ==
 = 1.9.11 November 22nd 2019 =
 * added : video background for section and column. Supports Vimeo, YouTube and self-hosted videos.
-* updated : swiper.js to latest version 5.2.1
+* improved : [Carousel module] performances
 
 = 1.9.10 November 20th 2019 =
 * improved : better default base style for tables, lists, codes, definitions, and various minor CSS improvements

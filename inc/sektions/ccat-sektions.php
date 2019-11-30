@@ -4941,6 +4941,13 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     //'notice_after' => __('', 'text_doma'),
                     'refresh_markup' => true,
                 ),
+                'bg-video-delay-start' => array(
+                    'input_type'  => 'number_simple',
+                    'title'       => __('Play after a delay', 'text_doma'),
+                    'default'     => '',
+                    'refresh_markup' => true,
+                    'notice_after' => __('Set an optional delay in seconds before playing the video', 'text-doma')
+                ),
                 'bg-video-on-mobile' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Play on mobile devices', 'text_doma'),
@@ -5117,9 +5124,9 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     }
 
     //Background overlay?
-    // 1) a background image should be set
+    // 1) a background image or video should be set
     // 2) the option should be checked
-    if ( !empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {
+    if ( ( !empty( $bg_options['bg-image']) || ( sek_is_checked( $bg_options['bg-use-video'] ) && !empty( $bg_options['bg-video'] ) ) ) && !empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {
         //(needs validation: we need a sanitize hex or rgba color)
         $bg_color_overlay = isset( $bg_options[ 'bg-color-overlay' ] ) ? $bg_options[ 'bg-color-overlay' ] : null;
         if ( $bg_color_overlay ) {
@@ -7968,6 +7975,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'css_identifier' => 'h_alignment',
                     'title_width' => 'width-100',
                     'width-100'   => true,
+                    'css_selectors'=> 'figure'
                 ),
                 'use_custom_title_attr' => array(
                     'input_type'  => 'nimblecheck',
@@ -17895,9 +17903,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             // implemented for video bg https://github.com/presscustomizr/nimble-builder/issues/287
             $video_bg_url = '';
             $video_bg_loop = true;
+            $video_bg_delay_before_start = null;
             $video_bg_on_mobile = false;
             $video_bg_start_time = null;
             $video_bg_end_time = null;
+
 
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
@@ -17923,10 +17933,13 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     if ( !empty( $bg_options[ 'bg-video' ] ) ) {
                         $video_bg_url = $bg_options[ 'bg-video' ];
                     }
-
                     if ( array_key_exists( 'bg-video-loop', $bg_options ) ) {
                         $video_bg_loop = sek_booleanize_checkbox_val( $bg_options[ 'bg-video-loop' ] );
                     }
+                    if ( !empty( $bg_options[ 'bg-video-delay-start' ] ) ) {
+                        $video_bg_delay_before_start = abs( (int)$bg_options[ 'bg-video-delay-start' ] );
+                    }
+
                     if ( array_key_exists( 'bg-video-on-mobile', $bg_options ) ) {
                         $video_bg_on_mobile = sek_booleanize_checkbox_val( $bg_options[ 'bg-video-on-mobile' ] );
                     }
@@ -17964,14 +17977,17 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( in_array( $level_type, array( 'section', 'column') ) ) {
                 if ( !empty( $video_bg_url ) && is_string( $video_bg_url ) ) {
                     $attributes .= sprintf('%1$s data-sek-video-bg-src="%2$s"', $attributes, $video_bg_url );
-                }
-                $attributes .= sprintf('%1$s data-sek-video-bg-loop="%2$s"', $attributes, $video_bg_loop ? 'true' : 'false' );
-                $attributes .= sprintf('%1$s data-sek-video-bg-on-mobile="%2$s"', $attributes, $video_bg_on_mobile ? 'true' : 'false' );
-                if ( !is_null( $video_bg_start_time ) && $video_bg_start_time >= 0 ) {
-                    $attributes .= sprintf('%1$s data-sek-video-start-at="%2$s"', $attributes, $video_bg_start_time );
-                }
-                if ( !is_null( $video_bg_end_time ) && $video_bg_end_time >= 0 ) {
-                    $attributes .= sprintf('%1$s data-sek-video-end-at="%2$s"', $attributes, $video_bg_end_time );
+                    $attributes .= sprintf('%1$s data-sek-video-bg-loop="%2$s"', $attributes, $video_bg_loop ? 'true' : 'false' );
+                    if ( !is_null( $video_bg_delay_before_start ) && $video_bg_delay_before_start >= 0 ) {
+                        $attributes .= sprintf('%1$s data-sek-video-delay-before="%2$s"', $attributes, $video_bg_delay_before_start );
+                    }
+                    $attributes .= sprintf('%1$s data-sek-video-bg-on-mobile="%2$s"', $attributes, $video_bg_on_mobile ? 'true' : 'false' );
+                    if ( !is_null( $video_bg_start_time ) && $video_bg_start_time >= 0 ) {
+                        $attributes .= sprintf('%1$s data-sek-video-start-at="%2$s"', $attributes, $video_bg_start_time );
+                    }
+                    if ( !is_null( $video_bg_end_time ) && $video_bg_end_time >= 0 ) {
+                        $attributes .= sprintf('%1$s data-sek-video-end-at="%2$s"', $attributes, $video_bg_end_time );
+                    }
                 }
             }
             return $attributes;

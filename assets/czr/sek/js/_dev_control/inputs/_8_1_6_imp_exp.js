@@ -129,7 +129,7 @@
                                 active_locations : api.czr_sektions.activeLocations()
                           }).done( function() {
                                 // disable the 'beforeunload' listeners generating popup window when the changeset is dirty
-                                $( window ).off( 'beforeunload' );
+                                $(window).off( 'beforeunload' );
                                 // Generate a download window
                                 // @see add_action( 'customize_register', '\Nimble\sek_catch_export_action', PHP_INT_MAX );
                                 window.location.href = [
@@ -138,7 +138,7 @@
                                       query.join('&')
                                 ].join('');
                                 // re-enable the listeners
-                                $( window ).on( 'beforeunload' );
+                                $(window).on( 'beforeunload' );
                           }).fail( function( error_resp ) {
                                 api.previewer.trigger('sek-notify', {
                                       notif_id : 'import-failed',

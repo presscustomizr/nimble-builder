@@ -2,6 +2,11 @@
 var SekPreviewPrototype = SekPreviewPrototype || {};
 ( function( api, $, _ ) {
       $.extend( SekPreviewPrototype, {
+            cachedElements : {
+                $body : $('body'),
+                $window : $(window)
+            },
+
             initialize: function() {
                   var self = this;
 
@@ -31,7 +36,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // => allow a better previewing experience and more realistic spacing adjustments
                   // The css class .sek-has-modules is also printed server side
                   // @see php SEK_Front_Render::render()
-                  $('body').on('sek-columns-refreshed sek-modules-refreshed', function( evt, params ) {
+                  self.cachedElements.$body.on('sek-columns-refreshed sek-modules-refreshed', function( evt, params ) {
                         if ( !_.isUndefined( params ) && !_.isUndefined( params.in_sektion ) && $('[data-sek-id="' + params.in_sektion +'"]').length > 0 ) {
                               var $updatedSektion = $('[data-sek-id="' + params.in_sektion +'"]');
                               $updatedSektion.toggleClass( 'sek-has-modules', $updatedSektion.find('[data-sek-level="module"]').length > 0 );
@@ -41,7 +46,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // Deactivates the links
                   self.deactivateLinks();
 
-                  $('body').on([
+                  self.cachedElements.$body.on([
                         'sek-modules-refreshed',
                         'sek-columns-refreshed',
                         'sek-section-added',
@@ -111,7 +116,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                 });
                           }
                     };
-                  $('body').find('[data-sek-level="module"]').each( function() {
+                  this.cachedElements.$body.find('[data-sek-level="module"]').each( function() {
                         $(this).find('a').each( function(){
                               try { _doSafe_.call( $(this) ); } catch(er) { api.errare( '::deactivateLinks => error ', er ); }
                         });
@@ -195,7 +200,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
 
                   // Schedule with delegation
-                  $( 'body').on( 'sek-section-added sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                  self.cachedElements.$body.on( 'sek-section-added sek-level-refreshed sek-location-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         self.makeSektionsSortableInLocation( $(this).data('sek-id') );
                   });
 
@@ -208,11 +213,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
                   });
                   // Schedule with delegation
-                  $('body').on( 'sek-columns-refreshed sek-section-added', '[data-sek-level="section"]', function( evt ) {
+                  self.cachedElements.$body.on( 'sek-columns-refreshed sek-section-added', '[data-sek-level="section"]', function( evt ) {
                         self.makeColumnsSortableInSektion( $(this).data('sek-id') );
                   });
                   // this case occurs when moving a section from one location to another for example
-                  $( 'body').on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                  self.cachedElements.$body.on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         $(this).find( '[data-sek-level="section"]' ).each( function() {
                               self.makeColumnsSortableInSektion( $(this).data('sek-id') );
                         });
@@ -227,28 +232,28 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         });
                   });
                   // Schedule with delegation
-                  $('body').on( 'sek-modules-refreshed', '[data-sek-level="column"]', function() {
+                  self.cachedElements.$body.on( 'sek-modules-refreshed', '[data-sek-level="column"]', function() {
                         self.makeModulesSortableInColumn( $(this).data('sek-id') );
                   });
-                  $('body').on( 'sek-columns-refreshed', '[data-sek-level="section"]', function() {
+                  self.cachedElements.$body.on( 'sek-columns-refreshed', '[data-sek-level="section"]', function() {
                         $(this).find('.sek-sektion-inner').first().children( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
                   // this case occurs when moving a section from one location to another for example
-                  $( 'body').on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                  self.cachedElements.$body.on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         $(this).find( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
-                  $( 'body').on( 'sek-section-added', '[data-sek-level="location"]', function( evt, params  ) {
+                  self.cachedElements.$body.on( 'sek-section-added', '[data-sek-level="location"]', function( evt, params  ) {
                         $(this).find( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
                   });
                   // added to fix impossibility to move an already inserted module in a freshly added multicolumn section
                   // @see https://github.com/presscustomizr/nimble-builder/issues/538
-                  $( 'body').on( 'sek-location-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                  self.cachedElements.$body.on( 'sek-location-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         $(this).find( '[data-sek-level="column"]' ).each( function() {
                               self.makeModulesSortableInColumn( $(this).data('sek-id') );
                         });
@@ -298,61 +303,62 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             makeSektionsSortableInLocation : function( locationId ) {
                   var self = this;
                   var from_location, to_location, startOrder = [], newOrder = [], defaults;
-                  $('[data-sek-id="' + locationId +'"]').each( function() {
-                        if ( true === $(this).data('sek-is-global-location') )
-                          return;
 
-                        defaults = $.extend( true, {}, self.sortableDefaultParams );
-                        $(this).sortable( _.extend( defaults, {
-                              //handle : '.sek-move-section, .sek-section-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
-                              handle : '.sek-move-section',
-                              connectWith : '[data-sek-is-global-location="false"]',
-                              placeholder: {
-                                    element: function(currentItem) {
-                                        return $('<div class="sortable-placeholder"><div class="sek-module-placeholder-content"><p>' + sekPreviewLocalized.i18n['Insert here'] + '</p></div></div>')[0];
-                                    },
-                                    update: function(container, p) {
-                                        return;
-                                    }
+                  if ( true === $('[data-sek-id="' + locationId +'"]').data('sek-is-global-location') )
+                      return;
+
+                  defaults = $.extend( true, {}, self.sortableDefaultParams );
+
+                  $('[data-sek-id="' + locationId +'"]').sortable( _.extend( defaults, {
+                        items: '[data-sek-level="section"]',
+                        //handle : '.sek-move-section, .sek-section-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
+                        handle : '.sek-move-section',
+                        connectWith : '[data-sek-is-global-location="false"]',
+                        placeholder: {
+                              element: function(currentItem) {
+                                  return $('<div class="sortable-placeholder"><div class="sek-module-placeholder-content"><p>' + sekPreviewLocalized.i18n['Insert here'] + '</p></div></div>')[0];
                               },
-                              start: function( event, ui ) {
-                                    $('body').addClass('sek-moving-section');
-                                    $sourceLocation = ui.item.closest('[data-sek-level="location"]');
-                                    from_location = $sourceLocation.data('sek-id');
-
-                                    // store the startOrder
-                                    $sourceLocation.children( '[data-sek-level="section"]' ).each( function() {
-                                          startOrder.push( $(this).data('sek-id') );
-                                    });
-                              },
-                              stop : function( event, ui ) {
-                                    $('body').removeClass('sek-moving-section');
-
-                                    newOrder = [];
-                                    $targetLocation = ui.item.closest('[data-sek-level="location"]');
-                                    to_location = $targetLocation.data('sek-id');
-
-                                    // Restrict to the direct children
-                                    $targetLocation.children( '[data-sek-level="section"]' ).each( function() {
-                                          newOrder.push( $(this).data('sek-id') );
-                                    });
-
-                                    api.preview.send( 'sek-move', {
-                                          id : ui.item.data('sek-id'),
-                                          level : 'section',
-                                          newOrder : newOrder,
-                                          from_location : from_location,
-                                          to_location : to_location
-                                    });
-                              },
-                              over : function( event, ui ) {
-                                    ui.placeholder.addClass('sek-sortable-section-over');
-                              },
-                              out : function( event, ui  ) {
-                                    ui.placeholder.removeClass('sek-sortable-section-over');
+                              update: function(container, p) {
+                                  return;
                               }
-                        }));
-                  });
+                        },
+                        start: function( event, ui ) {
+                              self.cachedElements.$body.addClass('sek-moving-section');
+                              $sourceLocation = ui.item.closest('[data-sek-level="location"]');
+                              from_location = $sourceLocation.data('sek-id');
+
+                              // store the startOrder
+                              // $sourceLocation.children( '[data-sek-level="section"]' ).each( function() {
+                              //       startOrder.push( $(this).data('sek-id') );
+                              // });
+                        },
+                        stop : function( event, ui ) {
+                              self.cachedElements.$body.removeClass('sek-moving-section');
+
+                              newOrder = [];
+                              $targetLocation = ui.item.closest('[data-sek-level="location"]');
+                              to_location = $targetLocation.data('sek-id');
+
+                              // Restrict to the direct children
+                              $targetLocation.children( '[data-sek-level="section"]' ).each( function() {
+                                    newOrder.push( $(this).data('sek-id') );
+                              });
+
+                              api.preview.send( 'sek-move', {
+                                    id : ui.item.data('sek-id'),
+                                    level : 'section',
+                                    newOrder : newOrder,
+                                    from_location : from_location,
+                                    to_location : to_location
+                              });
+                        },
+                        over : function( event, ui ) {
+                              ui.placeholder.addClass('sek-sortable-section-over');
+                        },
+                        out : function( event, ui  ) {
+                              ui.placeholder.removeClass('sek-sortable-section-over');
+                        }
+                  }));
             },//makeSektionsSortableInLocation
 
 
@@ -643,7 +649,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               startOrder = [];
                               newOrder = [];
 
-                              $('body').addClass( 'sek-dragging-element' );
+                              self.cachedElements.$body.addClass( 'sek-dragging-element' );
                               //$('.sek-column-inner').css( {'min-height' : '20px'});
                               // Set source
                               from_column = ui.item.closest('[data-sek-level="column"]').data( 'sek-id');
@@ -687,7 +693,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               });
 
                               // Clean some css classes
-                              $('body').removeClass( 'sek-dragging-element' );
+                              self.cachedElements.$body.removeClass( 'sek-dragging-element' );
                         }
                   }));
 
@@ -707,7 +713,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // Delegate instantiation when a level markup is refreshed
                   // Let the event bubble up to the location, and then visit all children section to maybe re-instantiate resizable
                   // @fixes https://github.com/presscustomizr/nimble-builder/issues/165
-                  $('body').on(
+                  self.cachedElements.$body.on(
                         'sek-level-refreshed sek-modules-refreshed sek-columns-refreshed sek-section-added sek-location-refreshed',
                         '[data-sek-level="location"]',
                         function( evt ) {
@@ -942,6 +948,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
 
+
+
+
             // Fired on Dom Ready, in ::initialize()
             setupUiHoverVisibility : function() {
                   var self = this;
@@ -971,6 +980,21 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   };//removeLevelUI
 
 
+                  var removeAddContentButtons = function() {
+                        self.cachedElements.$body.stop( true, true ).find('.sek-add-content-button').each( function() {
+                              $(this).fadeOut( {
+                                    duration : 200,
+                                    complete : function() { $(this).remove(); }
+                              });
+                        });
+                  };
+
+                  // clean add content buttons on section insertion
+                  // solves the problem of button not being rendered in some case
+                  // @see https://github.com/presscustomizr/nimble-builder/issues/545
+                  self.cachedElements.$body.on( 'sek-location-refreshed sek-section-added sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                        removeAddContentButtons();
+                  });
 
 
                   // UI MENU
@@ -997,7 +1021,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   $levelTypeAndMenuWrapper.show();
                             }
                       };
-                  $('body').on( 'click', '.sek-dyn-ui-location-inner', function( evt )  {
+                  self.cachedElements.$body.on( 'click', '.sek-dyn-ui-location-inner', function( evt )  {
                         var $menu = $(this).find('.sek-dyn-ui-hamb-menu-wrapper'),
                             $parentSection = $(this).closest('[data-sek-level="section"]');
                         // Close all other expanded ui menu of the column
@@ -1010,7 +1034,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         autoCollapser.call( $menu );
                   });
                   // maintain expanded as long as it's being hovered
-                  $('body').on( 'mouseenter mouseover mouseleave', '.sek-dyn-ui-wrapper', _.throttle( function( evt )  {
+                  self.cachedElements.$body.on( 'mouseenter mouseover mouseleave', '.sek-dyn-ui-wrapper', _.throttle( function( evt )  {
                         var $menu = $(this).find('.sek-dyn-ui-hamb-menu-wrapper');
                         if ( _.isUndefined( $menu.data('_toggle_ui_menu_') ) || $menu.hasClass('sek-collapsed') )
                           return;
@@ -1022,7 +1046,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // minimize on click
                   // solves the problem of a level ui on top of another one
                   // @ee https://github.com/presscustomizr/nimble-builder/issues/138
-                  $('body').on( 'click', '.sek-minimize-ui', function( evt )  {
+                  self.cachedElements.$body.on( 'click', '.sek-minimize-ui', function( evt )  {
                         $(this).closest('.sek-dyn-ui-location-type').slideToggle('fast');
                   });
 
@@ -1035,7 +1059,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // Generated when is_singular() only
                   // @see SEK_Front::render()
                   var $wpContentEl;
-                  $('body').on( 'mouseenter', '.sek-wp-content-wrapper', function( evt ) {
+                  self.cachedElements.$body.on( 'mouseenter', '.sek-wp-content-wrapper', function( evt ) {
                         $wpContentEl = $(this);
                         // stop here if the .sek-dyn-ui-wrapper is already printed for this level AND is not being faded out.
                         if ( $wpContentEl.children('.sek-dyn-ui-wrapper').length > 0 && true !== $wpContentEl.data( 'UIisFadingOut' ) )
@@ -1076,7 +1100,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // fired on mousemove and scroll, every 50ms
                   var _printAddContentButtons = function() {
                         var _location, _is_global_location;
-                        $('body').find( 'div[data-sek-level="location"]' ).each( function() {
+                        self.cachedElements.$body.find( 'div[data-sek-level="location"]' ).each( function() {
                               $sectionCollection = $(this).children( 'div[data-sek-level="section"]' );
                               tmpl = self.parseTemplate( '#sek-tmpl-add-content-button' );
                               var $btn_el;
@@ -1140,7 +1164,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                   // fired on mousemove and scroll, every 50ms
                   var _sniffAndRevealButtons = function( position ) {
-                        $( 'body').find('.sek-add-content-button').each( function() {
+                        self.cachedElements.$body.find('.sek-add-content-button').each( function() {
                               var btnWrapperRect = $(this)[0].getBoundingClientRect(),
                                   yPos = position.y,
                                   xPos = position.x,
@@ -1175,7 +1199,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         if ( _.isUndefined( $candidateForRemoval ) || $candidateForRemoval.length < 1 ) {
                               // data-sek-preview-level-guid has been introduced in https://github.com/presscustomizr/nimble-builder/issues/494
                               // to fix a wrong UI generation leading to user unable to edit content
-                              $('body').find('[data-sek-level][data-sek-preview-level-guid="' + sekPreviewLocalized.previewLevelGuid +'"]').each( function() {
+                              self.cachedElements.$body.find('[data-sek-level][data-sek-preview-level-guid="' + sekPreviewLocalized.previewLevelGuid +'"]').each( function() {
                                     collectionOfLevelsToWalk.push( $(this) );
                               });
                               sniffCase = 'printOrScheduleRemoval';
@@ -1239,13 +1263,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               if ( ! sekPreviewLocalized.isPreviewUIDebugMode ) {
                                     // Mouse didn't move recently?
                                     // => remove all UIs
-                                    $('body').stop( true, true ).find('.sek-add-content-button').each( function() {
-                                          $(this).fadeOut( {
-                                                duration : 200,
-                                                complete : function() { $(this).remove(); }
-                                          });
-                                    });
-                                    $('body').stop( true, true ).find('[data-sek-level]').each( function() {
+                                    // 1) add content buttons
+                                    removeAddContentButtons();
+
+                                    // 2) level UI's
+                                    self.cachedElements.$body.stop( true, true ).find('[data-sek-level]').each( function() {
                                           // preserve if the ui menu is expanded, otherwise remove
                                           if ( $(this).children('.sek-dyn-ui-wrapper').find('.sek-is-expanded').length < 1 ) {
                                                 removeLevelUI.call( $(this) );
@@ -1256,14 +1278,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
                   // @return void()
                   var resetMouseMoveTrack = function() {
-                        clearTimeout( $(window).data('_scroll_move_timer_') );
+                        clearTimeout( self.cachedElements.$window.data('_scroll_move_timer_') );
                         self.mouseMovedRecently.set({});
                   };
 
-                  $(window).on( 'mousemove scroll', _.throttle( function( evt ) {
+                  self.cachedElements.$window.on( 'mousemove scroll', _.throttle( function( evt ) {
                         self.mouseMovedRecently( { x : evt.clientX, y : evt.clientY } );
-                        clearTimeout( $(window).data('_scroll_move_timer_') );
-                        $(window).data('_scroll_move_timer_', setTimeout(function() {
+                        clearTimeout( self.cachedElements.$window.data('_scroll_move_timer_') );
+                        self.cachedElements.$window.data('_scroll_move_timer_', setTimeout(function() {
                               self.mouseMovedRecently.set({});
                         }, 4000 ) );
                   }, 50 ) );
@@ -1275,7 +1297,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         resetMouseMoveTrack();
                   });
 
-                  $( 'body').on( 'sek-section-added', '[data-sek-level="location"]', function( evt, params  ) {
+                  self.cachedElements.$body.on( 'sek-section-added', '[data-sek-level="location"]', function( evt, params  ) {
                         resetMouseMoveTrack();
                   });
 
@@ -1292,7 +1314,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             scheduleUiClickReactions : function() {
                   var self = this;
 
-                  $('body').on('click', function( evt ) {
+                  self.cachedElements.$body.on('click', function( evt ) {
                         // First clean any currently highlighted target drop zone
                         // implemented for double-click insertion https://github.com/presscustomizr/nimble-builder/issues/317
                         api.preview.send( 'sek-clean-target-drop-zone' );
@@ -1473,7 +1495,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                   // Loader Cleaning <= the element printed when refreshing a level
                   // @see ::mayBePrintLoader
-                  $( 'body').on([
+                  self.cachedElements.$body.on([
                         'sek-modules-refreshed',
                         'sek-columns-refreshed',
                         'sek-section-added',
@@ -1530,7 +1552,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   }
                   if ( true === params.fullPageLoader ) {
                         var $loaderWrapper = $('<div>', { id : 'nimble-full-page-loader-wrapper', class: 'white-loader'} );
-                        $('body').append($loaderWrapper);
+                        self.cachedElements.$body.append($loaderWrapper);
                         $loaderWrapper.fadeIn('fast').append( self._css_loader_html ).find('.sek-css-loader').fadeIn( 'fast' );
                         // Blur locations
                         $('[data-sek-level="location"]').each( function() {
@@ -1616,7 +1638,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                     if ( _.isEmpty( removeCandidateId ) || 1 > $candidateEl.length ) {
                                                           self.errare( 'reactToPanelMsg => sek-remove => invalid candidate id => ', removeCandidateId );
                                                     }
-                                                    $('body').find( $candidateEl ).remove();
+                                                    self.cachedElements.$body.find( $candidateEl ).remove();
                                                     // say it
                                                     // listened to clean the loader just in time
                                                     $('[data-sek-id="' + params.apiParams.location + '"]').trigger( 'sek-level-refreshed');
@@ -1939,7 +1961,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   }
 
                                   // toggle a parent css classes controlling some css rules @see preview.css
-                                  $('body').addClass('sek-dragging');
+                                  self.cachedElements.$body.addClass('sek-dragging');
 
                                   // Reveal all dynamic dropzones after a delay
                                   _.delay( function() {
@@ -1949,7 +1971,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             },
                             // is sent on dragend and drop
                             'sek-drag-stop' : function( params ) {
-                                  $('body').removeClass('sek-dragging');
+                                  self.cachedElements.$body.removeClass('sek-dragging');
                                   // Clean any remaining placeholder
                                   $('.sortable-placeholder').remove();
 
@@ -2080,7 +2102,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               // the action being processed is added as a css class to the body of the preview
                               // it's used to enable/disable specific css properties during the action
                               // for example, we don't want css transitions while duplicating or removing a column
-                              $('body').addClass( msgId );
+                              self.cachedElements.$body.addClass( msgId );
                               try {
                                     $.when( _.isFunction( callbackFn ) ? callbackFn( params ) : self[callbackFn].call( self, params ) )
                                           .done( function( _ajaxResponse_ ) {
@@ -2090,14 +2112,14 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                                 api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
                                           })
                                           .always( function( _ajaxResponse_ ) {
-                                                $('body').removeClass( msgId );
+                                                self.cachedElements.$body.removeClass( msgId );
                                           })
                                           .then( function() {
                                                 api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
                                           });
                               } catch( _er_ ) {
                                     self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
-                                    $('body').removeClass( msgId );
+                                    self.cachedElements.$body.removeClass( msgId );
                               }
                         });
                   });

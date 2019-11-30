@@ -228,6 +228,10 @@
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
+            cachedElements : {
+                $body : $('body'),
+                $window : $(window)
+            },
 
             initialize: function() {
                   var self = this;
@@ -536,8 +540,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
 
                         // reset after a delay
-                        clearTimeout( $(window).data('_preview_target_timer_') );
-                        $(window).data('_preview_target_timer_', setTimeout(function() {
+                        clearTimeout( self.cachedElements.$window.data('_preview_target_timer_') );
+                        self.cachedElements.$window.data('_preview_target_timer_', setTimeout(function() {
                               // Reset the click target
                               self.lastClickedTargetInPreview( {} );
                               // Tell the preview to clean the target highlight effect
@@ -859,12 +863,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   var trackMouseMovements = function( evt ) {
                         self.mouseMovedRecently( { x : evt.clientX, y : evt.clientY } );
-                        clearTimeout( $(window).data('_scroll_move_timer_') );
-                        $(window).data('_scroll_move_timer_', setTimeout(function() {
+                        clearTimeout( self.cachedElements.$window.data('_scroll_move_timer_') );
+                        self.cachedElements.$window.data('_scroll_move_timer_', setTimeout(function() {
                               self.mouseMovedRecently.set( {} );
                         }, 4000 ) );
                   };
-                  $(window).on( 'mousemove scroll,', _.throttle( trackMouseMovements , 50 ) );
+                  self.cachedElements.$window.on( 'mousemove scroll,', _.throttle( trackMouseMovements , 50 ) );
                   api.previewer.bind('ready', function() {
                         $(api.previewer.targetWindow().document ).on( 'mousemove scroll,', _.throttle( trackMouseMovements , 50 ) );
                   });
@@ -886,13 +890,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   self.topBarContainer = $_el;
                                   //display
                                   _.delay( function() {
-                                      $('body').addClass('nimble-top-bar-visible');
+                                      self.cachedElements.$body.addClass('nimble-top-bar-visible');
                                   }, 200 );
                             });
                       },
                       _hide = function() {
                             var dfd = $.Deferred();
-                            $('body').removeClass('nimble-top-bar-visible');
+                            self.cachedElements.$body.removeClass('nimble-top-bar-visible');
                             if ( self.topBarContainer && self.topBarContainer.length ) {
                                   //remove Dom element after slide up
                                   _.delay( function() {
@@ -1274,7 +1278,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // SETUP AND REACT TO LEVEL TREE EXPANSION
                   self.levelTreeExpanded = new api.Value(false);
                   self.levelTreeExpanded.bind( function(expanded) {
-                        $('body').toggleClass( 'sek-level-tree-expanded', expanded );
+                        self.cachedElements.$body.toggleClass( 'sek-level-tree-expanded', expanded );
                         if ( expanded ) {
                               // Set the level tree now
                               self.setLevelTreeValue();
@@ -1336,7 +1340,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                   // SETUP CLICK EVENTS IN THE TREE
-                  $('body').on('click', '#nimble-level-tree [data-nimb-level]', function(evt) {
+                  self.cachedElements.$body.on('click', '#nimble-level-tree [data-nimb-level]', function(evt) {
                         evt.preventDefault();
                         evt.stopPropagation();
                         var $el = $(evt.target),
@@ -1359,7 +1363,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }, 100 );
                   });
 
-                  $('body').on('click', '#nimble-level-tree .sek-remove-level', function(evt) {
+                  self.cachedElements.$body.on('click', '#nimble-level-tree .sek-remove-level', function(evt) {
                         evt.preventDefault();
                         evt.stopPropagation();
                         var $el = $(evt.target).closest('[data-nimb-level]');
@@ -1376,7 +1380,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   // Collapse tree ( also possible by clicking on the tree icon in the top Nimble bar )
-                  $('body').on('click', '.sek-close-level-tree' , function(evt) {
+                  self.cachedElements.$body.on('click', '.sek-close-level-tree' , function(evt) {
                         evt.preventDefault();
                         self.levelTreeExpanded(false);
                   });
@@ -1654,7 +1658,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   self.saveUIContainer = $_el;
                                   //display
                                   _.delay( function() {
-                                      $('body').addClass('nimble-save-ui-visible');
+                                      self.cachedElements.$body.addClass('nimble-save-ui-visible');
                                   }, 200 );
                                   // set section id input value
                                   $('#sek-saved-section-id').val( sectionId );
@@ -1662,7 +1666,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       },
                       _hide = function() {
                             var dfd = $.Deferred();
-                            $('body').removeClass('nimble-save-ui-visible');
+                            self.cachedElements.$body.removeClass('nimble-save-ui-visible');
                             if ( $( '#nimble-top-save-ui' ).length > 0 ) {
                                   //remove Dom element after slide up
                                   _.delay( function() {
@@ -1837,13 +1841,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             $.when( self.renderAndSetupFeedbackTmpl({}) ).done( function( $_el ) {
                                   //display
                                   _.delay( function() {
-                                      $('body').addClass('nimble-feedback-ui-visible');
+                                      self.cachedElements.$body.addClass('nimble-feedback-ui-visible');
                                   }, 200 );
                             });
                       },
                       _hideAndRemove = function() {
                             var dfd = $.Deferred();
-                            $('body').removeClass('nimble-feedback-ui-visible');
+                            self.cachedElements.$body.removeClass('nimble-feedback-ui-visible');
                             if ( $( self.feedbackUIId ).length > 0 ) {
                                   //remove Dom element after slide up
                                   _.delay( function() {
@@ -1905,7 +1909,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
 
                   // Attach event with delegation
-                  $('body').on('click', '[data-sek-feedback-action]', function(evt) {
+                  self.cachedElements.$body.on('click', '[data-sek-feedback-action]', function(evt) {
                         evt.preventDefault();
 
                         // On each click action, reset the timer
@@ -5627,7 +5631,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           _candidate_.options = _new_options_values;
 
                                           // Live update the input value ( when rendered )
-                                          $('body').find('[data-sek-width-range-column-id="'+ _candidate_.id +'"]').val( newWidthValue ).trigger('input', { is_resize_column_trigger : true } );
+                                          self.cachedElements.$body.find('[data-sek-width-range-column-id="'+ _candidate_.id +'"]').val( newWidthValue ).trigger('input', { is_resize_column_trigger : true } );
                                           return newWidthValue;
                                     };
                                     ///
@@ -8168,7 +8172,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         }
                         $(this).addClass('sek-dragged');
-                        $('body').addClass('sek-dragging');
+                        self.cachedElements.$body.addClass('sek-dragging');
 
                         // Say it to the preview
                         // @see 'sek-drag-start' case in preview::schedulePanelMsgReactions()
@@ -8179,7 +8183,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
                   // $(this) is the dragged element
                   var _onEnd = function( evt ) {
-                        $('body').removeClass('sek-dragging');
+                        self.cachedElements.$body.removeClass('sek-dragging');
                         $(this).removeClass('sek-dragged');
                         api.previewer.send( 'sek-drag-stop' );
                   };
@@ -8959,7 +8963,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //       api.sekTinyMceEditor.locker = input;
                         // }
 
-                        $(window)[ expanded ? 'on' : 'off' ]('resize', function() {
+                        self.cachedElements.$window[ expanded ? 'on' : 'off' ]('resize', function() {
                                 if ( ! api.sekEditorExpanded() )
                                   return;
                                 _.delay( function() {
@@ -8973,7 +8977,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // fix wrong height on init https://github.com/presscustomizr/nimble-builder/issues/409
                               // there's probably a smarter way to get the right height on init. But let's be lazy.
                               _.delay( function() {
-                                    $(window).trigger('resize');
+                                    self.cachedElements.$window.trigger('resize');
                               }, 100 );
                         } else {
                               //resize reset
@@ -12033,7 +12037,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 active_locations : api.czr_sektions.activeLocations()
                           }).done( function() {
                                 // disable the 'beforeunload' listeners generating popup window when the changeset is dirty
-                                $( window ).off( 'beforeunload' );
+                                $(window).off( 'beforeunload' );
                                 // Generate a download window
                                 // @see add_action( 'customize_register', '\Nimble\sek_catch_export_action', PHP_INT_MAX );
                                 window.location.href = [
@@ -12042,7 +12046,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       query.join('&')
                                 ].join('');
                                 // re-enable the listeners
-                                $( window ).on( 'beforeunload' );
+                                $(window).on( 'beforeunload' );
                           }).fail( function( error_resp ) {
                                 api.previewer.trigger('sek-notify', {
                                       notif_id : 'import-failed',
@@ -13116,7 +13120,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     break;
                                     case 'bg-use-video' :
-                                          _.each( [ 'bg-video', 'bg-video-loop', 'bg-video-on-mobile', 'bg-video-start-time', 'bg-video-end-time' ] , function( _inputId_ ) {
+                                          _.each( [ 'bg-video', 'bg-video-loop', 'bg-video-delay-start', 'bg-video-on-mobile', 'bg-video-start-time', 'bg-video-end-time' ] , function( _inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return api.CZR_Helpers.isChecked( input() );
                                                 }); } catch( er ) {

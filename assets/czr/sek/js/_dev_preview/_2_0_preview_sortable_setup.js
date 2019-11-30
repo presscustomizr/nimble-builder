@@ -21,7 +21,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   });
 
                   // Schedule with delegation
-                  self.cachedElements.$body.on( 'sek-section-added sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                  self.cachedElements.$body.on( 'sek-section-added sek-level-refreshed sek-location-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
                         self.makeSektionsSortableInLocation( $(this).data('sek-id') );
                   });
 
@@ -124,61 +124,62 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             makeSektionsSortableInLocation : function( locationId ) {
                   var self = this;
                   var from_location, to_location, startOrder = [], newOrder = [], defaults;
-                  $('[data-sek-id="' + locationId +'"]').each( function() {
-                        if ( true === $(this).data('sek-is-global-location') )
-                          return;
 
-                        defaults = $.extend( true, {}, self.sortableDefaultParams );
-                        $(this).sortable( _.extend( defaults, {
-                              //handle : '.sek-move-section, .sek-section-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
-                              handle : '.sek-move-section',
-                              connectWith : '[data-sek-is-global-location="false"]',
-                              placeholder: {
-                                    element: function(currentItem) {
-                                        return $('<div class="sortable-placeholder"><div class="sek-module-placeholder-content"><p>' + sekPreviewLocalized.i18n['Insert here'] + '</p></div></div>')[0];
-                                    },
-                                    update: function(container, p) {
-                                        return;
-                                    }
+                  if ( true === $('[data-sek-id="' + locationId +'"]').data('sek-is-global-location') )
+                      return;
+
+                  defaults = $.extend( true, {}, self.sortableDefaultParams );
+
+                  $('[data-sek-id="' + locationId +'"]').sortable( _.extend( defaults, {
+                        items: '[data-sek-level="section"]',
+                        //handle : '.sek-move-section, .sek-section-dyn-ui > .sek-dyn-ui-location-type',//@fixes https://github.com/presscustomizr/nimble-builder/issues/153
+                        handle : '.sek-move-section',
+                        connectWith : '[data-sek-is-global-location="false"]',
+                        placeholder: {
+                              element: function(currentItem) {
+                                  return $('<div class="sortable-placeholder"><div class="sek-module-placeholder-content"><p>' + sekPreviewLocalized.i18n['Insert here'] + '</p></div></div>')[0];
                               },
-                              start: function( event, ui ) {
-                                    self.cachedElements.$body.addClass('sek-moving-section');
-                                    $sourceLocation = ui.item.closest('[data-sek-level="location"]');
-                                    from_location = $sourceLocation.data('sek-id');
-
-                                    // store the startOrder
-                                    $sourceLocation.children( '[data-sek-level="section"]' ).each( function() {
-                                          startOrder.push( $(this).data('sek-id') );
-                                    });
-                              },
-                              stop : function( event, ui ) {
-                                    self.cachedElements.$body.removeClass('sek-moving-section');
-
-                                    newOrder = [];
-                                    $targetLocation = ui.item.closest('[data-sek-level="location"]');
-                                    to_location = $targetLocation.data('sek-id');
-
-                                    // Restrict to the direct children
-                                    $targetLocation.children( '[data-sek-level="section"]' ).each( function() {
-                                          newOrder.push( $(this).data('sek-id') );
-                                    });
-
-                                    api.preview.send( 'sek-move', {
-                                          id : ui.item.data('sek-id'),
-                                          level : 'section',
-                                          newOrder : newOrder,
-                                          from_location : from_location,
-                                          to_location : to_location
-                                    });
-                              },
-                              over : function( event, ui ) {
-                                    ui.placeholder.addClass('sek-sortable-section-over');
-                              },
-                              out : function( event, ui  ) {
-                                    ui.placeholder.removeClass('sek-sortable-section-over');
+                              update: function(container, p) {
+                                  return;
                               }
-                        }));
-                  });
+                        },
+                        start: function( event, ui ) {
+                              self.cachedElements.$body.addClass('sek-moving-section');
+                              $sourceLocation = ui.item.closest('[data-sek-level="location"]');
+                              from_location = $sourceLocation.data('sek-id');
+
+                              // store the startOrder
+                              // $sourceLocation.children( '[data-sek-level="section"]' ).each( function() {
+                              //       startOrder.push( $(this).data('sek-id') );
+                              // });
+                        },
+                        stop : function( event, ui ) {
+                              self.cachedElements.$body.removeClass('sek-moving-section');
+
+                              newOrder = [];
+                              $targetLocation = ui.item.closest('[data-sek-level="location"]');
+                              to_location = $targetLocation.data('sek-id');
+
+                              // Restrict to the direct children
+                              $targetLocation.children( '[data-sek-level="section"]' ).each( function() {
+                                    newOrder.push( $(this).data('sek-id') );
+                              });
+
+                              api.preview.send( 'sek-move', {
+                                    id : ui.item.data('sek-id'),
+                                    level : 'section',
+                                    newOrder : newOrder,
+                                    from_location : from_location,
+                                    to_location : to_location
+                              });
+                        },
+                        over : function( event, ui ) {
+                              ui.placeholder.addClass('sek-sortable-section-over');
+                        },
+                        out : function( event, ui  ) {
+                              ui.placeholder.removeClass('sek-sortable-section-over');
+                        }
+                  }));
             },//makeSektionsSortableInLocation
 
 
