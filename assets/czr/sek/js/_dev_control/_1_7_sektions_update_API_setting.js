@@ -333,7 +333,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       duration : 30000,
                                                       message : [
                                                             '<span style="font-size:0.95em">',
-                                                              '<strong>' + sektionsLocalizedData.i18n[ "This section has reached the lowest possible location on page." ] + '</strong>',
+                                                              '<strong>' + sektionsLocalizedData.i18n[ "The section cannot be moved lower." ] + '</strong>',
                                                             '</span>'
                                                       ].join('')
                                                 });
@@ -343,7 +343,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       duration : 30000,
                                                       message : [
                                                             '<span style="font-size:0.95em">',
-                                                              '<strong>' + sektionsLocalizedData.i18n[ "This section has reached the highest possible location on page." ] + '</strong>',
+                                                              '<strong>' + sektionsLocalizedData.i18n[ "The section cannot be moved higher." ] + '</strong>',
                                                             '</span>'
                                                       ].join('')
                                                 });

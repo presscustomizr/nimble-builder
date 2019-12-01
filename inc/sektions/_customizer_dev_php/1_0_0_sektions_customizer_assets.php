@@ -525,8 +525,8 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             'Settings for the' => __('Settings for the', 'text_doma'),//section / column / module
 
-            'This section has reached the highest possible location on page.' => __('This section has reached the highest possible location on page', 'text_doma'),
-            'This section has reached the lowest possible location on page.' => __('This section has reached the lowest possible location on page', 'text_doma'),
+            'The section cannot be moved higher.' => __('The section cannot be moved higher.', 'text_doma'),
+            'The section cannot be moved lower.' => __('The section cannot be moved lower.', 'text_doma'),
 
             // UI global and local options
             'Current page options' => __( 'Current page options', 'text_doma'),
