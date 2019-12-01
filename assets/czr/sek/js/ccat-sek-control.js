@@ -505,10 +505,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                   // store active locations
-                  // introduced for the level tree, https://github.com/presscustomizr/nimble-builder/issues/359
-                  self.activeLocations = new api.Value([]);
+                  self.activeLocations = new api.Value([]);// <= introduced for the level tree, https://github.com/presscustomizr/nimble-builder/issues/359
+                  self.activeLocationsInfo = new api.Value([]);// <= introduced for better move up/down of sections https://github.com/presscustomizr/nimble-builder/issues/521
                   api.previewer.bind('sek-active-locations-in-preview', function( activelocs ){
                         self.activeLocations( ( _.isObject(activelocs) && _.isArray( activelocs.active_locations ) ) ? activelocs.active_locations : [] );
+                        self.activeLocationsInfo( ( _.isObject(activelocs) && _.isArray( activelocs.active_locs_info ) ) ? activelocs.active_locs_info : [] );
                   });
 
 
@@ -2652,6 +2653,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               original_action : 'sek-move-section-up',
                                               moved_level_id : params.apiParams.id
                                         });
+
+                                        // Introduced for https://github.com/presscustomizr/nimble-builder/issues/521
+                                        if ( params.apiParams.new_location ) {
+                                              api.previewer.trigger( 'sek-refresh-level', {
+                                                    level : 'location',
+                                                    id :  params.apiParams.new_location,
+
+                                                    // added for https://github.com/presscustomizr/nimble-builder/issues/471
+                                                    original_action : 'sek-move-section-down',
+                                                    moved_level_id : params.apiParams.id
+                                              });
+                                        }
                                   }
                             },
 
@@ -2678,6 +2691,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               original_action : 'sek-move-section-down',
                                               moved_level_id : params.apiParams.id
                                         });
+
+                                        // Introduced for https://github.com/presscustomizr/nimble-builder/issues/521
+                                        if ( params.apiParams.new_location ) {
+                                              api.previewer.trigger( 'sek-refresh-level', {
+                                                    level : 'location',
+                                                    id :  params.apiParams.new_location,
+
+                                                    // added for https://github.com/presscustomizr/nimble-builder/issues/471
+                                                    original_action : 'sek-move-section-down',
+                                                    moved_level_id : params.apiParams.id
+                                              });
+                                        }
                                   }
                             },
 
@@ -5453,7 +5478,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // Fired on click on up / down arrows in the section ui menu
                               // This handles the nested sections case
                               case 'sek-move-section-up-down' :
-                                    //api.infoLog('PARAMS in sek-move-section-up', params );
                                     parentCandidate = self.getLevelModel( params.is_nested ? params.in_column : params.location , newSetValue.collection );
                                     if ( _.isEmpty( parentCandidate ) || 'no_match' == parentCandidate ) {
                                           throw new Error( 'updateAPISetting => ' + params.action + ' => missing target location' );
@@ -5471,20 +5495,106 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                                     // Swap up <=> down
-                                    var direction = params.direction || 'up';
+                                    var direction = params.direction || 'up',
+                                        isLastSectionInLocation = originalCollection.length === _indexInOriginal + 1,
+                                        isFirstSectionInLocation = 0 === _indexInOriginal,
+                                        _locInfo = self.activeLocationsInfo(),
+                                        _currentLocInfo = ! _.isArray( _locInfo ) ? {} : _.findWhere( _locInfo, { id : params.location } ),
+                                        isCurrentLocationGlobal = false,
+                                        isCurrentLocationHeaderOrFooter = false;
 
-                                    // prevent absurd movements of a section
-                                    // this should not happen because up / down arrows are not displayed when section is positionned top / bottom
-                                    // but safer to add it
-                                    if ( 'up' !== direction && originalCollection.length === _indexInOriginal + 1 ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => bottom reached' );
-                                    } else if ( 'up' === direction && 0 === _indexInOriginal ){
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => top reached' );
+                                    // Is current location global ?
+                                    isCurrentLocationGlobal = _.isObject( _currentLocInfo ) && _currentLocInfo.is_global;
+
+                                    // Is current location header footer ?
+                                    isCurrentLocationHeaderOrFooter = _.isObject( _currentLocInfo ) && _currentLocInfo.is_header_footer;
+
+                                    // When a section is last in location and there's another location below, let's move the section to this sibling location
+                                    // This is possible when :
+                                    // - when moved section is not nested
+                                    // - only in locations that are 'local', not header or footer
+
+                                    // Populate the eligible activeLocations in the page
+                                    var activeLocationsInPage = [];
+                                    // self.activeLocationsInfo() is set on ::initialized when send by the preview, and is structured the following way :
+                                    //  [
+                                    //  {
+                                    //   id: "loop_start"
+                                    //   is_global: false
+                                    //   is_header_footer: false
+                                    //  },
+                                    //  {..},
+                                    //  .
+                                    if ( _.isArray( _locInfo ) ) {
+                                          _.each( self.activeLocationsInfo(), function( _loc_ ) {
+                                                if ( ! _loc_.is_global && ! _loc_.is_header_footer ) {
+                                                      activeLocationsInPage.push( _loc_.id );
+                                                }
+                                          });
                                     }
 
-                                    reorderedCollection[ _indexInOriginal ] = originalCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ];
-                                    reorderedCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ] = originalCollection[ _indexInOriginal ];
-                                    parentCandidate.collection = reorderedCollection;
+                                    // Set the index of the current location
+                                    var indexOfCurrentLocation = _.findIndex( activeLocationsInPage, function( _loc_id ) {
+                                          return _loc_id === params.location;
+                                    });
+
+                                    var isCurrentLocationEligibleForSectionMoveOutside = ! params.is_nested && ! isCurrentLocationGlobal && ! isCurrentLocationHeaderOrFooter,
+                                        isFirstLocationInPage = 0 === indexOfCurrentLocation,
+                                        isLastLocationInPage = activeLocationsInPage.length === indexOfCurrentLocation + 1,
+                                        newLocationId, newLocationCandidate;
+
+                                    if ( isCurrentLocationEligibleForSectionMoveOutside && isLastSectionInLocation && 'up' !== direction && ! isLastLocationInPage ) {
+                                          newLocationId = activeLocationsInPage[ indexOfCurrentLocation + 1 ];
+                                          newLocationCandidate = self.getLevelModel( newLocationId , newSetValue.collection );
+
+                                          // Add the section in first position of the section below
+                                          newLocationCandidate.collection.unshift( originalCollection[ _indexInOriginal ] );
+                                          // Removes the section in last position of the original section
+                                          parentCandidate.collection.pop();
+                                          // the new_location param will be used in the 'complete' callback of 'sek-move-section-down' / 'sek-move-section-up'
+                                          params.new_location = newLocationId;
+
+                                    } else if ( isCurrentLocationEligibleForSectionMoveOutside && isFirstSectionInLocation && 'up' === direction && ! isFirstLocationInPage ) {
+                                          newLocationId = activeLocationsInPage[ indexOfCurrentLocation - 1 ];
+                                          newLocationCandidate = self.getLevelModel( newLocationId , newSetValue.collection );
+
+                                          // Add the section in first position of the section below
+                                          newLocationCandidate.collection.push( originalCollection[ _indexInOriginal ] );
+                                          // Removes the section in last position of the original section
+                                          parentCandidate.collection.shift();
+                                          // the new_location param will be used in the 'complete' callback of 'sek-move-section-down' / 'sek-move-section-up'
+                                          params.new_location = newLocationId;
+                                    } else {
+                                          // prevent absurd movements of a section
+                                          // this should not happen because up / down arrows are not displayed when section is positionned top / bottom
+                                          // but safer to add it
+                                          if ( 'up' !== direction && originalCollection.length === _indexInOriginal + 1 ) {
+                                                //throw new Error( 'updateAPISetting => ' + params.action + ' => bottom reached' );
+                                                api.previewer.trigger('sek-notify', {
+                                                      type : 'info',
+                                                      duration : 30000,
+                                                      message : [
+                                                            '<span style="font-size:0.95em">',
+                                                              '<strong>' + sektionsLocalizedData.i18n[ "The section cannot be moved lower." ] + '</strong>',
+                                                            '</span>'
+                                                      ].join('')
+                                                });
+                                          } else if ( 'up' === direction && 0 === _indexInOriginal ){
+                                                api.previewer.trigger('sek-notify', {
+                                                      type : 'info',
+                                                      duration : 30000,
+                                                      message : [
+                                                            '<span style="font-size:0.95em">',
+                                                              '<strong>' + sektionsLocalizedData.i18n[ "The section cannot be moved higher." ] + '</strong>',
+                                                            '</span>'
+                                                      ].join('')
+                                                });
+                                          } else {
+                                                reorderedCollection[ _indexInOriginal ] = originalCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ];
+                                                reorderedCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ] = originalCollection[ _indexInOriginal ];
+                                                parentCandidate.collection = reorderedCollection;
+                                          }
+                                    }
                               break;
 
 

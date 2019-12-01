@@ -62,11 +62,17 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // 2) and when requested by the control panel
                   // introduced for the level tree, https://github.com/presscustomizr/nimble-builder/issues/359
                   var sendActiveLocations = function() {
-                        var active_locs = [];
+                        var active_locs = [],
+                            active_locs_info = [];// <= introduced for better move up/down of sections https://github.com/presscustomizr/nimble-builder/issues/521
                         $('[data-sek-level="location"]').each( function() {
                               active_locs.push( $(this).data('sek-id') );
+                              active_locs_info.push({
+                                    id : $(this).data('sek-id'),
+                                    is_global : true === $(this).data('sek-is-global-location'),
+                                    is_header_footer : true === $(this).data('sek-is-header-location') || true === $(this).data('sek-is-footer-location')
+                              });
                         });
-                        api.preview.send('sek-active-locations-in-preview', { active_locations : active_locs } );
+                        api.preview.send('sek-active-locations-in-preview', { active_locations : active_locs, active_locs_info : active_locs_info } );
                   };
                   api.preview.bind('sek-request-active-locations', sendActiveLocations );
                   sendActiveLocations();
@@ -324,8 +330,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         },
                         start: function( event, ui ) {
                               self.cachedElements.$body.addClass('sek-moving-section');
+                              self.isDraggingElement = true;
                               $sourceLocation = ui.item.closest('[data-sek-level="location"]');
                               from_location = $sourceLocation.data('sek-id');
+
+                              // Print all level ui
+                              // fixes slowness when dragging @see https://github.com/presscustomizr/nimble-builder/issues/521
+                              $( 'body' ).find( '[data-sek-level]' ).each( function() {
+                                    self.printLevelUI( $(this) );
+                                    $(this) .find('.sek-dyn-ui-wrapper').stop( true, true ).show();
+                              });
 
                               // store the startOrder
                               // $sourceLocation.children( '[data-sek-level="section"]' ).each( function() {
@@ -334,6 +348,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         },
                         stop : function( event, ui ) {
                               self.cachedElements.$body.removeClass('sek-moving-section');
+                              self.isDraggingElement = false;
 
                               newOrder = [];
                               $targetLocation = ui.item.closest('[data-sek-level="location"]');
@@ -964,7 +979,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         if ( $levelEl.children('.sek-dyn-ui-wrapper').length < 1 )
                           return;
                         // when PHP constant NIMBLE_IS_PREVIEW_UI_DEBUG_MODE is true, the levels UI in the preview are not being auto removed, so we can inspect the markup and CSS
-                        if ( sekPreviewLocalized.isPreviewUIDebugMode )
+                        if ( sekPreviewLocalized.isPreviewUIDebugMode || self.isDraggingElement )
                           return;
 
                         //stores the status of 200 ms fading out. => will let us know if we can print again when moving the mouse fast back and forth between two levels.

@@ -467,6 +467,8 @@ foreach ( array( 'wptexturize', 'convert_smilies' ) as $callback ) {
 function sek_welcome_notice_is_dismissed() {
     $dismissed = get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true );
     $dismissed_array = array_filter( explode( ',', (string) $dismissed ) );
+    if ( defined('NIMBLE_DEV') && NIMBLE_DEV )
+      return false;
     return in_array( NIMBLE_WELCOME_NOTICE_ID, $dismissed_array );
 }
 
@@ -481,7 +483,7 @@ function sek_render_welcome_notice() {
     // If the notice has not been dismissed, make sure it is still relevant to display it.
     // If user has started created sections, we should not display it anymore => update the dismissed pointers array
     // @see https://developer.wordpress.org/reference/functions/wp_ajax_dismiss_wp_pointer/
-    if ( sek_site_has_nimble_sections_created() ) {
+    if ( sek_site_has_nimble_sections_created() && ! ( defined('NIMBLE_DEV') && NIMBLE_DEV ) ) {
         $dismissed = get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true );
         $dismissed_array = array_filter( explode( ',', (string) $dismissed ) );
         $dismissed_array[] = NIMBLE_WELCOME_NOTICE_ID;
@@ -513,14 +515,14 @@ function sek_render_welcome_notice() {
       <div class="nimble-link-to-doc">
         <?php printf( '<div class="nimble-doc-link-wrap">%1$s <a href="%2$s" target="_blank" class="">%3$s</a>.</div>',
             __('Or', 'nimble'),
-            esc_url( add_query_arg(
+            add_query_arg(
                 array(
                   'utm_source' => 'usersite',
                   'utm_medium' => 'link',
                   'utm_campaign' => 'nimble-welcome-notice'
                 ),
-                'docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin'
-            ) ),
+                'https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin'
+            ),
             __( 'read the getting started guide', 'nimble' )
         ); ?>
       </div>
