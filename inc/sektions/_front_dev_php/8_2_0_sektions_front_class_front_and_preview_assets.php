@@ -285,9 +285,9 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <#
                           var section_title = true !== data.is_global_location ? sekPreviewLocalized.i18n['section'] : sekPreviewLocalized.i18n['section (global)'];
                           var section_title = ! data.is_nested ? sekPreviewLocalized.i18n['section'] : sekPreviewLocalized.i18n['nested section'];
-                          if ( true === data.is_header_location ) {
+                          if ( true === data.is_header_location && ! data.is_nested ) {
                                 section_title = sekPreviewLocalized.i18n['header section'];
-                          } else if ( true === data.is_footer_location ) {
+                          } else if ( true === data.is_footer_location && ! data.is_nested ) {
                                 section_title = sekPreviewLocalized.i18n['footer section'];
                           }
 
