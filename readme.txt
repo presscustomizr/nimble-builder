@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.3
-Stable tag: 1.9.12-beta
+Stable tag: 1.9.12
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,19 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.9.11 =
-Added video background for section and column. Supports Vimeo, YouTube and self-hosted videos.
+= 1.9.12 =
+Various improvements to the recently introduced video background. User interface improvements when moving sections up/down the page. Better compatibility with the new default WordPress theme.
 
 == Changelog ==
+= 1.9.12 December 1st 2019 =
+* fixed : [Image module] make sure the default img CSS display is not overriden by other rules
+* fixed : "Insert new section" button not always rendered after new section insertion
+* fixed : [Menu module] increase specificity of nav-toggler button to avoid overrides ( happen with twentytwenty theme )
+* fixed : slowness when dragging a section
+* improved : moving sections up/down ( when clicking on the arrow icons ) is now location "agnostic" => a section can be moved from one location to another
+* fixed : [video background] better handling of ssl when using mp4 videos, to prevent mixed content warnings in the browser
+* added : [video background] new option to set a delay before the video is loaded
+
 = 1.9.11 November 22nd 2019 =
 * added : video background for section and column. Supports Vimeo, YouTube and self-hosted videos.
 * improved : [Carousel module] performances
