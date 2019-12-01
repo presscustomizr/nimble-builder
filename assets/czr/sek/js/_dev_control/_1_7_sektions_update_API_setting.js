@@ -285,23 +285,55 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                                     // Swap up <=> down
-                                    var direction = params.direction || 'up';
+                                    var direction = params.direction || 'up',
+                                        isLastSectionInLocation = originalCollection.length === _indexInOriginal + 1,
+                                        isFirstSectionInLocation = 0 === _indexInOriginal,
+                                        _locInfo = self.activeLocationsInfo(),
+                                        _currentLocInfo = ! _.isArray( _locInfo ) ? {} : _.findWhere( _locInfo, { id : params.location } ),
+                                        isCurrentLocationGlobal = false,
+                                        isCurrentLocationHeaderOrFooter = false;
 
-                                    var isLastSectionInLocation = originalCollection.length === _indexInOriginal + 1,
-                                        isFirstSectionInLocation = 0 === _indexInOriginal;
+                                    // Is current location global ?
+                                    isCurrentLocationGlobal = _.isObject( _currentLocInfo ) && _currentLocInfo.is_global;
+
+                                    // Is current location header footer ?
+                                    isCurrentLocationHeaderOrFooter = _.isObject( _currentLocInfo ) && _currentLocInfo.is_header_footer;
 
                                     // When a section is last in location and there's another location below, let's move the section to this sibling location
-                                    // For this is possible only for not nested section.
-                                    var activeLocationsInPage = self.activeLocations();
-                                    var indexOfCurrentLocation = _.findIndex( newSetValue.collection, function( _loc_ ) {
-                                          return _loc_.id === params.location;
+                                    // This is possible when :
+                                    // - when moved section is not nested
+                                    // - only in locations that are 'local', not header or footer
+
+                                    // Populate the eligible activeLocations in the page
+                                    var activeLocationsInPage = [];
+                                    // self.activeLocationsInfo() is set on ::initialized when send by the preview, and is structured the following way :
+                                    //  [
+                                    //  {
+                                    //   id: "loop_start"
+                                    //   is_global: false
+                                    //   is_header_footer: false
+                                    //  },
+                                    //  {..},
+                                    //  .
+                                    if ( _.isArray( _locInfo ) ) {
+                                          _.each( self.activeLocationsInfo(), function( _loc_ ) {
+                                                if ( ! _loc_.is_global && ! _loc_.is_header_footer ) {
+                                                      activeLocationsInPage.push( _loc_.id );
+                                                }
+                                          });
+                                    }
+
+                                    // Set the index of the current location
+                                    var indexOfCurrentLocation = _.findIndex( activeLocationsInPage, function( _loc_id ) {
+                                          return _loc_id === params.location;
                                     });
 
-                                    var isFirstLocationInPage = 0 === indexOfCurrentLocation,
+                                    var isCurrentLocationEligibleForSectionMoveOutside = ! params.is_nested && ! isCurrentLocationGlobal && ! isCurrentLocationHeaderOrFooter,
+                                        isFirstLocationInPage = 0 === indexOfCurrentLocation,
                                         isLastLocationInPage = activeLocationsInPage.length === indexOfCurrentLocation + 1,
                                         newLocationId, newLocationCandidate;
 
-                                    if ( ! params.is_nested && isLastSectionInLocation && 'up' !== direction && ! isLastLocationInPage ) {
+                                    if ( isCurrentLocationEligibleForSectionMoveOutside && isLastSectionInLocation && 'up' !== direction && ! isLastLocationInPage ) {
                                           newLocationId = activeLocationsInPage[ indexOfCurrentLocation + 1 ];
                                           newLocationCandidate = self.getLevelModel( newLocationId , newSetValue.collection );
 
@@ -312,7 +344,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // the new_location param will be used in the 'complete' callback of 'sek-move-section-down' / 'sek-move-section-up'
                                           params.new_location = newLocationId;
 
-                                    } else if ( ! params.is_nested && isFirstSectionInLocation && 'up' === direction && ! isFirstLocationInPage ) {
+                                    } else if ( isCurrentLocationEligibleForSectionMoveOutside && isFirstSectionInLocation && 'up' === direction && ! isFirstLocationInPage ) {
                                           newLocationId = activeLocationsInPage[ indexOfCurrentLocation - 1 ];
                                           newLocationCandidate = self.getLevelModel( newLocationId , newSetValue.collection );
 

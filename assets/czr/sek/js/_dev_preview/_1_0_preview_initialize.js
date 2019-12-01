@@ -62,11 +62,17 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // 2) and when requested by the control panel
                   // introduced for the level tree, https://github.com/presscustomizr/nimble-builder/issues/359
                   var sendActiveLocations = function() {
-                        var active_locs = [];
+                        var active_locs = [],
+                            active_locs_info = [];// <= introduced for better move up/down of sections https://github.com/presscustomizr/nimble-builder/issues/521
                         $('[data-sek-level="location"]').each( function() {
                               active_locs.push( $(this).data('sek-id') );
+                              active_locs_info.push({
+                                    id : $(this).data('sek-id'),
+                                    is_global : true === $(this).data('sek-is-global-location'),
+                                    is_header_footer : true === $(this).data('sek-is-header-location') || true === $(this).data('sek-is-footer-location')
+                              });
                         });
-                        api.preview.send('sek-active-locations-in-preview', { active_locations : active_locs } );
+                        api.preview.send('sek-active-locations-in-preview', { active_locations : active_locs, active_locs_info : active_locs_info } );
                   };
                   api.preview.bind('sek-request-active-locations', sendActiveLocations );
                   sendActiveLocations();

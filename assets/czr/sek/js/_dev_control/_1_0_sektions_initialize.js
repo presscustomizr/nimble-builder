@@ -279,10 +279,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                   // store active locations
-                  // introduced for the level tree, https://github.com/presscustomizr/nimble-builder/issues/359
-                  self.activeLocations = new api.Value([]);
+                  self.activeLocations = new api.Value([]);// <= introduced for the level tree, https://github.com/presscustomizr/nimble-builder/issues/359
+                  self.activeLocationsInfo = new api.Value([]);// <= introduced for better move up/down of sections https://github.com/presscustomizr/nimble-builder/issues/521
                   api.previewer.bind('sek-active-locations-in-preview', function( activelocs ){
                         self.activeLocations( ( _.isObject(activelocs) && _.isArray( activelocs.active_locations ) ) ? activelocs.active_locations : [] );
+                        self.activeLocationsInfo( ( _.isObject(activelocs) && _.isArray( activelocs.active_locs_info ) ) ? activelocs.active_locs_info : [] );
                   });
 
 
