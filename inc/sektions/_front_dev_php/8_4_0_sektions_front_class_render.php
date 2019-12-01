@@ -863,6 +863,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 if ( in_array( $level_type, array( 'section', 'column') ) && !empty( $bg_options[ 'bg-use-video'] ) && sek_booleanize_checkbox_val( $bg_options[ 'bg-use-video'] ) ) {
                     if ( !empty( $bg_options[ 'bg-video' ] ) ) {
                         $video_bg_url = $bg_options[ 'bg-video' ];
+                        // replace http by https if needed for mp4 video url
+                        // fixes https://github.com/presscustomizr/nimble-builder/issues/550
+                        if ( is_ssl() && is_string($video_bg_url) && stripos($video_bg_url, 'http://') === 0 ) {
+                            $video_bg_url = 'https' . substr($video_bg_url, 4);
+                        }
                     }
                     if ( array_key_exists( 'bg-video-loop', $bg_options ) ) {
                         $video_bg_loop = sek_booleanize_checkbox_val( $bg_options[ 'bg-video-loop' ] );
