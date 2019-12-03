@@ -14,7 +14,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         'css_val' => '',//string or array(), //<= the css property value
         'input_id' => '',//string// <= the unique input_id as it as been declared on module registration
         'registered_input_list' => array(),// <= the full list of input for the module
-        'parent_module_level' => array(),// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+        'parent_module_level' => array(),// <= the parent level. name is misleading because can be module but also other levels array( 'location', 'section', 'column', 'module' )
         'module_css_selector' => '',//<= a default set of css_selectors might have been specified on module registration
         'is_multi_items' => false,// <= for multi-item modules, the input selectors will be made specific for each item-id. In module templates, we'll use data-sek-item-id="%5$s"
         'item_id' => '' // <= a multi-item module has a unique id for each item
@@ -236,6 +236,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                       'css_property' => 'text-align',
                       'selector' => $selector,
                       'is_important' => $important,
+                      'parent_level_model' => $parent_level
                   ), $rules );
             }
         break;

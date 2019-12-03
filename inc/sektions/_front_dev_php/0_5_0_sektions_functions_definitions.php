@@ -285,6 +285,9 @@ function sek_get_parent_level_model( $child_level_id = '', $collection = array()
     return $_parent_level_data;
 }
 
+
+
+
 // @return boolean
 // Indicates if a section level contains at least on module
 // Used in SEK_Front_Render::render() to maybe print a css class on the section level
@@ -1081,6 +1084,139 @@ function sek_get_section_custom_breakpoint( $section ) {
       return;
 
     return $custom_breakpoint;
+}
+
+
+
+
+// Recursive helper
+// Is also used when building the dyn_css or when firing sek_add_css_rules_for_spacing()
+// @param id : mandatory
+// @param collection : optional <= that's why if missing we must walk all collections : local and global
+function sek_get_closest_section_custom_breakpoint( $params ) {
+    $params = wp_parse_args( $params, array(
+        'searched_level_id' => '',
+        'collection' => 'not_set',
+        'skope_id' => '',
+
+        'last_section_breakpoint_found' => 0,
+        'last_regular_section_breakpoint_found' => 0,
+        'last_nested_section_breakpoint_found' => 0,
+
+        'searched_level_id_found' => false,
+
+    ) );
+
+    extract( $params, EXTR_OVERWRITE );
+
+    if ( ! is_string( $searched_level_id ) || empty( $searched_level_id ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing or invalid child_level_id param.');
+        return $last_section_breakpoint_found;;
+    }
+    if ( $searched_level_id_found ) {
+        return $last_section_breakpoint_found;
+    }
+
+    // When no collection is provided, we must walk all collections, local and global.
+    if ( 'not_set' === $collection  ) {
+        if ( empty( $skope_id ) ) {
+            if ( is_array( $_POST ) && ! empty( $_POST['location_skope_id'] ) ) {
+                $skope_id = $_POST['location_skope_id'];
+            } else {
+                // When fired during an ajax 'customize_save' action, the skp_get_skope_id() is determined with $_POST['local_skope_id']
+                // @see add_filter( 'skp_get_skope_id', '\Nimble\sek_filter_skp_get_skope_id', 10, 2 );
+                $skope_id = skp_get_skope_id();
+            }
+        }
+        if ( empty( $skope_id ) || '_skope_not_set_' === $skope_id ) {
+            sek_error_log( __FUNCTION__ . ' => the skope_id should not be empty.');
+        }
+        $local_skope_settings = sek_get_skoped_seks( $skope_id );
+        $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+        $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+        $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
+
+        $collection = array_merge( $local_collection, $global_collection );
+    }
+
+    // Loop collections
+    foreach ( $collection as $level_data ) {
+        //sek_error_log('ALORS?', $level_data );
+        sek_error_log($last_section_breakpoint_found . ' MATCH ?  => LEVEL ID AND TYPE => ' . $level_data['level'] . ' | ' . $level_data['id'] );
+        // stop here and return if a match was recursively found
+        if ( $searched_level_id_found )
+          break;
+
+        if ( 'section' == $level_data['level'] ) {
+            $section_maybe_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $level_data ) );
+
+            if ( !empty( $level_data['is_nested'] ) && $level_data['is_nested'] ) {
+                $last_nested_section_breakpoint_found = $section_maybe_custom_breakpoint;
+            } else {
+                $last_nested_section_breakpoint_found = 0;//reset last nested breakpoint
+                $last_regular_section_breakpoint_found = $section_maybe_custom_breakpoint;
+            }
+
+           //sek_error_log('SECTION ID AND BREAKPOINT ' . $level_data['level'] . ' | ' . $level_data['id'] , $last_section_breakpoint_found );
+
+            sek_error_log('ALORS ???', compact(
+                'searched_level_id_found',
+                'last_section_breakpoint_found',
+                'last_regular_section_breakpoint_found',
+                'last_nested_section_breakpoint_found'
+            ) );
+        }
+
+        if ( array_key_exists( 'id', $level_data ) && $searched_level_id == $level_data['id'] ) {
+            //match found, break this loop
+            sek_error_log('MATCH FOUND! => ' . $last_section_breakpoint_found );
+            sek_error_log('MATCH FOUND => ALORS ???', compact(
+                'searched_level_id_found',
+                'last_section_breakpoint_found',
+                'last_regular_section_breakpoint_found',
+                'last_nested_section_breakpoint_found'
+            ) );
+            if ( $last_nested_section_breakpoint_found >= 1 ) {
+                $last_section_breakpoint_found = $last_nested_section_breakpoint_found;
+            } else if ( $last_regular_section_breakpoint_found >= 1 ) {
+                $last_section_breakpoint_found = $last_regular_section_breakpoint_found;
+            } else {
+                $last_section_breakpoint_found = 0;
+            }
+
+            $searched_level_id_found = true;
+            break;
+        }
+        if ( !$searched_level_id_found && array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
+            $collection = $level_data['collection'];
+
+            $recursive_params = compact(
+                'searched_level_id',
+                'collection',
+                'skope_id',
+                'last_section_breakpoint_found',
+                'last_regular_section_breakpoint_found',
+                'last_nested_section_breakpoint_found',
+                'searched_level_id_found'
+            );
+            $recursive_values = sek_get_closest_section_custom_breakpoint( $recursive_params );
+
+            if ( is_array($recursive_values) ) {
+                extract( $recursive_values );
+            } else {
+                $last_section_breakpoint_found = $recursive_values;
+                $searched_level_id_found = true;
+                break;
+            }
+        }
+    }
+
+    return $searched_level_id_found ? $last_section_breakpoint_found : compact(
+        'searched_level_id_found',
+        'last_section_breakpoint_found',
+        'last_regular_section_breakpoint_found',
+        'last_nested_section_breakpoint_found'
+    );
 }
 
 

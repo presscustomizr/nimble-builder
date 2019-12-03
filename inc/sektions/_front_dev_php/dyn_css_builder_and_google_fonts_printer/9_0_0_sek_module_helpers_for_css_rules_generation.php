@@ -277,8 +277,32 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
 //     'value' => $ready_value,(array)
 //     'css_property' => 'height',(string or array of properties)
 //     'selector' => $selector,(string)
-//     'is_important' => $important,(bool)
+//     'is_important' => $important,(bool),
+//     'parent_level_model' => Array
+            // (
+            //     [id] => __nimble__1b173266a663
+            //     [level] => module
+            //     [module_type] => czr_heading_module
+            //     [ver_ini] => 1.9.11
+            //     [value] => Array
+            //         (
+            //             [main_settings] => Array
+            //                 (
+            //                     [heading_text] => This is a heading.
+            //                     [h_alignment_css] => Array
+            //                         (
+            //                             [desktop] => justify
+            //                             [tablet] => left
+            //                             [mobile] => right
+            //                         )
+
+            //                 )
+
+            //         )
+
+            // )
 // )
+//
 // params['value'] = Array
 // (
 //     [desktop] => 5em
@@ -298,11 +322,21 @@ function sek_set_mq_css_rules( $params, $rules ) {
         'value' => array(),
         'css_property' => '',
         'selector' => '',
-        'is_important' => false
+        'is_important' => false,
+        'parent_level_model' => array() //<= added for https://github.com/presscustomizr/nimble-builder/issues/552
     ));
+
+    $level_id = !empty( $params['parent_level_model']['id'] ) ? $params['parent_level_model']['id'] : '';
+    $tablet_breakpoint = sek_get_user_defined_tablet_breakpoint( $level_id );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
+    $mobile_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['sm'];//max-width: 576
+
+    // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
+    $mobile_breakpoint = $mobile_breakpoint >= $tablet_breakpoint ? $tablet_breakpoint : $mobile_breakpoint;
 
     $css_value_by_devices = $params['value'];
     $_font_size_mq = array('desktop' => null , 'tablet' => null , 'mobile' => null );
+
+    sek_error_log('ALORS $tablet breakpoint?' . $tablet_breakpoint, $css_value_by_devices );
 
     if ( !empty( $css_value_by_devices ) ) {
           if ( ! empty( $css_value_by_devices[ 'desktop' ] ) ) {
@@ -310,11 +344,11 @@ function sek_set_mq_css_rules( $params, $rules ) {
           }
 
           if ( ! empty( $css_value_by_devices[ 'tablet' ] ) ) {
-              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
+              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; // default is max-width: 767
           }
 
           if ( ! empty( $css_value_by_devices[ 'mobile' ] ) ) {
-              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
+              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; // default is max-width: 575
           }
 
           // $css_value_by_devices looks like
@@ -354,6 +388,43 @@ function sek_set_mq_css_rules( $params, $rules ) {
 
     return $rules;
 }
+
+
+
+
+// BREAKPOINT HELPER
+function sek_get_user_defined_tablet_breakpoint( $level_id = '' ) {
+    //sek_error_log('ALORS CLOSEST PARENT SECTION MODEL ?' . $level_id , sek_get_closest_section_custom_breakpoint( $level_id ) );
+
+    // define a default breakpoint : 768
+    $breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];
+
+    // Is there a custom breakpoint set by a parent section?
+    sek_error_log('WE SEARCH FOR => ' . $level_id );
+    $closest_section_custom_breakpoint = sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $level_id ) );
+    sek_error_log('WE FOUND A BREAKPOINT ', $closest_section_custom_breakpoint  );
+
+    if ( is_array( $closest_section_custom_breakpoint ) ) {
+        // we do this check because sek_get_closest_section_custom_breakpoint() uses an array when recursively looping
+        // but returns number when a match is found
+        $closest_section_custom_breakpoint = 0;
+    } else {
+        $closest_section_custom_breakpoint = intval( $closest_section_custom_breakpoint );
+    }
+
+
+    if ( $closest_section_custom_breakpoint >= 1 ) {
+        $breakpoint = $closest_section_custom_breakpoint;
+    } else {
+        // Is there a global custom breakpoint set ?
+        $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
+        if ( $global_custom_breakpoint >= 1 ) {
+            $breakpoint = $global_custom_breakpoint;
+        }
+    }
+    return $breakpoint;
+}
+
 
 
 // New version of sek_set_mq_css_rules() created in July 2019
@@ -428,9 +499,6 @@ function sek_set_mq_css_rules_new_version( $params, $rules ) {
 
     return $rules;
 }
-
-
-
 
 
 
