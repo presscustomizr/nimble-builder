@@ -264,6 +264,17 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
 
 
 
+
+
+
+
+
+
+
+/****************************************************
+* BREAKPOINT / CSS GENERATION WITH MEDIA QUERIES
+****************************************************/
+
 // This function is invoked when sniffing the input rules.
 // It's a generic helper to generate media query css rule
 // @return an array of css rules looking like
@@ -278,29 +289,7 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
 //     'css_property' => 'height',(string or array of properties)
 //     'selector' => $selector,(string)
 //     'is_important' => $important,(bool),
-//     'parent_level_model' => Array
-            // (
-            //     [id] => __nimble__1b173266a663
-            //     [level] => module
-            //     [module_type] => czr_heading_module
-            //     [ver_ini] => 1.9.11
-            //     [value] => Array
-            //         (
-            //             [main_settings] => Array
-            //                 (
-            //                     [heading_text] => This is a heading.
-            //                     [h_alignment_css] => Array
-            //                         (
-            //                             [desktop] => justify
-            //                             [tablet] => left
-            //                             [mobile] => right
-            //                         )
-
-            //                 )
-
-            //         )
-
-            // )
+//     'level_id' => ''
 // )
 //
 // params['value'] = Array
@@ -323,20 +312,30 @@ function sek_set_mq_css_rules( $params, $rules ) {
         'css_property' => '',
         'selector' => '',
         'is_important' => false,
-        'parent_level_model' => array() //<= added for https://github.com/presscustomizr/nimble-builder/issues/552
+        'level_id' => '' //<= added for https://github.com/presscustomizr/nimble-builder/issues/552
     ));
 
-    $level_id = !empty( $params['parent_level_model']['id'] ) ? $params['parent_level_model']['id'] : '';
-    $tablet_breakpoint = sek_get_user_defined_tablet_breakpoint( $level_id );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
     $mobile_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['sm'];//max-width: 576
+    $tablet_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];// 768
 
-    // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
-    $mobile_breakpoint = $mobile_breakpoint >= $tablet_breakpoint ? $tablet_breakpoint : $mobile_breakpoint;
+    // since https://github.com/presscustomizr/nimble-builder/issues/552,
+    // we need the parent_level id ( <=> the level on which the CSS rule is applied ) to determine if there's any inherited custom breakpoint to use
+    // Exceptions :
+    // - when generating media queries for local options, there level_id is set to '_local_or_global_rules_no_level_id_', @see sek_add_raw_local_widths_css()
+    if ( '_local_or_global_rules_no_level_id_' !== $params['level_id'] ) {
+        if ( empty( $params['level_id'] ) ) {
+            sek_error_log( __FUNCTION__ . ' => missing level id, needed to determine if there is a custom breakpoint to use', $params );
+        } else {
+            $level_id = $params['level_id'];
+            $tablet_breakpoint = sek_get_user_defined_tablet_breakpoint( $level_id );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
+
+            // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
+            $mobile_breakpoint = $mobile_breakpoint >= $tablet_breakpoint ? $tablet_breakpoint : $mobile_breakpoint;
+        }
+    }
 
     $css_value_by_devices = $params['value'];
     $_font_size_mq = array('desktop' => null , 'tablet' => null , 'mobile' => null );
-
-    sek_error_log('ALORS $tablet breakpoint?' . $tablet_breakpoint, $css_value_by_devices );
 
     if ( !empty( $css_value_by_devices ) ) {
           if ( ! empty( $css_value_by_devices[ 'desktop' ] ) ) {
@@ -392,42 +391,9 @@ function sek_set_mq_css_rules( $params, $rules ) {
 
 
 
-// BREAKPOINT HELPER
-function sek_get_user_defined_tablet_breakpoint( $level_id = '' ) {
-    //sek_error_log('ALORS CLOSEST PARENT SECTION MODEL ?' . $level_id , sek_get_closest_section_custom_breakpoint( $level_id ) );
 
-    // define a default breakpoint : 768
-    $breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];
-
-    // Is there a custom breakpoint set by a parent section?
-    sek_error_log('WE SEARCH FOR => ' . $level_id );
-    $closest_section_custom_breakpoint = sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $level_id ) );
-    sek_error_log('WE FOUND A BREAKPOINT ', $closest_section_custom_breakpoint  );
-
-    if ( is_array( $closest_section_custom_breakpoint ) ) {
-        // we do this check because sek_get_closest_section_custom_breakpoint() uses an array when recursively looping
-        // but returns number when a match is found
-        $closest_section_custom_breakpoint = 0;
-    } else {
-        $closest_section_custom_breakpoint = intval( $closest_section_custom_breakpoint );
-    }
-
-
-    if ( $closest_section_custom_breakpoint >= 1 ) {
-        $breakpoint = $closest_section_custom_breakpoint;
-    } else {
-        // Is there a global custom breakpoint set ?
-        $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
-        if ( $global_custom_breakpoint >= 1 ) {
-            $breakpoint = $global_custom_breakpoint;
-        }
-    }
-    return $breakpoint;
-}
-
-
-
-// New version of sek_set_mq_css_rules() created in July 2019
+// Additional version of sek_set_mq_css_rules() created in July 2019
+// It does not replace the old, but allow another type of rule generation by device
 // => this version uses a param "css_rules_by_device" which describe the complete rule ( like padding-top:5em; ) for each device, instead of spliting value and property like the previous one
 // => it fixes the problem of vendor prefixes for which the value is not written the same.
 // For example, a top alignment in flex is written this way :
@@ -449,7 +415,8 @@ function sek_get_user_defined_tablet_breakpoint( $level_id = '' ) {
 // array(
 //     'css_rules_by_device' => array of css rules by devices
 //     'selector' => $selector,(string)
-//     'is_important' => $important,(bool)
+//     'level_id' => ''
+// )
 // )
 // params['value'] = Array
 // (
@@ -457,7 +424,7 @@ function sek_get_user_defined_tablet_breakpoint( $level_id = '' ) {
 //     [tablet] => padding-top:4em
 //     [mobile] => padding-top:25px
 // )
-function sek_set_mq_css_rules_new_version( $params, $rules ) {
+function sek_set_mq_css_rules_supporting_vendor_prefixes( $params, $rules ) {
     // TABLETS AND MOBILES WILL INHERIT UPPER MQ LEVELS IF NOT OTHERWISE SPECIFIED
     // Sek_Dyn_CSS_Builder::$breakpoints = [
     //     'xs' => 0,
@@ -468,8 +435,28 @@ function sek_set_mq_css_rules_new_version( $params, $rules ) {
     // ];
     $params = wp_parse_args( $params, array(
         'css_rules_by_device' => array(),
-        'selector' => ''
+        'selector' => '',
+        'level_id' => array() //<= added for https://github.com/presscustomizr/nimble-builder/issues/552
     ));
+
+    $mobile_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['sm'];//max-width: 576
+    $tablet_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];// 768
+
+    // since https://github.com/presscustomizr/nimble-builder/issues/552,
+    // we need the parent_level id ( <=> the level on which the CSS rule is applied ) to determine if there's any inherited custom breakpoint to use
+    // Exceptions :
+    // - when generating media queries for local options, there level_id is set to '_local_or_global_rules_no_level_id_', @see sek_add_raw_local_widths_css()
+    if ( '_local_or_global_rules_no_level_id_' !== $params['level_id'] ) {
+        if ( empty( $params['level_id'] ) ) {
+            sek_error_log( __FUNCTION__ . ' => missing level id, needed to determine if there is a custom breakpoint to use', $params );
+        } else {
+            $level_id = $params['level_id'];
+            $tablet_breakpoint = sek_get_user_defined_tablet_breakpoint( $level_id );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
+
+            // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
+            $mobile_breakpoint = $mobile_breakpoint >= $tablet_breakpoint ? $tablet_breakpoint : $mobile_breakpoint;
+        }
+    }
 
     $css_rules_by_device = $params['css_rules_by_device'];
     $_font_size_mq = array('desktop' => null , 'tablet' => null , 'mobile' => null );
@@ -480,11 +467,11 @@ function sek_set_mq_css_rules_new_version( $params, $rules ) {
           }
 
           if ( ! empty( $css_rules_by_device[ 'tablet' ] ) ) {
-              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
+              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; //max-width: 767
           }
 
           if ( ! empty( $css_rules_by_device[ 'mobile' ] ) ) {
-              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
+              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; //max-width: 575
           }
           foreach ( $css_rules_by_device as $device => $rules_for_device ) {
               $rules[] = array(
@@ -499,6 +486,57 @@ function sek_set_mq_css_rules_new_version( $params, $rules ) {
 
     return $rules;
 }
+
+
+
+
+
+
+// BREAKPOINT HELPER
+// A custom breakpoint can be set globally or by section
+// It replaces the default tablet breakpoint ( 768 px )
+function sek_get_user_defined_tablet_breakpoint( $level_id = '' ) {
+    //sek_error_log('ALORS CLOSEST PARENT SECTION MODEL ?' . $level_id , sek_get_closest_section_custom_breakpoint( $level_id ) );
+
+    // define a default breakpoint : 768
+    $tablet_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];
+
+    // Is there a custom breakpoint set by a parent section?
+    // Order :
+    // 1) custom breakpoint set on a nested section
+    // 2) custom breakpoint set on a regular section
+    //sek_error_log('WE SEARCH FOR => ' . $level_id );
+    $closest_section_custom_breakpoint = sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $level_id ) );
+    //sek_error_log('WE FOUND A BREAKPOINT ', $closest_section_custom_breakpoint  );
+
+    if ( is_array( $closest_section_custom_breakpoint ) ) {
+        // we do this check because sek_get_closest_section_custom_breakpoint() uses an array when recursively looping
+        // but returns number when a match is found
+        $closest_section_custom_breakpoint = 0;
+    } else {
+        $closest_section_custom_breakpoint = intval( $closest_section_custom_breakpoint );
+    }
+
+
+    if ( $closest_section_custom_breakpoint >= 1 ) {
+        $tablet_breakpoint = $closest_section_custom_breakpoint;
+    } else {
+        // Is there a global custom breakpoint set ?
+        $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
+        if ( $global_custom_breakpoint >= 1 ) {
+            $tablet_breakpoint = $global_custom_breakpoint;
+        }
+    }
+    return intval( $tablet_breakpoint );
+}
+
+
+
+
+
+
+
+
 
 
 

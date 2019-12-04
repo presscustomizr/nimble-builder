@@ -1066,6 +1066,9 @@ function sek_get_section_custom_breakpoint( $section ) {
     if ( ! is_array( $section ) )
       return;
 
+    if ( empty($section['id']) )
+      return;
+
     $options = empty( $section[ 'options' ] ) ? array() : $section['options'];
     if ( empty( $options[ 'breakpoint' ] ) )
       return;
@@ -1073,13 +1076,14 @@ function sek_get_section_custom_breakpoint( $section ) {
     if ( empty( $options[ 'breakpoint' ][ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $options[ 'breakpoint' ][ 'use-custom-breakpoint'] ) )
       return;
 
-    if ( empty( $options[ 'breakpoint' ][ 'custom-breakpoint' ] ) )
-      return;
+    // assign default value if use-custom-breakpoint is checked but there's no breakpoint set.
+    // this can also occur if the custom breakpoint is left to default in the customizer ( default values are not considered when saving )
+    if ( empty( $options[ 'breakpoint' ][ 'custom-breakpoint' ] ) ) {
+        $custom_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];//768
+    } else {
+        $custom_breakpoint = intval( $options[ 'breakpoint' ][ 'custom-breakpoint' ] );
+    }
 
-    if ( empty($section['id']) )
-      return;
-
-    $custom_breakpoint = intval( $options[ 'breakpoint' ][ 'custom-breakpoint' ] );
     if ( $custom_breakpoint < 0 )
       return;
 
@@ -1141,8 +1145,7 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
 
     // Loop collections
     foreach ( $collection as $level_data ) {
-        //sek_error_log('ALORS?', $level_data );
-        sek_error_log($last_section_breakpoint_found . ' MATCH ?  => LEVEL ID AND TYPE => ' . $level_data['level'] . ' | ' . $level_data['id'] );
+        //sek_error_log($last_section_breakpoint_found . ' MATCH ?  => LEVEL ID AND TYPE => ' . $level_data['level'] . ' | ' . $level_data['id'] );
         // stop here and return if a match was recursively found
         if ( $searched_level_id_found )
           break;
@@ -1159,23 +1162,23 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
 
            //sek_error_log('SECTION ID AND BREAKPOINT ' . $level_data['level'] . ' | ' . $level_data['id'] , $last_section_breakpoint_found );
 
-            sek_error_log('ALORS ???', compact(
-                'searched_level_id_found',
-                'last_section_breakpoint_found',
-                'last_regular_section_breakpoint_found',
-                'last_nested_section_breakpoint_found'
-            ) );
+            // sek_error_log('ALORS ???', compact(
+            //     'searched_level_id_found',
+            //     'last_section_breakpoint_found',
+            //     'last_regular_section_breakpoint_found',
+            //     'last_nested_section_breakpoint_found'
+            // ) );
         }
 
         if ( array_key_exists( 'id', $level_data ) && $searched_level_id == $level_data['id'] ) {
             //match found, break this loop
-            sek_error_log('MATCH FOUND! => ' . $last_section_breakpoint_found );
-            sek_error_log('MATCH FOUND => ALORS ???', compact(
-                'searched_level_id_found',
-                'last_section_breakpoint_found',
-                'last_regular_section_breakpoint_found',
-                'last_nested_section_breakpoint_found'
-            ) );
+            // sek_error_log('MATCH FOUND! => ' . $last_section_breakpoint_found );
+            // sek_error_log('MATCH FOUND => ALORS ???', compact(
+            //     'searched_level_id_found',
+            //     'last_section_breakpoint_found',
+            //     'last_regular_section_breakpoint_found',
+            //     'last_nested_section_breakpoint_found'
+            // ) );
             if ( $last_nested_section_breakpoint_found >= 1 ) {
                 $last_section_breakpoint_found = $last_nested_section_breakpoint_found;
             } else if ( $last_regular_section_breakpoint_found >= 1 ) {
@@ -1211,6 +1214,8 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
         }
     }
 
+    // Returns a breakpoint int if found or an array
+    // => this way we can determine if we continue or not to walk recursively
     return $searched_level_id_found ? $last_section_breakpoint_found : compact(
         'searched_level_id_found',
         'last_section_breakpoint_found',
