@@ -321,8 +321,8 @@ function sek_set_mq_css_rules( $params, $rules ) {
     // since https://github.com/presscustomizr/nimble-builder/issues/552,
     // we need the parent_level id ( <=> the level on which the CSS rule is applied ) to determine if there's any inherited custom breakpoint to use
     // Exceptions :
-    // - when generating media queries for local options, there level_id is set to '_local_or_global_rules_no_level_id_', @see sek_add_raw_local_widths_css()
-    if ( '_local_or_global_rules_no_level_id_' !== $params['level_id'] ) {
+    // - when generating media queries for local options, there level_id is set to '_excluded_from_section_custom_breakpoint_', @see sek_add_raw_local_widths_css()
+    if ( '_excluded_from_section_custom_breakpoint_' !== $params['level_id'] ) {
         if ( empty( $params['level_id'] ) ) {
             sek_error_log( __FUNCTION__ . ' => missing level id, needed to determine if there is a custom breakpoint to use', $params );
         } else {
@@ -445,8 +445,8 @@ function sek_set_mq_css_rules_supporting_vendor_prefixes( $params, $rules ) {
     // since https://github.com/presscustomizr/nimble-builder/issues/552,
     // we need the parent_level id ( <=> the level on which the CSS rule is applied ) to determine if there's any inherited custom breakpoint to use
     // Exceptions :
-    // - when generating media queries for local options, there level_id is set to '_local_or_global_rules_no_level_id_', @see sek_add_raw_local_widths_css()
-    if ( '_local_or_global_rules_no_level_id_' !== $params['level_id'] ) {
+    // - when generating media queries for local options, there level_id is set to '_excluded_from_section_custom_breakpoint_', @see sek_add_raw_local_widths_css()
+    if ( '_excluded_from_section_custom_breakpoint_' !== $params['level_id'] ) {
         if ( empty( $params['level_id'] ) ) {
             sek_error_log( __FUNCTION__ . ' => missing level id, needed to determine if there is a custom breakpoint to use', $params );
         } else {
