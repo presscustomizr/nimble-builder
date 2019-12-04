@@ -75,57 +75,6 @@
 
 
 
-/* MAKE SURE WE CAN SEE THE LEVELS, EVEN IF SETUP TO BE HIDDEN WITH THE CURRENT PREVIEWED DEVICE */
-@media (min-width:767px){
-  [data-sek-level="location"] .sek-hidden-on-desktops {
-    display: -ms-flexbox;
-    display: -webkit-box;
-    display: flex;
-  -webkit-filter: grayscale(30%);
-      filter: grayscale(30%);
--webkit-filter: gray;
-        filter: gray;
-    /*-webkit-filter:blur(1px);
-    filter: blur(1px);*/
-    opacity: 0.8;
-  }
-}
-@media (min-width:575px) and (max-width:768px){
-  [data-sek-level="location"] .sek-hidden-on-tablets {
-    display: -ms-flexbox;
-    display: -webkit-box;
-    display: flex;
-    -webkit-filter: grayscale(30%);
-    filter: grayscale(30%);
--webkit-filter: gray;
-      filter: gray;
-  /*-webkit-filter:blur(1px);
-    filter: blur(1px);*/
-    opacity: 0.8;
-  }
-}
-@media (max-width:575px){
-  [data-sek-level="location"] .sek-hidden-on-mobiles {
-    display: -ms-flexbox;
-    display: -webkit-box;
-    display: flex;
-    -webkit-filter: grayscale(30%);
-    filter: grayscale(30%);
--webkit-filter: gray;
-      filter: gray;
-   /* -webkit-filter:blur(1px);
-    filter: blur(1px);*/
-    opacity: 0.8;
-  }
-}
-
-
-
-
-
-
-
-
 
 
 

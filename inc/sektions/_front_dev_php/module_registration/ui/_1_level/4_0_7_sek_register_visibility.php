@@ -109,13 +109,19 @@ function sek_add_css_rules_for_level_visibility( $rules, $level ) {
                 $media_qu = "(max-width:{$mob_bp_val}px)";
             break;
         }
+        /* WHEN CUSTOMIZING MAKE SURE WE CAN SEE THE LEVELS, EVEN IF SETUP TO BE HIDDEN WITH THE CURRENT PREVIEWED DEVICE */
+        if ( skp_is_customizing() ) {
+            $css_rules = 'display: -ms-flexbox;display: -webkit-box;display: flex;-webkit-filter: grayscale(50%);filter: grayscale(50%);-webkit-filter: gray;filter: gray;opacity: 0.7;';
+        } else {
+            $css_rules = 'display:none';
+        }
+
         $rules[] = array(
             'selector' => '[data-sek-level="location"] [data-sek-id="'.$level['id'].'"]',
-            'css_rules' => 'display:none',
+            'css_rules' => $css_rules,
             'mq' => $media_qu
         );
     }
-
     return $rules;
 }
 
