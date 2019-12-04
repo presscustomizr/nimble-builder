@@ -3940,8 +3940,8 @@ function sek_set_mq_css_rules( $params, $rules ) {
     // since https://github.com/presscustomizr/nimble-builder/issues/552,
     // we need the parent_level id ( <=> the level on which the CSS rule is applied ) to determine if there's any inherited custom breakpoint to use
     // Exceptions :
-    // - when generating media queries for local options, there level_id is set to '_local_or_global_rules_no_level_id_', @see sek_add_raw_local_widths_css()
-    if ( '_local_or_global_rules_no_level_id_' !== $params['level_id'] ) {
+    // - when generating media queries for local options, there level_id is set to '_excluded_from_section_custom_breakpoint_', @see sek_add_raw_local_widths_css()
+    if ( '_excluded_from_section_custom_breakpoint_' !== $params['level_id'] ) {
         if ( empty( $params['level_id'] ) ) {
             sek_error_log( __FUNCTION__ . ' => missing level id, needed to determine if there is a custom breakpoint to use', $params );
         } else {
@@ -4064,8 +4064,8 @@ function sek_set_mq_css_rules_supporting_vendor_prefixes( $params, $rules ) {
     // since https://github.com/presscustomizr/nimble-builder/issues/552,
     // we need the parent_level id ( <=> the level on which the CSS rule is applied ) to determine if there's any inherited custom breakpoint to use
     // Exceptions :
-    // - when generating media queries for local options, there level_id is set to '_local_or_global_rules_no_level_id_', @see sek_add_raw_local_widths_css()
-    if ( '_local_or_global_rules_no_level_id_' !== $params['level_id'] ) {
+    // - when generating media queries for local options, there level_id is set to '_excluded_from_section_custom_breakpoint_', @see sek_add_raw_local_widths_css()
+    if ( '_excluded_from_section_custom_breakpoint_' !== $params['level_id'] ) {
         if ( empty( $params['level_id'] ) ) {
             sek_error_log( __FUNCTION__ . ' => missing level id, needed to determine if there is a custom breakpoint to use', $params );
         } else {
@@ -6541,6 +6541,89 @@ function sek_get_module_params_for_sek_level_visibility_module() {
     );
 }
 
+
+/* ------------------------------------------------------------------------- *
+ *  SCHEDULE CSS RULES FILTERING
+/* ------------------------------------------------------------------------- */
+// levels are visible by default
+// the default CSS rule should be :
+// @media (min-width:768px){
+//   [data-sek-level="location"] .sek-hidden-on-desktops { display: none; }
+// }
+// @media (min-width:575px) and (max-width:767px){
+//   [data-sek-level="location"] .sek-hidden-on-tablets { display: none; }
+// }
+// @media (max-width:575px){
+//   [data-sek-level="location"] .sek-hidden-on-mobiles { display: none; }
+// }
+//
+// Dec 2019 : since issue https://github.com/presscustomizr/nimble-builder/issues/555, we use a dynamic CSS rule generation instead of static CSS
+add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_level_visibility', 10, 3 );
+function sek_add_css_rules_for_level_visibility( $rules, $level ) {
+    $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
+    if ( empty( $options[ 'visibility' ] ) )
+      return $rules;
+
+    $visibility_options = is_array( $options[ 'visibility' ] ) ? $options[ 'visibility' ] : array();
+
+    // Get the default breakpoint values
+    $mobile_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['sm'];// 576
+    $tablet_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];// 768
+
+    // nested section should inherit the custom breakpoint of the parent
+    // @fixes https://github.com/presscustomizr/nimble-builder/issues/554
+    $custom_tablet_breakpoint =  intval( sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $level['id'] ) ) );
+
+    if ( $custom_tablet_breakpoint >= 1 ) {
+        $tablet_breakpoint = $custom_tablet_breakpoint;
+    }
+
+    // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
+    $mobile_breakpoint = $mobile_breakpoint >= $tablet_breakpoint ? $tablet_breakpoint : $mobile_breakpoint;
+
+    $visibility_value =  array(
+        'desktop' => ( array_key_exists('desktops', $visibility_options ) && true !== sek_booleanize_checkbox_val( $visibility_options['desktops'] ) ) ? 'hide' : '',
+        'tablet' => ( array_key_exists('tablets', $visibility_options ) && true !== sek_booleanize_checkbox_val( $visibility_options['tablets'] ) ) ? 'hide' : '',
+        'mobile' => ( array_key_exists('mobiles', $visibility_options ) && true !== sek_booleanize_checkbox_val( $visibility_options['mobiles'] ) ) ? 'hide' : ''
+    );
+
+    $mob_bp_val = $mobile_breakpoint - 1;// -1 to avoid "blind" spots @see https://github.com/presscustomizr/nimble-builder/issues/551
+    foreach ( $visibility_value as $device => $visibility_val ) {
+        if ( 'hide' !== $visibility_val )
+          continue;
+
+        switch( $device ) {
+            case 'desktop' :
+                $media_qu = "(min-width:{$tablet_breakpoint}px)";
+            break;
+            case 'tablet' :
+                $tab_bp_val = $tablet_breakpoint - 1;// -1 to avoid "blind" spots @see https://github.com/presscustomizr/nimble-builder/issues/551
+                if ( $mobile_breakpoint >= ( $tab_bp_val ) ) {
+                    $media_qu = "(max-width:{$tab_bp_val}px)";
+                } else {
+                    $media_qu = "(min-width:{$mob_bp_val}px) and (max-width:{$tab_bp_val}px)";
+                }
+            break;
+            case 'mobile' :
+                $media_qu = "(max-width:{$mob_bp_val}px)";
+            break;
+        }
+        /* WHEN CUSTOMIZING MAKE SURE WE CAN SEE THE LEVELS, EVEN IF SETUP TO BE HIDDEN WITH THE CURRENT PREVIEWED DEVICE */
+        if ( skp_is_customizing() ) {
+            $css_rules = 'display: -ms-flexbox;display: -webkit-box;display: flex;-webkit-filter: grayscale(50%);filter: grayscale(50%);-webkit-filter: gray;filter: gray;opacity: 0.7;';
+        } else {
+            $css_rules = 'display:none';
+        }
+
+        $rules[] = array(
+            'selector' => '[data-sek-level="location"] [data-sek-id="'.$level['id'].'"]',
+            'css_rules' => $css_rules,
+            'mq' => $media_qu
+        );
+    }
+    return $rules;
+}
+
 ?><?php
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 function sek_get_module_params_for_sek_level_breakpoint_module() {
@@ -6823,7 +6906,7 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
             'value' => $max_width_value,
             'css_property' => 'max-width',
             'selector' => $selector,
-            'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+            'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
         ), $rules );
 
         // when customizing the inner section width, we need to reset the default padding rules for .sek-container-fluid {padding-right:10px; padding-left:10px}
@@ -6833,13 +6916,13 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-left',
                 'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid',
-                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-right',
                 'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid',
-                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
         }
 
@@ -6848,7 +6931,7 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
                 'value' => $margin_value,
                 'css_property' => 'margin',
                 'selector' => $selector,
-                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
         }
     }//foreach
@@ -7238,7 +7321,7 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
             'css_property' => 'font-size',
             'selector' => $default_text_selector,
             'is_important' => false,
-            'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+            'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
         ), $rules );
     }
     // Line height
@@ -7565,7 +7648,7 @@ function sek_write_global_custom_section_widths() {
             'value' => $max_width_value,
             'css_property' => 'max-width',
             'selector' => $selector,
-            'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+            'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
         ), $rules );
 
         // when customizing the inner section width, we need to reset the default padding rules for .sek-container-fluid {padding-right:10px; padding-left:10px}
@@ -7575,13 +7658,13 @@ function sek_write_global_custom_section_widths() {
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-left',
                 'selector' => '[data-sek-level="section"] > .sek-container-fluid',
-                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-right',
                 'selector' => '[data-sek-level="section"] > .sek-container-fluid',
-                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
         }
 
@@ -7590,7 +7673,7 @@ function sek_write_global_custom_section_widths() {
                 'value' => $margin_value,
                 'css_property' => 'margin',
                 'selector' => $selector,
-                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
         }
     }//foreach
@@ -15342,7 +15425,10 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                       'css_property' => 'font-size',
                       'selector' => $selector,
                       'is_important' => $important,
-                      'level_id' => $parent_level['id']
+                      // font-size should follow rules from custom breakpoint at a section level
+                      // following implementation of https://github.com/presscustomizr/nimble-builder/issues/552
+                      // => otherwise, if the breakpoint is very small ( to keep column horizontal for example ), font-size won't change on mobile devices
+                      'level_id' => '_excluded_from_section_custom_breakpoint_'
                   ), $rules );
             }
         break;
@@ -17845,7 +17931,6 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                     // SETUP THE GLOBAL CUSTOM BREAKPOINT CSS CLASS
                     $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
-                    $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
 
                     // SETUP THE LEVEL CUSTOM BREAKPOINT CSS CLASS
                     // nested section should inherit the custom breakpoint of the parent
@@ -17855,7 +17940,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $grid_column_class = "sek-col-{$col_suffix}";
                     if ( $section_custom_breakpoint >= 1 ) {
                         $grid_column_class = "sek-section-custom-breakpoint-col-{$col_suffix}";
-                    } else if ( $has_global_custom_breakpoint ) {
+                    } else if ( $global_custom_breakpoint >= 1 ) {
                         $grid_column_class = "sek-global-custom-breakpoint-col-{$col_suffix}";
                     }
                     ?>
@@ -18015,6 +18100,9 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
          * VARIOUS HELPERS
         /* ------------------------------------------------------------------------- */
         /* HELPER TO PRINT THE VISIBILITY CSS CLASS IN THE LEVEL CONTAINER */
+        // Dec 2019 : since issue https://github.com/presscustomizr/nimble-builder/issues/555, we use a dynamic CSS rule generation instead of static CSS
+        // The CSS class are kept only for information when inspecting the markup
+        // @see sek_add_css_rules_for_level_visibility()
         // @return string
         private function get_level_visibility_css_class( $model ) {
             if ( ! is_array( $model ) ) {

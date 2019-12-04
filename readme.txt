@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.3
-Stable tag: 1.9.13-beta
+Stable tag: 1.10.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,16 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.9.12 =
-Various improvements to the recently introduced video background. User interface improvements when moving sections up/down the page. Better compatibility with the new default WordPress theme.
+= 1.10.0 =
+Version 1.10 greatly improves the CSS rules generated when user define custom breakpoints, globally, for sections and nested sections. It fixes issues when setting level visibilities by devices, or when using by-device CSS rules like horizontal centering, which are now applied with better CSS media queries.
 
 == Changelog ==
+= 1.10.0 December 4th 2019 =
+* fixed : columns layout on mobile => nested section should inherit the custom breakpoint of the parent
+* fixed : level visibility options should be consistent with user defined breakpoints
+* fixed : level visibility breakpoints have "blind" spots
+* fixed : by-device CSS rules, like horizontal centering, should be applied to the custom breakpoint
+
 = 1.9.12 December 1st 2019 =
 * fixed : [Image module] make sure the default img CSS display is not overriden by other rules
 * fixed : "Insert new section" button not always rendered after new section insertion
