@@ -211,7 +211,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                 'mobile' => ''
             ));
 
-            $rules = sek_set_mq_css_rules_new_version( array(
+            $rules = sek_set_mq_css_rules_supporting_vendor_prefixes( array(
                 'css_rules_by_device' => $flex_ready_value,
                 'selector' => $selector
             ), $rules );

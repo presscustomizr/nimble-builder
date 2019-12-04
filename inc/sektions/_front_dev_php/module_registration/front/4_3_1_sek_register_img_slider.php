@@ -481,7 +481,7 @@ function sek_add_css_rules_for_items_in_czr_img_slider_collection_child( $rules,
                 break;
             }
         }
-        $rules = sek_set_mq_css_rules_new_version( array(
+        $rules = sek_set_mq_css_rules_supporting_vendor_prefixes( array(
             'css_rules_by_device' => $mapped_values,
             'selector' => sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"] .sek-slider-text-wrapper', $params['parent_module_id'], $item_model['id'] )
         ), $rules );
