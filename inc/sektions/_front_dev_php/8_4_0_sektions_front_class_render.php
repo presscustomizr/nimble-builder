@@ -484,11 +484,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
 
                     // SETUP THE LEVEL CUSTOM BREAKPOINT CSS CLASS
-                    $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $parent_model ) );
-                    $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
+                    // nested section should inherit the custom breakpoint of the parent
+                    // @fixes https://github.com/presscustomizr/nimble-builder/issues/554
+                    $section_custom_breakpoint =  sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $parent_model['id'] ) );
 
                     $grid_column_class = "sek-col-{$col_suffix}";
-                    if ( $has_section_custom_breakpoint ) {
+                    if ( $section_custom_breakpoint >= 1 ) {
                         $grid_column_class = "sek-section-custom-breakpoint-col-{$col_suffix}";
                     } else if ( $has_global_custom_breakpoint ) {
                         $grid_column_class = "sek-global-custom-breakpoint-col-{$col_suffix}";

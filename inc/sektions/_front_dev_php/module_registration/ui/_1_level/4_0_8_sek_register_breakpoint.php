@@ -52,7 +52,14 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
 /* ------------------------------------------------------------------------- */
 add_filter( 'sek_add_css_rules_for__section__options', '\Nimble\sek_add_css_rules_for_sections_breakpoint', 10, 3 );
 function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
-    $custom_breakpoint = intval( sek_get_section_custom_breakpoint( $section ) );
+    // nested section should inherit the custom breakpoint of the parent
+    // @fixes https://github.com/presscustomizr/nimble-builder/issues/554
+    // Is there a custom breakpoint set by a parent section?
+    // Order :
+    // 1) custom breakpoint set on a nested section
+    // 2) custom breakpoint set on a regular section
+    //sek_error_log('WE SEARCH FOR => ' . $level_id );
+    $custom_breakpoint = sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $section['id'] ) );
     if ( $custom_breakpoint > 0 ) {
         $col_number = ( array_key_exists( 'collection', $section ) && is_array( $section['collection'] ) ) ? count( $section['collection'] ) : 1;
         $col_number = 12 < $col_number ? 12 : $col_number;
