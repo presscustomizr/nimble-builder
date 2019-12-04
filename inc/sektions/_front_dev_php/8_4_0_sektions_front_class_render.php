@@ -481,7 +481,6 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                     // SETUP THE GLOBAL CUSTOM BREAKPOINT CSS CLASS
                     $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
-                    $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
 
                     // SETUP THE LEVEL CUSTOM BREAKPOINT CSS CLASS
                     // nested section should inherit the custom breakpoint of the parent
@@ -491,7 +490,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $grid_column_class = "sek-col-{$col_suffix}";
                     if ( $section_custom_breakpoint >= 1 ) {
                         $grid_column_class = "sek-section-custom-breakpoint-col-{$col_suffix}";
-                    } else if ( $has_global_custom_breakpoint ) {
+                    } else if ( $global_custom_breakpoint >= 1 ) {
                         $grid_column_class = "sek-global-custom-breakpoint-col-{$col_suffix}";
                     }
                     ?>
@@ -651,6 +650,9 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
          * VARIOUS HELPERS
         /* ------------------------------------------------------------------------- */
         /* HELPER TO PRINT THE VISIBILITY CSS CLASS IN THE LEVEL CONTAINER */
+        // Dec 2019 : since issue https://github.com/presscustomizr/nimble-builder/issues/555, we use a dynamic CSS rule generation instead of static CSS
+        // The CSS class are kept only for information when inspecting the markup
+        // @see sek_add_css_rules_for_level_visibility()
         // @return string
         private function get_level_visibility_css_class( $model ) {
             if ( ! is_array( $model ) ) {
