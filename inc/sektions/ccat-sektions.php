@@ -285,6 +285,9 @@ function sek_get_parent_level_model( $child_level_id = '', $collection = array()
     return $_parent_level_data;
 }
 
+
+
+
 // @return boolean
 // Indicates if a section level contains at least on module
 // Used in SEK_Front_Render::render() to maybe print a css class on the section level
@@ -1063,6 +1066,9 @@ function sek_get_section_custom_breakpoint( $section ) {
     if ( ! is_array( $section ) )
       return;
 
+    if ( empty($section['id']) )
+      return;
+
     $options = empty( $section[ 'options' ] ) ? array() : $section['options'];
     if ( empty( $options[ 'breakpoint' ] ) )
       return;
@@ -1070,17 +1076,152 @@ function sek_get_section_custom_breakpoint( $section ) {
     if ( empty( $options[ 'breakpoint' ][ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $options[ 'breakpoint' ][ 'use-custom-breakpoint'] ) )
       return;
 
-    if ( empty( $options[ 'breakpoint' ][ 'custom-breakpoint' ] ) )
-      return;
+    // assign default value if use-custom-breakpoint is checked but there's no breakpoint set.
+    // this can also occur if the custom breakpoint is left to default in the customizer ( default values are not considered when saving )
+    if ( empty( $options[ 'breakpoint' ][ 'custom-breakpoint' ] ) ) {
+        $custom_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];//768
+    } else {
+        $custom_breakpoint = intval( $options[ 'breakpoint' ][ 'custom-breakpoint' ] );
+    }
 
-    if ( empty($section['id']) )
-      return;
-
-    $custom_breakpoint = intval( $options[ 'breakpoint' ][ 'custom-breakpoint' ] );
     if ( $custom_breakpoint < 0 )
       return;
 
     return $custom_breakpoint;
+}
+
+
+
+
+// Recursive helper
+// Is also used when building the dyn_css or when firing sek_add_css_rules_for_spacing()
+// @param id : mandatory
+// @param collection : optional <= that's why if missing we must walk all collections : local and global
+function sek_get_closest_section_custom_breakpoint( $params ) {
+    $params = wp_parse_args( $params, array(
+        'searched_level_id' => '',
+        'collection' => 'not_set',
+        'skope_id' => '',
+
+        'last_section_breakpoint_found' => 0,
+        'last_regular_section_breakpoint_found' => 0,
+        'last_nested_section_breakpoint_found' => 0,
+
+        'searched_level_id_found' => false,
+
+    ) );
+
+    extract( $params, EXTR_OVERWRITE );
+
+    if ( ! is_string( $searched_level_id ) || empty( $searched_level_id ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing or invalid child_level_id param.');
+        return $last_section_breakpoint_found;;
+    }
+    if ( $searched_level_id_found ) {
+        return $last_section_breakpoint_found;
+    }
+
+    // When no collection is provided, we must walk all collections, local and global.
+    if ( 'not_set' === $collection  ) {
+        if ( empty( $skope_id ) ) {
+            if ( is_array( $_POST ) && ! empty( $_POST['location_skope_id'] ) ) {
+                $skope_id = $_POST['location_skope_id'];
+            } else {
+                // When fired during an ajax 'customize_save' action, the skp_get_skope_id() is determined with $_POST['local_skope_id']
+                // @see add_filter( 'skp_get_skope_id', '\Nimble\sek_filter_skp_get_skope_id', 10, 2 );
+                $skope_id = skp_get_skope_id();
+            }
+        }
+        if ( empty( $skope_id ) || '_skope_not_set_' === $skope_id ) {
+            sek_error_log( __FUNCTION__ . ' => the skope_id should not be empty.');
+        }
+        $local_skope_settings = sek_get_skoped_seks( $skope_id );
+        $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+        $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+        $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
+
+        $collection = array_merge( $local_collection, $global_collection );
+    }
+
+    // Loop collections
+    foreach ( $collection as $level_data ) {
+        //sek_error_log($last_section_breakpoint_found . ' MATCH ?  => LEVEL ID AND TYPE => ' . $level_data['level'] . ' | ' . $level_data['id'] );
+        // stop here and return if a match was recursively found
+        if ( $searched_level_id_found )
+          break;
+
+        if ( 'section' == $level_data['level'] ) {
+            $section_maybe_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $level_data ) );
+
+            if ( !empty( $level_data['is_nested'] ) && $level_data['is_nested'] ) {
+                $last_nested_section_breakpoint_found = $section_maybe_custom_breakpoint;
+            } else {
+                $last_nested_section_breakpoint_found = 0;//reset last nested breakpoint
+                $last_regular_section_breakpoint_found = $section_maybe_custom_breakpoint;
+            }
+
+           //sek_error_log('SECTION ID AND BREAKPOINT ' . $level_data['level'] . ' | ' . $level_data['id'] , $last_section_breakpoint_found );
+
+            // sek_error_log('ALORS ???', compact(
+            //     'searched_level_id_found',
+            //     'last_section_breakpoint_found',
+            //     'last_regular_section_breakpoint_found',
+            //     'last_nested_section_breakpoint_found'
+            // ) );
+        }
+
+        if ( array_key_exists( 'id', $level_data ) && $searched_level_id == $level_data['id'] ) {
+            //match found, break this loop
+            // sek_error_log('MATCH FOUND! => ' . $last_section_breakpoint_found );
+            // sek_error_log('MATCH FOUND => ALORS ???', compact(
+            //     'searched_level_id_found',
+            //     'last_section_breakpoint_found',
+            //     'last_regular_section_breakpoint_found',
+            //     'last_nested_section_breakpoint_found'
+            // ) );
+            if ( $last_nested_section_breakpoint_found >= 1 ) {
+                $last_section_breakpoint_found = $last_nested_section_breakpoint_found;
+            } else if ( $last_regular_section_breakpoint_found >= 1 ) {
+                $last_section_breakpoint_found = $last_regular_section_breakpoint_found;
+            } else {
+                $last_section_breakpoint_found = 0;
+            }
+
+            $searched_level_id_found = true;
+            break;
+        }
+        if ( !$searched_level_id_found && array_key_exists( 'collection', $level_data ) && is_array( $level_data['collection'] ) ) {
+            $collection = $level_data['collection'];
+
+            $recursive_params = compact(
+                'searched_level_id',
+                'collection',
+                'skope_id',
+                'last_section_breakpoint_found',
+                'last_regular_section_breakpoint_found',
+                'last_nested_section_breakpoint_found',
+                'searched_level_id_found'
+            );
+            $recursive_values = sek_get_closest_section_custom_breakpoint( $recursive_params );
+
+            if ( is_array($recursive_values) ) {
+                extract( $recursive_values );
+            } else {
+                $last_section_breakpoint_found = $recursive_values;
+                $searched_level_id_found = true;
+                break;
+            }
+        }
+    }
+
+    // Returns a breakpoint int if found or an array
+    // => this way we can determine if we continue or not to walk recursively
+    return $searched_level_id_found ? $last_section_breakpoint_found : compact(
+        'searched_level_id_found',
+        'last_section_breakpoint_found',
+        'last_regular_section_breakpoint_found',
+        'last_nested_section_breakpoint_found'
+    );
 }
 
 
@@ -3742,6 +3883,17 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
 
 
 
+
+
+
+
+
+
+
+/****************************************************
+* BREAKPOINT / CSS GENERATION WITH MEDIA QUERIES
+****************************************************/
+
 // This function is invoked when sniffing the input rules.
 // It's a generic helper to generate media query css rule
 // @return an array of css rules looking like
@@ -3755,8 +3907,10 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
 //     'value' => $ready_value,(array)
 //     'css_property' => 'height',(string or array of properties)
 //     'selector' => $selector,(string)
-//     'is_important' => $important,(bool)
+//     'is_important' => $important,(bool),
+//     'level_id' => ''
 // )
+//
 // params['value'] = Array
 // (
 //     [desktop] => 5em
@@ -3776,8 +3930,28 @@ function sek_set_mq_css_rules( $params, $rules ) {
         'value' => array(),
         'css_property' => '',
         'selector' => '',
-        'is_important' => false
+        'is_important' => false,
+        'level_id' => '' //<= added for https://github.com/presscustomizr/nimble-builder/issues/552
     ));
+
+    $mobile_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['sm'];//max-width: 576
+    $tablet_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];// 768
+
+    // since https://github.com/presscustomizr/nimble-builder/issues/552,
+    // we need the parent_level id ( <=> the level on which the CSS rule is applied ) to determine if there's any inherited custom breakpoint to use
+    // Exceptions :
+    // - when generating media queries for local options, there level_id is set to '_local_or_global_rules_no_level_id_', @see sek_add_raw_local_widths_css()
+    if ( '_local_or_global_rules_no_level_id_' !== $params['level_id'] ) {
+        if ( empty( $params['level_id'] ) ) {
+            sek_error_log( __FUNCTION__ . ' => missing level id, needed to determine if there is a custom breakpoint to use', $params );
+        } else {
+            $level_id = $params['level_id'];
+            $tablet_breakpoint = sek_get_user_defined_tablet_breakpoint( $level_id );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
+
+            // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
+            $mobile_breakpoint = $mobile_breakpoint >= $tablet_breakpoint ? $tablet_breakpoint : $mobile_breakpoint;
+        }
+    }
 
     $css_value_by_devices = $params['value'];
     $_font_size_mq = array('desktop' => null , 'tablet' => null , 'mobile' => null );
@@ -3788,11 +3962,11 @@ function sek_set_mq_css_rules( $params, $rules ) {
           }
 
           if ( ! empty( $css_value_by_devices[ 'tablet' ] ) ) {
-              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
+              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; // default is max-width: 767
           }
 
           if ( ! empty( $css_value_by_devices[ 'mobile' ] ) ) {
-              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
+              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; // default is max-width: 575
           }
 
           // $css_value_by_devices looks like
@@ -3834,7 +4008,11 @@ function sek_set_mq_css_rules( $params, $rules ) {
 }
 
 
-// New version of sek_set_mq_css_rules() created in July 2019
+
+
+
+// Additional version of sek_set_mq_css_rules() created in July 2019
+// It does not replace the old, but allow another type of rule generation by device
 // => this version uses a param "css_rules_by_device" which describe the complete rule ( like padding-top:5em; ) for each device, instead of spliting value and property like the previous one
 // => it fixes the problem of vendor prefixes for which the value is not written the same.
 // For example, a top alignment in flex is written this way :
@@ -3856,7 +4034,8 @@ function sek_set_mq_css_rules( $params, $rules ) {
 // array(
 //     'css_rules_by_device' => array of css rules by devices
 //     'selector' => $selector,(string)
-//     'is_important' => $important,(bool)
+//     'level_id' => ''
+// )
 // )
 // params['value'] = Array
 // (
@@ -3864,7 +4043,7 @@ function sek_set_mq_css_rules( $params, $rules ) {
 //     [tablet] => padding-top:4em
 //     [mobile] => padding-top:25px
 // )
-function sek_set_mq_css_rules_new_version( $params, $rules ) {
+function sek_set_mq_css_rules_supporting_vendor_prefixes( $params, $rules ) {
     // TABLETS AND MOBILES WILL INHERIT UPPER MQ LEVELS IF NOT OTHERWISE SPECIFIED
     // Sek_Dyn_CSS_Builder::$breakpoints = [
     //     'xs' => 0,
@@ -3875,8 +4054,28 @@ function sek_set_mq_css_rules_new_version( $params, $rules ) {
     // ];
     $params = wp_parse_args( $params, array(
         'css_rules_by_device' => array(),
-        'selector' => ''
+        'selector' => '',
+        'level_id' => array() //<= added for https://github.com/presscustomizr/nimble-builder/issues/552
     ));
+
+    $mobile_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['sm'];//max-width: 576
+    $tablet_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];// 768
+
+    // since https://github.com/presscustomizr/nimble-builder/issues/552,
+    // we need the parent_level id ( <=> the level on which the CSS rule is applied ) to determine if there's any inherited custom breakpoint to use
+    // Exceptions :
+    // - when generating media queries for local options, there level_id is set to '_local_or_global_rules_no_level_id_', @see sek_add_raw_local_widths_css()
+    if ( '_local_or_global_rules_no_level_id_' !== $params['level_id'] ) {
+        if ( empty( $params['level_id'] ) ) {
+            sek_error_log( __FUNCTION__ . ' => missing level id, needed to determine if there is a custom breakpoint to use', $params );
+        } else {
+            $level_id = $params['level_id'];
+            $tablet_breakpoint = sek_get_user_defined_tablet_breakpoint( $level_id );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
+
+            // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
+            $mobile_breakpoint = $mobile_breakpoint >= $tablet_breakpoint ? $tablet_breakpoint : $mobile_breakpoint;
+        }
+    }
 
     $css_rules_by_device = $params['css_rules_by_device'];
     $_font_size_mq = array('desktop' => null , 'tablet' => null , 'mobile' => null );
@@ -3887,11 +4086,11 @@ function sek_set_mq_css_rules_new_version( $params, $rules ) {
           }
 
           if ( ! empty( $css_rules_by_device[ 'tablet' ] ) ) {
-              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
+              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; //max-width: 767
           }
 
           if ( ! empty( $css_rules_by_device[ 'mobile' ] ) ) {
-              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
+              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; //max-width: 575
           }
           foreach ( $css_rules_by_device as $device => $rules_for_device ) {
               $rules[] = array(
@@ -3906,6 +4105,54 @@ function sek_set_mq_css_rules_new_version( $params, $rules ) {
 
     return $rules;
 }
+
+
+
+
+
+
+// BREAKPOINT HELPER
+// A custom breakpoint can be set globally or by section
+// It replaces the default tablet breakpoint ( 768 px )
+function sek_get_user_defined_tablet_breakpoint( $level_id = '' ) {
+    //sek_error_log('ALORS CLOSEST PARENT SECTION MODEL ?' . $level_id , sek_get_closest_section_custom_breakpoint( $level_id ) );
+
+    // define a default breakpoint : 768
+    $tablet_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];
+
+    // Is there a custom breakpoint set by a parent section?
+    // Order :
+    // 1) custom breakpoint set on a nested section
+    // 2) custom breakpoint set on a regular section
+    //sek_error_log('WE SEARCH FOR => ' . $level_id );
+    $closest_section_custom_breakpoint = sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $level_id ) );
+    //sek_error_log('WE FOUND A BREAKPOINT ', $closest_section_custom_breakpoint  );
+
+    if ( is_array( $closest_section_custom_breakpoint ) ) {
+        // we do this check because sek_get_closest_section_custom_breakpoint() uses an array when recursively looping
+        // but returns number when a match is found
+        $closest_section_custom_breakpoint = 0;
+    } else {
+        $closest_section_custom_breakpoint = intval( $closest_section_custom_breakpoint );
+    }
+
+
+    if ( $closest_section_custom_breakpoint >= 1 ) {
+        $tablet_breakpoint = $closest_section_custom_breakpoint;
+    } else {
+        // Is there a global custom breakpoint set ?
+        $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
+        if ( $global_custom_breakpoint >= 1 ) {
+            $tablet_breakpoint = $global_custom_breakpoint;
+        }
+    }
+    return intval( $tablet_breakpoint );
+}
+
+
+
+
+
 
 
 
@@ -5079,7 +5326,8 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
                 $rules = sek_set_mq_css_rules(array(
                     'value' => $mapped_bg_options,
                     'css_property' => 'background-position',
-                    'selector' => $bg_property_selector
+                    'selector' => $bg_property_selector,
+                    'level_id' => $level['id']
                 ), $rules );
             }
         }
@@ -5601,9 +5849,10 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
                 break;
             }
         }
-        $rules = sek_set_mq_css_rules_new_version( array(
+        $rules = sek_set_mq_css_rules_supporting_vendor_prefixes( array(
             'css_rules_by_device' => $mapped_values,
-            'selector' => '[data-sek-id="'.$level['id'].'"]'
+            'selector' => '[data-sek-id="'.$level['id'].'"]',
+            'level_id' => $level['id']
         ), $rules );
     }
 
@@ -5634,7 +5883,8 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $height_value,
                 'css_property' => 'height',
-                'selector' => $selector
+                'selector' => $selector,
+                'level_id' => $level['id']
             ), $rules );
         }
     }
@@ -5883,9 +6133,10 @@ function sek_add_css_rules_for_module_width( $rules, $module ) {
             }
         }
 
-        $rules = sek_set_mq_css_rules_new_version( array(
+        $rules = sek_set_mq_css_rules_supporting_vendor_prefixes( array(
             'css_rules_by_device' => $mapped_values,
-            'selector' => '[data-sek-id="'.$module['id'].'"]'
+            'selector' => '[data-sek-id="'.$module['id'].'"]',
+            'level_id' => $module['id']
         ), $rules );
     }
 
@@ -5917,7 +6168,8 @@ function sek_add_css_rules_for_module_width( $rules, $module ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $width_value,
                 'css_property' => 'width',
-                'selector' => $selector
+                'selector' => $selector,
+                'level_id' => $module['id']
             ), $rules );
         }
     }
@@ -6035,7 +6287,8 @@ function sek_add_css_rules_for_column_width( $rules, $column ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $width_value,
                 'css_property' => 'width',
-                'selector' => $selector
+                'selector' => $selector,
+                'level_id' => $column['id']
             ), $rules );
         }
     }
@@ -6180,7 +6433,8 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
         $rules = sek_set_mq_css_rules(array(
             'value' => $max_width_value,
             'css_property' => 'max-width',
-            'selector' => $selector
+            'selector' => $selector,
+            'level_id' => $section['id']
         ), $rules );
 
         // when customizing the inner section width, we need to reset the default padding rules for .sek-container-fluid {padding-right:10px; padding-left:10px}
@@ -6189,12 +6443,14 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-left',
-                'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid'
+                'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid',
+                'level_id' => $section['id']
             ), $rules );
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-right',
-                'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid'
+                'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid',
+                'level_id' => $section['id']
             ), $rules );
         }
 
@@ -6202,7 +6458,8 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $margin_value,
                 'css_property' => 'margin',
-                'selector' => $selector
+                'selector' => $selector,
+                'level_id' => $section['id']
             ), $rules );
         }
     }//foreach
@@ -6338,7 +6595,14 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
 /* ------------------------------------------------------------------------- */
 add_filter( 'sek_add_css_rules_for__section__options', '\Nimble\sek_add_css_rules_for_sections_breakpoint', 10, 3 );
 function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
-    $custom_breakpoint = intval( sek_get_section_custom_breakpoint( $section ) );
+    // nested section should inherit the custom breakpoint of the parent
+    // @fixes https://github.com/presscustomizr/nimble-builder/issues/554
+    // Is there a custom breakpoint set by a parent section?
+    // Order :
+    // 1) custom breakpoint set on a nested section
+    // 2) custom breakpoint set on a regular section
+    //sek_error_log('WE SEARCH FOR => ' . $level_id );
+    $custom_breakpoint = sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $section['id'] ) );
     if ( $custom_breakpoint > 0 ) {
         $col_number = ( array_key_exists( 'collection', $section ) && is_array( $section['collection'] ) ) ? count( $section['collection'] ) : 1;
         $col_number = 12 < $col_number ? 12 : $col_number;
@@ -6558,7 +6822,8 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
         $rules = sek_set_mq_css_rules(array(
             'value' => $max_width_value,
             'css_property' => 'max-width',
-            'selector' => $selector
+            'selector' => $selector,
+            'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
         ), $rules );
 
         // when customizing the inner section width, we need to reset the default padding rules for .sek-container-fluid {padding-right:10px; padding-left:10px}
@@ -6567,12 +6832,14 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-left',
-                'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid'
+                'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid',
+                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-right',
-                'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid'
+                'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid',
+                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
         }
 
@@ -6580,7 +6847,8 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $margin_value,
                 'css_property' => 'margin',
-                'selector' => $selector
+                'selector' => $selector,
+                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
         }
     }//foreach
@@ -6970,6 +7238,7 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
             'css_property' => 'font-size',
             'selector' => $default_text_selector,
             'is_important' => false,
+            'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
         ), $rules );
     }
     // Line height
@@ -7295,7 +7564,8 @@ function sek_write_global_custom_section_widths() {
         $rules = sek_set_mq_css_rules(array(
             'value' => $max_width_value,
             'css_property' => 'max-width',
-            'selector' => $selector
+            'selector' => $selector,
+            'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
         ), $rules );
 
         // when customizing the inner section width, we need to reset the default padding rules for .sek-container-fluid {padding-right:10px; padding-left:10px}
@@ -7304,12 +7574,14 @@ function sek_write_global_custom_section_widths() {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-left',
-                'selector' => '[data-sek-level="section"] > .sek-container-fluid'
+                'selector' => '[data-sek-level="section"] > .sek-container-fluid',
+                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-right',
-                'selector' => '[data-sek-level="section"] > .sek-container-fluid'
+                'selector' => '[data-sek-level="section"] > .sek-container-fluid',
+                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
         }
 
@@ -7317,7 +7589,8 @@ function sek_write_global_custom_section_widths() {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $margin_value,
                 'css_property' => 'margin',
-                'selector' => $selector
+                'selector' => $selector,
+                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
         }
     }//foreach
@@ -8157,7 +8430,8 @@ function sek_add_css_rules_for_czr_image_module( $rules, $complete_modul_model )
                       'value' => $ready_value,
                       'css_property' => 'width',
                       'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner img',
-                      'is_important' => false
+                      'is_important' => false,
+                      'level_id' => $complete_modul_model['id']
                   ), $rules );
             }
         }//if
@@ -8600,7 +8874,8 @@ function sek_add_css_rules_for_czr_social_icons_module( $rules, $complete_modul_
         'selector' => implode(',', array(
             '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-social-icons-wrapper > *:not(:last-child)',
         )),
-        'is_important' => false
+        'is_important' => false,
+        'level_id' => $complete_modul_model['id']
     ), $rules );
 
     return $rules;
@@ -11988,7 +12263,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items.sek-list-layout article > *:not(:last-child):not(.sek-pg-thumbnail)',
             '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items.sek-grid-layout article > *:not(:last-child)'
         )),
-        'is_important' => false
+        'is_important' => false,
+        'level_id' => $complete_modul_model['id']
     ), $rules );
 
 
@@ -12019,7 +12295,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
         'value' => $content_padding_ready_val,
         'css_property' => 'padding',
         'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items article .sek-pg-content',
-        'is_important' => false
+        'is_important' => false,
+        'level_id' => $complete_modul_model['id']
     ), $rules );
 
 
@@ -12055,7 +12332,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             'value' => $img_column_width_ready_value,
             'css_property' => array( 'grid-template-columns', '-ms-grid-columns' ),
             'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-list-layout article.sek-has-thumb',
-            'is_important' => false
+            'is_important' => false,
+            'level_id' => $complete_modul_model['id']
         ), $rules );
     }
 
@@ -12089,7 +12367,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             'value' => $img_height_ready_value,
             'css_property' => 'padding-top',
             'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-thumb-custom-height figure a',
-            'is_important' => false
+            'is_important' => false,
+            'level_id' => $complete_modul_model['id']
         ), $rules );
     }
 
@@ -12129,7 +12408,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
                   '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-layout',
                   '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-list-layout article.sek-has-thumb'
               ] ),
-              'is_important' => false
+              'is_important' => false,
+              'level_id' => $complete_modul_model['id']
           ), $rules );
 
           // Vertical Gap => common to list and grid layout
@@ -12160,7 +12440,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
               'value' => $v_gap_ready_value,
               'css_property' => 'grid-row-gap',
               'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items',
-              'is_important' => false
+              'is_important' => false,
+              'level_id' => $complete_modul_model['id']
           ), $rules );
     }
     return $rules;
@@ -12959,9 +13240,10 @@ function sek_add_css_rules_for_items_in_czr_img_slider_collection_child( $rules,
                 break;
             }
         }
-        $rules = sek_set_mq_css_rules_new_version( array(
+        $rules = sek_set_mq_css_rules_supporting_vendor_prefixes( array(
             'css_rules_by_device' => $mapped_values,
-            'selector' => sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"] .sek-slider-text-wrapper', $params['parent_module_id'], $item_model['id'] )
+            'selector' => sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"] .sek-slider-text-wrapper', $params['parent_module_id'], $item_model['id'] ),
+            'level_id' => $params['parent_module_id']
         ), $rules );
     }//Vertical alignment
 
@@ -13049,7 +13331,8 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
                 $rules = sek_set_mq_css_rules(array(
                     'value' => $height_value,
                     'css_property' => 'height',
-                    'selector' => $selector
+                    'selector' => $selector,
+                    'level_id' => $complete_modul_model['id']
                 ), $rules );
             }
         }// if custom height
@@ -14172,10 +14455,6 @@ class Sek_Dyn_CSS_Builder {
         // define a default breakpoint : 768
         $breakpoint = self::$breakpoints[ self::COLS_MOBILE_BREAKPOINT ];
 
-        // Is there a global custom breakpoint set ?
-        $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
-        $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
-
         // Does the parent section have a custom breakpoint set ?
         $parent_section = sek_get_parent_level_model( $column['id'] );
         if ( 'no_match' === $parent_section ) {
@@ -14183,12 +14462,14 @@ class Sek_Dyn_CSS_Builder {
             return $rules;
         }
         $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $parent_section ) );
-        $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
-
-        if ( $has_section_custom_breakpoint ) {
+        if ( $section_custom_breakpoint >= 1 ) {
             $breakpoint = $section_custom_breakpoint;
-        } else if ( $has_global_custom_breakpoint ) {
-            $breakpoint = $global_custom_breakpoint;
+        } else {
+            // Is there a global custom breakpoint set ?
+            $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
+            if ( $global_custom_breakpoint >= 1 ) {
+                $breakpoint = $global_custom_breakpoint;
+            }
         }
 
         // Note : the css selector must be specific enough to override the possible parent section ( or global ) custom breakpoint one.
@@ -14933,7 +15214,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         'css_val' => '',//string or array(), //<= the css property value
         'input_id' => '',//string// <= the unique input_id as it as been declared on module registration
         'registered_input_list' => array(),// <= the full list of input for the module
-        'parent_module_level' => array(),// <= the parent module level. can be one of those array( 'location', 'section', 'column', 'module' )
+        'parent_module_level' => array(),// <= the parent level. name is misleading because can be module but also other levels array( 'location', 'section', 'column', 'module' )
         'module_css_selector' => '',//<= a default set of css_selectors might have been specified on module registration
         'is_multi_items' => false,// <= for multi-item modules, the input selectors will be made specific for each item-id. In module templates, we'll use data-sek-item-id="%5$s"
         'item_id' => '' // <= a multi-item module has a unique id for each item
@@ -15061,6 +15342,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                       'css_property' => 'font-size',
                       'selector' => $selector,
                       'is_important' => $important,
+                      'level_id' => $parent_level['id']
                   ), $rules );
             }
         break;
@@ -15130,9 +15412,10 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                 'mobile' => ''
             ));
 
-            $rules = sek_set_mq_css_rules_new_version( array(
+            $rules = sek_set_mq_css_rules_supporting_vendor_prefixes( array(
                 'css_rules_by_device' => $flex_ready_value,
-                'selector' => $selector
+                'selector' => $selector,
+                'level_id' => $parent_level['id']
             ), $rules );
         break;
 
@@ -15155,6 +15438,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                       'css_property' => 'text-align',
                       'selector' => $selector,
                       'is_important' => $important,
+                      'level_id' => $parent_level['id'],
                   ), $rules );
             }
         break;
@@ -15228,6 +15512,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                       'css_property' => 'height',
                       'selector' => $selector,
                       'is_important' => $important,
+                      'level_id' => $parent_level['id']
                   ), $rules );
             }
         break;
@@ -15302,6 +15587,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                       'css_property' => 'width',
                       'selector' => $selector,
                       'is_important' => $important,
+                      'level_id' => $parent_level['id']
                   ), $rules );
             }
         break;
@@ -15343,12 +15629,14 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                       'css_property' => 'margin-top',
                       'selector' => $selector,
                       'is_important' => $important,
+                      'level_id' => $parent_level['id']
                   ), $rules );
                   $rules = sek_set_mq_css_rules(array(
                       'value' => $ready_value,
                       'css_property' => 'margin-bottom',
                       'selector' => $selector,
                       'is_important' => $important,
+                      'level_id' => $parent_level['id']
                   ), $rules );
             }
         break;
@@ -17560,11 +17848,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
 
                     // SETUP THE LEVEL CUSTOM BREAKPOINT CSS CLASS
-                    $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $parent_model ) );
-                    $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
+                    // nested section should inherit the custom breakpoint of the parent
+                    // @fixes https://github.com/presscustomizr/nimble-builder/issues/554
+                    $section_custom_breakpoint =  sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $parent_model['id'] ) );
 
                     $grid_column_class = "sek-col-{$col_suffix}";
-                    if ( $has_section_custom_breakpoint ) {
+                    if ( $section_custom_breakpoint >= 1 ) {
                         $grid_column_class = "sek-section-custom-breakpoint-col-{$col_suffix}";
                     } else if ( $has_global_custom_breakpoint ) {
                         $grid_column_class = "sek-global-custom-breakpoint-col-{$col_suffix}";

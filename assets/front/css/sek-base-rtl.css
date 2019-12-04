@@ -2662,13 +2662,13 @@ body .sek-module-inner h1:before, body .sek-module-inner h2:before, body .sek-mo
 }
 
 /* LEVEL VISIBILITY BY DEVICE */
-@media (min-width: 767px) {
+@media (min-width: 768px) {
   [data-sek-level="location"] .sek-hidden-on-desktops {
     display: none;
   }
 }
 
-@media (min-width: 575px) and (max-width: 768px) {
+@media (min-width: 575px) and (max-width: 767px) {
   [data-sek-level="location"] .sek-hidden-on-tablets {
     display: none;
   }
