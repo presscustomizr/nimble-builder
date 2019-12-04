@@ -142,7 +142,10 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                       'css_property' => 'font-size',
                       'selector' => $selector,
                       'is_important' => $important,
-                      'level_id' => $parent_level['id']
+                      // font-size should follow rules from custom breakpoint at a section level
+                      // following implementation of https://github.com/presscustomizr/nimble-builder/issues/552
+                      // => otherwise, if the breakpoint is very small ( to keep column horizontal for example ), font-size won't change on mobile devices
+                      'level_id' => '_excluded_from_section_custom_breakpoint_'
                   ), $rules );
             }
         break;
