@@ -483,7 +483,8 @@ function sek_add_css_rules_for_items_in_czr_img_slider_collection_child( $rules,
         }
         $rules = sek_set_mq_css_rules_supporting_vendor_prefixes( array(
             'css_rules_by_device' => $mapped_values,
-            'selector' => sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"] .sek-slider-text-wrapper', $params['parent_module_id'], $item_model['id'] )
+            'selector' => sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"] .sek-slider-text-wrapper', $params['parent_module_id'], $item_model['id'] ),
+            'level_id' => $params['parent_module_id']
         ), $rules );
     }//Vertical alignment
 
@@ -571,7 +572,8 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
                 $rules = sek_set_mq_css_rules(array(
                     'value' => $height_value,
                     'css_property' => 'height',
-                    'selector' => $selector
+                    'selector' => $selector,
+                    'level_id' => $complete_modul_model['id']
                 ), $rules );
             }
         }// if custom height

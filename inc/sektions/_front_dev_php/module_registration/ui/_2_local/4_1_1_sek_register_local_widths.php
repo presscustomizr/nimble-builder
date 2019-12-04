@@ -155,7 +155,8 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
         $rules = sek_set_mq_css_rules(array(
             'value' => $max_width_value,
             'css_property' => 'max-width',
-            'selector' => $selector
+            'selector' => $selector,
+            'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
         ), $rules );
 
         // when customizing the inner section width, we need to reset the default padding rules for .sek-container-fluid {padding-right:10px; padding-left:10px}
@@ -164,12 +165,14 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-left',
-                'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid'
+                'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid',
+                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-right',
-                'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid'
+                'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid',
+                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
         }
 
@@ -177,7 +180,8 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $margin_value,
                 'css_property' => 'margin',
-                'selector' => $selector
+                'selector' => $selector,
+                'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
             ), $rules );
         }
     }//foreach

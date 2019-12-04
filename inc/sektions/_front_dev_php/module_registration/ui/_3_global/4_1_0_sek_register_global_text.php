@@ -168,6 +168,7 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
             'css_property' => 'font-size',
             'selector' => $default_text_selector,
             'is_important' => false,
+            'level_id' => '_local_or_global_rules_no_level_id_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
         ), $rules );
     }
     // Line height

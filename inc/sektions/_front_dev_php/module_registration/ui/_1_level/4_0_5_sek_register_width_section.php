@@ -135,7 +135,8 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
         $rules = sek_set_mq_css_rules(array(
             'value' => $max_width_value,
             'css_property' => 'max-width',
-            'selector' => $selector
+            'selector' => $selector,
+            'level_id' => $section['id']
         ), $rules );
 
         // when customizing the inner section width, we need to reset the default padding rules for .sek-container-fluid {padding-right:10px; padding-left:10px}
@@ -144,12 +145,14 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-left',
-                'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid'
+                'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid',
+                'level_id' => $section['id']
             ), $rules );
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-right',
-                'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid'
+                'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid',
+                'level_id' => $section['id']
             ), $rules );
         }
 
@@ -157,7 +160,8 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $margin_value,
                 'css_property' => 'margin',
-                'selector' => $selector
+                'selector' => $selector,
+                'level_id' => $section['id']
             ), $rules );
         }
     }//foreach

@@ -257,7 +257,8 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
                 $rules = sek_set_mq_css_rules(array(
                     'value' => $mapped_bg_options,
                     'css_property' => 'background-position',
-                    'selector' => $bg_property_selector
+                    'selector' => $bg_property_selector,
+                    'level_id' => $level['id']
                 ), $rules );
             }
         }

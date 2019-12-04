@@ -80,7 +80,8 @@ function sek_add_css_rules_for_module_width( $rules, $module ) {
 
         $rules = sek_set_mq_css_rules_supporting_vendor_prefixes( array(
             'css_rules_by_device' => $mapped_values,
-            'selector' => '[data-sek-id="'.$module['id'].'"]'
+            'selector' => '[data-sek-id="'.$module['id'].'"]',
+            'level_id' => $module['id']
         ), $rules );
     }
 
@@ -112,7 +113,8 @@ function sek_add_css_rules_for_module_width( $rules, $module ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $width_value,
                 'css_property' => 'width',
-                'selector' => $selector
+                'selector' => $selector,
+                'level_id' => $module['id']
             ), $rules );
         }
     }

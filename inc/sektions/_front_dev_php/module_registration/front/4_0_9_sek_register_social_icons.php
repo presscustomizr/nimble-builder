@@ -316,7 +316,8 @@ function sek_add_css_rules_for_czr_social_icons_module( $rules, $complete_modul_
         'selector' => implode(',', array(
             '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-social-icons-wrapper > *:not(:last-child)',
         )),
-        'is_important' => false
+        'is_important' => false,
+        'level_id' => $complete_modul_model['id']
     ), $rules );
 
     return $rules;

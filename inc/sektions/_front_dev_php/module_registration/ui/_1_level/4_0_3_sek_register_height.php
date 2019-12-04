@@ -94,7 +94,8 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
         }
         $rules = sek_set_mq_css_rules_supporting_vendor_prefixes( array(
             'css_rules_by_device' => $mapped_values,
-            'selector' => '[data-sek-id="'.$level['id'].'"]'
+            'selector' => '[data-sek-id="'.$level['id'].'"]',
+            'level_id' => $level['id']
         ), $rules );
     }
 
@@ -125,7 +126,8 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $height_value,
                 'css_property' => 'height',
-                'selector' => $selector
+                'selector' => $selector,
+                'level_id' => $level['id']
             ), $rules );
         }
     }

@@ -108,7 +108,8 @@ function sek_add_css_rules_for_column_width( $rules, $column ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $width_value,
                 'css_property' => 'width',
-                'selector' => $selector
+                'selector' => $selector,
+                'level_id' => $column['id']
             ), $rules );
         }
     }

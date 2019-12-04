@@ -142,6 +142,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                       'css_property' => 'font-size',
                       'selector' => $selector,
                       'is_important' => $important,
+                      'level_id' => $parent_level['id']
                   ), $rules );
             }
         break;
@@ -213,7 +214,8 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
 
             $rules = sek_set_mq_css_rules_supporting_vendor_prefixes( array(
                 'css_rules_by_device' => $flex_ready_value,
-                'selector' => $selector
+                'selector' => $selector,
+                'level_id' => $parent_level['id']
             ), $rules );
         break;
 
@@ -236,7 +238,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                       'css_property' => 'text-align',
                       'selector' => $selector,
                       'is_important' => $important,
-                      'parent_level_model' => $parent_level
+                      'level_id' => $parent_level['id'],
                   ), $rules );
             }
         break;
@@ -310,6 +312,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                       'css_property' => 'height',
                       'selector' => $selector,
                       'is_important' => $important,
+                      'level_id' => $parent_level['id']
                   ), $rules );
             }
         break;
@@ -384,6 +387,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                       'css_property' => 'width',
                       'selector' => $selector,
                       'is_important' => $important,
+                      'level_id' => $parent_level['id']
                   ), $rules );
             }
         break;
@@ -425,12 +429,14 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                       'css_property' => 'margin-top',
                       'selector' => $selector,
                       'is_important' => $important,
+                      'level_id' => $parent_level['id']
                   ), $rules );
                   $rules = sek_set_mq_css_rules(array(
                       'value' => $ready_value,
                       'css_property' => 'margin-bottom',
                       'selector' => $selector,
                       'is_important' => $important,
+                      'level_id' => $parent_level['id']
                   ), $rules );
             }
         break;

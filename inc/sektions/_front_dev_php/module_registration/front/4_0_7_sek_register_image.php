@@ -288,7 +288,8 @@ function sek_add_css_rules_for_czr_image_module( $rules, $complete_modul_model )
                       'value' => $ready_value,
                       'css_property' => 'width',
                       'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner img',
-                      'is_important' => false
+                      'is_important' => false,
+                      'level_id' => $complete_modul_model['id']
                   ), $rules );
             }
         }//if

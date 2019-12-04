@@ -850,7 +850,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items.sek-list-layout article > *:not(:last-child):not(.sek-pg-thumbnail)',
             '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items.sek-grid-layout article > *:not(:last-child)'
         )),
-        'is_important' => false
+        'is_important' => false,
+        'level_id' => $complete_modul_model['id']
     ), $rules );
 
 
@@ -881,7 +882,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
         'value' => $content_padding_ready_val,
         'css_property' => 'padding',
         'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items article .sek-pg-content',
-        'is_important' => false
+        'is_important' => false,
+        'level_id' => $complete_modul_model['id']
     ), $rules );
 
 
@@ -917,7 +919,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             'value' => $img_column_width_ready_value,
             'css_property' => array( 'grid-template-columns', '-ms-grid-columns' ),
             'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-list-layout article.sek-has-thumb',
-            'is_important' => false
+            'is_important' => false,
+            'level_id' => $complete_modul_model['id']
         ), $rules );
     }
 
@@ -951,7 +954,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             'value' => $img_height_ready_value,
             'css_property' => 'padding-top',
             'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-thumb-custom-height figure a',
-            'is_important' => false
+            'is_important' => false,
+            'level_id' => $complete_modul_model['id']
         ), $rules );
     }
 
@@ -991,7 +995,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
                   '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-layout',
                   '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-list-layout article.sek-has-thumb'
               ] ),
-              'is_important' => false
+              'is_important' => false,
+              'level_id' => $complete_modul_model['id']
           ), $rules );
 
           // Vertical Gap => common to list and grid layout
@@ -1022,7 +1027,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
               'value' => $v_gap_ready_value,
               'css_property' => 'grid-row-gap',
               'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items',
-              'is_important' => false
+              'is_important' => false,
+              'level_id' => $complete_modul_model['id']
           ), $rules );
     }
     return $rules;
