@@ -193,6 +193,11 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     // @return string
     // @param module_options is the module level "value" property. @see tmpl/modules/simple_form_module_tmpl.php
     function get_simple_form_html( $module_model ) {
+        // sek_error_log('$module_model ?', $module_model );
+        // sek_error_log('$this->fields ?', $this->fields );
+        // sek_error_log('$this->form ?', $this->form );
+        // sek_error_log('$this->mailer ?', $this->mailer );
+        // sek_error_log('$_POST ?', $_POST );
         $html         = '';
         //set the form composition according to the user's options
         $form_composition = $this->_set_form_composition( $this->form_composition, $module_model );
@@ -208,10 +213,17 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
           <?php
             $echo_form = true;
             // When loading the page after a send attempt, focus on the module html element with a javascript animation
+            // In this case, don't echo the form, but only the user defined message which should be displayed after submitting the form
             if ( ! is_null( $this->mailer ) ) {
-                if ( 'sent' == $status_code = $this->mailer->get_status() ) {
+                // Make sure we target the right form if several forms are displayed in a page
+                $current_form_has_been_submitted = isset( $_POST['nimble_level_id'] ) && $_POST['nimble_level_id'] === $module_id;
+
+                if ( 'sent' == $this->mailer->get_status() && $current_form_has_been_submitted ) {
                     $echo_form = false;
                 }
+            }
+
+            if ( !$echo_form ) {
                 ?>
                   <script type="text/javascript">
                       jQuery( function($) {
@@ -228,7 +240,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                   </script>
                 <?php
 
-                $message = $this->mailer->get_message( $status_code, $module_model );
+                $message = $this->mailer->get_message( $this->mailer->get_status(), $module_model );
                 if ( !empty($message) ) {
                     $class = 'sek-mail-failure';
                     switch( $this->mailer->get_status() ) {
@@ -244,8 +256,8 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                     }
                     printf( '<div class="sek-form-message %1$s">%2$s</div>', $class, $message );
                 }
-            }
-            if ( $echo_form ) {
+            } else {
+                // If we're in the regular case ( not after submission ), echo the form
                 echo $form;
             }
           ?>
