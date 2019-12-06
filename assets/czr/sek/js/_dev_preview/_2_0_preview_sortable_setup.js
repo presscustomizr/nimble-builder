@@ -121,6 +121,17 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             },//setupSortable()
 
 
+            // Print all level ui
+            // fixes slowness when dragging @see https://github.com/presscustomizr/nimble-builder/issues/521
+            printAllLevelsUi : function() {
+                  var self = this;
+                  self.cachedElements.$body.find( '[data-sek-level]' ).each( function() {
+                        self.printLevelUI( $(this) );
+                        $(this).find('.sek-dyn-ui-wrapper').stop( true, true ).show();
+                  });
+            },
+
+
             makeSektionsSortableInLocation : function( locationId ) {
                   var self = this;
                   var from_location, to_location, startOrder = [], newOrder = [], defaults;
@@ -151,10 +162,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                               // Print all level ui
                               // fixes slowness when dragging @see https://github.com/presscustomizr/nimble-builder/issues/521
-                              $( 'body' ).find( '[data-sek-level]' ).each( function() {
-                                    self.printLevelUI( $(this) );
-                                    $(this) .find('.sek-dyn-ui-wrapper').stop( true, true ).show();
-                              });
+                              self.printAllLevelsUi();
 
                               // store the startOrder
                               // $sourceLocation.children( '[data-sek-level="section"]' ).each( function() {
@@ -348,6 +356,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     self.errare( 'column sortable => startOrder should not be empty' );
                                     return;
                               }
+
+                              // Print all level ui
+                              // fixes slowness when dragging @see https://github.com/presscustomizr/nimble-builder/issues/553
+                              self.printAllLevelsUi();
                         },
 
                         stop : function( event, ui ) {
@@ -492,6 +504,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     self.errare( 'makeModulesSortableInColumn => startOrder should not be empty' );
                                     return;
                               }
+
+                              // Print all level ui
+                              // fixes slowness when dragging @see https://github.com/presscustomizr/nimble-builder/issues/521
+                              self.printAllLevelsUi();
                         },
 
                         stop : function( event, ui ) {
