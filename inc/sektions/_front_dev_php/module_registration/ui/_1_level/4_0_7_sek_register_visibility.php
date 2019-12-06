@@ -15,8 +15,8 @@ function sek_get_module_params_for_sek_level_visibility_module() {
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'refresh_markup' => true,
-                    'refresh_stylesheet' => false
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
                 ),
                 'tablets' => array(
                     'input_type'  => 'nimblecheck',
@@ -24,8 +24,8 @@ function sek_get_module_params_for_sek_level_visibility_module() {
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'refresh_markup' => true,
-                    'refresh_stylesheet' => false
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
                 ),
                 'mobiles' => array(
                     'input_type'  => 'nimblecheck',
@@ -33,8 +33,8 @@ function sek_get_module_params_for_sek_level_visibility_module() {
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'refresh_markup' => true,
-                    'refresh_stylesheet' => false,
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true,
                     'notice_after' => __('Note that those options are not applied during the live customization of your site, but only when the changes are published.', 'text_domain')
                 ),
             )
