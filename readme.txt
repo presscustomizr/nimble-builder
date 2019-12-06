@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.3
-Stable tag: 1.10.0
+Stable tag: 1.10.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,15 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.10.0 =
-Version 1.10 greatly improves the CSS rules generated when user define custom breakpoints, globally, for sections and nested sections. It fixes issues when setting level visibilities by devices, or when using by-device CSS rules like horizontal centering, which are now applied with better CSS media queries.
+= 1.10.1 =
+Fixes a bug occuring when several contact forms are used on the same page. Various improvements of the UI when customizing.
 
 == Changelog ==
+= 1.10.1 December 6th 2019 =
+* fixed : minor bug introduced when implementing better level visibility options in 1.10.0
+* fixed : slowness when dragging modules and columns from one place to another
+* fixed : [contact form] in a page with several contact forms, post submission actions should target only the submitted form
+
 = 1.10.0 December 4th 2019 =
 * fixed : columns layout on mobile => nested section should inherit the custom breakpoint of the parent
 * fixed : level visibility options should be consistent with user defined breakpoints
