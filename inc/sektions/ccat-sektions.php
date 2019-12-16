@@ -7988,7 +7988,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
                 ),
                 'h_alignment_css'        => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'              => __( 'Horizontal alignment', 'text_doma' ),
+                    'title'              => __( 'Horizontal text alignment', 'text_doma' ),
                     'default'     => array( 'desktop' => 'left' ),
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
@@ -13968,6 +13968,24 @@ function sek_get_module_params_for_czr_shortcode_module() {
                     'refresh_markup'    => '.sek-shortcode-content',
                     'notice_before' => __('A shortcode is a WordPress-specific code that lets you display predefined items. For example a trivial shortcode for a gallery looks like this [gallery].') . '<br/><br/>',
                     'notice_after' => __('You may use some html tags in the "text" tab of the editor.', 'text_domain_to_be_replaced')
+                ),
+                'refresh_button' => array(
+                    'input_type'  => 'refresh_preview_button',
+                    'title'       => __( '' , 'text_doma' ),
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => false,
+                ),
+                'h_alignment_css'        => array(
+                    'input_type'  => 'horizAlignmentWithDeviceSwitcher',
+                    'title'              => __( 'Horizontal alignment', 'text_doma' ),
+                    'default'     => array( 'desktop' => 'center' ),
+                    'refresh_markup'     => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier'     => 'h_flex_alignment',
+                    'css_selectors'      => '.sek-module-inner > .sek-shortcode-content',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                    'html_before' => '<hr/><h3>' . __('ALIGNMENT') .'</h3>'
                 )
             )
         ),

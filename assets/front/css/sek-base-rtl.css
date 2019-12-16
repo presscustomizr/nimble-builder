@@ -2177,6 +2177,11 @@ button.sek-btn,
   transition: all 0.2s ease-in-out;
 }
 
+.sek-column-inner [data-sek-module-type="czr_img_slider_module"] {
+  width: calc(100% + 20px);
+  max-width: calc(100% + 20px);
+}
+
 [data-sek-module-type="czr_img_slider_module"] {
   /* SWIPER BULLETS */
   /* SWIPER ARROWS */
@@ -2522,6 +2527,13 @@ button.sek-btn,
 
 .sek-accord-wrapper .sek-accord-item[data-sek-expanded="false"] > .sek-accord-content {
   display: none;
+}
+
+[data-sek-module-type="czr_shortcode_module"] .sek-shortcode-content {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
 }
 
 .sek-module-inner {

@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.3
-Stable tag: 1.10.1
+Stable tag: 1.10.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,15 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.10.1 =
-Fixes a bug occuring when several contact forms are used on the same page. Various improvements of the UI when customizing.
+= 1.10.2 =
+Fixed images not filling entire column's width in the [carousel module]. Various improvements brought to the [shortcode module], in particular an horizontal alignment option.
 
 == Changelog ==
+= 1.10.2 December 16th 2019 =
+* fixed : [Image carousel] fix images not filling entire column's width
+* added : [Shortcode module] added a refresh preview button below text field
+* added : [Shortcode module] Add horizontal centering
+
 = 1.10.1 December 6th 2019 =
 * fixed : minor bug introduced when implementing better level visibility options in 1.10.0
 * fixed : slowness when dragging modules and columns from one place to another

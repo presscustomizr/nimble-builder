@@ -1717,6 +1717,17 @@ function sek_print_nimble_input_templates() {
         </div>
       </script>
 
+      <?php
+      /* ------------------------------------------------------------------------- *
+       *  REFRESH PREVIEW BUTTON
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___refresh_preview_button">
+        <div class="sek-button-choice-wrapper">
+          <input data-czrtype="{{data.input_id}}" type="hidden"/>
+          <button type="button" aria-pressed="false" class="sek-refresh-button sek-float-right button button-primary" title="<?php _e('Refresh preview', 'text_doma'); ?>"><?php _e('Refresh preview', 'text_doma'); ?></button>
+        </div>
+      </script>
 
       <?php
       /* ------------------------------------------------------------------------- *
