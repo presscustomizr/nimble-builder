@@ -251,6 +251,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_7_selects_input.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_8_category_picker_input.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_1_9_grid_layout_input.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/inputs/_8_2_0_refresh_button.js',
 
       // Content pickers
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js',

@@ -20,7 +20,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
                 ),
                 'h_alignment_css'        => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'              => __( 'Horizontal alignment', 'text_doma' ),
+                    'title'              => __( 'Horizontal text alignment', 'text_doma' ),
                     'default'     => array( 'desktop' => 'left' ),
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,

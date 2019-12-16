@@ -1,0 +1,9 @@
+[data-sek-module-type="czr_shortcode_module"] .sek-shortcode-content {
+    // implemented to fix : https://github.com/presscustomizr/nimble-builder/issues/565
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
