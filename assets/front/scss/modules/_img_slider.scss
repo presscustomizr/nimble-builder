@@ -1,3 +1,10 @@
+.sek-column-inner [data-sek-module-type="czr_img_slider_module"] {
+    // enlarge the module wrapper to "compensate" the parent column paddings
+    // @fixes https://github.com/presscustomizr/nimble-builder/issues/566
+    width: calc(100% + 20px);
+    max-width: calc(100% + 20px);
+}
+
 [data-sek-module-type="czr_img_slider_module"] {
     .swiper-container {
       width: 100%;
@@ -222,4 +229,4 @@
     // @media only screen and (max-width: 719px) {
     //     .sek-swiper-nav { display: none;}
     // }
-}
+}//[data-sek-module-type="czr_img_slider_module"]
