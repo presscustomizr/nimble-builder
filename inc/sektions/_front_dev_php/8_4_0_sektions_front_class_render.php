@@ -1078,11 +1078,24 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
         // fired @filter get_header()
+        // Nimble will use an overridable template if a local or global header/footer is used
+        // template located in /tmpl/header/ or /tmpl/footer
+        // developers can override this template from a theme with a file that has this path : 'nimble_templates/header/nimble_header_tmpl.php
         function sek_maybe_set_local_nimble_header( $header_name ) {
             // if Nimble_Manager()->has_local_header_footer || Nimble_Manager()->has_global_header_footer
             if ( sek_page_uses_nimble_header_footer() ) {
                 // load the Nimble template which includes a call to wp_head()
-                load_template( NIMBLE_BASE_PATH . '/tmpl/header/nimble_header_tmpl.php', false );
+                $template_file_name_with_php_extension = 'nimble_header_tmpl.php';
+                $template_path = apply_filters( 'nimble_set_header_template_path', NIMBLE_BASE_PATH . "/tmpl/header/{$template_file_name_with_php_extension}", $template_file_name_with_php_extension );
+
+                // dec 2019 : can be overriden from a child theme
+                // see https://github.com/presscustomizr/nimble-builder/issues/568
+                $overriden_template_path = sek_maybe_get_overriden_local_template_path( array( 'file_name' => $template_file_name_with_php_extension, 'folder' => 'header' ) );
+                if ( !empty( $overriden_template_path ) ) {
+                    $template_path = $overriden_template_path;
+                }
+
+                load_template( $template_path, false );
 
                 // do like in wp core get_header()
                 $templates = array();
@@ -1106,11 +1119,24 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         }
 
         // fired @filter get_footer()
+        // Nimble will use an overridable template if a local or global header/footer is used
+        // template located in /tmpl/header/ or /tmpl/footer
+        // developers can override this template from a theme with a file that has this path : 'nimble_templates/footer/nimble_footer_tmpl.php
         function sek_maybe_set_local_nimble_footer( $footer_name ) {
             // if Nimble_Manager()->has_local_header_footer || Nimble_Manager()->has_global_header_footer
             if ( sek_page_uses_nimble_header_footer() ) {
                 // load the Nimble template which includes a call to wp_footer()
-                load_template( NIMBLE_BASE_PATH . '/tmpl/footer/nimble_footer_tmpl.php', false );
+                $template_file_name_with_php_extension = 'nimble_footer_tmpl.php';
+                $template_path = apply_filters( 'nimble_set_header_template_path', NIMBLE_BASE_PATH . "/tmpl/footer/{$template_file_name_with_php_extension}", $template_file_name_with_php_extension );
+
+                // dec 2019 : can be overriden from a child theme
+                // see https://github.com/presscustomizr/nimble-builder/issues/568
+                $overriden_template_path = sek_maybe_get_overriden_local_template_path( array( 'file_name' => $template_file_name_with_php_extension, 'folder' => 'footer' ) );
+                if ( !empty( $overriden_template_path ) ) {
+                    $template_path = $overriden_template_path;
+                }
+
+                load_template( $template_path, false );
 
                 // do like in wp core get_footer()
                 $templates = array();

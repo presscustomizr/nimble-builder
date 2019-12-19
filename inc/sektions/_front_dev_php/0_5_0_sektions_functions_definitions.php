@@ -870,15 +870,25 @@ function sek_get_theme_template_base_paths() {
 
 // @return path string
 // added for #400
-function sek_maybe_get_overriden_local_template_path( $template_name = '') {
-    if ( empty( $template_name ) )
+// @param params = array(
+//  'file_name' string 'nimble_template.php',
+//  'folder' =>  string 'page-templates', 'header', 'footer'
+// )
+// @param
+function sek_maybe_get_overriden_local_template_path( $params = array() ) {
+    if ( empty( $params ) || ! is_array( $params ))
       return;
+    $params = wp_parse_args( $params, array( 'file_name' => '', 'folder' => 'page-templates' ) );
+
+    if ( ! in_array( $params['folder'] , array( 'page-templates', 'header', 'footer' ) ) )
+      return;
+
     $overriden_template_path = '';
     // try locating this template file by looping through the template paths
     // inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
     foreach( sek_get_theme_template_base_paths() as $path_candidate ) {
-      if( file_exists( $path_candidate . 'page-templates/' . $template_name ) ) {
-        $overriden_template_path = $path_candidate . 'page-templates/' . $template_name;
+      if( file_exists( $path_candidate . $params['folder'] . '/' . $params['file_name'] ) ) {
+        $overriden_template_path = $path_candidate . $params['folder'] . '/' . $params['file_name'];
         break;
       }
     }
@@ -905,7 +915,7 @@ function sek_get_locale_template(){
 
         // Use an override if any
         // Default page tmpl path looks like : NIMBLE_BASE_PATH . "/tmpl/page-template/nimble_template.php",
-        $overriden_template_path = sek_maybe_get_overriden_local_template_path( $template_file_name_with_php_extension );
+        $overriden_template_path = sek_maybe_get_overriden_local_template_path( array( 'file_name' => $template_file_name_with_php_extension, 'folder' => 'page-templates' ) );
         if ( !empty( $overriden_template_path ) ) {
             $template_path = $overriden_template_path;
         }
@@ -978,6 +988,9 @@ function sek_normalize_local_options_with_defaults( $option_name, $raw_module_va
     }
     return $normalized_values;
 }
+
+
+
 
 
 /* ------------------------------------------------------------------------- *
