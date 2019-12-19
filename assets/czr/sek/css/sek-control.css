@@ -742,7 +742,7 @@ div[data-sek-grid-layout].selected {
 }
 
 /* DEVICE SWITCHER */
-.sek-input-device-switcher .sek-switcher:before {
+.sek-input-device-switcher .sek-switcher:before, .sek-mobile-device-icons .sek-switcher:before {
   display: inline-block;
   -webkit-font-smoothing: antialiased;
   font: normal 20px/30px "dashicons";
@@ -754,7 +754,9 @@ div[data-sek-grid-layout].selected {
   top: -5px
 }
 .sek-input-device-switcher .sek-switcher {
-  cursor: pointer;
+    cursor: pointer;
+}
+.sek-input-device-switcher .sek-switcher, .sek-mobile-device-icons .sek-switcher {
   background: transparent;
   border: none;
   padding: 0 1px;
@@ -796,15 +798,15 @@ div[data-sek-grid-layout].selected {
   color: #0073aa;
 }
 
-.sek-input-device-switcher .preview-desktop:before {
+.sek-input-device-switcher .preview-desktop:before, .sek-mobile-device-icons .preview-desktop:before {
   content: "\f472";
 }
 
-.sek-input-device-switcher .preview-tablet:before {
+.sek-input-device-switcher .preview-tablet:before, .sek-mobile-device-icons .preview-tablet:before {
   content: "\f471";
 }
 
-.sek-input-device-switcher .preview-mobile:before {
+.sek-input-device-switcher .preview-mobile:before, .sek-mobile-device-icons .preview-mobile:before {
   content: "\f470";
 }
 
@@ -861,7 +863,7 @@ credits : Gutenberg team @wordpress */
   width: 70%;
 }
 .sek-number-wrapper, .sek-simple-number-wrapper {
-  width: 50px;
+  width: 60px;
   margin-right: 5px;
 }
 .sek-simple-number-wrapper {
