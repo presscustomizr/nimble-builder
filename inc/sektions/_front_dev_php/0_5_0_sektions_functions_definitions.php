@@ -1061,8 +1061,36 @@ function sek_get_global_custom_breakpoint() {
     return intval( $global_breakpoint_data['global-custom-breakpoint'] );
 }
 
+
+// @return bool
+// introduced for https://github.com/presscustomizr/nimble-builder/issues/564
+// Let us know if we need to apply the user defined custom breakpoint to all by-device customizations, like alignment
+// false by default.
+function sek_is_global_custom_breakpoint_applied_to_all_customizations_by_device() {
+    $global_breakpoint_data = sek_get_global_option_value('breakpoint');
+    if ( is_null( $global_breakpoint_data ) || empty( $global_breakpoint_data['global-custom-breakpoint'] ) )
+      return false;
+
+    if ( empty( $global_breakpoint_data[ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $global_breakpoint_data[ 'use-custom-breakpoint'] ) )
+      return false;
+
+    // We need a custom breakpoint > 1
+    if ( intval( $global_breakpoint_data['global-custom-breakpoint'] ) <= 1 )
+      return;
+
+    // apply-to-all option is unchecked by default
+    // returns true when user has checked the apply to all option
+    return array_key_exists('apply-to-all', $global_breakpoint_data ) && sek_booleanize_checkbox_val( $global_breakpoint_data[ 'apply-to-all' ] ) ;
+}
+
+
 // invoked when filtering 'sek_add_css_rules_for__section__options'
-function sek_get_section_custom_breakpoint( $section ) {
+// param 'for_responsive_columns' has been introduced for https://github.com/presscustomizr/nimble-builder/issues/564
+// so we can differentiate when the custom breakpoint is requested for column responsiveness or for css rules generation
+// when for columns, we always apply the custom breakpoint defined by the user
+// otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
+// 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
+function sek_get_section_custom_breakpoint( $section, $for_responsive_columns = false ) {
     if ( ! is_array( $section ) )
       return;
 
@@ -1087,10 +1115,39 @@ function sek_get_section_custom_breakpoint( $section ) {
     if ( $custom_breakpoint < 0 )
       return;
 
-    return $custom_breakpoint;
+    // 1) When the breakpoint is requested for responsive columns, we always return the custom value
+    if ( $for_responsive_columns )
+      return $custom_breakpoint;
+
+    // 2) Otherwise ( other CSS rules generation case, like alignment ) we make sure that user want to apply the custom breakpoint also to other by-device customizations
+    return sek_is_section_custom_breakpoint_applied_to_all_customizations_by_device( $options[ 'breakpoint' ] ) ? $custom_breakpoint : null;
 }
 
 
+// @return bool
+// introduced for https://github.com/presscustomizr/nimble-builder/issues/564
+// Let us know if we need to apply the user defined custom breakpoint to all by-device customizations, like alignment
+// false by default.
+// @param $section_breakpoint_options = array(
+//    'use-custom-breakpoint' => bool
+//    'custom-breakpoint' => int
+//    'apply-to-all' => bool
+// )
+function sek_is_section_custom_breakpoint_applied_to_all_customizations_by_device( $section_breakpoint_options ) {
+    if ( ! is_array( $section_breakpoint_options ) || empty( $section_breakpoint_options ) )
+      return;
+
+    if ( empty( $section_breakpoint_options[ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $section_breakpoint_options[ 'use-custom-breakpoint'] ) )
+      return;
+
+    // We need a custom breakpoint > 1
+    if ( intval( $section_breakpoint_options['custom-breakpoint'] ) <= 1 )
+      return;
+
+    // apply-to-all option is unchecked by default
+    // returns true when user has checked the apply to all option
+    return array_key_exists('apply-to-all', $section_breakpoint_options ) && sek_booleanize_checkbox_val( $section_breakpoint_options[ 'apply-to-all' ] );
+}
 
 
 // Recursive helper
@@ -1109,6 +1166,12 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
 
         'searched_level_id_found' => false,
 
+        // the 'for_responsive_columns' param has been introduced for https://github.com/presscustomizr/nimble-builder/issues/564
+        // so we can differentiate when the custom breakpoint is requested for column responsiveness or for css rules generation
+        // when for columns, we always apply the custom breakpoint defined by the user
+        // otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
+        // 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
+        'for_responsive_columns' => false
     ) );
 
     extract( $params, EXTR_OVERWRITE );
@@ -1151,7 +1214,7 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
           break;
 
         if ( 'section' == $level_data['level'] ) {
-            $section_maybe_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $level_data ) );
+            $section_maybe_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $level_data, $for_responsive_columns ) );
 
             if ( !empty( $level_data['is_nested'] ) && $level_data['is_nested'] ) {
                 $last_nested_section_breakpoint_found = $section_maybe_custom_breakpoint;
@@ -1200,7 +1263,8 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
                 'last_section_breakpoint_found',
                 'last_regular_section_breakpoint_found',
                 'last_nested_section_breakpoint_found',
-                'searched_level_id_found'
+                'searched_level_id_found',
+                'for_responsive_columns'
             );
             $recursive_values = sek_get_closest_section_custom_breakpoint( $recursive_params );
 
@@ -1223,6 +1287,8 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
         'last_nested_section_breakpoint_found'
     );
 }
+
+
 
 
 

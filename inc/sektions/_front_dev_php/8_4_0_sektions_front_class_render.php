@@ -485,7 +485,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     // SETUP THE LEVEL CUSTOM BREAKPOINT CSS CLASS
                     // nested section should inherit the custom breakpoint of the parent
                     // @fixes https://github.com/presscustomizr/nimble-builder/issues/554
-                    $section_custom_breakpoint =  sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $parent_model['id'] ) );
+
+                    // the 'for_responsive_columns' param has been introduced for https://github.com/presscustomizr/nimble-builder/issues/564
+                    // so we can differentiate when the custom breakpoint is requested for column responsiveness or for css rules generation
+                    // when for columns, we always apply the custom breakpoint defined by the user
+                    // otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
+                    // 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
+                    $section_custom_breakpoint =  sek_get_closest_section_custom_breakpoint( array(
+                        'searched_level_id' => $parent_model['id'],
+                        'for_responsive_columns' => true
+                    ));
 
                     $grid_column_class = "sek-col-{$col_suffix}";
                     if ( $section_custom_breakpoint >= 1 ) {

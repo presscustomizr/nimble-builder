@@ -141,7 +141,7 @@ function sek_write_global_custom_section_widths() {
             'value' => $max_width_value,
             'css_property' => 'max-width',
             'selector' => $selector,
-            'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+            'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
         ), $rules );
 
         // when customizing the inner section width, we need to reset the default padding rules for .sek-container-fluid {padding-right:10px; padding-left:10px}
@@ -151,13 +151,13 @@ function sek_write_global_custom_section_widths() {
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-left',
                 'selector' => '[data-sek-level="section"] > .sek-container-fluid',
-                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
             ), $rules );
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-right',
                 'selector' => '[data-sek-level="section"] > .sek-container-fluid',
-                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
             ), $rules );
         }
 
@@ -166,7 +166,7 @@ function sek_write_global_custom_section_widths() {
                 'value' => $margin_value,
                 'css_property' => 'margin',
                 'selector' => $selector,
-                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
             ), $rules );
         }
     }//foreach

@@ -14,11 +14,11 @@ function sek_get_module_params_for_sek_global_breakpoint() {
             'item-inputs' => array(
                 'use-custom-breakpoint' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Use a global custom breakpoint for the vertical reorganization of columns', 'text_doma'),
+                    'title'       => __('Use a global custom breakpoint for responsive columns', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_before_title' => __( 'This is the breakpoint under which columns are reorganized vertically. The default global breakpoint is 768px. A custom breakpoint can also be set for each section.', 'text_doma')
+                    'notice_before_title' => __( 'This is the viewport width from which columns are rearranged vertically. The default global breakpoint is 768px. A custom breakpoint can also be set for each section.', 'text_doma')
                 ),
                 'global-custom-breakpoint'  => array(
                     'input_type'  => 'range_simple',
@@ -32,7 +32,18 @@ function sek_get_module_params_for_sek_global_breakpoint() {
                     //'css_identifier' => 'letter_spacing',
                     'width-100'   => true,
                     'title_width' => 'width-100'
-                )//0,
+                ),
+                'apply-to-all' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Apply this breakpoint to all by-device customizations', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => sprintf(
+                        __( '%s When enabled, this custom breakpoint is applied not only to responsive columns but also to all by-device customizations, like alignment for example.', 'text_doma'),
+                        '<span class="sek-mobile-device-icons"><i class="sek-switcher preview-desktop"></i>&nbsp;<i class="sek-switcher preview-tablet"></i>&nbsp;<i class="sek-switcher preview-mobile"></i></span>'
+                    )
+                ),
             )
         )//tmpl
     );

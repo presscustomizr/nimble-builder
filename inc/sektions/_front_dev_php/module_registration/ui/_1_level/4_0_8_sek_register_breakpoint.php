@@ -12,7 +12,7 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
             'item-inputs' => array(
                   'use-custom-breakpoint' => array(
                       'input_type'  => 'nimblecheck',
-                      'title'       => __('Use a custom breakpoint for the vertical reorganization of columns', 'text_doma'),
+                      'title'       => __('Use a custom breakpoint for responsive columns', 'text_doma'),
                       'default'     => 0,
                       'title_width' => 'width-80',
                       'input_width' => 'width-20',
@@ -31,8 +31,19 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
                       //'css_identifier' => 'letter_spacing',
                       'width-100'   => true,
                       'title_width' => 'width-100',
-                      'notice_after' => __( 'This is the breakpoint under which columns are reorganized vertically. The default breakpoint is 768px.', 'text_doma')
+                      'notice_after' => __( 'This is the viewport width from which columns are rearranged vertically. The default breakpoint is 768px.', 'text_doma')
                   ),//0,
+                  'apply-to-all' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Apply this breakpoint to all by-device customizations', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => sprintf(
+                        __( '%s When enabled, this custom breakpoint is applied not only to responsive columns but also to all by-device customizations, like alignment for example.', 'text_doma'),
+                        '<span class="sek-mobile-device-icons"><i class="sek-switcher preview-desktop"></i>&nbsp;<i class="sek-switcher preview-tablet"></i>&nbsp;<i class="sek-switcher preview-mobile"></i></span>'
+                    )
+                  ),
                   'reverse-col-at-breakpoint' => array(
                       'input_type'  => 'nimblecheck',
                       'title'       => __('Reverse the columns direction on devices smaller than the breakpoint.', 'text_doma'),
@@ -41,7 +52,7 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
                       'input_width' => 'width-20',
                       'refresh_markup' => true,
                       'refresh_stylesheet' => true
-                  ),
+                  )
             )
         )//tmpl
     );
@@ -58,8 +69,16 @@ function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
     // Order :
     // 1) custom breakpoint set on a nested section
     // 2) custom breakpoint set on a regular section
-    //sek_error_log('WE SEARCH FOR => ' . $level_id );
-    $custom_breakpoint = sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $section['id'] ) );
+
+    // the 'for_responsive_columns' param has been introduced for https://github.com/presscustomizr/nimble-builder/issues/564
+    // so we can differentiate when the custom breakpoint is requested for column responsiveness or for css rules generation
+    // when for columns, we always apply the custom breakpoint defined by the user
+    // otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
+    // 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
+    $custom_breakpoint = sek_get_closest_section_custom_breakpoint( array(
+        'searched_level_id' => $section['id'],
+        'for_responsive_columns' => true
+    ));
     if ( $custom_breakpoint > 0 ) {
         $col_number = ( array_key_exists( 'collection', $section ) && is_array( $section['collection'] ) ) ? count( $section['collection'] ) : 1;
         $col_number = 12 < $col_number ? 12 : $col_number;
