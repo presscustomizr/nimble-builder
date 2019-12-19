@@ -100,6 +100,8 @@ function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
             $default_md_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];
         }
         $breakpoint = $custom_breakpoint > 0 ? $custom_breakpoint : $default_md_breakpoint;
+        $breakpoint = $breakpoint - 1;//fixes https://github.com/presscustomizr/nimble-builder/issues/559
+
         $responsive_css_rules = "-ms-flex-direction: column-reverse;flex-direction: column-reverse;";
         $rules[] = array(
             'selector' => '[data-sek-id="'.$section['id'].'"] .sek-sektion-inner',
