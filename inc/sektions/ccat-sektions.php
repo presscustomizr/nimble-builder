@@ -870,15 +870,25 @@ function sek_get_theme_template_base_paths() {
 
 // @return path string
 // added for #400
-function sek_maybe_get_overriden_local_template_path( $template_name = '') {
-    if ( empty( $template_name ) )
+// @param params = array(
+//  'file_name' string 'nimble_template.php',
+//  'folder' =>  string 'page-templates', 'header', 'footer'
+// )
+// @param
+function sek_maybe_get_overriden_local_template_path( $params = array() ) {
+    if ( empty( $params ) || ! is_array( $params ))
       return;
+    $params = wp_parse_args( $params, array( 'file_name' => '', 'folder' => 'page-templates' ) );
+
+    if ( ! in_array( $params['folder'] , array( 'page-templates', 'header', 'footer' ) ) )
+      return;
+
     $overriden_template_path = '';
     // try locating this template file by looping through the template paths
     // inspîred from /wp-content/plugins/easy-digital-downloads/includes/template-functions.php
     foreach( sek_get_theme_template_base_paths() as $path_candidate ) {
-      if( file_exists( $path_candidate . 'page-templates/' . $template_name ) ) {
-        $overriden_template_path = $path_candidate . 'page-templates/' . $template_name;
+      if( file_exists( $path_candidate . $params['folder'] . '/' . $params['file_name'] ) ) {
+        $overriden_template_path = $path_candidate . $params['folder'] . '/' . $params['file_name'];
         break;
       }
     }
@@ -905,7 +915,7 @@ function sek_get_locale_template(){
 
         // Use an override if any
         // Default page tmpl path looks like : NIMBLE_BASE_PATH . "/tmpl/page-template/nimble_template.php",
-        $overriden_template_path = sek_maybe_get_overriden_local_template_path( $template_file_name_with_php_extension );
+        $overriden_template_path = sek_maybe_get_overriden_local_template_path( array( 'file_name' => $template_file_name_with_php_extension, 'folder' => 'page-templates' ) );
         if ( !empty( $overriden_template_path ) ) {
             $template_path = $overriden_template_path;
         }
@@ -978,6 +988,9 @@ function sek_normalize_local_options_with_defaults( $option_name, $raw_module_va
     }
     return $normalized_values;
 }
+
+
+
 
 
 /* ------------------------------------------------------------------------- *
@@ -1061,8 +1074,36 @@ function sek_get_global_custom_breakpoint() {
     return intval( $global_breakpoint_data['global-custom-breakpoint'] );
 }
 
+
+// @return bool
+// introduced for https://github.com/presscustomizr/nimble-builder/issues/564
+// Let us know if we need to apply the user defined custom breakpoint to all by-device customizations, like alignment
+// false by default.
+function sek_is_global_custom_breakpoint_applied_to_all_customizations_by_device() {
+    $global_breakpoint_data = sek_get_global_option_value('breakpoint');
+    if ( is_null( $global_breakpoint_data ) || empty( $global_breakpoint_data['global-custom-breakpoint'] ) )
+      return false;
+
+    if ( empty( $global_breakpoint_data[ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $global_breakpoint_data[ 'use-custom-breakpoint'] ) )
+      return false;
+
+    // We need a custom breakpoint > 1
+    if ( intval( $global_breakpoint_data['global-custom-breakpoint'] ) <= 1 )
+      return;
+
+    // apply-to-all option is unchecked by default
+    // returns true when user has checked the apply to all option
+    return array_key_exists('apply-to-all', $global_breakpoint_data ) && sek_booleanize_checkbox_val( $global_breakpoint_data[ 'apply-to-all' ] ) ;
+}
+
+
 // invoked when filtering 'sek_add_css_rules_for__section__options'
-function sek_get_section_custom_breakpoint( $section ) {
+// param 'for_responsive_columns' has been introduced for https://github.com/presscustomizr/nimble-builder/issues/564
+// so we can differentiate when the custom breakpoint is requested for column responsiveness or for css rules generation
+// when for columns, we always apply the custom breakpoint defined by the user
+// otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
+// 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
+function sek_get_section_custom_breakpoint( $section, $for_responsive_columns = false ) {
     if ( ! is_array( $section ) )
       return;
 
@@ -1087,10 +1128,39 @@ function sek_get_section_custom_breakpoint( $section ) {
     if ( $custom_breakpoint < 0 )
       return;
 
-    return $custom_breakpoint;
+    // 1) When the breakpoint is requested for responsive columns, we always return the custom value
+    if ( $for_responsive_columns )
+      return $custom_breakpoint;
+
+    // 2) Otherwise ( other CSS rules generation case, like alignment ) we make sure that user want to apply the custom breakpoint also to other by-device customizations
+    return sek_is_section_custom_breakpoint_applied_to_all_customizations_by_device( $options[ 'breakpoint' ] ) ? $custom_breakpoint : null;
 }
 
 
+// @return bool
+// introduced for https://github.com/presscustomizr/nimble-builder/issues/564
+// Let us know if we need to apply the user defined custom breakpoint to all by-device customizations, like alignment
+// false by default.
+// @param $section_breakpoint_options = array(
+//    'use-custom-breakpoint' => bool
+//    'custom-breakpoint' => int
+//    'apply-to-all' => bool
+// )
+function sek_is_section_custom_breakpoint_applied_to_all_customizations_by_device( $section_breakpoint_options ) {
+    if ( ! is_array( $section_breakpoint_options ) || empty( $section_breakpoint_options ) )
+      return;
+
+    if ( empty( $section_breakpoint_options[ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $section_breakpoint_options[ 'use-custom-breakpoint'] ) )
+      return;
+
+    // We need a custom breakpoint > 1
+    if ( intval( $section_breakpoint_options['custom-breakpoint'] ) <= 1 )
+      return;
+
+    // apply-to-all option is unchecked by default
+    // returns true when user has checked the apply to all option
+    return array_key_exists('apply-to-all', $section_breakpoint_options ) && sek_booleanize_checkbox_val( $section_breakpoint_options[ 'apply-to-all' ] );
+}
 
 
 // Recursive helper
@@ -1109,6 +1179,12 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
 
         'searched_level_id_found' => false,
 
+        // the 'for_responsive_columns' param has been introduced for https://github.com/presscustomizr/nimble-builder/issues/564
+        // so we can differentiate when the custom breakpoint is requested for column responsiveness or for css rules generation
+        // when for columns, we always apply the custom breakpoint defined by the user
+        // otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
+        // 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
+        'for_responsive_columns' => false
     ) );
 
     extract( $params, EXTR_OVERWRITE );
@@ -1151,7 +1227,7 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
           break;
 
         if ( 'section' == $level_data['level'] ) {
-            $section_maybe_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $level_data ) );
+            $section_maybe_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $level_data, $for_responsive_columns ) );
 
             if ( !empty( $level_data['is_nested'] ) && $level_data['is_nested'] ) {
                 $last_nested_section_breakpoint_found = $section_maybe_custom_breakpoint;
@@ -1200,7 +1276,8 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
                 'last_section_breakpoint_found',
                 'last_regular_section_breakpoint_found',
                 'last_nested_section_breakpoint_found',
-                'searched_level_id_found'
+                'searched_level_id_found',
+                'for_responsive_columns'
             );
             $recursive_values = sek_get_closest_section_custom_breakpoint( $recursive_params );
 
@@ -1223,6 +1300,8 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
         'last_nested_section_breakpoint_found'
     );
 }
+
+
 
 
 
@@ -3940,13 +4019,13 @@ function sek_set_mq_css_rules( $params, $rules ) {
     // since https://github.com/presscustomizr/nimble-builder/issues/552,
     // we need the parent_level id ( <=> the level on which the CSS rule is applied ) to determine if there's any inherited custom breakpoint to use
     // Exceptions :
-    // - when generating media queries for local options, there level_id is set to '_excluded_from_section_custom_breakpoint_', @see sek_add_raw_local_widths_css()
+    // - when generating media queries for local options, the level_id is set to '_excluded_from_section_custom_breakpoint_', @see sek_add_raw_local_widths_css()
     if ( '_excluded_from_section_custom_breakpoint_' !== $params['level_id'] ) {
         if ( empty( $params['level_id'] ) ) {
             sek_error_log( __FUNCTION__ . ' => missing level id, needed to determine if there is a custom breakpoint to use', $params );
         } else {
             $level_id = $params['level_id'];
-            $tablet_breakpoint = sek_get_user_defined_tablet_breakpoint( $level_id );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
+            $tablet_breakpoint = sek_get_user_defined_tablet_breakpoint_for_css_rules( $level_id );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
 
             // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
             $mobile_breakpoint = $mobile_breakpoint >= $tablet_breakpoint ? $tablet_breakpoint : $mobile_breakpoint;
@@ -4064,13 +4143,13 @@ function sek_set_mq_css_rules_supporting_vendor_prefixes( $params, $rules ) {
     // since https://github.com/presscustomizr/nimble-builder/issues/552,
     // we need the parent_level id ( <=> the level on which the CSS rule is applied ) to determine if there's any inherited custom breakpoint to use
     // Exceptions :
-    // - when generating media queries for local options, there level_id is set to '_excluded_from_section_custom_breakpoint_', @see sek_add_raw_local_widths_css()
+    // - when generating media queries for local options, the level_id is set to '_excluded_from_section_custom_breakpoint_', @see sek_add_raw_local_widths_css()
     if ( '_excluded_from_section_custom_breakpoint_' !== $params['level_id'] ) {
         if ( empty( $params['level_id'] ) ) {
             sek_error_log( __FUNCTION__ . ' => missing level id, needed to determine if there is a custom breakpoint to use', $params );
         } else {
             $level_id = $params['level_id'];
-            $tablet_breakpoint = sek_get_user_defined_tablet_breakpoint( $level_id );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
+            $tablet_breakpoint = sek_get_user_defined_tablet_breakpoint_for_css_rules( $level_id );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
 
             // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
             $mobile_breakpoint = $mobile_breakpoint >= $tablet_breakpoint ? $tablet_breakpoint : $mobile_breakpoint;
@@ -4114,7 +4193,7 @@ function sek_set_mq_css_rules_supporting_vendor_prefixes( $params, $rules ) {
 // BREAKPOINT HELPER
 // A custom breakpoint can be set globally or by section
 // It replaces the default tablet breakpoint ( 768 px )
-function sek_get_user_defined_tablet_breakpoint( $level_id = '' ) {
+function sek_get_user_defined_tablet_breakpoint_for_css_rules( $level_id = '' ) {
     //sek_error_log('ALORS CLOSEST PARENT SECTION MODEL ?' . $level_id , sek_get_closest_section_custom_breakpoint( $level_id ) );
 
     // define a default breakpoint : 768
@@ -4140,10 +4219,13 @@ function sek_get_user_defined_tablet_breakpoint( $level_id = '' ) {
     if ( $closest_section_custom_breakpoint >= 1 ) {
         $tablet_breakpoint = $closest_section_custom_breakpoint;
     } else {
-        // Is there a global custom breakpoint set ?
-        $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
-        if ( $global_custom_breakpoint >= 1 ) {
-            $tablet_breakpoint = $global_custom_breakpoint;
+        // 1) Is there a global custom breakpoint set ?
+        // 2) shall we apply this global custom breakpoint to all customizations or only to responsive columns ? https://github.com/presscustomizr/nimble-builder/issues/564
+        if ( sek_is_global_custom_breakpoint_applied_to_all_customizations_by_device() ) {
+            $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
+            if ( $global_custom_breakpoint >= 1 ) {
+                $tablet_breakpoint = $global_custom_breakpoint;
+            }
         }
     }
     return intval( $tablet_breakpoint );
@@ -6638,7 +6720,7 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
             'item-inputs' => array(
                   'use-custom-breakpoint' => array(
                       'input_type'  => 'nimblecheck',
-                      'title'       => __('Use a custom breakpoint for the vertical reorganization of columns', 'text_doma'),
+                      'title'       => __('Use a custom breakpoint for responsive columns', 'text_doma'),
                       'default'     => 0,
                       'title_width' => 'width-80',
                       'input_width' => 'width-20',
@@ -6657,8 +6739,19 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
                       //'css_identifier' => 'letter_spacing',
                       'width-100'   => true,
                       'title_width' => 'width-100',
-                      'notice_after' => __( 'This is the breakpoint under which columns are reorganized vertically. The default breakpoint is 768px.', 'text_doma')
+                      'notice_after' => __( 'This is the viewport width from which columns are rearranged vertically. The default breakpoint is 768px.', 'text_doma')
                   ),//0,
+                  'apply-to-all' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Apply this breakpoint to all by-device customizations', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => sprintf(
+                        __( '%s When enabled, this custom breakpoint is applied not only to responsive columns but also to all by-device customizations, like alignment for example.', 'text_doma'),
+                        '<span class="sek-mobile-device-icons"><i class="sek-switcher preview-desktop"></i>&nbsp;<i class="sek-switcher preview-tablet"></i>&nbsp;<i class="sek-switcher preview-mobile"></i></span>'
+                    )
+                  ),
                   'reverse-col-at-breakpoint' => array(
                       'input_type'  => 'nimblecheck',
                       'title'       => __('Reverse the columns direction on devices smaller than the breakpoint.', 'text_doma'),
@@ -6667,7 +6760,7 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
                       'input_width' => 'width-20',
                       'refresh_markup' => true,
                       'refresh_stylesheet' => true
-                  ),
+                  )
             )
         )//tmpl
     );
@@ -6684,8 +6777,16 @@ function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
     // Order :
     // 1) custom breakpoint set on a nested section
     // 2) custom breakpoint set on a regular section
-    //sek_error_log('WE SEARCH FOR => ' . $level_id );
-    $custom_breakpoint = sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $section['id'] ) );
+
+    // the 'for_responsive_columns' param has been introduced for https://github.com/presscustomizr/nimble-builder/issues/564
+    // so we can differentiate when the custom breakpoint is requested for column responsiveness or for css rules generation
+    // when for columns, we always apply the custom breakpoint defined by the user
+    // otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
+    // 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
+    $custom_breakpoint = sek_get_closest_section_custom_breakpoint( array(
+        'searched_level_id' => $section['id'],
+        'for_responsive_columns' => true
+    ));
     if ( $custom_breakpoint > 0 ) {
         $col_number = ( array_key_exists( 'collection', $section ) && is_array( $section['collection'] ) ) ? count( $section['collection'] ) : 1;
         $col_number = 12 < $col_number ? 12 : $col_number;
@@ -6707,6 +6808,8 @@ function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
             $default_md_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];
         }
         $breakpoint = $custom_breakpoint > 0 ? $custom_breakpoint : $default_md_breakpoint;
+        $breakpoint = $breakpoint - 1;//fixes https://github.com/presscustomizr/nimble-builder/issues/559
+
         $responsive_css_rules = "-ms-flex-direction: column-reverse;flex-direction: column-reverse;";
         $rules[] = array(
             'selector' => '[data-sek-id="'.$section['id'].'"] .sek-sektion-inner',
@@ -6906,7 +7009,7 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
             'value' => $max_width_value,
             'css_property' => 'max-width',
             'selector' => $selector,
-            'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+            'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
         ), $rules );
 
         // when customizing the inner section width, we need to reset the default padding rules for .sek-container-fluid {padding-right:10px; padding-left:10px}
@@ -6916,13 +7019,13 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-left',
                 'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid',
-                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
             ), $rules );
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-right',
                 'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid',
-                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
             ), $rules );
         }
 
@@ -6931,7 +7034,7 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
                 'value' => $margin_value,
                 'css_property' => 'margin',
                 'selector' => $selector,
-                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
             ), $rules );
         }
     }//foreach
@@ -7321,7 +7424,7 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
             'css_property' => 'font-size',
             'selector' => $default_text_selector,
             'is_important' => false,
-            'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+            'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
         ), $rules );
     }
     // Line height
@@ -7470,11 +7573,11 @@ function sek_get_module_params_for_sek_global_breakpoint() {
             'item-inputs' => array(
                 'use-custom-breakpoint' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Use a global custom breakpoint for the vertical reorganization of columns', 'text_doma'),
+                    'title'       => __('Use a global custom breakpoint for responsive columns', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_before_title' => __( 'This is the breakpoint under which columns are reorganized vertically. The default global breakpoint is 768px. A custom breakpoint can also be set for each section.', 'text_doma')
+                    'notice_before_title' => __( 'This is the viewport width from which columns are rearranged vertically. The default global breakpoint is 768px. A custom breakpoint can also be set for each section.', 'text_doma')
                 ),
                 'global-custom-breakpoint'  => array(
                     'input_type'  => 'range_simple',
@@ -7488,7 +7591,18 @@ function sek_get_module_params_for_sek_global_breakpoint() {
                     //'css_identifier' => 'letter_spacing',
                     'width-100'   => true,
                     'title_width' => 'width-100'
-                )//0,
+                ),
+                'apply-to-all' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Apply this breakpoint to all by-device customizations', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => sprintf(
+                        __( '%s When enabled, this custom breakpoint is applied not only to responsive columns but also to all by-device customizations, like alignment for example.', 'text_doma'),
+                        '<span class="sek-mobile-device-icons"><i class="sek-switcher preview-desktop"></i>&nbsp;<i class="sek-switcher preview-tablet"></i>&nbsp;<i class="sek-switcher preview-mobile"></i></span>'
+                    )
+                ),
             )
         )//tmpl
     );
@@ -7648,7 +7762,7 @@ function sek_write_global_custom_section_widths() {
             'value' => $max_width_value,
             'css_property' => 'max-width',
             'selector' => $selector,
-            'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+            'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
         ), $rules );
 
         // when customizing the inner section width, we need to reset the default padding rules for .sek-container-fluid {padding-right:10px; padding-left:10px}
@@ -7658,13 +7772,13 @@ function sek_write_global_custom_section_widths() {
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-left',
                 'selector' => '[data-sek-level="section"] > .sek-container-fluid',
-                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
             ), $rules );
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-right',
                 'selector' => '[data-sek-level="section"] > .sek-container-fluid',
-                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
             ), $rules );
         }
 
@@ -7673,7 +7787,7 @@ function sek_write_global_custom_section_widths() {
                 'value' => $margin_value,
                 'css_property' => 'margin',
                 'selector' => $selector,
-                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/552
+                'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
             ), $rules );
         }
     }//foreach
@@ -15443,10 +15557,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                       'css_property' => 'font-size',
                       'selector' => $selector,
                       'is_important' => $important,
-                      // font-size should follow rules from custom breakpoint at a section level
-                      // following implementation of https://github.com/presscustomizr/nimble-builder/issues/552
-                      // => otherwise, if the breakpoint is very small ( to keep column horizontal for example ), font-size won't change on mobile devices
-                      'level_id' => '_excluded_from_section_custom_breakpoint_'
+                      'level_id' => $parent_level['id']
                   ), $rules );
             }
         break;
@@ -17953,7 +18064,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     // SETUP THE LEVEL CUSTOM BREAKPOINT CSS CLASS
                     // nested section should inherit the custom breakpoint of the parent
                     // @fixes https://github.com/presscustomizr/nimble-builder/issues/554
-                    $section_custom_breakpoint =  sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $parent_model['id'] ) );
+
+                    // the 'for_responsive_columns' param has been introduced for https://github.com/presscustomizr/nimble-builder/issues/564
+                    // so we can differentiate when the custom breakpoint is requested for column responsiveness or for css rules generation
+                    // when for columns, we always apply the custom breakpoint defined by the user
+                    // otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
+                    // 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
+                    $section_custom_breakpoint =  sek_get_closest_section_custom_breakpoint( array(
+                        'searched_level_id' => $parent_model['id'],
+                        'for_responsive_columns' => true
+                    ));
 
                     $grid_column_class = "sek-col-{$col_suffix}";
                     if ( $section_custom_breakpoint >= 1 ) {
@@ -18537,11 +18657,24 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
         // fired @filter get_header()
+        // Nimble will use an overridable template if a local or global header/footer is used
+        // template located in /tmpl/header/ or /tmpl/footer
+        // developers can override this template from a theme with a file that has this path : 'nimble_templates/header/nimble_header_tmpl.php
         function sek_maybe_set_local_nimble_header( $header_name ) {
             // if Nimble_Manager()->has_local_header_footer || Nimble_Manager()->has_global_header_footer
             if ( sek_page_uses_nimble_header_footer() ) {
                 // load the Nimble template which includes a call to wp_head()
-                load_template( NIMBLE_BASE_PATH . '/tmpl/header/nimble_header_tmpl.php', false );
+                $template_file_name_with_php_extension = 'nimble_header_tmpl.php';
+                $template_path = apply_filters( 'nimble_set_header_template_path', NIMBLE_BASE_PATH . "/tmpl/header/{$template_file_name_with_php_extension}", $template_file_name_with_php_extension );
+
+                // dec 2019 : can be overriden from a child theme
+                // see https://github.com/presscustomizr/nimble-builder/issues/568
+                $overriden_template_path = sek_maybe_get_overriden_local_template_path( array( 'file_name' => $template_file_name_with_php_extension, 'folder' => 'header' ) );
+                if ( !empty( $overriden_template_path ) ) {
+                    $template_path = $overriden_template_path;
+                }
+
+                load_template( $template_path, false );
 
                 // do like in wp core get_header()
                 $templates = array();
@@ -18565,11 +18698,24 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         }
 
         // fired @filter get_footer()
+        // Nimble will use an overridable template if a local or global header/footer is used
+        // template located in /tmpl/header/ or /tmpl/footer
+        // developers can override this template from a theme with a file that has this path : 'nimble_templates/footer/nimble_footer_tmpl.php
         function sek_maybe_set_local_nimble_footer( $footer_name ) {
             // if Nimble_Manager()->has_local_header_footer || Nimble_Manager()->has_global_header_footer
             if ( sek_page_uses_nimble_header_footer() ) {
                 // load the Nimble template which includes a call to wp_footer()
-                load_template( NIMBLE_BASE_PATH . '/tmpl/footer/nimble_footer_tmpl.php', false );
+                $template_file_name_with_php_extension = 'nimble_footer_tmpl.php';
+                $template_path = apply_filters( 'nimble_set_header_template_path', NIMBLE_BASE_PATH . "/tmpl/footer/{$template_file_name_with_php_extension}", $template_file_name_with_php_extension );
+
+                // dec 2019 : can be overriden from a child theme
+                // see https://github.com/presscustomizr/nimble-builder/issues/568
+                $overriden_template_path = sek_maybe_get_overriden_local_template_path( array( 'file_name' => $template_file_name_with_php_extension, 'folder' => 'footer' ) );
+                if ( !empty( $overriden_template_path ) ) {
+                    $template_path = $overriden_template_path;
+                }
+
+                load_template( $template_path, false );
 
                 // do like in wp core get_footer()
                 $templates = array();

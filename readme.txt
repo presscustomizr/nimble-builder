@@ -5,8 +5,8 @@ Plugin URI: https://wordpress.org/plugins/nimble-builder/
 Tags: page builder, visual editor, customizer, drag and drop, header, footer, landing page, contact form, grid, post grid
 Requires at least: 4.7
 Requires PHP: 5.4
-Tested up to: 5.3
-Stable tag: 1.10.2
+Tested up to: 5.3.2
+Stable tag: 1.10.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -121,9 +121,14 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 
 == Upgrade Notice ==
 = 1.10.2 =
-Fixed images not filling entire column's width in the [carousel module]. Various improvements brought to the [shortcode module], in particular an horizontal alignment option.
+Fixes a bug when using the "Reverse the columns direction" option. Introduction of new option allowing users to apply the custom breakpoints not only to responsive columns but also to all by-device customizations. Developers can now override built-in header and footer templates from a child theme. 
 
 == Changelog ==
+= 1.10.3 December 19th 2019 =
+* fixed : [breakpoint] column reverse media query rules should be 1px lower
+* improved : [custom breakpoints] introduction of new option allowing users to apply the custom breakpoint not only to responsive columns but also to all by-device customizations.
+* improved : [templates] developers can now override built-in header and footer templates from a child theme.
+
 = 1.10.2 December 16th 2019 =
 * fixed : [Image carousel] fix images not filling entire column's width
 * added : [Shortcode module] added a refresh preview button below text field

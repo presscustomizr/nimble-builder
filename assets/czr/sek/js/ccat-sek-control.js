@@ -13442,8 +13442,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use-custom-breakpoint' :
-                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'custom-breakpoint', function() {
-                                                return input();
+                                          _.each( [ 'custom-breakpoint', 'apply-to-all' ] , function( _inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input();
+                                                }); } catch( er ) {
+                                                      api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
+                                                }
                                           });
                                     break;
                               }
@@ -14390,8 +14394,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
                                     case 'use-custom-breakpoint' :
-                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'global-custom-breakpoint', function() {
-                                                return input();
+                                          _.each( [ 'global-custom-breakpoint', 'apply-to-all' ] , function( _inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input();
+                                                }); } catch( er ) {
+                                                      api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
+                                                }
                                           });
                                     break;
                               }
