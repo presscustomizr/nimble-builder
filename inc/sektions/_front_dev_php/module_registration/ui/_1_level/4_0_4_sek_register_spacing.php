@@ -118,6 +118,9 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
                 // @see sek_add_css_rules_for_sections_breakpoint
                 $selector =  sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-section-custom-breakpoint-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] );
             } else if ( $has_global_custom_breakpoint ) {
+                // In this case, we need to use ".sek-global-custom-breakpoint-col-{}"
+                // @see sek_add_css_rules_for_sections_breakpoint
+                $selector =  sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-global-custom-breakpoint-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] );
                 $breakpoint = $global_custom_breakpoint;
             }
 
