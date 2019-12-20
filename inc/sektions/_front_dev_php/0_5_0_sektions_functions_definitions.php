@@ -1103,7 +1103,21 @@ function sek_is_global_custom_breakpoint_applied_to_all_customizations_by_device
 // when for columns, we always apply the custom breakpoint defined by the user
 // otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
 // 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
-function sek_get_section_custom_breakpoint( $section, $for_responsive_columns = false ) {
+// @param params array(
+//  'section_model' => array(),
+//  'for_responsive_columns' => bool
+// )
+function sek_get_section_custom_breakpoint( $params ) {
+    if ( !is_array( $params ) )
+      return;
+
+    $params = wp_parse_args( $params, array(
+        'section_model' => array(),
+        'for_responsive_columns' => false
+    ));
+
+    $section = $params['section_model'];
+
     if ( ! is_array( $section ) )
       return;
 
@@ -1129,7 +1143,7 @@ function sek_get_section_custom_breakpoint( $section, $for_responsive_columns = 
       return;
 
     // 1) When the breakpoint is requested for responsive columns, we always return the custom value
-    if ( $for_responsive_columns )
+    if ( $params['for_responsive_columns'] )
       return $custom_breakpoint;
 
     // 2) Otherwise ( other CSS rules generation case, like alignment ) we make sure that user want to apply the custom breakpoint also to other by-device customizations
@@ -1227,7 +1241,7 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
           break;
 
         if ( 'section' == $level_data['level'] ) {
-            $section_maybe_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $level_data, $for_responsive_columns ) );
+            $section_maybe_custom_breakpoint = intval( sek_get_section_custom_breakpoint( array( 'section_model' => $level_data, 'for_responsive_columns' => $for_responsive_columns ) ) );
 
             if ( !empty( $level_data['is_nested'] ) && $level_data['is_nested'] ) {
                 $last_nested_section_breakpoint_found = $section_maybe_custom_breakpoint;

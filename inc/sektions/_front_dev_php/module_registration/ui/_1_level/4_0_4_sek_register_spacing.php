@@ -109,7 +109,7 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
             $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
 
             // Does the parent section have a custom breakpoint set ?
-            $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $parent_section ) );
+            $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( array( 'section_model' => $parent_section, 'for_responsive_columns' => true ) ) );
             $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
 
             if ( $has_section_custom_breakpoint ) {
