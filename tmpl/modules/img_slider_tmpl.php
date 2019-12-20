@@ -56,12 +56,17 @@ if ( ! function_exists( 'Nimble\sek_slider_parse_template_tags') ) {
 }
 
 if ( ! function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
-    function sek_get_img_slider_module_img_html( $item ) {
+    function sek_get_img_slider_module_img_html( $item, $lazy_load_on ) {
         $html = '';
         if ( is_int( $item['img'] ) ) {
-            $html = wp_get_attachment_image( $item['img'], empty( $item['img-size'] ) ? 'large' : $item['img-size']);
+            if ( $lazy_load_on ) {
+                $html = sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $item['img'], empty( $item['img-size'] ) ? 'large' : $item['img-size']);
+                $html .= '<div class="swiper-lazy-preloader"></div>';//this element is removed by swiper.js once the image is loaded @see https://swiperjs.com/api/#lazy
+            } else {
+                $html = wp_get_attachment_image( $item['img'], empty( $item['img-size'] ) ? 'large' : $item['img-size']);
+            }
         } else if ( ! empty( $item['img'] ) && is_string( $item['img'] ) ) {
-            // the default img is excluded from the smart loading parsing @see nimble_regex_callback()
+            // the default img is excluded from the Nimble Builder smart loading parsing @see nimble_regex_callback()
             // => this is needed because this image has no specific dimensions set. And therefore can create false javascript computations of other element's distance to top on page load.
             // in particular when calculting if is_visible() to decide if we smart load.
             $html = sprintf( '<img alt="default img" data-sek-smartload="false" src="%1$s"/>', esc_url(  $item['img'] )  );
@@ -81,10 +86,11 @@ if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
       $autoplay_delay = intval( $slider_options['autoplay_delay'] ) < 300 ? 1000 : intval( $slider_options['autoplay_delay'] );
       $pause_on_hover = true === sek_booleanize_checkbox_val( $slider_options['pause_on_hover'] ) ? "true" : "false";
       $loop_on = true === sek_booleanize_checkbox_val( $slider_options['infinite_loop'] ) ? "true" : "false";
+      $lazy_load_on = true === sek_booleanize_checkbox_val( $slider_options['lazy_load'] ) ? "true" : "false";
       $nav_type = ( is_string( $slider_options['nav_type'] ) && !empty( $slider_options['nav_type'] ) ) ? $slider_options['nav_type'] : 'arrows_dots';
       $hide_nav_on_mobiles = true === sek_booleanize_checkbox_val( $slider_options['hide_nav_on_mobiles'] );
       ?>
-        <?php printf('<div class="swiper-container sek-swiper%1$s" data-sek-swiper-id="%1$s" data-sek-autoplay="%2$s" data-sek-autoplay-delay="%3$s" data-sek-pause-on-hover="%4$s" data-sek-loop="%5$s" data-sek-image-layout="%6$s" data-sek-navtype="%7$s" data-sek-is-multislide="%8$s" data-sek-hide-nav-on-mobile="%9$s">',
+        <?php printf('<div class="swiper-container sek-swiper%1$s" data-sek-swiper-id="%1$s" data-sek-autoplay="%2$s" data-sek-autoplay-delay="%3$s" data-sek-pause-on-hover="%4$s" data-sek-loop="%5$s" data-sek-image-layout="%6$s" data-sek-navtype="%7$s" data-sek-is-multislide="%8$s" data-sek-hide-nav-on-mobile="%9$s" data-sek-lazyload="%10$s">',
             $model['id'],
             $autoplay,
             $autoplay_delay,
@@ -93,7 +99,8 @@ if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
             $slider_options['image-layout'],
             $nav_type,
             $is_multislide ? 'true' : 'false',
-            $hide_nav_on_mobiles ? 'true' : 'false'
+            $hide_nav_on_mobiles ? 'true' : 'false',
+            $lazy_load_on
           ); ?>
           <?php if ( is_array( $img_collection ) && count( $img_collection ) > 0 ) : ?>
             <div class="swiper-wrapper">
@@ -112,7 +119,7 @@ if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
                   // Put them together
                   printf( '<div class="swiper-slide" title="%1$s" data-sek-item-id="%4$s" data-sek-has-overlay="%5$s"><figure class="sek-carousel-img">%2$s</figure>%3$s</div>',
                       sek_slider_parse_template_tags( esc_html( esc_attr( $item['title_attr'] ) ), $item ),
-                      sek_get_img_slider_module_img_html( $item ),
+                      sek_get_img_slider_module_img_html( $item, "true" === $lazy_load_on ),
                       sek_slider_parse_template_tags( $text_html, $item ),
                       $item['id'],
                       true === sek_booleanize_checkbox_val( $has_overlay ) ? 'true' : 'false'

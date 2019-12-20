@@ -312,7 +312,16 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                                 'default'     => true,
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20'
-                            )
+                            ),
+                            // added dec 2019 for https://github.com/presscustomizr/nimble-builder/issues/570
+                            'lazy_load' => array(
+                                'input_type'  => 'nimblecheck',
+                                'title'       => __('Lazy load images', 'text_doma'),
+                                'default'     => true,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20',
+                                'notice_after' => __('Lazy loading images improves page load performances.', 'text_doma' ),
+                            ),
                         )//inputs
                     ),
                     array(

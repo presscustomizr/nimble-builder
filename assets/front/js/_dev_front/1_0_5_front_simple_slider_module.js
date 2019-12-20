@@ -91,6 +91,18 @@ jQuery( function($){
               }
           }
 
+          // LAZYLOAD @see https://swiperjs.com/api/#lazy
+          if ( true === $swiperWrapper.data('sek-lazyload') ) {
+              $.extend( swiperParams, {
+                  // Disable preloading of all images
+                  preloadImages: false,
+                  lazy : {
+                    // By default, Swiper will load lazy images after transition to this slide, so you may enable this parameter if you need it to start loading of new image in the beginning of transition
+                    loadOnTransitionStart : true
+                  }
+              });
+          }
+
           mySwipers.push( new Swiper(
               '.' + swiperClass,//$(this)[0],
               swiperParams
