@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.3.2
-Stable tag: 1.10.3
+Stable tag: 1.10.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,14 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.10.2 =
-Fixes a bug when using the "Reverse the columns direction" option. Introduction of new option allowing users to apply the custom breakpoints not only to responsive columns but also to all by-device customizations. Developers can now override built-in header and footer templates from a child theme. 
+= 1.10.4 =
+Fixes a bug when columns have custom margins inside a section with custom breakpoint. Implements lazy loading for images in carousels for better page load time performances.
 
 == Changelog ==
+= 1.10.4 December 20th 2019 =
+* fixed : columns that have custom margins inside a section with custom breakpoint are broken
+* added : [Carousel module] improved page loading time with a new lazyloading option for images ( enabled by default ). Successfully tested with Customizr, Hueman, Twentytwenty.
+
 = 1.10.3 December 19th 2019 =
 * fixed : [breakpoint] column reverse media query rules should be 1px lower
 * improved : [custom breakpoints] introduction of new option allowing users to apply the custom breakpoint not only to responsive columns but also to all by-device customizations.

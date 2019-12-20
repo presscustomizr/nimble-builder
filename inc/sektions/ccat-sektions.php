@@ -1103,7 +1103,21 @@ function sek_is_global_custom_breakpoint_applied_to_all_customizations_by_device
 // when for columns, we always apply the custom breakpoint defined by the user
 // otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
 // 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
-function sek_get_section_custom_breakpoint( $section, $for_responsive_columns = false ) {
+// @param params array(
+//  'section_model' => array(),
+//  'for_responsive_columns' => bool
+// )
+function sek_get_section_custom_breakpoint( $params ) {
+    if ( !is_array( $params ) )
+      return;
+
+    $params = wp_parse_args( $params, array(
+        'section_model' => array(),
+        'for_responsive_columns' => false
+    ));
+
+    $section = $params['section_model'];
+
     if ( ! is_array( $section ) )
       return;
 
@@ -1129,7 +1143,7 @@ function sek_get_section_custom_breakpoint( $section, $for_responsive_columns = 
       return;
 
     // 1) When the breakpoint is requested for responsive columns, we always return the custom value
-    if ( $for_responsive_columns )
+    if ( $params['for_responsive_columns'] )
       return $custom_breakpoint;
 
     // 2) Otherwise ( other CSS rules generation case, like alignment ) we make sure that user want to apply the custom breakpoint also to other by-device customizations
@@ -1227,7 +1241,7 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
           break;
 
         if ( 'section' == $level_data['level'] ) {
-            $section_maybe_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $level_data, $for_responsive_columns ) );
+            $section_maybe_custom_breakpoint = intval( sek_get_section_custom_breakpoint( array( 'section_model' => $level_data, 'for_responsive_columns' => $for_responsive_columns ) ) );
 
             if ( !empty( $level_data['is_nested'] ) && $level_data['is_nested'] ) {
                 $last_nested_section_breakpoint_found = $section_maybe_custom_breakpoint;
@@ -2438,6 +2452,88 @@ function sek_sideload_img_and_return_attachment_id( $img_url ) {
 
     return $id;
 }
+
+
+// /* ------------------------------------------------------------------------- *
+// *  Adaptation of wp_get_attachment_image() for preprocessing lazy loading carousel images
+//  added in dec 2019 for https://github.com/presscustomizr/nimble-builder/issues/570
+//  used in tmpl/modules/img_slider_tmpl.php
+// /* ------------------------------------------------------------------------- */
+function sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '' ) {
+    $html  = '';
+    $image = wp_get_attachment_image_src( $attachment_id, $size, $icon );
+    if ( $image ) {
+        list($src, $width, $height) = $image;
+        $hwstring                   = image_hwstring( $width, $height );
+        $size_class                 = $size;
+        if ( is_array( $size_class ) ) {
+            $size_class = join( 'x', $size_class );
+        }
+        $attachment   = get_post( $attachment_id );
+        $default_attr = array(
+            'src'   => $src,
+            'class' => "attachment-$size_class size-$size_class swiper-lazy",// add swiper class for lazyloading @see https://swiperjs.com/api/#lazy
+            'alt'   => trim( strip_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ),
+        );
+
+        $attr = wp_parse_args( $attr, $default_attr );
+
+        // Generate 'srcset' and 'sizes' if not already present.
+        if ( empty( $attr['srcset'] ) ) {
+            $image_meta = wp_get_attachment_metadata( $attachment_id );
+
+            if ( is_array( $image_meta ) ) {
+                $size_array = array( absint( $width ), absint( $height ) );
+                $srcset     = wp_calculate_image_srcset( $size_array, $src, $image_meta, $attachment_id );
+                $sizes      = wp_calculate_image_sizes( $size_array, $src, $image_meta, $attachment_id );
+
+                if ( $srcset && ( $sizes || ! empty( $attr['sizes'] ) ) ) {
+                    $attr['srcset'] = $srcset;
+
+                    if ( empty( $attr['sizes'] ) ) {
+                        $attr['sizes'] = $sizes;
+                    }
+                }
+            }
+        }
+
+        /**
+         * Filters the list of attachment image attributes.
+         *
+         * @since 2.8.0
+         *
+         * @param array        $attr       Attributes for the image markup.
+         * @param WP_Post      $attachment Image attachment post.
+         * @param string|array $size       Requested size. Image size or array of width and height values
+         *                                 (in that order). Default 'thumbnail'.
+         */
+        $attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $attachment, $size );
+
+        // add swiper data-* stuffs for lazyloading now, after all filters
+        // @see https://swiperjs.com/api/#lazy
+        if ( !empty( $attr['srcset'] ) ) {
+            $attr['data-srcset'] = $attr['srcset'];
+            unset( $attr['srcset'] );
+        }
+
+        if ( !empty( $attr['src'] ) ) {
+            $attr['data-src'] = $attr['src'];
+            unset( $attr['src'] );
+        }
+
+        $attr = array_map( 'esc_attr', $attr );
+        $html = rtrim( "<img $hwstring" );
+        foreach ( $attr as $name => $value ) {
+            $html .= " $name=" . '"' . $value . '"';
+        }
+        $html .= ' />';
+    }
+
+    return $html;
+}
+
+
+
 ?><?php
 namespace Nimble;
 // /* ------------------------------------------------------------------------- *
@@ -6095,7 +6191,7 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
             $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
 
             // Does the parent section have a custom breakpoint set ?
-            $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $parent_section ) );
+            $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( array( 'section_model' => $parent_section, 'for_responsive_columns' => true ) ) );
             $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
 
             if ( $has_section_custom_breakpoint ) {
@@ -6104,6 +6200,9 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
                 // @see sek_add_css_rules_for_sections_breakpoint
                 $selector =  sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-section-custom-breakpoint-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] );
             } else if ( $has_global_custom_breakpoint ) {
+                // In this case, we need to use ".sek-global-custom-breakpoint-col-{}"
+                // @see sek_add_css_rules_for_sections_breakpoint
+                $selector =  sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-global-custom-breakpoint-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] );
                 $breakpoint = $global_custom_breakpoint;
             }
 
@@ -13248,7 +13347,8 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                                 'input_type'  => 'range_simple',
                                 'title'       => __( 'Delay between each slide in milliseconds (ms)', 'text_doma' ),
                                 'min' => 1,
-                                'max' => 10000,
+                                'max' => 30000,
+                                'step' => 500,
                                 'unit' => '',
                                 'default' => 3000,
                                 'width-100'   => true,
@@ -13267,7 +13367,16 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                                 'default'     => true,
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20'
-                            )
+                            ),
+                            // added dec 2019 for https://github.com/presscustomizr/nimble-builder/issues/570
+                            'lazy_load' => array(
+                                'input_type'  => 'nimblecheck',
+                                'title'       => __('Lazy load images', 'text_doma'),
+                                'default'     => true,
+                                'title_width' => 'width-80',
+                                'input_width' => 'width-20',
+                                'notice_after' => __('Lazy loading images improves page load performances.', 'text_doma' ),
+                            ),
                         )//inputs
                     ),
                     array(
@@ -14676,7 +14785,7 @@ class Sek_Dyn_CSS_Builder {
             sek_error_log( __FUNCTION__ . ' => $parent_section not found for column id : ' . $column['id'] );
             return $rules;
         }
-        $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( $parent_section ) );
+        $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( array( 'section_model' => $parent_section ) ) );
         if ( $section_custom_breakpoint >= 1 ) {
             $breakpoint = $section_custom_breakpoint;
         } else {
