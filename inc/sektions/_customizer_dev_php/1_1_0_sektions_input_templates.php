@@ -132,7 +132,7 @@ function sek_print_nimble_input_templates() {
           <input class="sek-range-input" type="range" <# print(_step); #> <# print(_saved_unit); #> <# print(_min); #> <# print(_max); #>/>
         </div>
         <div class="sek-number-wrapper">
-            <input class="sek-pm-input" value="{{value}}" type="number"  >
+            <input class="sek-pm-input" value="{{value}}" type="number" <# print(_step); #> <# print(_min); #> <# print(_max); #> >
         </div>
       </script>
 
