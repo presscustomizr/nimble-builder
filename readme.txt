@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.3.2
-Stable tag: 1.10.4
+Stable tag: 1.10.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,14 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.10.4 =
-Fixes a bug when columns have custom margins inside a section with custom breakpoint. Implements lazy loading for images in carousels for better page load time performances.
+= 1.10.5 =
+Maintenance release. Minor fixes and improvements. Fully compatible with WordPress 5.3.2
 
 == Changelog ==
+= 1.10.5 December 24th 2019 =
+* fixed : Nimble edit button => only print when post type is public
+* improved : when setting an anchor to a level ( section, column, module ), make sure the hash gets removed if user left it
+
 = 1.10.4 December 20th 2019 =
 * fixed : columns that have custom margins inside a section with custom breakpoint are broken
 * added : [Carousel module] improved page loading time with a new lazyloading option for images ( enabled by default ). Successfully tested with Customizr, Hueman, Twentytwenty.
