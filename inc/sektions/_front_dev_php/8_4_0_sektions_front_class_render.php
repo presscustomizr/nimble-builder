@@ -443,7 +443,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $this->get_level_visibility_css_class( $model ),
                         is_null( $custom_css_classes ) ? '' : $custom_css_classes,
 
-                        is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+                        is_null( $custom_anchor ) ? '' : 'id="' . ltrim( $custom_anchor , '#' ) . '"',// make sure we clean the hash if user left it
                         // add smartload + parallax attributes
                         $this->sek_maybe_add_bg_attributes( $model ),
 
