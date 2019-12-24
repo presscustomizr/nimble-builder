@@ -700,11 +700,11 @@ function sek_nimble_dashboard_callback_fn() {
 // /* ------------------------------------------------------------------------- */
 // introduced to fix https://github.com/presscustomizr/nimble-builder/issues/528
 function sek_is_forbidden_post_type_for_nimble_edit_button( $post_type = '' ) {
-    $forbidden_post_types = apply_filters('nimble_forbidden_post_type', [
-        'acf-field-group'
-    ]);
-
-    return is_array( $forbidden_post_types ) && in_array( $post_type, $forbidden_post_types );
+    // updated in dec 2019 to allow public post types only : posts, pages, woocommerce products, etc
+    // not post types like ACF, contact forms, etc,
+    // @see https://github.com/presscustomizr/nimble-builder/issues/573
+    $post_type_obj = get_post_type_object( $post_type );
+    return is_object($post_type_obj) && true !== $post_type_obj->public;
 }
 
 // When using classic editor
