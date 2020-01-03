@@ -285,10 +285,13 @@
                 }
             };
 
-            // Chrome doesn't trigger the `PLAYING` state at start time
-            if ( window.chrome ) {
-                  startStateCode = self.apiInstance.PlayerState.UNSTARTED;
-            }
+            // Chrome browser may not fire the `PLAYING` state on starttime
+            // if ( window.chrome ) {
+            //       startStateCode = self.apiInstance.PlayerState.UNSTARTED;
+            // }
+            // Updated in January 2020
+            // fixes https://github.com/presscustomizr/nimble-builder/issues/574
+            var startStateCode = self.apiInstance.PlayerState.UNSTARTED;
 
             self.$backgroundVideoContainer.addClass( self.options.bgLoadingClass );
             this.videoPlayer = new self.apiInstance.Player( self.$backgroundVideoContainer.find( '.' + self.options.bgYoutubeVideoContainerClass )[0], {
