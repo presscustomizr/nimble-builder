@@ -1,4 +1,4 @@
-[data-sek-module-type="czr_shortcode_module"] .sek-shortcode-content {
+[data-sek-module-type="czr_shortcode_module"] [data-sek-use-flexbox="true"] {
     // implemented to fix : https://github.com/presscustomizr/nimble-builder/issues/565
     display: -webkit-box;
     display: -ms-flexbox;
