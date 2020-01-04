@@ -2529,7 +2529,7 @@ button.sek-btn,
   display: none;
 }
 
-[data-sek-module-type="czr_shortcode_module"] .sek-shortcode-content {
+[data-sek-module-type="czr_shortcode_module"] [data-sek-use-flexbox="true"] {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-pack: center;

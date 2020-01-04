@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.3.2
-Stable tag: 1.10.5
+Stable tag: 1.10.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,14 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.10.5 =
-Maintenance release. Minor fixes and improvements. Fully compatible with WordPress 5.3.2
+= 1.10.6 =
+Fixes a javascript error on Firefox when using Youtube videos as section background. Flex-box layout is now optional for the shortcode module wrapper.
 
 == Changelog ==
+= 1.10.6 January 4th 2020 =
+* fixed : javascript error on Firefox when using Youtube videos as section background
+* fixed : [Shortcode module] Allow user to switch between flex and block display
+
 = 1.10.5 December 24th 2019 =
 * fixed : Nimble edit button => only print when post type is public
 * improved : when setting an anchor to a level ( section, column, module ), make sure the hash gets removed if user left it

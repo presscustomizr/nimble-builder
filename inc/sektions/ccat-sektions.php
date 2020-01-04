@@ -14198,6 +14198,14 @@ function sek_get_module_params_for_czr_shortcode_module() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
                 ),
+                'use_flex' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Use a flex-box wrapper', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => __('Flex-box is a CSS standard used to specify the layout of HTML pages. Using flex-box can make it easier to center the content of shortcodes.', 'text_doma')
+                ),
                 'h_alignment_css'        => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
                     'title'              => __( 'Horizontal alignment', 'text_doma' ),
