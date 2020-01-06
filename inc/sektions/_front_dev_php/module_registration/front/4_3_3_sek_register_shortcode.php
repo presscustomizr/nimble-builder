@@ -33,10 +33,13 @@ function sek_get_module_params_for_czr_shortcode_module() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
                 ),
+                // flex-box should be enabled by user and not active by default.
+                // It's been implemented primarily to ease centering ( see https://github.com/presscustomizr/nimble-builder/issues/565 )
+                // When enabled, it can create layout issues like : https://github.com/presscustomizr/nimble-builder/issues/576
                 'use_flex' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Use a flex-box wrapper', 'text_doma'),
-                    'default'     => true,
+                    'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'notice_after' => __('Flex-box is a CSS standard used to specify the layout of HTML pages. Using flex-box can make it easier to center the content of shortcodes.', 'text_doma')
