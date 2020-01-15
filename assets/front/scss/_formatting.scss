@@ -86,28 +86,29 @@
 // VARIOUS
 // mostly inspired from Customizr
 .sek-module-inner {
-  dl {
-    dt {
-      overflow: hidden;
-      clear: left;
-      text-align: left;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      padding: 1.25em 1.25em .625em 1.25em;
-      position: relative;
-      &::before {
-        content: "";
-        position: absolute;
-        width: $base-line-height;
-        height: 2px;
-        bottom: calc(#{$base-line-height} - 6px);
-        left: 0;
-        background: $black;
-      }
-    }
-    .wp-caption-dt::before { content: none }
-    dd { padding-left: $base-line-height; }
-  }
+  // January 15th 2020 => dl dt and dd styling has been commented following https://github.com/presscustomizr/nimble-builder/issues/579
+  // dl {
+  //   dt {
+  //     overflow: hidden;
+  //     clear: left;
+  //     text-align: left;
+  //     text-overflow: ellipsis;
+  //     white-space: nowrap;
+  //     padding: 1.25em 1.25em .625em 1.25em;
+  //     position: relative;
+  //     &::before {
+  //       content: "";
+  //       position: absolute;
+  //       width: $base-line-height;
+  //       height: 2px;
+  //       bottom: calc(#{$base-line-height} - 6px);
+  //       left: 0;
+  //       background: $black;
+  //     }
+  //   }
+  //   .wp-caption-dt::before { content: none }
+  //   dd { padding-left: $base-line-height; }
+  // }
 
   pre code, tt {
     @include box-sizing(border-box);
