@@ -440,34 +440,6 @@
   margin-bottom: 0;
 }
 
-.sek-module-inner dl dt {
-  overflow: hidden;
-  clear: left;
-  text-align: left;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding: 1.25em 1.25em .625em 1.25em;
-  position: relative;
-}
-
-.sek-module-inner dl dt::before {
-  content: "";
-  position: absolute;
-  width: 1.25em;
-  height: 2px;
-  bottom: calc(1.25em - 6px);
-  left: 0;
-  background: #313131;
-}
-
-.sek-module-inner dl .wp-caption-dt::before {
-  content: none;
-}
-
-.sek-module-inner dl dd {
-  padding-left: 1.25em;
-}
-
 .sek-module-inner pre code, .sek-module-inner tt {
   box-sizing: border-box;
   font-size: inherit;

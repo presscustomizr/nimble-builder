@@ -11984,7 +11984,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // To ensure retro-compat with content created prior to Nimble v1.5.2, in which the editor has been updated
                         // @see https://github.com/presscustomizr/nimble-builder/issues/404
                         // we add the <p> tag on init, if autop option is checked
-                        var initial_content = !isAutoPEnabled() ? input() : wp.editor.autop( input() );
+                        var initial_content = ( !isAutoPEnabled() || ! _.isFunction( wp.editor.autop ) ) ? input() : wp.editor.autop( input() );
                         _editor.setContent( initial_content );
                         api.sekEditorExpanded( true );
                         // trigger a resize to adjust height on init https://github.com/presscustomizr/nimble-builder/issues/409

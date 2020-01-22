@@ -14198,10 +14198,13 @@ function sek_get_module_params_for_czr_shortcode_module() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
                 ),
+                // flex-box should be enabled by user and not active by default.
+                // It's been implemented primarily to ease centering ( see https://github.com/presscustomizr/nimble-builder/issues/565 )
+                // When enabled, it can create layout issues like : https://github.com/presscustomizr/nimble-builder/issues/576
                 'use_flex' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Use a flex-box wrapper', 'text_doma'),
-                    'default'     => true,
+                    'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'notice_after' => __('Flex-box is a CSS standard used to specify the layout of HTML pages. Using flex-box can make it easier to center the content of shortcodes.', 'text_doma')
@@ -18530,7 +18533,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // the local option wins
         // deactivated when customizing @see function sek_is_img_smartload_enabled()
         function sek_maybe_add_bg_attributes( $model ) {
-            $attributes = '';
+            $new_attributes = [];
             $bg_url_for_lazy_load = '';
             $parallax_enabled = false;
             $fixed_bg_enabled = false;
@@ -18551,7 +18554,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
                 if ( !empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
-                    $attributes .= 'data-sek-has-bg="true"';
+                    $new_attributes[] = 'data-sek-has-bg="true"';
                     if ( sek_is_img_smartload_enabled() ) {
                         $bg_url_for_lazy_load = wp_get_attachment_url( $bg_options[ 'bg-image'] );
                     }
@@ -18597,19 +18600,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
 
             if ( !empty( $bg_url_for_lazy_load ) ) {
-                $attributes .= sprintf('%1$s data-sek-lazy-bg="true" data-sek-src="%2$s"', $attributes, $bg_url_for_lazy_load );
+                $new_attributes[] = sprintf( 'data-sek-lazy-bg="true" data-sek-src="%1$s"', $bg_url_for_lazy_load );
             }
             // data-sek-bg-fixed attribute has been added for https://github.com/presscustomizr/nimble-builder/issues/414
             // @see css rules related
             // we can't have both fixed and parallax option together
             // when the fixed background is ckecked, it wins against parallax
             if ( $fixed_bg_enabled ) {
-                $attributes .= sprintf('%1$s data-sek-bg-fixed="true"',
-                    $attributes
-                );
+                $new_attributes[] = 'data-sek-bg-fixed="true"';
             } else if ( $parallax_enabled ) {
-                $attributes .= sprintf('%1$s data-sek-bg-parallax="true" data-bg-width="%2$s" data-bg-height="%3$s" data-sek-parallax-force="%4$s"',
-                    $attributes,
+                $new_attributes[] = sprintf('data-sek-bg-parallax="true" data-bg-width="%1$s" data-bg-height="%2$s" data-sek-parallax-force="%3$s"',
                     $width,
                     $height,
                     array_key_exists('bg-parallax-force', $bg_options) ? $bg_options['bg-parallax-force'] : '40'
@@ -18620,21 +18620,21 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             // video background insertion can only be done for sections and columns
             if ( in_array( $level_type, array( 'section', 'column') ) ) {
                 if ( !empty( $video_bg_url ) && is_string( $video_bg_url ) ) {
-                    $attributes .= sprintf('%1$s data-sek-video-bg-src="%2$s"', $attributes, $video_bg_url );
-                    $attributes .= sprintf('%1$s data-sek-video-bg-loop="%2$s"', $attributes, $video_bg_loop ? 'true' : 'false' );
+                    $new_attributes[] = sprintf('data-sek-video-bg-src="%1$s"', $video_bg_url );
+                    $new_attributes[] = sprintf('data-sek-video-bg-loop="%1$s"', $video_bg_loop ? 'true' : 'false' );
                     if ( !is_null( $video_bg_delay_before_start ) && $video_bg_delay_before_start >= 0 ) {
-                        $attributes .= sprintf('%1$s data-sek-video-delay-before="%2$s"', $attributes, $video_bg_delay_before_start );
+                        $new_attributes[] = sprintf('data-sek-video-delay-before="%1$s"', $video_bg_delay_before_start );
                     }
-                    $attributes .= sprintf('%1$s data-sek-video-bg-on-mobile="%2$s"', $attributes, $video_bg_on_mobile ? 'true' : 'false' );
+                    $new_attributes[] = sprintf('data-sek-video-bg-on-mobile="%1$s"', $video_bg_on_mobile ? 'true' : 'false' );
                     if ( !is_null( $video_bg_start_time ) && $video_bg_start_time >= 0 ) {
-                        $attributes .= sprintf('%1$s data-sek-video-start-at="%2$s"', $attributes, $video_bg_start_time );
+                        $new_attributes[] = sprintf('data-sek-video-start-at="%1$s"', $video_bg_start_time );
                     }
                     if ( !is_null( $video_bg_end_time ) && $video_bg_end_time >= 0 ) {
-                        $attributes .= sprintf('%1$s data-sek-video-end-at="%2$s"', $attributes, $video_bg_end_time );
+                        $new_attributes[] = sprintf('data-sek-video-end-at="%1$s"', $video_bg_end_time );
                     }
                 }
             }
-            return $attributes;
+            return implode( ' ', $new_attributes );
         }
 
 
@@ -19206,7 +19206,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         //generate fields
         $this->fields = $this->simple_form_generate_fields( $form_composition );
         //generate form
-        $this->form = $this->simple_form_generate_form( $this->fields );
+        $this->form = $this->simple_form_generate_form( $this->fields, $module_model );
 
         //mailer
         $this->mailer = new Sek_Mailer( $this->form );
@@ -19246,7 +19246,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     // sek_front_sections_include_a_form()
     function print_recaptcha_inline_js() {
         ?>
-            <script type="text/javascript" id="nimble-inline-recaptcha">
+            <script id="nimble-inline-recaptcha">
               !( function( grecaptcha, sitekey ) {
                   var recaptcha = {
                       execute: function() {
@@ -19303,7 +19303,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         //generate fields
         $fields       = isset( $this->fields ) ? $this->fields : $this->simple_form_generate_fields( $form_composition );
         //generate form
-        $form         = isset( $this->form ) ? $this->form : $this->simple_form_generate_form( $fields );
+        $form         = isset( $this->form ) ? $this->form : $this->simple_form_generate_form( $fields, $module_model );
 
         $module_id = is_array( $module_model ) && array_key_exists('id', $module_model ) ? $module_model['id'] : '';
         ob_start();
@@ -19477,8 +19477,11 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
 
 
     //generate the fields
-    function simple_form_generate_form( $fields ) {
-        $form   = new Sek_Form();
+    function simple_form_generate_form( $fields, $module_model ) {
+        $form   = new Sek_Form( [
+            'action' => is_array( $module_model ) && ! empty( $module_model['id']) ? '#' . $module_model['id'] :'#',
+            'method' => 'post'
+        ] );
         $form->add_fields( $fields );
 
         return $form;
@@ -19488,8 +19491,7 @@ endif;
 
 ?><?php
 /*
-*
-* Form class definition
+*&
 *
 */
 if ( ! class_exists( '\Nimble\Sek_Form' ) ) :
@@ -19497,10 +19499,17 @@ class Sek_Form {
     private $fields;
     private $attributes;
 
+    // Sek_Form is instantiated from Sek_Simple_Form::simple_form_generate_form
+    //$form   = new Sek_Form( [
+    //     'action' => is_array( $module_model ) && ! empty( $module_model['id']) ? $module_model['id'] :'#',
+    //     'method' => 'post'
+    // ] );
     public function __construct( $args = array() ) {
         $this->fields        = array();
         $this->attributes    = wp_parse_args( $args, array(
-            'action' => '',
+            'action' => '#',// the action attribute doesn't have to be specified when form data is sent to the same page
+            // see https://developer.mozilla.org/en-US/docs/Learn/Forms/Sending_and_retrieving_form_data,
+            // for the moment we use the parent module id, example : #__nimble__cd4d5b307a3b
             'method' => 'post'
             //TODO: add html callback
         ) );
@@ -19773,8 +19782,16 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
         }
         $attributes = array_map(
             function ($k, $v) {
-                $v     =  'value' == $k ? $this->get_value() : esc_attr( $v );
-                return sanitize_key( $k ) .'="'. $v .'"';
+                switch ( $k ) {
+                  case 'value':
+                      $v = $this->get_value();
+                  break;
+                  default:
+                      $v = esc_attr( $v );
+                  break;
+                }
+                // 'required' attribute doesn't need a value : <input name="nimble_email" id="nimble_email1163989492" type="text" required/>
+                return 'required' === $k ? 'required' : sanitize_key( $k ) .'="'. $v .'"';
             },
             array_keys($attributes), $attributes
         );
@@ -19928,7 +19945,7 @@ class Sek_Input_Textarea extends Sek_Input_Abstract {
 
 
     public function html() {
-        return sprintf( '<textarea %1$s/>%2$s</textarea>',
+        return sprintf( '<textarea %1$s>%2$s</textarea>',
             $this->get_attributes_html(),
             $this->get_value()
         );
