@@ -1,7 +1,6 @@
 <?php
 /*
-*
-* Form class definition
+*&
 *
 */
 if ( ! class_exists( '\Nimble\Sek_Form' ) ) :
@@ -9,10 +8,17 @@ class Sek_Form {
     private $fields;
     private $attributes;
 
+    // Sek_Form is instantiated from Sek_Simple_Form::simple_form_generate_form
+    //$form   = new Sek_Form( [
+    //     'action' => is_array( $module_model ) && ! empty( $module_model['id']) ? $module_model['id'] :'#',
+    //     'method' => 'post'
+    // ] );
     public function __construct( $args = array() ) {
         $this->fields        = array();
         $this->attributes    = wp_parse_args( $args, array(
-            'action' => '',
+            'action' => '#',// the action attribute doesn't have to be specified when form data is sent to the same page
+            // see https://developer.mozilla.org/en-US/docs/Learn/Forms/Sending_and_retrieving_form_data,
+            // for the moment we use the parent module id, example : #__nimble__cd4d5b307a3b
             'method' => 'post'
             //TODO: add html callback
         ) );

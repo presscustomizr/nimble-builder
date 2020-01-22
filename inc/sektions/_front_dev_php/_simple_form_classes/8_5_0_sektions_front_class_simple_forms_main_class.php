@@ -107,7 +107,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         //generate fields
         $this->fields = $this->simple_form_generate_fields( $form_composition );
         //generate form
-        $this->form = $this->simple_form_generate_form( $this->fields );
+        $this->form = $this->simple_form_generate_form( $this->fields, $module_model );
 
         //mailer
         $this->mailer = new Sek_Mailer( $this->form );
@@ -147,7 +147,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     // sek_front_sections_include_a_form()
     function print_recaptcha_inline_js() {
         ?>
-            <script type="text/javascript" id="nimble-inline-recaptcha">
+            <script id="nimble-inline-recaptcha">
               !( function( grecaptcha, sitekey ) {
                   var recaptcha = {
                       execute: function() {
@@ -204,7 +204,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         //generate fields
         $fields       = isset( $this->fields ) ? $this->fields : $this->simple_form_generate_fields( $form_composition );
         //generate form
-        $form         = isset( $this->form ) ? $this->form : $this->simple_form_generate_form( $fields );
+        $form         = isset( $this->form ) ? $this->form : $this->simple_form_generate_form( $fields, $module_model );
 
         $module_id = is_array( $module_model ) && array_key_exists('id', $module_model ) ? $module_model['id'] : '';
         ob_start();
@@ -378,8 +378,11 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
 
 
     //generate the fields
-    function simple_form_generate_form( $fields ) {
-        $form   = new Sek_Form();
+    function simple_form_generate_form( $fields, $module_model ) {
+        $form   = new Sek_Form( [
+            'action' => is_array( $module_model ) && ! empty( $module_model['id']) ? '#' . $module_model['id'] :'#',
+            'method' => 'post'
+        ] );
         $form->add_fields( $fields );
 
         return $form;

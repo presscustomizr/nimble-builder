@@ -107,7 +107,17 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
         }
         $attributes = array_map(
             function ($k, $v) {
-                $v     =  'value' == $k ? $this->get_value() : esc_attr( $v );
+                switch ( $k ) {
+                  case 'value':
+                      $v = $this->get_value();
+                  break;
+                  case 'required':
+                      $v = true === (bool)$v ? 'true' : 'false';
+                  break;
+                  default:
+                      $v = esc_attr( $v );
+                  break;
+                }
                 return sanitize_key( $k ) .'="'. $v .'"';
             },
             array_keys($attributes), $attributes
@@ -262,7 +272,7 @@ class Sek_Input_Textarea extends Sek_Input_Abstract {
 
 
     public function html() {
-        return sprintf( '<textarea %1$s/>%2$s</textarea>',
+        return sprintf( '<textarea %1$s>%2$s</textarea>',
             $this->get_attributes_html(),
             $this->get_value()
         );
