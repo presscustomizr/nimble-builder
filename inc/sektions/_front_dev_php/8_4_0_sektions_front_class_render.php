@@ -834,7 +834,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // the local option wins
         // deactivated when customizing @see function sek_is_img_smartload_enabled()
         function sek_maybe_add_bg_attributes( $model ) {
-            $attributes = '';
+            $new_attributes = [];
             $bg_url_for_lazy_load = '';
             $parallax_enabled = false;
             $fixed_bg_enabled = false;
@@ -855,7 +855,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
                 if ( !empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
-                    $attributes .= 'data-sek-has-bg="true"';
+                    $new_attributes[] = 'data-sek-has-bg="true"';
                     if ( sek_is_img_smartload_enabled() ) {
                         $bg_url_for_lazy_load = wp_get_attachment_url( $bg_options[ 'bg-image'] );
                     }
@@ -901,19 +901,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
 
             if ( !empty( $bg_url_for_lazy_load ) ) {
-                $attributes .= sprintf('%1$s data-sek-lazy-bg="true" data-sek-src="%2$s"', $attributes, $bg_url_for_lazy_load );
+                $new_attributes[] = sprintf( 'data-sek-lazy-bg="true" data-sek-src="%1$s"', $bg_url_for_lazy_load );
             }
             // data-sek-bg-fixed attribute has been added for https://github.com/presscustomizr/nimble-builder/issues/414
             // @see css rules related
             // we can't have both fixed and parallax option together
             // when the fixed background is ckecked, it wins against parallax
             if ( $fixed_bg_enabled ) {
-                $attributes .= sprintf('%1$s data-sek-bg-fixed="true"',
-                    $attributes
-                );
+                $new_attributes[] = 'data-sek-bg-fixed="true"';
             } else if ( $parallax_enabled ) {
-                $attributes .= sprintf('%1$s data-sek-bg-parallax="true" data-bg-width="%2$s" data-bg-height="%3$s" data-sek-parallax-force="%4$s"',
-                    $attributes,
+                $new_attributes[] = sprintf('data-sek-bg-parallax="true" data-bg-width="%1$s" data-bg-height="%2$s" data-sek-parallax-force="%3$s"',
                     $width,
                     $height,
                     array_key_exists('bg-parallax-force', $bg_options) ? $bg_options['bg-parallax-force'] : '40'
@@ -924,21 +921,21 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             // video background insertion can only be done for sections and columns
             if ( in_array( $level_type, array( 'section', 'column') ) ) {
                 if ( !empty( $video_bg_url ) && is_string( $video_bg_url ) ) {
-                    $attributes .= sprintf('%1$s data-sek-video-bg-src="%2$s"', $attributes, $video_bg_url );
-                    $attributes .= sprintf('%1$s data-sek-video-bg-loop="%2$s"', $attributes, $video_bg_loop ? 'true' : 'false' );
+                    $new_attributes[] = sprintf('data-sek-video-bg-src="%1$s"', $video_bg_url );
+                    $new_attributes[] = sprintf('data-sek-video-bg-loop="%1$s"', $video_bg_loop ? 'true' : 'false' );
                     if ( !is_null( $video_bg_delay_before_start ) && $video_bg_delay_before_start >= 0 ) {
-                        $attributes .= sprintf('%1$s data-sek-video-delay-before="%2$s"', $attributes, $video_bg_delay_before_start );
+                        $new_attributes[] = sprintf('data-sek-video-delay-before="%1$s"', $video_bg_delay_before_start );
                     }
-                    $attributes .= sprintf('%1$s data-sek-video-bg-on-mobile="%2$s"', $attributes, $video_bg_on_mobile ? 'true' : 'false' );
+                    $new_attributes[] = sprintf('data-sek-video-bg-on-mobile="%1$s"', $video_bg_on_mobile ? 'true' : 'false' );
                     if ( !is_null( $video_bg_start_time ) && $video_bg_start_time >= 0 ) {
-                        $attributes .= sprintf('%1$s data-sek-video-start-at="%2$s"', $attributes, $video_bg_start_time );
+                        $new_attributes[] = sprintf('data-sek-video-start-at="%1$s"', $video_bg_start_time );
                     }
                     if ( !is_null( $video_bg_end_time ) && $video_bg_end_time >= 0 ) {
-                        $attributes .= sprintf('%1$s data-sek-video-end-at="%2$s"', $attributes, $video_bg_end_time );
+                        $new_attributes[] = sprintf('data-sek-video-end-at="%1$s"', $video_bg_end_time );
                     }
                 }
             }
-            return $attributes;
+            return implode( ' ', $new_attributes );
         }
 
 
