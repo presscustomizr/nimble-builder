@@ -40,7 +40,7 @@ if ( ! function_exists( 'Nimble\sek_render_post_navigation') ) {
 
     ?>
     <div class="sek-row sek-post-navigation">
-      <nav id="sek-nav-below" class="sek-col-100" role="navigation">
+      <nav id="sek-nav-below" class="sek-col-100">
         <h2 class="sek-screen-reader-text"><?php _e('Posts navigation', 'text_doma') ?></h2>
         <ul class="sek-czr-pager sek-row">
           <li class="sek-next-posts sek-col-base sek-col-33 <?php echo $tnext_align_class ?> ">
