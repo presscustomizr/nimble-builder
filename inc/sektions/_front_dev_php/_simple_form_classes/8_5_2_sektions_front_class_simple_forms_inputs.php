@@ -111,14 +111,12 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
                   case 'value':
                       $v = $this->get_value();
                   break;
-                  case 'required':
-                      $v = true === (bool)$v ? 'true' : 'false';
-                  break;
                   default:
                       $v = esc_attr( $v );
                   break;
                 }
-                return sanitize_key( $k ) .'="'. $v .'"';
+                // 'required' attribute doesn't need a value : <input name="nimble_email" id="nimble_email1163989492" type="text" required/>
+                return 'required' === $k ? 'required' : sanitize_key( $k ) .'="'. $v .'"';
             },
             array_keys($attributes), $attributes
         );
