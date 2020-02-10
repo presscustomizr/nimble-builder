@@ -172,11 +172,19 @@ function sek_get_seks_setting_id( $skope_id = '' ) {
 
 
 // return bool
+// count the number of global section created, no matter if they are header footer or other global locations
+// can be used to determine if we need to render Nimble Builder assets on front. See ::sek_enqueue_front_assets()
 function sek_has_global_sections() {
     if ( skp_is_customizing() )
       return true;
     $maybe_global_sek_post = sek_get_seks_post( NIMBLE_GLOBAL_SKOPE_ID );
-    return ! is_null($maybe_global_sek_post) || !!$maybe_global_sek_post;
+    $nb_section_created = 0;
+    if ( is_object($maybe_global_sek_post) ) {
+        $seks_data = maybe_unserialize($maybe_global_sek_post->post_content);
+        $seks_data = is_array( $seks_data ) ? $seks_data : array();
+        $nb_section_created = sek_count_not_empty_sections_in_page( $seks_data );
+    }
+    return $nb_section_created > 0;
 }
 
 
@@ -184,13 +192,20 @@ function sek_has_global_sections() {
 // added for https://github.com/presscustomizr/nimble-builder/issues/436
 // initially used to determine if a post or a page has been customized with Nimble Builder => if so, we add an edit link in the post/page list
 // when used in admin, the skope_id must be provided
+// can be used to determine if we need to render Nimble Builder assets on front. See ::sek_enqueue_front_assets()
 function sek_local_skope_has_nimble_sections( $skope_id = '' ) {
     if ( empty( $skope_id ) ) {
         sek_error_log( __FUNCTION__ . ' => missing skope id' );
         return false;
     }
-    $post = sek_get_seks_post( $skope_id );
-    return $post ? true : false;
+    $maybe_local_sek_post = sek_get_seks_post( $skope_id );
+    $nb_section_created = 0;
+    if ( is_object($maybe_local_sek_post) ) {
+        $seks_data = maybe_unserialize($maybe_local_sek_post->post_content);
+        $seks_data = is_array( $seks_data ) ? $seks_data : array();
+        $nb_section_created = sek_count_not_empty_sections_in_page( $seks_data );
+    }
+    return $nb_section_created > 0;
 }
 
 
