@@ -21,7 +21,7 @@ if ( ! function_exists( 'Nimble\sek_print_accordion' ) ) {
       $title_border_width = sek_extract_numeric_value( $accord_opts['title_border_w_css']);
 
       ?>
-        <?php printf('<div class="sek-accord-wrapper data-sek-accord-id="%1$s" data-sek-is-multi-item="%2$s" data-sek-first-expanded="%3$s" data-sek-one-expanded="%4$s" data-sek-has-global-border="%5$s" data-sek-has-title-border="%6$s" role="tablist">',
+        <?php printf('<div class="sek-accord-wrapper" data-sek-accord-id="%1$s" data-sek-is-multi-item="%2$s" data-sek-first-expanded="%3$s" data-sek-one-expanded="%4$s" data-sek-has-global-border="%5$s" data-sek-has-title-border="%6$s" role="tablist">',
             $model['id'],
             $is_accordion_multi_item ? "true" : "false",
             $first_expanded,
