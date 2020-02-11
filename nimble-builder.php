@@ -1,11 +1,14 @@
 <?php
 /**
 * Plugin Name: Nimble Page Builder
+* Plugin URI: https://nimblebuilder.com
 * Description: Powerful drag and drop page builder using the native WordPress customizer.
 * Version: 1.10.7
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://nimblebuilder.com/?utm_source=wp-plugins&utm_medium=wp-dashboard&utm_campaign=author-uri
+* License: GPLv3
+* License URI: https://www.gnu.org/licenses/gpl-3.0.html
 */
 if ( ! defined( 'ABSPATH' ) ) {
   exit;
