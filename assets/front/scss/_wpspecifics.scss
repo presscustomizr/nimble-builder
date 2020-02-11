@@ -1,0 +1,35 @@
+//
+// WordPress Specifics
+//
+[data-sek-level="module"] .sek-module-inner {
+  figcaption, .wp-caption {
+    color: #6d6d6d;
+    font-style: italic;
+    max-width: 100%;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    /* Keep wide captions from overflowing their container. */
+    padding: 4px;
+    margin-top: 1rem;
+  }
+  figure {
+    display: block;
+  }
+  .aligncenter, .aligncenter img {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .alignleft {
+    float: left;
+  }
+  .alignright {
+    float: right;
+  }
+  .alignnone, .aligncenter, .alignleft, .alignright, .alignwide {
+    margin-top: 1.5rem;
+    margin-right: auto;
+    margin-bottom: 1.5rem;
+    margin-left: auto;
+  }
+}
