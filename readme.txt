@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.3.2
-Stable tag: 1.10.8-beta
+Stable tag: 1.10.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,8 +120,9 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.10.7 =
-Fixes a javascript error on Firefox when using Youtube videos as section background. Flex-box layout is now optional for the shortcode module wrapper.
+= 1.10.8 =
+Performance improvements for a better page load time when using Nimble Builder.
+Various minor fixes in the HTML markup to be compliant with the latest HTML5 standards.
 
 == Changelog ==
 = 1.10.8 February 11th 2020 =
@@ -133,7 +134,7 @@ Fixes a javascript error on Firefox when using Youtube videos as section backgro
 * fixed : [Button module] error in html => Element div not allowed as child of element button
 * fixed : [Accordion module] html errors => aria-controls and aria-labelledby not properly implemented
 * fixed : [Carousel module] fix html errors related to lazyloading
-* improved : performance => consider adding 'async' attribute to main js front
+* improved : performance => added 'async' attribute to main js front
 
 = 1.10.7 January 22nd 2020 =
 * fixed : [Shortcode module] when flex is enabled layout can be broken => disabled flex by default
