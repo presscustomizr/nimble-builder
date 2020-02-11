@@ -14,11 +14,11 @@ $expand_below = true === sek_booleanize_checkbox_val( $mobile_options['expand_be
 ?>
  <nav class="sek-nav-wrap" data-sek-expand-below="<?php echo $expand_below; ?>">
     <button class="sek-nav-toggler sek-collapsed" type="button" data-sek-toggle="sek-collapse" data-target="#<?php echo $model['id'] ?>" aria-controls="<?php echo $model['id'] ?>" aria-expanded="false" aria-label="<?php esc_attr_e( 'Toggle navigation', 'textdomain_to_be_replaced' ) ?>">
-        <div class="sek-ham__span-wrapper">
+        <span class="sek-ham__span-wrapper">
           <span class="line line-1"></span>
           <span class="line line-2"></span>
           <span class="line line-3"></span>
-        </div>
+        </span>
     </button>
     <div class="sek-nav-collapse sek-collapse <?php echo $sek_nav_collapse_additional_classes ?>" id="<?php echo $model['id'] ?>">
   <?php
