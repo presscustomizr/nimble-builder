@@ -25,7 +25,6 @@
 
 .sek-service-font, .sek-module-inner .sek-btn {
   font-family: sans-serif;
-  letter-spacing: 1px;
 }
 
 .sek-container {
@@ -608,6 +607,42 @@ button.sek-btn,
   background: transparent;
 }
 
+[data-sek-level="module"] .sek-module-inner figcaption, [data-sek-level="module"] .sek-module-inner .wp-caption {
+  color: #6d6d6d;
+  font-style: italic;
+  max-width: 100%;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  /* Keep wide captions from overflowing their container. */
+  padding: 4px;
+  margin-top: 1rem;
+}
+
+[data-sek-level="module"] .sek-module-inner figure {
+  display: block;
+}
+
+[data-sek-level="module"] .sek-module-inner .aligncenter, [data-sek-level="module"] .sek-module-inner .aligncenter img {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+[data-sek-level="module"] .sek-module-inner .alignleft {
+  float: left;
+}
+
+[data-sek-level="module"] .sek-module-inner .alignright {
+  float: right;
+}
+
+[data-sek-level="module"] .sek-module-inner .alignnone, [data-sek-level="module"] .sek-module-inner .aligncenter, [data-sek-level="module"] .sek-module-inner .alignleft, [data-sek-level="module"] .sek-module-inner .alignright, [data-sek-level="module"] .sek-module-inner .alignwide {
+  margin-top: 1.5rem;
+  margin-right: auto;
+  margin-bottom: 1.5rem;
+  margin-left: auto;
+}
+
 .sek-module-inner h1, .sek-module-inner h2, .sek-module-inner h3, .sek-module-inner h4, .sek-module-inner h5, .sek-module-inner h6 {
   font-weight: 400;
   line-height: 1.5em;
@@ -825,6 +860,7 @@ button.sek-btn,
 .sek-ham__span-wrapper {
   height: 12px;
   position: relative;
+  display: block;
 }
 
 .sek-ham__span-wrapper .line {

@@ -2934,7 +2934,7 @@ jQuery( function($){
                                   enableCentering : 1,
                                   zeroTopAdjust: 0,
                                   setOpacityWhenCentered : false,//will set the opacity to 1
-                                  oncustom : [ 'simple_load', 'smartload', 'sek-nimble-refreshed' ]
+                                  oncustom : [ 'simple_load', 'smartload', 'sek-nimble-refreshed', 'recenter']
                             })
                             //images with src which starts with "data" are our smartload placeholders
                             //we don't want to trigger the simple_load on them
@@ -3003,12 +3003,28 @@ jQuery( function($){
               '.' + swiperClass,//$(this)[0],
               swiperParams
           ));
+
+          // On Swiper Lazy Loading
+          // https://swiperjs.com/api/#lazy
+          _utils_.each( mySwipers, function( _swiperInstance ){
+                _swiperInstance.on( 'lazyImageReady', function( slideEl, imageEl ) {
+                    $(imageEl).trigger('recenter');
+                });
+                _swiperInstance.on( 'lazyImageLoad', function( slideEl, imageEl ) {
+                    var $img = $(imageEl);
+                    $img.attr('sizes', $img.attr('data-sek-img-sizes') );
+                    $img.removeAttr('data-sek-img-sizes');
+                });
+          });
+
     };
     var doAllSwiperInstanciation = function() {
           $('.sektion-wrapper').find('[data-sek-swiper-id]').each( function() {
                 doSingleSwiperInstantiation.call($(this));
           });
     };
+
+
 
     // On custom events
     $( 'body').on( 'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-level-refreshed', '[data-sek-level="location"]',

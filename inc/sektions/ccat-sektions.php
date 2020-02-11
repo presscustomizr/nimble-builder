@@ -172,11 +172,19 @@ function sek_get_seks_setting_id( $skope_id = '' ) {
 
 
 // return bool
+// count the number of global section created, no matter if they are header footer or other global locations
+// can be used to determine if we need to render Nimble Builder assets on front. See ::sek_enqueue_front_assets()
 function sek_has_global_sections() {
     if ( skp_is_customizing() )
       return true;
     $maybe_global_sek_post = sek_get_seks_post( NIMBLE_GLOBAL_SKOPE_ID );
-    return ! is_null($maybe_global_sek_post) || !!$maybe_global_sek_post;
+    $nb_section_created = 0;
+    if ( is_object($maybe_global_sek_post) ) {
+        $seks_data = maybe_unserialize($maybe_global_sek_post->post_content);
+        $seks_data = is_array( $seks_data ) ? $seks_data : array();
+        $nb_section_created = sek_count_not_empty_sections_in_page( $seks_data );
+    }
+    return $nb_section_created > 0;
 }
 
 
@@ -184,13 +192,20 @@ function sek_has_global_sections() {
 // added for https://github.com/presscustomizr/nimble-builder/issues/436
 // initially used to determine if a post or a page has been customized with Nimble Builder => if so, we add an edit link in the post/page list
 // when used in admin, the skope_id must be provided
+// can be used to determine if we need to render Nimble Builder assets on front. See ::sek_enqueue_front_assets()
 function sek_local_skope_has_nimble_sections( $skope_id = '' ) {
     if ( empty( $skope_id ) ) {
         sek_error_log( __FUNCTION__ . ' => missing skope id' );
         return false;
     }
-    $post = sek_get_seks_post( $skope_id );
-    return $post ? true : false;
+    $maybe_local_sek_post = sek_get_seks_post( $skope_id );
+    $nb_section_created = 0;
+    if ( is_object($maybe_local_sek_post) ) {
+        $seks_data = maybe_unserialize($maybe_local_sek_post->post_content);
+        $seks_data = is_array( $seks_data ) ? $seks_data : array();
+        $nb_section_created = sek_count_not_empty_sections_in_page( $seks_data );
+    }
+    return $nb_section_created > 0;
 }
 
 
@@ -2518,7 +2533,12 @@ function sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $at
 
         if ( !empty( $attr['src'] ) ) {
             $attr['data-src'] = $attr['src'];
-            unset( $attr['src'] );
+            $attr['src'] = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            //unset( $attr['src'] );
+        }
+        if ( !empty( $attr['sizes'] ) ) {
+            $attr['data-sek-img-sizes'] = $attr['sizes'];
+            unset( $attr['sizes'] );
         }
 
         $attr = array_map( 'esc_attr', $attr );
@@ -17322,26 +17342,43 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_front_assets' ) );
             // Load customize preview js
             add_action ( 'customize_preview_init' , array( $this, 'sek_schedule_customize_preview_assets' ) );
+            // Adds `async` and `defer` support for scripts registered or enqueued
+            // and for which we've added an attribute with wp_script_add_data( $_hand, 'async', true );
+            // inspired from Twentytwenty WP theme
+            // @see https://core.trac.wordpress.org/ticket/12009
+            add_filter( 'script_loader_tag', array( $this, 'sek_filter_script_loader_tag' ), 10, 2 );
         }
 
         // hook : 'wp_enqueue_scripts'
         function sek_enqueue_front_assets() {
-            $rtl_suffix = is_rtl() ? '-rtl' : '';
+            // do we have local or global sections to render in this page ?
+            // see https://github.com/presscustomizr/nimble-builder/issues/586
+            // we know the skope_id because 'wp' has been fired
+            $has_local_sections = sek_local_skope_has_nimble_sections( skp_get_skope_id() );
+            $has_global_sections = sek_has_global_sections();
 
-            //wp_enqueue_style( 'google-material-icons', '//fonts.googleapis.com/icon?family=Material+Icons', array(), null, 'all' );
-            //base custom CSS bootstrap inspired
-            wp_enqueue_style(
-                'sek-base',
-                sprintf(
-                    '%1$s/assets/front/css/%2$s' ,
-                    NIMBLE_BASE_URL,
-                    sek_is_dev_mode() ? "sek-base{$rtl_suffix}.css" : "sek-base{$rtl_suffix}.min.css"
-                ),
-                array(),
-                NIMBLE_ASSETS_VERSION,
-                'all'
-            );
+            // Always load the base Nimble style when user logged in so we can display properly the button in the top admin bar.
+            if ( is_user_logged_in() || $has_local_sections || $has_global_sections ) {
+                $rtl_suffix = is_rtl() ? '-rtl' : '';
+                //wp_enqueue_style( 'google-material-icons', '//fonts.googleapis.com/icon?family=Material+Icons', array(), null, 'all' );
+                //base custom CSS bootstrap inspired
+                wp_enqueue_style(
+                    'sek-base',
+                    sprintf(
+                        '%1$s/assets/front/css/%2$s' ,
+                        NIMBLE_BASE_URL,
+                        sek_is_dev_mode() ? "sek-base{$rtl_suffix}.css" : "sek-base{$rtl_suffix}.min.css"
+                    ),
+                    array(),
+                    NIMBLE_ASSETS_VERSION,
+                    'all'
+                );
+            }
 
+            // We don't need Nimble Builder assets when no local or global sections have been created
+            // see https://github.com/presscustomizr/nimble-builder/issues/586
+            if ( !$has_local_sections && !$has_global_sections )
+              return;
 
             // wp_register_script(
             //     'sek-front-fmk-js',
@@ -17359,6 +17396,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 NIMBLE_ASSETS_VERSION,
                 true
             );
+            // added for https://github.com/presscustomizr/nimble-builder/issues/583
+            wp_script_add_data( 'sek-main-js', 'async', true );
 
             // Font awesome is always loaded when customizing
             // when not customizing, sek_front_needs_font_awesome() sniffs if the collection include a module using an icon
@@ -17528,6 +17567,37 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             );
             wp_enqueue_script( 'jquery-ui-resizable' );
         }
+
+
+        /**
+         * Fired @'script_loader_tag'
+         * Adds async/defer attributes to enqueued / registered scripts.
+         * based on a solution found in Twentytwenty
+         * and for which we've added an attribute with wp_script_add_data( $_hand, 'async', true );
+         * If #12009 lands in WordPress, this function can no-op since it would be handled in core.
+         *
+         * @param string $tag    The script tag.
+         * @param string $handle The script handle.
+         * @return string Script HTML string.
+        */
+        public function sek_filter_script_loader_tag( $tag, $handle ) {
+            if ( skp_is_customizing() )
+              return $tag;
+
+            foreach ( [ 'async', 'defer' ] as $attr ) {
+              if ( ! wp_scripts()->get_data( $handle, $attr ) ) {
+                continue;
+              }
+              // Prevent adding attribute when already added in #12009.
+              if ( ! preg_match( ":\s$attr(=|>|\s):", $tag ) ) {
+                $tag = preg_replace( ':(?=></script>):', " $attr", $tag, 1 );
+              }
+              // Only allow async or defer, not both.
+              break;
+            }
+            return $tag;
+        }
+
 
         //'wp_footer' in the preview frame
         function sek_print_ui_tmpl() {
