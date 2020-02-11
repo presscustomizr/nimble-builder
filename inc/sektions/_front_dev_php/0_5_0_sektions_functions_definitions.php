@@ -2533,7 +2533,12 @@ function sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $at
 
         if ( !empty( $attr['src'] ) ) {
             $attr['data-src'] = $attr['src'];
-            unset( $attr['src'] );
+            $attr['src'] = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            //unset( $attr['src'] );
+        }
+        if ( !empty( $attr['sizes'] ) ) {
+            $attr['data-sek-img-sizes'] = $attr['sizes'];
+            unset( $attr['sizes'] );
         }
 
         $attr = array_map( 'esc_attr', $attr );
