@@ -43,8 +43,9 @@ if ( ! function_exists( 'Nimble\sek_print_accordion' ) ) {
                   $item_html_content = sek_parse_template_tags( $item_html_content );
 
                   // Put them together
-                  printf( '<div class="sek-accord-item" title="%1$s" data-sek-item-id="%2$s" data-sek-expanded="%5$s"><div class="sek-accord-title" role="tab" aria-controls="sek-tab-content-%2$s"><span class="sek-inner-accord-title">%3$s</span><button><span></span><span></span></button></div><div class="sek-accord-content" role="tabpanel" aria-labelledby="sek-tab-content-%2$s">%4$s</div></div>',
-                      esc_html( esc_attr( $item['title_attr'] ) ),
+                  $title_attr = esc_html( esc_attr( $item['title_attr'] ) );
+                  printf( '<div class="sek-accord-item" %1$s data-sek-item-id="%2$s" data-sek-expanded="%5$s"><div id="sek-tab-title-%2$s" class="sek-accord-title" role="tab" aria-controls="sek-tab-content-%2$s"><span class="sek-inner-accord-title">%3$s</span><button><span></span><span></span></button></div><div id="sek-tab-content-%2$s" class="sek-accord-content" role="tabpanel" aria-labelledby="sek-tab-title-%2$s">%4$s</div></div>',
+                      empty($title_attr) ? '' : 'title="'. $title_attr . '"',
                       $item['id'],
                       $title,
                       $item_html_content,
