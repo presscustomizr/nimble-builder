@@ -39,11 +39,11 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * Use **full width image or video backgrounds** for your sections, and [enable a parallax effect](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link).
 * **Easily [customize your content specifically for mobile devices](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** : change the responsive breakpoint, adapt font-size, spacing, alignment, column layouts, in real-time preview.
 * **Customize any text [with Google Fonts](https://docs.presscustomizr.com/article/364-how-to-use-google-fonts-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)**.
+* Add **[custom CSS](https://docs.presscustomizr.com/article/409-how-to-add-custom-css-to-a-specific-page-of-your-wordpress-site/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** to any specific page of your site ( and only to this page ) : post, page, archive, 404 page, WooCommerce product, etc.
 * **[Export / Import](https://docs.presscustomizr.com/article/391-how-to-export-and-import-templates-with-nimble-builder)** : re-use your sections in other pages and between sites.
 * **[Embed shortcodes](https://docs.presscustomizr.com/article/350-how-to-use-shortcodes-from-other-plugins-with-the-nimble-builder-plugin/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page) from other plugins**, and see the result in real-time preview.
 * Nimble Builder automatically generates responsive HTML markup for a **pixel-perfect rendering on smartphones and tablets**.
-* Embed WordPress blocks, videos, tweets or any embed types supported by WordPress, and see the result in real-time preview.
-* Nimble Builder Leverage the WordPress customizer auto-drafting and schedule publishing features. You can safely build and save drafts of your content before deploying in production.
+* Nimble Builder leverage the WordPress customizer auto-drafting and schedule publishing features. You can safely build and save drafts of your content before deploying in production.
 
 = Content modules =
 * Headings
