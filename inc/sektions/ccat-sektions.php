@@ -1506,16 +1506,19 @@ function sek_img_sizes_preg_replace_callback( $matches ) {
 * @return string
 */
 function nimble_regex_callback( $matches ) {
-    $_placeholder = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-
-    if ( false !== strpos( $matches[0], 'data-sek-src' ) || preg_match('/ data-sek-smartload *= *"false" */', $matches[0]) ) {
+    // bail if the img has already been parsed for swiper slider lazyloading ( https://github.com/presscustomizr/nimble-builder/issues/596 )
+    if ( false !== strpos( $matches[0], 'data-srcset' ) || false !== strpos( $matches[0], 'data-src' ) ) {
       return $matches[0];
+    // bail if already parsed by this regex or if smartload is disabled
+    } else if ( false !== strpos( $matches[0], 'data-sek-src' ) || preg_match('/ data-sek-smartload *= *"false" */', $matches[0]) ) {
+      return $matches[0];
+    // otherwise go ahead and parse
     } else {
       return apply_filters( 'nimble_img_smartloaded',
         str_replace( array('srcset=', 'sizes='), array('data-sek-srcset=', 'data-sek-sizes='),
             sprintf('<img %1$s src="%2$s" data-sek-src="%3$s" %4$s>',
                 $matches[1],
-                $_placeholder,
+                'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
                 $matches[2],
                 $matches[3]
             )
@@ -18329,7 +18332,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => missing module_type for a module', $model );
                         break;
                     }
+
                     $module_type = $model['module_type'];
+
+                    if ( ! CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+                        sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => module_type not registered', $module_type );
+                        break;
+                    }
+
                     $model = sek_normalize_module_value_with_defaults( $model );
                     // update the current cached model
                     $this->model = $model;
@@ -18393,7 +18403,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                         $this->sek_maybe_print_preview_level_guid_html(), //<= added for #494
                         $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': ''// <= added for #532
-                      );
+                    );
                       ?>
                         <div class="sek-module-inner">
                           <?php

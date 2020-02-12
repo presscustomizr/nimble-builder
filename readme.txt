@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.3.2
-Stable tag: 1.10.8
+Stable tag: 1.10.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,11 +120,16 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.10.8 =
-Performance improvements for a better page load time when using Nimble Builder.
-Various minor fixes in the HTML markup to be compliant with the latest HTML5 standards.
+= 1.10.9 =
+Lazyloading improvements for the carousel module. Better mobile display of the menu module.
 
 == Changelog ==
+= 1.10.9 February 12th 2020 =
+* fixed : make sure Nimble doesn't try to render a module not registered. This can occur after importing sections including custom modules
+* fixed : [Carousel module] Lazy load break layout of first slide
+* fixed : [Menu module] Option for full width below the menu hamburger icon is broken
+* added : [Carousel module] lazyload slider images when global or local lazyload is enabled
+
 = 1.10.8 February 11th 2020 =
 * fixed : performance => no need to load front css / js assets when no local and global sections are rendered
 * fixed : removed letter-spacing to font affecting button style
