@@ -1506,16 +1506,19 @@ function sek_img_sizes_preg_replace_callback( $matches ) {
 * @return string
 */
 function nimble_regex_callback( $matches ) {
-    $_placeholder = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-
-    if ( false !== strpos( $matches[0], 'data-sek-src' ) || preg_match('/ data-sek-smartload *= *"false" */', $matches[0]) ) {
+    // bail if the img has already been parsed for swiper slider lazyloading ( https://github.com/presscustomizr/nimble-builder/issues/596 )
+    if ( false !== strpos( $matches[0], 'data-srcset' ) || false !== strpos( $matches[0], 'data-src' ) ) {
       return $matches[0];
+    // bail if already parsed by this regex or if smartload is disabled
+    } else if ( false !== strpos( $matches[0], 'data-sek-src' ) || preg_match('/ data-sek-smartload *= *"false" */', $matches[0]) ) {
+      return $matches[0];
+    // otherwise go ahead and parse
     } else {
       return apply_filters( 'nimble_img_smartloaded',
         str_replace( array('srcset=', 'sizes='), array('data-sek-srcset=', 'data-sek-sizes='),
             sprintf('<img %1$s src="%2$s" data-sek-src="%3$s" %4$s>',
                 $matches[1],
-                $_placeholder,
+                'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
                 $matches[2],
                 $matches[3]
             )

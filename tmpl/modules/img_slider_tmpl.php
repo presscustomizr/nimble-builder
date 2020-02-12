@@ -56,10 +56,12 @@ if ( ! function_exists( 'Nimble\sek_slider_parse_template_tags') ) {
 }
 
 if ( ! function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
-    function sek_get_img_slider_module_img_html( $item, $lazy_load_on ) {
+    function sek_get_img_slider_module_img_html( $item, $lazy_load_on, $index ) {
         $html = '';
         if ( is_int( $item['img'] ) ) {
-            if ( $lazy_load_on ) {
+            // don't parse the first image of the carousel for lazyloading
+            // @see https://github.com/presscustomizr/nimble-builder/issues/596
+            if ( $lazy_load_on && 0 !== $index ) {
                 $html = sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $item['img'], empty( $item['img-size'] ) ? 'large' : $item['img-size']);
                 $html .= '<div class="swiper-lazy-preloader"></div>';//this element is removed by swiper.js once the image is loaded @see https://swiperjs.com/api/#lazy
             } else {
@@ -71,8 +73,8 @@ if ( ! function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
             // in particular when calculting if is_visible() to decide if we smart load.
             $html = sprintf( '<img alt="default img" data-sek-smartload="false" src="%1$s"/>', esc_url(  $item['img'] )  );
         }
-        return $html;
-        //return apply_filters( 'nimble_parse_for_smart_load', sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', $visual_effect_class, $html, esc_html( $title ) ) );
+        //return $html;
+        return apply_filters( 'nimble_parse_for_smart_load', $html );
     }
 }
 
@@ -105,7 +107,7 @@ if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
           <?php if ( is_array( $img_collection ) && count( $img_collection ) > 0 ) : ?>
             <div class="swiper-wrapper">
               <?php
-              foreach( $img_collection as $item ) {
+              foreach( $img_collection as $index => $item ) {
                   $is_text_enabled = true === sek_booleanize_checkbox_val( $item['enable_text'] );
                   $text_content = $is_text_enabled ? $item['text_content'] : '';
                   $has_text_content = ! empty( $text_content );
@@ -119,7 +121,7 @@ if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
                   // Put them together
                   printf( '<div class="swiper-slide" title="%1$s" data-sek-item-id="%4$s" data-sek-has-overlay="%5$s"><figure class="sek-carousel-img">%2$s</figure>%3$s</div>',
                       sek_slider_parse_template_tags( esc_html( esc_attr( $item['title_attr'] ) ), $item ),
-                      sek_get_img_slider_module_img_html( $item, "true" === $lazy_load_on ),
+                      sek_get_img_slider_module_img_html( $item, "true" === $lazy_load_on, $index ),
                       sek_slider_parse_template_tags( $text_html, $item ),
                       $item['id'],
                       true === sek_booleanize_checkbox_val( $has_overlay ) ? 'true' : 'false'
