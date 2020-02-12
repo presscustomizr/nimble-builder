@@ -560,7 +560,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => missing module_type for a module', $model );
                         break;
                     }
+
                     $module_type = $model['module_type'];
+
+                    if ( ! CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+                        sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => module_type not registered', $module_type );
+                        break;
+                    }
+
                     $model = sek_normalize_module_value_with_defaults( $model );
                     // update the current cached model
                     $this->model = $model;
@@ -624,7 +631,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                         $this->sek_maybe_print_preview_level_guid_html(), //<= added for #494
                         $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': ''// <= added for #532
-                      );
+                    );
                       ?>
                         <div class="sek-module-inner">
                           <?php
