@@ -682,7 +682,7 @@ function sek_hex2rgb( $hex, $array = false, $make_prop_value = false ) {
 function sek_rgb2rgba( $rgb, $alpha = 0.7, $array = false, $make_prop_value = false ) {
     $rgb   = is_array( $rgb ) ? $rgb : explode( ',', $rgb );
     $rgb   = is_array( $rgb) ? $rgb : array( $rgb );
-    $rgb   = count( $rgb ) < 3 ? array_pad( $rgb, 3, 255 ) : $rgb;
+    $rgb   = $rgba = count( $rgb ) < 3 ? array_pad( $rgb, 3, 255 ) : $rgb;
 
     $rgba[] = $alpha;
 
@@ -721,12 +721,24 @@ function sek_rgb2hex( $rgb, $make_prop_value = false ) {
 
 /**
  *  Convert rgba to rgb array + alpha
+ *  @param $rgba string example rgba(221,51,51,0.72)
+ *  @return array()
  */
 function sek_rgba2rgb_a( $rgba ) {
     $rgba = is_array( $rgba ) ? $rgba : explode( ',', $rgba );
     $rgba = is_array( $rgba) ? $rgba : array( $rgba );
+    // make sure we remove all parenthesis remaining
+    $rgba = array_map( function( $val ) {
+        return str_replace(array('(', ')' ), '', $val);
+    }, array_values( $rgba ) );
+    $rgb =  array_slice( $rgba, 0, 3 );
+    // remove everything but numbers
+    $rgb = array_map( function( $_val ) {
+        return preg_replace('/[^0-9]/', '', $_val);
+    }, array_values( $rgb ) );
+
     return array(
-        array_slice( $rgba, 0, 3 ),
+        $rgb,
         // https://github.com/presscustomizr/nimble-builder/issues/303
         isset( $rgba[3] ) ? $rgba[3] : 1
     );
