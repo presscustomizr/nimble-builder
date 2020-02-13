@@ -75,10 +75,12 @@ fieldset[disabled] a.sek-btn {
   [type="submit"]::-moz-focus-inner {
     padding: 0;
     border-style: none;
-    .sek-btn {
-      padding: 0.5em 1em;
-      border-style: solid;
-    }
+    // Commented because generating error when validating with https://jigsaw.w3.org/
+    // see https://github.com/presscustomizr/nimble-builder/issues/597
+    // .sek-btn {
+    //   padding: 0.5em 1em;
+    //   border-style: solid;
+    // }
   }
 }
 
