@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.3.2
-Stable tag: 1.10.9
+Stable tag: 1.10.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -43,7 +43,7 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * **[Export / Import](https://docs.presscustomizr.com/article/391-how-to-export-and-import-templates-with-nimble-builder)** : re-use your sections in other pages and between sites.
 * **[Embed shortcodes](https://docs.presscustomizr.com/article/350-how-to-use-shortcodes-from-other-plugins-with-the-nimble-builder-plugin/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page) from other plugins**, and see the result in real-time preview.
 * Nimble Builder automatically generates responsive HTML markup for a **pixel-perfect rendering on smartphones and tablets**.
-* Nimble Builder leverage the WordPress customizer auto-drafting and schedule publishing features. You can safely build and save drafts of your content before deploying in production.
+* Nimble Builder leverages the WordPress live customizer features for auto-drafting and schedule publishing. You can safely build and save drafts of your content before deploying in production.
 
 = Content modules =
 * Headings
@@ -120,10 +120,19 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.10.9 =
-Lazyloading improvements for the carousel module. Better mobile display of the menu module.
+= 1.10.10 =
+Updated Font Awesome icons to latest version. Performance improvements => 1)fixed "ghosts" Google fonts loaded even if not used, 2) better management of when Font Awesome assets should be loaded.
 
 == Changelog ==
+= 1.10.10 February 15th 2020 =
+* fixed : button style => "-moz-focus-inner" pseudo class breaks CSS validation
+* fixed : Wrong css rule generated 'background-color:rgba(0));' due to issues with php color helpers
+* fixed : [performance] don't load font awesome when already loaded by customizr or hueman
+* fixed : [performance] "ghosts" google fonts can be loaded even when not used anywhere
+* improved : [asset] update Font Awesome to latest version
+* improved : [quote module] cite default font-size set to 14px instead of 13px
+* improved : [menu module][quote module][performance] replaced Font Awesome arrows icon by unicode characters
+
 = 1.10.9 February 12th 2020 =
 * fixed : make sure Nimble doesn't try to render a module not registered. This can occur after importing sections including custom modules
 * fixed : [Carousel module] Lazy load break layout of first slide

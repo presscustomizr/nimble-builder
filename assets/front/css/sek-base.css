@@ -591,14 +591,6 @@ fieldset[disabled] a.sek-btn {
   border-style: none;
 }
 
-.sektion-wrapper button::-moz-focus-inner .sek-btn,
-.sektion-wrapper [type="button"]::-moz-focus-inner .sek-btn,
-.sektion-wrapper [type="reset"]::-moz-focus-inner .sek-btn,
-.sektion-wrapper [type="submit"]::-moz-focus-inner .sek-btn {
-  padding: 0.5em 1em;
-  border-style: solid;
-}
-
 button.sek-btn,
 [type="button"].sek-btn,
 [type="reset"].sek-btn,
@@ -775,14 +767,14 @@ button.sek-btn,
 
 .sek-nav .menu-item-has-children > a::after,
 .sek-nav .page_item_has_children > a::after {
-  content: "\f107";
-  -moz-osx-font-smoothing: grayscale;
+  content: "\203A";
+  font-family: "Arial Unicode MS", Arial;
+  moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   display: none;
   font-style: normal;
   font-variant: normal;
   text-rendering: auto;
-  font-family: 'Font Awesome 5 Free';
   font-weight: 900;
   transition: all 0.3s ease;
   -webkit-transform-style: preserve-3d;
@@ -792,16 +784,18 @@ button.sek-btn,
   -webkit-perspective: 1000px;
   perspective: 1000px;
   padding: 0 .45em;
-  font-size: .8em;
-  top: .1em;
+  font-size: 1em;
   position: relative;
+  -webkit-transform: translateZ(0) rotate(90deg);
+  transform: translateZ(0) rotate(90deg);
+  -ms-transform: rotate(90deg);
 }
 
 .sek-nav .menu-item-has-children.show > a::after,
 .sek-nav .page_item_has_children.show > a::after {
-  -webkit-transform: translateZ(0) rotate(-180deg) !important;
-  transform: translateZ(0) rotate(-180deg) !important;
-  -ms-transform: rotate(-180deg) !important;
+  -webkit-transform: translateZ(0) rotate(-90deg) !important;
+  transform: translateZ(0) rotate(-90deg) !important;
+  -ms-transform: rotate(-90deg) !important;
 }
 
 .sek-nav .sub-menu,
@@ -830,14 +824,16 @@ button.sek-btn,
 }
 
 .sek-dropdown-submenu > a::after {
-  -webkit-transform: translateZ(0) rotate(-90deg);
-  transform: translateZ(0) rotate(-90deg);
-  -ms-transform: rotate(-90deg);
+  -webkit-transform: translateZ(0) rotate(0deg) !important;
+  transform: translateZ(0) rotate(0deg) !important;
+  -ms-transform: rotate(0deg) !important;
 }
 
 .sek-dropdown-submenu > a[class*=-reverse]::after {
-  -webkit-transform: translateZ(0) rotate(-270deg);
-  transform: translateZ(0) rotate(-270deg);
+  top: .1em;
+  -webkit-transform: translateZ(0) rotate(-180deg) !important;
+  transform: translateZ(0) rotate(-180deg) !important;
+  -ms-transform: rotate(-180deg) !important;
 }
 
 .sek-module-inner .sek-nav-toggler {
@@ -1448,7 +1444,6 @@ button.sek-btn,
 }
 
 [data-sek-module-type="czr_icon_module"] .sek-icon i {
-  webkit-transition: all 0.15s ease-in-out;
   transition: all 0.15s ease-in-out;
 }
 
@@ -1478,7 +1473,7 @@ button.sek-btn,
 }
 
 .sek-quote .sek-cite {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5em;
   font-style: inherit;
 }
@@ -1516,7 +1511,7 @@ button.sek-btn,
 
 .sek-quote.sek-quote-design .sek-quote-inner {
   color: inherit;
-  padding-left: calc(10px + 1.3em);
+  padding-left: calc(10px + 0.7em);
 }
 
 .sek-quote.sek-quote-design .sek-quote-content {
@@ -1555,7 +1550,7 @@ button.sek-btn,
   position: relative;
   display: -ms-flexbox;
   display: flex;
-  font-size: 32px;
+  font-size: 50px;
 }
 
 .sek-quote.sek-quote-design.sek-quote-icon-before .sek-quote-content *:last-child {
@@ -1563,24 +1558,22 @@ button.sek-btn,
 }
 
 .sek-quote.sek-quote-design.sek-quote-icon-before::before {
-  content: '\f10d';
+  content: "\275D";
+  font-family: "Arial Unicode MS", Code2000;
   color: #ccc;
-  font-weight: 900;
   font-style: normal;
   text-align: center;
-  font-family: 'Font Awesome 5 Free';
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   font-variant: normal;
   text-rendering: auto;
   display: -ms-flexbox;
   display: flex;
-  position: static;
   width: auto;
   margin: 0;
   left: 0;
   position: absolute;
-  top: 0;
+  top: 10px;
 }
 
 [data-sek-module-type="czr_button_module"] .sek-module-inner {

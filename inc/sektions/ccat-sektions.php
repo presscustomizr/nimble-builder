@@ -1352,7 +1352,7 @@ function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
             $recursive_data = array_merge( $local_collection, $global_collection );
         }
 
-        $font_awesome_dependant_modules = array( 'czr_button_module', 'czr_icon_module', 'czr_menu_module' );
+        $font_awesome_dependant_modules = array( 'czr_button_module', 'czr_icon_module', 'czr_social_icons_module', 'czr_quote_module' );
 
         foreach ($recursive_data as $key => $value) {
             if ( is_array( $value ) && array_key_exists('module_type', $value) && in_array($value['module_type'], $font_awesome_dependant_modules ) ) {
@@ -4499,7 +4499,7 @@ function sek_hex2rgb( $hex, $array = false, $make_prop_value = false ) {
 function sek_rgb2rgba( $rgb, $alpha = 0.7, $array = false, $make_prop_value = false ) {
     $rgb   = is_array( $rgb ) ? $rgb : explode( ',', $rgb );
     $rgb   = is_array( $rgb) ? $rgb : array( $rgb );
-    $rgb   = count( $rgb ) < 3 ? array_pad( $rgb, 3, 255 ) : $rgb;
+    $rgb   = $rgba = count( $rgb ) < 3 ? array_pad( $rgb, 3, 255 ) : $rgb;
 
     $rgba[] = $alpha;
 
@@ -4538,12 +4538,24 @@ function sek_rgb2hex( $rgb, $make_prop_value = false ) {
 
 /**
  *  Convert rgba to rgb array + alpha
+ *  @param $rgba string example rgba(221,51,51,0.72)
+ *  @return array()
  */
 function sek_rgba2rgb_a( $rgba ) {
     $rgba = is_array( $rgba ) ? $rgba : explode( ',', $rgba );
     $rgba = is_array( $rgba) ? $rgba : array( $rgba );
+    // make sure we remove all parenthesis remaining
+    $rgba = array_map( function( $val ) {
+        return str_replace(array('(', ')' ), '', $val);
+    }, array_values( $rgba ) );
+    $rgb =  array_slice( $rgba, 0, 3 );
+    // remove everything but numbers
+    $rgb = array_map( function( $_val ) {
+        return preg_replace('/[^0-9]/', '', $_val);
+    }, array_values( $rgb ) );
+
     return array(
-        array_slice( $rgba, 0, 3 ),
+        $rgb,
         // https://github.com/presscustomizr/nimble-builder/issues/303
         isset( $rgba[3] ) ? $rgba[3] : 1
     );
@@ -8901,14 +8913,16 @@ function sek_get_module_params_for_czr_social_icons_module() {
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '.sek-social-icons-wrapper' ),//array( '.sek-icon i' ),
         'render_tmpl_path' => "social_icons_tmpl.php",
-        'front_assets' => array(
-              'czr-font-awesome' => array(
-                  'type' => 'css',
-                  //'handle' => 'czr-font-awesome',
-                  'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
-                  //'deps' => array()
-              )
-        )
+        // Nimble will "sniff" if we need font awesome
+        // No need to enqueue font awesome here
+        // 'front_assets' => array(
+        //       'czr-font-awesome' => array(
+        //           'type' => 'css',
+        //           //'handle' => 'czr-font-awesome',
+        //           'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
+        //           //'deps' => array()
+        //       )
+        // )
     );
 }
 
@@ -9525,14 +9539,16 @@ function sek_get_module_params_for_czr_icon_module() {
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '.sek-icon-wrapper' ),//array( '.sek-icon i' ),
         'render_tmpl_path' => "icon_module_tmpl.php",
-        'front_assets' => array(
-              'czr-font-awesome' => array(
-                  'type' => 'css',
-                  //'handle' => 'czr-font-awesome',
-                  'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
-                  //'deps' => array()
-              )
-        )
+        // Nimble will "sniff" if we need font awesome
+        // see ::sek_front_needs_font_awesome()
+        // 'front_assets' => array(
+        //       'czr-font-awesome' => array(
+        //           'type' => 'css',
+        //           //'handle' => 'czr-font-awesome',
+        //           'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
+        //           //'deps' => array()
+        //       )
+        // )
     );
 }
 
@@ -9906,12 +9922,14 @@ function sek_get_module_params_for_czr_quote_module() {
         ),
         'css_selectors' => array( '.sek-module-inner' ),
         'render_tmpl_path' => "quote_module_tmpl.php",
-        'front_assets' => array(
-              'czr-font-awesome' => array(
-                  'type' => 'css',
-                  'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
-              )
-        )
+        // Nimble will "sniff" if we need font awesome
+        // No need to enqueue font awesome here
+        // 'front_assets' => array(
+        //       'czr-font-awesome' => array(
+        //           'type' => 'css',
+        //           'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
+        //       )
+        // )
     );
 }
 
@@ -10130,7 +10148,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 'cite_font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __( 'Font size', 'text_doma' ),
-                    'default'     => array( 'desktop' => '13px' ),
+                    'default'     => array( 'desktop' => '14px' ),
                     'min' => 0,
                     'max' => 100,
                     'width-100'         => true,
@@ -10310,7 +10328,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
                 'icon_size_css' => array(
                     'input_type'  => 'range_with_unit_picker',
                     'title'       => __( 'Icon Size', 'text_doma' ),
-                    'default'     => '32px',
+                    'default'     => '50px',
                     'min' => 0,
                     'max' => 100,
                     'width-100'         => true,
@@ -17116,7 +17134,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         function sek_retrieve_decoded_font_awesome_icons() {
             // this file must be generated with: https://github.com/presscustomizr/nimble-builder/issues/57
             $faicons_json_path      = NIMBLE_BASE_PATH . '/assets/faicons.json';
-            $faicons_transient_name = 'sek_font_awesome_november_2018';
+            $faicons_transient_name = 'sek_font_awesome_february_2020';
             if ( false == get_transient( $faicons_transient_name ) ) {
                 if ( file_exists( $faicons_json_path ) ) {
                     $faicons_raw      = @file_get_contents( $faicons_json_path );
@@ -17343,6 +17361,9 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
         function _schedule_front_and_preview_assets_printing() {
             // Load Front Assets
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_front_assets' ) );
+            // Maybe load Font Awesome icons if needed ( sniff first )
+            add_action( 'wp_enqueue_scripts', array( $this, 'sek_maybe_enqueue_font_awesome_icons' ), PHP_INT_MAX );
+
             // Load customize preview js
             add_action ( 'customize_preview_init' , array( $this, 'sek_schedule_customize_preview_assets' ) );
             // Adds `async` and `defer` support for scripts registered or enqueued
@@ -17401,18 +17422,6 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             );
             // added for https://github.com/presscustomizr/nimble-builder/issues/583
             wp_script_add_data( 'sek-main-js', 'async', true );
-
-            // Font awesome is always loaded when customizing
-            // when not customizing, sek_front_needs_font_awesome() sniffs if the collection include a module using an icon
-            if ( ! skp_is_customizing() && sek_front_needs_font_awesome() ) {
-                wp_enqueue_style(
-                    'czr-font-awesome',
-                    NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
-                    array(),
-                    NIMBLE_ASSETS_VERSION,
-                    $media = 'all'
-                );
-            }
 
             // Magnific Popup is loaded when needed only
             if ( ! skp_is_customizing() && sek_front_needs_magnific_popup() ) {
@@ -17474,6 +17483,28 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
         }//sek_enqueue_front_assets
 
+        // hook : 'wp_enqueue_scripts:PHP_INT_MAX'
+        // Feb 2020 => now check if Hueman or Customizr has already loaded font awesome
+        // @see https://github.com/presscustomizr/nimble-builder/issues/600
+        function sek_maybe_enqueue_font_awesome_icons() {
+            // if active theme is Hueman or Customizr, Font Awesome may already been enqueued.
+            // asset handle for Customizr => 'customizr-fa'
+            // asset handle for Hueman => 'hueman-font-awesome'
+            if ( wp_style_is('customizr-fa', 'enqueued') || wp_style_is('hueman-font-awesome', 'enqueued') )
+              return;
+
+            // Font awesome is always loaded when customizing
+            // when not customizing, sek_front_needs_font_awesome() sniffs if the collection include a module using an icon
+            if ( ! skp_is_customizing() && sek_front_needs_font_awesome() ) {
+                wp_enqueue_style(
+                    'czr-font-awesome',
+                    NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
+                    array(),
+                    NIMBLE_ASSETS_VERSION,
+                    $media = 'all'
+                );
+            }
+        }
 
         // enqueue / print customize preview assets
         // hook : 'customize_preview_init'
