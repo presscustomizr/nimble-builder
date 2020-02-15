@@ -34,10 +34,10 @@
         .#{$project-prefix}quote-inner {
             color: inherit;
             @if ( true == $is_rtl ) {
-              padding-right: calc( 10px + 1.3em );
+              padding-right: calc( 10px + 0.7em );
             }
             @else {
-              padding-left: calc( 10px + 1.3em );
+              padding-left: calc( 10px + 0.7em );
             }
         }
         .#{$project-prefix}quote-content {
@@ -92,26 +92,25 @@
         &.#{$project-prefix}quote-icon-before {
             position: relative;
             display: flex;
-            font-size: 32px;
+            font-size: 50px;
             .#{$project-prefix}quote-content *:last-child {
                 margin-bottom: .75em;
             }
             &::before {
-                content: '\f10d';
+                // Feb 2020 => replaced font awesome by a unicode character well supported
+                // see https://github.com/presscustomizr/nimble-builder/issues/603
+                content: "\275D";//https://unicode-table.com/en/275D/
+                font-family: "Arial Unicode MS", Code2000;//<= https://www.fileformat.info/info/unicode/char/275D/fontsupport.htm
                 color: #ccc;
-                font-weight: 900;
                 font-style: normal;
                 text-align: center;
-                font-family: 'Font Awesome 5 Free';
                 -moz-osx-font-smoothing: grayscale;
                 -webkit-font-smoothing: antialiased;
                 font-variant: normal;
                 text-rendering: auto;
                 display: flex;
-                position: static;
                 width: auto;
                 margin: 0;
-
                 @if ( true == $is_rtl ) {
                   right: 0;
                 }
@@ -119,7 +118,7 @@
                   left: 0;
                 }
                 position: absolute;
-                top: 0;
+                top: 10px;
             }
         }
     }

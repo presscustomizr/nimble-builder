@@ -437,7 +437,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
                 'icon_size_css' => array(
                     'input_type'  => 'range_with_unit_picker',
                     'title'       => __( 'Icon Size', 'text_doma' ),
-                    'default'     => '32px',
+                    'default'     => '50px',
                     'min' => 0,
                     'max' => 100,
                     'width-100'         => true,
