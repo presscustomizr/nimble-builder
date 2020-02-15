@@ -242,10 +242,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           return;
                                     }
 
-                                    // add it only if gfont
-                                    if ( newFontFamily.indexOf('gfont') > -1 ) {
-                                          self.updateGlobalGFonts( newFontFamily );
-                                    }
+                                    // will add it only if gfont
+                                    self.updateGlobalGFonts( newFontFamily );
                               }
 
                               // REFRESH THE STYLESHEET ?
@@ -355,7 +353,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // if the changed input is a google font modifier ( <=> true === refresh_fonts )
                   // => we want to first refresh the google font collection, and then proceed the requested action
-                  // this way we make sure that the customized value used when ajaxing will take into account when writing the google font http request link
+                  // this way we make sure that the customized value used when ajaxing will be taken into account when writing the google font http request link
                   if ( true === refresh_fonts ) {
                         var newFontFamily = params.settingParams.args.input_value;
                         if ( ! _.isString( newFontFamily ) ) {
@@ -364,34 +362,30 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
 
                         // add it only if gfont
-                        if ( newFontFamily.indexOf('gfont') > -1 ) {
-                              if ( true === params.isGlobalOptions ) {
-                                    _doUpdateWithRequestedAction( newFontFamily );
-                              } else {
-                                    self.updateAPISetting({
-                                          action : 'sek-update-fonts',
-                                          font_family : newFontFamily,
-                                          is_global_location : self.isGlobalLocation( params.uiParams )
-                                    })
-                                    // we use always() instead of done here, because the api section setting might not be changed ( and therefore return a reject() promise ).
-                                    // => this can occur when a user is setting a google font already picked elsewhere
-                                    // @see case 'sek-update-fonts'
-                                    .always( function() {
-                                          _doUpdateWithRequestedAction().then( function() {
-                                                // always refresh again after
-                                                // Why ?
-                                                // Because the first refresh was done before actually setting the new font family, so based on a previous set of fonts
-                                                // which leads to have potentially an additional google fonts that we don't need after the first refresh
-                                                // that's why this second refresh is required. It wont trigger any preview ajax actions. Simply refresh the root fonts property of the main api setting.
-                                                self.updateAPISetting({
-                                                      action : 'sek-update-fonts',
-                                                      is_global_location : self.isGlobalLocation( params.uiParams )
-                                                });
+                        if ( true === params.isGlobalOptions ) {
+                              _doUpdateWithRequestedAction( newFontFamily );
+                        } else {
+                              self.updateAPISetting({
+                                    action : 'sek-update-fonts',
+                                    font_family : newFontFamily,
+                                    is_global_location : self.isGlobalLocation( params.uiParams )
+                              })
+                              // we use always() instead of done here, because the api section setting might not be changed ( and therefore return a reject() promise ).
+                              // => this can occur when a user is setting a google font already picked elsewhere
+                              // @see case 'sek-update-fonts'
+                              .always( function() {
+                                    _doUpdateWithRequestedAction().then( function() {
+                                          // always refresh again after
+                                          // Why ?
+                                          // Because the first refresh was done before actually setting the new font family, so based on a previous set of fonts
+                                          // which leads to have potentially an additional google fonts that we don't need after the first refresh
+                                          // that's why this second refresh is required. It wont trigger any preview ajax actions. Simply refresh the root fonts property of the main api setting.
+                                          self.updateAPISetting({
+                                                action : 'sek-update-fonts',
+                                                is_global_location : self.isGlobalLocation( params.uiParams )
                                           });
                                     });
-                              }
-                        } else {
-                             _doUpdateWithRequestedAction();
+                              });
                         }
                   } else {
                         _doUpdateWithRequestedAction();
@@ -409,13 +403,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Get the gfonts from the level options and modules values
                   var currentGfonts = self.sniffGlobalGFonts( clonedGlobalOptions );
-                  if ( ! _.contains( currentGfonts, newFontFamily ) ) {
-                        if ( newFontFamily.indexOf('gfont') < 0 ) {
-                              api.errare( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont' );
-                              __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => error => must be a google font, prefixed gfont');
-                              return;
+
+                  // add it only if gfont
+                  if ( ! _.isEmpty( newFontFamily ) && _.isString( newFontFamily ) ) {
+                        if ( newFontFamily.indexOf('gfont') > -1 && ! _.contains( currentGfonts, newFontFamily ) ) {
+                              currentGfonts.push( newFontFamily );
                         }
-                        currentGfonts.push( newFontFamily );
                   }
                   // update the global gfonts collection
                   // this is then used server side in Sek_Dyn_CSS_Handler::sek_get_gfont_print_candidates to build the Google Fonts request
