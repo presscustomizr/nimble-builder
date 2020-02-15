@@ -103,32 +103,35 @@
     .page_item_has_children {
         position: relative;
         & > a::after {
-            content: "\f107";
-            -moz-osx-font-smoothing: grayscale;
+            // Feb 2020 => replaced font awesome by a unicode character well supported
+            // see https://github.com/presscustomizr/nimble-builder/issues/602
+            content: "\203A";//https://unicode-table.com/en/203A/
+            font-family: "Arial Unicode MS", Arial;//<= https://www.fileformat.info/info/unicode/char/203A/fontsupport.htm
+            moz-osx-font-smoothing: grayscale;
             -webkit-font-smoothing: antialiased;
             display: none;
             font-style: normal;
             font-variant: normal;
             text-rendering: auto;
-            font-family: 'Font Awesome 5 Free';
             font-weight: 900;
             transition: all 0.3s ease;
             transform-style: preserve-3d;
             backface-visibility: hidden;
             perspective: 1000px;
             padding: 0 .45em;
-            font-size: .8em;
-            top: .1em;
+            font-size: 1em;
             position: relative;
+            transform: translateZ(0) rotate(90deg);
+            -ms-transform: rotate(90deg);
         }
         &.show > a::after {
             @if ( true == $is_rtl ) {
-                transform: translateZ(0) rotate(180deg) !important;
-                -ms-transform: rotate(180deg)!important;
+                transform: translateZ(0) rotate(90deg) !important;
+                -ms-transform: rotate(90deg)!important;
             }
             @else {
-                transform: translateZ(0) rotate(-180deg)!important;
-                -ms-transform: rotate(-180deg)!important;
+                transform: translateZ(0) rotate(-90deg)!important;
+                -ms-transform: rotate(-90deg)!important;
             }
         }
     }
@@ -142,22 +145,24 @@
     & > a{
         &::after {
             @if ( true == $is_rtl ) {
-                transform: translateZ(0) rotate(90deg);
-                -ms-transform: rotate(90deg);
+                transform: translateZ(0) rotate(0deg)!important;
+                -ms-transform: rotate(0deg)!important;
             }
             @else {
-                transform: translateZ(0) rotate(-90deg);
-                -ms-transform: rotate(-90deg);
+                transform: translateZ(0) rotate(0deg)!important;
+                -ms-transform: rotate(0deg)!important;
             }
         }
         //TODO: row reverse
         &[class*=-reverse]::after {
+            top: .1em;
             @if ( true == $is_rtl ) {
-                transform: translateZ(0) rotate(270deg);
-                -ms-transform: rotate(270deg);
+                transform: translateZ(0) rotate(180deg)!important;
+                -ms-transform: rotate(180deg)!important;
             }
             @else {
-                transform: translateZ(0) rotate(-270deg);
+                transform: translateZ(0) rotate(-180deg)!important;
+                -ms-transform: rotate(-180deg)!important;
             }
         }
     }
