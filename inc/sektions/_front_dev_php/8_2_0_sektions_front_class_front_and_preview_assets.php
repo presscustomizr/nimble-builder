@@ -5,6 +5,9 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
         function _schedule_front_and_preview_assets_printing() {
             // Load Front Assets
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_front_assets' ) );
+            // Maybe load Font Awesome icons if needed ( sniff first )
+            add_action( 'wp_enqueue_scripts', array( $this, 'sek_maybe_enqueue_font_awesome_icons' ), PHP_INT_MAX );
+
             // Load customize preview js
             add_action ( 'customize_preview_init' , array( $this, 'sek_schedule_customize_preview_assets' ) );
             // Adds `async` and `defer` support for scripts registered or enqueued
@@ -63,18 +66,6 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             );
             // added for https://github.com/presscustomizr/nimble-builder/issues/583
             wp_script_add_data( 'sek-main-js', 'async', true );
-
-            // Font awesome is always loaded when customizing
-            // when not customizing, sek_front_needs_font_awesome() sniffs if the collection include a module using an icon
-            if ( ! skp_is_customizing() && sek_front_needs_font_awesome() ) {
-                wp_enqueue_style(
-                    'czr-font-awesome',
-                    NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
-                    array(),
-                    NIMBLE_ASSETS_VERSION,
-                    $media = 'all'
-                );
-            }
 
             // Magnific Popup is loaded when needed only
             if ( ! skp_is_customizing() && sek_front_needs_magnific_popup() ) {
@@ -136,6 +127,28 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
         }//sek_enqueue_front_assets
 
+        // hook : 'wp_enqueue_scripts:PHP_INT_MAX'
+        // Feb 2020 => now check if Hueman or Customizr has already loaded font awesome
+        // @see https://github.com/presscustomizr/nimble-builder/issues/600
+        function sek_maybe_enqueue_font_awesome_icons() {
+            // if active theme is Hueman or Customizr, Font Awesome may already been enqueued.
+            // asset handle for Customizr => 'customizr-fa'
+            // asset handle for Hueman => 'hueman-font-awesome'
+            if ( wp_style_is('customizr-fa', 'enqueued') || wp_style_is('hueman-font-awesome', 'enqueued') )
+              return;
+
+            // Font awesome is always loaded when customizing
+            // when not customizing, sek_front_needs_font_awesome() sniffs if the collection include a module using an icon
+            if ( ! skp_is_customizing() && sek_front_needs_font_awesome() ) {
+                wp_enqueue_style(
+                    'czr-font-awesome',
+                    NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
+                    array(),
+                    NIMBLE_ASSETS_VERSION,
+                    $media = 'all'
+                );
+            }
+        }
 
         // enqueue / print customize preview assets
         // hook : 'customize_preview_init'
