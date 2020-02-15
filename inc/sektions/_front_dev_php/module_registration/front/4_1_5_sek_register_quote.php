@@ -31,12 +31,14 @@ function sek_get_module_params_for_czr_quote_module() {
         ),
         'css_selectors' => array( '.sek-module-inner' ),
         'render_tmpl_path' => "quote_module_tmpl.php",
-        'front_assets' => array(
-              'czr-font-awesome' => array(
-                  'type' => 'css',
-                  'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
-              )
-        )
+        // Nimble will "sniff" if we need font awesome
+        // No need to enqueue font awesome here
+        // 'front_assets' => array(
+        //       'czr-font-awesome' => array(
+        //           'type' => 'css',
+        //           'src' => NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css'
+        //       )
+        // )
     );
 }
 
