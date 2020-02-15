@@ -257,7 +257,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 'cite_font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __( 'Font size', 'text_doma' ),
-                    'default'     => array( 'desktop' => '13px' ),
+                    'default'     => array( 'desktop' => '14px' ),
                     'min' => 0,
                     'max' => 100,
                     'width-100'         => true,
