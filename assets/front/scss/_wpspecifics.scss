@@ -32,4 +32,72 @@
     margin-bottom: 1.5rem;
     margin-left: auto;
   }
+
+  /* WP Search Widget */
+  [role=search].search-form {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    @if ( true == $is_rtl ) {
+      float:left;
+    } @else {
+      float:right;
+    }
+    //max-width: 768px)
+    @include media-breakpoint-down(sm) {
+      float: none;
+    }
+  }
+
+  [role=search].search-form label {
+    position: relative;
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    margin-right: 5px;
+  }
+
+  [role=search].search-form label input {
+    padding-left: 5px;
+    line-height: 20px;
+    width: 100%;
+    max-width: 185px;
+    min-width: 80px;
+    //max-width: 768px)
+    @include media-breakpoint-down(sm) {
+        max-width: none;
+    }
+  }
+
+  [role=search].search-form input[type=submit] {
+    line-height: 15px;
+    /*width: 25%;*/;
+  }
+
+  input[type="submit"]{
+    background: grey;
+    color: #fff;
+    padding: 10px 10px;
+    font-weight: normal;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+  }
+
+  .search-form input[type="search"] {
+    margin: 0;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    background: #fff;
+    border: 2px solid #ddd;
+    color: #777;
+    display: block;
+    max-width: 100%;
+    padding: 7px 8px;
+  }
 }
