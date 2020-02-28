@@ -1975,7 +1975,9 @@ jQuery( function($){
                 wb = wt + nimbleFront.cachedElements.$window.height(),
                 it  = $el_candidate.offset().top,
                 ib  = it + $el_candidate.height(),
-                th = this.options.threshold;
+                // don't apply a threshold on page load so that Google audit is happy
+                // for https://github.com/presscustomizr/nimble-builder/issues/619
+                th = ( _evt && 'scroll' === _evt.type ) ? this.options.threshold : 0;
 
             //force all images to visible if first scroll option enabled
             if ( _evt && 'scroll' == _evt.type && this.options.load_all_images_on_first_scroll )

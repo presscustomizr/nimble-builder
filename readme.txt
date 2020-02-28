@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.3.2
-Stable tag: 1.10.10
+Stable tag: 1.10.11
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -124,6 +124,14 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 Updated Font Awesome icons to latest version. Performance improvements => 1)fixed "ghosts" Google fonts loaded even if not used, 2) better management of when Font Awesome assets should be loaded.
 
 == Changelog ==
+= 1.10.11 February 29th 2020 =
+* fixed : figcaption => adjust margin top only when wrapped inside .wp-caption
+* fixed : [accordion module] wrong cursor pointer on +/- icons
+* fixed : [WP Widget module] implement basic styling for WP search form
+* improved : [performance] lazyload => implement a better deferral of offscreen images on page load and apply a higher threshold when scrolling
+* improved : [performance] removed unused CSS => reduced size of main CSS stylesheet
+* improved : [performance] removed Poppin Google font for prebuild menu sections
+
 = 1.10.10 February 15th 2020 =
 * fixed : button style => "-moz-focus-inner" pseudo class breaks CSS validation
 * fixed : Wrong css rule generated 'background-color:rgba(0));' due to issues with php color helpers
