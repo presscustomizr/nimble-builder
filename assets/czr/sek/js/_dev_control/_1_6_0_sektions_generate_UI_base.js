@@ -149,11 +149,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // The new module value can be a single item object if monoitem module, or an array of item objects if multi-item crud
                   // Let's normalize it
                   if ( ! isMultiItemModule && _.isObject( rawModuleValue ) ) {
-                        moduleValueCandidate = self.normalizeAndSanitizeSingleItemInputValues( { item_value : rawModuleValue, parent_module_type : parentModuleType, is_multi_items : false } );
+                        moduleValueCandidate = self.normalizeAndSanitizeSingleItemInputValues( {
+                              item_value : rawModuleValue,
+                              parent_module_type : parentModuleType,
+                              is_multi_items : false
+                            });
                   } else {
                         moduleValueCandidate = [];
                         _.each( rawModuleValue, function( item ) {
-                              moduleValueCandidate.push( self.normalizeAndSanitizeSingleItemInputValues( { item_value :item, parent_module_type : parentModuleType, is_multi_items : true } ) );
+                              moduleValueCandidate.push( self.normalizeAndSanitizeSingleItemInputValues( {
+                                    item_value :item,
+                                    parent_module_type : parentModuleType,
+                                    is_multi_items : true
+                              }));
                         });
                   }
 

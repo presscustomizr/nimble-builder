@@ -806,10 +806,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'sek-set-module-value' :
                                     moduleCandidate = self.getLevelModel( params.id, newSetValue.collection );
 
-                                    var _modValueCandidate = {};
+                                    // Is this a multi-item module ?
+                                    // Fixes https://github.com/presscustomizr/nimble-builder/issues/616
+                                    var _ctrl_ = params.settingParams.args.moduleRegistrationParams.control,
+                                        _module_id_ = params.settingParams.args.moduleRegistrationParams.id,
+                                        parentModuleInstance = _ctrl_.czr_Module( _module_id_ );
+
+                                    if ( ! _.isEmpty( parentModuleInstance ) ) {
+                                          isMultiItemModule = parentModuleInstance.isMultiItem();
+                                    } else {
+                                          api.errare( 'updateAPISetting => missing parentModuleInstance', params );
+                                    }
+
+                                    // if multi-item module, the value is array of items, otherwise an object
+                                    var _modValueCandidate = isMultiItemModule ? [] : {};
                                     // consider only the non empty settings for db
                                     // booleans should bypass this check
-                                    _.each( params.value || {}, function( _val_, _key_ ) {
+                                    _.each( params.value || (isMultiItemModule ? [] : {}), function( _val_, _key_ ) {
                                           // Note : _.isEmpty( 5 ) returns true when checking an integer,
                                           // that's why we need to cast the _val_ to a string when using _.isEmpty()
                                           if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
