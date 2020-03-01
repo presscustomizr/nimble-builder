@@ -568,7 +568,7 @@ class Sek_Dyn_CSS_Builder {
             sek_error_log( __FUNCTION__ . ' => $parent_section not found for column id : ' . $column['id'] );
             return $rules;
         }
-        $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( array( 'section_model' => $parent_section ) ) );
+        $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( array( 'section_model' => $parent_section, 'for_responsive_columns' => true ) ) );
         if ( $section_custom_breakpoint >= 1 ) {
             $breakpoint = $section_custom_breakpoint;
         } else {
