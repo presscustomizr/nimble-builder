@@ -9,30 +9,30 @@
     "url": "https://github.com/presscustomizr/nimble-builder"
   },
   "devDependencies": {
-    "autoprefixer": "^8.2.0",
-    "grunt": "^1.0.2",
+    "autoprefixer": "^8.6.5",
+    "grunt": "^1.0.4",
     "grunt-concurrent": "^2.3.1",
     "grunt-contrib-clean": "^1.1.0",
-    "grunt-contrib-compress": "^1.4.3",
+    "grunt-contrib-compress": "^1.6.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "^2.2.1",
     "grunt-contrib-jshint": "^1.1.0",
-    "grunt-contrib-uglify": "^3.3.0",
-    "grunt-contrib-watch": "^1.0.0",
+    "grunt-contrib-uglify": "^3.4.0",
+    "grunt-contrib-watch": "^1.1.0",
     "grunt-lineending": "^1.0.0",
     "grunt-postcss": "^0.9.0",
     "grunt-sass": "^2.1.0",
     "grunt-stripcomments": "^0.7.2",
     "grunt-text-replace": "^0.4.0",
-    "grunt-wp-i18n": "^1.0.2",
+    "grunt-wp-i18n": "^1.0.3",
     "jshint-stylish": "^2.2.1",
     "load-grunt-config": "^0.19.2",
-    "lodash": "^4.17.5",
-    "postcss-calc": "^6.0.1"
+    "lodash": "^4.17.15",
+    "postcss-calc": "^6.0.2"
   },
   "browserslist": [
-    "last 1 major version",
+    "last 2 major version",
     ">= 1%",
     "Chrome >= 45",
     "Firefox >= 38",
@@ -43,7 +43,5 @@
     "Android >= 4.4",
     "Opera >= 30"
   ],
-  "dependencies": {
-    "lodash": "^4.17.5"
-  }
+  "dependencies": {}
 }
