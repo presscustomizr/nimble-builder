@@ -62,6 +62,13 @@ module.exports = function(grunt) {
               'uglify:czr_flat_skope_js'
           ],
 
+          'build_front_css' : [
+              'sass',
+              'postcss',
+              'cssmin:sek_front_main_css',
+              'cssmin:sek_front_modules_css'
+          ],
+
           'build_sektion_php_js_css' : [
               'concat:czr_sektions_front_php',
               //'comments:sektions_front_php',
@@ -85,9 +92,7 @@ module.exports = function(grunt) {
               'cssmin:sek_customizer_css',
               //'cssmin:czr_css_fmk_fonts',
 
-              'sass:sek_main',
-              'postcss:sek_main',
-              'cssmin:sek_front_css',
+              'build_front_css',
               //'cssmin:sek_front_fonts_css'
           ],
 
@@ -174,9 +179,9 @@ module.exports = function(grunt) {
 		];
 		grunt.log.writeln( 'WATCH EVENT INFOS : ', grunt.task.current.name , action, filepath, target);
 
-		if ( 'jquery.sharrre.js' == target ) {
-			//if some js admin scripts have been changed in dev mode, jshint them dynamically
-			grunt.config('jshint.those', [filepath]);
-		}
+		// if ( 'jquery.sharrre.js' == target ) {
+		// if some js admin scripts have been changed in dev mode, jshint them dynamically
+		//	grunt.config('jshint.those', [filepath]);
+		// }
 	});
 };

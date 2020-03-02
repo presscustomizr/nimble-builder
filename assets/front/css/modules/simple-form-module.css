@@ -1,0 +1,83 @@
+.sek-simple-form-wrapper input[type=text], .sek-simple-form-wrapper textarea {
+  font-size: 16px;
+  width: 100% !important;
+  padding: 0.4em 0.5em;
+  border-radius: 3px;
+  box-sizing: border-box;
+  outline: none;
+  font-weight: normal;
+  max-width: 100%;
+  border: none;
+  color: #555555;
+  background-color: #ffffff;
+}
+
+.sek-simple-form-wrapper textarea {
+  height: auto;
+  max-height: 150px;
+}
+
+.sek-simple-form-wrapper .sek-form-field {
+  margin-bottom: 15px;
+  clear: both;
+}
+
+.sek-simple-form-wrapper label {
+  color: #444444;
+  font-weight: bold;
+  text-align: left;
+  margin: 0;
+  padding: 0 0 3px 0;
+  width: auto;
+  display: block;
+}
+
+.sek-simple-form-wrapper.use-outset-shadow .sek-form-field input[type="text"], .sek-simple-form-wrapper.use-outset-shadow .sek-form-field textarea {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.sek-simple-form-wrapper.use-inset-shadow .sek-form-field input[type="text"], .sek-simple-form-wrapper.use-inset-shadow .sek-form-field textarea {
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+}
+
+.sek-simple-form-wrapper #sek-form-respond {
+  padding: 20px 0;
+}
+
+.sek-form-message {
+  padding: 10px;
+  margin: 10px 0;
+  text-align: center;
+  line-height: 1.5em;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+.sek-form-message.sek-mail-failure {
+  color: #ff0000;
+  border: 1px solid #ff0000;
+  background: none;
+  background: rgba(255, 0, 0, 0.05);
+}
+
+.sek-form-message.sek-mail-success {
+  color: #008000;
+  border: 1px solid #008000;
+  background: none;
+  background: rgba(0, 128, 0, 0.05);
+}
+
+.sek-form-message.sek-mail-aborted {
+  color: #ffa500;
+  border: 1px solid #ffa500;
+  background: none;
+  background: rgba(255, 165, 0, 0.05);
+}
+
+.grecaptcha-badge {
+  z-index: 1;
+}
+
+.sek-hide-rc-badge .grecaptcha-badge {
+  display: none;
+}

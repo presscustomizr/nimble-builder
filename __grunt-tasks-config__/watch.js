@@ -307,10 +307,8 @@ module.exports = {
       '<%= paths.front_assets %>scss/**/*.scss'
     ],
     tasks : [
-      'sass:sek_main',
-      'postcss:sek_main',
-      'sass:sek_main_rtl',
-      'postcss:sek_main_rtl',
+      'sass',
+      'postcss',
     ]
   },
 

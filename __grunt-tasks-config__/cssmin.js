@@ -29,11 +29,19 @@ module.exports = {
     ext: '.min.css'
   },
 
-  sek_front_css: {
+  sek_front_main_css: {
     expand: true,
     cwd: '<%= paths.front_assets %>css/',
-    src: ['sek-base.css', 'sek-base-rtl.css'],
+    src: ['*.css', '!*.min.css'],
     dest: '<%= paths.front_assets %>css/',
+    ext: '.min.css'
+  },
+  // added for https://github.com/presscustomizr/nimble-builder/issues/612
+  sek_front_modules_css: {
+    expand: true,
+    cwd: '<%= paths.front_assets %>css/modules/',
+    src: ['*.css', '!*.min.css'],
+    dest: '<%= paths.front_assets %>css/modules/',
     ext: '.min.css'
   },
   sek_front_fonts_css: {
