@@ -102,10 +102,17 @@ function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
         $breakpoint = $custom_breakpoint > 0 ? $custom_breakpoint : $default_md_breakpoint;
         $breakpoint = $breakpoint - 1;//fixes https://github.com/presscustomizr/nimble-builder/issues/559
 
-        $responsive_css_rules = "-ms-flex-direction: column-reverse;flex-direction: column-reverse;";
         $rules[] = array(
             'selector' => '[data-sek-id="'.$section['id'].'"] .sek-sektion-inner',
-            'css_rules' => $responsive_css_rules,
+            'css_rules' => "-ms-flex-direction: column-reverse;flex-direction: column-reverse;",
+            'mq' => "(max-width: {$breakpoint}px)"
+        );
+
+        // when using column-reverse for the parent section we need to set the flex:auto to children column
+        // otherwise, columns may lose their height. See https://github.com/presscustomizr/nimble-builder/issues/622
+        $rules[] = array(
+            'selector' => '[data-sek-id="'.$section['id'].'"] .sek-sektion-inner > [data-sek-level="column"]',
+            'css_rules' => '-webkit-box-flex: 1;-ms-flex: auto;flex: auto;',
             'mq' => "(max-width: {$breakpoint}px)"
         );
     }
