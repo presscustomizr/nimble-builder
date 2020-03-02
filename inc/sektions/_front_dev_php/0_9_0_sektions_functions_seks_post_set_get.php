@@ -47,6 +47,17 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
         $skope_id = skp_get_skope_id( $skope_level );
     }
 
+    $cached_seks_posts = Nimble_Manager()->seks_posts;
+    if ( !is_array($cached_seks_posts) ) {
+        sek_error_log( __FUNCTION__ .' => error => $cached_seks_posts must be an array' );
+        $cached_seks_posts = array();
+    }
+
+    if ( !skp_is_customizing() && array_key_exists( $skope_id, $cached_seks_posts ) && !empty( $cached_seks_posts[$skope_id] ) ) {
+        return $cached_seks_posts[$skope_id];
+    }
+    //sek_error_log('sek_get_seks_post => ' . $skope_id . ' skope level : ' . $skope_level );
+
     $sek_post_query_vars = array(
         'post_type'              => NIMBLE_CPT,
         'post_status'            => get_post_stati(),
@@ -90,8 +101,13 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
          */
         update_option( $option_name, (int)$post_id );
     }
-
-    return $post;
+    if ( !skp_is_customizing() ) {
+        $cached_seks_posts[$skope_id] = $post;
+        Nimble_Manager()->seks_posts = $cached_seks_posts;
+        return $cached_seks_posts[$skope_id];
+    } else {
+        return $post;
+    }
 }
 
 
@@ -124,7 +140,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
 
     if ( ! $is_cached ) {
         $seks_data = array();
-        $post = sek_get_seks_post( $skope_id );
+        $post = sek_get_seks_post( $skope_id, $is_global_skope ? 'global' : 'local' );
         if ( $post ) {
             $seks_data = maybe_unserialize( $post->post_content );
         }
@@ -218,7 +234,7 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
     );
 
     // Update post if it already exists, otherwise create a new one.
-    $post = sek_get_seks_post( $skope_id );
+    $post = sek_get_seks_post( $skope_id, NIMBLE_GLOBAL_SKOPE_ID !== $skope_id ? 'local' : 'global' );
 
     if ( $post ) {
         $post_data['ID'] = $post->ID;

@@ -177,7 +177,7 @@ function sek_get_seks_setting_id( $skope_id = '' ) {
 function sek_has_global_sections() {
     if ( skp_is_customizing() )
       return true;
-    $maybe_global_sek_post = sek_get_seks_post( NIMBLE_GLOBAL_SKOPE_ID );
+    $maybe_global_sek_post = sek_get_seks_post( NIMBLE_GLOBAL_SKOPE_ID, 'global' );
     $nb_section_created = 0;
     if ( is_object($maybe_global_sek_post) ) {
         $seks_data = maybe_unserialize($maybe_global_sek_post->post_content);
@@ -198,7 +198,7 @@ function sek_local_skope_has_nimble_sections( $skope_id = '' ) {
         sek_error_log( __FUNCTION__ . ' => missing skope id' );
         return false;
     }
-    $maybe_local_sek_post = sek_get_seks_post( $skope_id );
+    $maybe_local_sek_post = sek_get_seks_post( $skope_id, 'local' );
     $nb_section_created = 0;
     if ( is_object($maybe_local_sek_post) ) {
         $seks_data = maybe_unserialize($maybe_local_sek_post->post_content);
