@@ -356,7 +356,7 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                                 'input_type'  => 'simpleselect',
                                 'title_width' => 'width-100',
                                 'width-100'   => true,
-                                'default' => 'arrows_dots',
+                                'default' => 'arrows',
                                 'choices'     => array(
                                     'arrows_dots' => __('Arrows and bullets', 'text_doma'),
                                     'arrows' => __('Arrows only', 'text_doma'),
