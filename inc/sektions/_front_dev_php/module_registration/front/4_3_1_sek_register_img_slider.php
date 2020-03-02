@@ -283,7 +283,7 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                             'autoplay' => array(
                                 'input_type'  => 'nimblecheck',
                                 'title'       => __('Autoplay', 'text_doma'),
-                                'default'     => true,
+                                'default'     => false,
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20',
                                 'notice_after' => __('Note that the autoplay is disabled during customization.', 'text_doma' ),
