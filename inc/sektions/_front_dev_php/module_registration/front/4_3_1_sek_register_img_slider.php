@@ -270,7 +270,7 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                             'image-layout' => array(
                                 'input_type'  => 'simpleselect',
                                 'title'       => __('Image layout', 'text_doma'),
-                                'default'     => 'nimble-wizard',
+                                'default'     => 'width-100',
                                 'choices'     => array(
                                     'nimble-wizard' => __('Nimble wizard', 'text_doma' ),
                                     'width-100' => __('Adapt images to carousel\'s width', 'text_doma' ),
