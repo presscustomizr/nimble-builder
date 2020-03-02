@@ -383,6 +383,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           in_sektion : params.apiParams.id
                                                     });
                                                     idForStyleSheetRefresh = params.apiParams.location;
+
+                                                    //introduced for https://github.com/presscustomizr/nimble-builder/issues/617
+                                                    if ( params.apiParams.is_nested ) {
+                                                          api.previewer.refresh();
+                                                    }
+
                                                     // Focus on the cloned level
                                                     api.previewer.send('sek-animate-to-level', { id : params.apiParams.id });
                                               break;
