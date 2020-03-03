@@ -380,7 +380,6 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_0_6_breakpoint_helpers.php',
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_0_7_local_global_options_helpers.php',
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php',
-      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_0_9_module_helpers.php',
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_1_0_templates_header_footer_helpers.php',
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_1_1_generic_level_helpers.php',
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_1_1_sections_helpers.php',
