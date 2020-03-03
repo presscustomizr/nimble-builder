@@ -166,6 +166,15 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         // so that we don't fire the heavy requests multiple times in case the function sek_get_feedback_notif_status() is invoked several times
         public $feedback_notif_status = 'not_set';
 
+        // March 2020 : introduction of split stylesheet for some modules
+        public $big_module_stylesheet_map = [
+            'czr_img_slider_module' => 'img-slider-module-with-swiper',
+            'czr_accordion_module' => 'accordion-module',
+            'czr_menu_module' => 'menu-module',
+            'czr_post_grid_module' => 'post-grid-module',
+            'czr_simple_form_module' => 'simple-form-module'
+        ];
+
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
         function __construct( $params = array() ) {

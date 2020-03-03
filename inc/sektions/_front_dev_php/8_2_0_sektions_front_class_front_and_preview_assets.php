@@ -5,6 +5,11 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
         function _schedule_front_and_preview_assets_printing() {
             // Load Front Assets
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_front_assets' ) );
+
+            // Maybe print split module stylesheet inline
+            // introduced in march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
+            add_action( 'wp_head', array( $this, 'sek_maybe_print_inline_split_module_stylesheets' ), PHP_INT_MAX  );
+
             // Maybe load Font Awesome icons if needed ( sniff first )
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_maybe_enqueue_font_awesome_icons' ), PHP_INT_MAX );
 
@@ -25,17 +30,24 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             $has_local_sections = sek_local_skope_has_nimble_sections( skp_get_skope_id() );
             $has_global_sections = sek_has_global_sections();
 
+            // the light split stylesheet is never used when customizing
+            $is_stylesheet_split_for_performance = !skp_is_customizing() && defined('NIMBLE_USE_SPLIT_STYLESHEETS') && NIMBLE_USE_SPLIT_STYLESHEETS;
+            $is_split_module_stylesheets_inline_for_performance = !skp_is_customizing() && $is_stylesheet_split_for_performance && defined('NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE') && NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE;
+
+            $main_stylesheet_name = $is_stylesheet_split_for_performance ? 'sek-base-light' : 'sek-base';
+
             // Always load the base Nimble style when user logged in so we can display properly the button in the top admin bar.
             if ( is_user_logged_in() || $has_local_sections || $has_global_sections ) {
                 $rtl_suffix = is_rtl() ? '-rtl' : '';
+
                 //wp_enqueue_style( 'google-material-icons', '//fonts.googleapis.com/icon?family=Material+Icons', array(), null, 'all' );
                 //base custom CSS bootstrap inspired
                 wp_enqueue_style(
-                    'sek-base',
+                    $main_stylesheet_name,
                     sprintf(
                         '%1$s/assets/front/css/%2$s' ,
                         NIMBLE_BASE_URL,
-                        sek_is_dev_mode() ? "sek-base{$rtl_suffix}.css" : "sek-base{$rtl_suffix}.min.css"
+                        sek_is_dev_mode() ? "{$main_stylesheet_name}{$rtl_suffix}.css" : "{$main_stylesheet_name}{$rtl_suffix}.min.css"
                     ),
                     array(),
                     NIMBLE_ASSETS_VERSION,
@@ -43,10 +55,66 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 );
             }
 
+            // populate the collection of module displayed in current context : local + global
+            // introduced march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
+            // formed like :
+            // [czr_heading_module] => Array
+            //     (
+            //         [0] => __nimble__9a02775e86ec
+            //         [1] => __nimble__01f1e8d56415
+            //         [2] => __nimble__8fc8dac22299
+            //         [3] => __nimble__b71c69fd674d
+            //         [4] => __nimble__b74a63e1dc57
+            //         [5] => __nimble__ca13a73ca586
+            //         [6] => __nimble__e66b407f0f2b
+            //         [7] => __nimble__7d6526ab1812
+            //     )
+
+            // [czr_img_slider_module] => Array
+            //     (
+            //         [0] => __nimble__3a38fe3587b2
+            //     )
+
+            // [czr_accordion_module] => Array
+            //     (
+            //         [0] => __nimble__ec3d7956fe17
+            //     )
+
+            // [czr_social_icons_module] => Array
+            //     (
+            //         [0] => __nimble__c1526193134e
+            //     )
+            $module_collection = sek_get_collection_of_contextually_active_modules();
+
+            //sek_error_log('$module_collection ?', $module_collection );
+
             // We don't need Nimble Builder assets when no local or global sections have been created
             // see https://github.com/presscustomizr/nimble-builder/issues/586
             if ( !$has_local_sections && !$has_global_sections )
               return;
+
+            // SPLIT STYLESHEETS
+            // introduced march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
+            // if the module stylesheets are inline, see wp_head action
+            if ( $is_stylesheet_split_for_performance && !$is_split_module_stylesheets_inline_for_performance ) {
+                // loop on the map module type (candidates for split) => stylesheet file name
+                foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
+                    if ( !array_key_exists($module_type , $module_collection ) )
+                      continue;
+
+                    wp_enqueue_style(
+                        $module_type,
+                        sprintf( '%1$s%2$s%3$s',
+                            NIMBLE_BASE_URL . '/assets/front/css/modules/',
+                            $stylesheet_name,
+                            sek_is_dev_mode() ? '.css' : '.min.css'
+                        ),
+                        array( $main_stylesheet_name ),
+                        NIMBLE_ASSETS_VERSION,
+                        $media = 'all'
+                    );
+                }
+            }
 
             // wp_register_script(
             //     'sek-front-fmk-js',
@@ -87,14 +155,19 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
 
             // Swiper js + css is needed for the czr_img_slider_module
-            if ( skp_is_customizing() || ( ! skp_is_customizing() && sek_front_needs_swiper() ) ) {
-                wp_enqueue_style(
-                    'czr-swiper',
-                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.css' : NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.min.css',
-                    array(),
-                    NIMBLE_ASSETS_VERSION,
-                    $media = 'all'
-                );
+            if ( skp_is_customizing() || ( !skp_is_customizing() && sek_front_needs_swiper() ) ) {
+                // march 2020 : when using split stylesheet, swiper css is already included in assets/front/css/modules/img-slider-module-with-swiper.css
+                // so we don't need to enqueue it
+                // added for https://github.com/presscustomizr/nimble-builder/issues/612
+                if ( ( !skp_is_customizing() && sek_front_needs_swiper() && !$is_stylesheet_split_for_performance ) ) {
+                      wp_enqueue_style(
+                          'czr-swiper',
+                          sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.css' : NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.min.css',
+                          array(),
+                          NIMBLE_ASSETS_VERSION,
+                          $media = 'all'
+                      );
+                }
                 wp_enqueue_script(
                     'czr-swiper',
                     sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/swiper.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/swiper.min.js',
@@ -244,6 +317,40 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 $media = 'all'
             );
             wp_enqueue_script( 'jquery-ui-resizable' );
+
+            // March 2020
+            if ( sek_get_feedback_notif_status() ) {
+                wp_enqueue_script(
+                  'sek-confettis',
+                  sprintf( '%1$s/assets/front/css/libs/confetti.browser.min.js', NIMBLE_BASE_URL ),
+                  array(),
+                  NIMBLE_ASSETS_VERSION,
+                  true
+                );
+            }
+        }
+
+
+        // hook : wp_head@PHP_INT_MAX
+        // introduced in march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
+        function sek_maybe_print_inline_split_module_stylesheets() {
+            $is_stylesheet_split_for_performance = !skp_is_customizing() && defined('NIMBLE_USE_SPLIT_STYLESHEETS') && NIMBLE_USE_SPLIT_STYLESHEETS;
+            $is_split_module_stylesheets_inline_for_performance = !skp_is_customizing() && $is_stylesheet_split_for_performance && defined('NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE') && NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE;
+            if ( !$is_split_module_stylesheets_inline_for_performance )
+              return;
+            global $wp_filesystem;
+            $module_collection = sek_get_collection_of_contextually_active_modules();
+            // loop on the map module type (candidates for split) => stylesheet file name
+            foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
+                if ( !array_key_exists($module_type , $module_collection) )
+                  continue;
+                $uri = NIMBLE_BASE_PATH . '/assets/front/css/modules/' . $stylesheet_name .'.min.css';
+                //sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' SOOO ? => ' . $this->uri . $wp_filesystem->exists( $this->uri ), empty( $file_content ) );
+                if ( $wp_filesystem->exists( $uri ) && $wp_filesystem->is_readable( $uri ) ) {
+                    $file_content = $wp_filesystem->get_contents( $uri );
+                    printf( '<style id="%1$s-stylesheet" type="text/css" media="all">%2$s</style>', $stylesheet_name, $file_content );
+                }
+            }
         }
 
 
