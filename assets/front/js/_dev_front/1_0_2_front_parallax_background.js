@@ -53,7 +53,7 @@
             //the scroll event gets throttled with the requestAnimationFrame
             this.$_window.scroll( function(_evt) { self.maybeParallaxMe(_evt); } );
             //debounced resize event
-            this.$_window.resize( _utils_.debounce( function(_evt) {
+            this.$_window.resize( nb_.debounce( function(_evt) {
                   self.maybeParallaxMe(_evt);
             }, 100 ) );
 
@@ -68,7 +68,7 @@
 
             // options.matchMedia is set to 'only screen and (max-width: 768px)' by default
             // if a match is found, then reset the top position
-            if ( _utils_.isFunction( window.matchMedia ) && matchMedia( self.options.matchMedia ).matches ) {
+            if ( nb_.isFunction( window.matchMedia ) && matchMedia( self.options.matchMedia ).matches ) {
                   this.element.css({'background-position-y' : '', 'background-attachment' : '' });
                   return;
             }

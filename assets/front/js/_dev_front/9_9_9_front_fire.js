@@ -95,7 +95,7 @@ jQuery( function($){
 
     };
     //doFitText();
-    // if ( 'function' == typeof(_) && window.wp && ! _utils_.isUndefined( wp.customize ) ) {
+    // if ( 'function' == typeof(_) && window.wp && ! nb_.isUndefined( wp.customize ) ) {
     //     wp.customize.selectiveRefresh.bind('partial-content-rendered' , function() {
     //         doFitText();
     //     });
@@ -194,7 +194,7 @@ jQuery( function($){
     // when customizing the level
     nimbleFront.cachedElements.$body.on('sek-level-refreshed', function( evt, params ){
           // when removing a level => no params.id
-          if ( !params || !_utils_.isObject( params ) || !params.id )
+          if ( !params || !nb_.isObject( params ) || !params.id )
             return;
 
           var $levelRefreshed = $( '[data-sek-id="'+ params.id +'"][data-sek-video-bg-src]' );

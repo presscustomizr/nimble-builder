@@ -46,7 +46,7 @@ jQuery( function($){
                             .find( 'img:not([src^="data"])' );
 
                             //trigger the simple load
-                            _utils_.delay( function() {
+                            nb_.delay( function() {
                                 triggerSimpleLoad( $_imgsToSimpleLoad );
                             }, 10 );
                         });//each()
@@ -73,7 +73,8 @@ jQuery( function($){
 
           // NAVIGATION ARROWS && PAGINATION DOTS
           if ( true === $swiperWrapper.data('sek-is-multislide') ) {
-              if ( _utils_.contains( ['arrows_dots', 'arrows'], $swiperWrapper.data('sek-navtype') ) ) {
+              var navType = $swiperWrapper.data('sek-navtype');
+              if ( 'arrows_dots' === navType || 'arrows' === navType ) {
                   $.extend( swiperParams, {
                       navigation: {
                         nextEl: '.sek-swiper-next' + $swiperWrapper.data('sek-swiper-id'),
@@ -81,7 +82,7 @@ jQuery( function($){
                       }
                   });
               }
-              if ( _utils_.contains( ['arrows_dots', 'dots'], $swiperWrapper.data('sek-navtype') ) ) {
+              if ( 'arrows_dots' === navType || 'dots' === navType  ) {
                   $.extend( swiperParams, {
                       pagination: {
                         el: '.swiper-pagination' + $swiperWrapper.data('sek-swiper-id'),
@@ -110,7 +111,7 @@ jQuery( function($){
 
           // On Swiper Lazy Loading
           // https://swiperjs.com/api/#lazy
-          _utils_.each( mySwipers, function( _swiperInstance ){
+          $.each( mySwipers, function( ind, _swiperInstance ){
                 _swiperInstance.on( 'lazyImageReady', function( slideEl, imageEl ) {
                     $(imageEl).trigger('recenter');
                 });
@@ -133,8 +134,8 @@ jQuery( function($){
     // On custom events
     $( 'body').on( 'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-level-refreshed', '[data-sek-level="location"]',
           function() {
-            if ( ! _utils_.isEmpty( mySwipers ) ) {
-                  _utils_.each( mySwipers, function( _swiperInstance ){
+            if ( 0 !== mySwipers.length ) {
+                  $.each( mySwipers, function( ind, _swiperInstance ){
                         _swiperInstance.destroy();
                   });
             }
@@ -177,7 +178,7 @@ jQuery( function($){
     // @seehttps://stackoverflow.com/questions/53028089/swiper-autoplay-stop-the-swiper-when-you-move-the-mouse-cursor-and-start-playba
     $('.swiper-slide').on('mouseover mouseout', function( evt ) {
         var swiperInstance = $(this).closest('.swiper-container')[0].swiper;
-        if ( ! _utils_.isUndefined( swiperInstance ) && true === swiperInstance.params.autoplay.disableOnInteraction ) {
+        if ( ! nb_.isUndefined( swiperInstance ) && true === swiperInstance.params.autoplay.disableOnInteraction ) {
             switch( evt.type ) {
                 case 'mouseover' :
                     swiperInstance.autoplay.stop();
@@ -191,7 +192,7 @@ jQuery( function($){
 
     // When customizing, focus on the currently expanded / edited item
     // @see CZRItemConstructor in api.czrModuleMap.czr_img_slider_collection_child
-    if ( window.wp && ! _utils_.isUndefined( wp.customize ) ) {
+    if ( window.wp && ! nb_.isUndefined( wp.customize ) ) {
           wp.customize.preview.bind('sek-item-focus', function( params ) {
 
                 var $itemEl = $('[data-sek-item-id="' + params.item_id +'"]', '.swiper-container').first();
@@ -203,7 +204,7 @@ jQuery( function($){
 
                 var activeSwiperInstance = $itemEl.closest('.swiper-container')[0].swiper;
 
-                if ( _utils_.isUndefined( activeSwiperInstance ) )
+                if ( nb_.isUndefined( activeSwiperInstance ) )
                   return;
                 // we can't rely on internal indexing system of swipe, because it uses duplicate item when infinite looping is enabled
                 // jQuery is our friend

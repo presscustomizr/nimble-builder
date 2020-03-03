@@ -86,7 +86,7 @@
                   // Parse Img can be fired several times, so bind once
                   if ( self.options.onresize && ! $_img.data('resize-react-bound' ) ) {
                         $_img.data('resize-react-bound', true );
-                        nimbleFront.cachedElements.$window.resize( _utils_.debounce( function() {
+                        nimbleFront.cachedElements.$window.resize( nb_.debounce( function() {
                               self._pre_img_cent( $_img, 'resize');
                         }, 100 ) );
                   }
@@ -120,8 +120,8 @@
                       .css( _not_p.dim.name , self.options.defaultCSSVal[ _not_p.dim.name ] || 'auto' )
                       .css( _p.dir.name, _p.dir.val ).css( _not_p.dir.name, _not_p_dir_val );
 
-                  if ( 0 !== self.options.addCenteredClassWithDelay && _utils_.isNumber( self.options.addCenteredClassWithDelay ) ) {
-                        _utils_.delay( function() {
+                  if ( 0 !== self.options.addCenteredClassWithDelay && nb_.isNumber( self.options.addCenteredClassWithDelay ) ) {
+                        nb_.delay( function() {
                               $_img.addClass( _p._class ).removeClass( _not_p._class );
                         }, self.options.addCenteredClassWithDelay );
                   } else {
@@ -142,7 +142,7 @@
                         $_img.css( 'opacity', self.options.opacity );
                   });
             } else {
-                  _utils_.delay(function() { _centerImg( $_img ); }, 0 );
+                  nb_.delay(function() { _centerImg( $_img ); }, 0 );
             }
       };
 

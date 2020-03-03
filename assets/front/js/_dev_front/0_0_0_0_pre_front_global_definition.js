@@ -7,7 +7,7 @@ jQuery( function($){
             $body : $('body')
         },
         isMobile : function() {
-              return ( _utils_.isFunction( window.matchMedia ) && matchMedia( 'only screen and (max-width: 768px)' ).matches ) || ( this.isCustomizing() && 'desktop' != this.previewedDevice );
+              return ( nb_.isFunction( window.matchMedia ) && matchMedia( 'only screen and (max-width: 768px)' ).matches ) || ( this.isCustomizing() && 'desktop' != this.previewedDevice );
         },
         isCustomizing : function() {
               return this.cachedElements.$body.hasClass('is-customizing') || ( 'undefined' !== typeof wp && 'undefined' !== typeof wp.customize );
@@ -18,7 +18,7 @@ jQuery( function($){
         isInWindow : function( $_el, threshold ) {
               if ( ! ( $_el instanceof $ ) )
                 return;
-              if ( threshold && ! _utils_.isNumber( threshold ) )
+              if ( threshold && ! nb_.isNumber( threshold ) )
                 return;
 
               var sniffFirstVisiblePrevElement = function( $el ) {
@@ -57,8 +57,7 @@ jQuery( function($){
 
               return ib >= wt - th && it <= wb + th;
         }
-    };
-
+    };//window.nimbleFront
     //PREVIEWED DEVICE ?
     //Listen to the customizer previewed device
     if ( nimbleFront.isCustomizing() ) {

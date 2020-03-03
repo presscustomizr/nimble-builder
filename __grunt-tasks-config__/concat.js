@@ -190,8 +190,8 @@ module.exports = {
   //
   sektions_front_js : {
     src: [
+      '<%= paths.front_assets %>js/_dev_front/0_0_0_0_0_pre_front_nimble_utils.js',
       '<%= paths.front_assets %>js/_dev_front/0_0_0_0_pre_front_global_definition.js',
-      '<%= paths.front_assets %>js/_dev_front/0_0_0_front_underscore.js',
       '<%= paths.front_assets %>js/_dev_front/0_0_1_front_fittext.js',
       '<%= paths.front_assets %>js/_dev_front/0_0_2_jquery_front_smartload.js',
       '<%= paths.front_assets %>js/_dev_front/0_0_3_jquery_nimblecenterimage.js',

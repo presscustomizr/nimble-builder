@@ -47,7 +47,7 @@ jQuery( function($){
 
     // When customizing, expand the currently edited item
     // @see CZRItemConstructor in api.czrModuleMap.czr_img_slider_collection_child
-    if ( window.wp && ! _utils_.isUndefined( wp.customize ) ) {
+    if ( window.wp && ! nb_.isUndefined( wp.customize ) ) {
           wp.customize.preview.bind('sek-item-focus', function( params ) {
 
                 var $itemEl = $('[data-sek-item-id="' + params.item_id +'"]', '.sek-accord-wrapper').first();

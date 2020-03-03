@@ -44,7 +44,7 @@
             this.element = element;
             this.options = $.extend( {}, defaults, options) ;
             //add .smartload-skip to the excludeImg
-            if ( _utils_.isArray( this.options.excludeImg ) ) {
+            if ( nb_.isArray( this.options.excludeImg ) ) {
                   this.options.excludeImg.push( '.'+skipLazyLoadClass );
             } else {
                   this.options.excludeImg = [ '.'+skipLazyLoadClass ];
@@ -75,7 +75,7 @@
                   self._better_scroll_event_handler( $_ImgOrDivOrIFrameElements, _evt );
             });
             //debounced resize event
-            nimbleFront.cachedElements.$window.resize( _utils_.debounce( function( _evt ) {
+            nimbleFront.cachedElements.$window.resize( nb_.debounce( function( _evt ) {
                   self._maybe_trigger_load( $_ImgOrDivOrIFrameElements, _evt );
             }, 100 ) );
             //on load

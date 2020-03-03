@@ -38,13 +38,13 @@
             this.$window    = nimbleFront.cachedElements.$window;
             this._defaults  = defaults;
             this._name      = pluginName;
-            this.options    = _utils_.isObject( options ) ? options : {};
+            this.options    = nb_.isObject( options ) ? options : {};
 
             this.videoPlayer = false;//<= will hold the video player object
 
             if ( this.options.lazyLoad ) {
                   //the scroll event gets throttled with the requestAnimationFrame
-                  nimbleFront.cachedElements.$window.scroll( _utils_.throttle( function( _evt ) {
+                  nimbleFront.cachedElements.$window.scroll( nb_.throttle( function( _evt ) {
                         if ( nimbleFront.isInWindow( self.$element ) && !self.$element.data('sek-player-instantiated') ) {
                               // Are we already instantiated ?
                               if ( false === self.videoPlayer ) {
@@ -54,7 +54,7 @@
                   }, 50 ) );
 
                   //debounced resize event
-                  nimbleFront.cachedElements.$window.resize( _utils_.debounce( function( _evt ) {
+                  nimbleFront.cachedElements.$window.resize( nb_.debounce( function( _evt ) {
                         if ( nimbleFront.isInWindow( self.$element ) && !self.$element.data('sek-player-instantiated') ) {
                               // Are we already instantiated ?
                               if ( false === self.videoPlayer ) {
@@ -81,13 +81,13 @@
             var self = this;
 
             // set options from data attributes
-            if ( ! _utils_.isUndefined( self.$element.data('sek-video-bg-loop') ) ) {
+            if ( ! nb_.isUndefined( self.$element.data('sek-video-bg-loop') ) ) {
                 this.options.loop = self.$element.data('sek-video-bg-loop');
             }
             this.options.delayBeforeStart = self.$element.data('sek-video-delay-before');
             this.options.delayBeforeStart = Math.abs( self.options.delayBeforeStart ? parseInt( self.options.delayBeforeStart, 10 ) : 0 );
 
-            if ( ! _utils_.isUndefined( self.$element.data('sek-video-bg-on-mobile') ) ) {
+            if ( ! nb_.isUndefined( self.$element.data('sek-video-bg-on-mobile') ) ) {
                 this.options.activeOnMobile = self.$element.data('sek-video-bg-on-mobile');
             }
             this.options.startAt = self.$element.data('sek-video-start-at');
@@ -117,8 +117,8 @@
             var _doInit = function() {
                   // init now
                   self.init();
-                  self.$element.on( 'refresh-video-dimensions', _utils_.debounce( function() {
-                      _utils_.delay( function() {
+                  self.$element.on( 'refresh-video-dimensions', nb_.debounce( function() {
+                      nb_.delay( function() {
                           self.updatePlayerDimensions();
                       }, 300 );
                   }, 200 ) );
@@ -128,7 +128,7 @@
             };
 
             // maybe delay init if set by user
-            _utils_.delay( _doInit, self.options.delayBeforeStart * 1000 );
+            nb_.delay( _doInit, self.options.delayBeforeStart * 1000 );
       };
 
       /*
@@ -172,7 +172,7 @@
 
 
             // inject video container if not done yet
-            if ( _utils_.isUndefined(self.$backgroundVideoContainer) || self.$backgroundVideoContainer.length < 1 ) {
+            if ( nb_.isUndefined(self.$backgroundVideoContainer) || self.$backgroundVideoContainer.length < 1 ) {
                 self.$element.children().first().before( $('<div>', { class : self.options.bgVideoContainerClass} ) );
                 self.$backgroundVideoContainer = $( '.' + self.options.bgVideoContainerClass, self.$element );
             }
@@ -197,7 +197,7 @@
             }
 
             // update video dimension for all players on resize
-            this.$window.on( 'resize', _utils_.debounce( function() { self.updatePlayerDimensions(); }, 200 ) );
+            this.$window.on( 'resize', nb_.debounce( function() { self.updatePlayerDimensions(); }, 200 ) );
       };
 
 
@@ -242,7 +242,7 @@
             var isVideoUrlSetupForFragment = -1 !== this.videoUrl.indexOf('#t=');
             if ( self.options.loop && isVideoUrlSetupForFragment ) {
                   // solution found here : https://stackoverflow.com/questions/23304021/loop-video-with-media-fragments
-                  self.videoPlayer.on( 'timeupdate', _utils_.throttle( function () {
+                  self.videoPlayer.on( 'timeupdate', nb_.throttle( function () {
                         if( this.currentTime > endAt ) {
                               this.currentTime = startAt;
                               this.play();
@@ -390,7 +390,7 @@
             this.videoPlayer.ready().then(function () {
                   $( self.videoPlayer.element ).addClass('sek-background-vimeo-element');
                   self.updatePlayerDimensions();
-                  _utils_.delay( function() {
+                  nb_.delay( function() {
                       self.$backgroundVideoContainer.removeClass( self.options.bgLoadingClass );
                       self.$backgroundVideoContainer.css('opacity', 1);
                   }, 200 );
