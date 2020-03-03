@@ -11,8 +11,8 @@ function sek_get_feedback_notif_status() {
     $start_version = get_option( 'nimble_started_with_version', NIMBLE_VERSION );
     //sek_error_log('START VERSION ?' . $start_version, version_compare( $start_version, '1.6.0', '<=' ) );
 
-    // Bail if user did not start before 1.9.5, October 21st 2019 ( set on November 18th 2019 )
-    if ( ! version_compare( $start_version, '1.9.5', '<=' ) )
+    // Bail if user did not start before v1.10.10, February 15th 2020 ( set on March 3rd 2020 )
+    if ( ! version_compare( $start_version, '1.10.10', '<=' ) )
       return;
 
     $sek_post_query_vars = array(
@@ -56,6 +56,25 @@ function sek_get_feedback_notif_status() {
     return $customized_pages > 0 && $nb_section_created > 2 && count($modules_used) > 2;
 }
 
+
+// recursive helper to generate a list of module used in a given set of sections data
+function sek_populate_list_of_modules_used( $seks_data ) {
+    global $modules_used;
+    if ( ! is_array( $seks_data ) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid seks_data param');
+        return $count;
+    }
+    foreach ( $seks_data as $key => $data ) {
+        if ( is_array( $data ) ) {
+            if ( !empty( $data['level'] ) && 'module' === $data['level'] && !empty( $data['module_type'] ) ) {
+                $modules_used[] = $data['module_type'];
+            } else {
+                //$modules_used = array_merge( $modules_used, sek_populate_list_of_modules_used( $data, $modules_used ) );
+                sek_populate_list_of_modules_used( $data, $modules_used );
+            }
+        }
+    }
+}
 
 
 function sek_feedback_notice_is_dismissed() {
