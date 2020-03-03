@@ -2405,8 +2405,8 @@ body .sek-module-inner h1:before, body .sek-module-inner h2:before, body .sek-mo
 }
 
 .sek-module {
-  -ms-grid-row-align: center;
   -ms-flex-item-align: center;
+  -ms-grid-row-align: center;
   align-self: center;
   width: 100%;
   max-width: 100%;
