@@ -156,9 +156,18 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         // otherwise the preview UI can be broken
         public $preview_level_guid = '_preview_level_guid_not_set_';
 
+        // list of modules displayed on local + global sektions for a givent page.
+        // populated @wp_enqueue_scripts and used to determine which assets ( css / js ) is needed for this context
+        // see ::sek_enqueue_front_assets
+        // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
+        public $modules_currently_displayed = [];
+
+
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
         function __construct( $params = array() ) {
+            if ( did_action('nimble_manager_ready') )
+              return;
             // INITIALIZE THE REGISTERED LOCATIONS WITH THE DEFAULT LOCATIONS
             $this->registered_locations = $this->default_locations;
 
@@ -178,6 +187,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             $this->_setup_simple_forms();
             // REGISTER NIMBLE WIDGET ZONES
             add_action( 'widgets_init', array( $this, 'sek_nimble_widgets_init' ) );
+            do_action('nimble_manager_ready');
         }//__construct
 
         // @fired @hook 'widgets_init'

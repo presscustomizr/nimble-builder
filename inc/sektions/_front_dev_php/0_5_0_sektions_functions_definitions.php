@@ -1338,6 +1338,41 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
 /* ------------------------------------------------------------------------- *
  *  FRONT ASSET SNIFFERS
 /* ------------------------------------------------------------------------- */
+// @return void()
+// Fired in 'wp_enqueue_scripts'
+// Recursively sniff the local and global sections to populate Nimble_Manager()->modules_currently_displayed
+// introduced for https://github.com/presscustomizr/nimble-builder/issues/612
+function sek_populate_collection_of_module_displayed( $recursive_data = null, $module_collection = null ) {
+    if ( is_null( $recursive_data ) ) {
+        $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
+        $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
+        $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
+        $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
+
+        $recursive_data = array_merge( $local_collection, $global_collection );
+    }
+    if ( is_null( $module_collection ) ) {
+        $module_collection = Nimble_Manager()->modules_currently_displayed;
+    }
+
+    foreach ($recursive_data as $key => $value) {
+        if ( is_array( $value ) && array_key_exists('module_type', $value) ) {
+            $module_type = $value['module_type'];
+            if ( !array_key_exists($module_type, $module_collection) ) {
+                $module_collection[$module_type] = [];
+            }
+            if ( !in_array( $value['id'], $module_collection[$module_type] ) ) {
+                $module_collection[$module_type][] = $value['id'];
+            }
+        } else if ( is_array( $value ) ) {
+            $module_collection = sek_populate_collection_of_module_displayed( $value, $module_collection );
+        }
+    }
+    Nimble_Manager()->modules_currently_displayed = $module_collection;
+    return Nimble_Manager()->modules_currently_displayed;
+}
+
+
 // @return bool
 // some modules uses font awesome :
 // Fired in 'wp_enqueue_scripts' to check if font awesome is needed
