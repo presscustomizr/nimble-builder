@@ -41,32 +41,32 @@ function sek_register_modules_when_customizing_or_ajaxing() {
 
 
 // @return void();
-// @hook 'wp'
+// @hook 'wp'@PHP_INT_MAX
 function sek_register_modules_when_not_customizing_and_not_ajaxing() {
-    //sniff the list of active modules in local and global location
-    sek_populate_contextually_active_module_list();
+    $contextually_actives_raw = sek_get_collection_of_contextually_active_modules();
+    $contextually_actives_raw = array_keys( $contextually_actives_raw );
 
-    $contextually_actives = array();
+    $contextually_actives_candidates = array();
     $front_modules = array_merge( SEK_Front_Construct::sek_get_front_module_collection(), SEK_Front_Construct::$ui_front_beta_modules );
 
     // we need to get all children when the module is a father.
     // This will be flatenized afterwards
-    foreach ( Nimble_Manager()->contextually_active_modules as $module_name ) {
+    foreach ( $contextually_actives_raw as $module_name ) {
 
         // Parent module with children
         if ( array_key_exists( $module_name, $front_modules ) ) {
             // get the list of childrent, includes the parent too.
             // @see ::sek_get_front_module_collection()
-            $contextually_actives[] = $front_modules[ $module_name ];
+            $contextually_actives_candidates[] = $front_modules[ $module_name ];
         }
         // Simple module with no children
         if ( in_array( $module_name, $front_modules ) ) {
-            $contextually_actives[] = $module_name;
+            $contextually_actives_candidates[] = $module_name;
         }
     }
 
     $modules = array_merge(
-        $contextually_actives,
+        $contextually_actives_candidates,
         SEK_Front_Construct::$ui_level_modules,
         SEK_Front_Construct::$ui_local_global_options_modules
     );
@@ -115,29 +115,6 @@ function sek_do_register_module_collection( $modules ) {
             }
         } else {
             error_log( __FUNCTION__ . ' missing params callback fn for module ' . $module_name );
-        }
-    }
-}
-
-// @return void()
-// recursive helper => populates Nimble_Manager()->contextually_active_modules
-function sek_populate_contextually_active_module_list( $recursive_data = null ) {
-    if ( is_null( $recursive_data ) ) {
-        $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
-        $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
-        $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
-        $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
-        $recursive_data = array_merge( $local_collection, $global_collection );
-    }
-    foreach ( $recursive_data as $key => $value ) {
-        if ( is_array( $value ) ) {
-            sek_populate_contextually_active_module_list( $value );
-        }
-        // @see sek_get_module_params_for_czr_image_main_settings_child
-        if ( is_string( $key ) && 'module_type' === $key ) {
-            $module_collection = Nimble_Manager()->contextually_active_modules;
-            $module_collection[] = $value;
-            Nimble_Manager()->contextually_active_modules = array_unique( $module_collection );
         }
     }
 }

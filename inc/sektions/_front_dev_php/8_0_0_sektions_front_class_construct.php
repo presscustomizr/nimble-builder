@@ -90,7 +90,13 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $img_import_errors = [];
 
         // stores the active module collection
-        // @see populated in sek_get_contextually_active_module_list()
+        // @see populated in sek_populate_collection_of_contextually_active_modules()
+        // list of modules displayed on local + global sektions for a givent page.
+        // populated 'wp'@PHP_INT_MAX and used to
+        // 1) determine which module should be registered when not customizing or ajaxing. See sek_register_modules_when_not_customizing_and_not_ajaxing()
+        // 2) determine which assets ( css / js ) is needed for this context. see ::sek_enqueue_front_assets
+        //
+        // updated for https://github.com/presscustomizr/nimble-builder/issues/612
         public $contextually_active_modules = [];
 
         public static $ui_picker_modules = [
@@ -155,13 +161,6 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         // @see ::render() method
         // otherwise the preview UI can be broken
         public $preview_level_guid = '_preview_level_guid_not_set_';
-
-        // list of modules displayed on local + global sektions for a givent page.
-        // populated @wp_enqueue_scripts and used to determine which assets ( css / js ) is needed for this context
-        // see ::sek_enqueue_front_assets
-        // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-        public $modules_currently_displayed = [];
-
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
