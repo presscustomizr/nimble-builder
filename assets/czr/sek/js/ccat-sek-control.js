@@ -662,9 +662,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           if ( expanded && _.isUndefined( self.feedbackUIVisible ) ) {
                                                 // FEEDBACK UI
                                                 self.setupFeedBackUI();
+
+                                                // march 2020 : print confettis
+                                                // confettis script is enqueued in the preview
+                                                setTimeout( function() {
+                                                    api.previewer.send('sek-print-confettis', { duration : Date.now() + (1 * 2000) } );
+                                                }, 1000 );
                                           }
                                     });
-                              }
+                              }//if ( sektionsLocalizedData.eligibleForFeedbackNotification )
                         });
                   });
 
@@ -2752,6 +2758,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           in_sektion : params.apiParams.id
                                                     });
                                                     idForStyleSheetRefresh = params.apiParams.location;
+
+                                                    //introduced for https://github.com/presscustomizr/nimble-builder/issues/617
+                                                    if ( params.apiParams.is_nested ) {
+                                                          api.previewer.refresh();
+                                                    }
+
                                                     // Focus on the cloned level
                                                     api.previewer.send('sek-animate-to-level', { id : params.apiParams.id });
                                               break;
@@ -3420,11 +3432,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // The new module value can be a single item object if monoitem module, or an array of item objects if multi-item crud
                   // Let's normalize it
                   if ( ! isMultiItemModule && _.isObject( rawModuleValue ) ) {
-                        moduleValueCandidate = self.normalizeAndSanitizeSingleItemInputValues( { item_value : rawModuleValue, parent_module_type : parentModuleType, is_multi_items : false } );
+                        moduleValueCandidate = self.normalizeAndSanitizeSingleItemInputValues( {
+                              item_value : rawModuleValue,
+                              parent_module_type : parentModuleType,
+                              is_multi_items : false
+                            });
                   } else {
                         moduleValueCandidate = [];
                         _.each( rawModuleValue, function( item ) {
-                              moduleValueCandidate.push( self.normalizeAndSanitizeSingleItemInputValues( { item_value :item, parent_module_type : parentModuleType, is_multi_items : true } ) );
+                              moduleValueCandidate.push( self.normalizeAndSanitizeSingleItemInputValues( {
+                                    item_value :item,
+                                    parent_module_type : parentModuleType,
+                                    is_multi_items : true
+                              }));
                         });
                   }
 
@@ -6009,10 +6029,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'sek-set-module-value' :
                                     moduleCandidate = self.getLevelModel( params.id, newSetValue.collection );
 
-                                    var _modValueCandidate = {};
+                                    // Is this a multi-item module ?
+                                    // Fixes https://github.com/presscustomizr/nimble-builder/issues/616
+                                    var _ctrl_ = params.settingParams.args.moduleRegistrationParams.control,
+                                        _module_id_ = params.settingParams.args.moduleRegistrationParams.id,
+                                        parentModuleInstance = _ctrl_.czr_Module( _module_id_ );
+
+                                    if ( ! _.isEmpty( parentModuleInstance ) ) {
+                                          isMultiItemModule = parentModuleInstance.isMultiItem();
+                                    } else {
+                                          api.errare( 'updateAPISetting => missing parentModuleInstance', params );
+                                    }
+
+                                    // if multi-item module, the value is array of items, otherwise an object
+                                    var _modValueCandidate = isMultiItemModule ? [] : {};
                                     // consider only the non empty settings for db
                                     // booleans should bypass this check
-                                    _.each( params.value || {}, function( _val_, _key_ ) {
+                                    _.each( params.value || (isMultiItemModule ? [] : {}), function( _val_, _key_ ) {
                                           // Note : _.isEmpty( 5 ) returns true when checking an integer,
                                           // that's why we need to cast the _val_ to a string when using _.isEmpty()
                                           if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
@@ -6390,7 +6423,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var presetColumnOrSectionCollection;
                                     __presetSectionInjected__ = $.Deferred();//defined at the beginning of the method
 
-                                    _doWhenPresetSectionCollectionFetched = function( presetColumnOrSectionCollection ) {
+                                    var _doWhenPrebuiltSectionCollectionFetched = function( presetColumnOrSectionCollection ) {
                                           self.preparePresetSectionForInjection( presetColumnOrSectionCollection )
                                                 .fail( function( _er_ ){
                                                       __updateAPISettingDeferred__.reject( 'updateAPISetting => error when preparePresetSectionForInjection => ' + params.action + ' => ' + _er_ );
@@ -6436,7 +6469,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       // @see end of this method
                                                       __presetSectionInjected__.resolve();
                                                 });//self.preparePresetSectionForInjection.done()
-                                    };//_doWhenPresetSectionCollectionFetched
+                                    };//_doWhenPrebuiltSectionCollectionFetched
 
 
                                     // Try to fetch the sections from the server
@@ -6455,7 +6488,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
                                                 }
                                                 // OK. time to resolve __presetSectionInjected__.promise()
-                                                _doWhenPresetSectionCollectionFetched( presetColumnOrSectionCollection );
+                                                _doWhenPrebuiltSectionCollectionFetched( presetColumnOrSectionCollection );
                                           });//self.getPresetSectionCollection().done()
                               break;
 

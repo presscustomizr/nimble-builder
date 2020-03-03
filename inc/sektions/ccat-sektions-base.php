@@ -1006,32 +1006,32 @@ function sek_register_modules_when_customizing_or_ajaxing() {
 
 
 // @return void();
-// @hook 'wp'
+// @hook 'wp'@PHP_INT_MAX
 function sek_register_modules_when_not_customizing_and_not_ajaxing() {
-    //sniff the list of active modules in local and global location
-    sek_populate_contextually_active_module_list();
+    $contextually_actives_raw = sek_get_collection_of_contextually_active_modules();
+    $contextually_actives_raw = array_keys( $contextually_actives_raw );
 
-    $contextually_actives = array();
+    $contextually_actives_candidates = array();
     $front_modules = array_merge( SEK_Front_Construct::sek_get_front_module_collection(), SEK_Front_Construct::$ui_front_beta_modules );
 
     // we need to get all children when the module is a father.
     // This will be flatenized afterwards
-    foreach ( Nimble_Manager()->contextually_active_modules as $module_name ) {
+    foreach ( $contextually_actives_raw as $module_name ) {
 
         // Parent module with children
         if ( array_key_exists( $module_name, $front_modules ) ) {
             // get the list of childrent, includes the parent too.
             // @see ::sek_get_front_module_collection()
-            $contextually_actives[] = $front_modules[ $module_name ];
+            $contextually_actives_candidates[] = $front_modules[ $module_name ];
         }
         // Simple module with no children
         if ( in_array( $module_name, $front_modules ) ) {
-            $contextually_actives[] = $module_name;
+            $contextually_actives_candidates[] = $module_name;
         }
     }
 
     $modules = array_merge(
-        $contextually_actives,
+        $contextually_actives_candidates,
         SEK_Front_Construct::$ui_level_modules,
         SEK_Front_Construct::$ui_local_global_options_modules
     );
@@ -1080,29 +1080,6 @@ function sek_do_register_module_collection( $modules ) {
             }
         } else {
             error_log( __FUNCTION__ . ' missing params callback fn for module ' . $module_name );
-        }
-    }
-}
-
-// @return void()
-// recursive helper => populates Nimble_Manager()->contextually_active_modules
-function sek_populate_contextually_active_module_list( $recursive_data = null ) {
-    if ( is_null( $recursive_data ) ) {
-        $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
-        $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
-        $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
-        $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
-        $recursive_data = array_merge( $local_collection, $global_collection );
-    }
-    foreach ( $recursive_data as $key => $value ) {
-        if ( is_array( $value ) ) {
-            sek_populate_contextually_active_module_list( $value );
-        }
-        // @see sek_get_module_params_for_czr_image_main_settings_child
-        if ( is_string( $key ) && 'module_type' === $key ) {
-            $module_collection = Nimble_Manager()->contextually_active_modules;
-            $module_collection[] = $value;
-            Nimble_Manager()->contextually_active_modules = array_unique( $module_collection );
         }
     }
 }
@@ -12436,8 +12413,14 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $img_import_errors = [];
 
         // stores the active module collection
-        // @see populated in sek_get_contextually_active_module_list()
-        public $contextually_active_modules = [];
+        // @see populated in sek_populate_collection_of_contextually_active_modules()
+        // list of modules displayed on local + global sektions for a givent page.
+        // populated 'wp'@PHP_INT_MAX and used to
+        // 1) determine which module should be registered when not customizing or ajaxing. See sek_register_modules_when_not_customizing_and_not_ajaxing()
+        // 2) determine which assets ( css / js ) is needed for this context. see ::sek_enqueue_front_assets
+        //
+        // updated for https://github.com/presscustomizr/nimble-builder/issues/612
+        public $contextually_active_modules = 'not_set';
 
         public static $ui_picker_modules = [
           // UI CONTENT PICKER
@@ -12502,12 +12485,18 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         // otherwise the preview UI can be broken
         public $preview_level_guid = '_preview_level_guid_not_set_';
 
-        // list of modules displayed on local + global sektions for a givent page.
-        // populated @wp_enqueue_scripts and used to determine which assets ( css / js ) is needed for this context
-        // see ::sek_enqueue_front_assets
-        // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-        public $modules_currently_displayed = [];
+        // March 2020 : feedback_notif_status is used to store the feedback notif ( used to display a request for review in the customizer )
+        // so that we don't fire the heavy requests multiple times in case the function sek_get_feedback_notif_status() is invoked several times
+        public $feedback_notif_status = 'not_set';
 
+        // March 2020 : introduction of split stylesheet for some modules
+        public $big_module_stylesheet_map = [
+            'czr_img_slider_module' => 'img-slider-module-with-swiper',
+            'czr_accordion_module' => 'accordion-module',
+            'czr_menu_module' => 'menu-module',
+            'czr_post_grid_module' => 'post-grid-module',
+            'czr_simple_form_module' => 'simple-form-module'
+        ];
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
@@ -13563,8 +13552,10 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
         function _schedule_front_and_preview_assets_printing() {
             // Load Front Assets
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_front_assets' ) );
+
             // Maybe print split module stylesheet inline
-            //add_action( 'wp_head', array( $this, 'sek_maybe_print_inline_split_module_stylesheets' ), PHP_INT_MAX  );
+            // introduced in march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
+            add_action( 'wp_head', array( $this, 'sek_maybe_print_inline_split_module_stylesheets' ), PHP_INT_MAX  );
 
             // Maybe load Font Awesome icons if needed ( sniff first )
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_maybe_enqueue_font_awesome_icons' ), PHP_INT_MAX );
@@ -13578,44 +13569,6 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             add_filter( 'script_loader_tag', array( $this, 'sek_filter_script_loader_tag' ), 10, 2 );
         }
 
-        // hook : wp_head@PHP_INT_MAX
-        function sek_maybe_print_inline_split_module_stylesheets() {
-            $is_stylesheet_split_for_performance = !skp_is_customizing() && defined('NIMBLE_SPLIT_STYLESHEET') && NIMBLE_SPLIT_STYLESHEET;
-            $is_split_module_stylesheets_inline_for_performance = !skp_is_customizing() && $is_stylesheet_split_for_performance && defined('NIMBLE_INLINE_SPLIT_MODULE_STYLESHEETS') && NIMBLE_INLINE_SPLIT_MODULE_STYLESHEETS;
-            if ( !$is_split_module_stylesheets_inline_for_performance )
-              return;
-
-            // maps module type (candidates for split) => stylesheet file name
-            $module_stylesheet_map = [
-                'czr_img_slider_module' => 'img-slider-module-with-swiper',
-                'czr_accordion_module' => 'accordion-module',
-                'czr_menu_module' => 'menu-module',
-                'czr_post_grid_module' => 'post-grid-module',
-                'czr_simple_form_module' => 'simple-form-module'
-            ];
-
-            global $wp_filesystem;
-            $module_collection = sek_get_collection_of_module_displayed();
-            foreach ($module_stylesheet_map as $module_type => $stylesheet_name ) {
-                if ( !array_key_exists($module_type , $module_collection ) )
-                  continue;
-                //////////////////////////
-                ////////////////////////
-                /////////////////////
-                ///HERE !!
-            }
-
-            //sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' SOOO ? => ' . $this->uri . $wp_filesystem->exists( $this->uri ), empty( $file_content ) );
-            if ( $wp_filesystem->exists( $this->uri ) ) {
-                $file_content = $wp_filesystem->get_contents( $this->uri );
-                printf( '<style id="sek-%1$s" type="text/css" media="all">%2$s</style>', $this->id, $this->css_string_to_enqueue_or_print );
-                return $wp_filesystem->is_readable( $this->uri ) && !empty( $file_content );
-            } else {
-                return false;
-            }
-
-        }
-
         // hook : 'wp_enqueue_scripts'
         function sek_enqueue_front_assets() {
             // do we have local or global sections to render in this page ?
@@ -13625,8 +13578,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             $has_global_sections = sek_has_global_sections();
 
             // the light split stylesheet is never used when customizing
-            $is_stylesheet_split_for_performance = !skp_is_customizing() && defined('NIMBLE_SPLIT_STYLESHEET') && NIMBLE_SPLIT_STYLESHEET;
-            $is_split_module_stylesheets_inline_for_performance = !skp_is_customizing() && $is_stylesheet_split_for_performance && defined('NIMBLE_INLINE_SPLIT_MODULE_STYLESHEETS') && NIMBLE_INLINE_SPLIT_MODULE_STYLESHEETS;
+            $is_stylesheet_split_for_performance = !skp_is_customizing() && defined('NIMBLE_USE_SPLIT_STYLESHEETS') && NIMBLE_USE_SPLIT_STYLESHEETS;
+            $is_split_module_stylesheets_inline_for_performance = !skp_is_customizing() && $is_stylesheet_split_for_performance && defined('NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE') && NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE;
 
             $main_stylesheet_name = $is_stylesheet_split_for_performance ? 'sek-base-light' : 'sek-base';
 
@@ -13678,9 +13631,9 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             //     (
             //         [0] => __nimble__c1526193134e
             //     )
-            $module_collection = sek_get_collection_of_module_displayed();
+            $module_collection = sek_get_collection_of_contextually_active_modules();
 
-            sek_error_log('$module_collection ?', $module_collection );
+            //sek_error_log('$module_collection ?', $module_collection );
 
             // We don't need Nimble Builder assets when no local or global sections have been created
             // see https://github.com/presscustomizr/nimble-builder/issues/586
@@ -13689,17 +13642,10 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
             // SPLIT STYLESHEETS
             // introduced march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
-            if ( $is_stylesheet_split_for_performance ) {
-                // maps module type (candidates for split) => stylesheet file name
-                $module_stylesheet_map = [
-                    'czr_img_slider_module' => 'img-slider-module-with-swiper',
-                    'czr_accordion_module' => 'accordion-module',
-                    'czr_menu_module' => 'menu-module',
-                    'czr_post_grid_module' => 'post-grid-module',
-                    'czr_simple_form_module' => 'simple-form-module'
-                ];
-
-                foreach ($module_stylesheet_map as $module_type => $stylesheet_name ) {
+            // if the module stylesheets are inline, see wp_head action
+            if ( $is_stylesheet_split_for_performance && !$is_split_module_stylesheets_inline_for_performance ) {
+                // loop on the map module type (candidates for split) => stylesheet file name
+                foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
                     if ( !array_key_exists($module_type , $module_collection ) )
                       continue;
 
@@ -13918,6 +13864,40 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 $media = 'all'
             );
             wp_enqueue_script( 'jquery-ui-resizable' );
+
+            // March 2020
+            if ( sek_get_feedback_notif_status() ) {
+                wp_enqueue_script(
+                  'sek-confettis',
+                  sprintf( '%1$s/assets/front/css/libs/confetti.browser.min.js', NIMBLE_BASE_URL ),
+                  array(),
+                  NIMBLE_ASSETS_VERSION,
+                  true
+                );
+            }
+        }
+
+
+        // hook : wp_head@PHP_INT_MAX
+        // introduced in march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
+        function sek_maybe_print_inline_split_module_stylesheets() {
+            $is_stylesheet_split_for_performance = !skp_is_customizing() && defined('NIMBLE_USE_SPLIT_STYLESHEETS') && NIMBLE_USE_SPLIT_STYLESHEETS;
+            $is_split_module_stylesheets_inline_for_performance = !skp_is_customizing() && $is_stylesheet_split_for_performance && defined('NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE') && NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE;
+            if ( !$is_split_module_stylesheets_inline_for_performance )
+              return;
+            global $wp_filesystem;
+            $module_collection = sek_get_collection_of_contextually_active_modules();
+            // loop on the map module type (candidates for split) => stylesheet file name
+            foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
+                if ( !array_key_exists($module_type , $module_collection) )
+                  continue;
+                $uri = NIMBLE_BASE_PATH . '/assets/front/css/modules/' . $stylesheet_name .'.min.css';
+                //sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' SOOO ? => ' . $this->uri . $wp_filesystem->exists( $this->uri ), empty( $file_content ) );
+                if ( $wp_filesystem->exists( $uri ) && $wp_filesystem->is_readable( $uri ) ) {
+                    $file_content = $wp_filesystem->get_contents( $uri );
+                    printf( '<style id="%1$s-stylesheet" type="text/css" media="all">%2$s</style>', $stylesheet_name, $file_content );
+                }
+            }
         }
 
 

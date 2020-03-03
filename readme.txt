@@ -5,8 +5,8 @@ Plugin URI: https://wordpress.org/plugins/nimble-builder/
 Tags: page builder, visual editor, customizer, drag and drop, header, footer, landing page, contact form, grid, post grid
 Requires at least: 4.7
 Requires PHP: 5.4
-Tested up to: 5.3.2
-Stable tag: 1.10.11
+Tested up to: 5.4
+Stable tag: 1.10.12-beta
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,22 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.10.10 =
-Updated Font Awesome icons to latest version. Performance improvements => 1)fixed "ghosts" Google fonts loaded even if not used, 2) better management of when Font Awesome assets should be loaded.
+= 1.10.12 =
+Various fixes and performance improvements. Successfully tested with WordPress 5.4.
 
 == Changelog ==
+= 1.10.12 March 3rd 2020 =
+* fixed : when a multi-item module, like carousel or social icon, is updated, its value should be cast as an array
+* fixed : [responsive columns] custom column width might not be applied when using a custom breakpoint < 768px
+* fixed : [nested sections] duplicating a nested section should trigger a preview refresh in order to regenerate a proper column layout
+* fixed : [carousel module] disable autoplay by default
+* updated : [carousel module] set default navigation to arrows only, not arrows + dots
+* fixed : [CSS grid] columns of a section with property "flex-direction: column-reverse" needs to be set on "flex:auto"
+* fixed : [breakpoint] possible php error notice when custom breakpoint is set to an empty value
+* updated : use "adapt images to carousel's width" instead of "Nimble wizard" by default
+* improved : [performance] avoid potential multiple db queries when fetching the sektion posts
+* improved : [performance] added an experiment to load some of the largest module stylesheets per module instead of bundled in the main one. Can be enabled with constants in wp-config : NIMBLE_USE_SPLIT_STYLESHEET, NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE
+
 = 1.10.11 February 29th 2020 =
 * fixed : figcaption => adjust margin top only when wrapped inside .wp-caption
 * fixed : [accordion module] wrong cursor pointer on +/- icons

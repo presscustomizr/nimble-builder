@@ -900,31 +900,13 @@ function sek_get_module_collection() {
 }
 
 
-// recursive helper to generate a list of module used in a given set of sections data
-function sek_populate_list_of_modules_used( $seks_data ) {
-    global $modules_used;
-    if ( ! is_array( $seks_data ) ) {
-        sek_error_log( __FUNCTION__ . ' => invalid seks_data param');
-        return $count;
-    }
-    foreach ( $seks_data as $key => $data ) {
-        if ( is_array( $data ) ) {
-            if ( !empty( $data['level'] ) && 'module' === $data['level'] && !empty( $data['module_type'] ) ) {
-                $modules_used[] = $data['module_type'];
-            } else {
-                //$modules_used = array_merge( $modules_used, sek_populate_list_of_modules_used( $data, $modules_used ) );
-                sek_populate_list_of_modules_used( $data, $modules_used );
-            }
-        }
-    }
-}
 
 
 // @return void()
 // Fired in 'wp_enqueue_scripts'
-// Recursively sniff the local and global sections to populate Nimble_Manager()->modules_currently_displayed
+// Recursively sniff the local and global sections to populate Nimble_Manager()->contextually_active_modules
 // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-function sek_populate_collection_of_module_displayed( $recursive_data = null, $module_collection = null ) {
+function sek_populate_collection_of_contextually_active_modules( $recursive_data = null, $module_collection = null ) {
     if ( is_null( $recursive_data ) ) {
         $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
         $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
@@ -934,7 +916,8 @@ function sek_populate_collection_of_module_displayed( $recursive_data = null, $m
         $recursive_data = array_merge( $local_collection, $global_collection );
     }
     if ( is_null( $module_collection ) ) {
-        $module_collection = Nimble_Manager()->modules_currently_displayed;
+        // make sure Nimble_Manager()->contextually_active_modules is initialized as an array before starting populating it.
+        $module_collection = 'not_set' === Nimble_Manager()->contextually_active_modules ? [] : Nimble_Manager()->contextually_active_modules;
     }
 
     foreach ($recursive_data as $key => $value) {
@@ -947,18 +930,19 @@ function sek_populate_collection_of_module_displayed( $recursive_data = null, $m
                 $module_collection[$module_type][] = $value['id'];
             }
         } else if ( is_array( $value ) ) {
-            $module_collection = sek_populate_collection_of_module_displayed( $value, $module_collection );
+            $module_collection = sek_populate_collection_of_contextually_active_modules( $value, $module_collection );
         }
     }
-    Nimble_Manager()->modules_currently_displayed = $module_collection;
-    return Nimble_Manager()->modules_currently_displayed;
+    Nimble_Manager()->contextually_active_modules = $module_collection;
+    return Nimble_Manager()->contextually_active_modules;
 }
 
 // return the cached collection or build it when needed
-function sek_get_collection_of_module_displayed( $recursive_data = null, $module_collection = null ) {
-    if ( empty( Nimble_Manager()->modules_currently_displayed ) )
-      return sek_populate_collection_of_module_displayed();
-    return Nimble_Manager()->modules_currently_displayed;
+function sek_get_collection_of_contextually_active_modules( $recursive_data = null, $module_collection = null ) {
+    if ( 'not_set' === Nimble_Manager()->contextually_active_modules ) {
+        return sek_populate_collection_of_contextually_active_modules();
+    }
+    return Nimble_Manager()->contextually_active_modules;
 }
 
 
@@ -1470,13 +1454,18 @@ function sek_get_section_custom_breakpoint( $params ) {
     // assign default value if use-custom-breakpoint is checked but there's no breakpoint set.
     // this can also occur if the custom breakpoint is left to default in the customizer ( default values are not considered when saving )
     if ( empty( $options[ 'breakpoint' ][ 'custom-breakpoint' ] ) ) {
-        $custom_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];//768
+        if ( array_key_exists('custom-breakpoint', $options[ 'breakpoint' ] ) ) {
+            // this is the case when user has emptied the setting
+            $custom_breakpoint = 1;// added when fixing https://github.com/presscustomizr/nimble-builder/issues/623
+        } else {
+            $custom_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];//768
+        }
     } else {
         $custom_breakpoint = intval( $options[ 'breakpoint' ][ 'custom-breakpoint' ] );
     }
 
-    if ( $custom_breakpoint < 0 )
-      return;
+    if ( $custom_breakpoint <= 0 )
+      return 1;
 
     // 1) When the breakpoint is requested for responsive columns, we always return the custom value
     if ( $params['for_responsive_columns'] )
@@ -1504,7 +1493,10 @@ function sek_is_section_custom_breakpoint_applied_to_all_customizations_by_devic
       return;
 
     // We need a custom breakpoint > 1
-    if ( intval( $section_breakpoint_options['custom-breakpoint'] ) <= 1 )
+    // Make sure the custom breakpoint has not been emptied, otherwise assign a minimal value of 1px
+    // fixes : https://github.com/presscustomizr/nimble-builder/issues/623
+    $custom_breakpoint = empty( $section_breakpoint_options['custom-breakpoint'] ) ? 1 : $section_breakpoint_options['custom-breakpoint'];
+    if ( intval( $custom_breakpoint ) <= 1 )
       return;
 
     // apply-to-all option is unchecked by default
@@ -2227,11 +2219,18 @@ function sek_get_feedback_notif_status() {
       return;
     if ( sek_feedback_notice_is_postponed() )
       return;
+
+    // Did we set the status already ?
+    if ( 'not_set' !== Nimble_Manager()->feedback_notif_status )
+      return Nimble_Manager()->feedback_notif_status;
+
+    // If not let's set it
+
     $start_version = get_option( 'nimble_started_with_version', NIMBLE_VERSION );
     //sek_error_log('START VERSION ?' . $start_version, version_compare( $start_version, '1.6.0', '<=' ) );
 
-    // Bail if user did not start before 1.9.5, October 21st 2019 ( set on November 18th 2019 )
-    if ( ! version_compare( $start_version, '1.9.5', '<=' ) )
+    // Bail if user did not start before v1.10.10, February 15th 2020 ( set on March 3rd 2020 )
+    if ( ! version_compare( $start_version, '1.10.10', '<=' ) )
       return;
 
     $sek_post_query_vars = array(
@@ -2272,9 +2271,29 @@ function sek_get_feedback_notif_status() {
     // sek_error_log('$modules_used ?? ' . count($modules_used), $modules_used );
     // sek_error_log('$customized_pages ??', $customized_pages );
     //version_compare( $this->wp_version, '4.1', '>=' )
-    return $customized_pages > 0 && $nb_section_created > 2 && count($modules_used) > 2;
+    Nimble_Manager()->feedback_notif_status = $customized_pages > 0 && $nb_section_created > 2 && count($modules_used) > 2;
+    return Nimble_Manager()->feedback_notif_status;
 }
 
+
+// recursive helper to generate a list of module used in a given set of sections data
+function sek_populate_list_of_modules_used( $seks_data ) {
+    global $modules_used;
+    if ( ! is_array( $seks_data ) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid seks_data param');
+        return $count;
+    }
+    foreach ( $seks_data as $key => $data ) {
+        if ( is_array( $data ) ) {
+            if ( !empty( $data['level'] ) && 'module' === $data['level'] && !empty( $data['module_type'] ) ) {
+                $modules_used[] = $data['module_type'];
+            } else {
+                //$modules_used = array_merge( $modules_used, sek_populate_list_of_modules_used( $data, $modules_used ) );
+                sek_populate_list_of_modules_used( $data, $modules_used );
+            }
+        }
+    }
+}
 
 
 function sek_feedback_notice_is_dismissed() {
