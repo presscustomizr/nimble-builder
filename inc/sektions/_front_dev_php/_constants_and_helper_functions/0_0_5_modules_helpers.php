@@ -172,7 +172,8 @@ function sek_populate_collection_of_contextually_active_modules( $recursive_data
         $recursive_data = array_merge( $local_collection, $global_collection );
     }
     if ( is_null( $module_collection ) ) {
-        $module_collection = Nimble_Manager()->contextually_active_modules;
+        // make sure Nimble_Manager()->contextually_active_modules is initialized as an array before starting populating it.
+        $module_collection = 'not_set' === Nimble_Manager()->contextually_active_modules ? [] : Nimble_Manager()->contextually_active_modules;
     }
 
     foreach ($recursive_data as $key => $value) {
@@ -194,8 +195,9 @@ function sek_populate_collection_of_contextually_active_modules( $recursive_data
 
 // return the cached collection or build it when needed
 function sek_get_collection_of_contextually_active_modules( $recursive_data = null, $module_collection = null ) {
-    if ( empty( Nimble_Manager()->contextually_active_modules ) )
-      return sek_populate_collection_of_contextually_active_modules();
+    if ( 'not_set' === Nimble_Manager()->contextually_active_modules ) {
+        return sek_populate_collection_of_contextually_active_modules();
+    }
     return Nimble_Manager()->contextually_active_modules;
 }
 
