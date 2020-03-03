@@ -104,7 +104,8 @@ if ( nimble_pass_requirements() ) {
         }
     }
 
-    require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-sektions.php' );
+    require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-constants-and-helper-functions.php' );
+    require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-sektions-base.php' );
 
     // $_POST['ac_get_template'] <= scenario of an input template getting ajaxily fetched
     if ( \Nimble\skp_is_customizing() || isset( $_POST['ac_get_template']) || ( defined('DOING_AJAX') && DOING_AJAX ) ) {

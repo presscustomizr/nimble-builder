@@ -74,7 +74,8 @@ module.exports = function(grunt) {
           ],
 
           'build_sektion_php_js_css' : [
-              'concat:czr_sektions_front_php',
+              'concat:czr_sektions_constants_helper_functions_php',
+              'concat:czr_sektions_base_front_php',
               //'comments:sektions_front_php',
               'concat:czr_sektions_customizer_php',
               //'comments:sektions_customizer_php',

@@ -1,5 +1,4 @@
 <?php
-namespace Nimble;
 // This file has been introduced on May 21st 2019 => back to the local data
 // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
 

@@ -367,19 +367,44 @@ module.exports = {
 
 
   //
-  //------------------------- SEKTIONS FRONT PHP
+  //------------------------- SEKTIONS CONSTANTS AND HELPER FUNCTIONS PHP
   //
-  czr_sektions_front_php : {
+  czr_sektions_constants_helper_functions_php : {
     src: [
-      '<%= paths.sektions %>_front_dev_php/0_5_0_sektions_functions_definitions.php',
-      '<%= paths.sektions %>_front_dev_php/0_5_1_sektions_nimble_remote_api.php',
-      '<%= paths.sektions %>_front_dev_php/0_5_2_sektions_local_sektion_data.php',
-      '<%= paths.sektions %>_front_dev_php/0_6_0_sektions_nimble_customize_link.php',
-      '<%= paths.sektions %>_front_dev_php/0_7_0_sektions_retro_compatibilities.php',
-      '<%= paths.sektions %>_front_dev_php/0_9_0_sektions_functions_seks_post_set_get.php',
-      '<%= paths.sektions %>_front_dev_php/0_9_1_sektions_functions_saved_sektions.php',
-      '<%= paths.sektions %>_front_dev_php/0_9_2_sektions_functions_revision_history.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_0_0_constants.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_0_1_location_utilities.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_0_2_front_assets_helpers.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_0_3_images_and_videos_helpers.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_0_4_menus_helpers.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_0_6_breakpoint_helpers.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_0_7_local_global_options_helpers.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_0_9_module_helpers.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_1_0_templates_header_footer_helpers.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_1_1_generic_level_helpers.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_1_1_sections_helpers.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_1_5_feedback_notifications_helpers.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_1_7_recaptcha_helpers.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/9_9_9_various_helpers.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_5_1_sektions_nimble_remote_api.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_6_0_sektions_nimble_customize_link.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_7_0_sektions_retro_compatibilities.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_0_sektions_functions_seks_post_set_get.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_1_sektions_functions_saved_sektions.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_2_sektions_functions_revision_history.php'
+    ],
+    dest: '<%= paths.sektions %>ccat-constants-and-helper-functions.php',
+  },
 
+
+
+  //
+  //------------------------- SEKTIONS BASE AND FRONT PHP
+  //
+  czr_sektions_base_front_php : {
+    src: [
       '<%= paths.sektions %>_front_dev_php/dyn_css_builder_and_google_fonts_printer/9_0_0_sek_module_helpers_for_css_rules_generation.php',
 
       // MODULE REGISTRATION
@@ -473,7 +498,7 @@ module.exports = {
 
       '<%= paths.sektions %>_front_dev_php/8_9_0_sektions_front_class_instantiate.php'
     ],
-    dest: '<%= paths.sektions %>ccat-sektions.php',
+    dest: '<%= paths.sektions %>ccat-sektions-base.php',
   },
 
 

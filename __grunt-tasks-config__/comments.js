@@ -5,7 +5,7 @@ module.exports = {
         singleline: true,
         multiline: false
     },
-    src: [ '<%= paths.sektions %>ccat-sektions.php' ] // files to remove comments from
+    src: ['<%= paths.sektions %>ccat-constants-and-helper-functions.php', '<%= paths.sektions %>ccat-sektions-base.php' ] // files to remove comments from
   },
   sektions_admin_php: {
     // Target-specific file lists and/or options go here.

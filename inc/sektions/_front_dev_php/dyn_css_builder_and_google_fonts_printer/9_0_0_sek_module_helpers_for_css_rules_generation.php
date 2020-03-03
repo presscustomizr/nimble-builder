@@ -1,4 +1,5 @@
 <?php
+namespace Nimble;
 // @return array() for css rules
 // $rules[]     = array(
 //     'selector' => '[data-sek-id="'.$level['id'].'"]',

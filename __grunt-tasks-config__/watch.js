@@ -142,7 +142,8 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/**/*.php'
     ],
     tasks : [
-      'concat:czr_sektions_front_php',
+      'concat:czr_sektions_constants_helper_functions_php',
+      'concat:czr_sektions_base_front_php'
       //'comments:sektions_front_php'
     ],
   },
