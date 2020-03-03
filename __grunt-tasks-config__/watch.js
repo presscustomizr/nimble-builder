@@ -309,6 +309,8 @@ module.exports = {
     tasks : [
       'sass',
       'postcss',
+      // march 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/612
+      'concat:sektions_front_slider_module_css',
     ]
   },
 

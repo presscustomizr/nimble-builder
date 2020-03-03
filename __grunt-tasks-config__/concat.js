@@ -170,6 +170,16 @@ module.exports = {
 
 
 
+  //
+  //------------------------- SEKTION FRONT CSS
+  //
+  sektions_front_slider_module_css:{
+    src:[
+      '<%= paths.front_assets %>css/modules/img-slider-module.css',
+      '<%= paths.front_assets %>css/libs/swiper.css'
+    ],
+    dest : '<%= paths.front_assets %>css/modules/img-slider-module-with-swiper.css',
+  },
 
 
 
@@ -481,6 +491,8 @@ module.exports = {
       ],
       dest: '<%= paths.sektions %>ccat-czr-sektions.php',
   },
+
+
 
   // czr_sektions_front_fmk_js : {
   //   src: [
