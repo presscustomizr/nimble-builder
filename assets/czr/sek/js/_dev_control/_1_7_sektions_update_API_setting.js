@@ -1200,7 +1200,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var presetColumnOrSectionCollection;
                                     __presetSectionInjected__ = $.Deferred();//defined at the beginning of the method
 
-                                    _doWhenPresetSectionCollectionFetched = function( presetColumnOrSectionCollection ) {
+                                    var _doWhenPrebuiltSectionCollectionFetched = function( presetColumnOrSectionCollection ) {
                                           self.preparePresetSectionForInjection( presetColumnOrSectionCollection )
                                                 .fail( function( _er_ ){
                                                       __updateAPISettingDeferred__.reject( 'updateAPISetting => error when preparePresetSectionForInjection => ' + params.action + ' => ' + _er_ );
@@ -1246,7 +1246,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       // @see end of this method
                                                       __presetSectionInjected__.resolve();
                                                 });//self.preparePresetSectionForInjection.done()
-                                    };//_doWhenPresetSectionCollectionFetched
+                                    };//_doWhenPrebuiltSectionCollectionFetched
 
 
                                     // Try to fetch the sections from the server
@@ -1265,7 +1265,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
                                                 }
                                                 // OK. time to resolve __presetSectionInjected__.promise()
-                                                _doWhenPresetSectionCollectionFetched( presetColumnOrSectionCollection );
+                                                _doWhenPrebuiltSectionCollectionFetched( presetColumnOrSectionCollection );
                                           });//self.getPresetSectionCollection().done()
                               break;
 
