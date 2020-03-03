@@ -97,7 +97,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         // 2) determine which assets ( css / js ) is needed for this context. see ::sek_enqueue_front_assets
         //
         // updated for https://github.com/presscustomizr/nimble-builder/issues/612
-        public $contextually_active_modules = [];
+        public $contextually_active_modules = 'not_set';
 
         public static $ui_picker_modules = [
           // UI CONTENT PICKER
@@ -161,6 +161,10 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         // @see ::render() method
         // otherwise the preview UI can be broken
         public $preview_level_guid = '_preview_level_guid_not_set_';
+
+        // March 2020 : feedback_notif_status is used to store the feedback notif ( used to display a request for review in the customizer )
+        // so that we don't fire the heavy requests multiple times in case the function sek_get_feedback_notif_status() is invoked several times
+        public $feedback_notif_status = 'not_set';
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>

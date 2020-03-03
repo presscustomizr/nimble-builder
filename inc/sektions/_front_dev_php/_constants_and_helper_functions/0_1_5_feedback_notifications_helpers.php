@@ -8,6 +8,13 @@ function sek_get_feedback_notif_status() {
       return;
     if ( sek_feedback_notice_is_postponed() )
       return;
+
+    // Did we set the status already ?
+    if ( 'not_set' !== Nimble_Manager()->feedback_notif_status )
+      return Nimble_Manager()->feedback_notif_status;
+
+    // If not let's set it
+
     $start_version = get_option( 'nimble_started_with_version', NIMBLE_VERSION );
     //sek_error_log('START VERSION ?' . $start_version, version_compare( $start_version, '1.6.0', '<=' ) );
 
@@ -53,7 +60,8 @@ function sek_get_feedback_notif_status() {
     // sek_error_log('$modules_used ?? ' . count($modules_used), $modules_used );
     // sek_error_log('$customized_pages ??', $customized_pages );
     //version_compare( $this->wp_version, '4.1', '>=' )
-    return $customized_pages > 0 && $nb_section_created > 2 && count($modules_used) > 2;
+    Nimble_Manager()->feedback_notif_status = $customized_pages > 0 && $nb_section_created > 2 && count($modules_used) > 2;
+    return Nimble_Manager()->feedback_notif_status;
 }
 
 

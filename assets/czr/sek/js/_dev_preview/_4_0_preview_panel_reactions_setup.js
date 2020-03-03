@@ -467,8 +467,42 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                   } else {
                                         self.errare( 'reactToPanelMsg => sek-update-html-in-selector => missing level or target dom element', params );
                                   }
-                            }
+                            },
+                            // march 2020 : print confettis when displaying the review request
+                            'sek-print-confettis' : function( params ) {
+                                  if (!window.confetti || !window.requestAnimationFrame)
+                                    return;
+                                  params = params || {};
+                                  var end = params.duration || Date.now() + (1 * 1000);
+                                  var colors = ['#f18700', '#684F2F', '#eea236'];
 
+                                  (function frame() {
+                                    confetti({
+                                      particleCount: 2,
+                                      angle: 60,
+                                      spread: 55,
+                                      origin: {
+                                        x: 0,
+                                        y: 0.8
+                                      },
+                                      colors: colors
+                                    });
+                                    confetti({
+                                      particleCount: 4,
+                                      angle: 120,
+                                      spread: 55,
+                                      origin: {
+                                        x: 1,
+                                        y: 0.8
+                                      },
+                                      colors: colors
+                                    });
+
+                                    if (Date.now() < end) {
+                                      window.requestAnimationFrame(frame);
+                                    }
+                                  }());
+                            }
                       };//msgCollection
 
                   _.each( msgCollection, function( callbackFn, msgId ) {
@@ -530,6 +564,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               }
                         });
                   });
-            }//schedulePanelMsgReactions()
+            },//schedulePanelMsgReactions()
       });//$.extend()
 })( wp.customize, jQuery, _ );

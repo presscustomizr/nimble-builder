@@ -436,9 +436,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           if ( expanded && _.isUndefined( self.feedbackUIVisible ) ) {
                                                 // FEEDBACK UI
                                                 self.setupFeedBackUI();
+
+                                                // march 2020 : print confettis
+                                                // confettis script is enqueued in the preview
+                                                setTimeout( function() {
+                                                    api.previewer.send('sek-print-confettis', { duration : Date.now() + (1 * 2000) } );
+                                                }, 1000 );
                                           }
                                     });
-                              }
+                              }//if ( sektionsLocalizedData.eligibleForFeedbackNotification )
                         });
                   });
 

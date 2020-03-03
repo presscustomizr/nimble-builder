@@ -774,7 +774,7 @@ function sek_print_nimble_customizer_tmpl() {
           <div class="sek-feedback-step-one">
             <div class="sek-main-feedback-heading">
               <img class="sek-feedback-nimble-icon big" src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php _e('Nimble Builder','text_dom'); ?>"/>
-              <p>Congratulations! You have created several sections with Nimble Builder on your website.</p>
+              <p>Congratulations, you have built some pages with Nimble Builder on your website!</p>
             </div>
             <p>Are you enjoying Nimble Builder ?</p>
             <button class="button sek-feedback-btn sek-neg" data-sek-feedback-action="not_enjoying" type="button">
