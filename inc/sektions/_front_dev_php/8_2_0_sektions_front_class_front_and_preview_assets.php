@@ -168,7 +168,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                           $media = 'all'
                       );
                 // Always enqueue when customizing
-                } else {
+                } else if ( skp_is_customizing() ) {
                       wp_enqueue_style(
                           'czr-swiper',
                           sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.css' : NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.min.css',
