@@ -156,31 +156,13 @@ function sek_get_module_collection() {
 }
 
 
-// recursive helper to generate a list of module used in a given set of sections data
-function sek_populate_list_of_modules_used( $seks_data ) {
-    global $modules_used;
-    if ( ! is_array( $seks_data ) ) {
-        sek_error_log( __FUNCTION__ . ' => invalid seks_data param');
-        return $count;
-    }
-    foreach ( $seks_data as $key => $data ) {
-        if ( is_array( $data ) ) {
-            if ( !empty( $data['level'] ) && 'module' === $data['level'] && !empty( $data['module_type'] ) ) {
-                $modules_used[] = $data['module_type'];
-            } else {
-                //$modules_used = array_merge( $modules_used, sek_populate_list_of_modules_used( $data, $modules_used ) );
-                sek_populate_list_of_modules_used( $data, $modules_used );
-            }
-        }
-    }
-}
 
 
 // @return void()
 // Fired in 'wp_enqueue_scripts'
-// Recursively sniff the local and global sections to populate Nimble_Manager()->modules_currently_displayed
+// Recursively sniff the local and global sections to populate Nimble_Manager()->contextually_active_modules
 // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-function sek_populate_collection_of_module_displayed( $recursive_data = null, $module_collection = null ) {
+function sek_populate_collection_of_contextually_active_modules( $recursive_data = null, $module_collection = null ) {
     if ( is_null( $recursive_data ) ) {
         $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
         $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
@@ -190,7 +172,7 @@ function sek_populate_collection_of_module_displayed( $recursive_data = null, $m
         $recursive_data = array_merge( $local_collection, $global_collection );
     }
     if ( is_null( $module_collection ) ) {
-        $module_collection = Nimble_Manager()->modules_currently_displayed;
+        $module_collection = Nimble_Manager()->contextually_active_modules;
     }
 
     foreach ($recursive_data as $key => $value) {
@@ -203,18 +185,18 @@ function sek_populate_collection_of_module_displayed( $recursive_data = null, $m
                 $module_collection[$module_type][] = $value['id'];
             }
         } else if ( is_array( $value ) ) {
-            $module_collection = sek_populate_collection_of_module_displayed( $value, $module_collection );
+            $module_collection = sek_populate_collection_of_contextually_active_modules( $value, $module_collection );
         }
     }
-    Nimble_Manager()->modules_currently_displayed = $module_collection;
-    return Nimble_Manager()->modules_currently_displayed;
+    Nimble_Manager()->contextually_active_modules = $module_collection;
+    return Nimble_Manager()->contextually_active_modules;
 }
 
 // return the cached collection or build it when needed
-function sek_get_collection_of_module_displayed( $recursive_data = null, $module_collection = null ) {
-    if ( empty( Nimble_Manager()->modules_currently_displayed ) )
-      return sek_populate_collection_of_module_displayed();
-    return Nimble_Manager()->modules_currently_displayed;
+function sek_get_collection_of_contextually_active_modules( $recursive_data = null, $module_collection = null ) {
+    if ( empty( Nimble_Manager()->contextually_active_modules ) )
+      return sek_populate_collection_of_contextually_active_modules();
+    return Nimble_Manager()->contextually_active_modules;
 }
 
 
