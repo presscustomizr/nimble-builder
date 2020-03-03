@@ -73,13 +73,18 @@ function sek_get_section_custom_breakpoint( $params ) {
     // assign default value if use-custom-breakpoint is checked but there's no breakpoint set.
     // this can also occur if the custom breakpoint is left to default in the customizer ( default values are not considered when saving )
     if ( empty( $options[ 'breakpoint' ][ 'custom-breakpoint' ] ) ) {
-        $custom_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];//768
+        if ( array_key_exists('custom-breakpoint', $options[ 'breakpoint' ] ) ) {
+            // this is the case when user has emptied the setting
+            $custom_breakpoint = 1;// added when fixing https://github.com/presscustomizr/nimble-builder/issues/623
+        } else {
+            $custom_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];//768
+        }
     } else {
         $custom_breakpoint = intval( $options[ 'breakpoint' ][ 'custom-breakpoint' ] );
     }
 
-    if ( $custom_breakpoint < 0 )
-      return;
+    if ( $custom_breakpoint <= 0 )
+      return 1;
 
     // 1) When the breakpoint is requested for responsive columns, we always return the custom value
     if ( $params['for_responsive_columns'] )
@@ -107,7 +112,10 @@ function sek_is_section_custom_breakpoint_applied_to_all_customizations_by_devic
       return;
 
     // We need a custom breakpoint > 1
-    if ( intval( $section_breakpoint_options['custom-breakpoint'] ) <= 1 )
+    // Make sure the custom breakpoint has not been emptied, otherwise assign a minimal value of 1px
+    // fixes : https://github.com/presscustomizr/nimble-builder/issues/623
+    $custom_breakpoint = empty( $section_breakpoint_options['custom-breakpoint'] ) ? 1 : $section_breakpoint_options['custom-breakpoint'];
+    if ( intval( $custom_breakpoint ) <= 1 )
       return;
 
     // apply-to-all option is unchecked by default
