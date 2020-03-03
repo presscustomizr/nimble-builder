@@ -279,7 +279,8 @@ module.exports = {
       livereload : true
     },
     files : [
-      '<%= paths.front_assets %>js/_dev_front/**/*.js',
+      '<%= paths.front_assets %>js/_dev_front_concat/**/*.js',
+      '<%= paths.front_assets %>js/_dev_stand_alone/**/*.js'
     ],
     tasks : [
       'jshint:front_js',

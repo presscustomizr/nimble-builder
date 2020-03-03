@@ -5,8 +5,8 @@ module.exports = {
 	},
 	gruntfile : ['Gruntfile.js'],
 	front_js : [
-    '<%= paths.front_assets %>js/_dev_front/*.js',
-    '!<%= paths.front_assets %>js/_dev_front/0_0_0_front_underscore.js'
+    '<%= paths.front_assets %>js/_dev_front_concat/*.js',
+    '<%= paths.front_assets %>js/_dev_stand_alone/*.js'
   ],
   sektion_customizer_js : [
     '<%= paths.czr_assets %>sek/js/_dev_control/*.js',

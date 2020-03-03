@@ -48,7 +48,8 @@ module.exports = {
 
       // front dev fmk js
       '!assets/front/js/__FRONT_JS_FMK_TO_BE_UPDATED/**',
-      '!assets/front/js/_dev_front/**',
+      '!assets/front/js/_dev_front_concat/**',
+      '!assets/front/js/_dev_stand_alone/**',
 
       // front dev sass
       '!assets/front/scss/**',

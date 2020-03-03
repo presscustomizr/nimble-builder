@@ -190,17 +190,16 @@ module.exports = {
   //
   sektions_front_js : {
     src: [
-      '<%= paths.front_assets %>js/_dev_front/0_0_0_0_0_pre_front_nimble_utils.js',
-      '<%= paths.front_assets %>js/_dev_front/0_0_0_0_pre_front_global_definition.js',
-      '<%= paths.front_assets %>js/_dev_front/0_0_1_front_fittext.js',
-      '<%= paths.front_assets %>js/_dev_front/0_0_2_jquery_front_smartload.js',
-      '<%= paths.front_assets %>js/_dev_front/0_0_3_jquery_nimblecenterimage.js',
-      '<%= paths.front_assets %>js/_dev_front/1_0_2_front_parallax_background.js',
-      '<%= paths.front_assets %>js/_dev_front/1_0_3_front_menu_module.js',
-      '<%= paths.front_assets %>js/_dev_front/1_0_4_front_accordion_module.js',
-      '<%= paths.front_assets %>js/_dev_front/1_0_5_front_simple_slider_module.js',
-      '<%= paths.front_assets %>js/_dev_front/2_0_0_front_video_bg.js',
-      '<%= paths.front_assets %>js/_dev_front/9_9_9_front_fire.js'
+      '<%= paths.front_assets %>js/_dev_front_concat/0_0_0_0_0_pre_front_nimble_utils.js',
+      '<%= paths.front_assets %>js/_dev_front_concat/0_0_0_0_pre_front_global_definition.js',
+      '<%= paths.front_assets %>js/_dev_front_concat/0_0_1_front_fittext.js',
+      '<%= paths.front_assets %>js/_dev_front_concat/0_0_2_jquery_front_smartload.js',
+      '<%= paths.front_assets %>js/_dev_front_concat/1_0_2_front_parallax_background.js',
+      //'<%= paths.front_assets %>js/_dev_front_concat/1_0_3_front_menu_module.js',
+      '<%= paths.front_assets %>js/_dev_front_concat/1_0_4_front_accordion_module.js',
+      //'<%= paths.front_assets %>js/_dev_front_concat/1_0_5_front_simple_slider_module.js',
+      //'<%= paths.front_assets %>js/_dev_front_concat/2_0_0_front_video_bg.js',
+      '<%= paths.front_assets %>js/_dev_front_concat/9_9_9_front_fire.js'
     ],
     dest: '<%= paths.front_assets %>js/ccat-nimble-front.js',
   },
