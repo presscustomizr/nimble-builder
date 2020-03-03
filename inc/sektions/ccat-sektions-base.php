@@ -13631,9 +13631,9 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             //     (
             //         [0] => __nimble__c1526193134e
             //     )
-            $module_collection = sek_get_collection_of_contextually_active_modules();
+            $contextually_active_modules = sek_get_collection_of_contextually_active_modules();
 
-            //sek_error_log('$module_collection ?', $module_collection );
+            //sek_error_log('$contextually_active_modules ?', $contextually_active_modules );
 
             // We don't need Nimble Builder assets when no local or global sections have been created
             // see https://github.com/presscustomizr/nimble-builder/issues/586
@@ -13646,7 +13646,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             if ( $is_stylesheet_split_for_performance && !$is_split_module_stylesheets_inline_for_performance ) {
                 // loop on the map module type (candidates for split) => stylesheet file name
                 foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
-                    if ( !array_key_exists($module_type , $module_collection ) )
+                    if ( !array_key_exists($module_type , $contextually_active_modules ) )
                       continue;
 
                     wp_enqueue_style(
@@ -13702,11 +13702,20 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
 
             // Swiper js + css is needed for the czr_img_slider_module
-            if ( skp_is_customizing() || ( !skp_is_customizing() && sek_front_needs_swiper() ) ) {
+            if ( skp_is_customizing() || ( !skp_is_customizing() && array_key_exists('czr_img_slider_module' , $contextually_active_modules) ) ) {
                 // march 2020 : when using split stylesheet, swiper css is already included in assets/front/css/modules/img-slider-module-with-swiper.css
                 // so we don't need to enqueue it
                 // added for https://github.com/presscustomizr/nimble-builder/issues/612
-                if ( ( !skp_is_customizing() && sek_front_needs_swiper() && !$is_stylesheet_split_for_performance ) ) {
+                if ( ( !skp_is_customizing() && !$is_stylesheet_split_for_performance ) ) {
+                      wp_enqueue_style(
+                          'czr-swiper',
+                          sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.css' : NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.min.css',
+                          array(),
+                          NIMBLE_ASSETS_VERSION,
+                          $media = 'all'
+                      );
+                // Always enqueue when customizing
+                } else if ( skp_is_customizing() ) {
                       wp_enqueue_style(
                           'czr-swiper',
                           sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.css' : NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.min.css',
@@ -13886,10 +13895,10 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             if ( !$is_split_module_stylesheets_inline_for_performance )
               return;
             global $wp_filesystem;
-            $module_collection = sek_get_collection_of_contextually_active_modules();
+            $contextually_active_modules = sek_get_collection_of_contextually_active_modules();
             // loop on the map module type (candidates for split) => stylesheet file name
             foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
-                if ( !array_key_exists($module_type , $module_collection) )
+                if ( !array_key_exists($module_type , $contextually_active_modules) )
                   continue;
                 $uri = NIMBLE_BASE_PATH . '/assets/front/css/modules/' . $stylesheet_name .'.min.css';
                 //sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' SOOO ? => ' . $this->uri . $wp_filesystem->exists( $this->uri ), empty( $file_content ) );
