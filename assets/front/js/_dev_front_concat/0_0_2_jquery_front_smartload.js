@@ -194,7 +194,7 @@
 
                     $jQueryImgToLoad
                           // .hide()
-                          .load( function () {
+                          .on( 'load', function () {
                                 //https://api.jquery.com/removeAttr/
                                 //An attribute to remove; as of version 1.7, it can be a space-separated list of attributes.
                                 //minimum supported wp version (3.4+) embeds jQuery 1.7.2
@@ -223,7 +223,7 @@
                           });//<= create a load() fn
                     //http://stackoverflow.com/questions/1948672/how-to-tell-if-an-image-is-loaded-or-cached-in-jquery
                     if ( $jQueryImgToLoad[0].complete ) {
-                          $jQueryImgToLoad.load();
+                          $jQueryImgToLoad.trigger( 'load' );
                     }
                     $_el.removeClass('lazy-loading');
               };
