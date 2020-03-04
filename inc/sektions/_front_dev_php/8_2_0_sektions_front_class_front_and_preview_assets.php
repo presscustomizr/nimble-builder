@@ -49,6 +49,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
             // Experiment
             add_action('wp_footer', function() {
+                if( !defined('NIMBLE_DEQUEUE_JQUERY') ||  !NIMBLE_DEQUEUE_JQUERY )
+                  return;
                 ?>
                 <script id="nimble-fire-front-js">
                   ( function() {
@@ -70,14 +72,14 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                       };
                       tryToLoadIfJqueryIsReady();
 
-                      // Load jQuery with a delay for testing purposes
+                      // Load jQuery
                       setTimeout( function() {
                           var script = document.createElement('script');
-                          script.setAttribute('src', 'http://customizr-dev.test/wp-includes/js/jquery/jquery.js?ver=1.12.4-wp');
+                          script.setAttribute('src', 'https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js');
                           script.setAttribute('type', 'text/javascript');
                           script.setAttribute('id', 'nimble-jquery');
                           document.getElementsByTagName('head')[0].appendChild(script);
-                      }, 500 );
+                      },0 );//<= add a delay to test 'nimble-jquery-ready' and mimic the 'defer' option of a cache plugin
                   })();
                 </script>
                 <?php
