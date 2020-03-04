@@ -6,7 +6,6 @@
 
 (function(w, d){
       var onNimbleAppReady = function() {
-          console.log('ALORS SWIPER MODULE JS ?');
           jQuery( function($){
               var mySwipers = [];
               var triggerSimpleLoad = function( $_imgs ) {

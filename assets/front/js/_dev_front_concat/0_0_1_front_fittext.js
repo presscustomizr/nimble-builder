@@ -40,6 +40,26 @@
                   });
                 };
             })( jQuery );
+
+            var doFitText = function() {
+                  $(".sek-module-placeholder").each( function() {
+                        $(this).fitText( 0.4, { minFontSize: '50px', maxFontSize: '300px' } ).data('sek-fittext-done', true );
+                  });
+                  // Delegate instantiation
+                  $('.sektion-wrapper').on(
+                        'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-level-refreshed',
+                        'div[data-sek-level="section"]',
+                        function( evt ) {
+                              $(this).find(".sek-module-placeholder").fitText( 0.4, { minFontSize: '50px', maxFontSize: '300px' } ).data('sek-fittext-done', true );
+                        }
+                  );
+            };
+            //doFitText();
+            // if ( 'function' == typeof(_) && window.wp && ! nb_.isUndefined( wp.customize ) ) {
+            //     wp.customize.selectiveRefresh.bind('partial-content-rendered' , function() {
+            //         doFitText();
+            //     });
+            // }
       };// onJQueryReady
       window.fireOnNimbleAppReady( onNimbleAppReady );
 }(window, document));

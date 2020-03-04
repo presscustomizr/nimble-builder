@@ -79,30 +79,9 @@
 
 
         /* ------------------------------------------------------------------------- *
-         *  FITTEXT
+         *  SCROLL TO ANCHOR
         /* ------------------------------------------------------------------------- */
         jQuery( function($){
-            var doFitText = function() {
-                  $(".sek-module-placeholder").each( function() {
-                        $(this).fitText( 0.4, { minFontSize: '50px', maxFontSize: '300px' } ).data('sek-fittext-done', true );
-                  });
-                  // Delegate instantiation
-                  $('.sektion-wrapper').on(
-                        'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-level-refreshed',
-                        'div[data-sek-level="section"]',
-                        function( evt ) {
-                              $(this).find(".sek-module-placeholder").fitText( 0.4, { minFontSize: '50px', maxFontSize: '300px' } ).data('sek-fittext-done', true );
-                        }
-                  );
-
-            };
-            //doFitText();
-            // if ( 'function' == typeof(_) && window.wp && ! nb_.isUndefined( wp.customize ) ) {
-            //     wp.customize.selectiveRefresh.bind('partial-content-rendered' , function() {
-            //         doFitText();
-            //     });
-            // }
-
             // does the same as new URL(url)
             // but support IE.
             // @see https://stackoverflow.com/questions/736513/how-do-i-parse-a-url-into-hostname-and-path-in-javascript
@@ -159,52 +138,7 @@
 
 
 
-        /* ------------------------------------------------------------------------- *
-         *  VIDEO BACKGROUND FOR SECTIONS AND COLUMNS
-        /* ------------------------------------------------------------------------- */
-        // - insert bg video container
-        // - inject player api script
-        // - print video iframe
-        // - on api ready, do stuff
-        jQuery( function($){
-            var _maybeInstantiatePlayers = function() {
-                  $('[data-sek-video-bg-src]').each(function() {
-                      if ( 'section' === $(this).data('sek-level') || 'column' === $(this).data('sek-level') ) {
-                          if ( ! $(this).data('sek-player-instantiated') ) {
-                              $(this).nimbleLoadVideoBg( { lazyLoad: sekFrontLocalized.video_bg_lazyload_enabled } );
-                          }
-                      }
-                  });
-            };
 
-            // on page load
-            _maybeInstantiatePlayers();
-
-            // WHEN CUSTOMIZING
-            // on various nimble events when customizing
-            nb_.cachedElements.$body.on('sek-section-added sek-columns-refreshed', function( evt, params ){
-                  _maybeInstantiatePlayers();
-            });
-
-            // On module refreshed inside a section, simply trigger a dimensions update
-            nb_.cachedElements.$body.on('sek-modules-refreshed', function( evt, params ){
-                  $('[data-sek-video-bg-src]').each(function() {
-                      $(this).trigger('refresh-video-dimensions');
-                  });
-            });
-
-            // when customizing the level
-            nb_.cachedElements.$body.on('sek-level-refreshed', function( evt, params ){
-                  // when removing a level => no params.id
-                  if ( !params || !nb_.isObject( params ) || !params.id )
-                    return;
-
-                  var $levelRefreshed = $( '[data-sek-id="'+ params.id +'"][data-sek-video-bg-src]' );
-                  if ( $levelRefreshed.length > 0 && !$levelRefreshed.data('sek-player-instantiated') ) {
-                      $levelRefreshed.nimbleLoadVideoBg( { lazyLoad: sekFrontLocalized.video_bg_lazyload_enabled } );
-                  }
-            });
-        });
 
       };/////////////// onJQueryReady
 

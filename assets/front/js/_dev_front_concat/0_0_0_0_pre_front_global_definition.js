@@ -25,7 +25,7 @@
                             cache : true,// use the browser cached version when available
                             dataType: "script"
                       }).done(function() {
-                            console.log('ALORS SWIPER Module LOADED ?');
+                            //console.log('ALORS SWIPER Module LOADED ?');
                             if ( 'function' != typeof( window.Swiper ) )
                               return;
                             //the script is loaded. Say it globally.
@@ -44,7 +44,7 @@
                             cache : true,// use the browser cached version when available
                             dataType: "script"
                       }).done(function() {
-                            console.log('ALORS SWIPER LIB LOADED ?', window.Swiper );
+                            //console.log('ALORS SWIPER LIB LOADED ?', window.Swiper );
                             if ( 'function' != typeof( window.Swiper ) )
                               return;
 
