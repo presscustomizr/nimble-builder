@@ -73,6 +73,14 @@ module.exports = function(grunt) {
               'cssmin:sek_front_modules_css'
           ],
 
+          'build_front_js' : [
+              'concat:sektions_front_js',
+              //'comments:sektions_front_js',
+              'copy:sek_stand_alone_module_js_in_main_js_folder',
+              'uglify:sektions_front_js'
+
+          ],
+
           'build_sektion_php_js_css' : [
               'concat:czr_sektions_constants_helper_functions_php',
               'concat:czr_sektions_base_front_php',
@@ -80,9 +88,8 @@ module.exports = function(grunt) {
               'concat:czr_sektions_customizer_php',
               //'comments:sektions_customizer_php',
 
-              'concat:sektions_front_js',
-              //'comments:sektions_front_js',
-              'uglify:sektions_front_js',
+              'build_front_js',
+              'build_front_css',
 
               'concat:czr_sektions_customizer_control_js',
               //'comments:czr_base_control_js',
@@ -96,9 +103,6 @@ module.exports = function(grunt) {
 
               'cssmin:sek_customizer_css',
               //'cssmin:czr_css_fmk_fonts',
-
-              'build_front_css',
-              //'cssmin:sek_front_fonts_css'
           ],
 
           build : [

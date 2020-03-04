@@ -167,13 +167,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $feedback_notif_status = 'not_set';
 
         // March 2020 : introduction of split stylesheet for some modules
-        public $big_module_stylesheet_map = [
-            'czr_img_slider_module' => 'img-slider-module-with-swiper',
-            'czr_accordion_module' => 'accordion-module',
-            'czr_menu_module' => 'menu-module',
-            'czr_post_grid_module' => 'post-grid-module',
-            'czr_simple_form_module' => 'simple-form-module'
-        ];
+        public $big_module_stylesheet_map = [];//<= is populated in ::_schedule_front_and_preview_assets_printing()
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>

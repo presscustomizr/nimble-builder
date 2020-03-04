@@ -285,6 +285,7 @@ module.exports = {
     tasks : [
       'jshint:front_js',
       'concat:sektions_front_js',
+      'copy:sek_stand_alone_module_js_in_main_js_folder'
     ],
   },
 
