@@ -53,11 +53,11 @@ module.exports = {
       ext: '.min.js'
     }]
   },
-  sektions_front_magnific_popup_js : {
+  sektions_front_libs_js : {
     files: [{
       expand: true,
       cwd: '<%= paths.front_assets %>js/libs/',
-      src: [ 'jquery-magnific-popup.js' ],
+      src: [ '*.js', '!*.min.js' ],
       dest: '<%= paths.front_assets %>js/libs/',
       ext: '.min.js'
     }]

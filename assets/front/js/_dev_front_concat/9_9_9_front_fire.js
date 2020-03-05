@@ -12,7 +12,7 @@
 
               // fire the fn when we know that it's been loaded
               // either enqueued with possible defer or injected with js
-              nb_.fireOnMagnificPopupReady(
+              window.fireOnMagnificPopupReady(
                   function() {
                       // $candidates are .sek-link-to-img-lightbox selectors
                       $linkCandidates.each( function() {

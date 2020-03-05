@@ -119,16 +119,7 @@ window.nb_ = {};
             } else {
                 document.addEventListener('nimble-jquery-ready', func );
             }
-        },
-        // func = fn()
-        // 'nimble-jquery-ready' is fired @'wp_footer' see inline script in ::_schedule_front_and_preview_assets_printing()
-        fireOnMagnificPopupReady : function( func ) {
-            if ( typeof undefined !== typeof jQuery.fn.magnificPopup ) {
-                func();
-            } else {
-                document.addEventListener('nimble-magnific-popup-ready', func );
-            }
-        },
+        }
     };//window.nb_
 }(window, document ));
 

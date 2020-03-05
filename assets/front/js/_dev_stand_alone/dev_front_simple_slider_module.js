@@ -5,7 +5,7 @@
 /* ------------------------------------------------------------------------- */
 
 (function(w, d){
-      var onNimbleAppReady = function() {
+      var onSwiperReady = function() {
           jQuery( function($){
               var mySwipers = [];
               var triggerSimpleLoad = function( $_imgs ) {
@@ -457,7 +457,7 @@
           })( jQuery, window );
       };/////////////// onJQueryReady
 
-      window.fireOnNimbleAppReady( onNimbleAppReady );
+      window.fireOnSwiperReady( onSwiperReady );
 }(window, document));
 
 

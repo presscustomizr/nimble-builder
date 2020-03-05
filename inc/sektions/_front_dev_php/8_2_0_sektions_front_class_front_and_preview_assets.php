@@ -41,9 +41,14 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             // 1) window.nb_ utils starts being populated
             // 2) 'nimble-jquery-ready' => fired in footer when jQuery is defined <= window.nb_ utils is completed with jQuery dependant helper properties and methods
             // 3) 'nimble-app-ready' => fired in footer on 'nimble-jquery-ready' <= all module scripts are fired on this event
+            // 4) 'nimble-magnific-popup-ready', ... are emitted in each script files
             add_action('wp_head', function() {
                 ?>
-                <script>window.fireOnNimbleAppReady = function( func ) { if ( typeof undefined !== typeof nb_ && nb_.isReady === true ) {func(); } else {document.addEventListener('nimble-app-ready', func );}}</script>
+                <script>
+                  window.fireOnNimbleAppReady = function(func) {if ( typeof undefined !== typeof window.nb_ && nb_.isReady === true ) {func();} else {document.addEventListener('nimble-app-ready', func );}};
+                  window.fireOnMagnificPopupReady = function(func) {if ( typeof undefined !== typeof jQuery && typeof undefined !== typeof jQuery.fn.magnificPopup ) {func();} else {document.addEventListener('nimble-magnific-popup-ready', func );}};
+                  window.fireOnSwiperReady = function(func) {if ( typeof undefined !== typeof window.Swiper ) {func();} else {document.addEventListener('nimble-swiper-ready', func );}};
+                </script>
                 <?php
             }, 0);
 

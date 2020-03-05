@@ -298,7 +298,7 @@ module.exports = {
       '<%= paths.front_assets %>js/libs/**/*.js',
     ],
     tasks : [
-      'uglify:sektions_front_magnific_popup_js'
+      'uglify:sektions_front_libs_js'
     ],
   },
 

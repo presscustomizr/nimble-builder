@@ -78,7 +78,7 @@ module.exports = function(grunt) {
               //'comments:sektions_front_js',
               'copy:sek_stand_alone_module_js_in_main_js_folder',
               'uglify:sektions_front_js',
-              'uglify:sektions_front_magnific_popup_js'
+              'uglify:sektions_front_libs_js'
 
           ],
 
