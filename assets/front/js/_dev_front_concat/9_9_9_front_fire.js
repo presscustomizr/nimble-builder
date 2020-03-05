@@ -35,9 +35,7 @@
                                 duration: 300 // don't foget to change the duration also in CSS
                               }
                           }); } catch( er ) {
-                                if ( typeof window.console.log === 'function' ) {
-                                      console.log( er );
-                                }
+                                nb_.errorLog( 'error with fireOnMagnificPopupReady => ', er );
                           }
                       });
                   }
@@ -112,9 +110,7 @@
         jQuery(function($){
               $('.sektion-wrapper').each( function() {
                     try { $(this).nimbleLazyLoad(); } catch( er ) {
-                          if ( typeof window.console.log === 'function' ) {
-                                console.log( er );
-                          }
+                          nb_.errorLog( 'error with nimbleLazyLoad => ', er );
                     }
               });
         });
