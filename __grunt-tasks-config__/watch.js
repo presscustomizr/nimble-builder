@@ -279,14 +279,28 @@ module.exports = {
       livereload : true
     },
     files : [
-      '<%= paths.front_assets %>js/_dev_front_concat/**/*.js',
-      '<%= paths.front_assets %>js/_dev_stand_alone/**/*.js'
+      '<%= paths.front_assets %>js/_dev_front_concat/**/*.js'
     ],
     tasks : [
       'jshint:front_js',
       'concat:sektions_front_js',
       'copy:sek_stand_alone_module_js_in_main_js_folder'
+    ]
+  },
+  sektions_front_js_stand_alone_module_scripts : {
+    options: {
+      spawn : false,
+      // Start a live reload server on the default port 35729
+      livereload : true
+    },
+    files : [
+      '<%= paths.front_assets %>js/_dev_stand_alone/**/*.js'
     ],
+    tasks : [
+      'jshint:front_js',
+      'copy:sek_stand_alone_module_js_in_main_js_folder',
+      'uglify:sektions_front_js_stand_alone_module_scripts'
+    ]
   },
   sektions_front_js_libs : {
     options: {

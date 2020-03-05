@@ -22,7 +22,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             add_filter( 'script_loader_tag', array( $this, 'sek_filter_script_loader_tag' ), 10, 2 );
 
             // added March 2020 when experimenting for https://github.com/presscustomizr/nimble-builder/issues/626
-            if ( defined('NIMBLE_DEQUEUE_JQUERY') && NIMBLE_DEQUEUE_JQUERY ) {
+            if ( !skp_is_customizing() && defined('NIMBLE_DEQUEUE_JQUERY') && NIMBLE_DEQUEUE_JQUERY ) {
                   // see https://wordpress.stackexchange.com/questions/291700/how-to-stop-jquery-migrate-manually
                   // https://stackoverflow.com/questions/18421404/how-do-i-stop-wordpress-loading-jquery-and-jquery-migrate#25977181
                   add_action( 'wp_default_scripts', function( &$scripts ) {
@@ -45,16 +45,17 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             add_action('wp_head', function() {
                 ?>
                 <script>
-                  window.fireOnNimbleAppReady = function(func) {if ( typeof undefined !== typeof window.nb_ && nb_.isReady === true ) {func();} else {document.addEventListener('nimble-app-ready', func );}};
-                  window.fireOnMagnificPopupReady = function(func) {if ( typeof undefined !== typeof jQuery && typeof undefined !== typeof jQuery.fn.magnificPopup ) {func();} else {document.addEventListener('nimble-magnific-popup-ready', func );}};
-                  window.fireOnSwiperReady = function(func) {if ( typeof undefined !== typeof window.Swiper ) {func();} else {document.addEventListener('nimble-swiper-ready', func );}};
+                  window.fireOnNimbleAppReady = function(func) {if ( typeof undefined !== typeof window.nb_ && nb_.isReady === true ) {func();} else {document.addEventListener('nimble-app-ready',func);}};
+                  window.fireOnMagnificPopupReady = function(func) {if ( typeof undefined !== typeof jQuery && typeof undefined !== typeof jQuery.fn.magnificPopup ) {func();} else {document.addEventListener('nimble-magnific-popup-ready',func);}};
+                  window.fireOnCarouselTmplRendered = function(func) {document.addEventListener('nimble-carousel-template-ready',func);};
+                  window.fireOnSwiperReady = function(func) {if ( typeof undefined !== typeof window.Swiper ) {func();} else {document.addEventListener('nimble-swiper-ready',func);}};
                 </script>
                 <?php
             }, 0);
 
             // Experiment
             add_action('wp_footer', function() {
-                if( !defined('NIMBLE_DEQUEUE_JQUERY') ||  !NIMBLE_DEQUEUE_JQUERY )
+                if( skp_is_customizing() || !defined('NIMBLE_DEQUEUE_JQUERY') ||  !NIMBLE_DEQUEUE_JQUERY )
                   return;
                 ?>
                 <script id="nimble-fire-front-js">
@@ -207,7 +208,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.js' : NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.min.js',
                 //array( 'jquery', 'underscore'),
                 // october 2018 => underscore is concatenated in the main front js file.
-                ( defined('NIMBLE_DEQUEUE_JQUERY') && NIMBLE_DEQUEUE_JQUERY ) ? array() : array( 'jquery'),
+                ( !skp_is_customizing() && defined('NIMBLE_DEQUEUE_JQUERY') && NIMBLE_DEQUEUE_JQUERY ) ? array() : array( 'jquery'),
                 NIMBLE_ASSETS_VERSION,
                 true
             );
@@ -216,7 +217,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             sek_wp_script_add_data( 'sek-main-js', 'async', true );
 
             // Magnific Popup is loaded when needed only
-            if ( skp_is_customizing() || ( sek_front_needs_magnific_popup() && !sek_load_front_assets_with_js() ) ) {
+            if ( !sek_load_front_assets_with_js() && sek_front_needs_magnific_popup() ) {
                 wp_enqueue_style(
                     'czr-magnific-popup',
                     NIMBLE_BASE_URL . '/assets/front/css/libs/magnific-popup.min.css',
@@ -227,7 +228,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 wp_enqueue_script(
                     'sek-magnific-popups',
                     sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.min.js',
-                    ( defined('NIMBLE_DEQUEUE_JQUERY') && NIMBLE_DEQUEUE_JQUERY ) ? array() : array( 'jquery'),
+                    ( !skp_is_customizing() && defined('NIMBLE_DEQUEUE_JQUERY') && NIMBLE_DEQUEUE_JQUERY ) ? array() : array( 'jquery'),
                     NIMBLE_ASSETS_VERSION,
                     true
                 );
@@ -237,20 +238,11 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
             // SWIPER JS LIB + MODULE SCRIPT
             // Swiper js + css is needed for the czr_img_slider_module
-            if ( skp_is_customizing() || ( array_key_exists('czr_img_slider_module' , $contextually_active_modules) && !sek_load_front_assets_with_js() ) ) {
+            if ( !sek_load_front_assets_with_js() && array_key_exists('czr_img_slider_module' , $contextually_active_modules) ) {
                 // march 2020 : when using split stylesheet, swiper css is already included in assets/front/css/modules/img-slider-module-with-swiper.css
                 // so we don't need to enqueue it
                 // added for https://github.com/presscustomizr/nimble-builder/issues/612
-                if ( ( !skp_is_customizing() && !$is_stylesheet_split_for_performance ) ) {
-                      wp_enqueue_style(
-                          'czr-swiper',
-                          sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.css' : NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.min.css',
-                          array(),
-                          NIMBLE_ASSETS_VERSION,
-                          $media = 'all'
-                      );
-                // Always enqueue when customizing
-                } else if ( skp_is_customizing() ) {
+                if ( !$is_stylesheet_split_for_performance ) {
                       wp_enqueue_style(
                           'czr-swiper',
                           sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.css' : NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.min.css',
@@ -280,7 +272,9 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sek_wp_script_add_data( 'sek-slider-module', 'async', true );
             }
 
-            if ( skp_is_customizing() || ( array_key_exists('czr_menu_module' , $contextually_active_modules ) && !sek_load_front_assets_with_js() ) ) {
+
+            // <TO DO>
+            if ( skp_is_customizing() || array_key_exists('czr_menu_module' , $contextually_active_modules ) ) {
                 wp_enqueue_script(
                     'sek-menu-module',
                     sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/prod-front-menu-module.js' : NIMBLE_BASE_URL . '/assets/front/js/prod-front-menu-module.min.js',
@@ -292,7 +286,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sek_wp_script_add_data( 'sek-menu-module', 'async', true );
             }
 
-            if ( skp_is_customizing() || !sek_load_front_assets_with_js() ) {
+            //if ( skp_is_customizing() || !sek_load_front_assets_with_js() ) {
                 wp_enqueue_script(
                     'sek-video-bg',
                     sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/prod-front-video-bg.js' : NIMBLE_BASE_URL . '/assets/front/js/prod-front-video-bg.min.js',
@@ -302,8 +296,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 );
                 // not added when customizing
                 sek_wp_script_add_data( 'sek-video-bg', 'async', true );
-            }
-
+            //}
+            // </TO DO>
 
             // Google reCAPTCHA
             $global_recaptcha_opts = sek_get_global_option_value('recaptcha');
@@ -322,8 +316,12 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     'recaptcha_public_key' => !empty ( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : '',
 
                     'video_bg_lazyload_enabled' => sek_is_video_bg_lazyload_enabled(),
-                    'load_js_on_scroll' => sek_load_front_assets_with_js(),
-                    'frontAssetsPath' => NIMBLE_BASE_URL . '/assets/front/'
+                    'load_front_assets_on_scroll' => sek_load_front_assets_with_js(),
+                    'assetVersion' => NIMBLE_ASSETS_VERSION,
+                    'frontAssetsPath' => NIMBLE_BASE_URL . '/assets/front/',
+                    'contextuallyActiveModules' => sek_get_collection_of_contextually_active_modules(),
+                    'modulesFontAwesomeDependant' => Nimble_Manager()->modules_dependant_of_font_awesome,
+                    'fontAwesomeAlreadyEnqueued' => wp_style_is('customizr-fa', 'enqueued') || wp_style_is('hueman-font-awesome', 'enqueued')
                 )
             );
 

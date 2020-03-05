@@ -1,10 +1,10 @@
 // global sekFrontLocalized, fireOnNimbleAppReady
-/* ------------------------------------------------------------------------- *
- *  LIGHT BOX WITH MAGNIFIC POPUP
-/* ------------------------------------------------------------------------- */
 (function(w, d){
       var onNimbleAppReady = function() {
           jQuery(function($){
+              /* ------------------------------------------------------------------------- *
+               *  LIGHT BOX WITH MAGNIFIC POPUP
+              /* ------------------------------------------------------------------------- */
               var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
               // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
               if ( $linkCandidates.length < 1 )
@@ -41,39 +41,36 @@
                   }
               );//nb_.fireOnMagnificPopupReady
 
-              //Load the style
-              if ( sekFrontLocalized.load_js_on_scroll ) {
-                  if ( $('head').find( '#czr-magnific-popup' ).length < 1 ) {
-                        $('head').append( $('<link/>' , {
-                              rel : 'stylesheet',
-                              id : 'czr-magnific-popup',
-                              type : 'text/css',
-                              href : sekFrontLocalized.frontAssetsPath + 'css/libs/magnific-popup.min.css'
-                        }) );
-                  }
-              }
 
               // Load js plugin if needed
               // when the plugin is loaded => it emits 'nimble-magnific-popup-ready' listened to by nb_.fireOnMagnificPopupReady()
-              if ( !nb_.isFunction( $.fn.magnificPopup ) && sekFrontLocalized.load_js_on_scroll ) {
+              if ( !nb_.isFunction( $.fn.magnificPopup ) && sekFrontLocalized.load_front_assets_on_scroll ) {
+
                     var _scrollHandle = function() {},//abstract that we can unbind
-                        doLoadMagnificPopup = function() {
+                        doLoad = function() {
                           // I've been executed forget about me
                           nb_.cachedElements.$window.unbind( 'scroll', _scrollHandle );
 
-                          // Check if the load request has already been made, but not yet finished.
+                          // Bail if the load request has already been made, but not yet finished.
                           if ( nb_.scriptsLoadingStatus.czrMagnificPopup && 'pending' === nb_.scriptsLoadingStatus.czrMagnificPopup.state() ) {
-                                nb_.scriptsLoadingStatus.czrMagnificPopup.done( function() {
-                                      _doMagnificPopupWhenScriptAndStyleLoaded($linkCandidates);
-                                });
-                                return;
+                              return;
                           }
 
                           // set the script loading status now to avoid several calls
                           nb_.scriptsLoadingStatus.czrMagnificPopup = nb_.scriptsLoadingStatus.czrMagnificPopup || $.Deferred();
 
+                          //Load the style
+                          if ( $('head').find( '#czr-magnific-popup' ).length < 1 ) {
+                                $('head').append( $('<link/>' , {
+                                      rel : 'stylesheet',
+                                      id : 'czr-magnific-popup',
+                                      type : 'text/css',
+                                      href : sekFrontLocalized.frontAssetsPath + 'css/libs/magnific-popup.min.css?' + sekFrontLocalized.assetVersion
+                                }) );
+                          }
+
                           $.ajax( {
-                                url : sekFrontLocalized.frontAssetsPath + 'js/libs/jquery-magnific-popup.min.js',
+                                url : sekFrontLocalized.frontAssetsPath + 'js/libs/jquery-magnific-popup.min.js?' + sekFrontLocalized.assetVersion,
                                 cache : true,// use the browser cached version when available
                                 dataType: "script"
                           }).done(function() {
@@ -81,25 +78,31 @@
                                   return;
                                 //the script is loaded. Say it globally.
                                 nb_.scriptsLoadingStatus.czrMagnificPopup.resolve();
-                                // instantiate if not done yet
-                                //if ( ! $lightBoxCandidate.data( 'magnificPopup' ) )
-                                //_doMagnificPopupWhenScriptAndStyleLoaded($linkCandidates);
                           }).fail( function() {
-                                nb_.errorLog('Magnific popup instantiation failed for candidate');
+                                nb_.errorLog('Magnific popup instantiation failed');
                           });
-                    };// doLoadMagnificPopup
+                    };// doLoad
+
                     // Fire now or schedule when becoming visible.
-                    if ( nb_.isInWindow( $linkCandidates.first() ) ) {
-                          doLoadMagnificPopup();
-                    } else {
+                    var isLoading = false;
+                    $.each( $linkCandidates, function( k, el ) {
+                        if ( !isLoading && nb_.isInWindow($(el) ) ) {
+                            isLoading = true;
+                            doLoad();
+                        }
+                    });
+                    if ( !isLoading ) {
                           _scrollHandle = nb_.throttle( function() {
-                                if ( nb_.isInWindow( $linkCandidates.first() ) ) {
-                                      doLoadMagnificPopup();
-                                }
+                                $.each( $linkCandidates, function( k, el ) {
+                                    if ( !isLoading && nb_.isInWindow( $(el) ) ) {
+                                        isLoading = true;
+                                        doLoad();
+                                    }
+                                });
                           }, 100 );
                           nb_.cachedElements.$window.on( 'scroll', _scrollHandle );
                     }
-              } // if( sekFrontLocalized.load_js_on_scroll )
+              } // if( sekFrontLocalized.load_front_assets_on_scroll )
 
         });//jQuery(function($){})
 
@@ -203,12 +206,172 @@
             // fixes https://github.com/presscustomizr/nimble-builder/issues/443
             $('[data-sek-level="location"]' ).on( 'click', 'a', maybeScrollToAnchor );
         });
+    };/////////////// onNimbleAppReady
+
+    window.fireOnNimbleAppReady( onNimbleAppReady );
+}(window, document));
 
 
 
 
 
-      };/////////////// onJQueryReady
 
-      window.fireOnNimbleAppReady( onNimbleAppReady );
+/* ------------------------------------------------------------------------- *
+ *  MAYBE LOAD SWIPER ON SCROLL
+/* ------------------------------------------------------------------------- */
+(function(w, d){
+    var carouselTmplReadyCb = function() {
+        jQuery(function($){
+
+            if ( !sekFrontLocalized.load_front_assets_on_scroll )
+              return;
+
+            var $swiperCandidates = $('[data-sek-module-type="czr_img_slider_module"]');
+            if ( $swiperCandidates.length < 1 )
+              return;
+
+
+            // Load js plugin if needed
+            // when the plugin is loaded => it emits 'nimble-swiper-ready' listened to by nb_.fireOnSwiperReady()
+            if ( nb_.scriptsLoadingStatus.swiper && 'resolved' === nb_.scriptsLoadingStatus.swiper.state() )
+              return;
+            var _scrollHandle = function() {},//abstract that we can unbind
+                doLoad = function() {
+                  // I've been executed forget about me
+                  // so we execute the callback only once
+                  nb_.cachedElements.$window.unbind( 'scroll', _scrollHandle );
+
+                  // Bail if the load request has already been made, but not yet finished.
+                  if ( nb_.scriptsLoadingStatus.swiper && 'pending' === nb_.scriptsLoadingStatus.swiper.state() ) {
+                    return;
+                  }
+
+                  // set the script loading status now to avoid several calls
+                  nb_.scriptsLoadingStatus.swiper = nb_.scriptsLoadingStatus.swiper || $.Deferred();
+
+                  //Load the style
+                  if ( $('head').find( '#czr-swiper' ).length < 1 ) {
+                        $('head').append( $('<link/>' , {
+                              rel : 'stylesheet',
+                              id : 'czr-swiper',
+                              type : 'text/css',
+                              href : sekFrontLocalized.frontAssetsPath + 'css/libs/swiper.min.css?'+sekFrontLocalized.assetVersion
+                        }) );
+                  }
+
+                  $.ajax( {
+                        url : sekFrontLocalized.frontAssetsPath + 'js/libs/swiper.min.js?'+sekFrontLocalized.assetVersion,
+                        cache : true,// use the browser cached version when available
+                        dataType: "script"
+                  }).done(function() {
+                        if ( 'function' != typeof( window.Swiper ) )
+                          return;
+
+                        $.ajax( {
+                              url : sekFrontLocalized.frontAssetsPath + 'js/prod-front-simple-slider-module.min.js?'+sekFrontLocalized.assetVersion,
+                              cache : true,// use the browser cached version when available
+                              dataType: "script"
+                        }).done(function() {
+                              //the script is loaded. Say it globally.
+                              nb_.scriptsLoadingStatus.swiper.resolve();
+                        }).fail( function() {
+                              nb_.errorLog('Swiper instantiation failed');
+                        });
+                  }).fail( function() {
+                        nb_.errorLog('Swiper instantiation failed');
+                  });
+            };// doLoad
+
+            // Fire now or schedule when becoming visible.
+            var isLoading = false;
+            $.each( $swiperCandidates, function( k, el ) {
+                if ( !isLoading && nb_.isInWindow($(el) ) ) {
+                    isLoading = true;
+                    doLoad();
+                }
+            });
+            if ( !isLoading ) {
+                  _scrollHandle = nb_.throttle( function() {
+                        $.each( $swiperCandidates, function( k, el ) {
+                            if ( !isLoading && nb_.isInWindow( $(el) ) ) {
+                                isLoading = true;
+                                doLoad();
+                            }
+                        });
+                  }, 100 );
+                  nb_.cachedElements.$window.on( 'scroll', _scrollHandle );
+            }
+        });//jQuery(function($){})
+    };/////////////// onNimbleAppReady
+    window.fireOnCarouselTmplRendered( carouselTmplReadyCb );
+}(window, document));
+
+
+/* ------------------------------------------------------------------------- *
+ *  MAYBE LOAD FONTAWESOME ON SCROLL
+/* ------------------------------------------------------------------------- */
+(function(w, d){
+    var onNimbleAppReady = function() {
+        jQuery(function($){
+            // we don't need to inject font awesome if already enqueued by a theme
+            if ( !sekFrontLocalized.load_front_assets_on_scroll || sekFrontLocalized.fontAwesomeAlreadyEnqueued )
+              return;
+
+            var modulesPrintedOnPage = sekFrontLocalized.contextuallyActiveModules,
+                modulesFADependant = sekFrontLocalized.modulesFontAwesomeDependant,
+                fontAwesomeCandidates = [],
+                $fontAwesomeCandidates;
+
+            $.each( modulesFADependant, function( key, moduleType ) {
+                if ( !nb_.isUndefined( modulesPrintedOnPage[moduleType] ) ) {
+                    var _candidate = '[data-sek-module-type="'+ moduleType +'"]';
+                    if ( $(_candidate).length > 0 ) {
+                        fontAwesomeCandidates.push( _candidate );
+                    }
+                }
+            });
+            $fontAwesomeCandidates = $( fontAwesomeCandidates.join(',') );
+
+            if ( $fontAwesomeCandidates.length < 1 )
+              return;
+
+            // Load js plugin if needed
+            // when the plugin is loaded => it emits 'nimble-swiper-ready' listened to by nb_.fireOnSwiperReady()
+            var _scrollHandle = function() {},//abstract that we can unbind
+                doLoad = function() {
+                  // I've been executed forget about me
+                  // so we execute the callback only once
+                  nb_.cachedElements.$window.unbind( 'scroll', _scrollHandle );
+                  //Load the style
+                  if ( $('head').find( '#czr-font-awesome' ).length < 1 ) {
+                        $('head').append( $('<link/>' , {
+                              rel : 'stylesheet',
+                              id : 'czr-font-awesome',
+                              type : 'text/css',
+                              href : sekFrontLocalized.frontAssetsPath + 'fonts/css/fontawesome-all.min.css?'+sekFrontLocalized.assetVersion
+                        }) );
+                  }
+            };// doLoad
+            var isLoading = false;
+            // Fire now or schedule when becoming visible.
+            $.each( $fontAwesomeCandidates, function( k, el ) {
+                if ( !isLoading && nb_.isInWindow($(el) ) ) {
+                    isLoading = true;
+                    doLoad();
+                }
+            });
+            if ( !isLoading ) {
+                  _scrollHandle = nb_.throttle( function() {
+                        $.each( $fontAwesomeCandidates, function( k, el ) {
+                            if ( !isLoading && nb_.isInWindow( $(el) ) ) {
+                                isLoading = true;
+                                doLoad();
+                            }
+                        });
+                  }, 100 );
+                  nb_.cachedElements.$window.on( 'scroll', _scrollHandle );
+            }
+        });//jQuery(function($){})
+    };/////////////// onNimbleAppReady
+    window.fireOnNimbleAppReady( onNimbleAppReady );
 }(window, document));

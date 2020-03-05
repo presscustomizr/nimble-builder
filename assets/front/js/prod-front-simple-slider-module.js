@@ -457,7 +457,5 @@
           })( jQuery, window );
       };/////////////// onJQueryReady
 
-      window.fireOnSwiperReady( onSwiperReady );
+      window.fireOnSwiperReady(onSwiperReady);
 }(window, document));
-
-

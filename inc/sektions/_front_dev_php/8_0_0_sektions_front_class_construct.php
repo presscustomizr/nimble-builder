@@ -169,6 +169,9 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         // March 2020 : introduction of split stylesheet for some modules
         public $big_module_stylesheet_map = [];//<= is populated in ::_schedule_front_and_preview_assets_printing()
 
+        // March 2020
+        public $modules_dependant_of_font_awesome = [ 'czr_button_module', 'czr_icon_module', 'czr_social_icons_module', 'czr_quote_module' ];
+
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
         function __construct( $params = array() ) {

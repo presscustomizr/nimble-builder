@@ -171,7 +171,7 @@ function sek_get_default_location_model( $skope_id = null ) {
 // Fired in 'wp_enqueue_scripts' to check if font awesome is needed
 function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
     $contextually_active_modules = sek_get_collection_of_contextually_active_modules();
-    $font_awesome_dependant_modules = array( 'czr_button_module', 'czr_icon_module', 'czr_social_icons_module', 'czr_quote_module' );
+    $font_awesome_dependant_modules = Nimble_Manager()->modules_dependant_of_font_awesome;
     foreach ( $font_awesome_dependant_modules as $module_type ) {
       if ( array_key_exists($module_type , $contextually_active_modules) )
         $bool = true;
@@ -211,7 +211,7 @@ function sek_front_needs_magnific_popup( $bool = false, $recursive_data = null )
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/626
 function sek_load_front_assets_with_js() {
-    return !skp_is_customizing() && defined('NIMBLE_LOAD_FRONT_ASSETS_ON_SCROLL') && NIMBLE_LOAD_FRONT_ASSETS_ON_SCROLL;
+    return defined('NIMBLE_LOAD_FRONT_ASSETS_ON_SCROLL') && NIMBLE_LOAD_FRONT_ASSETS_ON_SCROLL;
 }
 
 // @return bool
@@ -230,7 +230,7 @@ function sek_use_split_stylesheets_on_front() {
 // Adds async/defer attributes to enqueued / registered scripts.
 // works with ::sek_filter_script_loader_tag loaded @'script_loader_tag'
 function sek_wp_script_add_data( $handle, $attribute = 'async', $bool = true ) {
-    if ( skp_is_customizing() )
+    if ( skp_is_customizing() || ( defined('NIMBLE_LOAD_FRONT_ASSETS_ASYNC') && !NIMBLE_LOAD_FRONT_ASSETS_ASYNC ) )
       return;
     wp_script_add_data( $handle, $attribute, $bool );
 }

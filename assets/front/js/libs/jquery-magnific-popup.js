@@ -1,5 +1,3 @@
-window.fireOnNimbleAppReady( function() {
-
 /*! Magnific Popup - v1.1.0 - 2016-02-20
 * http://dimsemenov.com/plugins/magnific-popup/
 * Copyright (c) 2016 Dmitry Semenov; */
@@ -1860,7 +1858,10 @@ $.magnificPopup.registerModule(RETINA_NS, {
 
 /*>>retina*/
  _checkInstance(); }));
-var readyEvt = document.createEvent('Event');
-readyEvt.initEvent('nimble-magnific-popup-ready', true, true); //can bubble, and is cancellable
-document.dispatchEvent(readyEvt);
-});//window.fireOnNimbleAppReady( function() {});
+
+
+window.fireOnNimbleAppReady( function() {
+    var readyEvt = document.createEvent('Event');
+    readyEvt.initEvent('nimble-magnific-popup-ready', true, true); //can bubble, and is cancellable
+    document.dispatchEvent(readyEvt);
+});

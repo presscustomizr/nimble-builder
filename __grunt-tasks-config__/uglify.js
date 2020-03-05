@@ -53,6 +53,15 @@ module.exports = {
       ext: '.min.js'
     }]
   },
+  sektions_front_js_stand_alone_module_scripts : {
+    files: [{
+      expand: true,
+      cwd: '<%= paths.front_assets %>js/',
+      src: [ '*.js', '!*.min.js', '!ccat-nimble-front.js', '!ccat-nimble-front.min.js' ],
+      dest: '<%= paths.front_assets %>js/',
+      ext: '.min.js'
+    }]
+  },
   sektions_front_libs_js : {
     files: [{
       expand: true,

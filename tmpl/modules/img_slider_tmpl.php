@@ -162,3 +162,11 @@ if ( !empty( $img_collection ) ) {
         );
     }
 }
+?>
+<script type="text/javascript">
+  window.fireOnNimbleAppReady( function() {
+      var readyEvt = document.createEvent('Event');
+      readyEvt.initEvent('nimble-carousel-template-ready', true, true); //can bubble, and is cancellable
+      document.dispatchEvent(readyEvt);
+  });
+</script>

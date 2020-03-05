@@ -9,7 +9,7 @@
  *
  * Released on: November 16, 2019
  */
-window.fireOnNimbleAppReady( function() {
+
 
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -8627,8 +8627,9 @@ window.fireOnNimbleAppReady( function() {
   return Swiper;
 
 }));
-//# sourceMappingURL=swiper.js.map
-var readyEvt = document.createEvent('Event');
-readyEvt.initEvent('nimble-swiper-ready', true, true); //can bubble, and is cancellable
-document.dispatchEvent(readyEvt);
-});//window.fireOnNimbleAppReady( function() {});
+
+window.fireOnNimbleAppReady( function() {
+    var readyEvt = document.createEvent('Event');
+    readyEvt.initEvent('nimble-swiper-ready', true, true); //can bubble, and is cancellable
+    document.dispatchEvent(readyEvt);
+});
