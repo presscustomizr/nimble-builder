@@ -288,7 +288,19 @@ module.exports = {
       'copy:sek_stand_alone_module_js_in_main_js_folder'
     ],
   },
-
+  sektions_front_js_libs : {
+    options: {
+      spawn : false,
+      // Start a live reload server on the default port 35729
+      livereload : true
+    },
+    files : [
+      '<%= paths.front_assets %>js/libs/**/*.js',
+    ],
+    tasks : [
+      'uglify:sektions_front_magnific_popup_js'
+    ],
+  },
 
   sektions_modules : {
     options: {

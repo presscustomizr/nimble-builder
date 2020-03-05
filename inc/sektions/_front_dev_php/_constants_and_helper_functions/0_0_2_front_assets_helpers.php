@@ -45,4 +45,30 @@ function sek_front_needs_magnific_popup( $bool = false, $recursive_data = null )
     return true === $bool;
 }
 
+// @return bool
+// march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/626
+function sek_load_front_assets_with_js() {
+    return !skp_is_customizing() && defined('NIMBLE_LOAD_FRONT_ASSETS_ON_SCROLL') && NIMBLE_LOAD_FRONT_ASSETS_ON_SCROLL;
+}
+
+// @return bool
+// march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
+function sek_inline_stylesheets_on_front() {
+    return !skp_is_customizing() && defined('NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE') && NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE;
+}
+
+// @return bool
+// march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
+function sek_use_split_stylesheets_on_front() {
+    return !skp_is_customizing() && defined('NIMBLE_USE_SPLIT_STYLESHEETS') && NIMBLE_USE_SPLIT_STYLESHEETS;
+}
+
+
+// Adds async/defer attributes to enqueued / registered scripts.
+// works with ::sek_filter_script_loader_tag loaded @'script_loader_tag'
+function sek_wp_script_add_data( $handle, $attribute = 'async', $bool = true ) {
+    if ( skp_is_customizing() )
+      return;
+    wp_script_add_data( $handle, $attribute, $bool );
+}
 ?>

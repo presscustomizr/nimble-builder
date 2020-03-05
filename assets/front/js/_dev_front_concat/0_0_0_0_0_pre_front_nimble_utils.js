@@ -103,6 +103,14 @@ window.nb_ = {};
             return func.apply(null, args);
           }, wait);
         }),
+        // safe console log for
+        errorLog : function() {
+            //fix for IE, because console is only defined when in F12 debugging mode in IE
+            if ( nb_.isUndefined( console ) || !nb_.isFunction( window.console.log ) )
+              return;
+            console.log.apply(console,arguments);
+        },
+        scriptsLoadingStatus : {},// <= will be populated with the script loading promises
         // func = fn()
         // 'nimble-jquery-ready' is fired @'wp_footer' see inline script in ::_schedule_front_and_preview_assets_printing()
         fireOnJqueryReady : function( func ) {
@@ -111,7 +119,16 @@ window.nb_ = {};
             } else {
                 document.addEventListener('nimble-jquery-ready', func );
             }
-        }
+        },
+        // func = fn()
+        // 'nimble-jquery-ready' is fired @'wp_footer' see inline script in ::_schedule_front_and_preview_assets_printing()
+        fireOnMagnificPopupReady : function( func ) {
+            if ( typeof undefined !== typeof jQuery.fn.magnificPopup ) {
+                func();
+            } else {
+                document.addEventListener('nimble-magnific-popup-ready', func );
+            }
+        },
     };//window.nb_
 }(window, document ));
 
