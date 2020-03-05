@@ -121,7 +121,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 'skope_id'       => $params['skope_id'],
                 // property "is_global_stylesheet" has been added when fixing https://github.com/presscustomizr/nimble-builder/issues/273
                 'is_global_stylesheet' => $params['is_global_stylesheet'],
-                'mode'           => is_customize_preview() ? Sek_Dyn_CSS_Handler::MODE_INLINE : Sek_Dyn_CSS_Handler::MODE_FILE,
+                'mode'           => ( is_customize_preview() || ( defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) ) ? Sek_Dyn_CSS_Handler::MODE_INLINE : Sek_Dyn_CSS_Handler::MODE_FILE,
                 //these are taken in account only when 'mode' is 'file'
                 'force_write'    => true, //<- write if the file doesn't exist
                 'force_rewrite'  => is_user_logged_in() && current_user_can( 'customize' ), //<- write even if the file exists
