@@ -21,7 +21,7 @@
 
                 var loadNimbleSliderModuleScript = function() {
                       $.ajax( {
-                            url : ( 'http://customizr-dev.test/wp-content/plugins/nimble-builder/assets/front/js/prod-front-simple-slider-module.js'),
+                            url : ( sekFrontLocalized.frontAssetsPath + 'js/prod-front-simple-slider-module.min.js'),
                             cache : true,// use the browser cached version when available
                             dataType: "script"
                       }).done(function() {
@@ -40,7 +40,7 @@
                 };
                 var loadSwiperScript = function() {
                       $.ajax( {
-                            url : ( 'http://customizr-dev.test/wp-content/plugins/nimble-builder/assets/front/js/libs/swiper.js?ver=1583317088'),
+                            url : ( sekFrontLocalized.frontAssetsPath + 'js/libs/swiper.min.js'),
                             cache : true,// use the browser cached version when available
                             dataType: "script"
                       }).done(function() {
