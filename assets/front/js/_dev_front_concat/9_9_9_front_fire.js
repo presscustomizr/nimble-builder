@@ -5,33 +5,105 @@
 (function(w, d){
       var onNimbleAppReady = function() {
           jQuery(function($){
-              $('[data-sek-module-type="czr_image_module"]').each( function() {
-                    $linkCandidate = $(this).find('.sek-link-to-img-lightbox');
-                    // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
-                    if ( $linkCandidate.length < 1 || 'string' !== typeof( $linkCandidate[0].protocol ) || -1 !== $linkCandidate[0].protocol.indexOf('javascript') )
-                      return;
-                    if ( 'function' !== typeof( $.fn.magnificPopup ) )
-                      return;
-                    try { $linkCandidate.magnificPopup({
-                        type: 'image',
-                        closeOnContentClick: true,
-                        closeBtnInside: true,
-                        fixedContentPos: true,
-                        mainClass: 'mfp-no-margins mfp-with-zoom', // class to remove default margin from left and right side
-                        image: {
-                          verticalFit: true
-                        },
-                        zoom: {
-                          enabled: true,
-                          duration: 300 // don't foget to change the duration also in CSS
-                        }
-                    }); } catch( er ) {
-                          if ( typeof window.console.log === 'function' ) {
-                                console.log( er );
+              var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
+              // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
+              if ( $linkCandidates.length < 1 )
+                return;
+
+              // fire the fn when we know that it's been loaded
+              // either enqueued with possible defer or injected with js
+              nb_.fireOnMagnificPopupReady(
+                  function() {
+                      // $candidates are .sek-link-to-img-lightbox selectors
+                      $linkCandidates.each( function() {
+                          $linkCandidate = $(this);
+                          // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
+                          if ( $linkCandidate.length < 1 || 'string' !== typeof( $linkCandidate[0].protocol ) || -1 !== $linkCandidate[0].protocol.indexOf('javascript') )
+                            return;
+
+                          try { $linkCandidate.magnificPopup({
+                              type: 'image',
+                              closeOnContentClick: true,
+                              closeBtnInside: true,
+                              fixedContentPos: true,
+                              mainClass: 'mfp-no-margins mfp-with-zoom', // class to remove default margin from left and right side
+                              image: {
+                                verticalFit: true
+                              },
+                              zoom: {
+                                enabled: true,
+                                duration: 300 // don't foget to change the duration also in CSS
+                              }
+                          }); } catch( er ) {
+                                if ( typeof window.console.log === 'function' ) {
+                                      console.log( er );
+                                }
                           }
+                      });
+                  }
+              );//nb_.fireOnMagnificPopupReady
+
+              //Load the style
+              if ( sekFrontLocalized.load_js_on_scroll ) {
+                  if ( $('head').find( '#czr-magnific-popup' ).length < 1 ) {
+                        $('head').append( $('<link/>' , {
+                              rel : 'stylesheet',
+                              id : 'czr-magnific-popup',
+                              type : 'text/css',
+                              href : sekFrontLocalized.frontAssetsPath + 'css/libs/magnific-popup.min.css'
+                        }) );
+                  }
+              }
+
+              // Load js plugin if needed
+              // when the plugin is loaded => it emits 'nimble-magnific-popup-ready' listened to by nb_.fireOnMagnificPopupReady()
+              if ( !nb_.isFunction( $.fn.magnificPopup ) && sekFrontLocalized.load_js_on_scroll ) {
+                    var _scrollHandle = function() {},//abstract that we can unbind
+                        doLoadMagnificPopup = function() {
+                          // I've been executed forget about me
+                          nb_.cachedElements.$window.unbind( 'scroll', _scrollHandle );
+
+                          // Check if the load request has already been made, but not yet finished.
+                          if ( nb_.scriptsLoadingStatus.czrMagnificPopup && 'pending' === nb_.scriptsLoadingStatus.czrMagnificPopup.state() ) {
+                                nb_.scriptsLoadingStatus.czrMagnificPopup.done( function() {
+                                      _doMagnificPopupWhenScriptAndStyleLoaded($linkCandidates);
+                                });
+                                return;
+                          }
+
+                          // set the script loading status now to avoid several calls
+                          nb_.scriptsLoadingStatus.czrMagnificPopup = nb_.scriptsLoadingStatus.czrMagnificPopup || $.Deferred();
+
+                          $.ajax( {
+                                url : sekFrontLocalized.frontAssetsPath + 'js/libs/jquery-magnific-popup.min.js',
+                                cache : true,// use the browser cached version when available
+                                dataType: "script"
+                          }).done(function() {
+                                if ( 'function' != typeof( $.fn.magnificPopup ) )
+                                  return;
+                                //the script is loaded. Say it globally.
+                                nb_.scriptsLoadingStatus.czrMagnificPopup.resolve();
+                                // instantiate if not done yet
+                                //if ( ! $lightBoxCandidate.data( 'magnificPopup' ) )
+                                //_doMagnificPopupWhenScriptAndStyleLoaded($linkCandidates);
+                          }).fail( function() {
+                                nb_.errorLog('Magnific popup instantiation failed for candidate');
+                          });
+                    };// doLoadMagnificPopup
+                    // Fire now or schedule when becoming visible.
+                    if ( nb_.isInWindow( $linkCandidates.first() ) ) {
+                          doLoadMagnificPopup();
+                    } else {
+                          _scrollHandle = nb_.throttle( function() {
+                                if ( nb_.isInWindow( $linkCandidates.first() ) ) {
+                                      doLoadMagnificPopup();
+                                }
+                          }, 100 );
+                          nb_.cachedElements.$window.on( 'scroll', _scrollHandle );
                     }
-              });
-        });
+              } // if( sekFrontLocalized.load_js_on_scroll )
+
+        });//jQuery(function($){})
 
 
         /* ------------------------------------------------------------------------- *
