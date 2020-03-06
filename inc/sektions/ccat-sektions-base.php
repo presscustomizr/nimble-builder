@@ -12490,13 +12490,10 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $feedback_notif_status = 'not_set';
 
         // March 2020 : introduction of split stylesheet for some modules
-        public $big_module_stylesheet_map = [
-            'czr_img_slider_module' => 'img-slider-module-with-swiper',
-            'czr_accordion_module' => 'accordion-module',
-            'czr_menu_module' => 'menu-module',
-            'czr_post_grid_module' => 'post-grid-module',
-            'czr_simple_form_module' => 'simple-form-module'
-        ];
+        public $big_module_stylesheet_map = [];//<= is populated in ::_schedule_front_and_preview_assets_printing()
+
+        // March 2020
+        public $modules_dependant_of_font_awesome = [ 'czr_button_module', 'czr_icon_module', 'czr_social_icons_module' ];
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
@@ -13546,31 +13543,53 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
     }//class
 endif;
 ?><?php
-if ( ! class_exists( 'SEK_Front_Assets' ) ) :
+if ( !class_exists( 'SEK_Front_Assets' ) ) :
     class SEK_Front_Assets extends SEK_Front_Ajax {
         // Fired in __construct()
         function _schedule_front_and_preview_assets_printing() {
             // Load Front Assets
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_front_assets' ) );
 
+            // Maybe load Font Awesome icons if needed ( sniff first )
+            add_action( 'wp_enqueue_scripts', array( $this, 'sek_maybe_enqueue_font_awesome_icons' ), PHP_INT_MAX );
+
+            // Adds `async` and `defer` support for scripts registered or enqueued
+            // and for which we've added an attribute with sek_wp_script_add_data( $_hand, 'async', true );
+            // inspired from Twentytwenty WP theme
+            // @see https://core.trac.wordpress.org/ticket/12009
+            add_filter( 'script_loader_tag', array( $this, 'sek_filter_script_loader_tag' ), 10, 2 );
+
+            // added March 2020 when experimenting for https://github.com/presscustomizr/nimble-builder/issues/626
+            add_action( 'wp_default_scripts', array( $this, 'sek_maybe_dequeue_jquery' ) );
+
             // Maybe print split module stylesheet inline
             // introduced in march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
             add_action( 'wp_head', array( $this, 'sek_maybe_print_inline_split_module_stylesheets' ), PHP_INT_MAX  );
 
-            // Maybe load Font Awesome icons if needed ( sniff first )
-            add_action( 'wp_enqueue_scripts', array( $this, 'sek_maybe_enqueue_font_awesome_icons' ), PHP_INT_MAX );
+            // initialize Nimble front js app
+            add_action( 'wp_head', array( $this, 'sek_initialize_front_js_app' ), 0  );
+
+            // Emit an event when jQuery is detected. 'nimble-jquery-ready'
+            // maybe fetch jQuery from a CDN when dequeued
+            add_action( 'wp_footer', array( $this, 'sek_handle_jquery' ));
+
+            add_action( 'wp_footer', array( $this, 'sek_handle_customizer_previewed_device_js' ), PHP_INT_MAX  );
 
             // Load customize preview js
-            add_action ( 'customize_preview_init' , array( $this, 'sek_schedule_customize_preview_assets' ) );
-            // Adds `async` and `defer` support for scripts registered or enqueued
-            // and for which we've added an attribute with wp_script_add_data( $_hand, 'async', true );
-            // inspired from Twentytwenty WP theme
-            // @see https://core.trac.wordpress.org/ticket/12009
-            add_filter( 'script_loader_tag', array( $this, 'sek_filter_script_loader_tag' ), 10, 2 );
-        }
+            add_action( 'customize_preview_init' , array( $this, 'sek_schedule_customize_preview_assets' ) );
+        }//_schedule_front_and_preview_assets_printing
+
 
         // hook : 'wp_enqueue_scripts'
         function sek_enqueue_front_assets() {
+            Nimble_Manager()->big_module_stylesheet_map = [
+                'czr_img_slider_module' => 'img-slider-module-with-swiper',
+                'czr_accordion_module' => 'accordion-module',
+                'czr_menu_module' => 'menu-module',
+                'czr_post_grid_module' => 'post-grid-module',
+                'czr_simple_form_module' => 'simple-form-module'
+            ];
+
             // do we have local or global sections to render in this page ?
             // see https://github.com/presscustomizr/nimble-builder/issues/586
             // we know the skope_id because 'wp' has been fired
@@ -13578,8 +13597,8 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
             $has_global_sections = sek_has_global_sections();
 
             // the light split stylesheet is never used when customizing
-            $is_stylesheet_split_for_performance = !skp_is_customizing() && defined('NIMBLE_USE_SPLIT_STYLESHEETS') && NIMBLE_USE_SPLIT_STYLESHEETS;
-            $is_split_module_stylesheets_inline_for_performance = !skp_is_customizing() && $is_stylesheet_split_for_performance && defined('NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE') && NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE;
+            $is_stylesheet_split_for_performance = sek_use_split_stylesheets_on_front();
+            $is_split_module_stylesheets_inline_for_performance = $is_stylesheet_split_for_performance && sek_inline_stylesheets_on_front();
 
             $main_stylesheet_name = $is_stylesheet_split_for_performance ? 'sek-base-light' : 'sek-base';
 
@@ -13675,15 +13694,51 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.js' : NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.min.js',
                 //array( 'jquery', 'underscore'),
                 // october 2018 => underscore is concatenated in the main front js file.
-                array( 'jquery'),
+                ( !skp_is_customizing() && sek_is_front_jquery_dequeued() ) ? array() : array( 'jquery'),
                 NIMBLE_ASSETS_VERSION,
                 true
             );
             // added for https://github.com/presscustomizr/nimble-builder/issues/583
-            wp_script_add_data( 'sek-main-js', 'async', true );
+            // not added when customizing
+            sek_wp_script_add_data( 'sek-main-js', 'async', true );
 
+            // SMART LOAD
+            // only load on front
+            if ( !sek_load_front_js_assets_on_scroll() && sek_is_img_smartload_enabled() ) {
+                wp_enqueue_script(
+                    'sek-smartload',
+                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/nimble-smartload.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/nimble-smartload.min.js',
+                    ( !skp_is_customizing() && sek_is_front_jquery_dequeued() ) ? array() : array( 'jquery'),
+                    NIMBLE_ASSETS_VERSION,
+                    true
+                );
+                // not added when customizing
+                sek_wp_script_add_data( 'sek-smartload', 'async', true );
+            }
+
+            // PARALLAX BG
+            // front : Load if js not loaded dynamically + we detect the need for the script
+            // customizing : load if not loaded dynamically
+            if ( ( !sek_load_front_js_assets_on_scroll() && sek_front_needs_parallax_bg() ) || skp_is_customizing() ) {
+                wp_enqueue_script(
+                    'sek-parallax-bg',
+                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/nimble-parallax-bg.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/nimble-parallax-bg.min.js',
+                    ( !skp_is_customizing() && sek_is_front_jquery_dequeued() ) ? array() : array( 'jquery'),
+                    NIMBLE_ASSETS_VERSION,
+                    true
+                );
+                // not added when customizing
+                sek_wp_script_add_data( 'sek-parallax-bg', 'async', true );
+            }
+
+
+            /* ------------------------------------------------------------------------- *
+             *  LIGHT BOX WITH MAGNIFIC POPUP
+             /* ------------------------------------------------------------------------- */
             // Magnific Popup is loaded when needed only
-            if ( ! skp_is_customizing() && sek_front_needs_magnific_popup() ) {
+            // front : Load if js not loaded dynamically + we detect the need for the script
+            // customizing : load if not loaded dynamically
+            if ( ( !sek_load_front_js_assets_on_scroll() && sek_front_needs_magnific_popup() ) || skp_is_customizing() ) {
                 wp_enqueue_style(
                     'czr-magnific-popup',
                     NIMBLE_BASE_URL . '/assets/front/css/libs/magnific-popup.min.css',
@@ -13694,28 +13749,27 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                 wp_enqueue_script(
                     'sek-magnific-popups',
                     sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.min.js',
-                    array( 'jquery'),
+                    ( !skp_is_customizing() && sek_is_front_jquery_dequeued() ) ? array() : array( 'jquery'),
                     NIMBLE_ASSETS_VERSION,
                     true
                 );
+                // not added when customizing
+                sek_wp_script_add_data( 'sek-magnific-popups', 'async', true );
             }
 
 
+            /* ------------------------------------------------------------------------- *
+             *  SWIPER FOR SLIDERS
+             /* ------------------------------------------------------------------------- */
+            // SWIPER JS LIB + MODULE SCRIPT
             // Swiper js + css is needed for the czr_img_slider_module
-            if ( skp_is_customizing() || ( !skp_is_customizing() && array_key_exists('czr_img_slider_module' , $contextually_active_modules) ) ) {
+            // front : Load if js not loaded dynamically + we detect the need for the script
+            // customizing : load if not loaded dynamically
+            if ( ( !sek_load_front_js_assets_on_scroll() && array_key_exists('czr_img_slider_module' , $contextually_active_modules) ) || skp_is_customizing() ) {
                 // march 2020 : when using split stylesheet, swiper css is already included in assets/front/css/modules/img-slider-module-with-swiper.css
                 // so we don't need to enqueue it
                 // added for https://github.com/presscustomizr/nimble-builder/issues/612
-                if ( ( !skp_is_customizing() && !$is_stylesheet_split_for_performance ) ) {
-                      wp_enqueue_style(
-                          'czr-swiper',
-                          sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.css' : NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.min.css',
-                          array(),
-                          NIMBLE_ASSETS_VERSION,
-                          $media = 'all'
-                      );
-                // Always enqueue when customizing
-                } else if ( skp_is_customizing() ) {
+                if ( !$is_stylesheet_split_for_performance ) {
                       wp_enqueue_style(
                           'czr-swiper',
                           sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.css' : NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.min.css',
@@ -13724,13 +13778,61 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                           $media = 'all'
                       );
                 }
+
+                wp_register_script(
+                  'czr-swiper',
+                  sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/swiper.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/swiper.min.js',
+                  array(),
+                  NIMBLE_ASSETS_VERSION,
+                  true
+                );
+                // not added when customizing
+                sek_wp_script_add_data( 'czr-swiper', 'async', true );
                 wp_enqueue_script(
-                    'czr-swiper',
-                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/swiper.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/swiper.min.js',
-                    array( 'jquery'),
+                    'sek-slider-module',
+                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/prod-front-simple-slider-module.js' : NIMBLE_BASE_URL . '/assets/front/js/prod-front-simple-slider-module.min.js',
+                    array('czr-swiper'),
                     NIMBLE_ASSETS_VERSION,
                     true
                 );
+                // not added when customizing
+                sek_wp_script_add_data( 'sek-slider-module', 'async', true );
+            }
+
+
+
+            /* ------------------------------------------------------------------------- *
+             *  MENU MODULE
+             /* ------------------------------------------------------------------------- */
+            // front : Load if js not loaded dynamically + we detect the need for the script
+            // customizing : load if not loaded dynamically
+            if ( ( !sek_load_front_js_assets_on_scroll() && array_key_exists('czr_menu_module' , $contextually_active_modules ) ) || skp_is_customizing() ) {
+                wp_enqueue_script(
+                    'sek-menu-module',
+                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/prod-front-menu-module.js' : NIMBLE_BASE_URL . '/assets/front/js/prod-front-menu-module.min.js',
+                    array(),
+                    NIMBLE_ASSETS_VERSION,
+                    true
+                );
+                // not added when customizing
+                sek_wp_script_add_data( 'sek-menu-module', 'async', true );
+            }
+
+            /* ------------------------------------------------------------------------- *
+             *  MENU MODULE
+             /* ------------------------------------------------------------------------- */
+            // front : Load if js not loaded dynamically + we detect the need for the script
+            // customizing : load if not loaded dynamically
+            if ( ( !sek_load_front_js_assets_on_scroll() && sek_front_needs_video_bg() ) || skp_is_customizing() ) {
+                wp_enqueue_script(
+                    'sek-video-bg',
+                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/prod-front-video-bg.js' : NIMBLE_BASE_URL . '/assets/front/js/prod-front-video-bg.min.js',
+                    array(),
+                    NIMBLE_ASSETS_VERSION,
+                    true
+                );
+                // not added when customizing
+                sek_wp_script_add_data( 'sek-video-bg', 'async', true );
             }
 
 
@@ -13750,11 +13852,18 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     'skope_id' => skp_get_skope_id(), //added for debugging purposes
                     'recaptcha_public_key' => !empty ( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : '',
 
-                    'video_bg_lazyload_enabled' => sek_is_video_bg_lazyload_enabled()
+                    'video_bg_lazyload_enabled' => sek_is_video_bg_lazyload_enabled(),
+                    'load_front_module_js_on_scroll' => sek_load_front_js_assets_on_scroll(),
+                    'load_front_partial_css_on_scroll' => sek_load_front_partial_css_assets_on_scroll(),
+                    'assetVersion' => NIMBLE_ASSETS_VERSION,
+                    'frontAssetsPath' => NIMBLE_BASE_URL . '/assets/front/',
+                    'contextuallyActiveModules' => sek_get_collection_of_contextually_active_modules(),
+                    'fontAwesomeAlreadyEnqueued' => wp_style_is('customizr-fa', 'enqueued') || wp_style_is('hueman-font-awesome', 'enqueued')
                 )
             );
 
         }//sek_enqueue_front_assets
+
 
         // hook : 'wp_enqueue_scripts:PHP_INT_MAX'
         // Feb 2020 => now check if Hueman or Customizr has already loaded font awesome
@@ -13768,7 +13877,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
             // Font awesome is always loaded when customizing
             // when not customizing, sek_front_needs_font_awesome() sniffs if the collection include a module using an icon
-            if ( ! skp_is_customizing() && sek_front_needs_font_awesome() ) {
+            if ( !skp_is_customizing() && sek_front_needs_font_awesome() && !sek_load_front_partial_css_assets_on_scroll() ) {
                 wp_enqueue_style(
                     'czr-font-awesome',
                     NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
@@ -13777,6 +13886,90 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                     $media = 'all'
                 );
             }
+        }
+
+
+
+
+        // @'wp_head'0
+        // Loading sequence :
+        // 1) window.nb_ utils starts being populated
+        // 2) 'nimble-jquery-ready' => fired in footer when jQuery is defined <= window.nb_ utils is completed with jQuery dependant helper properties and methods
+        // 3) 'nimble-app-ready' => fired in footer on 'nimble-jquery-ready' <= all module scripts are fired on this event
+        // 4) 'nimble-magnific-popup-ready', ... are emitted in each script files
+        function sek_initialize_front_js_app() {
+            ?>
+            <script>window.nimbleFireOn=function(i,n){var e={"nimble-app-ready":void 0!==window.nb_&&!0===nb_.isReady,"nimble-magnific-popup-ready":"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup,"nimble-swiper-plugin-ready":void 0!==window.Swiper};"function"==typeof n&&(!0===e[i]?n():document.addEventListener(i,n))};</script>
+            <?php
+        }
+
+        // @'wp_footer'PHP_INT_MAX
+        // introduced for https://github.com/presscustomizr/nimble-builder/issues/626
+        function sek_handle_jquery() {
+            ?>
+            <script id="nimble-detect-jquery">!function(){var n=function(e){if(e=e||0,"undefined"!=typeof jQuery){var t=document.createEvent("Event");t.initEvent("nimble-jquery-ready",!0,!0),document.dispatchEvent(t)}else e<30?setTimeout(function(){n(++e)},200):alert("Nimble Builder problem : jQuery.js was not detected on your website")};n()}();</script>
+            <?php
+            if( skp_is_customizing() || !sek_is_front_jquery_dequeued() )
+              return;
+            ?>
+            <script id="nimble-load-jquery">setTimeout(function(){var e=document.createElement("script");e.setAttribute("src","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),e.setAttribute("type","text/javascript"),e.setAttribute("id","nimble-jquery"),e.setAttribute("defer","defer"),document.getElementsByTagName("head")[0].appendChild(e)},0);</script>
+            <?php
+        }//sek_handle_jquery()
+
+
+        // @'wp_default_scripts'
+        // see https://wordpress.stackexchange.com/questions/291700/how-to-stop-jquery-migrate-manually
+        // https://stackoverflow.com/questions/18421404/how-do-i-stop-wordpress-loading-jquery-and-jquery-migrate#25977181
+        function sek_maybe_dequeue_jquery( &$scripts ) {
+            if ( sek_is_front_jquery_dequeued() && !skp_is_customizing() && !is_admin() && !empty( $scripts->registered['jquery'] ) ) {
+                $scripts->registered['jquery']->deps = array_diff(
+                    $scripts->registered['jquery']->deps,
+                    [ 'jquery-migrate' ]
+                );
+                $scripts->remove( 'jquery');
+                //$scripts->add( 'jquery', false, array( 'jquery-core' ), '1.2.1' );
+            }
+        }
+
+        /**
+         * Fired @'script_loader_tag'
+         * Adds async/defer attributes to enqueued / registered scripts.
+         * works with sek_wp_script_add_data()
+         * see https://html.spec.whatwg.org/multipage/scripting.html#attr-script-defer
+         * based on a solution found in Twentytwenty
+         * and for which we've added an attribute with sek_wp_script_add_data( $_hand, 'async', true );
+         * If #12009 lands in WordPress, this function can no-op since it would be handled in core.
+         *
+         * @param string $tag    The script tag.
+         * @param string $handle The script handle.
+         * @return string Script HTML string.
+        */
+        public function sek_filter_script_loader_tag( $tag, $handle ) {
+            if ( skp_is_customizing() )
+              return $tag;
+
+            foreach ( [ 'async', 'defer' ] as $attr ) {
+              if ( !wp_scripts()->get_data( $handle, $attr ) ) {
+                continue;
+              }
+              // Prevent adding attribute when already added in #12009.
+              if ( !preg_match( ":\s$attr(=|>|\s):", $tag ) ) {
+                $tag = preg_replace( ':(?=></script>):', " $attr", $tag, 1 );
+              }
+              // Only allow async or defer, not both.
+              break;
+            }
+            return $tag;
+        }
+
+
+        // @'wp_footer'
+        function sek_handle_customizer_previewed_device_js() {
+            if( !skp_is_customizing() )
+              return;
+            ?>
+            <script is="nimble-customizer-previewed-device-handler">window,document,window.nimbleFireOn("nimble-app-ready",function(){jQuery(function(e){if(nb_.isCustomizing()){function i(){wp.customize.preview.bind("previewed-device",function(e){nb_.previewedDevice=e})}wp.customize.preview?i():wp.customize.bind("preview-ready",function(){i()})}})});</script>
+            <?php
         }
 
         // enqueue / print customize preview assets
@@ -13910,36 +14103,6 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
         }
 
 
-        /**
-         * Fired @'script_loader_tag'
-         * Adds async/defer attributes to enqueued / registered scripts.
-         * based on a solution found in Twentytwenty
-         * and for which we've added an attribute with wp_script_add_data( $_hand, 'async', true );
-         * If #12009 lands in WordPress, this function can no-op since it would be handled in core.
-         *
-         * @param string $tag    The script tag.
-         * @param string $handle The script handle.
-         * @return string Script HTML string.
-        */
-        public function sek_filter_script_loader_tag( $tag, $handle ) {
-            if ( skp_is_customizing() )
-              return $tag;
-
-            foreach ( [ 'async', 'defer' ] as $attr ) {
-              if ( ! wp_scripts()->get_data( $handle, $attr ) ) {
-                continue;
-              }
-              // Prevent adding attribute when already added in #12009.
-              if ( ! preg_match( ":\s$attr(=|>|\s):", $tag ) ) {
-                $tag = preg_replace( ':(?=></script>):', " $attr", $tag, 1 );
-              }
-              // Only allow async or defer, not both.
-              break;
-            }
-            return $tag;
-        }
-
-
         //'wp_footer' in the preview frame
         function sek_print_ui_tmpl() {
             ?>
@@ -13986,7 +14149,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
 
 
                         <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it draggable for the moment. @todo ?>
-                        <# if ( ! data.is_nested ) { #>
+                        <# if ( !data.is_nested ) { #>
                           <# if ( true !== data.is_global_location ) { #>
                             <i class="fas fa-arrows-alt sek-move-section" title="<?php _e( 'Drag section', 'text_domain' ); ?>"></i>
                            <# } #>
@@ -14010,10 +14173,10 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         </div>
                         <#
                           var section_title = true !== data.is_global_location ? sekPreviewLocalized.i18n['section'] : sekPreviewLocalized.i18n['section (global)'];
-                          var section_title = ! data.is_nested ? sekPreviewLocalized.i18n['section'] : sekPreviewLocalized.i18n['nested section'];
-                          if ( true === data.is_header_location && ! data.is_nested ) {
+                          var section_title = !data.is_nested ? sekPreviewLocalized.i18n['section'] : sekPreviewLocalized.i18n['nested section'];
+                          if ( true === data.is_header_location && !data.is_nested ) {
                                 section_title = sekPreviewLocalized.i18n['header section'];
-                          } else if ( true === data.is_footer_location && ! data.is_nested ) {
+                          } else if ( true === data.is_footer_location && !data.is_nested ) {
                                 section_title = sekPreviewLocalized.i18n['footer section'];
                           }
 
@@ -14039,7 +14202,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move column', 'text_domain' ); ?>"></i>
                         <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>">tune</i>
-                        <# if ( ! data.parent_is_last_allowed_nested ) { #>
+                        <# if ( !data.parent_is_last_allowed_nested ) { #>
                           <i data-sek-click-on="add-section" class="material-icons sek-click-on" title="<?php _e( 'Add a nested section', 'text_domain' ); ?>">account_balance_wallet</i>
                         <# } #>
                         <# if ( data.parent_can_have_more_columns ) { #>
@@ -14047,7 +14210,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                         <# } #>
 
                         <i data-sek-click-on="pick-content" data-sek-content-type="module" class="material-icons sek-click-on" title="<?php _e( 'Add a module', 'text_domain' ); ?>">add_circle_outline</i>
-                        <# if ( ! data.parent_is_single_column ) { #>
+                        <# if ( !data.parent_is_single_column ) { #>
                           <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove column', 'text_domain' ); ?>">delete_forever</i>
                         <# } #>
                       </div>
@@ -14077,7 +14240,7 @@ if ( ! class_exists( 'SEK_Front_Assets' ) ) :
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>
                     <#
-                      var module_name = ! _.isEmpty( data.module_name ) ? data.module_name + ' ' + '<?php _e("module", "text_domain"); ?>' : '<?php _e("module", "text_domain"); ?>';
+                      var module_name = !_.isEmpty( data.module_name ) ? data.module_name + ' ' + '<?php _e("module", "text_domain"); ?>' : '<?php _e("module", "text_domain"); ?>';
                     #>
                     <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-module" title="<?php _e( 'Edit module settings', 'text_domain' ); ?>">
                       <div class="sek-dyn-ui-location-inner">
@@ -15503,7 +15666,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 'skope_id'       => $params['skope_id'],
                 // property "is_global_stylesheet" has been added when fixing https://github.com/presscustomizr/nimble-builder/issues/273
                 'is_global_stylesheet' => $params['is_global_stylesheet'],
-                'mode'           => is_customize_preview() ? Sek_Dyn_CSS_Handler::MODE_INLINE : Sek_Dyn_CSS_Handler::MODE_FILE,
+                'mode'           => ( is_customize_preview() || ( defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) ) ? Sek_Dyn_CSS_Handler::MODE_INLINE : Sek_Dyn_CSS_Handler::MODE_FILE,
                 //these are taken in account only when 'mode' is 'file'
                 'force_write'    => true, //<- write if the file doesn't exist
                 'force_rewrite'  => is_user_logged_in() && current_user_can( 'customize' ), //<- write even if the file exists
