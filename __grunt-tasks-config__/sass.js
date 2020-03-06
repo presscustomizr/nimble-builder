@@ -49,5 +49,20 @@ module.exports = {
     files : {
       '<%= paths.front_assets %>css/modules/accordion-module.css' : '<%= paths.front_assets %>scss/stand-alone-module-generators/accordion-module.scss'
     }
+  },
+  sek_module_quote: {
+    files : {
+      '<%= paths.front_assets %>css/modules/quote-module.css' : '<%= paths.front_assets %>scss/stand-alone-module-generators/quote-module.scss'
+    }
+  },
+  sek_module_image: {
+    files : {
+      '<%= paths.front_assets %>css/modules/image-module.css' : '<%= paths.front_assets %>scss/stand-alone-module-generators/image-module.scss'
+    }
+  },
+  sek_module_icon: {
+    files : {
+      '<%= paths.front_assets %>css/modules/icon-module.css' : '<%= paths.front_assets %>scss/stand-alone-module-generators/icon-module.scss'
+    }
   }
 };

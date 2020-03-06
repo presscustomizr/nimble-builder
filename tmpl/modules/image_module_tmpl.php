@@ -117,3 +117,8 @@ if ( 'no-link' === $main_settings['link-to'] ) {
         'sek-link-to-'.$main_settings['link-to'] // sek-link-to-img-lightbox
     );
 }
+if ( 'img-lightbox' === $main_settings['link-to'] ) {
+  ?>
+  <script>window.nimbleFireOn('nimble-app-ready', function(){var e=document.createEvent("Event");e.initEvent("nimble-magnific-popup-dependant",!0,!0);document.dispatchEvent(e);});</script>
+  <?php
+}

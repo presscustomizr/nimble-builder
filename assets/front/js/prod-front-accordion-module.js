@@ -1,9 +1,9 @@
-// global sekFrontLocalized, fireOnNimbleAppReady
+// global sekFrontLocalized, nimbleFireOn
 /* ------------------------------------------------------------------------- *
  *  ACCORDION MODULE
 /* ------------------------------------------------------------------------- */
 (function(w, d){
-      var onNimbleAppReady = function() {
+      var callbackFunc = function() {
           jQuery( function($){
 
               $( 'body' ).on( 'click sek-expand-accord-item', '.sek-accord-item > .sek-accord-title', function( evt ) {
@@ -62,8 +62,9 @@
               }
           });//jQuery()
 
-      };/////////////// onJQueryReady
-      window.fireOnNimbleAppReady( onNimbleAppReady );
+      };/////////////// callbackFunc
+      // on 'nimble-app-ready', jQuery is loaded
+      window.nimbleFireOn('nimble-app-ready', callbackFunc );
 }(window, document));
 
 

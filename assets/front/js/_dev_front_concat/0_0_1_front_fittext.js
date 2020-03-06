@@ -8,9 +8,9 @@
 *
 * Date: Thu May 05 14:23:00 2011 -0600
 */
-// global sekFrontLocalized, fireOnNimbleAppReady
+// global sekFrontLocalized, nimbleFireOn
 (function(w, d){
-      var onNimbleAppReady = function() {
+      var callbackFunc = function() {
             (function( $ ){
                 $.fn.fitText = function( kompressor, options ) {
 
@@ -61,5 +61,7 @@
             //     });
             // }
       };// onJQueryReady
-      window.fireOnNimbleAppReady( onNimbleAppReady );
+
+      // on 'nimble-app-ready', jQuery is loaded
+      window.nimbleFireOn('nimble-app-ready', callbackFunc );
 }(window, document));

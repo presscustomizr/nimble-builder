@@ -1,6 +1,9 @@
 /*! Magnific Popup - v1.1.0 - 2016-02-20
 * http://dimsemenov.com/plugins/magnific-popup/
 * Copyright (c) 2016 Dmitry Semenov; */
+(function(w, d){
+      var callbackFunc = function() {
+
 (function (factory) {
 if (typeof define === 'function' && define.amd) {
  // AMD. Register as an anonymous module.
@@ -1859,9 +1862,13 @@ $.magnificPopup.registerModule(RETINA_NS, {
 /*>>retina*/
  _checkInstance(); }));
 
+      };/////////////// callbackFunc
 
-window.fireOnNimbleAppReady( function() {
-    var readyEvt = document.createEvent('Event');
-    readyEvt.initEvent('nimble-magnific-popup-ready', true, true); //can bubble, and is cancellable
-    document.dispatchEvent(readyEvt);
-});
+      // on 'nimble-app-ready', jQuery is loaded
+      window.nimbleFireOn('nimble-app-ready', function(){
+          callbackFunc();
+          var evt = document.createEvent('Event');
+          evt.initEvent('nimble-magnific-popup-ready', true, true); //can bubble, and is cancellable
+          document.dispatchEvent(evt);
+      });
+}(window, document));

@@ -1,0 +1,62 @@
+[data-sek-module-type="czr_image_module"] {
+  text-align: center;
+}
+
+[data-sek-module-type="czr_image_module"] img {
+  border: 0 solid #f2f2f2;
+}
+
+[data-sek-module-type="czr_image_module"] .box-shadow img {
+  -webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;
+  -moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0;
+}
+
+/* image module transitions for better animations when effects are used */
+[data-sek-module-type="czr_image_module"] figure img {
+  -webkit-transition: all 0.2s ease-out;
+  -o-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+}
+
+.sek-hover-effect-opacity img:hover {
+  opacity: .7;
+}
+
+.sek-hover-effect-zoom-out img:hover {
+  transform: scale(1.05);
+}
+
+.sek-hover-effect-zoom-in img:hover {
+  transform: scale(0.95);
+}
+
+.sek-hover-effect-move-up img:hover {
+  transform: translateY(-6px);
+}
+
+.sek-hover-effect-move-down img:hover {
+  transform: translateY(6px);
+}
+
+.sek-hover-effect-blur img:hover {
+  filter: blur(2px);
+}
+
+.sek-hover-effect-grayscale img:hover {
+  filter: grayscale(0%);
+}
+
+.sek-hover-effect-grayscale img:hover {
+  filter: grayscale(100%);
+  filter: gray;
+}
+
+.sek-hover-effect-reverse-grayscale img {
+  filter: grayscale(100%);
+  filter: gray;
+}
+
+.sek-hover-effect-reverse-grayscale img:hover {
+  filter: grayscale(0%);
+}

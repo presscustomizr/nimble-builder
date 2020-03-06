@@ -59,6 +59,9 @@ $icons_style = !empty($value['icons_style']) ? $value['icons_style'] : array();
 
 if ( !empty( $icons_collection ) ) {
     sek_print_social_links( $icons_collection, $icons_style );
+    ?>
+    <script>window.nimbleFireOn('nimble-app-ready', function(){var e=document.createEvent("Event");e.initEvent("nimble-fa-dependant",!0,!0);document.dispatchEvent(e);});</script>
+    <?php
 } else {
     if ( skp_is_customizing() ) {
         printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',

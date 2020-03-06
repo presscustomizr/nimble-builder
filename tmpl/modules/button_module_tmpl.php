@@ -71,3 +71,8 @@ if ( !isset( $content_settings['link-to'] ) || isset( $content_settings['link-to
         !empty($content_settings['btn_text_on_hover']) ? 'title="' . esc_html( $content_settings['btn_text_on_hover'] ) . '"' : ''
     );
 }
+if ( !empty(sek_get_button_module_icon( $content_settings )) ) {
+  ?>
+  <script>window.nimbleFireOn('nimble-app-ready', function(){var e=document.createEvent("Event");e.initEvent("nimble-fa-dependant",!0,!0);document.dispatchEvent(e);});</script>
+  <?php
+}

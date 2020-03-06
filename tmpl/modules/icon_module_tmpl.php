@@ -90,3 +90,5 @@ else :
         $visual_effect_class
     );
 endif;
+?>
+<script>window.nimbleFireOn('nimble-app-ready', function(){var e=document.createEvent("Event");e.initEvent("nimble-fa-dependant",!0,!0);document.dispatchEvent(e);});</script>

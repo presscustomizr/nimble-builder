@@ -1,4 +1,4 @@
-// global sekFrontLocalized, fireOnNimbleAppReady
+// global sekFrontLocalized, nimbleFireOn
 window.nb_ = {};
 // Jquery agnostic
 (function(w, d){
@@ -110,22 +110,13 @@ window.nb_ = {};
               return;
             console.log.apply(console,arguments);
         },
-        scriptsLoadingStatus : {},// <= will be populated with the script loading promises
-        // func = fn()
-        // 'nimble-jquery-ready' is fired @'wp_footer' see inline script in ::_schedule_front_and_preview_assets_printing()
-        fireOnJqueryReady : function( func ) {
-            if ( typeof undefined !== typeof jQuery ) {
-                func();
-            } else {
-                document.addEventListener('nimble-jquery-ready', func );
-            }
-        }
+        scriptsLoadingStatus : {}// <= will be populated with the script loading promises
     };//window.nb_
 }(window, document ));
 
 
 (function(w, d){
-    var onJqueryReady = function() {
+    var callbackFunc = function() {
         jQuery( function($){
               // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp, isError, isMap, isWeakMap, isSet, isWeakSet
               // see https://underscorejs.org/docs/underscore.html#section-149
@@ -190,16 +181,91 @@ window.nb_ = {};
                               th = threshold || 0;
 
                           return ib >= wt - th && it <= wb + th;
-                    }//isInWindow
+                    },//isInWindow
+                    // params = {
+                    //  path : 'js/libs/swiper.min.js'
+                    //  complete : function() {
+                    //    $.ajax( {
+                        //       url : sekFrontLocalized.frontAssetsPath + 'js/prod-front-simple-slider-module.min.js?'+sekFrontLocalized.assetVersion,
+                        //       cache : true,// use the browser cached version when available
+                        //       dataType: "script"
+                        // }).done(function() {
+                        //       //the script is loaded. Say it globally.
+                        //       nb_.scriptsLoadingStatus.swiper.resolve();
+                        // }).fail( function() {
+                        //       nb_.errorLog('script instantiation failed');
+                        // });
+                    //  }
+                    //  loadcheck : 'function' === typeof( window.Swiper )
+                    // }
+                    ajaxLoadScript : function( params ) {
+                        params = $.extend( { path : '', complete : '', loadcheck : false }, params );
+                        // Bail if the load request has already been made, but not yet finished.
+                        if ( nb_.scriptsLoadingStatus[params.path] && 'pending' === nb_.scriptsLoadingStatus[params.path].state() ) {
+                          return;
+                        }
+                        // set the script loading status now to avoid several calls
+                        nb_.scriptsLoadingStatus[params.path] = nb_.scriptsLoadingStatus[params.path] || $.Deferred();
+                        $.ajax( {
+                              url : sekFrontLocalized.frontAssetsPath + params.path + '?'+ sekFrontLocalized.assetVersion,
+                              cache : true,// use the browser cached version when available
+                              dataType: "script"
+                        }).done(function() {
+                              console.log( params.path + ' is loaded', params );
+                              if ( nb_.isFunction(params.loadcheck) && !params.loadcheck() ) {
+                                  nb_.errorLog('ajaxLoadScript success but loadcheck failed for => ' + params.path );
+                                  return;
+                              }
+
+                              if ( 'function' === typeof params.complete ) {
+                                  params.complete();
+                              }
+                        }).fail( function() {
+                              nb_.errorLog('ajaxLoadScript failed for => ' + params.path );
+                        });
+                    },//ajaxLoadScript
+                    // params = {
+                    //  elements : $swiperCandidate,
+                    //  func : function() {}
+                    // }
+                    maybeLoadAssetsWhenSelectorInScreen : function( params ) {
+                        params = $.extend( { elements : '', func : '' }, params );
+                        console.log('params in maybeLoadScriptWhenSelectorInScreen', params );
+                        if ( 1 > $(params.elements).length )
+                          return;
+                        if ( !nb_.isFunction( params.func ) )
+                          return;
+
+                        // Fire now or schedule when becoming visible.
+                        var isLoading = false;
+                        $.each( $(params.elements), function( k, el ) {
+                            if ( !isLoading && nb_.isInWindow($(el) ) ) {
+                                isLoading = true;
+                                params.func();
+                            }
+                        });
+                        if ( !isLoading ) {
+                              _scrollHandle = nb_.throttle( function() {
+                                    $.each( $(params.elements), function( k, el ) {
+                                        if ( !isLoading && nb_.isInWindow( $(el) ) ) {
+                                            isLoading = true;
+                                            params.func();
+                                        }
+                                    });
+                              }, 100 );
+                              nb_.cachedElements.$window.on( 'scroll', _scrollHandle );
+                        }
+                    }
               });//$.extend( nb_
 
               // now that nb_ has been populated, let's say it to the app
+              nb_.isReady = true;
               var evt = document.createEvent('Event');
               evt.initEvent('nimble-app-ready', true, true); //can bubble, and is cancellable
               document.dispatchEvent(evt);
-              nb_.isReady = true;
           });// jQuery( function($){
     };
-    nb_.fireOnJqueryReady( onJqueryReady );
+    // 'nimble-jquery-ready' is fired @'wp_footer' see inline script in ::_schedule_front_and_preview_assets_printing()
+    window.nimbleFireOn('nimble-jquery-ready', callbackFunc );
 
 }(window, document));

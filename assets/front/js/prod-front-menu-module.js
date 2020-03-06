@@ -1,9 +1,9 @@
-// global sekFrontLocalized, fireOnNimbleAppReady
+// global sekFrontLocalized, nimbleFireOn
 /* ------------------------------------------------------------------------- *
  *  MENU
 /* ------------------------------------------------------------------------- */
 (function(w, d){
-      var onNimbleAppReady = function() {
+      var callbackFunc = function() {
           jQuery( function($){
               //DROPDOWN
               var Dropdown = function() {
@@ -379,8 +379,8 @@
               });
           });//jQuery( function($){})
 
-      };/////////////// onNimbleAppReady
-
-      window.fireOnNimbleAppReady( onNimbleAppReady );
+      };/////////////// callbackFunc
+      // on 'nimble-app-ready', jQuery is loaded
+      window.nimbleFireOn('nimble-app-ready', callbackFunc );
 }(window, document));
 

@@ -1,4 +1,4 @@
-// global sekFrontLocalized, fireOnNimbleAppReady
+// global sekFrontLocalized, nimbleFireOn
 /* ===================================================
  * jquery.fn.parallaxBg v1.0.0
  * Created in October 2018.
@@ -6,7 +6,7 @@
  * ===================================================
 */
 (function(w, d){
-      var onNimbleAppReady = function() {
+      var callbackFunc = function() {
           (function ( $, window ) {
               //defaults
               var pluginName = 'parallaxBg',
@@ -150,6 +150,13 @@
                   });
               };
           })( jQuery, window );
-      };/////////////// onJQueryReady
-      window.fireOnNimbleAppReady( onNimbleAppReady );
+      };/////////////// callbackFunc
+
+      // on 'nimble-app-ready', jQuery is loaded
+      window.nimbleFireOn('nimble-app-ready', function(){
+          callbackFunc();
+          var evt = document.createEvent('Event');
+          evt.initEvent('nimble-parallax-ready', true, true); //can bubble, and is cancellable
+          document.dispatchEvent(evt);
+      });
 }(window, document));

@@ -1,11 +1,11 @@
-// global sekFrontLocalized, fireOnNimbleAppReady
+// global sekFrontLocalized, nimbleFireOn
 /* ------------------------------------------------------------------------- *
  *  SWIPER CAROUSEL implemented for the simple slider module czr_img_slider_module
  *  dependency : $.fn.nimbleCenterImages()
 /* ------------------------------------------------------------------------- */
 
 (function(w, d){
-      var onSwiperReady = function() {
+      var callbackFunc = function() {
           jQuery( function($){
               var mySwipers = [];
               var triggerSimpleLoad = function( $_imgs ) {
@@ -455,7 +455,12 @@
                 };
 
           })( jQuery, window );
-      };/////////////// onJQueryReady
+      };/////////////// callbackFunc
 
-      window.fireOnSwiperReady(onSwiperReady);
+      // When loaded with defer, we can not be sure that jQuery will be loaded before
+      // so let's make sure that we have both the plugin and jQuery loaded
+      window.nimbleFireOn( 'nimble-swiper-plugin-ready', function() {
+          // on 'nimble-app-ready', jQuery is loaded
+          window.nimbleFireOn( 'nimble-app-ready', callbackFunc );
+      });
 }(window, document));

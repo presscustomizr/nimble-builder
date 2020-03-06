@@ -1,8 +1,8 @@
-// global sekFrontLocalized, fireOnNimbleAppReady
+// global sekFrontLocalized, nimbleFireOn
 // jQuery plugin
 // Fired in ...front_fire.js
 (function(w, d){
-      var onNimbleAppReady = function() {
+      var callbackFunc = function() {
           (function ( $, window ) {
               //defaults
               var pluginName = 'nimbleLoadVideoBg',
@@ -544,6 +544,6 @@
       };/////////////// onJQueryReady
 
       // we
-      window.fireOnNimbleAppReady( onNimbleAppReady );
+      window.nimbleFireOn('nimble-app-ready', callbackFunc );
 }(window, document));
 

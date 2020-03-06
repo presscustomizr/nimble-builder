@@ -154,6 +154,9 @@ $slider_options = !empty($value['slider_options']) ? $value['slider_options'] : 
 
 if ( !empty( $img_collection ) ) {
     sek_print_img_slider( $img_collection, $slider_options, $model );
+    ?>
+    <script>window.nimbleFireOn('nimble-app-ready', function(){var e=document.createEvent("Event");e.initEvent("nimble-swiper-dependant",!0,!0);document.dispatchEvent(e);});</script>
+    <?php
 } else {
     if ( skp_is_customizing() ) {
         printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',
@@ -162,11 +165,3 @@ if ( !empty( $img_collection ) ) {
         );
     }
 }
-?>
-<script type="text/javascript">
-  window.fireOnNimbleAppReady( function() {
-      var readyEvt = document.createEvent('Event');
-      readyEvt.initEvent('nimble-carousel-template-ready', true, true); //can bubble, and is cancellable
-      document.dispatchEvent(readyEvt);
-  });
-</script>

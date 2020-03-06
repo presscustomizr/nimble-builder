@@ -22,9 +22,9 @@
  *
  * Feb 2019 : added support for iframe lazyloading for https://github.com/presscustomizr/nimble-builder/issues/361
  * =================================================== */
-// global sekFrontLocalized, fireOnNimbleAppReady
+// global sekFrontLocalized, nimbleFireOn
 (function(w, d){
-      var onNimbleAppReady = function() {
+      var callbackFunc = function() {
            (function ( $, window ) {
               //defaults
               var pluginName = 'nimbleLazyLoad',
@@ -266,5 +266,5 @@
           })( jQuery, window );
 
       };////////////// onJQueryReady
-      window.fireOnNimbleAppReady( onNimbleAppReady );
+      window.nimbleFireOn('nimble-app-ready', callbackFunc );
 }(window, document));

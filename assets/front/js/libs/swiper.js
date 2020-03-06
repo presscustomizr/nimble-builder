@@ -8627,9 +8627,5 @@
   return Swiper;
 
 }));
-
-window.fireOnNimbleAppReady( function() {
-    var readyEvt = document.createEvent('Event');
-    readyEvt.initEvent('nimble-swiper-ready', true, true); //can bubble, and is cancellable
-    document.dispatchEvent(readyEvt);
-});
+// on 'nimble-app-ready', jQuery is loaded
+window.nimbleFireOn('nimble-app-ready', function(){var e=document.createEvent("Event");e.initEvent('nimble-swiper-plugin-ready',!0,!0);document.dispatchEvent(e);});
