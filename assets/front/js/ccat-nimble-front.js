@@ -1,120 +1,7 @@
-// global sekFrontLocalized, nimbleFireOn
-window.nb_ = {};
-// Jquery agnostic
-(function(w, d){
-    //https://underscorejs.org/docs/underscore.html#section-17
-    var restArguments = function(func, startIndex) {
-      startIndex = startIndex == null ? func.length - 1 : +startIndex;
-      return function() {
-        var length = Math.max(arguments.length - startIndex, 0),
-            rest = Array(length),
-            index = 0;
-        for (; index < length; index++) {
-          rest[index] = arguments[index + startIndex];
-        }
-        switch (startIndex) {
-          case 0: return func.call(this, rest);
-          case 1: return func.call(this, arguments[0], rest);
-          case 2: return func.call(this, arguments[0], arguments[1], rest);
-        }
-        var args = Array(startIndex + 1);
-        for (index = 0; index < startIndex; index++) {
-          args[index] = arguments[index];
-        }
-        args[startIndex] = rest;
-        return func.apply(this, args);
-      };
-    };
-
-    // helper for nb_.throttle()
-    var _now = Date.now || function() {
-      return new Date().getTime();
-    };
-
-    window.nb_ = {
-        isArray : function(obj) {
-            return Array.isArray(obj) || toString.call(obj) === '[object Array]';
-        },
-        isUndefined : function(obj) {
-          return obj === void 0;
-        },
-        isObject : function(obj) {
-          var type = typeof obj;
-          return type === 'function' || type === 'object' && !!obj;
-        },
-        // https://davidwalsh.name/javascript-debounce-function
-        debounce : function(func, wait, immediate) {
-          var timeout;
-          return function() {
-            var context = this, args = arguments;
-            var later = function() {
-              timeout = null;
-              if (!immediate) func.apply(context, args);
-            };
-            var callNow = immediate && !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            if (callNow) func.apply(context, args);
-          };
-        },
-        // https://underscorejs.org/docs/underscore.html#section-85
-        throttle : function(func, wait, options) {
-          var timeout, context, args, result;
-          var previous = 0;
-          if (!options) options = {};
-
-          var later = function() {
-            previous = options.leading === false ? 0 : _now();
-            timeout = null;
-            result = func.apply(context, args);
-            if (!timeout) context = args = null;
-          };
-
-          var throttled = function() {
-            var now = _now();
-            if (!previous && options.leading === false) previous = now;
-            var remaining = wait - (now - previous);
-            context = this;
-            args = arguments;
-            if (remaining <= 0 || remaining > wait) {
-              if (timeout) {
-                clearTimeout(timeout);
-                timeout = null;
-              }
-              previous = now;
-              result = func.apply(context, args);
-              if (!timeout) context = args = null;
-            } else if (!timeout && options.trailing !== false) {
-              timeout = setTimeout(later, remaining);
-            }
-            return result;
-          };
-
-          throttled.cancel = function() {
-            clearTimeout(timeout);
-            previous = 0;
-            timeout = context = args = null;
-          };
-
-          return throttled;
-        },
-        delay : restArguments(function(func, wait, args) {
-          return setTimeout(function() {
-            return func.apply(null, args);
-          }, wait);
-        }),
-        // safe console log for
-        errorLog : function() {
-            //fix for IE, because console is only defined when in F12 debugging mode in IE
-            if ( nb_.isUndefined( console ) || !nb_.isFunction( window.console.log ) )
-              return;
-            console.log.apply(console,arguments);
-        },
-        scriptsLoadingStatus : {}// <= will be populated with the script loading promises
-    };//window.nb_
-}(window, document ));
-
-
+// global sekFrontLocalized, nimbleListenTo
+if ( window.nb_ === void 0 && window.console && window.console.log ) {
+    console.log('Nimble error => window.nb_ global not instantiated');
+}
 (function(w, d){
     var callbackFunc = function() {
         jQuery( function($){
@@ -259,14 +146,11 @@ window.nb_ = {};
               });//$.extend( nb_
 
               // now that nb_ has been populated, let's say it to the app
-              nb_.isReady = true;
-              var evt = document.createEvent('Event');
-              evt.initEvent('nimble-app-ready', true, true); //can bubble, and is cancellable
-              document.dispatchEvent(evt);
+              nb_.emit('nimble-app-ready');
           });// jQuery( function($){
     };
-    // 'nimble-jquery-ready' is fired @'wp_footer' see inline script in ::_schedule_front_and_preview_assets_printing()
-    window.nimbleFireOn('nimble-jquery-ready', callbackFunc );
+    // 'nimble-jquery-loaded' is fired @'wp_footer' see inline script in ::_schedule_front_and_preview_assets_printing()
+    window.nb_.listenTo('nimble-jquery-loaded', callbackFunc );
 
 }(window, document));/*global jQuery */
 /*!
@@ -278,7 +162,7 @@ window.nb_ = {};
 *
 * Date: Thu May 05 14:23:00 2011 -0600
 */
-// global sekFrontLocalized, nimbleFireOn
+// global sekFrontLocalized, nimbleListenTo
 (function(w, d){
       var callbackFunc = function() {
             (function( $ ){
@@ -333,8 +217,8 @@ window.nb_ = {};
       };// onJQueryReady
 
       // on 'nimble-app-ready', jQuery is loaded
-      window.nimbleFireOn('nimble-app-ready', callbackFunc );
-}(window, document));// global sekFrontLocalized, nimbleFireOn
+      window.nb_.listenTo('nimble-app-ready', callbackFunc );
+}(window, document));// global sekFrontLocalized, nimbleListenTo
 /* ------------------------------------------------------------------------- *
  *  SCROLL TO ANCHOR
 /* ------------------------------------------------------------------------- */
@@ -396,8 +280,8 @@ window.nb_ = {};
         });
     };/////////////// callbackFunc
 
-    window.nimbleFireOn('nimble-app-ready', callbackFunc );
-}(window, document));// global sekFrontLocalized, nimbleFireOn
+    window.nb_.listenTo('nimble-app-ready', callbackFunc );
+}(window, document));// global sekFrontLocalized, nimbleListenTo
 /* ------------------------------------------------------------------------- *
  *  LIGHT BOX WITH MAGNIFIC POPUP
  /* ------------------------------------------------------------------------- */
@@ -434,7 +318,7 @@ window.nb_ = {};
                 };// doLoad
 
             // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nimble-magnific-popup-ready' listened to by window.nimbleFireOn()
+            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by window.nb_.listenTo()
             if ( sekFrontLocalized.load_front_partial_css_on_scroll || sekFrontLocalized.load_front_module_js_on_scroll ) {
                 nb_.maybeLoadAssetsWhenSelectorInScreen( {
                     elements : $linkCandidates,
@@ -445,8 +329,8 @@ window.nb_ = {};
         });//jQuery(function($){})
     };/////////////// callbackFunc
     // When loaded with defer, we can not be sure that jQuery will be loaded before
-    window.nimbleFireOn( 'nimble-magnific-popup-dependant', function() {
-        window.nimbleFireOn('nimble-app-ready', callbackFunc );
+    window.nb_.listenTo( 'nimble-magnific-popup-dependant', function() {
+        window.nb_.listenTo('nimble-app-ready', callbackFunc );
     });
 
 }(window, document));
@@ -482,14 +366,14 @@ window.nb_ = {};
                         duration: 300 // don't foget to change the duration also in CSS
                       }
                   }); } catch( er ) {
-                        nb_.errorLog( 'error in callback of nimble-magnific-popup-ready => ', er );
+                        nb_.errorLog( 'error in callback of nimble-magnific-popup-loaded => ', er );
                   }
                   $linkCandidate.data('nimble-mfp-done', true );
               });
           });//jQuery(function($){})
     };/////////////// callbackFunc
 
-    window.nimbleFireOn('nimble-magnific-popup-ready', callbackFunc );
+    window.nb_.listenTo('nimble-magnific-popup-loaded', callbackFunc );
 }(window, document));
 
 
@@ -509,7 +393,7 @@ window.nb_ = {};
         jQuery(function($){
 
             // Load js plugin if needed
-            // // when the plugin is loaded => it emits 'nimble-swiper-ready' listened to by window.nimbleFireOn()
+            // // when the plugin is loaded => it emits 'nimble-swiper-ready' listened to by window.nb_.listenTo()
             // if ( nb_.scriptsLoadingStatus.swiper && 'resolved' === nb_.scriptsLoadingStatus.swiper.state() )
             //   return;
             var _scrollHandle = function() {},//abstract that we can unbind
@@ -560,8 +444,8 @@ window.nb_ = {};
 
     // When loaded with defer, we can not be sure that jQuery will be loaded before
     // on 'nimble-app-ready', jQuery is loaded
-    window.nimbleFireOn( 'nimble-swiper-dependant', function() {
-        window.nimbleFireOn('nimble-app-ready', callbackFunc );
+    window.nb_.listenTo( 'nimble-swiper-dependant', function() {
+        window.nb_.listenTo('nimble-app-ready', callbackFunc );
     });
 }(window, document));
 
@@ -574,7 +458,7 @@ window.nb_ = {};
  *  SMARTLOAD
 /* ------------------------------------------------------------------------- */
 (function(w, d){
-    window.nimbleFireOn('nimble-lazyload-ready', function() {
+    window.nb_.listenTo('nimble-lazyload-ready', function() {
         jQuery(function($){
               $('.sektion-wrapper').each( function() {
                     try { $(this).nimbleLazyLoad(); } catch( er ) {
@@ -584,7 +468,7 @@ window.nb_ = {};
         });
     });
 
-    window.nimbleFireOn('nimble-jquery-ready', function() {
+    window.nb_.listenTo('nimble-jquery-loaded', function() {
         if ( !sekFrontLocalized.load_front_module_js_on_scroll )
             return;
         jQuery(function($){
@@ -632,7 +516,7 @@ window.nb_ = {};
               return;
 
             // Load js plugin if needed
-            // when the plugin is loaded => it emits "nimble-fa-dependant" listened to by window.nimbleFireOn()
+            // when the plugin is loaded => it emits "nimble-fa-dependant" listened to by window.nb_.listenTo()
             var _scrollHandle = function() {},//abstract that we can unbind
                 doLoad = function() {
                   // I've been executed forget about me
@@ -673,8 +557,8 @@ window.nb_ = {};
 
     // When loaded with defer, we can not be sure that jQuery will be loaded before
     //  on 'nimble-app-ready', jQuery is loaded
-    window.nimbleFireOn( 'nimble-fa-dependant', function() {
-        window.nimbleFireOn( 'nimble-app-ready', callbackFunc );
+    window.nb_.listenTo( 'nimble-fa-dependant', function() {
+        window.nb_.listenTo( 'nimble-app-ready', callbackFunc );
     });
 }(window, document));
 
@@ -691,7 +575,7 @@ window.nb_ = {};
  *  BG PARALLAX
 /* ------------------------------------------------------------------------- */
 (function(w, d){
-    window.nimbleFireOn('nimble-parallax-ready', function() {
+    window.nb_.listenTo('nimble-parallax-ready', function() {
         jQuery(function($){
               $('[data-sek-bg-parallax="true"]').each( function() {
                     $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );

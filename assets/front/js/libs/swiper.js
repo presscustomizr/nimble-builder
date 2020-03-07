@@ -8628,4 +8628,4 @@
 
 }));
 // on 'nimble-app-ready', jQuery is loaded
-window.nimbleFireOn('nimble-app-ready', function(){var e=document.createEvent("Event");e.initEvent('nimble-swiper-plugin-ready',!0,!0);document.dispatchEvent(e);});
+window.nb_.listenTo('nimble-app-ready', function(){nb_.emit('nimble-swiper-script-loaded');});

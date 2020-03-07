@@ -1,4 +1,4 @@
-// global sekFrontLocalized, nimbleFireOn
+// global sekFrontLocalized, nimbleListenTo
 /* ------------------------------------------------------------------------- *
  *  LIGHT BOX WITH MAGNIFIC POPUP
  /* ------------------------------------------------------------------------- */
@@ -35,7 +35,7 @@
                 };// doLoad
 
             // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nimble-magnific-popup-ready' listened to by window.nimbleFireOn()
+            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by window.nb_.listenTo()
             if ( sekFrontLocalized.load_front_partial_css_on_scroll || sekFrontLocalized.load_front_module_js_on_scroll ) {
                 nb_.maybeLoadAssetsWhenSelectorInScreen( {
                     elements : $linkCandidates,
@@ -46,8 +46,8 @@
         });//jQuery(function($){})
     };/////////////// callbackFunc
     // When loaded with defer, we can not be sure that jQuery will be loaded before
-    window.nimbleFireOn( 'nimble-magnific-popup-dependant', function() {
-        window.nimbleFireOn('nimble-app-ready', callbackFunc );
+    window.nb_.listenTo( 'nimble-magnific-popup-dependant', function() {
+        window.nb_.listenTo('nimble-app-ready', callbackFunc );
     });
 
 }(window, document));
@@ -83,14 +83,14 @@
                         duration: 300 // don't foget to change the duration also in CSS
                       }
                   }); } catch( er ) {
-                        nb_.errorLog( 'error in callback of nimble-magnific-popup-ready => ', er );
+                        nb_.errorLog( 'error in callback of nimble-magnific-popup-loaded => ', er );
                   }
                   $linkCandidate.data('nimble-mfp-done', true );
               });
           });//jQuery(function($){})
     };/////////////// callbackFunc
 
-    window.nimbleFireOn('nimble-magnific-popup-ready', callbackFunc );
+    window.nb_.listenTo('nimble-magnific-popup-loaded', callbackFunc );
 }(window, document));
 
 
@@ -110,7 +110,7 @@
         jQuery(function($){
 
             // Load js plugin if needed
-            // // when the plugin is loaded => it emits 'nimble-swiper-ready' listened to by window.nimbleFireOn()
+            // // when the plugin is loaded => it emits 'nimble-swiper-ready' listened to by window.nb_.listenTo()
             // if ( nb_.scriptsLoadingStatus.swiper && 'resolved' === nb_.scriptsLoadingStatus.swiper.state() )
             //   return;
             var _scrollHandle = function() {},//abstract that we can unbind
@@ -161,8 +161,8 @@
 
     // When loaded with defer, we can not be sure that jQuery will be loaded before
     // on 'nimble-app-ready', jQuery is loaded
-    window.nimbleFireOn( 'nimble-swiper-dependant', function() {
-        window.nimbleFireOn('nimble-app-ready', callbackFunc );
+    window.nb_.listenTo( 'nimble-swiper-dependant', function() {
+        window.nb_.listenTo('nimble-app-ready', callbackFunc );
     });
 }(window, document));
 
@@ -175,7 +175,7 @@
  *  SMARTLOAD
 /* ------------------------------------------------------------------------- */
 (function(w, d){
-    window.nimbleFireOn('nimble-lazyload-ready', function() {
+    window.nb_.listenTo('nimble-lazyload-ready', function() {
         jQuery(function($){
               $('.sektion-wrapper').each( function() {
                     try { $(this).nimbleLazyLoad(); } catch( er ) {
@@ -185,7 +185,7 @@
         });
     });
 
-    window.nimbleFireOn('nimble-jquery-ready', function() {
+    window.nb_.listenTo('nimble-jquery-loaded', function() {
         if ( !sekFrontLocalized.load_front_module_js_on_scroll )
             return;
         jQuery(function($){
@@ -233,7 +233,7 @@
               return;
 
             // Load js plugin if needed
-            // when the plugin is loaded => it emits "nimble-fa-dependant" listened to by window.nimbleFireOn()
+            // when the plugin is loaded => it emits "nimble-fa-dependant" listened to by window.nb_.listenTo()
             var _scrollHandle = function() {},//abstract that we can unbind
                 doLoad = function() {
                   // I've been executed forget about me
@@ -274,8 +274,8 @@
 
     // When loaded with defer, we can not be sure that jQuery will be loaded before
     //  on 'nimble-app-ready', jQuery is loaded
-    window.nimbleFireOn( 'nimble-fa-dependant', function() {
-        window.nimbleFireOn( 'nimble-app-ready', callbackFunc );
+    window.nb_.listenTo( 'nimble-fa-dependant', function() {
+        window.nb_.listenTo( 'nimble-app-ready', callbackFunc );
     });
 }(window, document));
 
@@ -292,7 +292,7 @@
  *  BG PARALLAX
 /* ------------------------------------------------------------------------- */
 (function(w, d){
-    window.nimbleFireOn('nimble-parallax-ready', function() {
+    window.nb_.listenTo('nimble-parallax-ready', function() {
         jQuery(function($){
               $('[data-sek-bg-parallax="true"]').each( function() {
                     $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );

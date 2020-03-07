@@ -155,7 +155,7 @@ $slider_options = !empty($value['slider_options']) ? $value['slider_options'] : 
 if ( !empty( $img_collection ) ) {
     sek_print_img_slider( $img_collection, $slider_options, $model );
     ?>
-    <script>window.nimbleFireOn('nimble-app-ready', function(){var e=document.createEvent("Event");e.initEvent("nimble-swiper-dependant",!0,!0);document.dispatchEvent(e);});</script>
+    <script>nb_.listenTo('nimble-app-ready',function(){nb_.emit('nimble-swiper-dependant');});</script>
     <?php
 } else {
     if ( skp_is_customizing() ) {

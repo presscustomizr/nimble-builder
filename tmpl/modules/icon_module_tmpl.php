@@ -91,4 +91,4 @@ else :
     );
 endif;
 ?>
-<script>window.nimbleFireOn('nimble-app-ready', function(){var e=document.createEvent("Event");e.initEvent("nimble-fa-dependant",!0,!0);document.dispatchEvent(e);});</script>
+<script>nb_.listenTo('nimble-app-ready',function(){nb_.emit('nimble-fa-dependant');});</script>

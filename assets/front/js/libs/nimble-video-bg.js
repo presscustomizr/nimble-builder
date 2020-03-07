@@ -1,4 +1,4 @@
-// global sekFrontLocalized, nimbleFireOn
+// global sekFrontLocalized, nimbleListenTo
 // jQuery plugin
 // Fired in ...front_fire.js
 (function(w, d){
@@ -544,11 +544,9 @@
       };/////////////// callbackFunc
 
       // on 'nimble-app-ready', jQuery is loaded
-      window.nimbleFireOn('nimble-app-ready', function(){
+      nb_.listenTo('nimble-app-ready', function(){
           callbackFunc();
-          var evt = document.createEvent('Event');
-          evt.initEvent('nimble-video-bg-ready', true, true); //can bubble, and is cancellable
-          document.dispatchEvent(evt);
+          nb_.emit('nimble-video-bg-ready');
       });
 }(window, document));
 

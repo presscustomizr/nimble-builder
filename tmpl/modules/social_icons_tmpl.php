@@ -60,7 +60,7 @@ $icons_style = !empty($value['icons_style']) ? $value['icons_style'] : array();
 if ( !empty( $icons_collection ) ) {
     sek_print_social_links( $icons_collection, $icons_style );
     ?>
-    <script>window.nimbleFireOn('nimble-app-ready', function(){var e=document.createEvent("Event");e.initEvent("nimble-fa-dependant",!0,!0);document.dispatchEvent(e);});</script>
+    <script>nb_.listenTo('nimble-app-ready',function(){nb_.emit('nimble-fa-dependant');});</script>
     <?php
 } else {
     if ( skp_is_customizing() ) {

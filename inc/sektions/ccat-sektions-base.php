@@ -11478,8 +11478,19 @@ class Sek_Dyn_CSS_Handler {
 
                 $this->enqueued_or_printed = true;
             }
-
         }// if ( self::MODE_FILE )
+        // case when defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE
+        // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
+        else if ( self::MODE_INLINE == $this->mode ) {
+            if ( $this->file_exists ) {
+                printf( '<link rel="stylesheet" id="sek-dyn-%1$s-css" href="%2$s" type="text/css" media="all" />',
+                    $this->id,
+                    //this resource version is built upon the file last modification time
+                    add_query_arg( array( 'ver' => filemtime($this->uri) ), $this->url )
+                );
+                $this->enqueued_or_printed = true;
+            }
+        }
 
 
         //if $this->mode != 'file' or the file enqueuing didn't go through (fall back)
@@ -13569,7 +13580,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // initialize Nimble front js app
             add_action( 'wp_head', array( $this, 'sek_initialize_front_js_app' ), 0  );
 
-            // Emit an event when jQuery is detected. 'nimble-jquery-ready'
+            // Emit an event when jQuery is detected. 'nimble-jquery-loaded'
             // maybe fetch jQuery from a CDN when dequeued
             add_action( 'wp_footer', array( $this, 'sek_handle_jquery' ));
 
@@ -13894,12 +13905,12 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // @'wp_head'0
         // Loading sequence :
         // 1) window.nb_ utils starts being populated
-        // 2) 'nimble-jquery-ready' => fired in footer when jQuery is defined <= window.nb_ utils is completed with jQuery dependant helper properties and methods
-        // 3) 'nimble-app-ready' => fired in footer on 'nimble-jquery-ready' <= all module scripts are fired on this event
-        // 4) 'nimble-magnific-popup-ready', ... are emitted in each script files
+        // 2) 'nimble-jquery-loaded' => fired in footer when jQuery is defined <= window.nb_ utils is completed with jQuery dependant helper properties and methods
+        // 3) 'nimble-app-ready' => fired in footer on 'nimble-jquery-loaded' <= all module scripts are fired on this event
+        // 4) 'nimble-magnific-popup-loaded', ... are emitted in each script files
         function sek_initialize_front_js_app() {
             ?>
-            <script>window.nimbleFireOn=function(i,n){var e={"nimble-app-ready":void 0!==window.nb_&&!0===nb_.isReady,"nimble-magnific-popup-ready":"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup,"nimble-swiper-plugin-ready":void 0!==window.Swiper};"function"==typeof n&&(!0===e[i]?n():document.addEventListener(i,n))};</script>
+            <script>window.nb_={},function(n,e){var t,i,r=Date.now||function(){return(new Date).getTime()};window.nb_={isArray:function(n){return Array.isArray(n)||"[object Array]"===toString.call(n)},inArray:function(n,e){return!(!nb_.isArray(n)||nb_.isUndefined(e))&&n.indexOf(e)>-1},isUndefined:function(n){return void 0===n},isObject:function(n){var e=typeof n;return"function"===e||"object"===e&&!!n},has:function(n,e){if(!_.isArray(e))return function(n,e){return null!=n&&hasOwnProperty.call(n,e)}(n,e);for(var t=e.length,i=0;i<t;i++){var r=e[i];if(null==n||!Object.prototype.hasOwnProperty.call(n,r))return!1;n=n[r]}return!!t},debounce:function(n,e,t){var i;return function(){var r=this,o=arguments,u=t&&!i;clearTimeout(i),i=setTimeout(function(){i=null,t||n.apply(r,o)},e),u&&n.apply(r,o)}},throttle:function(n,e,t){var i,o,u,a,l=0;t||(t={});var c=function(){l=!1===t.leading?0:r(),i=null,a=n.apply(o,u),i||(o=u=null)},d=function(){var d=r();l||!1!==t.leading||(l=d);var s=e-(d-l);return o=this,u=arguments,s<=0||s>e?(i&&(clearTimeout(i),i=null),l=d,a=n.apply(o,u),i||(o=u=null)):i||!1===t.trailing||(i=setTimeout(c,s)),a};return d.cancel=function(){clearTimeout(i),l=0,i=o=u=null},d},delay:(t=function(n,e,t){return setTimeout(function(){return n.apply(null,t)},e)},i=null==i?t.length-1:+i,function(){for(var n=Math.max(arguments.length-i,0),e=Array(n),r=0;r<n;r++)e[r]=arguments[r+i];switch(i){case 0:return t.call(this,e);case 1:return t.call(this,arguments[0],e);case 2:return t.call(this,arguments[0],arguments[1],e)}var o=Array(i+1);for(r=0;r<i;r++)o[r]=arguments[r];return o[i]=e,t.apply(this,o)}),errorLog:function(){!nb_.isUndefined(console)&&nb_.isFunction(window.console.log)&&console.log.apply(console,arguments)},scriptsLoadingStatus:{},listenTo:function(n,e){var t={"nimble-jquery-loaded":"undefined"!=typeof jQuery,"nimble-app-ready":void 0!==window.nb_&&nb_.isEmitted("nimble-app-ready"),"nimble-magnific-popup-loaded":"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup,"nimble-swiper-script-loaded":void 0!==window.Swiper};"function"==typeof e&&(!0===t[n]||nb_.isUndefined(t[n])&&nb_.inArray(nb_.emittedEvents,n)?e():document.addEventListener(n,e))},emittedEvents:[],emit:function(n){nb_.emittedEvents.push(n);var e=document.createEvent("Event");e.initEvent(n,!0,!0),document.dispatchEvent(e)},isEmitted:function(n){return"string"==typeof n&&nb_.inArray(nb_.emittedEvents,n)}}}(window,document);</script>
             <?php
         }
 
@@ -13907,7 +13918,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // introduced for https://github.com/presscustomizr/nimble-builder/issues/626
         function sek_handle_jquery() {
             ?>
-            <script id="nimble-detect-jquery">!function(){var n=function(e){if(e=e||0,"undefined"!=typeof jQuery){var t=document.createEvent("Event");t.initEvent("nimble-jquery-ready",!0,!0),document.dispatchEvent(t)}else e<30?setTimeout(function(){n(++e)},200):alert("Nimble Builder problem : jQuery.js was not detected on your website")};n()}();</script>
+            <script id="nimble-detect-jquery">!function(){var e=function(n){n=n||0,"undefined"!=typeof jQuery?nb_.emit("nimble-jquery-loaded"):n<30?setTimeout(function(){e(++n)},200):alert("Nimble Builder problem : jQuery.js was not detected on your website")};e()}();</script>
             <?php
             if( skp_is_customizing() || !sek_is_front_jquery_dequeued() )
               return;
@@ -13968,7 +13979,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             if( !skp_is_customizing() )
               return;
             ?>
-            <script is="nimble-customizer-previewed-device-handler">window,document,window.nimbleFireOn("nimble-app-ready",function(){jQuery(function(e){if(nb_.isCustomizing()){function i(){wp.customize.preview.bind("previewed-device",function(e){nb_.previewedDevice=e})}wp.customize.preview?i():wp.customize.bind("preview-ready",function(){i()})}})});</script>
+            <script id="nimble-customizer-previewed-device-handler">window,document,window.nb_.listenTo("nimble-app-ready",function(){jQuery(function(e){if(nb_.isCustomizing()){var i=function(){wp.customize.preview.bind("previewed-device",function(e){nb_.previewedDevice=e})};wp.customize.preview?i():wp.customize.bind("preview-ready",function(){i()})}})});</script>
             <?php
         }
 
@@ -15659,18 +15670,38 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
         }
 
         // @param params = array( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) )
+        // fired @'wp_enqueue_scripts'
         private function _instantiate_css_handler( $params = array() ) {
             $params = wp_parse_args( $params, array( 'skope_id' => '', 'is_global_stylesheet' => false ) );
+
+            // Print inline or enqueue ?
+            $print_mode = Sek_Dyn_CSS_Handler::MODE_FILE;
+            if ( is_customize_preview() ) {
+              $print_mode = Sek_Dyn_CSS_Handler::MODE_FILE;
+            } else if ( defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) {
+              $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
+            }
+
+            // Which hook ?
+            $fire_at_hook = '';
+            if ( !defined( 'DOING_AJAX' ) && is_customize_preview() ) {
+              $fire_at_hook = 'wp_head';
+            }
+            // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
+            else if ( !defined( 'DOING_AJAX' ) && defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) {
+              $fire_at_hook = 'wp_head';
+            }
+
             $css_handler_instance = new Sek_Dyn_CSS_Handler( array(
                 'id'             => $params['skope_id'],
                 'skope_id'       => $params['skope_id'],
                 // property "is_global_stylesheet" has been added when fixing https://github.com/presscustomizr/nimble-builder/issues/273
                 'is_global_stylesheet' => $params['is_global_stylesheet'],
-                'mode'           => ( is_customize_preview() || ( defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) ) ? Sek_Dyn_CSS_Handler::MODE_INLINE : Sek_Dyn_CSS_Handler::MODE_FILE,
+                'mode'           => $print_mode,
                 //these are taken in account only when 'mode' is 'file'
                 'force_write'    => true, //<- write if the file doesn't exist
                 'force_rewrite'  => is_user_logged_in() && current_user_can( 'customize' ), //<- write even if the file exists
-                'hook'           => ( ! defined( 'DOING_AJAX' ) && is_customize_preview() ) ? 'wp_head' : ''
+                'hook'           => $fire_at_hook
             ));
             return $css_handler_instance;
         }

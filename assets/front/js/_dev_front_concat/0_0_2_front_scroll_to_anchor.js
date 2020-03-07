@@ -1,4 +1,4 @@
-// global sekFrontLocalized, nimbleFireOn
+// global sekFrontLocalized, nimbleListenTo
 /* ------------------------------------------------------------------------- *
  *  SCROLL TO ANCHOR
 /* ------------------------------------------------------------------------- */
@@ -60,5 +60,5 @@
         });
     };/////////////// callbackFunc
 
-    window.nimbleFireOn('nimble-app-ready', callbackFunc );
+    window.nb_.listenTo('nimble-app-ready', callbackFunc );
 }(window, document));

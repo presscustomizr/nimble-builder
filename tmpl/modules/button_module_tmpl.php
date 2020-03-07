@@ -73,6 +73,6 @@ if ( !isset( $content_settings['link-to'] ) || isset( $content_settings['link-to
 }
 if ( !empty(sek_get_button_module_icon( $content_settings )) ) {
   ?>
-  <script>window.nimbleFireOn('nimble-app-ready', function(){var e=document.createEvent("Event");e.initEvent("nimble-fa-dependant",!0,!0);document.dispatchEvent(e);});</script>
+  <script>nb_.listenTo('nimble-app-ready',function(){nb_.emit('nimble-fa-dependant');});</script>
   <?php
 }

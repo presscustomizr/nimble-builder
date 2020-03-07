@@ -1,4 +1,4 @@
-// global sekFrontLocalized, nimbleFireOn
+// global sekFrontLocalized, nimbleListenTo
 /* ------------------------------------------------------------------------- *
  *  MENU
 /* ------------------------------------------------------------------------- */
@@ -381,6 +381,6 @@
 
       };/////////////// callbackFunc
       // on 'nimble-app-ready', jQuery is loaded
-      window.nimbleFireOn('nimble-app-ready', callbackFunc );
+      window.nb_.listenTo('nimble-app-ready', callbackFunc );
 }(window, document));
 

@@ -449,8 +449,19 @@ class Sek_Dyn_CSS_Handler {
 
                 $this->enqueued_or_printed = true;
             }
-
         }// if ( self::MODE_FILE )
+        // case when defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE
+        // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
+        else if ( self::MODE_INLINE == $this->mode ) {
+            if ( $this->file_exists ) {
+                printf( '<link rel="stylesheet" id="sek-dyn-%1$s-css" href="%2$s" type="text/css" media="all" />',
+                    $this->id,
+                    //this resource version is built upon the file last modification time
+                    add_query_arg( array( 'ver' => filemtime($this->uri) ), $this->url )
+                );
+                $this->enqueued_or_printed = true;
+            }
+        }
 
 
         //if $this->mode != 'file' or the file enqueuing didn't go through (fall back)

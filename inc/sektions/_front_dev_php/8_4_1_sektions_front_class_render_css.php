@@ -114,18 +114,38 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
         }
 
         // @param params = array( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) )
+        // fired @'wp_enqueue_scripts'
         private function _instantiate_css_handler( $params = array() ) {
             $params = wp_parse_args( $params, array( 'skope_id' => '', 'is_global_stylesheet' => false ) );
+
+            // Print inline or enqueue ?
+            $print_mode = Sek_Dyn_CSS_Handler::MODE_FILE;
+            if ( is_customize_preview() ) {
+              $print_mode = Sek_Dyn_CSS_Handler::MODE_FILE;
+            } else if ( defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) {
+              $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
+            }
+
+            // Which hook ?
+            $fire_at_hook = '';
+            if ( !defined( 'DOING_AJAX' ) && is_customize_preview() ) {
+              $fire_at_hook = 'wp_head';
+            }
+            // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
+            else if ( !defined( 'DOING_AJAX' ) && defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) {
+              $fire_at_hook = 'wp_head';
+            }
+
             $css_handler_instance = new Sek_Dyn_CSS_Handler( array(
                 'id'             => $params['skope_id'],
                 'skope_id'       => $params['skope_id'],
                 // property "is_global_stylesheet" has been added when fixing https://github.com/presscustomizr/nimble-builder/issues/273
                 'is_global_stylesheet' => $params['is_global_stylesheet'],
-                'mode'           => ( is_customize_preview() || ( defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) ) ? Sek_Dyn_CSS_Handler::MODE_INLINE : Sek_Dyn_CSS_Handler::MODE_FILE,
+                'mode'           => $print_mode,
                 //these are taken in account only when 'mode' is 'file'
                 'force_write'    => true, //<- write if the file doesn't exist
                 'force_rewrite'  => is_user_logged_in() && current_user_can( 'customize' ), //<- write even if the file exists
-                'hook'           => ( ! defined( 'DOING_AJAX' ) && is_customize_preview() ) ? 'wp_head' : ''
+                'hook'           => $fire_at_hook
             ));
             return $css_handler_instance;
         }
