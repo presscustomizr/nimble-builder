@@ -381,6 +381,6 @@
 
       };/////////////// callbackFunc
       // on 'nimble-app-ready', jQuery is loaded
-      window.nb_.listenTo('nimble-app-ready', callbackFunc );
+      nb_.listenTo('nimble-app-ready', callbackFunc );
 }(window, document));
 

@@ -546,7 +546,7 @@
       // on 'nimble-app-ready', jQuery is loaded
       nb_.listenTo('nimble-app-ready', function(){
           callbackFunc();
-          nb_.emit('nimble-video-bg-ready');
+          nb_.emit('nimble-video-bg-loaded');
       });
 }(window, document));
 

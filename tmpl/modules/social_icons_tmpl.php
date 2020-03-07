@@ -60,7 +60,7 @@ $icons_style = !empty($value['icons_style']) ? $value['icons_style'] : array();
 if ( !empty( $icons_collection ) ) {
     sek_print_social_links( $icons_collection, $icons_style );
     ?>
-    <script>nb_.listenTo('nimble-app-ready',function(){nb_.emit('nimble-fa-dependant');});</script>
+    <script>nb_.emit('nimble-needs-fontawesome');</script>
     <?php
 } else {
     if ( skp_is_customizing() ) {

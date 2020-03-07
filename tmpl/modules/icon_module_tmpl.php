@@ -91,4 +91,4 @@ else :
     );
 endif;
 ?>
-<script>nb_.listenTo('nimble-app-ready',function(){nb_.emit('nimble-fa-dependant');});</script>
+<script>nb_.emit('nimble-needs-fontawesome');</script>

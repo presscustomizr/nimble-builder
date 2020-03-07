@@ -98,7 +98,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                               cache : true,// use the browser cached version when available
                               dataType: "script"
                         }).done(function() {
-                              console.log( params.path + ' is loaded', params );
+                              console.log( 'ASSET IS LOADED => ' + params.path, params );
                               if ( nb_.isFunction(params.loadcheck) && !params.loadcheck() ) {
                                   nb_.errorLog('ajaxLoadScript success but loadcheck failed for => ' + params.path );
                                   return;
@@ -116,40 +116,31 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                     //  func : function() {}
                     // }
                     maybeLoadAssetsWhenSelectorInScreen : function( params ) {
-                        params = $.extend( { elements : '', func : '' }, params );
+                        // do nothing if dynamic asset loading is not enabled for js and css
+                        if ( !sekFrontLocalized.load_front_partial_css_on_scroll && !sekFrontLocalized.load_front_module_js_on_scroll )
+                          return;
+
+                        params = $.extend( { id : '', elements : '', func : '' }, params );
                         console.log('params in maybeLoadScriptWhenSelectorInScreen', params );
+                        if ( 1 > params.id.length ) {
+                            nb_.errorLog('Nimble error => maybeLoadAssetsWhenSelectorInScreen => missing id', params );
+                          return;
+                        }
                         if ( 1 > $(params.elements).length )
                           return;
                         if ( !nb_.isFunction( params.func ) )
                           return;
-
-                        // Fire now or schedule when becoming visible.
-                        var isLoading = false;
-                        $.each( $(params.elements), function( k, el ) {
-                            if ( !isLoading && nb_.isInWindow($(el) ) ) {
-                                isLoading = true;
-                                params.func();
-                            }
-                        });
-                        if ( !isLoading ) {
-                              _scrollHandle = nb_.throttle( function() {
-                                    $.each( $(params.elements), function( k, el ) {
-                                        if ( !isLoading && nb_.isInWindow( $(el) ) ) {
-                                            isLoading = true;
-                                            params.func();
-                                        }
-                                    });
-                              }, 100 );
-                              nb_.cachedElements.$window.on( 'scroll', _scrollHandle );
-                        }
+                        nb_.scrollHandlers = nb_.scrollHandlers || {};
+                        nb_.scrollHandlers[params.id] = { elements : params.elements, func : params.func };
                     }
               });//$.extend( nb_
 
+              console.log('EMIT NIMBLE APP READY', jQuery);
               // now that nb_ has been populated, let's say it to the app
               nb_.emit('nimble-app-ready');
           });// jQuery( function($){
     };
     // 'nimble-jquery-loaded' is fired @'wp_footer' see inline script in ::_schedule_front_and_preview_assets_printing()
-    window.nb_.listenTo('nimble-jquery-loaded', callbackFunc );
+    nb_.listenTo('nimble-jquery-loaded', callbackFunc );
 
 }(window, document));

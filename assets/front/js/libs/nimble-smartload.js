@@ -25,7 +25,6 @@
 // global sekFrontLocalized, nimbleListenTo
 (function(w, d){
       var callbackFunc = function() {
-          console.log('ALOS ?');
            (function ( $, window ) {
               //defaults
               var pluginName = 'nimbleLazyLoad',
@@ -270,6 +269,6 @@
       // on 'nimble-app-ready', jQuery is loaded
       nb_.listenTo('nimble-app-ready', function(){
           callbackFunc();
-          nb_.emit('nimble-lazyload-ready');
+          nb_.emit('nimble-lazyload-loaded');
       });
 }(window, document));

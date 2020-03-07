@@ -9,6 +9,12 @@
         font-style: inherit;
     }
     &[data-sek-quote-design="none"] { border-left: none;}//<= make sure the blockquote doesn't inherit another border style from the theme or a plugin
+    .#{$project-prefix}quote-content {
+      font-weight: 400;
+      font-size: 16px;//as defined as default value on module registration
+      line-height: 1.5em;
+      color: inherit;
+    }
     &.#{$project-prefix}quote-design {
         //reset
         background: none;
@@ -39,11 +45,6 @@
             @else {
               padding-left: calc( 10px + 0.7em );
             }
-        }
-        .#{$project-prefix}quote-content {
-            font-weight: 400;
-            font-size: 16px;//as defined as default value on module registration
-            color: inherit;
         }
         //border before
         &.#{$project-prefix}border-before {

@@ -11294,6 +11294,7 @@ class Sek_Dyn_CSS_Handler {
             'force_rewrite'                   => $this->force_rewrite
         );
 
+        sek_error_log('ARGS IN DYN CSS HANDLER ?', $args );
 
         $args = wp_parse_args( $args, $defaults );
 
@@ -11390,6 +11391,7 @@ class Sek_Dyn_CSS_Handler {
 
         $this->file_exists          = $this->_sek_dyn_css_file_exists();
 
+        sek_error_log('MERDE', $this->mode );
         if ( self::MODE_FILE == $this->mode ) {
             if ( ! $this->_sek_dyn_css_write_file_is_possible() ) {
                 $this->mode = self::MODE_INLINE;
@@ -11481,13 +11483,11 @@ class Sek_Dyn_CSS_Handler {
         }// if ( self::MODE_FILE )
         // case when defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE
         // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-        else if ( self::MODE_INLINE == $this->mode ) {
-            if ( $this->file_exists ) {
-                printf( '<link rel="stylesheet" id="sek-dyn-%1$s-css" href="%2$s" type="text/css" media="all" />',
-                    $this->id,
-                    //this resource version is built upon the file last modification time
-                    add_query_arg( array( 'ver' => filemtime($this->uri) ), $this->url )
-                );
+        else if ( !is_customize_preview() && self::MODE_INLINE == $this->mode ) {
+            global $wp_filesystem;
+            if ( $wp_filesystem->exists($this->uri) && $wp_filesystem->is_readable($this->uri) ) {
+                $file_content = $wp_filesystem->get_contents($this->uri);
+                printf( '<style id="sek-dyn-%1$s-css" media="all">%2$s</style>', $this->id, $file_content );
                 $this->enqueued_or_printed = true;
             }
         }
@@ -13594,6 +13594,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // hook : 'wp_enqueue_scripts'
         function sek_enqueue_front_assets() {
             Nimble_Manager()->big_module_stylesheet_map = [
+                'czr_quote_module' => 'quote-module',
+                'czr_icon_module' => 'icon-module',
                 'czr_img_slider_module' => 'img-slider-module-with-swiper',
                 'czr_accordion_module' => 'accordion-module',
                 'czr_menu_module' => 'menu-module',
@@ -13910,7 +13912,185 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // 4) 'nimble-magnific-popup-loaded', ... are emitted in each script files
         function sek_initialize_front_js_app() {
             ?>
-            <script>window.nb_={},function(n,e){var t,i,r=Date.now||function(){return(new Date).getTime()};window.nb_={isArray:function(n){return Array.isArray(n)||"[object Array]"===toString.call(n)},inArray:function(n,e){return!(!nb_.isArray(n)||nb_.isUndefined(e))&&n.indexOf(e)>-1},isUndefined:function(n){return void 0===n},isObject:function(n){var e=typeof n;return"function"===e||"object"===e&&!!n},has:function(n,e){if(!_.isArray(e))return function(n,e){return null!=n&&hasOwnProperty.call(n,e)}(n,e);for(var t=e.length,i=0;i<t;i++){var r=e[i];if(null==n||!Object.prototype.hasOwnProperty.call(n,r))return!1;n=n[r]}return!!t},debounce:function(n,e,t){var i;return function(){var r=this,o=arguments,u=t&&!i;clearTimeout(i),i=setTimeout(function(){i=null,t||n.apply(r,o)},e),u&&n.apply(r,o)}},throttle:function(n,e,t){var i,o,u,a,l=0;t||(t={});var c=function(){l=!1===t.leading?0:r(),i=null,a=n.apply(o,u),i||(o=u=null)},d=function(){var d=r();l||!1!==t.leading||(l=d);var s=e-(d-l);return o=this,u=arguments,s<=0||s>e?(i&&(clearTimeout(i),i=null),l=d,a=n.apply(o,u),i||(o=u=null)):i||!1===t.trailing||(i=setTimeout(c,s)),a};return d.cancel=function(){clearTimeout(i),l=0,i=o=u=null},d},delay:(t=function(n,e,t){return setTimeout(function(){return n.apply(null,t)},e)},i=null==i?t.length-1:+i,function(){for(var n=Math.max(arguments.length-i,0),e=Array(n),r=0;r<n;r++)e[r]=arguments[r+i];switch(i){case 0:return t.call(this,e);case 1:return t.call(this,arguments[0],e);case 2:return t.call(this,arguments[0],arguments[1],e)}var o=Array(i+1);for(r=0;r<i;r++)o[r]=arguments[r];return o[i]=e,t.apply(this,o)}),errorLog:function(){!nb_.isUndefined(console)&&nb_.isFunction(window.console.log)&&console.log.apply(console,arguments)},scriptsLoadingStatus:{},listenTo:function(n,e){var t={"nimble-jquery-loaded":"undefined"!=typeof jQuery,"nimble-app-ready":void 0!==window.nb_&&nb_.isEmitted("nimble-app-ready"),"nimble-magnific-popup-loaded":"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup,"nimble-swiper-script-loaded":void 0!==window.Swiper};"function"==typeof e&&(!0===t[n]||nb_.isUndefined(t[n])&&nb_.inArray(nb_.emittedEvents,n)?e():document.addEventListener(n,e))},emittedEvents:[],emit:function(n){nb_.emittedEvents.push(n);var e=document.createEvent("Event");e.initEvent(n,!0,!0),document.dispatchEvent(e)},isEmitted:function(n){return"string"==typeof n&&nb_.inArray(nb_.emittedEvents,n)}}}(window,document);</script>
+            <script>window.nb_ = {};
+// Jquery agnostic
+(function(w, d){
+    //https://underscorejs.org/docs/underscore.html#section-17
+    var restArguments = function(func, startIndex) {
+      startIndex = startIndex == null ? func.length - 1 : +startIndex;
+      return function() {
+        var length = Math.max(arguments.length - startIndex, 0),
+            rest = Array(length),
+            index = 0;
+        for (; index < length; index++) {
+          rest[index] = arguments[index + startIndex];
+        }
+        switch (startIndex) {
+          case 0: return func.call(this, rest);
+          case 1: return func.call(this, arguments[0], rest);
+          case 2: return func.call(this, arguments[0], arguments[1], rest);
+        }
+        var args = Array(startIndex + 1);
+        for (index = 0; index < startIndex; index++) {
+          args[index] = arguments[index];
+        }
+        args[startIndex] = rest;
+        return func.apply(this, args);
+      };
+    };
+    var has = function(obj, path) {
+      return obj != null && hasOwnProperty.call(obj, path);
+    };
+    // helper for nb_.throttle()
+    var _now = Date.now || function() {
+      return new Date().getTime();
+    };
+
+    window.nb_ = {
+        isArray : function(obj) {
+            return Array.isArray(obj) || toString.call(obj) === '[object Array]';
+        },
+        inArray : function(obj, value) {
+          if ( !nb_.isArray(obj) || nb_.isUndefined(value) )
+            return false;
+          return obj.indexOf(value) > -1;
+        },
+        isUndefined : function(obj) {
+          return obj === void 0;
+        },
+        isObject : function(obj) {
+          var type = typeof obj;
+          return type === 'function' || type === 'object' && !!obj;
+        },
+        has : function(obj, path) {
+          if (!_.isArray(path)) {
+            return has(obj, path);
+          }
+          var length = path.length;
+          for (var i = 0; i < length; i++) {
+            var key = path[i];
+            if (obj == null || !Object.prototype.hasOwnProperty.call(obj, key)) {
+              return false;
+            }
+            obj = obj[key];
+          }
+          return !!length;
+        },
+        // https://davidwalsh.name/javascript-debounce-function
+        debounce : function(func, wait, immediate) {
+          var timeout;
+          return function() {
+            var context = this, args = arguments;
+            var later = function() {
+              timeout = null;
+              if (!immediate) func.apply(context, args);
+            };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+          };
+        },
+        // https://underscorejs.org/docs/underscore.html#section-85
+        throttle : function(func, wait, options) {
+          var timeout, context, args, result;
+          var previous = 0;
+          if (!options) options = {};
+
+          var later = function() {
+            previous = options.leading === false ? 0 : _now();
+            timeout = null;
+            result = func.apply(context, args);
+            if (!timeout) context = args = null;
+          };
+
+          var throttled = function() {
+            var now = _now();
+            if (!previous && options.leading === false) previous = now;
+            var remaining = wait - (now - previous);
+            context = this;
+            args = arguments;
+            if (remaining <= 0 || remaining > wait) {
+              if (timeout) {
+                clearTimeout(timeout);
+                timeout = null;
+              }
+              previous = now;
+              result = func.apply(context, args);
+              if (!timeout) context = args = null;
+            } else if (!timeout && options.trailing !== false) {
+              timeout = setTimeout(later, remaining);
+            }
+            return result;
+          };
+
+          throttled.cancel = function() {
+            clearTimeout(timeout);
+            previous = 0;
+            timeout = context = args = null;
+          };
+
+          return throttled;
+        },
+        delay : restArguments(function(func, wait, args) {
+          return setTimeout(function() {
+            return func.apply(null, args);
+          }, wait);
+        }),
+        // safe console log for
+        errorLog : function() {
+            //fix for IE, because console is only defined when in F12 debugging mode in IE
+            if ( nb_.isUndefined( console ) || !nb_.isFunction( window.console.log ) )
+              return;
+            console.log.apply(console,arguments);
+        },
+        scriptsLoadingStatus : {},// <= will be populated with the script loading promises
+        listenTo : function( evt, func ) {
+            var bools = {
+                'nimble-jquery-loaded' : typeof undefined !== typeof jQuery,
+                'nimble-app-ready' : typeof undefined !== typeof window.nb_ && nb_.wasListenedTo('nimble-jquery-loaded'),
+                'nimble-magnific-popup-loaded' : typeof undefined !== typeof jQuery && typeof undefined !== typeof jQuery.fn.magnificPopup,
+                'nimble-swiper-script-loaded' : typeof undefined !== typeof window.Swiper
+            };
+            var _executeAndLog = function() {
+                func();
+                console.log('LISTENED TO', evt );
+                // store it, so if the event has been emitted before the listener is fired, we know it's been emitted
+                nb_.eventsListenedTo.push(evt);
+            };
+            //if ( '')
+            if ( 'function' === typeof func ) {
+                // For event without a boolean check, if the event has been emitted before the listener is fired, we know it's been emitted if stored in [] eventsEmitted
+                if ( true === bools[evt] ) {
+                    _executeAndLog();
+                } else if ( nb_.wasListenedTo(evt) ) {
+                    _executeAndLog();
+                } else if ( nb_.wasEmitted(evt) ) {
+                    _executeAndLog();
+                } else {
+                    document.addEventListener(evt,_executeAndLog);
+                }
+            } else {
+              nb_.errorLog('Nimble error => listenTo func param is not a function for event => ', evt, func );
+            }
+        },
+        eventsEmitted : [],
+        eventsListenedTo : [],
+        emit : function( evt ) {
+            var _evt = document.createEvent('Event');
+            _evt.initEvent(evt, true, true); //can bubble, and is cancellable
+            document.dispatchEvent(_evt);
+            console.log('EMITTED', evt );
+            nb_.eventsEmitted.push(evt);
+        },
+        wasListenedTo : function( evt ) {
+            return ('string' === typeof evt) && nb_.inArray( nb_.eventsListenedTo, evt );
+        },
+        wasEmitted : function( evt ) {
+            return ('string' === typeof evt) && nb_.inArray( nb_.eventsEmitted, evt );
+        }
+    };//window.nb_
+}(window, document ));</script>
             <?php
         }
 
@@ -13979,7 +14159,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             if( !skp_is_customizing() )
               return;
             ?>
-            <script id="nimble-customizer-previewed-device-handler">window,document,window.nb_.listenTo("nimble-app-ready",function(){jQuery(function(e){if(nb_.isCustomizing()){var i=function(){wp.customize.preview.bind("previewed-device",function(e){nb_.previewedDevice=e})};wp.customize.preview?i():wp.customize.bind("preview-ready",function(){i()})}})});</script>
+            <script id="nimble-customizer-previewed-device-handler">window,document,nb_.listenTo("nimble-app-ready",function(){jQuery(function(e){if(nb_.isCustomizing()){var i=function(){wp.customize.preview.bind("previewed-device",function(e){nb_.previewedDevice=e})};wp.customize.preview?i():wp.customize.bind("preview-ready",function(){i()})}})});</script>
             <?php
         }
 
@@ -14098,6 +14278,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             $is_split_module_stylesheets_inline_for_performance = !skp_is_customizing() && $is_stylesheet_split_for_performance && defined('NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE') && NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE;
             if ( !$is_split_module_stylesheets_inline_for_performance )
               return;
+            // css assets are always enqueued when customizing
             global $wp_filesystem;
             $contextually_active_modules = sek_get_collection_of_contextually_active_modules();
             // loop on the map module type (candidates for split) => stylesheet file name
@@ -15677,18 +15858,19 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             // Print inline or enqueue ?
             $print_mode = Sek_Dyn_CSS_Handler::MODE_FILE;
             if ( is_customize_preview() ) {
-              $print_mode = Sek_Dyn_CSS_Handler::MODE_FILE;
+              $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
             } else if ( defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) {
               $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
             }
 
+            sek_error_log('print mode ?', $print_mode );
             // Which hook ?
             $fire_at_hook = '';
             if ( !defined( 'DOING_AJAX' ) && is_customize_preview() ) {
               $fire_at_hook = 'wp_head';
             }
             // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-            else if ( !defined( 'DOING_AJAX' ) && defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) {
+            else if ( !defined( 'DOING_AJAX' ) && !is_customize_preview() && defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) {
               $fire_at_hook = 'wp_head';
             }
 

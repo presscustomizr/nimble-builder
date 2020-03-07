@@ -340,6 +340,7 @@ module.exports = {
       'postcss',
       // march 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/612
       'concat:sektions_front_slider_module_css',
+      'cssmin:sek_front_modules_css'
     ]
   },
 

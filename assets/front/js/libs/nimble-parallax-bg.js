@@ -155,6 +155,6 @@
       // on 'nimble-app-ready', jQuery is loaded
       nb_.listenTo('nimble-app-ready', function(){
           callbackFunc();
-          nb_.emit('nimble-parallax-ready');
+          nb_.emit('nimble-parallax-loaded');
       });
 }(window, document));

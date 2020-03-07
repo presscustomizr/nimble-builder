@@ -13,6 +13,13 @@
   border-left: none;
 }
 
+.sek-quote .sek-quote-content {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5em;
+  color: inherit;
+}
+
 .sek-quote.sek-quote-design {
   background: none;
   font-style: inherit;
@@ -43,12 +50,6 @@
 .sek-quote.sek-quote-design .sek-quote-inner {
   color: inherit;
   padding-left: calc( 10px + 0.7em);
-}
-
-.sek-quote.sek-quote-design .sek-quote-content {
-  font-weight: 400;
-  font-size: 16px;
-  color: inherit;
 }
 
 .sek-quote.sek-quote-design.sek-border-before {

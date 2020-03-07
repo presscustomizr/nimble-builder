@@ -119,6 +119,6 @@ if ( 'no-link' === $main_settings['link-to'] ) {
 }
 if ( 'img-lightbox' === $main_settings['link-to'] ) {
   ?>
-  <script>nb_.listenTo('nimble-app-ready',function(){nb_.emit('nimble-magnific-popup-dependant');});</script>
+  <script>nb_.emit('nimble-needs-magnific-popup');</script>
   <?php
 }

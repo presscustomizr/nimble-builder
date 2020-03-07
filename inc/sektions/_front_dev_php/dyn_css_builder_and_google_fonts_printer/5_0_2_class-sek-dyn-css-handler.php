@@ -265,6 +265,7 @@ class Sek_Dyn_CSS_Handler {
             'force_rewrite'                   => $this->force_rewrite
         );
 
+        sek_error_log('ARGS IN DYN CSS HANDLER ?', $args );
 
         $args = wp_parse_args( $args, $defaults );
 
@@ -361,6 +362,7 @@ class Sek_Dyn_CSS_Handler {
 
         $this->file_exists          = $this->_sek_dyn_css_file_exists();
 
+        sek_error_log('MERDE', $this->mode );
         if ( self::MODE_FILE == $this->mode ) {
             if ( ! $this->_sek_dyn_css_write_file_is_possible() ) {
                 $this->mode = self::MODE_INLINE;
@@ -453,12 +455,10 @@ class Sek_Dyn_CSS_Handler {
         // case when defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE
         // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
         else if ( !is_customize_preview() && self::MODE_INLINE == $this->mode ) {
-            if ( $this->file_exists ) {
-                printf( '<link rel="stylesheet" id="sek-dyn-%1$s-css" href="%2$s" type="text/css" media="all" />',
-                    $this->id,
-                    //this resource version is built upon the file last modification time
-                    add_query_arg( array( 'ver' => filemtime($this->uri) ), $this->url )
-                );
+            global $wp_filesystem;
+            if ( $wp_filesystem->exists($this->uri) && $wp_filesystem->is_readable($this->uri) ) {
+                $file_content = $wp_filesystem->get_contents($this->uri);
+                printf( '<style id="sek-dyn-%1$s-css" media="all">%2$s</style>', $this->id, $file_content );
                 $this->enqueued_or_printed = true;
             }
         }

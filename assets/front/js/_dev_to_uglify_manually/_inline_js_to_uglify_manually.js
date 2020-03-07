@@ -139,32 +139,42 @@ window.nb_ = {};
         listenTo : function( evt, func ) {
             var bools = {
                 'nimble-jquery-loaded' : typeof undefined !== typeof jQuery,
-                'nimble-app-ready' : typeof undefined !== typeof window.nb_ && nb_.isEmitted('nimble-app-ready'),
+                'nimble-app-ready' : typeof undefined !== typeof window.nb_ && nb_.isListenedTo('nimble-jquery-loaded'),
                 'nimble-magnific-popup-loaded' : typeof undefined !== typeof jQuery && typeof undefined !== typeof jQuery.fn.magnificPopup,
                 'nimble-swiper-script-loaded' : typeof undefined !== typeof window.Swiper
             };
             if ( 'function' === typeof func ) {
               // For event without a boolean check, if the event has been emitted before the listener is fired, we know it's been emitted if stored in [] emittedEvents
-              if ( true === bools[evt] || ( nb_.isUndefined( bools[evt] ) && nb_.inArray( nb_.emittedEvents, evt ) ) ) { func(); }
-              else document.addEventListener(evt,func);
+              if ( true === bools[evt] || ( nb_.isUndefined( bools[evt] ) && nb_.isListenedTo( nb_.eventsListenedTo, evt ) ) ) {
+                  func();
+                  // store it, so if the event has been emitted before the listener is fired, we know it's been emitted
+                  nb_.eventsListenedTo.push(evt);
+              }
+              else {
+                  document.addEventListener(evt,function() {
+                      func();
+                      // store it, so if the event has been emitted before the listener is fired, we know it's been emitted
+                      nb_.eventsListenedTo.push(evt);
+                  });
+              }
             }
         },
         emittedEvents : [],
+        eventsListenedTo : [],
         emit : function( evt ) {
-            nb_.emittedEvents.push(evt);
             var _evt = document.createEvent('Event');
             _evt.initEvent(evt, true, true); //can bubble, and is cancellable
             document.dispatchEvent(_evt);
-            // store it, so if the event has been emitted before the listener is fired, we know it's been emitted
+            nb_.emittedEvents.push(evt);
         },
-        isEmitted : function( evt ) {
-            return ('string' === typeof evt) && nb_.inArray( nb_.emittedEvents, evt );
+        isListenedTo : function( evt ) {
+            return ('string' === typeof evt) && nb_.inArray( nb_.eventsListenedTo, evt );
         }
     };//window.nb_
 }(window, document ));
 
 
-// window.nb_.listenTo = function( evt, func ) {
+// nb_.listenTo = function( evt, func ) {
 //     var bools = {
 //         'nimble-jquery-loaded' : typeof undefined !== typeof jQuery,
 //         'nimble-app-ready' : typeof undefined !== typeof window.nb_ && nb_.isReady === true,
@@ -236,5 +246,5 @@ window.nb_ = {};
             });//jQuery( function($){
       };// onJQueryReady
 
-      window.nb_.listenTo('nimble-app-ready', callbackFunc );
+      nb_.listenTo('nimble-app-ready', callbackFunc );
 }(window, document));

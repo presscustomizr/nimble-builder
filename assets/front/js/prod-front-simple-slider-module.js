@@ -459,8 +459,8 @@
 
       // When loaded with defer, we can not be sure that jQuery will be loaded before
       // so let's make sure that we have both the plugin and jQuery loaded
-      window.nb_.listenTo( 'nimble-swiper-script-loaded', function() {
+      nb_.listenTo( 'nimble-swiper-script-loaded', function() {
           // on 'nimble-app-ready', jQuery is loaded
-          window.nb_.listenTo( 'nimble-app-ready', callbackFunc );
+          nb_.listenTo( 'nimble-app-ready', callbackFunc );
       });
 }(window, document));

@@ -5,7 +5,6 @@
 (function(w, d){
       var callbackFunc = function() {
           jQuery( function($){
-
               $( 'body' ).on( 'click sek-expand-accord-item', '.sek-accord-item > .sek-accord-title', function( evt ) {
                   //evt.preventDefault();
                   //evt.stopPropagation();
@@ -64,7 +63,7 @@
 
       };/////////////// callbackFunc
       // on 'nimble-app-ready', jQuery is loaded
-      window.nb_.listenTo('nimble-app-ready', callbackFunc );
+      nb_.listenTo('nimble-app-ready', callbackFunc );
 }(window, document));
 
 

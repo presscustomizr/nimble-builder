@@ -121,18 +121,19 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             // Print inline or enqueue ?
             $print_mode = Sek_Dyn_CSS_Handler::MODE_FILE;
             if ( is_customize_preview() ) {
-              $print_mode = Sek_Dyn_CSS_Handler::MODE_FILE;
+              $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
             } else if ( defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) {
               $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
             }
 
+            sek_error_log('print mode ?', $print_mode );
             // Which hook ?
             $fire_at_hook = '';
             if ( !defined( 'DOING_AJAX' ) && is_customize_preview() ) {
               $fire_at_hook = 'wp_head';
             }
             // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-            else if ( !defined( 'DOING_AJAX' ) && defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) {
+            else if ( !defined( 'DOING_AJAX' ) && !is_customize_preview() && defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) {
               $fire_at_hook = 'wp_head';
             }
 

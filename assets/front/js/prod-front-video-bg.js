@@ -544,6 +544,6 @@
       };/////////////// onJQueryReady
 
       // we
-      window.nb_.listenTo('nimble-app-ready', callbackFunc );
+      nb_.listenTo('nimble-app-ready', callbackFunc );
 }(window, document));
 

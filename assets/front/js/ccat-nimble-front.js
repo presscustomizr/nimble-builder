@@ -98,7 +98,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                               cache : true,// use the browser cached version when available
                               dataType: "script"
                         }).done(function() {
-                              console.log( params.path + ' is loaded', params );
+                              console.log( 'ASSET IS LOADED => ' + params.path, params );
                               if ( nb_.isFunction(params.loadcheck) && !params.loadcheck() ) {
                                   nb_.errorLog('ajaxLoadScript success but loadcheck failed for => ' + params.path );
                                   return;
@@ -116,41 +116,32 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                     //  func : function() {}
                     // }
                     maybeLoadAssetsWhenSelectorInScreen : function( params ) {
-                        params = $.extend( { elements : '', func : '' }, params );
+                        // do nothing if dynamic asset loading is not enabled for js and css
+                        if ( !sekFrontLocalized.load_front_partial_css_on_scroll && !sekFrontLocalized.load_front_module_js_on_scroll )
+                          return;
+
+                        params = $.extend( { id : '', elements : '', func : '' }, params );
                         console.log('params in maybeLoadScriptWhenSelectorInScreen', params );
+                        if ( 1 > params.id.length ) {
+                            nb_.errorLog('Nimble error => maybeLoadAssetsWhenSelectorInScreen => missing id', params );
+                          return;
+                        }
                         if ( 1 > $(params.elements).length )
                           return;
                         if ( !nb_.isFunction( params.func ) )
                           return;
-
-                        // Fire now or schedule when becoming visible.
-                        var isLoading = false;
-                        $.each( $(params.elements), function( k, el ) {
-                            if ( !isLoading && nb_.isInWindow($(el) ) ) {
-                                isLoading = true;
-                                params.func();
-                            }
-                        });
-                        if ( !isLoading ) {
-                              _scrollHandle = nb_.throttle( function() {
-                                    $.each( $(params.elements), function( k, el ) {
-                                        if ( !isLoading && nb_.isInWindow( $(el) ) ) {
-                                            isLoading = true;
-                                            params.func();
-                                        }
-                                    });
-                              }, 100 );
-                              nb_.cachedElements.$window.on( 'scroll', _scrollHandle );
-                        }
+                        nb_.scrollHandlers = nb_.scrollHandlers || {};
+                        nb_.scrollHandlers[params.id] = { elements : params.elements, func : params.func };
                     }
               });//$.extend( nb_
 
+              console.log('EMIT NIMBLE APP READY', jQuery);
               // now that nb_ has been populated, let's say it to the app
               nb_.emit('nimble-app-ready');
           });// jQuery( function($){
     };
     // 'nimble-jquery-loaded' is fired @'wp_footer' see inline script in ::_schedule_front_and_preview_assets_printing()
-    window.nb_.listenTo('nimble-jquery-loaded', callbackFunc );
+    nb_.listenTo('nimble-jquery-loaded', callbackFunc );
 
 }(window, document));/*global jQuery */
 /*!
@@ -217,7 +208,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
       };// onJQueryReady
 
       // on 'nimble-app-ready', jQuery is loaded
-      window.nb_.listenTo('nimble-app-ready', callbackFunc );
+      nb_.listenTo('nimble-app-ready', callbackFunc );
 }(window, document));// global sekFrontLocalized, nimbleListenTo
 /* ------------------------------------------------------------------------- *
  *  SCROLL TO ANCHOR
@@ -280,10 +271,92 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
         });
     };/////////////// callbackFunc
 
-    window.nb_.listenTo('nimble-app-ready', callbackFunc );
+    nb_.listenTo('nimble-app-ready', callbackFunc );
 }(window, document));// global sekFrontLocalized, nimbleListenTo
 /* ------------------------------------------------------------------------- *
- *  LIGHT BOX WITH MAGNIFIC POPUP
+ *  SCROLL LISTENER FOR DYNAMIC ASSET LOADING
+ /* ------------------------------------------------------------------------- */
+(function(w, d){
+    var callbackFunc = function() {
+        jQuery(function($){
+            // do nothing if dynamic asset loading is not enabled for js and css
+            if ( !sekFrontLocalized.load_front_partial_css_on_scroll && !sekFrontLocalized.load_front_module_js_on_scroll )
+              return;
+            // nb_.scrollHandlers = [
+            //    { id : 'swiper', elements : $(), func : function(){} }
+            //    ...
+            // ]
+            var _loopOnScrollHandlers = function() {
+                $.each( nb_.scrollHandlers, function( id, handlerParam ) {
+                    // has it been loaded already ?
+                    if ( handlerParam.loaded )
+                      return true;//<=> continue see https://api.jquery.com/jquery.each/
+
+                    if ( 1 > handlerParam.elements.length )
+                      return true;
+
+                    if( nb_.isFunction( handlerParam.func ) ) {
+                        try{ _loadAssetWhenElementVisible( id, handlerParam ); } catch(er){
+                            nb_.errorLog('Nimble error => _loadAssetWhenElementVisible', er, handlerParam );
+                        }
+                    } else {
+                        nb_.errorLog('Nimble error => _loadAssetWhenElementVisible => wrong callback func param', handlerParam );
+                    }
+
+                });
+            };
+
+            var _scrollHandle = nb_.throttle( _loopOnScrollHandlers, 100 );
+            // Fire now or schedule when becoming visible.
+            var _loadAssetWhenElementVisible = function( id, handlerParam ) {
+                var isLoading = false,
+                    $elements = handlerParam.elements,
+                    func = handlerParam.func;
+
+                $.each( $elements, function( k, el ) {
+                    if ( !isLoading && nb_.isInWindow($(el) ) ) {
+                        isLoading = true;
+                        func();
+                    }
+                });
+                if ( !isLoading ) {
+                    $.each( $elements, function( k, el ) {
+                        if ( !isLoading && nb_.isInWindow( $(el) ) ) {
+                            isLoading = true;
+                            func();
+                        }
+                    });
+                }
+                if ( isLoading ) {
+                    console.log('LOAD ASSET ?', id );
+                    // I've been executed forget about me
+                    nb_.scrollHandlers[id].loaded = true;
+                }
+
+                // check if we need to unbind the scroll handle when all assets are loaded
+                var allAssetsLoaded = true;
+                $.each( nb_.scrollHandlers, function( id, handlerParam ) {
+                    if ( true !== nb_.scrollHandlers[id].loaded ) {
+                        allAssetsLoaded = false;
+                    }
+                    return false !== allAssetsLoaded;//break the look on the first asset not loaded found
+                });
+                if ( allAssetsLoaded ) {
+                    console.log('ALL ASSETS LOADED');
+                    nb_.cachedElements.$window.unbind('scroll', _scrollHandle );
+                }
+            };//_loadAssetWhenElementVisible
+            // First try to load on page load
+            _loopOnScrollHandlers();
+            // then schedule loading on scroll
+            nb_.cachedElements.$window.on( 'scroll', _scrollHandle );
+        });//jQuery
+    };//callbackFunc
+
+    nb_.listenTo('nimble-app-ready', callbackFunc );
+}(window, document));// global sekFrontLocalized, nimbleListenTo
+/* ------------------------------------------------------------------------- *
+ *  LOAD MAGNIFIC POPUP
  /* ------------------------------------------------------------------------- */
 (function(w, d){
       var callbackFunc = function() {
@@ -292,11 +365,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
               // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
               if ( $linkCandidates.length < 1 )
                 return;
-              var _scrollHandle = function() {},//abstract that we can unbind
-                  doLoad = function() {
-                    // I've been executed forget about me
-                    nb_.cachedElements.$window.unbind( 'scroll', _scrollHandle );
-
+              var doLoad = function() {
                     if ( sekFrontLocalized.load_front_partial_css_on_scroll ) {
                         //Load the style
                         if ( $('head').find( '#czr-magnific-popup' ).length < 1 ) {
@@ -318,67 +387,22 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                 };// doLoad
 
             // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by window.nb_.listenTo()
-            if ( sekFrontLocalized.load_front_partial_css_on_scroll || sekFrontLocalized.load_front_module_js_on_scroll ) {
-                nb_.maybeLoadAssetsWhenSelectorInScreen( {
-                    elements : $linkCandidates,
-                    func : doLoad
-                });
-            }
+            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
+            nb_.maybeLoadAssetsWhenSelectorInScreen( {
+                id : 'magnific-popup',
+                elements : $linkCandidates,
+                func : doLoad
+            });
 
         });//jQuery(function($){})
     };/////////////// callbackFunc
     // When loaded with defer, we can not be sure that jQuery will be loaded before
-    window.nb_.listenTo( 'nimble-magnific-popup-dependant', function() {
-        window.nb_.listenTo('nimble-app-ready', callbackFunc );
+    nb_.listenTo( 'nimble-app-ready', function() {
+        console.log('SO??');
+        nb_.listenTo( 'nimble-needs-magnific-popup', callbackFunc );
     });
 
 }(window, document));
-
-(function(w, d){
-      var callbackFunc = function() {
-          jQuery(function($){
-              var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
-              // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
-              if ( $linkCandidates.length < 1 )
-                return;
-
-              $linkCandidates.each( function() {
-                  $linkCandidate = $(this);
-                  // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
-                  if ( $linkCandidate.length < 1 || 'string' !== typeof( $linkCandidate[0].protocol ) || -1 !== $linkCandidate[0].protocol.indexOf('javascript') )
-                    return;
-                  // Abort if candidate already setup
-                  if ( true === $linkCandidate.data('nimble-mfp-done') )
-                    return;
-
-                  try { $linkCandidate.magnificPopup({
-                      type: 'image',
-                      closeOnContentClick: true,
-                      closeBtnInside: true,
-                      fixedContentPos: true,
-                      mainClass: 'mfp-no-margins mfp-with-zoom', // class to remove default margin from left and right side
-                      image: {
-                        verticalFit: true
-                      },
-                      zoom: {
-                        enabled: true,
-                        duration: 300 // don't foget to change the duration also in CSS
-                      }
-                  }); } catch( er ) {
-                        nb_.errorLog( 'error in callback of nimble-magnific-popup-loaded => ', er );
-                  }
-                  $linkCandidate.data('nimble-mfp-done', true );
-              });
-          });//jQuery(function($){})
-    };/////////////// callbackFunc
-
-    window.nb_.listenTo('nimble-magnific-popup-loaded', callbackFunc );
-}(window, document));
-
-
-
-
 
 
 
@@ -393,15 +417,10 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
         jQuery(function($){
 
             // Load js plugin if needed
-            // // when the plugin is loaded => it emits 'nimble-swiper-ready' listened to by window.nb_.listenTo()
+            // // when the plugin is loaded => it emits 'nimble-swiper-ready' listened to by nb_.listenTo()
             // if ( nb_.scriptsLoadingStatus.swiper && 'resolved' === nb_.scriptsLoadingStatus.swiper.state() )
             //   return;
-            var _scrollHandle = function() {},//abstract that we can unbind
-                doLoad = function() {
-                  // I've been executed forget about me
-                  // so we execute the callback only once
-                  nb_.cachedElements.$window.unbind( 'scroll', _scrollHandle );
-
+            var doLoad = function() {
                   //Load the style
                   if ( sekFrontLocalized.load_front_partial_css_on_scroll ) {
                       if ( $('head').find( '#czr-swiper' ).length < 1 ) {
@@ -436,6 +455,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
               return;
 
             nb_.maybeLoadAssetsWhenSelectorInScreen( {
+                id : 'swiper',
                 elements : $swiperCandidates,
                 func : doLoad
             });
@@ -444,8 +464,8 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
 
     // When loaded with defer, we can not be sure that jQuery will be loaded before
     // on 'nimble-app-ready', jQuery is loaded
-    window.nb_.listenTo( 'nimble-swiper-dependant', function() {
-        window.nb_.listenTo('nimble-app-ready', callbackFunc );
+    nb_.listenTo( 'nimble-app-ready', function() {
+        nb_.listenTo('nimble-needs-swiper', callbackFunc );
     });
 }(window, document));
 
@@ -454,21 +474,12 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
 
 
 
+
 /* ------------------------------------------------------------------------- *
- *  SMARTLOAD
+ *  LOAD SMARTLOAD JQUERY PLUGIN
 /* ------------------------------------------------------------------------- */
 (function(w, d){
-    window.nb_.listenTo('nimble-lazyload-ready', function() {
-        jQuery(function($){
-              $('.sektion-wrapper').each( function() {
-                    try { $(this).nimbleLazyLoad(); } catch( er ) {
-                          nb_.errorLog( 'error with nimbleLazyLoad => ', er );
-                    }
-              });
-        });
-    });
-
-    window.nb_.listenTo('nimble-jquery-loaded', function() {
+    nb_.listenTo('nimble-jquery-loaded', function() {
         if ( !sekFrontLocalized.load_front_module_js_on_scroll )
             return;
         jQuery(function($){
@@ -480,6 +491,78 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
     });
 }(window, document));
 
+
+
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  LOAD PARALLAX BG JQUERY PLUGIN
+/* ------------------------------------------------------------------------- */
+(function(w, d){
+    nb_.listenTo('nimble-app-ready', function() {
+        jQuery(function($){
+            // is it loaded already ?
+            if ( nb_.isFunction( $.fn.parallaxBg ) )
+              return;
+            var $parallaxBGCandidates = $('[data-sek-bg-parallax="true"]');
+            // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
+            if ( $parallaxBGCandidates.length < 1 )
+              return;
+            var doLoad = function() {
+                if ( !nb_.isFunction( $.fn.parallaxBg ) && sekFrontLocalized.load_front_module_js_on_scroll ) {
+                    nb_.ajaxLoadScript({
+                        path : 'js/libs/nimble-parallax-bg.min.js',
+                        loadcheck : function() { return nb_.isFunction( $.fn.parallaxBg ); }
+                    });
+                }
+            };// doLoad
+
+            // Load js plugin if needed
+            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
+            nb_.maybeLoadAssetsWhenSelectorInScreen( {
+                id : 'parallax-bg',
+                elements : $parallaxBGCandidates,
+                func : doLoad
+            });
+        });// jQuery
+    });/////////////// callbackFunc
+}(window, document));
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  LOAD ACCORDION JS JQUERY DEPENDANT
+/* ------------------------------------------------------------------------- */
+(function(w, d){
+    var callbackFunc = function() {
+        jQuery(function($){
+            var $candidates = $('[data-sek-module-type="czr_accordion_module"]');
+            // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
+            if ( $candidates.length < 1 )
+              return;
+            var doLoad = function() {
+                //Load js
+                nb_.ajaxLoadScript({
+                    path : 'js/prod-front-accordion-module.js'
+                });
+            };// doLoad
+
+            // Load js plugin if needed
+            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
+            nb_.maybeLoadAssetsWhenSelectorInScreen( {
+                id : 'accordion',
+                elements : $candidates,
+                func : doLoad
+            });
+        });// jQuery
+    };/////////////// callbackFunc
+    nb_.listenTo('nimble-app-ready', function() {
+        nb_.listenTo('nimble-needs-accordion', callbackFunc );
+    });
+}(window, document));
 
 
 
@@ -516,7 +599,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
               return;
 
             // Load js plugin if needed
-            // when the plugin is loaded => it emits "nimble-fa-dependant" listened to by window.nb_.listenTo()
+            // when the plugin is loaded => it emits "nimble-needs-fontawesome" listened to by nb_.listenTo()
             var _scrollHandle = function() {},//abstract that we can unbind
                 doLoad = function() {
                   // I've been executed forget about me
@@ -557,17 +640,69 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
 
     // When loaded with defer, we can not be sure that jQuery will be loaded before
     //  on 'nimble-app-ready', jQuery is loaded
-    window.nb_.listenTo( 'nimble-fa-dependant', function() {
-        window.nb_.listenTo( 'nimble-app-ready', callbackFunc );
+    nb_.listenTo( 'nimble-app-ready', function() {
+        nb_.listenTo( 'nimble-needs-fontawesome', callbackFunc );
+    });
+}(window, document));// global sekFrontLocalized, nimbleListenTo
+/* ------------------------------------------------------------------------- *
+ *  LIGHT BOX WITH MAGNIFIC POPUP
+ /* ------------------------------------------------------------------------- */
+(function(w, d){
+    nb_.listenTo('nimble-magnific-popup-loaded', function() {
+        jQuery(function($){
+            var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
+            // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
+            if ( $linkCandidates.length < 1 )
+              return;
+
+            $linkCandidates.each( function() {
+                $linkCandidate = $(this);
+                // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
+                if ( $linkCandidate.length < 1 || 'string' !== typeof( $linkCandidate[0].protocol ) || -1 !== $linkCandidate[0].protocol.indexOf('javascript') )
+                  return;
+                // Abort if candidate already setup
+                if ( true === $linkCandidate.data('nimble-mfp-done') )
+                  return;
+
+                try { $linkCandidate.magnificPopup({
+                    type: 'image',
+                    closeOnContentClick: true,
+                    closeBtnInside: true,
+                    fixedContentPos: true,
+                    mainClass: 'mfp-no-margins mfp-with-zoom', // class to remove default margin from left and right side
+                    image: {
+                      verticalFit: true
+                    },
+                    zoom: {
+                      enabled: true,
+                      duration: 300 // don't foget to change the duration also in CSS
+                    }
+                }); } catch( er ) {
+                      nb_.errorLog( 'error in callback of nimble-magnific-popup-loaded => ', er );
+                }
+                $linkCandidate.data('nimble-mfp-done', true );
+            });
+        });//jQuery(function($){})
     });
 }(window, document));
 
 
 
 
-
-
-
+/* ------------------------------------------------------------------------- *
+ *  SMARTLOAD
+/* ------------------------------------------------------------------------- */
+(function(w, d){
+    nb_.listenTo('nimble-lazyload-loaded', function() {
+        jQuery(function($){
+              $('.sektion-wrapper').each( function() {
+                    try { $(this).nimbleLazyLoad(); } catch( er ) {
+                          nb_.errorLog( 'error with nimbleLazyLoad => ', er );
+                    }
+              });
+        });
+    });
+}(window, document));
 
 
 
@@ -575,7 +710,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
  *  BG PARALLAX
 /* ------------------------------------------------------------------------- */
 (function(w, d){
-    window.nb_.listenTo('nimble-parallax-ready', function() {
+    nb_.listenTo('nimble-parallax-loaded', function() {
         jQuery(function($){
               $('[data-sek-bg-parallax="true"]').each( function() {
                     $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );

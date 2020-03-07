@@ -8628,4 +8628,4 @@
 
 }));
 // on 'nimble-app-ready', jQuery is loaded
-window.nb_.listenTo('nimble-app-ready', function(){nb_.emit('nimble-swiper-script-loaded');});
+nb_.listenTo('nimble-app-ready', function(){nb_.emit('nimble-swiper-script-loaded');});
