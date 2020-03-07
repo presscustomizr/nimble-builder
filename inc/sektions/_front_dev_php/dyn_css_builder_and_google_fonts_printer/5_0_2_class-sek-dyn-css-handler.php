@@ -452,7 +452,7 @@ class Sek_Dyn_CSS_Handler {
         }// if ( self::MODE_FILE )
         // case when defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE
         // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-        else if ( self::MODE_INLINE == $this->mode ) {
+        else if ( !is_customize_preview() && self::MODE_INLINE == $this->mode ) {
             if ( $this->file_exists ) {
                 printf( '<link rel="stylesheet" id="sek-dyn-%1$s-css" href="%2$s" type="text/css" media="all" />',
                     $this->id,

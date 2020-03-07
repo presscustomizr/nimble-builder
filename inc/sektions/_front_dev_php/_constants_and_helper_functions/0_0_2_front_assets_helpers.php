@@ -124,7 +124,7 @@ function sek_load_front_js_assets_on_scroll() {
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
 function sek_load_front_partial_css_assets_on_scroll() {
-    return defined('NIMBLE_LOAD_FRONT_MODULE_CSS_ON_SCROLL') && NIMBLE_LOAD_FRONT_MODULE_CSS_ON_SCROLL;
+    return !skp_is_customizing() && defined('NIMBLE_LOAD_FRONT_MODULE_CSS_ON_SCROLL') && NIMBLE_LOAD_FRONT_MODULE_CSS_ON_SCROLL;
 }
 
 // @return bool
