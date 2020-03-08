@@ -5,9 +5,6 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-
-
-
 if ( ! function_exists( 'Nimble\sek_print_accordion' ) ) {
   function sek_print_accordion( $accord_collec = array(), $accord_opts, $model ) {
       $accord_collec = is_array( $accord_collec ) ? $accord_collec : array();
@@ -68,7 +65,7 @@ $accord_opts = !empty($value['accord_opts']) ? $value['accord_opts'] : array();
 
 if ( !empty( $accord_collec ) ) {
     sek_print_accordion( $accord_collec, $accord_opts, $model );
-    ?><script>nb_.emit('nimble-needs-accordion');</script><?php
+    ?><script>nb_.emit('nb-needs-accordion');</script><?php
 } else {
     if ( skp_is_customizing() ) {
         printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',

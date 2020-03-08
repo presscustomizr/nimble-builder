@@ -73,6 +73,6 @@ if ( !isset( $content_settings['link-to'] ) || isset( $content_settings['link-to
 }
 if ( !empty(sek_get_button_module_icon( $content_settings )) ) {
   ?>
-  <script>nb_.listenTo('nimble-app-ready',function(){nb_.emit('nimble-needs-fontawesome');});</script>
+  <script>nb_.listenTo('nimble-app-ready',function(){nb_.emit('nb-needs-fontawesome');});</script>
   <?php
 }

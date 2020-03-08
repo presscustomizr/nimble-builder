@@ -449,7 +449,7 @@ class Sek_Dyn_CSS_Handler {
                 $this->enqueued_or_printed = true;
             }
         }// if ( self::MODE_FILE )
-        // case when defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE
+        // case when sek_inline_dynamic_stylesheets_on_front()
         // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
         else if ( !is_customize_preview() && self::MODE_INLINE == $this->mode ) {
             global $wp_filesystem;

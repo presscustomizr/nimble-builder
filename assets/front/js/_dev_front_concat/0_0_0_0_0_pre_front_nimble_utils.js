@@ -13,6 +13,35 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                 };
               });
 
+              //https://underscorejs.org/docs/underscore.html#section-17
+              //helper for nb_.delay
+              var _restArguments = function(func, startIndex) {
+                  startIndex = startIndex == null ? func.length - 1 : +startIndex;
+                  return function() {
+                      var length = Math.max(arguments.length - startIndex, 0),
+                          rest = Array(length),
+                          index = 0;
+                      for (; index < length; index++) {
+                        rest[index] = arguments[index + startIndex];
+                      }
+                      switch (startIndex) {
+                        case 0: return func.call(this, rest);
+                        case 1: return func.call(this, arguments[0], rest);
+                        case 2: return func.call(this, arguments[0], arguments[1], rest);
+                      }
+                      var args = Array(startIndex + 1);
+                      for (index = 0; index < startIndex; index++) {
+                        args[index] = arguments[index];
+                      }
+                      args[startIndex] = rest;
+                      return func.apply(this, args);
+                  };
+              };
+              // helper for nb_.throttle()
+              var _now = function() {
+                  return Date.now || new Date().getTime();
+              };
+
               $.extend( nb_, {
                     cachedElements : {
                         $window : $(window),
@@ -77,14 +106,13 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                         //       cache : true,// use the browser cached version when available
                         //       dataType: "script"
                         // }).done(function() {
-                        //       //the script is loaded. Say it globally.
-                        //       nb_.scriptsLoadingStatus.swiper.resolve();
                         // }).fail( function() {
                         //       nb_.errorLog('script instantiation failed');
                         // });
                     //  }
                     //  loadcheck : 'function' === typeof( window.Swiper )
                     // }
+                    scriptsLoadingStatus : {},// <= will be populated with the script loading promises
                     ajaxLoadScript : function( params ) {
                         params = $.extend( { path : '', complete : '', loadcheck : false }, params );
                         // Bail if the load request has already been made, but not yet finished.
@@ -110,8 +138,88 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                         }).fail( function() {
                               nb_.errorLog('ajaxLoadScript failed for => ' + params.path );
                         });
-                    }//ajaxLoadScript
+                    },//ajaxLoadScript
+
+
+
+                    // HELPERS COPIED FROM UNDERSCORE
+                    has : function(obj, path) {
+                        if (!_.isArray(path)) {
+                          return obj != null && hasOwnProperty.call(obj, path);
+                        }
+                        var length = path.length;
+                        for (var i = 0; i < length; i++) {
+                          var key = path[i];
+                          if (obj == null || !Object.prototype.hasOwnProperty.call(obj, key)) {
+                            return false;
+                          }
+                          obj = obj[key];
+                        }
+                        return !!length;
+                    },
+                    // https://davidwalsh.name/javascript-debounce-function
+                    debounce : function(func, wait, immediate) {
+                        var timeout;
+                        return function() {
+                            var context = this, args = arguments;
+                            var later = function() {
+                              timeout = null;
+                              if (!immediate) func.apply(context, args);
+                            };
+                            var callNow = immediate && !timeout;
+                            clearTimeout(timeout);
+                            timeout = setTimeout(later, wait);
+                            if (callNow) func.apply(context, args);
+                        };
+                    },
+                    // https://underscorejs.org/docs/underscore.html#section-85
+                    throttle : function(func, wait, options) {
+                        var timeout, context, args, result;
+                        var previous = 0;
+                        if (!options) options = {};
+
+                        var later = function() {
+                          previous = options.leading === false ? 0 : _now();
+                          timeout = null;
+                          result = func.apply(context, args);
+                          if (!timeout) context = args = null;
+                        };
+
+                        var throttled = function() {
+                            var now = _now();
+                            if (!previous && options.leading === false) previous = now;
+                            var remaining = wait - (now - previous);
+                            context = this;
+                            args = arguments;
+                            if (remaining <= 0 || remaining > wait) {
+                              if (timeout) {
+                                clearTimeout(timeout);
+                                timeout = null;
+                              }
+                              previous = now;
+                              result = func.apply(context, args);
+                              if (!timeout) context = args = null;
+                            } else if (!timeout && options.trailing !== false) {
+                              timeout = setTimeout(later, remaining);
+                            }
+                            return result;
+                        };
+
+                        throttled.cancel = function() {
+                            clearTimeout(timeout);
+                            previous = 0;
+                            timeout = context = args = null;
+                        };
+
+                        return throttled;
+                    },
+                    delay : _restArguments(function(func, wait, args) {
+                        return setTimeout(function() {
+                          return func.apply(null, args);
+                        }, wait);
+                    })
               });//$.extend( nb_
+
               // now that nb_ has been populated, let's say it to the app
               nb_.emit('nimble-app-ready');
           });// jQuery( function($){

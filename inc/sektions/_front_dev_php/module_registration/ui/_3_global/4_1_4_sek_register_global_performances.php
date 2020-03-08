@@ -14,18 +14,17 @@ function sek_get_module_params_for_sek_global_performances() {
             'item-inputs' => array(
                 'global-img-smart-load' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Load images on scroll', 'text_doma'),
+                    'title'       => __('Defer loading of offscreen images', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after' => sprintf('%1$s <br/><strong>%2$s</strong>',
-                        __( 'Check this option to delay the loading of non visible images. Images outside the window will be dynamically loaded when scrolling. This can improve performance by reducing the weight of long web pages including multiple images.', 'text_dom'),
+                    'notice_after' => sprintf('<strong>%1$s</strong>',
                         __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
                     )
                 ),
                 'global-bg-video-lazy-load' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Lazy load video backgrounds', 'text_doma'),
+                    'title'       => __('Defer loading video backgrounds', 'text_doma'),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -33,7 +32,42 @@ function sek_get_module_params_for_sek_global_performances() {
                     //     __( 'Load video backgrounds when', 'text_dom'),
                     //     __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
                     // )
-                )
+                ),
+                'use_partial_module_stylesheets' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Use partial CSS stylesheets for modules', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'print_partial_module_stylesheets_inline' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Print module stylesheets inline', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'print_dyn_stylesheets_inline' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Print generated stylesheets inline', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'load_front_assets_in_ajax' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Defer loading of module assets when modules are offscreen', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+                'load_js_async' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Load javascript asynchronously', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
             )
         )//tmpl
     );

@@ -91,4 +91,4 @@ else :
     );
 endif;
 ?>
-<script>nb_.emit('nimble-needs-fontawesome');</script>
+<script>nb_.emit('nb-needs-fontawesome');</script>

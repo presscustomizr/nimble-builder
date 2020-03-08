@@ -117,34 +117,56 @@ function sek_is_front_jquery_dequeued() {
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/626
-function sek_load_front_js_assets_on_scroll() {
-    return defined('NIMBLE_LOAD_FRONT_MODULE_JS_ON_SCROLL') && NIMBLE_LOAD_FRONT_MODULE_JS_ON_SCROLL;
+function sek_load_front_assets_on_scroll() {
+    $glob_perf = sek_get_global_option_value( 'performances' );
+    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['load_front_assets_in_ajax'] ) ) {
+        return sek_booleanize_checkbox_val( $glob_perf['load_front_assets_in_ajax'] );
+    }
+    return false;
+    //return defined('NIMBLE_LOAD_FRONT_MODULE_JS_ON_SCROLL') && NIMBLE_LOAD_FRONT_MODULE_JS_ON_SCROLL;
 }
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-function sek_load_front_partial_css_assets_on_scroll() {
-    return !skp_is_customizing() && defined('NIMBLE_LOAD_FRONT_MODULE_CSS_ON_SCROLL') && NIMBLE_LOAD_FRONT_MODULE_CSS_ON_SCROLL;
+function sek_inline_module_stylesheets_on_front() {
+    $glob_perf = sek_get_global_option_value( 'performances' );
+    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['print_partial_module_stylesheets_inline'] ) ) {
+        return sek_booleanize_checkbox_val( $glob_perf['print_partial_module_stylesheets_inline'] );
+    }
+    return false;
+    //return !skp_is_customizing() && defined('NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE') && NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE;
 }
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-function sek_inline_stylesheets_on_front() {
-    return !skp_is_customizing() && defined('NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE') && NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE;
+function sek_inline_dynamic_stylesheets_on_front() {
+    $glob_perf = sek_get_global_option_value( 'performances' );
+    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['print_dyn_stylesheets_inline'] ) ) {
+        return sek_booleanize_checkbox_val( $glob_perf['print_dyn_stylesheets_inline'] );
+    }
+    return false;
 }
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
 function sek_use_split_stylesheets_on_front() {
-    return !skp_is_customizing() && defined('NIMBLE_USE_SPLIT_STYLESHEETS') && NIMBLE_USE_SPLIT_STYLESHEETS;
+    $glob_perf = sek_get_global_option_value( 'performances' );
+    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['use_partial_module_stylesheets'] ) ) {
+        return sek_booleanize_checkbox_val( $glob_perf['use_partial_module_stylesheets'] );
+    }
+    return false;
+    //return !skp_is_customizing() && defined('NIMBLE_USE_SPLIT_STYLESHEETS') && NIMBLE_USE_SPLIT_STYLESHEETS;
 }
 
 
 // Adds async/defer attributes to enqueued / registered scripts.
 // works with ::sek_filter_script_loader_tag loaded @'script_loader_tag'
 function sek_wp_script_add_data( $handle, $attribute = 'async', $bool = true ) {
-    if ( skp_is_customizing() || ( defined('NIMBLE_LOAD_FRONT_ASSETS_ASYNC') && !NIMBLE_LOAD_FRONT_ASSETS_ASYNC ) )
-      return;
-    wp_script_add_data( $handle, $attribute, $bool );
+    // if ( skp_is_customizing() || ( defined('NIMBLE_LOAD_FRONT_ASSETS_ASYNC') && !NIMBLE_LOAD_FRONT_ASSETS_ASYNC ) )
+    //   return;
+    $glob_perf = sek_get_global_option_value( 'performances' );
+    if ( !skp_is_customizing() && !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['load_js_async'] ) && sek_booleanize_checkbox_val( $glob_perf['load_js_async'] ) ) {
+        wp_script_add_data( $handle, $attribute, $bool );
+    }
 }
 ?>

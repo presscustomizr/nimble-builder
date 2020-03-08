@@ -6,37 +6,6 @@
 window.nb_ = {};
 // Jquery agnostic
 (function(w, d){
-    //https://underscorejs.org/docs/underscore.html#section-17
-    var restArguments = function(func, startIndex) {
-      startIndex = startIndex == null ? func.length - 1 : +startIndex;
-      return function() {
-        var length = Math.max(arguments.length - startIndex, 0),
-            rest = Array(length),
-            index = 0;
-        for (; index < length; index++) {
-          rest[index] = arguments[index + startIndex];
-        }
-        switch (startIndex) {
-          case 0: return func.call(this, rest);
-          case 1: return func.call(this, arguments[0], rest);
-          case 2: return func.call(this, arguments[0], arguments[1], rest);
-        }
-        var args = Array(startIndex + 1);
-        for (index = 0; index < startIndex; index++) {
-          args[index] = arguments[index];
-        }
-        args[startIndex] = rest;
-        return func.apply(this, args);
-      };
-    };
-    var has = function(obj, path) {
-      return obj != null && hasOwnProperty.call(obj, path);
-    };
-    // helper for nb_.throttle()
-    var _now = Date.now || function() {
-      return new Date().getTime();
-    };
-
     window.nb_ = {
         isArray : function(obj) {
             return Array.isArray(obj) || toString.call(obj) === '[object Array]';
@@ -53,81 +22,6 @@ window.nb_ = {};
           var type = typeof obj;
           return type === 'function' || type === 'object' && !!obj;
         },
-        has : function(obj, path) {
-          if (!_.isArray(path)) {
-            return has(obj, path);
-          }
-          var length = path.length;
-          for (var i = 0; i < length; i++) {
-            var key = path[i];
-            if (obj == null || !Object.prototype.hasOwnProperty.call(obj, key)) {
-              return false;
-            }
-            obj = obj[key];
-          }
-          return !!length;
-        },
-        // https://davidwalsh.name/javascript-debounce-function
-        debounce : function(func, wait, immediate) {
-          var timeout;
-          return function() {
-            var context = this, args = arguments;
-            var later = function() {
-              timeout = null;
-              if (!immediate) func.apply(context, args);
-            };
-            var callNow = immediate && !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            if (callNow) func.apply(context, args);
-          };
-        },
-        // https://underscorejs.org/docs/underscore.html#section-85
-        throttle : function(func, wait, options) {
-          var timeout, context, args, result;
-          var previous = 0;
-          if (!options) options = {};
-
-          var later = function() {
-            previous = options.leading === false ? 0 : _now();
-            timeout = null;
-            result = func.apply(context, args);
-            if (!timeout) context = args = null;
-          };
-
-          var throttled = function() {
-            var now = _now();
-            if (!previous && options.leading === false) previous = now;
-            var remaining = wait - (now - previous);
-            context = this;
-            args = arguments;
-            if (remaining <= 0 || remaining > wait) {
-              if (timeout) {
-                clearTimeout(timeout);
-                timeout = null;
-              }
-              previous = now;
-              result = func.apply(context, args);
-              if (!timeout) context = args = null;
-            } else if (!timeout && options.trailing !== false) {
-              timeout = setTimeout(later, remaining);
-            }
-            return result;
-          };
-
-          throttled.cancel = function() {
-            clearTimeout(timeout);
-            previous = 0;
-            timeout = context = args = null;
-          };
-
-          return throttled;
-        },
-        delay : restArguments(function(func, wait, args) {
-          return setTimeout(function() {
-            return func.apply(null, args);
-          }, wait);
-        }),
         // safe console log for
         errorLog : function() {
             //fix for IE, because console is only defined when in F12 debugging mode in IE
@@ -135,7 +29,6 @@ window.nb_ = {};
               return;
             console.log.apply(console,arguments);
         },
-        scriptsLoadingStatus : {},// <= will be populated with the script loading promises
         listenTo : function( evt, func ) {
             var canWeFireCallbackForEvent = {
                 'nimble-jquery-loaded' : function() { return typeof undefined !== typeof jQuery; },
