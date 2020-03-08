@@ -98,7 +98,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                               cache : true,// use the browser cached version when available
                               dataType: "script"
                         }).done(function() {
-                              console.log( 'ASSET IS LOADED => ' + params.path, params );
+                              //console.log( 'ASSET IS LOADED => ' + params.path, params );
                               if ( nb_.isFunction(params.loadcheck) && !params.loadcheck() ) {
                                   nb_.errorLog('ajaxLoadScript success but loadcheck failed for => ' + params.path );
                                   return;
@@ -110,32 +110,8 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                         }).fail( function() {
                               nb_.errorLog('ajaxLoadScript failed for => ' + params.path );
                         });
-                    },//ajaxLoadScript
-                    // params = {
-                    //  elements : $swiperCandidate,
-                    //  func : function() {}
-                    // }
-                    maybeLoadAssetsWhenSelectorInScreen : function( params ) {
-                        // do nothing if dynamic asset loading is not enabled for js and css
-                        if ( !sekFrontLocalized.load_front_partial_css_on_scroll && !sekFrontLocalized.load_front_module_js_on_scroll )
-                          return;
-
-                        params = $.extend( { id : '', elements : '', func : '' }, params );
-                        console.log('params in maybeLoadScriptWhenSelectorInScreen', params );
-                        if ( 1 > params.id.length ) {
-                            nb_.errorLog('Nimble error => maybeLoadAssetsWhenSelectorInScreen => missing id', params );
-                          return;
-                        }
-                        if ( 1 > $(params.elements).length )
-                          return;
-                        if ( !nb_.isFunction( params.func ) )
-                          return;
-                        nb_.scrollHandlers = nb_.scrollHandlers || {};
-                        nb_.scrollHandlers[params.id] = { elements : params.elements, func : params.func };
-                    }
+                    }//ajaxLoadScript
               });//$.extend( nb_
-
-              console.log('EMIT NIMBLE APP READY', jQuery);
               // now that nb_ has been populated, let's say it to the app
               nb_.emit('nimble-app-ready');
           });// jQuery( function($){
@@ -277,7 +253,66 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
  *  SCROLL LISTENER FOR DYNAMIC ASSET LOADING
  /* ------------------------------------------------------------------------- */
 (function(w, d){
-    var callbackFunc = function() {
+    // Fire now or schedule when becoming visible.
+    nb_.loadAssetWhenElementVisible = function( id, handlerParams ) {
+        if ( nb_.scrollHandlers[id].loaded )
+          return;
+        nb_.scrollHandlers[id].loaded = false;
+        var $elements = handlerParams.elements,
+            loaderFunc = handlerParams.func;
+
+        $.each( $elements, function( k, el ) {
+            if ( !nb_.scrollHandlers[id].loaded && nb_.isInWindow($(el) ) ) {
+                loaderFunc();
+                nb_.scrollHandlers[id].loaded = true;
+                //console.log('LOAD ASSET ?', id );
+            }
+        });
+        // check if we need to unbind the scroll handle when all assets are loaded
+        var allAssetsLoaded = true;
+        $.each( nb_.scrollHandlers, function( id, handlerParams ) {
+            if ( true !== nb_.scrollHandlers[id].loaded ) {
+                allAssetsLoaded = false;
+            }
+            return false !== allAssetsLoaded;//break the look on the first asset not loaded found
+        });
+        if ( allAssetsLoaded ) {
+            //console.log('ALL ASSETS LOADED');
+            nb_.cachedElements.$window.unbind('scroll', nb_.scrollHandleForLoadingAssets );
+        }
+    };//_loadAssetWhenElementVisible
+
+    nb_.loopOnScrollHandlers = function() {
+        $.each( nb_.scrollHandlers, function( id, handlerParams ) {
+            // has it been loaded already ?
+            if ( handlerParams.loaded )
+              return true;//<=> continue see https://api.jquery.com/jquery.each/
+
+            if ( 1 > handlerParams.elements.length )
+              return true;
+
+            if( nb_.isFunction( handlerParams.func ) ) {
+                try{ nb_.loadAssetWhenElementVisible( id, handlerParams ); } catch(er){
+                    nb_.errorLog('Nimble error => nb_.loopOnScrollHandlers', er, handlerParams );
+                }
+            } else {
+                nb_.errorLog('Nimble error => nb_.loopOnScrollHandlers => wrong callback func param', handlerParams );
+            }
+
+        });
+    };
+
+    // each time a new scroll handler is added, it emits the event 'nimble-new-scroll-handler-added'
+    // so when caught, let's try to detect any dependant element is visible in the page
+    // and if so, load.
+    // Typically useful on page load if for example the slider is on top of the page and we need to load swiper.js right away before scrolling
+    nb_.listenTo('nimble-new-scroll-handler-added', nb_.loopOnScrollHandlers );
+
+    // bound on scroll,
+    // unbound when all assets are loaded
+    nb_.scrollHandleForLoadingAssets = nb_.throttle( nb_.loopOnScrollHandlers, 100 );
+
+    nb_.listenTo('nimble-app-ready', function() {
         jQuery(function($){
             // do nothing if dynamic asset loading is not enabled for js and css
             if ( !sekFrontLocalized.load_front_partial_css_on_scroll && !sekFrontLocalized.load_front_module_js_on_scroll )
@@ -286,79 +321,42 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
             //    { id : 'swiper', elements : $(), func : function(){} }
             //    ...
             // ]
-            var _loopOnScrollHandlers = function() {
-                $.each( nb_.scrollHandlers, function( id, handlerParam ) {
-                    // has it been loaded already ?
-                    if ( handlerParam.loaded )
-                      return true;//<=> continue see https://api.jquery.com/jquery.each/
-
-                    if ( 1 > handlerParam.elements.length )
-                      return true;
-
-                    if( nb_.isFunction( handlerParam.func ) ) {
-                        try{ _loadAssetWhenElementVisible( id, handlerParam ); } catch(er){
-                            nb_.errorLog('Nimble error => _loadAssetWhenElementVisible', er, handlerParam );
-                        }
-                    } else {
-                        nb_.errorLog('Nimble error => _loadAssetWhenElementVisible => wrong callback func param', handlerParam );
-                    }
-
-                });
-            };
-
-            var _scrollHandle = nb_.throttle( _loopOnScrollHandlers, 100 );
-            // Fire now or schedule when becoming visible.
-            var _loadAssetWhenElementVisible = function( id, handlerParam ) {
-                var isLoading = false,
-                    $elements = handlerParam.elements,
-                    func = handlerParam.func;
-
-                $.each( $elements, function( k, el ) {
-                    if ( !isLoading && nb_.isInWindow($(el) ) ) {
-                        isLoading = true;
-                        func();
-                    }
-                });
-                if ( !isLoading ) {
-                    $.each( $elements, function( k, el ) {
-                        if ( !isLoading && nb_.isInWindow( $(el) ) ) {
-                            isLoading = true;
-                            func();
-                        }
-                    });
-                }
-                if ( isLoading ) {
-                    console.log('LOAD ASSET ?', id );
-                    // I've been executed forget about me
-                    nb_.scrollHandlers[id].loaded = true;
-                }
-
-                // check if we need to unbind the scroll handle when all assets are loaded
-                var allAssetsLoaded = true;
-                $.each( nb_.scrollHandlers, function( id, handlerParam ) {
-                    if ( true !== nb_.scrollHandlers[id].loaded ) {
-                        allAssetsLoaded = false;
-                    }
-                    return false !== allAssetsLoaded;//break the look on the first asset not loaded found
-                });
-                if ( allAssetsLoaded ) {
-                    console.log('ALL ASSETS LOADED');
-                    nb_.cachedElements.$window.unbind('scroll', _scrollHandle );
-                }
-            };//_loadAssetWhenElementVisible
-            // First try to load on page load
-            _loopOnScrollHandlers();
-            // then schedule loading on scroll
-            nb_.cachedElements.$window.on( 'scroll', _scrollHandle );
+            //
+            // schedule loading on scroll
+            // unbound when all assets are loaded
+            nb_.cachedElements.$window.on( 'scroll', nb_.scrollHandleForLoadingAssets );
         });//jQuery
-    };//callbackFunc
-
-    nb_.listenTo('nimble-app-ready', callbackFunc );
-}(window, document));// global sekFrontLocalized, nimbleListenTo
+    });
+}(window, document));// global sekFrontLocalized, nimbleListenTo, nb_
 /* ------------------------------------------------------------------------- *
  *  LOAD MAGNIFIC POPUP
  /* ------------------------------------------------------------------------- */
 (function(w, d){
+      // params = {
+      //  elements : $swiperCandidate,
+      //  func : function() {}
+      // }
+      nb_.maybeLoadAssetsWhenSelectorInScreen = function( params ) {
+          // do nothing if dynamic asset loading is not enabled for js and css
+          if ( !sekFrontLocalized.load_front_partial_css_on_scroll && !sekFrontLocalized.load_front_module_js_on_scroll )
+            return;
+
+          params = $.extend( { id : '', elements : '', func : '' }, params );
+
+          if ( 1 > params.id.length ) {
+              nb_.errorLog('Nimble error => maybeLoadAssetsWhenSelectorInScreen => missing id', params );
+            return;
+          }
+          if ( 1 > $(params.elements).length )
+            return;
+          if ( !nb_.isFunction( params.func ) )
+            return;
+          nb_.scrollHandlers = nb_.scrollHandlers || {};
+          var handlerParams = { elements : params.elements, func : params.func };
+          nb_.scrollHandlers[params.id] = handlerParams;
+          nb_.emit('nimble-new-scroll-handler-added', handlerParams);
+      };
+
       var callbackFunc = function() {
           jQuery(function($){
               var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
@@ -398,7 +396,6 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
     };/////////////// callbackFunc
     // When loaded with defer, we can not be sure that jQuery will be loaded before
     nb_.listenTo( 'nimble-app-ready', function() {
-        console.log('SO??');
         nb_.listenTo( 'nimble-needs-magnific-popup', callbackFunc );
     });
 
@@ -415,7 +412,8 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
 (function(w, d){
     var callbackFunc = function() {
         jQuery(function($){
-
+            if ( !sekFrontLocalized.load_front_module_js_on_scroll && !sekFrontLocalized.load_front_partial_css_on_scroll )
+              return;
             // Load js plugin if needed
             // // when the plugin is loaded => it emits 'nimble-swiper-ready' listened to by nb_.listenTo()
             // if ( nb_.scriptsLoadingStatus.swiper && 'resolved' === nb_.scriptsLoadingStatus.swiper.state() )
@@ -504,6 +502,8 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
 (function(w, d){
     nb_.listenTo('nimble-app-ready', function() {
         jQuery(function($){
+            if ( !sekFrontLocalized.load_front_module_js_on_scroll )
+              return;
             // is it loaded already ?
             if ( nb_.isFunction( $.fn.parallaxBg ) )
               return;
@@ -539,6 +539,8 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
 (function(w, d){
     var callbackFunc = function() {
         jQuery(function($){
+            if ( !sekFrontLocalized.load_front_module_js_on_scroll )
+              return;
             var $candidates = $('[data-sek-module-type="czr_accordion_module"]');
             // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
             if ( $candidates.length < 1 )
@@ -578,34 +580,17 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
     var callbackFunc = function() {
         jQuery(function($){
             // we don't need to inject font awesome if already enqueued by a theme
-            if ( !sekFrontLocalized.load_front_assets_on_scroll || sekFrontLocalized.fontAwesomeAlreadyEnqueued )
+            if ( !sekFrontLocalized.load_front_partial_css_on_scroll || sekFrontLocalized.fontAwesomeAlreadyEnqueued )
               return;
 
-            var modulesPrintedOnPage = sekFrontLocalized.contextuallyActiveModules,
-                fontAwesomeCandidates = [],
-                $fontAwesomeCandidates;
+            var $candidates = $('i[class*=fa-]');
 
-            // $.each( modulesFADependant, function( key, moduleType ) {
-            //     if ( !nb_.isUndefined( modulesPrintedOnPage[moduleType] ) ) {
-            //         var _candidate = '[data-sek-module-type="'+ moduleType +'"]';
-            //         if ( $(_candidate).length > 0 ) {
-            //             fontAwesomeCandidates.push( _candidate );
-            //         }
-            //     }
-            // });
-            $fontAwesomeCandidates = $('i[class*=fa-]');
-
-            if ( $fontAwesomeCandidates.length < 1 )
+            if ( $candidates.length < 1 )
               return;
 
             // Load js plugin if needed
             // when the plugin is loaded => it emits "nimble-needs-fontawesome" listened to by nb_.listenTo()
-            var _scrollHandle = function() {},//abstract that we can unbind
-                doLoad = function() {
-                  // I've been executed forget about me
-                  // so we execute the callback only once
-                  nb_.cachedElements.$window.unbind( 'scroll', _scrollHandle );
-
+            var doLoad = function() {
                   //Load the style
                   if ( $('head').find( '#czr-font-awesome' ).length < 1 ) {
                         $('head').append( $('<link/>' , {
@@ -616,25 +601,13 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                         }) );
                   }
             };// doLoad
-            var isLoading = false;
-            // Fire now or schedule when becoming visible.
-            $.each( $fontAwesomeCandidates, function( k, el ) {
-                if ( !isLoading && nb_.isInWindow($(el) ) ) {
-                    isLoading = true;
-                    doLoad();
-                }
+            // Load js plugin if needed
+            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
+            nb_.maybeLoadAssetsWhenSelectorInScreen({
+                id : 'font-awesome',
+                elements : $candidates,
+                func : doLoad
             });
-            if ( !isLoading ) {
-                  _scrollHandle = nb_.throttle( function() {
-                        $.each( $fontAwesomeCandidates, function( k, el ) {
-                            if ( !isLoading && nb_.isInWindow( $(el) ) ) {
-                                isLoading = true;
-                                doLoad();
-                            }
-                        });
-                  }, 100 );
-                  nb_.cachedElements.$window.on( 'scroll', _scrollHandle );
-            }
         });//jQuery(function($){})
     };/////////////// callbackFunc
 

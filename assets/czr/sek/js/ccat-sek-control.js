@@ -16913,7 +16913,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // //update the item model on social-icon change
                         // item.bind('icon:changed', function(){
-                        //       console.log('MERDE ?');
                         //       //item.module.updateItemModel( item );
                         // });
                         //fire the parent
