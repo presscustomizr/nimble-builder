@@ -172,6 +172,9 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         // March 2020
         public $modules_dependant_of_font_awesome = [ 'czr_button_module', 'czr_icon_module', 'czr_social_icons_module' ];
 
+        // March 2020, for https://github.com/presscustomizr/nimble-builder/issues/629
+        public $google_fonts_print_candidates = 'not_set';// will cache the google font candidates to print in ::_setup_hook_for_front_css_printing_or_enqueuing()
+
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
         function __construct( $params = array() ) {

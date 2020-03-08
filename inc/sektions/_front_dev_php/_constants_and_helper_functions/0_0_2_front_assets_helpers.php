@@ -158,6 +158,16 @@ function sek_use_split_stylesheets_on_front() {
     //return !skp_is_customizing() && defined('NIMBLE_USE_SPLIT_STYLESHEETS') && NIMBLE_USE_SPLIT_STYLESHEETS;
 }
 
+// @return bool
+// march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/629
+function sek_preload_google_fonts_on_front() {
+    $glob_perf = sek_get_global_option_value( 'performances' );
+    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['preload_google_fonts'] ) ) {
+        return sek_booleanize_checkbox_val( $glob_perf['preload_google_fonts'] );
+    }
+    return false;
+    //return !skp_is_customizing() && defined('NIMBLE_USE_SPLIT_STYLESHEETS') && NIMBLE_USE_SPLIT_STYLESHEETS;
+}
 
 // Adds async/defer attributes to enqueued / registered scripts.
 // works with ::sek_filter_script_loader_tag loaded @'script_loader_tag'

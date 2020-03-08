@@ -10,7 +10,6 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
         // 1) on wp_enqueue_scripts or wp_head
         // 2) when ajaxing, for actions 'sek-resize-columns', 'sek-refresh-stylesheet'
         function print_or_enqueue_seks_style( $skope_id = null ) {
-            $google_fonts_print_candidates = '';
             // when this method is fired in a customize preview context :
             //    - the skope_id has to be built. Since we are after 'wp', this is not a problem.
             //    - the css rules are printed inline in the <head>
@@ -50,13 +49,18 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                     if ( in_array( current_filter(), array( 'wp_footer', 'wp_head' ) ) ) {
                         $this->sek_gfont_print( $google_fonts_print_candidates );
                     } else {
-                        wp_enqueue_style(
-                            'sek-gfonts-local-and-global',
-                            sprintf( '//fonts.googleapis.com/css?family=%s', $google_fonts_print_candidates ),
-                            array(),
-                            null,
-                            'all'
-                        );
+                        // preload implemented for https://github.com/presscustomizr/nimble-builder/issues/629
+                        if ( !skp_is_customizing() && sek_preload_google_fonts_on_front() ) {
+                            add_action( 'wp_head', array( $this, 'sek_gfont_print_with_preload') );
+                        } else {
+                            wp_enqueue_style(
+                                'sek-gfonts-local-and-global',
+                                sprintf( '//fonts.googleapis.com/css?family=%s', $google_fonts_print_candidates ),
+                                array(),
+                                null,
+                                'all'
+                            );
+                        }
                     }
                 }
             }
@@ -78,9 +82,31 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             }
         }
 
+        // hook : wp_head
+        // fired on front only when not customizing
+        // March 2020 preload implemented for https://github.com/presscustomizr/nimble-builder/issues/629
+        function sek_gfont_print_with_preload( $print_candidates = '' ) {
+            // print candidates must be fetched when sek_preload_google_fonts_on_front()
+            $print_candidates = $this->sek_get_gfont_print_candidates();
+
+            if ( ! empty( $print_candidates ) ) {
+                // preload => see https://web.dev/defer-non-critical-css/
+                printf('<link rel="preload" as="style" id="%1$s" href="%2$s" %3$s>',
+                    'sek-gfonts-local-and-global',
+                    "//fonts.googleapis.com/css?family={$print_candidates}",
+                    'onload="this.onload=null;this.rel=\'stylesheet\'"'
+                );
+            }
+        }
+
         //@return string
         // sek_model is passed when customizing in SEK_Front_Render_Css::print_or_enqueue_seks_style()
-        function sek_get_gfont_print_candidates( $local_skope_id ) {
+        function sek_get_gfont_print_candidates( $local_skope_id = null ) {
+            // return the cache version if already set
+            if ( 'not_set' !== Nimble_Manager()->google_fonts_print_candidates )
+              return Nimble_Manager()->google_fonts_print_candidates;
+
+            $local_skope_id = is_null( $local_skope_id ) ? skp_build_skope_id() : $local_skope_id;
             // local sections
             $local_seks = sek_get_skoped_seks( $local_skope_id );
             // global sections
@@ -110,7 +136,9 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 $print_candidates = str_replace( '|', '%7C', $ffamilies );
                 $print_candidates = str_replace( '[gfont]', '' , $print_candidates );
             }
-            return $print_candidates;
+            // cache now
+            Nimble_Manager()->google_fonts_print_candidates = $print_candidates;
+            return Nimble_Manager()->google_fonts_print_candidates;
         }
 
         // @param params = array( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) )

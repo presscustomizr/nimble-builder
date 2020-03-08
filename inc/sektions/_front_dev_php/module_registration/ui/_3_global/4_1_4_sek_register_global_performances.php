@@ -42,7 +42,7 @@ function sek_get_module_params_for_sek_global_performances() {
                 ),
                 'print_partial_module_stylesheets_inline' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Print module stylesheets inline', 'text_doma'),
+                    'title'       => __('Print modules stylesheets inline', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -64,7 +64,14 @@ function sek_get_module_params_for_sek_global_performances() {
                 'load_js_async' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Load javascript asynchronously', 'text_doma'),
-                    'default'     => 0,
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+                'preload_google_fonts' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Preload Google fonts', 'text_doma'),
+                    'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
