@@ -125,8 +125,6 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             } else if ( defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) {
               $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
             }
-
-            sek_error_log('print mode ?', $print_mode );
             // Which hook ?
             $fire_at_hook = '';
             if ( !defined( 'DOING_AJAX' ) && is_customize_preview() ) {

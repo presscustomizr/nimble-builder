@@ -1,8 +1,33 @@
-// global sekFrontLocalized, nimbleListenTo
+// global sekFrontLocalized, nimbleListenTo, nb_
 /* ------------------------------------------------------------------------- *
  *  LOAD MAGNIFIC POPUP
  /* ------------------------------------------------------------------------- */
 (function(w, d){
+      // params = {
+      //  elements : $swiperCandidate,
+      //  func : function() {}
+      // }
+      nb_.maybeLoadAssetsWhenSelectorInScreen = function( params ) {
+          // do nothing if dynamic asset loading is not enabled for js and css
+          if ( !sekFrontLocalized.load_front_partial_css_on_scroll && !sekFrontLocalized.load_front_module_js_on_scroll )
+            return;
+
+          params = $.extend( { id : '', elements : '', func : '' }, params );
+
+          if ( 1 > params.id.length ) {
+              nb_.errorLog('Nimble error => maybeLoadAssetsWhenSelectorInScreen => missing id', params );
+            return;
+          }
+          if ( 1 > $(params.elements).length )
+            return;
+          if ( !nb_.isFunction( params.func ) )
+            return;
+          nb_.scrollHandlers = nb_.scrollHandlers || {};
+          var handlerParams = { elements : params.elements, func : params.func };
+          nb_.scrollHandlers[params.id] = handlerParams;
+          nb_.emit('nimble-new-scroll-handler-added', handlerParams);
+      };
+
       var callbackFunc = function() {
           jQuery(function($){
               var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
@@ -42,7 +67,6 @@
     };/////////////// callbackFunc
     // When loaded with defer, we can not be sure that jQuery will be loaded before
     nb_.listenTo( 'nimble-app-ready', function() {
-        console.log('SO??');
         nb_.listenTo( 'nimble-needs-magnific-popup', callbackFunc );
     });
 
@@ -59,7 +83,8 @@
 (function(w, d){
     var callbackFunc = function() {
         jQuery(function($){
-
+            if ( !sekFrontLocalized.load_front_module_js_on_scroll && !sekFrontLocalized.load_front_partial_css_on_scroll )
+              return;
             // Load js plugin if needed
             // // when the plugin is loaded => it emits 'nimble-swiper-ready' listened to by nb_.listenTo()
             // if ( nb_.scriptsLoadingStatus.swiper && 'resolved' === nb_.scriptsLoadingStatus.swiper.state() )
@@ -148,6 +173,8 @@
 (function(w, d){
     nb_.listenTo('nimble-app-ready', function() {
         jQuery(function($){
+            if ( !sekFrontLocalized.load_front_module_js_on_scroll )
+              return;
             // is it loaded already ?
             if ( nb_.isFunction( $.fn.parallaxBg ) )
               return;
@@ -183,6 +210,8 @@
 (function(w, d){
     var callbackFunc = function() {
         jQuery(function($){
+            if ( !sekFrontLocalized.load_front_module_js_on_scroll )
+              return;
             var $candidates = $('[data-sek-module-type="czr_accordion_module"]');
             // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
             if ( $candidates.length < 1 )
@@ -222,34 +251,17 @@
     var callbackFunc = function() {
         jQuery(function($){
             // we don't need to inject font awesome if already enqueued by a theme
-            if ( !sekFrontLocalized.load_front_assets_on_scroll || sekFrontLocalized.fontAwesomeAlreadyEnqueued )
+            if ( !sekFrontLocalized.load_front_partial_css_on_scroll || sekFrontLocalized.fontAwesomeAlreadyEnqueued )
               return;
 
-            var modulesPrintedOnPage = sekFrontLocalized.contextuallyActiveModules,
-                fontAwesomeCandidates = [],
-                $fontAwesomeCandidates;
+            var $candidates = $('i[class*=fa-]');
 
-            // $.each( modulesFADependant, function( key, moduleType ) {
-            //     if ( !nb_.isUndefined( modulesPrintedOnPage[moduleType] ) ) {
-            //         var _candidate = '[data-sek-module-type="'+ moduleType +'"]';
-            //         if ( $(_candidate).length > 0 ) {
-            //             fontAwesomeCandidates.push( _candidate );
-            //         }
-            //     }
-            // });
-            $fontAwesomeCandidates = $('i[class*=fa-]');
-
-            if ( $fontAwesomeCandidates.length < 1 )
+            if ( $candidates.length < 1 )
               return;
 
             // Load js plugin if needed
             // when the plugin is loaded => it emits "nimble-needs-fontawesome" listened to by nb_.listenTo()
-            var _scrollHandle = function() {},//abstract that we can unbind
-                doLoad = function() {
-                  // I've been executed forget about me
-                  // so we execute the callback only once
-                  nb_.cachedElements.$window.unbind( 'scroll', _scrollHandle );
-
+            var doLoad = function() {
                   //Load the style
                   if ( $('head').find( '#czr-font-awesome' ).length < 1 ) {
                         $('head').append( $('<link/>' , {
@@ -260,25 +272,13 @@
                         }) );
                   }
             };// doLoad
-            var isLoading = false;
-            // Fire now or schedule when becoming visible.
-            $.each( $fontAwesomeCandidates, function( k, el ) {
-                if ( !isLoading && nb_.isInWindow($(el) ) ) {
-                    isLoading = true;
-                    doLoad();
-                }
+            // Load js plugin if needed
+            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
+            nb_.maybeLoadAssetsWhenSelectorInScreen({
+                id : 'font-awesome',
+                elements : $candidates,
+                func : doLoad
             });
-            if ( !isLoading ) {
-                  _scrollHandle = nb_.throttle( function() {
-                        $.each( $fontAwesomeCandidates, function( k, el ) {
-                            if ( !isLoading && nb_.isInWindow( $(el) ) ) {
-                                isLoading = true;
-                                doLoad();
-                            }
-                        });
-                  }, 100 );
-                  nb_.cachedElements.$window.on( 'scroll', _scrollHandle );
-            }
         });//jQuery(function($){})
     };/////////////// callbackFunc
 

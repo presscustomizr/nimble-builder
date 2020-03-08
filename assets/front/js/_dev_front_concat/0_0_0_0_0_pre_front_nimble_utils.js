@@ -98,7 +98,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                               cache : true,// use the browser cached version when available
                               dataType: "script"
                         }).done(function() {
-                              console.log( 'ASSET IS LOADED => ' + params.path, params );
+                              //console.log( 'ASSET IS LOADED => ' + params.path, params );
                               if ( nb_.isFunction(params.loadcheck) && !params.loadcheck() ) {
                                   nb_.errorLog('ajaxLoadScript success but loadcheck failed for => ' + params.path );
                                   return;
@@ -110,32 +110,8 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                         }).fail( function() {
                               nb_.errorLog('ajaxLoadScript failed for => ' + params.path );
                         });
-                    },//ajaxLoadScript
-                    // params = {
-                    //  elements : $swiperCandidate,
-                    //  func : function() {}
-                    // }
-                    maybeLoadAssetsWhenSelectorInScreen : function( params ) {
-                        // do nothing if dynamic asset loading is not enabled for js and css
-                        if ( !sekFrontLocalized.load_front_partial_css_on_scroll && !sekFrontLocalized.load_front_module_js_on_scroll )
-                          return;
-
-                        params = $.extend( { id : '', elements : '', func : '' }, params );
-                        console.log('params in maybeLoadScriptWhenSelectorInScreen', params );
-                        if ( 1 > params.id.length ) {
-                            nb_.errorLog('Nimble error => maybeLoadAssetsWhenSelectorInScreen => missing id', params );
-                          return;
-                        }
-                        if ( 1 > $(params.elements).length )
-                          return;
-                        if ( !nb_.isFunction( params.func ) )
-                          return;
-                        nb_.scrollHandlers = nb_.scrollHandlers || {};
-                        nb_.scrollHandlers[params.id] = { elements : params.elements, func : params.func };
-                    }
+                    }//ajaxLoadScript
               });//$.extend( nb_
-
-              console.log('EMIT NIMBLE APP READY', jQuery);
               // now that nb_ has been populated, let's say it to the app
               nb_.emit('nimble-app-ready');
           });// jQuery( function($){

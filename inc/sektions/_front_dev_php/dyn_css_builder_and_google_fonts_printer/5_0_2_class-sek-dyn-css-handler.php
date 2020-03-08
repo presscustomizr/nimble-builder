@@ -265,8 +265,6 @@ class Sek_Dyn_CSS_Handler {
             'force_rewrite'                   => $this->force_rewrite
         );
 
-        sek_error_log('ARGS IN DYN CSS HANDLER ?', $args );
-
         $args = wp_parse_args( $args, $defaults );
 
         //normalize some parameters
@@ -362,7 +360,6 @@ class Sek_Dyn_CSS_Handler {
 
         $this->file_exists          = $this->_sek_dyn_css_file_exists();
 
-        sek_error_log('MERDE', $this->mode );
         if ( self::MODE_FILE == $this->mode ) {
             if ( ! $this->_sek_dyn_css_write_file_is_possible() ) {
                 $this->mode = self::MODE_INLINE;

@@ -131,44 +131,59 @@ window.nb_ = {};
         // safe console log for
         errorLog : function() {
             //fix for IE, because console is only defined when in F12 debugging mode in IE
-            if ( nb_.isUndefined( console ) || !nb_.isFunction( window.console.log ) )
+            if ( nb_.isUndefined( console ) || 'function' != typeof window.console.log )
               return;
             console.log.apply(console,arguments);
         },
         scriptsLoadingStatus : {},// <= will be populated with the script loading promises
         listenTo : function( evt, func ) {
-            var bools = {
-                'nimble-jquery-loaded' : typeof undefined !== typeof jQuery,
-                'nimble-app-ready' : typeof undefined !== typeof window.nb_ && nb_.isListenedTo('nimble-jquery-loaded'),
-                'nimble-magnific-popup-loaded' : typeof undefined !== typeof jQuery && typeof undefined !== typeof jQuery.fn.magnificPopup,
-                'nimble-swiper-script-loaded' : typeof undefined !== typeof window.Swiper
+            var canWeFireCallbackForEvent = {
+                'nimble-jquery-loaded' : function() { return typeof undefined !== typeof jQuery; },
+                'nimble-app-ready' : function() { return ( typeof undefined !== typeof window.nb_ ) && nb_.wasListenedTo('nimble-jquery-loaded'); },
+                'nimble-magnific-popup-loaded' : function() { return ( typeof undefined !== typeof jQuery ) && ( typeof undefined !== typeof jQuery.fn.magnificPopup ); },
+                'nimble-swiper-script-loaded' : function() { return typeof undefined !== typeof window.Swiper; }
             };
+            // e is the event object passed
+            // it is possible to add params but we need to use new CustomEvent with a polyfill for IE
+            // see : https://stackoverflow.com/questions/18613456/trigger-event-with-parameters
+            var _executeAndLog = function(e) {
+                if ( !nb_.isUndefined(canWeFireCallbackForEvent[evt]) && false === canWeFireCallbackForEvent[evt]() ) {
+                    nb_.errorLog('Nimble error => an event callback could not be fired because conditions not met => ', evt, nb_.eventsListenedTo );
+                    return;
+                }
+                func();
+                // console.log('LISTENED TO', evt );
+                // store it, so if the event has been emitted before the listener is fired, we know it's been emitted
+                nb_.eventsListenedTo.push(evt);
+            };
+            // if the event requires a condition to be executed let's check it
+            // if the event has alreay been listened to, let's fire the func, otherwise wait for its emission
             if ( 'function' === typeof func ) {
-              // For event without a boolean check, if the event has been emitted before the listener is fired, we know it's been emitted if stored in [] emittedEvents
-              if ( true === bools[evt] || ( nb_.isUndefined( bools[evt] ) && nb_.isListenedTo( nb_.eventsListenedTo, evt ) ) ) {
-                  func();
-                  // store it, so if the event has been emitted before the listener is fired, we know it's been emitted
-                  nb_.eventsListenedTo.push(evt);
-              }
-              else {
-                  document.addEventListener(evt,function() {
-                      func();
-                      // store it, so if the event has been emitted before the listener is fired, we know it's been emitted
-                      nb_.eventsListenedTo.push(evt);
-                  });
-              }
+                if ( nb_.wasEmitted(evt) ) {
+                    _executeAndLog();
+                } else {
+                    document.addEventListener(evt,_executeAndLog);
+                }
+            } else {
+              nb_.errorLog('Nimble error => listenTo func param is not a function for event => ', evt );
             }
         },
-        emittedEvents : [],
+        eventsEmitted : [],
         eventsListenedTo : [],
-        emit : function( evt ) {
+        emit : function(evt) {
+            // it is possible to add params when dispatching the event, but we need to use new CustomEvent with a polyfill for IE
+            // see : https://stackoverflow.com/questions/18613456/trigger-event-with-parameters
             var _evt = document.createEvent('Event');
             _evt.initEvent(evt, true, true); //can bubble, and is cancellable
             document.dispatchEvent(_evt);
-            nb_.emittedEvents.push(evt);
+            // console.log('EMITTED', evt );
+            nb_.eventsEmitted.push(evt);
         },
-        isListenedTo : function( evt ) {
+        wasListenedTo : function( evt ) {
             return ('string' === typeof evt) && nb_.inArray( nb_.eventsListenedTo, evt );
+        },
+        wasEmitted : function( evt ) {
+            return ('string' === typeof evt) && nb_.inArray( nb_.eventsEmitted, evt );
         }
     };//window.nb_
 }(window, document ));
