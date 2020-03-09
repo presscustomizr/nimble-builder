@@ -1663,7 +1663,8 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     // Img background
     if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
         // deactivated when customizing @see function sek_is_img_smartload_enabled()
-        if ( ! sek_is_img_smartload_enabled() ) {
+        $is_publishing_or_saving = defined('DOING_AJAX') && DOING_AJAX;
+        if ( ( !skp_is_customizing() && !sek_is_img_smartload_enabled() ) || ( skp_is_customizing() && !$is_publishing_or_saving ) ) {
             //no repeat by default?
             $background_properties[ 'background-image' ] = 'url("'. wp_get_attachment_url( $bg_options[ 'bg-image'] ) .'")';
         }
@@ -4138,18 +4139,17 @@ function sek_get_module_params_for_sek_global_performances() {
             'item-inputs' => array(
                 'global-img-smart-load' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Load images on scroll', 'text_doma'),
+                    'title'       => __('Defer loading images off screen', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after' => sprintf('%1$s <br/><strong>%2$s</strong>',
-                        __( 'Check this option to delay the loading of non visible images. Images outside the window will be dynamically loaded when scrolling. This can improve performance by reducing the weight of long web pages including multiple images.', 'text_dom'),
+                    'notice_after' => sprintf('<strong>%1$s</strong>',
                         __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
                     )
                 ),
                 'global-bg-video-lazy-load' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Lazy load video backgrounds', 'text_doma'),
+                    'title'       => __('Defer loading video backgrounds', 'text_doma'),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -4157,7 +4157,64 @@ function sek_get_module_params_for_sek_global_performances() {
                     //     __( 'Load video backgrounds when', 'text_dom'),
                     //     __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
                     // )
-                )
+                ),
+                'use_partial_module_stylesheets' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Use partial CSS stylesheets for modules', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'print_partial_module_stylesheets_inline' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Print modules stylesheets inline', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'print_dyn_stylesheets_inline' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Print generated stylesheets inline', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'load_front_assets_in_ajax' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Defer loading module assets when modules are offscreen', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+                'load_font_awesome_in_ajax' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Defer loading Font Awesome icons', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+                'load_js_async' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Load javascript files asynchronously', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+                'preload_google_fonts' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Preload Google fonts', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+                'preload_jquery' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Preload jQuery library on front-end', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => __('Use with caution, preloading Jquery can break third party plugins and themes.')
+                ),
             )
         )//tmpl
     );
@@ -10354,7 +10411,7 @@ function sek_add_css_rules_for_czr_accordion_module( $rules, $complete_modul_mod
     // TEXT COLOR ( for the plus / minus icon )
     if ( ! empty( $accord_opts[ 'color_css' ] ) && $accord_defaults[ 'color_css' ] != $accord_opts[ 'color_css' ] ) {
         $rules[] = array(
-            'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item button span', $complete_modul_model['id'] ),
+            'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item .expander span', $complete_modul_model['id'] ),
             'css_rules' => 'background:'. $accord_opts[ 'color_css' ] .';',
             'mq' =>null
         );
@@ -10362,7 +10419,7 @@ function sek_add_css_rules_for_czr_accordion_module( $rules, $complete_modul_mod
     // ACTIVE / HOVER TEXT COLOR ( for the plus / minus icon )
     if ( ! empty( $accord_opts[ 'color_active_css' ] ) && $accord_defaults[ 'color_active_css' ] != $accord_opts[ 'color_active_css' ] ) {
         $rules[] = array(
-            'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper [data-sek-expanded="true"] .sek-accord-title button span, [data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item .sek-accord-title:hover button span', $complete_modul_model['id'] ),
+            'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper [data-sek-expanded="true"] .sek-accord-title .expander span, [data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item .sek-accord-title:hover .expander span', $complete_modul_model['id'] ),
             'css_rules' => sprintf('background:%s;', $accord_opts[ 'color_active_css' ] ),
             'mq' =>null
         );
@@ -11478,7 +11535,7 @@ class Sek_Dyn_CSS_Handler {
                 $this->enqueued_or_printed = true;
             }
         }// if ( self::MODE_FILE )
-        // case when defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE
+        // case when sek_inline_dynamic_stylesheets_on_front()
         // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
         else if ( !is_customize_preview() && self::MODE_INLINE == $this->mode ) {
             global $wp_filesystem;
@@ -12502,6 +12559,9 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
 
         // March 2020
         public $modules_dependant_of_font_awesome = [ 'czr_button_module', 'czr_icon_module', 'czr_social_icons_module' ];
+
+        // March 2020, for https://github.com/presscustomizr/nimble-builder/issues/629
+        public $google_fonts_print_candidates = 'not_set';// will cache the google font candidates to print in ::_setup_hook_for_front_css_printing_or_enqueuing()
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
@@ -13558,9 +13618,6 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // Load Front Assets
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_front_assets' ) );
 
-            // Maybe load Font Awesome icons if needed ( sniff first )
-            add_action( 'wp_enqueue_scripts', array( $this, 'sek_maybe_enqueue_font_awesome_icons' ), PHP_INT_MAX );
-
             // Adds `async` and `defer` support for scripts registered or enqueued
             // and for which we've added an attribute with sek_wp_script_add_data( $_hand, 'async', true );
             // inspired from Twentytwenty WP theme
@@ -13568,7 +13625,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             add_filter( 'script_loader_tag', array( $this, 'sek_filter_script_loader_tag' ), 10, 2 );
 
             // added March 2020 when experimenting for https://github.com/presscustomizr/nimble-builder/issues/626
-            add_action( 'wp_default_scripts', array( $this, 'sek_maybe_dequeue_jquery' ) );
+            add_action( 'wp_default_scripts', array( $this, 'sek_maybe_dequeue_and_preload_jquery' ) );
 
             // Maybe print split module stylesheet inline
             // introduced in march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
@@ -13576,6 +13633,12 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
             // initialize Nimble front js app
             add_action( 'wp_head', array( $this, 'sek_initialize_front_js_app' ), 0  );
+
+            // Maybe load Font Awesome icons if needed ( sniff first )
+            add_action( 'wp_head', array( $this, 'sek_maybe_load_font_awesome_icons' ), PHP_INT_MAX );
+
+            // Maybe print a CSS loader for img and background lazy loaded
+            add_action( 'wp_head', array( $this, 'sek_maybe_print_css_loader_for_lazyload' ), PHP_INT_MAX );
 
             // Emit an event when jQuery is detected. 'nimble-jquery-loaded'
             // maybe fetch jQuery from a CDN when dequeued
@@ -13586,7 +13649,6 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // Load customize preview js
             add_action( 'customize_preview_init' , array( $this, 'sek_schedule_customize_preview_assets' ) );
         }//_schedule_front_and_preview_assets_printing
-
 
         // hook : 'wp_enqueue_scripts'
         function sek_enqueue_front_assets() {
@@ -13607,8 +13669,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             $has_global_sections = sek_has_global_sections();
 
             // the light split stylesheet is never used when customizing
-            $is_stylesheet_split_for_performance = sek_use_split_stylesheets_on_front();
-            $is_split_module_stylesheets_inline_for_performance = $is_stylesheet_split_for_performance && sek_inline_stylesheets_on_front();
+            $is_stylesheet_split_for_performance = !skp_is_customizing() && sek_use_split_stylesheets_on_front();
+            $is_inline_stylesheets_for_performance = $is_stylesheet_split_for_performance && sek_inline_module_stylesheets_on_front();
 
             $main_stylesheet_name = $is_stylesheet_split_for_performance ? 'sek-base-light' : 'sek-base';
 
@@ -13672,7 +13734,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // SPLIT STYLESHEETS
             // introduced march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
             // if the module stylesheets are inline, see wp_head action
-            if ( $is_stylesheet_split_for_performance && !$is_split_module_stylesheets_inline_for_performance ) {
+            if ( !skp_is_customizing() && $is_stylesheet_split_for_performance && !$is_inline_stylesheets_for_performance) {
                 // loop on the map module type (candidates for split) => stylesheet file name
                 foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
                     if ( !array_key_exists($module_type , $contextually_active_modules ) )
@@ -13704,7 +13766,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.js' : NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.min.js',
                 //array( 'jquery', 'underscore'),
                 // october 2018 => underscore is concatenated in the main front js file.
-                ( !skp_is_customizing() && sek_is_front_jquery_dequeued() ) ? array() : array( 'jquery'),
+                ( !skp_is_customizing() && sek_is_front_jquery_preloaded() ) ? array() : array( 'jquery'),
                 NIMBLE_ASSETS_VERSION,
                 true
             );
@@ -13712,34 +13774,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // not added when customizing
             sek_wp_script_add_data( 'sek-main-js', 'async', true );
 
-            // SMART LOAD
-            // only load on front
-            if ( !sek_load_front_js_assets_on_scroll() && sek_is_img_smartload_enabled() ) {
-                wp_enqueue_script(
-                    'sek-smartload',
-                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/nimble-smartload.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/nimble-smartload.min.js',
-                    ( !skp_is_customizing() && sek_is_front_jquery_dequeued() ) ? array() : array( 'jquery'),
-                    NIMBLE_ASSETS_VERSION,
-                    true
-                );
-                // not added when customizing
-                sek_wp_script_add_data( 'sek-smartload', 'async', true );
-            }
 
-            // PARALLAX BG
-            // front : Load if js not loaded dynamically + we detect the need for the script
-            // customizing : load if not loaded dynamically
-            if ( ( !sek_load_front_js_assets_on_scroll() && sek_front_needs_parallax_bg() ) || skp_is_customizing() ) {
-                wp_enqueue_script(
-                    'sek-parallax-bg',
-                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/nimble-parallax-bg.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/nimble-parallax-bg.min.js',
-                    ( !skp_is_customizing() && sek_is_front_jquery_dequeued() ) ? array() : array( 'jquery'),
-                    NIMBLE_ASSETS_VERSION,
-                    true
-                );
-                // not added when customizing
-                sek_wp_script_add_data( 'sek-parallax-bg', 'async', true );
-            }
 
 
             /* ------------------------------------------------------------------------- *
@@ -13748,7 +13783,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // Magnific Popup is loaded when needed only
             // front : Load if js not loaded dynamically + we detect the need for the script
             // customizing : load if not loaded dynamically
-            if ( ( !sek_load_front_js_assets_on_scroll() && sek_front_needs_magnific_popup() ) || skp_is_customizing() ) {
+            if ( ( !sek_load_front_assets_on_scroll() && sek_front_needs_magnific_popup() ) || skp_is_customizing() ) {
                 wp_enqueue_style(
                     'czr-magnific-popup',
                     NIMBLE_BASE_URL . '/assets/front/css/libs/magnific-popup.min.css',
@@ -13759,7 +13794,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 wp_enqueue_script(
                     'sek-magnific-popups',
                     sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.min.js',
-                    ( !skp_is_customizing() && sek_is_front_jquery_dequeued() ) ? array() : array( 'jquery'),
+                    ( !skp_is_customizing() && sek_is_front_jquery_preloaded() ) ? array() : array( 'jquery'),
                     NIMBLE_ASSETS_VERSION,
                     true
                 );
@@ -13775,7 +13810,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // Swiper js + css is needed for the czr_img_slider_module
             // front : Load if js not loaded dynamically + we detect the need for the script
             // customizing : load if not loaded dynamically
-            if ( ( !sek_load_front_js_assets_on_scroll() && array_key_exists('czr_img_slider_module' , $contextually_active_modules) ) || skp_is_customizing() ) {
+            if ( ( !sek_load_front_assets_on_scroll() && array_key_exists('czr_img_slider_module' , $contextually_active_modules) ) || skp_is_customizing() ) {
                 // march 2020 : when using split stylesheet, swiper css is already included in assets/front/css/modules/img-slider-module-with-swiper.css
                 // so we don't need to enqueue it
                 // added for https://github.com/presscustomizr/nimble-builder/issues/612
@@ -13816,7 +13851,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
              /* ------------------------------------------------------------------------- */
             // front : Load if js not loaded dynamically + we detect the need for the script
             // customizing : load if not loaded dynamically
-            if ( ( !sek_load_front_js_assets_on_scroll() && array_key_exists('czr_menu_module' , $contextually_active_modules ) ) || skp_is_customizing() ) {
+            if ( ( !sek_load_front_assets_on_scroll() && array_key_exists('czr_menu_module' , $contextually_active_modules ) ) || skp_is_customizing() ) {
                 wp_enqueue_script(
                     'sek-menu-module',
                     sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/prod-front-menu-module.js' : NIMBLE_BASE_URL . '/assets/front/js/prod-front-menu-module.min.js',
@@ -13833,7 +13868,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
              /* ------------------------------------------------------------------------- */
             // front : Load if js not loaded dynamically + we detect the need for the script
             // customizing : load if not loaded dynamically
-            if ( ( !sek_load_front_js_assets_on_scroll() && sek_front_needs_video_bg() ) || skp_is_customizing() ) {
+            if ( ( !sek_load_front_assets_on_scroll() && sek_front_needs_video_bg() ) || skp_is_customizing() ) {
                 wp_enqueue_script(
                     'sek-video-bg',
                     sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/prod-front-video-bg.js' : NIMBLE_BASE_URL . '/assets/front/js/prod-front-video-bg.min.js',
@@ -13863,8 +13898,10 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                     'recaptcha_public_key' => !empty ( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : '',
 
                     'video_bg_lazyload_enabled' => sek_is_video_bg_lazyload_enabled(),
-                    'load_front_module_js_on_scroll' => sek_load_front_js_assets_on_scroll(),
-                    'load_front_partial_css_on_scroll' => sek_load_front_partial_css_assets_on_scroll(),
+
+                    'load_front_module_assets_on_scroll' => sek_load_front_assets_on_scroll(),
+                    'load_font_awesome_on_scroll' => sek_load_front_font_awesome_on_scroll(),
+
                     'assetVersion' => NIMBLE_ASSETS_VERSION,
                     'frontAssetsPath' => NIMBLE_BASE_URL . '/assets/front/',
                     'contextuallyActiveModules' => sek_get_collection_of_contextually_active_modules(),
@@ -13875,30 +13912,42 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         }//sek_enqueue_front_assets
 
 
-        // hook : 'wp_enqueue_scripts:PHP_INT_MAX'
+        // hook : 'wp_head:PHP_INT_MAX'
         // Feb 2020 => now check if Hueman or Customizr has already loaded font awesome
         // @see https://github.com/presscustomizr/nimble-builder/issues/600
-        function sek_maybe_enqueue_font_awesome_icons() {
+        function sek_maybe_load_font_awesome_icons() {
             // if active theme is Hueman or Customizr, Font Awesome may already been enqueued.
             // asset handle for Customizr => 'customizr-fa'
             // asset handle for Hueman => 'hueman-font-awesome'
             if ( wp_style_is('customizr-fa', 'enqueued') || wp_style_is('hueman-font-awesome', 'enqueued') )
               return;
 
-            // Font awesome is always loaded when customizing
+            // Font awesome is always loaded when customizing ( see ::sek_schedule_customize_preview_assets )
             // when not customizing, sek_front_needs_font_awesome() sniffs if the collection include a module using an icon
-            if ( !skp_is_customizing() && sek_front_needs_font_awesome() && !sek_load_front_partial_css_assets_on_scroll() ) {
-                wp_enqueue_style(
-                    'czr-font-awesome',
-                    NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
-                    array(),
-                    NIMBLE_ASSETS_VERSION,
-                    $media = 'all'
-                );
+            if ( !skp_is_customizing() && sek_front_needs_font_awesome() && !sek_load_front_font_awesome_on_scroll() ) {
+                // wp_enqueue_style(
+                //     'czr-font-awesome',
+                //     NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
+                //     array(),
+                //     NIMBLE_ASSETS_VERSION,
+                //     $media = 'all'
+                // );
+
+                ?>
+                <script id="nimble-load-fa">!function(){var e=document.createElement("link");e.setAttribute("href",'<?php echo NIMBLE_BASE_URL . "/assets/front/fonts/css/fontawesome-all.min.css"; ?>'),e.setAttribute("rel",nb_.assetPreloadSupported()?"preload":"stylesheet"),e.setAttribute("id","czr-font-awesome"),e.setAttribute("as","style"),e.onload=function(){this.onload=null,nb_.assetPreloadSupported()&&(this.rel="stylesheet");var e=document.getElementById("nimble-load-fa");e.parentNode.removeChild(e)},document.getElementsByTagName("head")[0].appendChild(e)}();</script>
+                <?php
             }
         }
 
 
+        //@'wp_head'PHP_INT_MAX
+        function sek_maybe_print_css_loader_for_lazyload() {
+          if ( !sek_is_img_smartload_enabled() || skp_is_customizing() )
+            return;
+          ?>
+          <style id="nb-lazyload-css-loader">@-webkit-keyframes sek-mr-loader{0%{-webkit-transform:scale(.1);transform:scale(.1);opacity:1}70%{-webkit-transform:scale(1);transform:scale(1);opacity:.7}100%{opacity:0}}@keyframes sek-mr-loader{0%{-webkit-transform:scale(.1);transform:scale(.1);opacity:1}70%{-webkit-transform:scale(1);transform:scale(1);opacity:.7}100%{opacity:0}}.sek-css-loader{width:50px;height:50px;position:absolute;-webkit-transform:translate3d(-50%,-50%,0);transform:translate3d(-50%,-50%,0);top:50%;left:50%}.csstransforms3d .sek-css-loader{display:block}.sek-mr-loader>div:nth-child(0){-webkit-animation-delay:-.8s;animation-delay:-.8s}.sek-mr-loader>div:nth-child(1){-webkit-animation-delay:-.6s;animation-delay:-.6s}.sek-mr-loader>div:nth-child(2){-webkit-animation-delay:-.4s;animation-delay:-.4s}.sek-mr-loader>div:nth-child(3){-webkit-animation-delay:-.2s;animation-delay:-.2s}.sek-mr-loader>div{-webkit-animation-fill-mode:both;animation-fill-mode:both;position:absolute;top:0;left:0;width:100%;height:100%;border-radius:100%;border:2px solid #777;-webkit-animation:sek-mr-loader 1.25s 0s infinite cubic-bezier(.21,.53,.56,.8);animation:sek-mr-loader 1.25s 0s infinite cubic-bezier(.21,.53,.56,.8)}.white-loader>.sek-mr-loader>div{border:2px solid #fff}</style>
+          <?php
+        }
 
 
         // @'wp_head'0
@@ -13909,7 +13958,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // 4) 'nimble-magnific-popup-loaded', ... are emitted in each script files
         function sek_initialize_front_js_app() {
             ?>
-            <script>window.nb_={},function(n,e){var t,r,i=Date.now||function(){return(new Date).getTime()};window.nb_={isArray:function(n){return Array.isArray(n)||"[object Array]"===toString.call(n)},inArray:function(n,e){return!(!nb_.isArray(n)||nb_.isUndefined(e))&&n.indexOf(e)>-1},isUndefined:function(n){return void 0===n},isObject:function(n){var e=typeof n;return"function"===e||"object"===e&&!!n},has:function(n,e){if(!_.isArray(e))return function(n,e){return null!=n&&hasOwnProperty.call(n,e)}(n,e);for(var t=e.length,r=0;r<t;r++){var i=e[r];if(null==n||!Object.prototype.hasOwnProperty.call(n,i))return!1;n=n[i]}return!!t},debounce:function(n,e,t){var r;return function(){var i=this,o=arguments,u=t&&!r;clearTimeout(r),r=setTimeout(function(){r=null,t||n.apply(i,o)},e),u&&n.apply(i,o)}},throttle:function(n,e,t){var r,o,u,a,l=0;t||(t={});var c=function(){l=!1===t.leading?0:i(),r=null,a=n.apply(o,u),r||(o=u=null)},s=function(){var s=i();l||!1!==t.leading||(l=s);var d=e-(s-l);return o=this,u=arguments,d<=0||d>e?(r&&(clearTimeout(r),r=null),l=s,a=n.apply(o,u),r||(o=u=null)):r||!1===t.trailing||(r=setTimeout(c,d)),a};return s.cancel=function(){clearTimeout(r),l=0,r=o=u=null},s},delay:(t=function(n,e,t){return setTimeout(function(){return n.apply(null,t)},e)},r=null==r?t.length-1:+r,function(){for(var n=Math.max(arguments.length-r,0),e=Array(n),i=0;i<n;i++)e[i]=arguments[i+r];switch(r){case 0:return t.call(this,e);case 1:return t.call(this,arguments[0],e);case 2:return t.call(this,arguments[0],arguments[1],e)}var o=Array(r+1);for(i=0;i<r;i++)o[i]=arguments[i];return o[r]=e,t.apply(this,o)}),errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},scriptsLoadingStatus:{},listenTo:function(n,e){var t={"nimble-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nimble-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nimble-jquery-loaded")},"nimble-magnific-popup-loaded":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup},"nimble-swiper-script-loaded":function(){return void 0!==window.Swiper}},r=function(r){nb_.isUndefined(t[n])||!1!==t[n]()?(e(),nb_.eventsListenedTo.push(n)):nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",n,nb_.eventsListenedTo)};"function"==typeof e?nb_.wasEmitted(n)?r():document.addEventListener(n,r):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",n)},eventsEmitted:[],eventsListenedTo:[],emit:function(n){var e=document.createEvent("Event");e.initEvent(n,!0,!0),document.dispatchEvent(e),nb_.eventsEmitted.push(n)},wasListenedTo:function(n){return"string"==typeof n&&nb_.inArray(nb_.eventsListenedTo,n)},wasEmitted:function(n){return"string"==typeof n&&nb_.inArray(nb_.eventsEmitted,n)}}}(window,document);</script>
+            <script id="nimble-app-init">window.nb_={},window,document,window.nb_={isArray:function(e){return Array.isArray(e)||"[object Array]"===toString.call(e)},inArray:function(e,n){return!(!nb_.isArray(e)||nb_.isUndefined(n))&&e.indexOf(n)>-1},isUndefined:function(e){return void 0===e},isObject:function(e){var n=typeof e;return"function"===n||"object"===n&&!!e},errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},browserIs:function(e){var n=!1,t=!!document.documentMode;switch(e){case"safari":n=/constructor/i.test(window.HTMLElement)||"[object SafariRemoteNotification]"===(!window.safari||"undefined"!=typeof safari&&safari.pushNotification).toString();break;case"firefox":n="undefined"!=typeof InstallTrigger;break;case"IE":n=t;break;case"edge":n=!t&&!!window.StyleMedia;break;case"chrome":n=!(!window.chrome||!window.chrome.webstore&&!window.chrome.runtime)}return n},assetPreloadSupported:function(){return!nb_.browserIs("firefox")&&!nb_.browserIs("IE")&&!nb_.browserIs("edge")},listenTo:function(e,n){var t={"nimble-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nimble-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nimble-jquery-loaded")},"nimble-magnific-popup-loaded":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup},"nimble-swiper-script-loaded":function(){return void 0!==window.Swiper}},o=function(o){nb_.isUndefined(t[e])||!1!==t[e]()?(n(),nb_.eventsListenedTo.push(e)):nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",e,nb_.eventsListenedTo)};"function"==typeof n?nb_.wasEmitted(e)?o():document.addEventListener(e,o):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",e)},eventsEmitted:[],eventsListenedTo:[],emit:function(e){var n=document.createEvent("Event");n.initEvent(e,!0,!0),document.dispatchEvent(n),nb_.eventsEmitted.push(e)},wasListenedTo:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsListenedTo,e)},wasEmitted:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsEmitted,e)}};</script>
             <?php
         }
 
@@ -13919,19 +13968,19 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             ?>
             <script id="nimble-detect-jquery">!function(){var e=function(n){n=n||0,"undefined"!=typeof jQuery?nb_.emit("nimble-jquery-loaded"):n<30?setTimeout(function(){e(++n)},200):alert("Nimble Builder problem : jQuery.js was not detected on your website")};e()}();</script>
             <?php
-            if( skp_is_customizing() || !sek_is_front_jquery_dequeued() )
-              return;
+            if( sek_is_front_jquery_preloaded() && !skp_is_customizing() ) {
             ?>
-            <script id="nimble-load-jquery">setTimeout(function(){var e=document.createElement("script");e.setAttribute("src","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),e.setAttribute("type","text/javascript"),e.setAttribute("id","nimble-jquery"),e.setAttribute("defer","defer"),document.getElementsByTagName("head")[0].appendChild(e)},0);</script>
+            <script id="nimble-load-jquery">setTimeout(function(){var e=function(){var e=document.createElement("script");e.setAttribute("src","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),e.setAttribute("id","nimble-jquery"),e.setAttribute("defer","defer"),document.getElementsByTagName("head")[0].appendChild(e);var t=document.getElementById("nimble-load-jquery");t.parentNode.removeChild(t)};if(nb_.assetPreloadSupported()){var t=document.createElement("link");t.setAttribute("href","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),t.setAttribute("rel","preload"),t.setAttribute("as","script"),t.onload=function(){this.onload=null,this.rel="script",e()},document.getElementsByTagName("head")[0].appendChild(t)}else e()},3000);</script>
             <?php
+            }
         }//sek_handle_jquery()
 
 
         // @'wp_default_scripts'
         // see https://wordpress.stackexchange.com/questions/291700/how-to-stop-jquery-migrate-manually
         // https://stackoverflow.com/questions/18421404/how-do-i-stop-wordpress-loading-jquery-and-jquery-migrate#25977181
-        function sek_maybe_dequeue_jquery( &$scripts ) {
-            if ( sek_is_front_jquery_dequeued() && !skp_is_customizing() && !is_admin() && !empty( $scripts->registered['jquery'] ) ) {
+        function sek_maybe_dequeue_and_preload_jquery( &$scripts ) {
+            if ( sek_is_front_jquery_preloaded() && !skp_is_customizing() && !is_admin() && !empty( $scripts->registered['jquery'] ) ) {
                 $scripts->registered['jquery']->deps = array_diff(
                     $scripts->registered['jquery']->deps,
                     [ 'jquery-migrate' ]
@@ -14093,9 +14142,9 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // hook : wp_head@PHP_INT_MAX
         // introduced in march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
         function sek_maybe_print_inline_split_module_stylesheets() {
-            $is_stylesheet_split_for_performance = !skp_is_customizing() && defined('NIMBLE_USE_SPLIT_STYLESHEETS') && NIMBLE_USE_SPLIT_STYLESHEETS;
-            $is_split_module_stylesheets_inline_for_performance = !skp_is_customizing() && $is_stylesheet_split_for_performance && defined('NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE') && NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE;
-            if ( !$is_split_module_stylesheets_inline_for_performance )
+            $is_stylesheet_split_for_performance = !skp_is_customizing() && sek_use_split_stylesheets_on_front();
+            $is_inline_stylesheets_for_performance= !skp_is_customizing() && $is_stylesheet_split_for_performance && sek_inline_module_stylesheets_on_front();
+            if ( !$is_inline_stylesheets_for_performance)
               return;
             // css assets are always enqueued when customizing
             global $wp_filesystem;
@@ -14718,9 +14767,19 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     if ( !empty( $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) {
                         $column_container_class = 'sek-container';
                     }
-
-                    ?>
-                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s" %6$s %7$s %8$s>',
+                    // if there's a video background we need to inform js api
+                    $bg_attributes = $this->sek_maybe_add_bg_attributes( $model );
+                    if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
+                      ?>
+                        <script>nb_.emit('nb-needs-videobg-js');</script>
+                      <?php
+                    }
+                    // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
+                    $has_lazy_loaded_bg_img = false;
+                    if ( false !== strpos( $bg_attributes, 'data-sek-lazy-bg="true" data-sek-src="http') ) {
+                        $has_lazy_loaded_bg_img = true;
+                    }
+                    printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s" %6$s %7$s %8$s>%9$s',
                         $id,
                         $is_nested ? 'data-sek-is-nested="true"' : '',
                         $has_at_least_one_module ? 'sek-has-modules' : '',
@@ -14729,9 +14788,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                         is_null( $custom_anchor ) ? '' : 'id="' . ltrim( $custom_anchor , '#' ) . '"',// make sure we clean the hash if user left it
                         // add smartload + parallax attributes
-                        $this->sek_maybe_add_bg_attributes( $model ),
+                        $bg_attributes,
 
-                        $this->sek_maybe_print_preview_level_guid_html()//<= added for #494
+                        $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
+                        ( $has_lazy_loaded_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>' : ''
                     ); ?>
                           <div class="<?php echo $column_container_class; ?>">
                             <div class="sek-row sek-sektion-inner">
@@ -14786,21 +14846,31 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     } else if ( $global_custom_breakpoint >= 1 ) {
                         $grid_column_class = "sek-global-custom-breakpoint-col-{$col_suffix}";
                     }
-                    ?>
+                    $bg_attributes = $this->sek_maybe_add_bg_attributes( $model );
+                    if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
+                      ?>
+                        <script>nb_.emit('nb-needs-videobg-js');</script>
                       <?php
-                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s" %5$s %6$s %7$s %8$s>',
-                              $id,
-                              $grid_column_class,
-                              $this->get_level_visibility_css_class( $model ),
-                              is_null( $custom_css_classes ) ? '' : $custom_css_classes,
+                    }
+                    // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
+                    $has_lazy_loaded_bg_img = false;
+                    if ( false !== strpos( $bg_attributes, 'data-sek-lazy-bg="true" data-sek-src="http') ) {
+                        $has_lazy_loaded_bg_img = true;
+                    }
+                    printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s" %5$s %6$s %7$s %8$s>%9$s',
+                        $id,
+                        $grid_column_class,
+                        $this->get_level_visibility_css_class( $model ),
+                        is_null( $custom_css_classes ) ? '' : $custom_css_classes,
 
-                              empty( $collection ) ? 'data-sek-no-modules="true"' : '',
-                              // add smartload + parallax attributes
-                              $this->sek_maybe_add_bg_attributes( $model ),
-                              is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+                        empty( $collection ) ? 'data-sek-no-modules="true"' : '',
+                        // add smartload + parallax attributes
+                        $bg_attributes,
+                        is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
 
-                              $this->sek_maybe_print_preview_level_guid_html()//<= added for #494
-                          );
+                        $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
+                        ( $has_lazy_loaded_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>' : ''
+                    );
                       ?>
                         <?php
                         // Drop zone : if no modules, the drop zone is wrapped in sek-no-modules-columns
@@ -14900,9 +14970,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $render_tmpl_path = $overriden_template_path;
                         $is_module_template_overriden = true;
                     }
+                    // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
+                    $bg_attributes = $this->sek_maybe_add_bg_attributes( $model );
+                    $has_lazy_loaded_bg_img = false;
+                    if ( false !== strpos( $bg_attributes, 'data-sek-lazy-bg="true" data-sek-src="http') ) {
+                        $has_lazy_loaded_bg_img = true;
+                    }
 
-
-                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s %9$s>',
+                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s %9$s>%10$s',
                         $id,
                         $module_type,
                         $this->get_level_visibility_css_class( $model ),
@@ -14910,11 +14985,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                         $title_attribute,
                         // add smartload + parallax attributes
-                        $this->sek_maybe_add_bg_attributes( $model ),
+                        $bg_attributes,
                         is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
 
                         $this->sek_maybe_print_preview_level_guid_html(), //<= added for #494
-                        $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': ''// <= added for #532
+                        $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': '',// <= added for #532
+                        ( $has_lazy_loaded_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>' : ''
                     );
                       ?>
                         <div class="sek-module-inner">
@@ -14998,6 +15074,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         }
 
 
+        // march 2020 : not used anymore
         function sek_get_input_placeholder_content( $input_type = '', $input_id = '' ) {
             $ph = '<i class="material-icons">pan_tool</i>';
             switch( $input_type ) {
@@ -15566,7 +15643,6 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
         // 1) on wp_enqueue_scripts or wp_head
         // 2) when ajaxing, for actions 'sek-resize-columns', 'sek-refresh-stylesheet'
         function print_or_enqueue_seks_style( $skope_id = null ) {
-            $google_fonts_print_candidates = '';
             // when this method is fired in a customize preview context :
             //    - the skope_id has to be built. Since we are after 'wp', this is not a problem.
             //    - the css rules are printed inline in the <head>
@@ -15599,20 +15675,25 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
 
             // GOOGLE FONTS
             if ( !empty( $google_fonts_print_candidates ) ) {
-                // When customizing
+                // When customizing we get the google font content
                 if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
                     $this->sek_gfont_print( $google_fonts_print_candidates );
                 } else {
                     if ( in_array( current_filter(), array( 'wp_footer', 'wp_head' ) ) ) {
                         $this->sek_gfont_print( $google_fonts_print_candidates );
                     } else {
-                        wp_enqueue_style(
-                            'sek-gfonts-local-and-global',
-                            sprintf( '//fonts.googleapis.com/css?family=%s', $google_fonts_print_candidates ),
-                            array(),
-                            null,
-                            'all'
-                        );
+                        // preload implemented for https://github.com/presscustomizr/nimble-builder/issues/629
+                        if ( !skp_is_customizing() && sek_preload_google_fonts_on_front() ) {
+                            add_action( 'wp_head', array( $this, 'sek_gfont_print_with_preload') );
+                        } else {
+                            wp_enqueue_style(
+                                'sek-gfonts-local-and-global',
+                                sprintf( '//fonts.googleapis.com/css?family=%s', $google_fonts_print_candidates ),
+                                array(),
+                                null,
+                                'all'
+                            );
+                        }
                     }
                 }
             }
@@ -15622,9 +15703,40 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             }
         }//print_or_enqueue_seks_style
 
+        // hook : wp_head
+        // or fired directly when ajaxing
+        // When ajaxing, the link#sek-gfonts-{$this->id} gets removed from the dom and replaced by this string
+        function sek_gfont_print( $print_candidates ) {
+            if ( ! empty( $print_candidates ) ) {
+                printf('<link rel="stylesheet" id="%1$s" href="%2$s">',
+                    'sek-gfonts-local-and-global',
+                    "//fonts.googleapis.com/css?family={$print_candidates}"
+                );
+            }
+        }
+
+        // hook : wp_head
+        // fired on front only when not customizing
+        // March 2020 preload implemented for https://github.com/presscustomizr/nimble-builder/issues/629
+        function sek_gfont_print_with_preload( $print_candidates = '' ) {
+            // print candidates must be fetched when sek_preload_google_fonts_on_front()
+            $print_candidates = $this->sek_get_gfont_print_candidates();
+
+            if ( ! empty( $print_candidates ) ) {
+                ?>
+                <script id="nimble-preload-gfonts">!function(){var e=document.createElement("link");e.setAttribute("href","//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>"),e.setAttribute("rel",nb_.assetPreloadSupported()?"preload":"stylesheet"),e.setAttribute("as","style"),e.onload=function(){this.onload=null,nb_.assetPreloadSupported()&&(this.rel="stylesheet");var e=document.getElementById("nimble-preload-gfonts");e.parentNode.removeChild(e)},document.getElementsByTagName("head")[0].appendChild(e)}();</script>
+                <?php
+            }
+        }
+
         //@return string
         // sek_model is passed when customizing in SEK_Front_Render_Css::print_or_enqueue_seks_style()
-        function sek_get_gfont_print_candidates( $local_skope_id ) {
+        function sek_get_gfont_print_candidates( $local_skope_id = null ) {
+            // return the cache version if already set
+            if ( 'not_set' !== Nimble_Manager()->google_fonts_print_candidates )
+              return Nimble_Manager()->google_fonts_print_candidates;
+
+            $local_skope_id = is_null( $local_skope_id ) ? skp_build_skope_id() : $local_skope_id;
             // local sections
             $local_seks = sek_get_skoped_seks( $local_skope_id );
             // global sections
@@ -15654,19 +15766,9 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 $print_candidates = str_replace( '|', '%7C', $ffamilies );
                 $print_candidates = str_replace( '[gfont]', '' , $print_candidates );
             }
-            return $print_candidates;
-        }
-
-        // hook : wp_head
-        // or fired directly when ajaxing
-        // When ajaxing, the link#sek-gfonts-{$this->id} gets removed from the dom and replaced by this string
-        function sek_gfont_print( $print_candidates ) {
-           if ( ! empty( $print_candidates ) ) {
-                printf('<link rel="stylesheet" id="%1$s" href="%2$s">',
-                    'sek-gfonts-local-and-global',
-                    "//fonts.googleapis.com/css?family={$print_candidates}"
-                );
-            }
+            // cache now
+            Nimble_Manager()->google_fonts_print_candidates = $print_candidates;
+            return Nimble_Manager()->google_fonts_print_candidates;
         }
 
         // @param params = array( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) )
@@ -15678,7 +15780,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             $print_mode = Sek_Dyn_CSS_Handler::MODE_FILE;
             if ( is_customize_preview() ) {
               $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
-            } else if ( defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) {
+            } else if ( sek_inline_dynamic_stylesheets_on_front() ) {
               $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
             }
             // Which hook ?
@@ -15687,7 +15789,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
               $fire_at_hook = 'wp_head';
             }
             // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-            else if ( !defined( 'DOING_AJAX' ) && !is_customize_preview() && defined('NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE') && NIMBLE_PRINT_GENERATED_STYLESHEETS_INLINE ) {
+            else if ( !defined( 'DOING_AJAX' ) && !is_customize_preview() && sek_inline_dynamic_stylesheets_on_front() ) {
               $fire_at_hook = 'wp_head';
             }
 

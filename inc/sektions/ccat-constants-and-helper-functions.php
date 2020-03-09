@@ -295,6 +295,16 @@ function sek_load_front_assets_on_scroll() {
 }
 
 // @return bool
+// march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/626
+function sek_load_front_font_awesome_on_scroll() {
+    $glob_perf = sek_get_global_option_value( 'performances' );
+    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['load_font_awesome_in_ajax'] ) ) {
+        return sek_booleanize_checkbox_val( $glob_perf['load_font_awesome_in_ajax'] );
+    }
+    return false;
+}
+
+// @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
 function sek_inline_module_stylesheets_on_front() {
     $glob_perf = sek_get_global_option_value( 'performances' );
@@ -326,7 +336,13 @@ function sek_use_split_stylesheets_on_front() {
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/629
+// Firefox doesn not support preload
+// IE is supposed to support it, but tests show that google fonts may not be loaded on each page refresh
 function sek_preload_google_fonts_on_front() {
+    if(strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== FALSE) // 'Internet explorer'
+      return;
+    elseif(strpos($_SERVER['HTTP_USER_AGENT'], 'Firefox') !== FALSE) // 'Mozilla Firefox'
+      return;
     $glob_perf = sek_get_global_option_value( 'performances' );
     if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['preload_google_fonts'] ) ) {
         return sek_booleanize_checkbox_val( $glob_perf['preload_google_fonts'] );

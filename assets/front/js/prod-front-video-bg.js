@@ -539,9 +539,9 @@
                         $levelRefreshed.nimbleLoadVideoBg( { lazyLoad: sekFrontLocalized.video_bg_lazyload_enabled } );
                     }
               });
-          });
+          });//onJQueryReady
 
-      };/////////////// onJQueryReady
+      };/////////////// callbackFunc
 
       // we
       nb_.listenTo('nimble-app-ready', callbackFunc );

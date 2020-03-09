@@ -330,7 +330,7 @@
                     .on( 'mouseenter', '.sek-nav-toggler', function(){ $(this).addClass( 'hovering' ); } )
                     .on( 'mouseleave', '.sek-nav-toggler', function(){ $(this).removeClass( 'hovering' ); } )
                     .on( 'show.sek.sekCollapse hide.sek.sekCollapse', '.sek-nav-collapse', function() {
-                          $('[data-target=#'+$(this).attr('id')+']').removeClass( 'hovering' );
+                          $('[data-target="#'+$(this).attr('id')+'"]').removeClass( 'hovering' );
                           nb_.cachedElements.$window.trigger('scroll');
                     });
 
