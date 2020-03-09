@@ -50,14 +50,14 @@ function sek_get_module_params_for_sek_global_performances() {
                 'print_dyn_stylesheets_inline' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Print generated stylesheets inline', 'text_doma'),
-                    'default'     => 0,
+                    'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'load_front_assets_in_ajax' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Defer loading of module assets when modules are offscreen', 'text_doma'),
-                    'default'     => 0,
+                    'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
@@ -74,6 +74,14 @@ function sek_get_module_params_for_sek_global_performances() {
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
+                ),
+                'preload_jquery' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Preload jQuery library on front-end', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => __('Use with caution, preloading Jquery can break third party plugins and themes.')
                 ),
             )
         )//tmpl

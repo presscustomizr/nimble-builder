@@ -16,7 +16,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             add_filter( 'script_loader_tag', array( $this, 'sek_filter_script_loader_tag' ), 10, 2 );
 
             // added March 2020 when experimenting for https://github.com/presscustomizr/nimble-builder/issues/626
-            add_action( 'wp_default_scripts', array( $this, 'sek_maybe_dequeue_jquery' ) );
+            add_action( 'wp_default_scripts', array( $this, 'sek_maybe_dequeue_and_preload_jquery' ) );
 
             // Maybe print split module stylesheet inline
             // introduced in march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
@@ -152,7 +152,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.js' : NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.min.js',
                 //array( 'jquery', 'underscore'),
                 // october 2018 => underscore is concatenated in the main front js file.
-                ( !skp_is_customizing() && sek_is_front_jquery_dequeued() ) ? array() : array( 'jquery'),
+                ( !skp_is_customizing() && sek_is_front_jquery_preloaded() ) ? array() : array( 'jquery'),
                 NIMBLE_ASSETS_VERSION,
                 true
             );
@@ -180,7 +180,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 wp_enqueue_script(
                     'sek-magnific-popups',
                     sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.min.js',
-                    ( !skp_is_customizing() && sek_is_front_jquery_dequeued() ) ? array() : array( 'jquery'),
+                    ( !skp_is_customizing() && sek_is_front_jquery_preloaded() ) ? array() : array( 'jquery'),
                     NIMBLE_ASSETS_VERSION,
                     true
                 );
@@ -329,7 +329,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // 4) 'nimble-magnific-popup-loaded', ... are emitted in each script files
         function sek_initialize_front_js_app() {
             ?>
-            <script id="nimble-app-init">window.nb_={},window,document,window.nb_={isArray:function(n){return Array.isArray(n)||"[object Array]"===toString.call(n)},inArray:function(n,e){return!(!nb_.isArray(n)||nb_.isUndefined(e))&&n.indexOf(e)>-1},isUndefined:function(n){return void 0===n},isObject:function(n){var e=typeof n;return"function"===e||"object"===e&&!!n},errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},listenTo:function(n,e){var t={"nimble-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nimble-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nimble-jquery-loaded")},"nimble-magnific-popup-loaded":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup},"nimble-swiper-script-loaded":function(){return void 0!==window.Swiper}},i=function(i){nb_.isUndefined(t[n])||!1!==t[n]()?(e(),nb_.eventsListenedTo.push(n)):nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",n,nb_.eventsListenedTo)};"function"==typeof e?nb_.wasEmitted(n)?i():document.addEventListener(n,i):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",n)},eventsEmitted:[],eventsListenedTo:[],emit:function(n){var e=document.createEvent("Event");e.initEvent(n,!0,!0),document.dispatchEvent(e),nb_.eventsEmitted.push(n)},wasListenedTo:function(n){return"string"==typeof n&&nb_.inArray(nb_.eventsListenedTo,n)},wasEmitted:function(n){return"string"==typeof n&&nb_.inArray(nb_.eventsEmitted,n)}};</script>
+            <script id="nimble-app-init">window.nb_={},window,document,window.nb_={isArray:function(e){return Array.isArray(e)||"[object Array]"===toString.call(e)},inArray:function(e,n){return!(!nb_.isArray(e)||nb_.isUndefined(n))&&e.indexOf(n)>-1},isUndefined:function(e){return void 0===e},isObject:function(e){var n=typeof e;return"function"===n||"object"===n&&!!e},errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},browserIs:function(e){var n=!1,t=!!document.documentMode;switch(e){case"safari":n=/constructor/i.test(window.HTMLElement)||"[object SafariRemoteNotification]"===(!window.safari||"undefined"!=typeof safari&&safari.pushNotification).toString();break;case"firefox":n="undefined"!=typeof InstallTrigger;break;case"IE":n=t;break;case"edge":n=!t&&!!window.StyleMedia;break;case"chrome":n=!(!window.chrome||!window.chrome.webstore&&!window.chrome.runtime)}return n},assetPreloadSupported:function(){return!nb_.browserIs("firefox")&&!nb_.browserIs("IE")&&!nb_.browserIs("edge")},listenTo:function(e,n){var t={"nimble-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nimble-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nimble-jquery-loaded")},"nimble-magnific-popup-loaded":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup},"nimble-swiper-script-loaded":function(){return void 0!==window.Swiper}},o=function(o){nb_.isUndefined(t[e])||!1!==t[e]()?(n(),nb_.eventsListenedTo.push(e)):nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",e,nb_.eventsListenedTo)};"function"==typeof n?nb_.wasEmitted(e)?o():document.addEventListener(e,o):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",e)},eventsEmitted:[],eventsListenedTo:[],emit:function(e){var n=document.createEvent("Event");n.initEvent(e,!0,!0),document.dispatchEvent(n),nb_.eventsEmitted.push(e)},wasListenedTo:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsListenedTo,e)},wasEmitted:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsEmitted,e)}};</script>
             <?php
         }
 
@@ -339,9 +339,9 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             ?>
             <script id="nimble-detect-jquery">!function(){var e=function(n){n=n||0,"undefined"!=typeof jQuery?nb_.emit("nimble-jquery-loaded"):n<30?setTimeout(function(){e(++n)},200):alert("Nimble Builder problem : jQuery.js was not detected on your website")};e()}();</script>
             <?php
-            if( sek_is_front_jquery_dequeued() && !skp_is_customizing() ) {
+            if( sek_is_front_jquery_preloaded() && !skp_is_customizing() ) {
             ?>
-            <script id="nimble-load-jquery">setTimeout(function(){var e=document.createElement("script");e.setAttribute("src","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),e.setAttribute("type","text/javascript"),e.setAttribute("id","nimble-jquery"),e.setAttribute("defer","defer"),document.getElementsByTagName("head")[0].appendChild(e)},0);</script>
+            <script id="nimble-load-jquery">setTimeout(function(){var e=function(){var e=document.createElement("script");e.setAttribute("src","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),e.setAttribute("id","nimble-jquery"),e.setAttribute("defer","defer"),document.getElementsByTagName("head")[0].appendChild(e)};if(nb_.assetPreloadSupported()){var t=document.createElement("link");t.setAttribute("href","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),t.setAttribute("rel","preload"),t.setAttribute("as","script"),t.onload=function(){this.onload=null,this.rel="script",e()},document.getElementsByTagName("head")[0].appendChild(t)}else e()},0);</script>
             <?php
             }
         }//sek_handle_jquery()
@@ -350,8 +350,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // @'wp_default_scripts'
         // see https://wordpress.stackexchange.com/questions/291700/how-to-stop-jquery-migrate-manually
         // https://stackoverflow.com/questions/18421404/how-do-i-stop-wordpress-loading-jquery-and-jquery-migrate#25977181
-        function sek_maybe_dequeue_jquery( &$scripts ) {
-            if ( sek_is_front_jquery_dequeued() && !skp_is_customizing() && !is_admin() && !empty( $scripts->registered['jquery'] ) ) {
+        function sek_maybe_dequeue_and_preload_jquery( &$scripts ) {
+            if ( sek_is_front_jquery_preloaded() && !skp_is_customizing() && !is_admin() && !empty( $scripts->registered['jquery'] ) ) {
                 $scripts->registered['jquery']->deps = array_diff(
                     $scripts->registered['jquery']->deps,
                     [ 'jquery-migrate' ]
