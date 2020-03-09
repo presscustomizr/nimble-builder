@@ -29,6 +29,33 @@ window.nb_ = {};
               return;
             console.log.apply(console,arguments);
         },
+        // Browser detection
+        // @see https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser#9851769
+        browserIs : function( browser ) {
+            var bool = false,
+                isIE = false || !!document.documentMode;
+            switch( browser) {
+                case 'safari' :
+                    bool = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+                break;
+                case 'firefox' :
+                    bool = typeof InstallTrigger !== 'undefined';
+                break;
+                case 'IE' :
+                    bool = isIE;
+                break;
+                case 'edge' :
+                    bool = !isIE && !!window.StyleMedia;
+                break;
+                case 'chrome' :
+                    bool = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+                break;
+            }
+            return bool;
+        },
+        assetPreloadSupported : function() {
+            return !nb_.browserIs('firefox') && !nb_.browserIs('IE') && !nb_.browserIs('edge');
+        },
         listenTo : function( evt, func ) {
             var canWeFireCallbackForEvent = {
                 'nimble-jquery-loaded' : function() { return typeof undefined !== typeof jQuery; },
@@ -120,15 +147,63 @@ window.nb_ = {};
 ( function() {
       // Load jQuery
       setTimeout( function() {
-          var script = document.createElement('script');
-          script.setAttribute('src', 'https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js');
-          script.setAttribute('type', 'text/javascript');
-          script.setAttribute('id', 'nimble-jquery');
-          script.setAttribute('defer', 'defer');//https://html.spec.whatwg.org/multipage/scripting.html#attr-script-defer
-          document.getElementsByTagName('head')[0].appendChild(script);
+          // deferred script
+          // var script = document.createElement('script');
+          // script.setAttribute('src', 'https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js');
+          // script.setAttribute('id', 'nimble-jquery');
+          // script.setAttribute('defer', 'defer');//https://html.spec.whatwg.org/multipage/scripting.html#attr-script-defer
+          // document.getElementsByTagName('head')[0].appendChild(script);
+
+          // Preload @see https://web.dev/uses-rel-preload/
+          var appendScript = function() {
+              var script = document.createElement('script');
+              script.setAttribute('src', 'https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js');
+              script.setAttribute('id', 'nimble-jquery');
+              script.setAttribute('defer', 'defer');//https://html.spec.whatwg.org/multipage/scripting.html#attr-script-defer
+              document.getElementsByTagName('head')[0].appendChild(script);
+          };
+          // Firefox does not support preload
+          // @see https://web.dev/preload-critical-assets/
+          // https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser#9851769
+          var isFirefox = typeof InstallTrigger !== 'undefined';
+          if ( !nb_.assetPreloadSupported() ) {
+              appendScript();
+          } else {
+              var link = document.createElement('link');
+              link.setAttribute('href', 'https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js');
+              link.setAttribute('rel', 'preload');
+              link.setAttribute('as', 'script');
+              link.onload = function() {
+                  this.onload=null;
+                  this.rel='script';
+                  appendScript();
+              };
+              document.getElementsByTagName('head')[0].appendChild(link);
+          }
       }, 0 );//<= add a delay to test 'nimble-jquery-loaded' and mimic the 'defer' option of a cache plugin
 })();
 
+// printed SEK_Front_Render_Css::in sek_gfont_print_with_preload()
+(function() {
+      // Preload @see https://web.dev/uses-rel-preload/
+      // @see https://web.dev/preload-critical-assets/
+      // @see https://caniuse.com/#search=preload
+      // IE and Firefox do not support preload
+      // edge is supposed to support it, but when refreshing the page several times, google font are sometimes not loaded... so let's not preload with it as well
+      // https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser#9851769
+      var link = document.createElement('link');
+      link.setAttribute('href', '//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>');
+      link.setAttribute('rel', nb_.assetPreloadSupported() ? 'preload' : 'stylesheet' );
+      link.setAttribute('as', 'style');
+      link.onload = function() {
+          this.onload=null;
+          if ( nb_.assetPreloadSupported() ) {
+              this.rel='stylesheet';
+          }
+
+      };
+      document.getElementsByTagName('head')[0].appendChild(link);
+})();
 
 // printed in function sek_customizr_js_stuff()
 // global sekFrontLocalized, nimbleListenTo

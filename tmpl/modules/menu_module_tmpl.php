@@ -12,7 +12,7 @@ $mobile_options = $value['mobile_options'];
 $sek_nav_collapse_additional_classes = 'sek-submenu-fade sek-submenu-move';
 $expand_below = true === sek_booleanize_checkbox_val( $mobile_options['expand_below'] ) ? 'yes' : 'no';
 ?>
-<script>nb_.listenTo('nimble-app-ready',function(){nb_.emit('nb-needs-menu-js');});</script>
+<script>nb_.emit('nb-needs-menu-js');</script>
 <nav class="sek-nav-wrap" data-sek-expand-below="<?php echo $expand_below; ?>">
     <button class="sek-nav-toggler sek-collapsed" type="button" data-sek-toggle="sek-collapse" data-target="#<?php echo $model['id'] ?>" aria-controls="<?php echo $model['id'] ?>" aria-expanded="false" aria-label="<?php esc_attr_e( 'Toggle navigation', 'textdomain_to_be_replaced' ) ?>">
         <span class="sek-ham__span-wrapper">

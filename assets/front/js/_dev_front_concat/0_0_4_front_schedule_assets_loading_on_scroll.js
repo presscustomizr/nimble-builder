@@ -1,62 +1,70 @@
 // global sekFrontLocalized, nimbleListenTo, nb_
+(function(w, d){
+    nb_.listenTo( 'nimble-app-ready', function() {
+        jQuery(function($){
+            // params = {
+            //  elements : $swiperCandidate,
+            //  func : function() {}
+            // }
+            nb_.maybeLoadAssetsWhenSelectorInScreen = function( params ) {
+                // do nothing if dynamic asset loading is not enabled for js and css
+                if ( !sekFrontLocalized.load_front_module_assets_on_scroll )
+                  return;
+
+                params = $.extend( { id : '', elements : '', func : '' }, params );
+
+                if ( 1 > params.id.length ) {
+                    nb_.errorLog('Nimble error => maybeLoadAssetsWhenSelectorInScreen => missing id', params );
+                  return;
+                }
+                if ( 1 > $(params.elements).length )
+                  return;
+                if ( !nb_.isFunction( params.func ) )
+                  return;
+
+                // populate the collection of scroll handlers looped on ::loopOnScrollHandlers()
+                // + emit
+                nb_.scrollHandlers = nb_.scrollHandlers || {};
+                var handlerParams = { elements : params.elements, func : params.func };
+                nb_.scrollHandlers[params.id] = handlerParams;
+                nb_.emit('nimble-new-scroll-handler-added' );
+
+            };
+        });//jQuery(function($){})
+    });//'nimble-app-ready'
+}(window, document));
+
 /* ------------------------------------------------------------------------- *
  *  LOAD MAGNIFIC POPUP
  /* ------------------------------------------------------------------------- */
 (function(w, d){
-      // params = {
-      //  elements : $swiperCandidate,
-      //  func : function() {}
-      // }
-      nb_.maybeLoadAssetsWhenSelectorInScreen = function( params ) {
-          jQuery(function($){
-              // do nothing if dynamic asset loading is not enabled for js and css
-              if ( !sekFrontLocalized.load_front_module_assets_on_scroll )
+    var callbackFunc = function() {
+        jQuery(function($){
+            if ( !sekFrontLocalized.load_front_module_assets_on_scroll )
                 return;
 
-              params = $.extend( { id : '', elements : '', func : '' }, params );
-
-              if ( 1 > params.id.length ) {
-                  nb_.errorLog('Nimble error => maybeLoadAssetsWhenSelectorInScreen => missing id', params );
-                return;
-              }
-              if ( 1 > $(params.elements).length )
-                return;
-              if ( !nb_.isFunction( params.func ) )
-                return;
-              nb_.scrollHandlers = nb_.scrollHandlers || {};
-              var handlerParams = { elements : params.elements, func : params.func };
-              nb_.scrollHandlers[params.id] = handlerParams;
-              nb_.emit('nimble-new-scroll-handler-added', handlerParams);
-          });//jQuery(function($){})
-      };
-
-      var callbackFunc = function() {
-          if ( !sekFrontLocalized.load_front_module_assets_on_scroll )
+            var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
+            // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
+            if ( $linkCandidates.length < 1 )
               return;
+            var doLoad = function() {
+                  //Load the style
+                  if ( $('head').find( '#czr-magnific-popup' ).length < 1 ) {
+                        $('head').append( $('<link/>' , {
+                              rel : 'stylesheet',
+                              id : 'czr-magnific-popup',
+                              type : 'text/css',
+                              href : sekFrontLocalized.frontAssetsPath + 'css/libs/magnific-popup.min.css?' + sekFrontLocalized.assetVersion
+                        }) );
+                  }
 
-          jQuery(function($){
-              var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
-              // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
-              if ( $linkCandidates.length < 1 )
-                return;
-              var doLoad = function() {
-                    //Load the style
-                    if ( $('head').find( '#czr-magnific-popup' ).length < 1 ) {
-                          $('head').append( $('<link/>' , {
-                                rel : 'stylesheet',
-                                id : 'czr-magnific-popup',
-                                type : 'text/css',
-                                href : sekFrontLocalized.frontAssetsPath + 'css/libs/magnific-popup.min.css?' + sekFrontLocalized.assetVersion
-                          }) );
-                    }
-
-                    if ( !nb_.isFunction( $.fn.magnificPopup ) && sekFrontLocalized.load_front_module_assets_on_scroll ) {
-                          nb_.ajaxLoadScript({
-                              path : 'js/libs/jquery-magnific-popup.min.js',
-                              loadcheck : function() { return nb_.isFunction( $.fn.magnificPopup ); }
-                          });
-                    }
-                };// doLoad
+                  if ( !nb_.isFunction( $.fn.magnificPopup ) && sekFrontLocalized.load_front_module_assets_on_scroll ) {
+                        nb_.ajaxLoadScript({
+                            path : 'js/libs/jquery-magnific-popup.min.js',
+                            loadcheck : function() { return nb_.isFunction( $.fn.magnificPopup ); }
+                        });
+                  }
+              };// doLoad
 
             // Load js plugin if needed
             // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
@@ -65,14 +73,13 @@
                 elements : $linkCandidates,
                 func : doLoad
             });
-
         });//jQuery(function($){})
     };/////////////// callbackFunc
-    // When loaded with defer, we can not be sure that jQuery will be loaded before
+
+    //When loaded with defer, we can not be sure that jQuery will be loaded before
     nb_.listenTo( 'nimble-app-ready', function() {
         nb_.listenTo( 'nb-needs-magnific-popup', callbackFunc );
     });
-
 }(window, document));
 
 

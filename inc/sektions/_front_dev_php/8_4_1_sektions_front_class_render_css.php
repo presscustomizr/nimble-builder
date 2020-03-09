@@ -90,12 +90,9 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             $print_candidates = $this->sek_get_gfont_print_candidates();
 
             if ( ! empty( $print_candidates ) ) {
-                // preload => see https://web.dev/defer-non-critical-css/
-                printf('<link rel="preload" as="style" id="%1$s" href="%2$s" %3$s>',
-                    'sek-gfonts-local-and-global',
-                    "//fonts.googleapis.com/css?family={$print_candidates}",
-                    'onload="this.onload=null;this.rel=\'stylesheet\'"'
-                );
+                ?>
+                <script id="nimble-preload-gfonts">!function(){var e=document.createElement("link");e.setAttribute("href","//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>"),e.setAttribute("rel",nb_.assetPreloadSupported()?"preload":"stylesheet"),e.setAttribute("as","style"),e.onload=function(){this.onload=null,nb_.assetPreloadSupported()&&(this.rel="stylesheet")},document.getElementsByTagName("head")[0].appendChild(e)}();</script>
+                <?php
             }
         }
 
