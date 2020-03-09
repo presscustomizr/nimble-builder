@@ -91,7 +91,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
 
             if ( ! empty( $print_candidates ) ) {
                 ?>
-                <script id="nimble-preload-gfonts">!function(){var e=document.createElement("link");e.setAttribute("href","//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>"),e.setAttribute("rel",nb_.assetPreloadSupported()?"preload":"stylesheet"),e.setAttribute("as","style"),e.onload=function(){this.onload=null,nb_.assetPreloadSupported()&&(this.rel="stylesheet")},document.getElementsByTagName("head")[0].appendChild(e)}();</script>
+                <script id="nimble-preload-gfonts">!function(){var e=document.createElement("link");e.setAttribute("href","//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>"),e.setAttribute("rel",nb_.assetPreloadSupported()?"preload":"stylesheet"),e.setAttribute("as","style"),e.onload=function(){this.onload=null,nb_.assetPreloadSupported()&&(this.rel="stylesheet");var e=document.getElementById("nimble-preload-gfonts");e.parentNode.removeChild(e)},document.getElementsByTagName("head")[0].appendChild(e)}();</script>
                 <?php
             }
         }
