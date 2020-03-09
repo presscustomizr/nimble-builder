@@ -175,6 +175,37 @@
 }(window, document));
 
 
+/* ------------------------------------------------------------------------- *
+ *  LOAD VIDEO BACKGROUND JS
+/* ------------------------------------------------------------------------- */
+(function(w, d){
+    var callbackFunc = function() {
+        jQuery(function($){
+            if ( !sekFrontLocalized.load_front_module_assets_on_scroll )
+              return;
+            var $candidates = $('[data-sek-video-bg-src]');
+            // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
+            if ( $candidates.length < 1 )
+              return;
+
+            // Load js plugin if needed
+            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
+            nb_.maybeLoadAssetsWhenSelectorInScreen( {
+                id : 'menu',
+                elements : $candidates,
+                func : function() {
+                    //Load js
+                    nb_.ajaxLoadScript({
+                        path : 'js/prod-front-video-bg.min.js'
+                    });
+                }// doLoad
+            });
+        });// jQuery
+    };/////////////// callbackFunc
+    nb_.listenTo('nimble-app-ready', function() {
+        nb_.listenTo('nb-needs-videobg-js', callbackFunc );
+    });
+}(window, document));
 
 
 
