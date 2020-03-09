@@ -61,9 +61,16 @@ function sek_get_module_params_for_sek_global_performances() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
+                'load_font_awesome_in_ajax' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Defer loading of Font Awesome icons', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
                 'load_js_async' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Load javascript asynchronously', 'text_doma'),
+                    'title'       => __('Load javascript files asynchronously', 'text_doma'),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'

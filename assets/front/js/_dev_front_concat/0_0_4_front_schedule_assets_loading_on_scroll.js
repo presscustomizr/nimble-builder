@@ -7,10 +7,6 @@
             //  func : function() {}
             // }
             nb_.maybeLoadAssetsWhenSelectorInScreen = function( params ) {
-                // do nothing if dynamic asset loading is not enabled for js and css
-                if ( !sekFrontLocalized.load_front_module_assets_on_scroll )
-                  return;
-
                 params = $.extend( { id : '', elements : '', func : '' }, params );
 
                 if ( 1 > params.id.length ) {
@@ -194,7 +190,8 @@
             // we don't need to inject font awesome if already enqueued by a theme
             if ( sekFrontLocalized.fontAwesomeAlreadyEnqueued )
               return;
-
+            if ( !sekFrontLocalized.load_font_awesome_on_scroll )
+              return;
             var $candidates = $('i[class*=fa-]');
 
             if ( $candidates.length < 1 )
@@ -205,12 +202,19 @@
             var doLoad = function() {
                   //Load the style
                   if ( $('head').find( '#czr-font-awesome' ).length < 1 ) {
-                        $('head').append( $('<link/>' , {
-                              rel : 'stylesheet',
-                              id : 'czr-font-awesome',
-                              type : 'text/css',
-                              href : sekFrontLocalized.frontAssetsPath + 'fonts/css/fontawesome-all.min.css?'+sekFrontLocalized.assetVersion
-                        }) );
+                        var link = document.createElement('link');
+                        link.setAttribute('href', sekFrontLocalized.frontAssetsPath + 'fonts/css/fontawesome-all.min.css?'+sekFrontLocalized.assetVersion );
+                        link.setAttribute('id', 'czr-font-awesome');
+                        link.setAttribute('rel', nb_.assetPreloadSupported() ? 'preload' : 'stylesheet' );
+                        link.setAttribute('as', 'style');
+                        link.onload = function() {
+                            this.onload=null;
+                            if ( nb_.assetPreloadSupported() ) {
+                                this.rel='stylesheet';
+                            }
+
+                        };
+                        document.getElementsByTagName('head')[0].appendChild(link);
                   }
             };// doLoad
             // Load js plugin if needed

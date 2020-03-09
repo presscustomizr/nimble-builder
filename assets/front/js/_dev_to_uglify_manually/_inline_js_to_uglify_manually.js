@@ -144,6 +144,7 @@ window.nb_ = {};
 })();
 
 // printed in function sek_handle_jquery()
+// in <script id="nimble-load-jquery">
 ( function() {
       // Load jQuery
       setTimeout( function() {
@@ -161,6 +162,9 @@ window.nb_ = {};
               script.setAttribute('id', 'nimble-jquery');
               script.setAttribute('defer', 'defer');//https://html.spec.whatwg.org/multipage/scripting.html#attr-script-defer
               document.getElementsByTagName('head')[0].appendChild(script);
+              // remove script wrapper when done
+              var elem = document.getElementById("nimble-load-jquery");
+              elem.parentNode.removeChild(elem);
           };
           // Firefox does not support preload
           // @see https://web.dev/preload-critical-assets/
@@ -183,7 +187,39 @@ window.nb_ = {};
       }, 0 );//<= add a delay to test 'nimble-jquery-loaded' and mimic the 'defer' option of a cache plugin
 })();
 
+
+// printed ::sek_maybe_load_font_awesome_icons()
+// in <script id="nimble-load-fa">
+(function() {
+      // Preload @see https://web.dev/uses-rel-preload/
+      // @see https://web.dev/preload-critical-assets/
+      // @see https://caniuse.com/#search=preload
+      // IE and Firefox do not support preload
+      // edge is supposed to support it, but when refreshing the page several times, google font are sometimes not loaded... so let's not preload with it as well
+      // https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser#9851769
+      var link = document.createElement('link');
+      link.setAttribute('href', '<?php echo NIMBLE_BASE_URL . "/assets/front/fonts/css/fontawesome-all.min.css"; ?>');
+      link.setAttribute('rel', nb_.assetPreloadSupported() ? 'preload' : 'stylesheet' );
+      link.setAttribute('id', 'czr-font-awesome' );
+      link.setAttribute('as', 'style');
+      link.onload = function() {
+          this.onload=null;
+          if ( nb_.assetPreloadSupported() ) {
+              this.rel='stylesheet';
+          }
+          // remove script wrapper when done
+          var elem = document.getElementById("nimble-load-fa");
+          elem.parentNode.removeChild(elem);
+      };
+      document.getElementsByTagName('head')[0].appendChild(link);
+
+})();
+
+
+
+
 // printed SEK_Front_Render_Css::in sek_gfont_print_with_preload()
+// in <script id="nimble-preload-gfonts">
 (function() {
       // Preload @see https://web.dev/uses-rel-preload/
       // @see https://web.dev/preload-critical-assets/
@@ -200,10 +236,15 @@ window.nb_ = {};
           if ( nb_.assetPreloadSupported() ) {
               this.rel='stylesheet';
           }
+          // remove script wrapper when done
+          var elem = document.getElementById("nimble-preload-gfonts");
+          elem.parentNode.removeChild(elem);
 
       };
       document.getElementsByTagName('head')[0].appendChild(link);
 })();
+
+
 
 // printed in function sek_customizr_js_stuff()
 // global sekFrontLocalized, nimbleListenTo

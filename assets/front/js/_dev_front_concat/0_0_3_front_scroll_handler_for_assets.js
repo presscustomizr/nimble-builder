@@ -16,7 +16,6 @@
                 if ( !nb_.scrollHandlers[id].loaded && nb_.isInWindow($(el) ) ) {
                     loaderFunc();
                     nb_.scrollHandlers[id].loaded = true;
-                    console.log('LOAD ASSET ?', id );
                 }
             });
             // check if we need to unbind the scroll handle when all assets are loaded
@@ -59,7 +58,7 @@
     nb_.listenTo('nimble-app-ready', function() {
         jQuery(function($){
             // do nothing if dynamic asset loading is not enabled for js and css
-            if ( !sekFrontLocalized.load_front_module_assets_on_scroll )
+            if ( !sekFrontLocalized.load_front_module_assets_on_scroll && !sekFrontLocalized.load_font_awesome_on_scroll )
               return;
             // nb_.scrollHandlers = [
             //    { id : 'swiper', elements : $(), func : function(){} }

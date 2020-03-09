@@ -7,7 +7,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_front_assets' ) );
 
             // Maybe load Font Awesome icons if needed ( sniff first )
-            add_action( 'wp_enqueue_scripts', array( $this, 'sek_maybe_enqueue_font_awesome_icons' ), PHP_INT_MAX );
+            add_action( 'wp_head', array( $this, 'sek_maybe_load_font_awesome_icons' ), PHP_INT_MAX );
 
             // Adds `async` and `defer` support for scripts registered or enqueued
             // and for which we've added an attribute with sek_wp_script_add_data( $_hand, 'async', true );
@@ -284,7 +284,10 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                     'recaptcha_public_key' => !empty ( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : '',
 
                     'video_bg_lazyload_enabled' => sek_is_video_bg_lazyload_enabled(),
+
                     'load_front_module_assets_on_scroll' => sek_load_front_assets_on_scroll(),
+                    'load_font_awesome_on_scroll' => sek_load_front_font_awesome_on_scroll(),
+
                     'assetVersion' => NIMBLE_ASSETS_VERSION,
                     'frontAssetsPath' => NIMBLE_BASE_URL . '/assets/front/',
                     'contextuallyActiveModules' => sek_get_collection_of_contextually_active_modules(),
@@ -295,26 +298,30 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         }//sek_enqueue_front_assets
 
 
-        // hook : 'wp_enqueue_scripts:PHP_INT_MAX'
+        // hook : 'wp_head:PHP_INT_MAX'
         // Feb 2020 => now check if Hueman or Customizr has already loaded font awesome
         // @see https://github.com/presscustomizr/nimble-builder/issues/600
-        function sek_maybe_enqueue_font_awesome_icons() {
+        function sek_maybe_load_font_awesome_icons() {
             // if active theme is Hueman or Customizr, Font Awesome may already been enqueued.
             // asset handle for Customizr => 'customizr-fa'
             // asset handle for Hueman => 'hueman-font-awesome'
             if ( wp_style_is('customizr-fa', 'enqueued') || wp_style_is('hueman-font-awesome', 'enqueued') )
               return;
 
-            // Font awesome is always loaded when customizing
+            // Font awesome is always loaded when customizing ( see ::sek_schedule_customize_preview_assets )
             // when not customizing, sek_front_needs_font_awesome() sniffs if the collection include a module using an icon
-            if ( !skp_is_customizing() && sek_front_needs_font_awesome() && !sek_load_front_assets_on_scroll() ) {
-                wp_enqueue_style(
-                    'czr-font-awesome',
-                    NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
-                    array(),
-                    NIMBLE_ASSETS_VERSION,
-                    $media = 'all'
-                );
+            if ( !skp_is_customizing() && sek_front_needs_font_awesome() && !sek_load_front_font_awesome_on_scroll() ) {
+                // wp_enqueue_style(
+                //     'czr-font-awesome',
+                //     NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
+                //     array(),
+                //     NIMBLE_ASSETS_VERSION,
+                //     $media = 'all'
+                // );
+
+                ?>
+                <script id="nimble-load-fa">!function(){var e=document.createElement("link");e.setAttribute("href",'<?php echo NIMBLE_BASE_URL . "/assets/front/fonts/css/fontawesome-all.min.css"; ?>'),e.setAttribute("rel",nb_.assetPreloadSupported()?"preload":"stylesheet"),e.setAttribute("id","czr-font-awesome"),e.setAttribute("as","style"),e.onload=function(){this.onload=null,nb_.assetPreloadSupported()&&(this.rel="stylesheet");var e=document.getElementById("nimble-load-fa");e.parentNode.removeChild(e)},document.getElementsByTagName("head")[0].appendChild(e)}();</script>
+                <?php
             }
         }
 
@@ -341,7 +348,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             <?php
             if( sek_is_front_jquery_preloaded() && !skp_is_customizing() ) {
             ?>
-            <script id="nimble-load-jquery">setTimeout(function(){var e=function(){var e=document.createElement("script");e.setAttribute("src","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),e.setAttribute("id","nimble-jquery"),e.setAttribute("defer","defer"),document.getElementsByTagName("head")[0].appendChild(e)};if(nb_.assetPreloadSupported()){var t=document.createElement("link");t.setAttribute("href","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),t.setAttribute("rel","preload"),t.setAttribute("as","script"),t.onload=function(){this.onload=null,this.rel="script",e()},document.getElementsByTagName("head")[0].appendChild(t)}else e()},0);</script>
+            <script id="nimble-load-jquery">setTimeout(function(){var e=function(){var e=document.createElement("script");e.setAttribute("src","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),e.setAttribute("id","nimble-jquery"),e.setAttribute("defer","defer"),document.getElementsByTagName("head")[0].appendChild(e);var t=document.getElementById("nimble-load-jquery");t.parentNode.removeChild(t)};if(nb_.assetPreloadSupported()){var t=document.createElement("link");t.setAttribute("href","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),t.setAttribute("rel","preload"),t.setAttribute("as","script"),t.onload=function(){this.onload=null,this.rel="script",e()},document.getElementsByTagName("head")[0].appendChild(t)}else e()},0);</script>
             <?php
             }
         }//sek_handle_jquery()
