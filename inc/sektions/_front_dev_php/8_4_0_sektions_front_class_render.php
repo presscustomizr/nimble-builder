@@ -434,9 +434,19 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     if ( !empty( $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) {
                         $column_container_class = 'sek-container';
                     }
-
-                    ?>
-                    <?php printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s" %6$s %7$s %8$s>',
+                    // if there's a video background we need to inform js api
+                    $bg_attributes = $this->sek_maybe_add_bg_attributes( $model );
+                    if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
+                      ?>
+                        <script>nb_.emit('nb-needs-videobg-js');</script>
+                      <?php
+                    }
+                    // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
+                    $has_lazy_loaded_bg_img = false;
+                    if ( false !== strpos( $bg_attributes, 'data-sek-lazy-bg="true" data-sek-src="http') ) {
+                        $has_lazy_loaded_bg_img = true;
+                    }
+                    printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s" %6$s %7$s %8$s>%9$s',
                         $id,
                         $is_nested ? 'data-sek-is-nested="true"' : '',
                         $has_at_least_one_module ? 'sek-has-modules' : '',
@@ -445,9 +455,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                         is_null( $custom_anchor ) ? '' : 'id="' . ltrim( $custom_anchor , '#' ) . '"',// make sure we clean the hash if user left it
                         // add smartload + parallax attributes
-                        $this->sek_maybe_add_bg_attributes( $model ),
+                        $bg_attributes,
 
-                        $this->sek_maybe_print_preview_level_guid_html()//<= added for #494
+                        $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
+                        ( $has_lazy_loaded_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>' : ''
                     ); ?>
                           <div class="<?php echo $column_container_class; ?>">
                             <div class="sek-row sek-sektion-inner">
@@ -502,21 +513,31 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     } else if ( $global_custom_breakpoint >= 1 ) {
                         $grid_column_class = "sek-global-custom-breakpoint-col-{$col_suffix}";
                     }
-                    ?>
+                    $bg_attributes = $this->sek_maybe_add_bg_attributes( $model );
+                    if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
+                      ?>
+                        <script>nb_.emit('nb-needs-videobg-js');</script>
                       <?php
-                          printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s" %5$s %6$s %7$s %8$s>',
-                              $id,
-                              $grid_column_class,
-                              $this->get_level_visibility_css_class( $model ),
-                              is_null( $custom_css_classes ) ? '' : $custom_css_classes,
+                    }
+                    // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
+                    $has_lazy_loaded_bg_img = false;
+                    if ( false !== strpos( $bg_attributes, 'data-sek-lazy-bg="true" data-sek-src="http') ) {
+                        $has_lazy_loaded_bg_img = true;
+                    }
+                    printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s" %5$s %6$s %7$s %8$s>%9$s',
+                        $id,
+                        $grid_column_class,
+                        $this->get_level_visibility_css_class( $model ),
+                        is_null( $custom_css_classes ) ? '' : $custom_css_classes,
 
-                              empty( $collection ) ? 'data-sek-no-modules="true"' : '',
-                              // add smartload + parallax attributes
-                              $this->sek_maybe_add_bg_attributes( $model ),
-                              is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+                        empty( $collection ) ? 'data-sek-no-modules="true"' : '',
+                        // add smartload + parallax attributes
+                        $bg_attributes,
+                        is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
 
-                              $this->sek_maybe_print_preview_level_guid_html()//<= added for #494
-                          );
+                        $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
+                        ( $has_lazy_loaded_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>' : ''
+                    );
                       ?>
                         <?php
                         // Drop zone : if no modules, the drop zone is wrapped in sek-no-modules-columns
@@ -616,9 +637,14 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $render_tmpl_path = $overriden_template_path;
                         $is_module_template_overriden = true;
                     }
+                    // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
+                    $bg_attributes = $this->sek_maybe_add_bg_attributes( $model );
+                    $has_lazy_loaded_bg_img = false;
+                    if ( false !== strpos( $bg_attributes, 'data-sek-lazy-bg="true" data-sek-src="http') ) {
+                        $has_lazy_loaded_bg_img = true;
+                    }
 
-
-                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s %9$s>',
+                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s %9$s>%10$s',
                         $id,
                         $module_type,
                         $this->get_level_visibility_css_class( $model ),
@@ -626,11 +652,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                         $title_attribute,
                         // add smartload + parallax attributes
-                        $this->sek_maybe_add_bg_attributes( $model ),
+                        $bg_attributes,
                         is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
 
                         $this->sek_maybe_print_preview_level_guid_html(), //<= added for #494
-                        $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': ''// <= added for #532
+                        $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': '',// <= added for #532
+                        ( $has_lazy_loaded_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>' : ''
                     );
                       ?>
                         <div class="sek-module-inner">
@@ -714,6 +741,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         }
 
 
+        // march 2020 : not used anymore
         function sek_get_input_placeholder_content( $input_type = '', $input_id = '' ) {
             $ph = '<i class="material-icons">pan_tool</i>';
             switch( $input_type ) {
