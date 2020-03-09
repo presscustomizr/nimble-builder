@@ -14,7 +14,7 @@ function sek_get_module_params_for_sek_global_performances() {
             'item-inputs' => array(
                 'global-img-smart-load' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Defer loading of offscreen images', 'text_doma'),
+                    'title'       => __('Defer loading images off screen', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -56,14 +56,14 @@ function sek_get_module_params_for_sek_global_performances() {
                 ),
                 'load_front_assets_in_ajax' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Defer loading of module assets when modules are offscreen', 'text_doma'),
+                    'title'       => __('Defer loading module assets when modules are offscreen', 'text_doma'),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
                 'load_font_awesome_in_ajax' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Defer loading of Font Awesome icons', 'text_doma'),
+                    'title'       => __('Defer loading Font Awesome icons', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
