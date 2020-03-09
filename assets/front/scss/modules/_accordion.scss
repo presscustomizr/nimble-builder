@@ -41,14 +41,14 @@
       &:hover * {
           color: #1e261f;//consistent with default on registration
       }
-      &:hover button span {
+      &:hover .expander span {
           background:#1e261f//consistent with default on registration
       }
       @at-root [data-sek-expanded="true"] {
         .sek-accord-title * {
             color: #1e261f;//consistent with default on registration
         }
-        .sek-accord-title button span {
+        .sek-accord-title .expander span {
             background:#1e261f//consistent with default on registration
         }
       }
@@ -59,7 +59,7 @@
         max-width: calc(100% - 30px);
       }
 
-      .sek-inner-accord-title, button span {
+      .sek-inner-accord-title, .expander span {
           -webkit-transition: all 0.15s ease-in-out;
           -moz-transition: all, 0.15s ease-in-out;
           -ms-transition: all, 0.15s ease-in-out;
@@ -68,7 +68,7 @@
       }
       // morphing + / -
       // inspired from https://stackoverflow.com/questions/38136077/how-to-morph-a-plus-sign-to-a-minus-sign-using-css-transition
-      button {
+      .expander {
         color: #1e261f;//consistent with default on registration
         width: 30px;
         height: 30px;
@@ -86,7 +86,7 @@
         cursor: pointer;
       }
 
-      button span {
+      .expander span {
         position: absolute;
         -webkit-transition: .3s;
           -o-transition: .3s;
@@ -95,14 +95,14 @@
         border-radius: 2px;
       }
 
-      button span:first-of-type {
+      .expander span:first-of-type {
         top: 25%;
         bottom: 25%;
         width: 10%;
         left: 45%;
       }
 
-      button span:last-of-type {
+      .expander span:last-of-type {
         left: 25%;
         right: 25%;
         height: 10%;
@@ -110,12 +110,12 @@
       }
 
       @at-root [data-sek-expanded="true"] {
-        button span:first-of-type, button span:last-of-type {
+        .expander span:first-of-type, .expander span:last-of-type {
           -webkit-transform: rotate(90deg);
             -ms-transform: rotate(90deg);
                 transform: rotate(90deg);
         }
-        button span:last-of-type {
+        .expander span:last-of-type {
           left: 50%;
           right: 50%;
         }
@@ -133,12 +133,12 @@
     }
 
     &[data-sek-expanded="true"] .sek-accord-title {
-      button span:first-of-type, button span:last-of-type {
+      .expander span:first-of-type, .expander span:last-of-type {
         -webkit-transform: rotate(90deg);
             -ms-transform: rotate(90deg);
                 transform: rotate(90deg);
       }
-      button span:last-of-type {
+      .expander span:last-of-type {
         left: 50%;
         right: 50%;
       }

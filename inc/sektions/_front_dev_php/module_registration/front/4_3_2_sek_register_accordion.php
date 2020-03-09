@@ -488,7 +488,7 @@ function sek_add_css_rules_for_czr_accordion_module( $rules, $complete_modul_mod
     // TEXT COLOR ( for the plus / minus icon )
     if ( ! empty( $accord_opts[ 'color_css' ] ) && $accord_defaults[ 'color_css' ] != $accord_opts[ 'color_css' ] ) {
         $rules[] = array(
-            'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item button span', $complete_modul_model['id'] ),
+            'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item .expander span', $complete_modul_model['id'] ),
             'css_rules' => 'background:'. $accord_opts[ 'color_css' ] .';',
             'mq' =>null
         );
@@ -496,7 +496,7 @@ function sek_add_css_rules_for_czr_accordion_module( $rules, $complete_modul_mod
     // ACTIVE / HOVER TEXT COLOR ( for the plus / minus icon )
     if ( ! empty( $accord_opts[ 'color_active_css' ] ) && $accord_defaults[ 'color_active_css' ] != $accord_opts[ 'color_active_css' ] ) {
         $rules[] = array(
-            'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper [data-sek-expanded="true"] .sek-accord-title button span, [data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item .sek-accord-title:hover button span', $complete_modul_model['id'] ),
+            'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper [data-sek-expanded="true"] .sek-accord-title .expander span, [data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item .sek-accord-title:hover .expander span', $complete_modul_model['id'] ),
             'css_rules' => sprintf('background:%s;', $accord_opts[ 'color_active_css' ] ),
             'mq' =>null
         );
