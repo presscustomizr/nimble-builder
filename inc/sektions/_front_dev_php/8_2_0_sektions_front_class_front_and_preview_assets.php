@@ -6,9 +6,6 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // Load Front Assets
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_front_assets' ) );
 
-            // Maybe load Font Awesome icons if needed ( sniff first )
-            add_action( 'wp_head', array( $this, 'sek_maybe_load_font_awesome_icons' ), PHP_INT_MAX );
-
             // Adds `async` and `defer` support for scripts registered or enqueued
             // and for which we've added an attribute with sek_wp_script_add_data( $_hand, 'async', true );
             // inspired from Twentytwenty WP theme
@@ -25,6 +22,12 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // initialize Nimble front js app
             add_action( 'wp_head', array( $this, 'sek_initialize_front_js_app' ), 0  );
 
+            // Maybe load Font Awesome icons if needed ( sniff first )
+            add_action( 'wp_head', array( $this, 'sek_maybe_load_font_awesome_icons' ), PHP_INT_MAX );
+
+            // Maybe print a CSS loader for img and background lazy loaded
+            add_action( 'wp_head', array( $this, 'sek_maybe_print_css_loader_for_lazyload' ), PHP_INT_MAX );
+
             // Emit an event when jQuery is detected. 'nimble-jquery-loaded'
             // maybe fetch jQuery from a CDN when dequeued
             add_action( 'wp_footer', array( $this, 'sek_handle_jquery' ));
@@ -34,7 +37,6 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // Load customize preview js
             add_action( 'customize_preview_init' , array( $this, 'sek_schedule_customize_preview_assets' ) );
         }//_schedule_front_and_preview_assets_printing
-
 
         // hook : 'wp_enqueue_scripts'
         function sek_enqueue_front_assets() {
@@ -326,6 +328,14 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         }
 
 
+        //@'wp_head'PHP_INT_MAX
+        function sek_maybe_print_css_loader_for_lazyload() {
+          if ( !sek_is_img_smartload_enabled() || skp_is_customizing() )
+            return;
+          ?>
+          <style id="nb-lazyload-css-loader">@-webkit-keyframes sek-mr-loader{0%{-webkit-transform:scale(.1);transform:scale(.1);opacity:1}70%{-webkit-transform:scale(1);transform:scale(1);opacity:.7}100%{opacity:0}}@keyframes sek-mr-loader{0%{-webkit-transform:scale(.1);transform:scale(.1);opacity:1}70%{-webkit-transform:scale(1);transform:scale(1);opacity:.7}100%{opacity:0}}.sek-css-loader{width:50px;height:50px;position:absolute;-webkit-transform:translate3d(-50%,-50%,0);transform:translate3d(-50%,-50%,0);top:50%;left:50%}.csstransforms3d .sek-css-loader{display:block}.sek-mr-loader>div:nth-child(0){-webkit-animation-delay:-.8s;animation-delay:-.8s}.sek-mr-loader>div:nth-child(1){-webkit-animation-delay:-.6s;animation-delay:-.6s}.sek-mr-loader>div:nth-child(2){-webkit-animation-delay:-.4s;animation-delay:-.4s}.sek-mr-loader>div:nth-child(3){-webkit-animation-delay:-.2s;animation-delay:-.2s}.sek-mr-loader>div{-webkit-animation-fill-mode:both;animation-fill-mode:both;position:absolute;top:0;left:0;width:100%;height:100%;border-radius:100%;border:2px solid #777;-webkit-animation:sek-mr-loader 1.25s 0s infinite cubic-bezier(.21,.53,.56,.8);animation:sek-mr-loader 1.25s 0s infinite cubic-bezier(.21,.53,.56,.8)}.white-loader>.sek-mr-loader>div{border:2px solid #fff}</style>
+          <?php
+        }
 
 
         // @'wp_head'0
@@ -348,7 +358,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             <?php
             if( sek_is_front_jquery_preloaded() && !skp_is_customizing() ) {
             ?>
-            <script id="nimble-load-jquery">setTimeout(function(){var e=function(){var e=document.createElement("script");e.setAttribute("src","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),e.setAttribute("id","nimble-jquery"),e.setAttribute("defer","defer"),document.getElementsByTagName("head")[0].appendChild(e);var t=document.getElementById("nimble-load-jquery");t.parentNode.removeChild(t)};if(nb_.assetPreloadSupported()){var t=document.createElement("link");t.setAttribute("href","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),t.setAttribute("rel","preload"),t.setAttribute("as","script"),t.onload=function(){this.onload=null,this.rel="script",e()},document.getElementsByTagName("head")[0].appendChild(t)}else e()},0);</script>
+            <script id="nimble-load-jquery">setTimeout(function(){var e=function(){var e=document.createElement("script");e.setAttribute("src","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),e.setAttribute("id","nimble-jquery"),e.setAttribute("defer","defer"),document.getElementsByTagName("head")[0].appendChild(e);var t=document.getElementById("nimble-load-jquery");t.parentNode.removeChild(t)};if(nb_.assetPreloadSupported()){var t=document.createElement("link");t.setAttribute("href","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),t.setAttribute("rel","preload"),t.setAttribute("as","script"),t.onload=function(){this.onload=null,this.rel="script",e()},document.getElementsByTagName("head")[0].appendChild(t)}else e()},3000);</script>
             <?php
             }
         }//sek_handle_jquery()
