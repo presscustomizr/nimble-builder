@@ -111,7 +111,11 @@ if ( ! function_exists( 'Nimble\sek_render_post') ) {
               <?php
                   if( $has_post_thumbnail ) {
                       $img_html = wp_get_attachment_image( get_post_thumbnail_id(), empty( $thumb_settings['img_size'] ) ? 'medium' : $thumb_settings['img_size']);
-                      echo apply_filters( 'nimble_parse_for_smart_load', $img_html );
+                      $img_html = apply_filters( 'nimble_parse_for_smart_load', $img_html );
+                      if ( !skp_is_customizing() && false !== strpos($img_html, 'data-sek-src="http') ) {
+                          $img_html = $img_html.Nimble_Manager()->css_loader_html;
+                      }
+                      echo $img_html;
                   } else if ( $use_post_thumb_placeholder ) {
                       printf( '<img alt="default img" data-sek-smartload="false" src="%1$s"/>', NIMBLE_BASE_URL . '/assets/img/default-img.png'  );
                   }

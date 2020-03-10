@@ -13,7 +13,7 @@
                 loaderFunc = handlerParams.func;
 
             $.each( $elements, function( k, el ) {
-                if ( !nb_.scrollHandlers[id].loaded && nb_.isInWindow($(el) ) ) {
+                if ( !nb_.scrollHandlers[id].loaded && nb_.elOrFirstVisibleParentIsInWindow($(el) ) ) {
                     loaderFunc();
                     nb_.scrollHandlers[id].loaded = true;
                 }

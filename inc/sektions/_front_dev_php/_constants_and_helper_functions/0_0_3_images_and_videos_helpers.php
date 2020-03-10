@@ -84,8 +84,6 @@ function nimble_regex_callback( $matches ) {
 // This option is cached
 // deactivated when customizing
 function sek_is_img_smartload_enabled() {
-    if ( skp_is_customizing() )
-      return false;
     if ( 'not_cached' !== Nimble_Manager()->img_smartload_enabled ) {
         return Nimble_Manager()->img_smartload_enabled;
     }

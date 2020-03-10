@@ -1,4 +1,4 @@
-// global sekFrontLocalized, nimbleListenTo
+// global sekFrontLocalized, nb_
 if ( window.nb_ === void 0 && window.console && window.console.log ) {
     console.log('Nimble error => window.nb_ global not instantiated');
 }
@@ -56,11 +56,16 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                     previewedDevice : 'desktop',
                     //Simple Utility telling if a given Dom element is currently in the window <=> visible.
                     //Useful to mimic a very basic WayPoint
-                    isInWindow : function( $_el, threshold ) {
-                          if ( ! ( $_el instanceof $ ) )
-                            return;
-                          if ( threshold && ! nb_.isNumber( threshold ) )
-                            return;
+                    elOrFirstVisibleParentIsInWindow : function( element, threshold ) {
+                          var $_el = ! ( element instanceof $ ) ? $(element) : element;
+                          if ( ! ( $_el instanceof $ ) ) {
+                              nb_.errorLog('invalid element in nb_.elOrFirstVisibleParentIsInWindow', $_el );
+                              return;
+                          }
+                          if ( threshold && ! nb_.isNumber( threshold ) ) {
+                              nb_.errorLog('invalid threshold in nb_.elOrFirstVisibleParentIsInWindow');
+                              return;
+                          }
 
                           var sniffFirstVisiblePrevElement = function( $el ) {
                               if ( $el.length > 0 && $el.is(':visible') )
@@ -97,7 +102,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                               th = threshold || 0;
 
                           return ib >= wt - th && it <= wb + th;
-                    },//isInWindow
+                    },//elOrFirstVisibleParentIsInWindow
                     // params = {
                     //  path : 'js/libs/swiper.min.js'
                     //  complete : function() {
@@ -224,7 +229,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
               nb_.emit('nimble-app-ready');
           });// jQuery( function($){
     };
-    // 'nimble-jquery-loaded' is fired @'wp_footer' see inline script in ::_schedule_front_and_preview_assets_printing()
+    // 'nimble-jquery-loaded' is fired @'wp_footer' see inline script in ::_schedule_front_assets_printing()
     nb_.listenTo('nimble-jquery-loaded', callbackFunc );
 
 }(window, document));

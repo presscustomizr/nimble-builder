@@ -112,8 +112,17 @@
               */
               Plugin.prototype._maybe_trigger_load = function( $_Elements , _evt ) {
                     var self = this,
-                        //get the visible images list
-                        _visible_list = $_Elements.filter( function( ind, _el ) { return self._is_visible( _el ,  _evt ); } );
+                        // get the visible images list
+                        // don't apply a threshold on page load so that Google audit is happy
+                        // for https://github.com/presscustomizr/nimble-builder/issues/619
+                        threshold = ( _evt && 'scroll' === _evt.type ) ? this.options.threshold : 0;
+
+                        _visible_list = $_Elements.filter( function( ind, _el ) {
+                            //force all images to visible if first scroll option enabled
+                            if ( _evt && 'scroll' == _evt.type && self.options.load_all_images_on_first_scroll )
+                              return true;
+                            return nb_.elOrFirstVisibleParentIsInWindow( _el, threshold );
+                        });
 
                     _visible_list.map( function( ind, _el ) {
                           if ( 'IFRAME' === $(_el).prop("tagName") ) {
@@ -122,57 +131,6 @@
                                 $(_el).trigger( 'sek_load_img' );
                           }
                     });
-              };
-
-
-              /*
-              * @param single $img object
-              * @param : current event
-              * @return bool
-              * helper to check if an image is the visible ( viewport + custom option threshold)
-              */
-              Plugin.prototype._is_visible = function( element, _evt ) {
-                    var sniffFirstVisiblePrevElement = function( $el ) {
-                          if ( $el.length > 0 && $el.is(':visible') )
-                            return $el;
-                          var $prev = $el.prev();
-                          // if there's a previous sibling and this sibling is visible, use it
-                          if ( $prev.length > 0 && $prev.is(':visible') ) {
-                              return $prev;
-                          }
-                          // if there's a previous sibling but it's not visible, let's try the next previous sibling
-                          if ( $prev.length > 0 && !$prev.is(':visible') ) {
-                              return sniffFirstVisiblePrevElement( $prev );
-                          }
-                          // if no previous sibling visible, let's go up the parent level
-                          var $parent = $el.parent();
-                          if ( $parent.length > 0 ) {
-                              return sniffFirstVisiblePrevElement( $parent );
-                          }
-                          // we don't have siblings or parent
-                          return null;
-                    };
-
-                    // Is the candidate visible ? <= not display:none
-                    // If not visible, we can't determine the offset().top because of https://github.com/presscustomizr/nimble-builder/issues/363
-                    // So let's sniff up in the DOM to find the first visible sibling or container
-                    var $el_candidate = sniffFirstVisiblePrevElement( $(element) );
-                    if ( !$el_candidate || $el_candidate.length < 1 )
-                      return false;
-
-                    var wt = nb_.cachedElements.$window.scrollTop(),
-                        wb = wt + nb_.cachedElements.$window.height(),
-                        it  = $el_candidate.offset().top,
-                        ib  = it + $el_candidate.height(),
-                        // don't apply a threshold on page load so that Google audit is happy
-                        // for https://github.com/presscustomizr/nimble-builder/issues/619
-                        th = ( _evt && 'scroll' === _evt.type ) ? this.options.threshold : 0;
-
-                    //force all images to visible if first scroll option enabled
-                    if ( _evt && 'scroll' == _evt.type && this.options.load_all_images_on_first_scroll )
-                      return true;
-
-                    return ib >= wt - th && it <= wb + th;
               };
 
 
@@ -220,12 +178,22 @@
                                 $_el.trigger('smartload');
                                 //flag to avoid double triggering
                                 $_el.data('sek-lazy-loaded', true );
+                                self._clean_css_loader( $_el );
+
                           });//<= create a load() fn
                     //http://stackoverflow.com/questions/1948672/how-to-tell-if-an-image-is-loaded-or-cached-in-jquery
                     if ( $jQueryImgToLoad[0].complete ) {
                           $jQueryImgToLoad.trigger( 'load' );
                     }
                     $_el.removeClass('lazy-loading');
+              };
+
+              Plugin.prototype._clean_css_loader = function( $_el ) {
+                    // maybe remove the CSS loader
+                    $.each( [ $_el.find('.sek-css-loader'),  $_el.parent().find('.sek-css-loader') ], function( k, $_el ) {
+                        if ( $_el.length > 0 )
+                          $_el.remove();
+                    });
               };
 
 
@@ -269,6 +237,6 @@
       // on 'nimble-app-ready', jQuery is loaded
       nb_.listenTo('nimble-app-ready', function(){
           callbackFunc();
-          nb_.emit('nimble-lazyload-loaded');
+          if ( sekFrontLocalized.lazyload_enabled ) { nb_.emit('nimble-lazyload-loaded'); }
       });
 }(window, document));

@@ -167,13 +167,15 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $feedback_notif_status = 'not_set';
 
         // March 2020 : introduction of split stylesheet for some modules
-        public $big_module_stylesheet_map = [];//<= is populated in ::_schedule_front_and_preview_assets_printing()
+        public $big_module_stylesheet_map = [];//<= is populated in ::_schedule_front_assets_printing()
 
         // March 2020
         public $modules_dependant_of_font_awesome = [ 'czr_button_module', 'czr_icon_module', 'czr_social_icons_module' ];
 
         // March 2020, for https://github.com/presscustomizr/nimble-builder/issues/629
         public $google_fonts_print_candidates = 'not_set';// will cache the google font candidates to print in ::_setup_hook_for_front_css_printing_or_enqueuing()
+
+        public $css_loader_html = '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>';
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
@@ -189,8 +191,10 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             if ( defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) && NIMBLE_SAVED_SECTIONS_ENABLED ) {
                 $this->_schedule_section_saving_ajax_actions();
             }
-            // ASSETS
-            $this->_schedule_front_and_preview_assets_printing();
+            // FRONT ASSETS
+            $this->_schedule_front_assets_printing();
+            // CUSTOOMIZER PREVIEW ASSETS
+            $this->_schedule_preview_assets_printing();
             // RENDERING
             $this->_schedule_front_rendering();
             // RENDERING

@@ -20,7 +20,8 @@ function sek_get_module_params_for_sek_global_performances() {
                     'input_width' => 'width-20',
                     'notice_after' => sprintf('<strong>%1$s</strong>',
                         __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
-                    )
+                    ),
+                    'html_before' => '<hr/><h3>' . __('LAZY LOADING') .'</h3>'
                 ),
                 'global-bg-video-lazy-load' => array(
                     'input_type'  => 'nimblecheck',
@@ -32,27 +33,6 @@ function sek_get_module_params_for_sek_global_performances() {
                     //     __( 'Load video backgrounds when', 'text_dom'),
                     //     __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
                     // )
-                ),
-                'use_partial_module_stylesheets' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Use partial CSS stylesheets for modules', 'text_doma'),
-                    'default'     => 1,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                ),
-                'print_partial_module_stylesheets_inline' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Print modules stylesheets inline', 'text_doma'),
-                    'default'     => 0,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                ),
-                'print_dyn_stylesheets_inline' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Print generated stylesheets inline', 'text_doma'),
-                    'default'     => 1,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
                 ),
                 'load_front_assets_in_ajax' => array(
                     'input_type'  => 'nimblecheck',
@@ -68,12 +48,28 @@ function sek_get_module_params_for_sek_global_performances() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
-                'load_js_async' => array(
+
+                'use_partial_module_stylesheets' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Load javascript files asynchronously', 'text_doma'),
+                    'title'       => __('Use partial CSS stylesheets for modules', 'text_doma'),
                     'default'     => 1,
                     'title_width' => 'width-80',
-                    'input_width' => 'width-20'
+                    'input_width' => 'width-20',
+                    'html_before' => '<hr/><h3>' . __('STYLESHEETS') .'</h3>'
+                ),
+                'print_partial_module_stylesheets_inline' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Print modules stylesheets inline', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'print_dyn_stylesheets_inline' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Print generated stylesheets inline', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
                 ),
                 'preload_google_fonts' => array(
                     'input_type'  => 'nimblecheck',
@@ -82,13 +78,31 @@ function sek_get_module_params_for_sek_global_performances() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
-                'preload_jquery' => array(
+                'load_js_async' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Preload jQuery library on front-end', 'text_doma'),
+                    'title'       => __('Load javascript files asynchronously', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'html_before' => '<hr/><h3>' . __('SCRIPTS') .'</h3>'
+                ),
+
+                'load_jquery_async' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Load jQuery library asynchronously', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after' => __('Use with caution, preloading Jquery can break third party plugins and themes.')
+                    'notice_after' => __('Use with caution, can break third party plugins and themes.'),
+                    'html_before' => '<hr/><h3>' . __('JQUERY') .'</h3>'
+                ),
+                'use_latest_version_jquery' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Use the latest version of jQuery library on front-end, without jquery-migrate', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => __('Use with caution, can break third party plugins and themes.')
                 ),
             )
         )//tmpl

@@ -104,8 +104,69 @@ window.nb_ = {};
         },
         wasEmitted : function( evt ) {
             return ('string' === typeof evt) && nb_.inArray( nb_.eventsEmitted, evt );
+        },
+        isInScreen : function(el, threshold) {
+          var wt = window.pageYOffset || document.documentElement.scrollTop,
+              wb = wt + window.innerHeight,
+              it  = el.offsetTop,
+              ib  = it + el.clientHeight,
+              th = threshold || 0;
+
+          return ib >= wt - th && it <= wb + th;
+        },
+        isCustomizing : function() {
+          return true == '<?php echo skp_is_customizing(); ?>';
+        },
+        isLazyLoadEnabled : function() {
+          return !nb_.isCustomizing() && true == '<?php echo sek_is_img_smartload_enabled(); ?>';
         }
     };//window.nb_
+
+    //forEach not supported by IE
+    //This polyfill adds compatibility to all Browsers supporting ES5:
+    if (window.NodeList && !NodeList.prototype.forEach) {
+        NodeList.prototype.forEach = function (callback, thisArg) {
+            thisArg = thisArg || window;
+            for (var i = 0; i < this.length; i++) {
+                callback.call(thisArg, this[i], i, this);
+            }
+        };
+    }
+    // handle bg images when lazyloading off
+    var _bgRevealed = false;
+        _revealBGImages = function() {
+        if ( !_bgRevealed ) {
+            _bgRevealed = true;
+            var matches = document.querySelectorAll('div.sek-has-bg');
+
+            if ( nb_.isObject( matches ) && matches.length > 0 ) {
+                var imgSrc, isInScreen = false;
+                matches.forEach( function(el) {
+                    if ( nb_.isObject(el) ) {
+                        if ( !nb_.isLazyLoadEnabled() || ( nb_.isInScreen(el) && nb_.isLazyLoadEnabled() ) ) {
+                            imgSrc = el.getAttribute('data-sek-src');
+                            if ( imgSrc ) {
+                                el.setAttribute( 'style', 'background-image:url("' + el.getAttribute('data-sek-src') +'")' );
+                                el.className += ' smartload-skip';//<= so we don't parse it twice when lazyload is active
+                                // clean css loader
+                                var css_loaders = el.querySelectorAll('.sek-css-loader');
+                                css_loaders.forEach( function(_cssl) {
+                                    if ( nb_.isObject(_cssl) ) {
+                                        _cssl.parentNode.removeChild(_cssl);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    };
+    // dom ready the jquery way
+    // Use the handy event callback
+    document.addEventListener( "DOMContentLoaded", _revealBGImages );
+    // A fallback to window.onload, that will always work
+    window.addEventListener( "load", _revealBGImages );
 }(window, document ));
 
 
@@ -122,44 +183,17 @@ window.nb_ = {};
 //     }
 // }
 
-// printed in function sek_handle_jquery()
-// march 2020 : wp_footer js code to be minified
-// introduced for https://github.com/presscustomizr/nimble-builder/issues/626
-( function() {
-      // recursively try to load jquery every 200ms during 6s ( max 30 times )
-      var sayWhenJqueryIsReady = function( attempts ) {
-          attempts = attempts || 0;
-          if ( typeof undefined !== typeof jQuery ) {
-              nb_.emit('nimble-jquery-loaded');
-          } else if ( attempts < 30 ) {
-              setTimeout( function() {
-                  attempts++;
-                  sayWhenJqueryIsReady( attempts );
-              }, 200 );
-          } else {
-              alert('Nimble Builder problem : jQuery.js was not detected on your website');
-          }
-      };
-      sayWhenJqueryIsReady();
-})();
 
-// printed in function sek_handle_jquery()
+// printed in function ek_preload_jquery_from_dns()
 // in <script id="nimble-load-jquery">
 ( function() {
       // Load jQuery
       setTimeout( function() {
-          // deferred script
-          // var script = document.createElement('script');
-          // script.setAttribute('src', 'https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js');
-          // script.setAttribute('id', 'nimble-jquery');
-          // script.setAttribute('defer', 'defer');//https://html.spec.whatwg.org/multipage/scripting.html#attr-script-defer
-          // document.getElementsByTagName('head')[0].appendChild(script);
-
           // Preload @see https://web.dev/uses-rel-preload/
           var appendScript = function() {
               var script = document.createElement('script');
-              script.setAttribute('src', 'https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js');
-              script.setAttribute('id', 'nimble-jquery');
+              script.setAttribute('src', '<?php echo NIMBLE_JQUERY_LATEST_CDN_URL; ?>');
+              script.setAttribute('id', '<?php echo NIMBLE_JQUERY_ID; ?>');
               script.setAttribute('defer', 'defer');//https://html.spec.whatwg.org/multipage/scripting.html#attr-script-defer
               document.getElementsByTagName('head')[0].appendChild(script);
               // remove script wrapper when done
@@ -169,13 +203,13 @@ window.nb_ = {};
           // Firefox does not support preload
           // @see https://web.dev/preload-critical-assets/
           // https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser#9851769
-          var isFirefox = typeof InstallTrigger !== 'undefined';
           if ( !nb_.assetPreloadSupported() ) {
               appendScript();
           } else {
               var link = document.createElement('link');
-              link.setAttribute('href', 'https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js');
+              link.setAttribute('href', '<?php echo NIMBLE_JQUERY_LATEST_CDN_URL; ?>');
               link.setAttribute('rel', 'preload');
+              link.setAttribute('id', '<?php echo NIMBLE_JQUERY_ID; ?>');
               link.setAttribute('as', 'script');
               link.onload = function() {
                   this.onload=null;
@@ -184,8 +218,89 @@ window.nb_ = {};
               };
               document.getElementsByTagName('head')[0].appendChild(link);
           }
-      }, 0 );//<= add a delay to test 'nimble-jquery-loaded' and mimic the 'defer' option of a cache plugin
+      }, 1000 );//<= add a delay to test 'nimble-jquery-loaded' and mimic the 'defer' option of a cache plugin
 })();
+
+
+
+// printed in function sek_detect_jquery()
+// march 2020 : wp_footer js code to be minified
+// introduced for https://github.com/presscustomizr/nimble-builder/issues/626
+( function() {
+      var _maybeEmit = function() {
+        var evt = 'nimble-jquery-loaded';
+        if ( !nb_.wasEmitted(evt) ) {
+            nb_.emit(evt);
+        }
+      };
+      // recursively try to load jquery every 200ms during 6s ( max 30 times )
+      var _emitWhenJqueryIsReady = function( attempts ) {
+          attempts = attempts || 0;
+          if ( typeof undefined !== typeof window.jQuery ) {
+              _maybeEmit();
+          } else if ( attempts < 30 ) {
+              setTimeout( function() {
+                  attempts++;
+                  _emitWhenJqueryIsReady( attempts );
+              }, 200 );
+          } else {
+              alert('Nimble Builder problem : jQuery.js was not detected on your website');
+          }
+      };
+      // if jQuery has already be printed, let's listen to the load event
+      var jquery_script_el = document.getElementById('<?php echo NIMBLE_JQUERY_ID; ?>');
+      if ( jquery_script_el ) {
+          jquery_script_el.addEventListener('load', function() {
+              _maybeEmit();
+          });
+      }
+      _emitWhenJqueryIsReady();
+})();
+
+
+// printed in function sek_maybe_inject_jquery_migrate()
+// march 2020 : wp_footer js code to be minified
+// introduced for https://github.com/presscustomizr/nimble-builder/issues/626
+// in script nimble-load-jquery-migrate
+(function() {
+    // Preload @see https://web.dev/uses-rel-preload/
+    var appendScript = function() {
+        var script = document.createElement('script');
+        script.setAttribute('src', '<?php echo NIMBLE_JQUERY_MIGRATE_URL; ?>');
+        script.setAttribute('id', 'nb-query-migrate');
+        script.setAttribute('defer', 'defer');//https://html.spec.whatwg.org/multipage/scripting.html#attr-script-defer
+        document.getElementsByTagName('head')[0].appendChild(script);
+        // remove script wrapper when done
+        var elem = document.getElementById("nimble-load-jquery-migrate");
+        elem.parentNode.removeChild(elem);
+    };
+    nb_.listenTo('nimble-jquery-loaded', function() {
+        // Firefox does not support preload
+        // @see https://web.dev/preload-critical-assets/
+        // https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser#9851769
+        if ( !nb_.assetPreloadSupported() ) {
+            appendScript();
+        } else {
+            var link = document.createElement('link');
+            link.setAttribute('href', '<?php echo NIMBLE_JQUERY_MIGRATE_URL; ?>');
+            link.setAttribute('rel', 'preload');
+            link.setAttribute('id', 'nb-query-migrate');
+            link.setAttribute('as', 'script');
+            link.onload = function() {
+                this.onload=null;
+                this.rel='script';
+                appendScript();
+            };
+            document.getElementsByTagName('head')[0].appendChild(link);
+        }
+    });
+})();
+
+
+
+
+
+
 
 
 // printed ::sek_maybe_load_font_awesome_icons()

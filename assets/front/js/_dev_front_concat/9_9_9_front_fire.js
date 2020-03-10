@@ -47,6 +47,7 @@
 /* ------------------------------------------------------------------------- *
  *  SMARTLOAD
 /* ------------------------------------------------------------------------- */
+// nimble-lazyload-loaded is fired in lazyload plugin, only when sekFrontLocalized.lazyload_enabled
 (function(w, d){
     nb_.listenTo('nimble-lazyload-loaded', function() {
         jQuery(function($){

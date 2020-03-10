@@ -69,7 +69,11 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
                 }
             }
         }
-        return apply_filters( 'nimble_parse_for_smart_load', sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', $visual_effect_class, $html, esc_html( $title ) ) );
+        $html = apply_filters( 'nimble_parse_for_smart_load', $html );
+        if ( !skp_is_customizing() && false !== strpos($html, 'data-sek-src="http') ) {
+            $html = $html.Nimble_Manager()->css_loader_html;
+        }
+        return sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', $visual_effect_class, $html, esc_html( $title ) );
     }
 }
 

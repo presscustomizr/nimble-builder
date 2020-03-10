@@ -491,7 +491,8 @@ module.exports = {
       // SEK_Front_Render()
       '<%= paths.sektions %>_front_dev_php/8_0_0_sektions_front_class_construct.php',
       '<%= paths.sektions %>_front_dev_php/8_0_1_sektions_front_class_ajax.php',
-      '<%= paths.sektions %>_front_dev_php/8_2_0_sektions_front_class_front_and_preview_assets.php',
+      '<%= paths.sektions %>_front_dev_php/8_2_0_sektions_front_class_front_assets.php',
+      '<%= paths.sektions %>_front_dev_php/8_2_1_sektions_front_class_preview_assets.php',
       '<%= paths.sektions %>_front_dev_php/8_4_0_sektions_front_class_render.php',
       '<%= paths.sektions %>_front_dev_php/8_4_1_sektions_front_class_render_css.php',
 

@@ -145,7 +145,7 @@ var czrapp = czrapp || {};
 
             //Simple Utility telling if a given Dom element is currently in the window <=> visible.
             //Useful to mimic a very basic WayPoint
-            isInWindow : function( $_el, threshold ) {
+            elOrFirstVisibleParentIsInWindow : function( $_el, threshold ) {
                   if ( ! ( $_el instanceof $ ) )
                     return;
                   if ( threshold && ! _.isNumber( threshold ) )

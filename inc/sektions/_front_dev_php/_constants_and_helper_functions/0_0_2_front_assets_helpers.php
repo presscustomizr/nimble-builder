@@ -111,12 +111,22 @@ function sek_front_needs_video_bg( $bool = false, $recursive_data = null ) {
 
 // @return bool
 // march 2020 introduced https://github.com/presscustomizr/nimble-builder/issues/632
-function sek_is_front_jquery_preloaded() {
+function sek_is_jquery_replaced() {
     if ( skp_is_customizing() )
       return;
     $glob_perf = sek_get_global_option_value( 'performances' );
-    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['preload_jquery'] ) ) {
-        return sek_booleanize_checkbox_val( $glob_perf['preload_jquery'] );
+    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['use_latest_version_jquery'] ) ) {
+        return sek_booleanize_checkbox_val( $glob_perf['use_latest_version_jquery'] );
+    }
+    return false;
+}
+
+// @return bool
+// march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
+function sek_load_jquery_async() {
+    $glob_perf = sek_get_global_option_value( 'performances' );
+    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['load_jquery_async'] ) ) {
+        return sek_booleanize_checkbox_val( $glob_perf['load_jquery_async'] );
     }
     return false;
 }
@@ -186,6 +196,7 @@ function sek_preload_google_fonts_on_front() {
     }
     return false;
 }
+
 
 // Adds async/defer attributes to enqueued / registered scripts.
 // works with ::sek_filter_script_loader_tag loaded @'script_loader_tag'

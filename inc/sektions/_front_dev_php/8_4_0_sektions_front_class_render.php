@@ -1,6 +1,6 @@
 <?php
 if ( ! class_exists( 'SEK_Front_Render' ) ) :
-    class SEK_Front_Render extends SEK_Front_Assets {
+    class SEK_Front_Render extends SEK_Front_Assets_Customizer_Preview {
         // Fired in __construct()
         function _schedule_front_rendering() {
             if ( !defined( "NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY", PHP_INT_MAX ); }
@@ -442,15 +442,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                       <?php
                     }
                     // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
-                    $has_lazy_loaded_bg_img = false;
-                    if ( false !== strpos( $bg_attributes, 'data-sek-lazy-bg="true" data-sek-src="http') ) {
-                        $has_lazy_loaded_bg_img = true;
+                    $has_bg_img = false;
+                    if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
+                        $has_bg_img = true;
                     }
-                    printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s" %6$s %7$s %8$s>%9$s',
+                    printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s %6$s" %7$s %8$s %9$s>%10$s',
                         $id,
                         $is_nested ? 'data-sek-is-nested="true"' : '',
                         $has_at_least_one_module ? 'sek-has-modules' : '',
                         $this->get_level_visibility_css_class( $model ),
+                        $has_bg_img ? 'sek-has-bg' : '',
                         is_null( $custom_css_classes ) ? '' : $custom_css_classes,
 
                         is_null( $custom_anchor ) ? '' : 'id="' . ltrim( $custom_anchor , '#' ) . '"',// make sure we clean the hash if user left it
@@ -458,7 +459,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $bg_attributes,
 
                         $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
-                        ( $has_lazy_loaded_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>' : ''
+                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     ); ?>
                           <div class="<?php echo $column_container_class; ?>">
                             <div class="sek-row sek-sektion-inner">
@@ -520,14 +521,15 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                       <?php
                     }
                     // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
-                    $has_lazy_loaded_bg_img = false;
-                    if ( false !== strpos( $bg_attributes, 'data-sek-lazy-bg="true" data-sek-src="http') ) {
-                        $has_lazy_loaded_bg_img = true;
+                    $has_bg_img = false;
+                    if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
+                        $has_bg_img = true;
                     }
-                    printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s" %5$s %6$s %7$s %8$s>%9$s',
+                    printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s %5$s" %6$s %7$s %8$s %9$s>%10$s',
                         $id,
                         $grid_column_class,
                         $this->get_level_visibility_css_class( $model ),
+                        $has_bg_img ? 'sek-has-bg' : '',
                         is_null( $custom_css_classes ) ? '' : $custom_css_classes,
 
                         empty( $collection ) ? 'data-sek-no-modules="true"' : '',
@@ -536,7 +538,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
 
                         $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
-                        ( $has_lazy_loaded_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>' : ''
+                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     );
                       ?>
                         <?php
@@ -639,15 +641,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     }
                     // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
                     $bg_attributes = $this->sek_maybe_add_bg_attributes( $model );
-                    $has_lazy_loaded_bg_img = false;
-                    if ( false !== strpos( $bg_attributes, 'data-sek-lazy-bg="true" data-sek-src="http') ) {
-                        $has_lazy_loaded_bg_img = true;
+                    $has_bg_img = false;
+                    if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
+                        $has_bg_img = true;
                     }
 
-                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s %9$s>%10$s',
+                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s %9$s %10$s>%11$s',
                         $id,
                         $module_type,
                         $this->get_level_visibility_css_class( $model ),
+                        $has_bg_img ? 'sek-has-bg' : '',
                         is_null( $custom_css_classes ) ? '' : $custom_css_classes,
 
                         $title_attribute,
@@ -657,7 +660,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                         $this->sek_maybe_print_preview_level_guid_html(), //<= added for #494
                         $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': '',// <= added for #532
-                        ( $has_lazy_loaded_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>' : ''
+                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     );
                       ?>
                         <div class="sek-module-inner">
@@ -870,7 +873,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // deactivated when customizing @see function sek_is_img_smartload_enabled()
         function sek_maybe_add_bg_attributes( $model ) {
             $new_attributes = [];
-            $bg_url_for_lazy_load = '';
+            $bg_img_url = '';
             $parallax_enabled = false;
             $fixed_bg_enabled = false;
             $width = '';
@@ -891,8 +894,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
                 if ( !empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
                     $new_attributes[] = 'data-sek-has-bg="true"';
-                    if ( sek_is_img_smartload_enabled() ) {
-                        $bg_url_for_lazy_load = wp_get_attachment_url( $bg_options[ 'bg-image'] );
+                    if ( !skp_is_customizing() ) {
+                        $bg_img_url = wp_get_attachment_url( $bg_options[ 'bg-image'] );
                     }
                     // When the fixed background is ckecked, it wins against parallax
                     $fixed_bg_enabled = !empty( $bg_options['bg-attachment'] ) && sek_booleanize_checkbox_val( $bg_options['bg-attachment'] );
@@ -935,8 +938,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 }
             }
 
-            if ( !empty( $bg_url_for_lazy_load ) ) {
-                $new_attributes[] = sprintf( 'data-sek-lazy-bg="true" data-sek-src="%1$s"', $bg_url_for_lazy_load );
+            if ( !empty( $bg_img_url ) ) {
+                $new_attributes[] = sprintf( 'data-sek-src="%1$s"', $bg_img_url );
+            }
+            if ( sek_is_img_smartload_enabled() ) {
+                $new_attributes[] = sprintf( 'data-sek-lazy-bg="true"' );
             }
             // data-sek-bg-fixed attribute has been added for https://github.com/presscustomizr/nimble-builder/issues/414
             // @see css rules related
@@ -980,7 +986,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // deactivated when customizing @see function sek_is_img_smartload_enabled()
         // @return html string
         function sek_maybe_process_img_for_js_smart_load( $html ) {
-            if ( !sek_is_img_smartload_enabled() )
+            if ( skp_is_customizing() || !sek_is_img_smartload_enabled() )
               return $html;
             if ( ! is_string( $html ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => provided html is not a string', $html );
