@@ -1663,11 +1663,8 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     // Img background
     if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
         // deactivated when customizing @see function sek_is_img_smartload_enabled()
-        $is_publishing_or_saving = defined('DOING_AJAX') && DOING_AJAX;
-        if ( ( !skp_is_customizing() && !sek_is_img_smartload_enabled() ) || ( skp_is_customizing() && !$is_publishing_or_saving ) ) {
-            //no repeat by default?
-            $background_properties[ 'background-image' ] = 'url("'. wp_get_attachment_url( $bg_options[ 'bg-image'] ) .'")';
-        }
+
+        //$background_properties[ 'background-image' ] = 'url("'. wp_get_attachment_url( $bg_options[ 'bg-image'] ) .'")';
 
         // Img Bg Position
         // 'center' is the default value. the CSS rule is declared in assets/front/scss/sek-base.scss
@@ -4145,7 +4142,8 @@ function sek_get_module_params_for_sek_global_performances() {
                     'input_width' => 'width-20',
                     'notice_after' => sprintf('<strong>%1$s</strong>',
                         __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
-                    )
+                    ),
+                    'html_before' => '<hr/><h3>' . __('LAZY LOADING') .'</h3>'
                 ),
                 'global-bg-video-lazy-load' => array(
                     'input_type'  => 'nimblecheck',
@@ -4157,27 +4155,6 @@ function sek_get_module_params_for_sek_global_performances() {
                     //     __( 'Load video backgrounds when', 'text_dom'),
                     //     __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
                     // )
-                ),
-                'use_partial_module_stylesheets' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Use partial CSS stylesheets for modules', 'text_doma'),
-                    'default'     => 1,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                ),
-                'print_partial_module_stylesheets_inline' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Print modules stylesheets inline', 'text_doma'),
-                    'default'     => 0,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                ),
-                'print_dyn_stylesheets_inline' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Print generated stylesheets inline', 'text_doma'),
-                    'default'     => 1,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
                 ),
                 'load_front_assets_in_ajax' => array(
                     'input_type'  => 'nimblecheck',
@@ -4193,12 +4170,28 @@ function sek_get_module_params_for_sek_global_performances() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
-                'load_js_async' => array(
+
+                'use_partial_module_stylesheets' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Load javascript files asynchronously', 'text_doma'),
+                    'title'       => __('Use partial CSS stylesheets for modules', 'text_doma'),
                     'default'     => 1,
                     'title_width' => 'width-80',
-                    'input_width' => 'width-20'
+                    'input_width' => 'width-20',
+                    'html_before' => '<hr/><h3>' . __('STYLESHEETS') .'</h3>'
+                ),
+                'print_partial_module_stylesheets_inline' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Print modules stylesheets inline', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'print_dyn_stylesheets_inline' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Print generated stylesheets inline', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
                 ),
                 'preload_google_fonts' => array(
                     'input_type'  => 'nimblecheck',
@@ -4207,13 +4200,31 @@ function sek_get_module_params_for_sek_global_performances() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
-                'preload_jquery' => array(
+                'load_js_async' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Preload jQuery library on front-end', 'text_doma'),
+                    'title'       => __('Load javascript files asynchronously', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'html_before' => '<hr/><h3>' . __('SCRIPTS') .'</h3>'
+                ),
+
+                'load_jquery_async' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Load jQuery library asynchronously', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after' => __('Use with caution, preloading Jquery can break third party plugins and themes.')
+                    'notice_after' => __('Use with caution, can break third party plugins and themes.'),
+                    'html_before' => '<hr/><h3>' . __('JQUERY') .'</h3>'
+                ),
+                'use_latest_version_jquery' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Use the latest version of jQuery library on front-end, without jquery-migrate', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => __('Use with caution, can break third party plugins and themes.')
                 ),
             )
         )//tmpl
@@ -12555,13 +12566,15 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $feedback_notif_status = 'not_set';
 
         // March 2020 : introduction of split stylesheet for some modules
-        public $big_module_stylesheet_map = [];//<= is populated in ::_schedule_front_and_preview_assets_printing()
+        public $big_module_stylesheet_map = [];//<= is populated in ::_schedule_front_assets_printing()
 
         // March 2020
         public $modules_dependant_of_font_awesome = [ 'czr_button_module', 'czr_icon_module', 'czr_social_icons_module' ];
 
         // March 2020, for https://github.com/presscustomizr/nimble-builder/issues/629
         public $google_fonts_print_candidates = 'not_set';// will cache the google font candidates to print in ::_setup_hook_for_front_css_printing_or_enqueuing()
+
+        public $css_loader_html = '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>';
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
@@ -12577,8 +12590,10 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             if ( defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) && NIMBLE_SAVED_SECTIONS_ENABLED ) {
                 $this->_schedule_section_saving_ajax_actions();
             }
-            // ASSETS
-            $this->_schedule_front_and_preview_assets_printing();
+            // FRONT ASSETS
+            $this->_schedule_front_assets_printing();
+            // CUSTOOMIZER PREVIEW ASSETS
+            $this->_schedule_preview_assets_printing();
             // RENDERING
             $this->_schedule_front_rendering();
             // RENDERING
@@ -13614,7 +13629,7 @@ endif;
 if ( !class_exists( 'SEK_Front_Assets' ) ) :
     class SEK_Front_Assets extends SEK_Front_Ajax {
         // Fired in __construct()
-        function _schedule_front_and_preview_assets_printing() {
+        function _schedule_front_assets_printing() {
             // Load Front Assets
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_enqueue_front_assets' ) );
 
@@ -13625,7 +13640,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             add_filter( 'script_loader_tag', array( $this, 'sek_filter_script_loader_tag' ), 10, 2 );
 
             // added March 2020 when experimenting for https://github.com/presscustomizr/nimble-builder/issues/626
-            add_action( 'wp_default_scripts', array( $this, 'sek_maybe_dequeue_and_preload_jquery' ) );
+            add_action( 'wp_default_scripts', array( $this, 'sek_maybe_dequeue_jquery_and_schedule_jquery_migrate' ) );
 
             // Maybe print split module stylesheet inline
             // introduced in march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
@@ -13634,21 +13649,22 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // initialize Nimble front js app
             add_action( 'wp_head', array( $this, 'sek_initialize_front_js_app' ), 0  );
 
+            // Inform Nimble app that jQuery is loaded
+            add_action( 'wp_head', array( $this, 'sek_detect_jquery' ), PHP_INT_MAX );
+
             // Maybe load Font Awesome icons if needed ( sniff first )
             add_action( 'wp_head', array( $this, 'sek_maybe_load_font_awesome_icons' ), PHP_INT_MAX );
 
             // Maybe print a CSS loader for img and background lazy loaded
-            add_action( 'wp_head', array( $this, 'sek_maybe_print_css_loader_for_lazyload' ), PHP_INT_MAX );
+            add_action( 'wp_head', array( $this, 'sek_print_style_for_css_loader' ), PHP_INT_MAX );
 
             // Emit an event when jQuery is detected. 'nimble-jquery-loaded'
             // maybe fetch jQuery from a CDN when dequeued
-            add_action( 'wp_footer', array( $this, 'sek_handle_jquery' ));
-
-            add_action( 'wp_footer', array( $this, 'sek_handle_customizer_previewed_device_js' ), PHP_INT_MAX  );
-
-            // Load customize preview js
-            add_action( 'customize_preview_init' , array( $this, 'sek_schedule_customize_preview_assets' ) );
+            add_action( 'wp_footer', array( $this, 'sek_preload_jquery_from_dns' ));
         }//_schedule_front_and_preview_assets_printing
+
+
+
 
         // hook : 'wp_enqueue_scripts'
         function sek_enqueue_front_assets() {
@@ -13766,7 +13782,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.js' : NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.min.js',
                 //array( 'jquery', 'underscore'),
                 // october 2018 => underscore is concatenated in the main front js file.
-                ( !skp_is_customizing() && sek_is_front_jquery_preloaded() ) ? array() : array( 'jquery'),
+                ( !skp_is_customizing() && sek_is_jquery_replaced() ) ? array() : array( 'jquery'),
                 NIMBLE_ASSETS_VERSION,
                 true
             );
@@ -13794,7 +13810,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 wp_enqueue_script(
                     'sek-magnific-popups',
                     sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.min.js',
-                    ( !skp_is_customizing() && sek_is_front_jquery_preloaded() ) ? array() : array( 'jquery'),
+                    ( !skp_is_customizing() && sek_is_jquery_replaced() ) ? array() : array( 'jquery'),
                     NIMBLE_ASSETS_VERSION,
                     true
                 );
@@ -13897,6 +13913,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                     'skope_id' => skp_get_skope_id(), //added for debugging purposes
                     'recaptcha_public_key' => !empty ( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : '',
 
+                    'lazyload_enabled' => sek_is_img_smartload_enabled(),
                     'video_bg_lazyload_enabled' => sek_is_video_bg_lazyload_enabled(),
 
                     'load_front_module_assets_on_scroll' => sek_load_front_assets_on_scroll(),
@@ -13941,9 +13958,9 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
 
         //@'wp_head'PHP_INT_MAX
-        function sek_maybe_print_css_loader_for_lazyload() {
-          if ( !sek_is_img_smartload_enabled() || skp_is_customizing() )
-            return;
+        function sek_print_style_for_css_loader() {
+          // if ( !sek_is_img_smartload_enabled() || skp_is_customizing() )
+          //   return;
           ?>
           <style id="nb-lazyload-css-loader">@-webkit-keyframes sek-mr-loader{0%{-webkit-transform:scale(.1);transform:scale(.1);opacity:1}70%{-webkit-transform:scale(1);transform:scale(1);opacity:.7}100%{opacity:0}}@keyframes sek-mr-loader{0%{-webkit-transform:scale(.1);transform:scale(.1);opacity:1}70%{-webkit-transform:scale(1);transform:scale(1);opacity:.7}100%{opacity:0}}.sek-css-loader{width:50px;height:50px;position:absolute;-webkit-transform:translate3d(-50%,-50%,0);transform:translate3d(-50%,-50%,0);top:50%;left:50%}.csstransforms3d .sek-css-loader{display:block}.sek-mr-loader>div:nth-child(0){-webkit-animation-delay:-.8s;animation-delay:-.8s}.sek-mr-loader>div:nth-child(1){-webkit-animation-delay:-.6s;animation-delay:-.6s}.sek-mr-loader>div:nth-child(2){-webkit-animation-delay:-.4s;animation-delay:-.4s}.sek-mr-loader>div:nth-child(3){-webkit-animation-delay:-.2s;animation-delay:-.2s}.sek-mr-loader>div{-webkit-animation-fill-mode:both;animation-fill-mode:both;position:absolute;top:0;left:0;width:100%;height:100%;border-radius:100%;border:2px solid #777;-webkit-animation:sek-mr-loader 1.25s 0s infinite cubic-bezier(.21,.53,.56,.8);animation:sek-mr-loader 1.25s 0s infinite cubic-bezier(.21,.53,.56,.8)}.white-loader>.sek-mr-loader>div{border:2px solid #fff}</style>
           <?php
@@ -13958,29 +13975,35 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // 4) 'nimble-magnific-popup-loaded', ... are emitted in each script files
         function sek_initialize_front_js_app() {
             ?>
-            <script id="nimble-app-init">window.nb_={},window,document,window.nb_={isArray:function(e){return Array.isArray(e)||"[object Array]"===toString.call(e)},inArray:function(e,n){return!(!nb_.isArray(e)||nb_.isUndefined(n))&&e.indexOf(n)>-1},isUndefined:function(e){return void 0===e},isObject:function(e){var n=typeof e;return"function"===n||"object"===n&&!!e},errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},browserIs:function(e){var n=!1,t=!!document.documentMode;switch(e){case"safari":n=/constructor/i.test(window.HTMLElement)||"[object SafariRemoteNotification]"===(!window.safari||"undefined"!=typeof safari&&safari.pushNotification).toString();break;case"firefox":n="undefined"!=typeof InstallTrigger;break;case"IE":n=t;break;case"edge":n=!t&&!!window.StyleMedia;break;case"chrome":n=!(!window.chrome||!window.chrome.webstore&&!window.chrome.runtime)}return n},assetPreloadSupported:function(){return!nb_.browserIs("firefox")&&!nb_.browserIs("IE")&&!nb_.browserIs("edge")},listenTo:function(e,n){var t={"nimble-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nimble-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nimble-jquery-loaded")},"nimble-magnific-popup-loaded":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup},"nimble-swiper-script-loaded":function(){return void 0!==window.Swiper}},o=function(o){nb_.isUndefined(t[e])||!1!==t[e]()?(n(),nb_.eventsListenedTo.push(e)):nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",e,nb_.eventsListenedTo)};"function"==typeof n?nb_.wasEmitted(e)?o():document.addEventListener(e,o):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",e)},eventsEmitted:[],eventsListenedTo:[],emit:function(e){var n=document.createEvent("Event");n.initEvent(e,!0,!0),document.dispatchEvent(n),nb_.eventsEmitted.push(e)},wasListenedTo:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsListenedTo,e)},wasEmitted:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsEmitted,e)}};</script>
+            <script id="nimble-app-init">window.nb_={},function(e,n){window.nb_={isArray:function(e){return Array.isArray(e)||"[object Array]"===toString.call(e)},inArray:function(e,n){return!(!nb_.isArray(e)||nb_.isUndefined(n))&&e.indexOf(n)>-1},isUndefined:function(e){return void 0===e},isObject:function(e){var n=typeof e;return"function"===n||"object"===n&&!!e},errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},browserIs:function(e){var n=!1,t=!!document.documentMode;switch(e){case"safari":n=/constructor/i.test(window.HTMLElement)||"[object SafariRemoteNotification]"===(!window.safari||"undefined"!=typeof safari&&safari.pushNotification).toString();break;case"firefox":n="undefined"!=typeof InstallTrigger;break;case"IE":n=t;break;case"edge":n=!t&&!!window.StyleMedia;break;case"chrome":n=!(!window.chrome||!window.chrome.webstore&&!window.chrome.runtime)}return n},assetPreloadSupported:function(){return!nb_.browserIs("firefox")&&!nb_.browserIs("IE")&&!nb_.browserIs("edge")},listenTo:function(e,n){var t={"nimble-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nimble-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nimble-jquery-loaded")},"nimble-magnific-popup-loaded":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup},"nimble-swiper-script-loaded":function(){return void 0!==window.Swiper}},o=function(o){nb_.isUndefined(t[e])||!1!==t[e]()?(n(),nb_.eventsListenedTo.push(e)):nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",e,nb_.eventsListenedTo)};"function"==typeof n?nb_.wasEmitted(e)?o():document.addEventListener(e,o):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",e)},eventsEmitted:[],eventsListenedTo:[],emit:function(e){var n=document.createEvent("Event");n.initEvent(e,!0,!0),document.dispatchEvent(n),nb_.eventsEmitted.push(e)},wasListenedTo:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsListenedTo,e)},wasEmitted:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsEmitted,e)},isInScreen:function(e,n){var t=window.pageYOffset||document.documentElement.scrollTop,o=t+window.innerHeight,i=e.offsetTop,r=n||0;return i+e.clientHeight>=t-r&&i<=o+r},isCustomizing:function(){return!1},isLazyLoadEnabled:function(){return!nb_.isCustomizing()&&!1}},window.NodeList&&!NodeList.prototype.forEach&&(NodeList.prototype.forEach=function(e,n){n=n||window;for(var t=0;t<this.length;t++)e.call(n,this[t],t,this)});var t=!1;_revealBGImages=function(){if(!t){t=!0;var e=document.querySelectorAll("div.sek-has-bg");if(nb_.isObject(e)&&e.length>0){e.forEach(function(e){nb_.isObject(e)&&((!nb_.isLazyLoadEnabled()||nb_.isInScreen(e)&&nb_.isLazyLoadEnabled())&&e.getAttribute("data-sek-src")&&(e.setAttribute("style",'background-image:url("'+e.getAttribute("data-sek-src")+'")'),e.className+=" smartload-skip",e.querySelectorAll(".sek-css-loader").forEach(function(e){nb_.isObject(e)&&e.parentNode.removeChild(e)})))})}}},document.addEventListener("DOMContentLoaded",_revealBGImages),window.addEventListener("load",_revealBGImages)}(window,document);</script>
             <?php
         }
 
         // @'wp_footer'PHP_INT_MAX
         // introduced for https://github.com/presscustomizr/nimble-builder/issues/626
-        function sek_handle_jquery() {
+        function sek_preload_jquery_from_dns() {
+            if( sek_is_jquery_replaced() && !skp_is_customizing() ) {
             ?>
-            <script id="nimble-detect-jquery">!function(){var e=function(n){n=n||0,"undefined"!=typeof jQuery?nb_.emit("nimble-jquery-loaded"):n<30?setTimeout(function(){e(++n)},200):alert("Nimble Builder problem : jQuery.js was not detected on your website")};e()}();</script>
-            <?php
-            if( sek_is_front_jquery_preloaded() && !skp_is_customizing() ) {
-            ?>
-            <script id="nimble-load-jquery">setTimeout(function(){var e=function(){var e=document.createElement("script");e.setAttribute("src","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),e.setAttribute("id","nimble-jquery"),e.setAttribute("defer","defer"),document.getElementsByTagName("head")[0].appendChild(e);var t=document.getElementById("nimble-load-jquery");t.parentNode.removeChild(t)};if(nb_.assetPreloadSupported()){var t=document.createElement("link");t.setAttribute("href","https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"),t.setAttribute("rel","preload"),t.setAttribute("as","script"),t.onload=function(){this.onload=null,this.rel="script",e()},document.getElementsByTagName("head")[0].appendChild(t)}else e()},3000);</script>
+            <script id="nimble-load-jquery">setTimeout(function(){var e=function(){var e=document.createElement("script");e.setAttribute("src","<?php echo NIMBLE_JQUERY_LATEST_CDN_URL; ?>"),e.setAttribute("id","<?php echo NIMBLE_JQUERY_ID; ?>"),e.setAttribute("defer","defer"),document.getElementsByTagName("head")[0].appendChild(e);var t=document.getElementById("nimble-load-jquery");t.parentNode.removeChild(t)};if(nb_.assetPreloadSupported()){var t=document.createElement("link");t.setAttribute("href","<?php echo NIMBLE_JQUERY_LATEST_CDN_URL; ?>"),t.setAttribute("rel","preload"),t.setAttribute("id","<?php echo NIMBLE_JQUERY_ID; ?>"),t.setAttribute("as","script"),t.onload=function(){this.onload=null,this.rel="script",e()},document.getElementsByTagName("head")[0].appendChild(t)}else e()},1e3);</script>
             <?php
             }
-        }//sek_handle_jquery()
+        }//sek_preload_jquery_from_dns()
 
+
+        // @'wp_head'PHP_INT_MAX
+        // introduced for https://github.com/presscustomizr/nimble-builder/issues/626
+        // jQuery can potentially be loaded async, so let's react to its load or the presence of window.jQuery
+        function sek_detect_jquery() {
+            ?>
+            <script id="nimble-detect-jquery">!function(){var e=function(){var e="nimble-jquery-loaded";nb_.wasEmitted(e)||nb_.emit(e)},n=function(t){t=t||0,void 0!==window.jQuery?e():t<30?setTimeout(function(){n(++t)},200):alert("Nimble Builder problem : jQuery.js was not detected on your website")},t=document.getElementById("<?php echo NIMBLE_JQUERY_ID; ?>");t&&t.addEventListener("load",function(){e()}),n()}();</script>
+            <?php
+        }
 
         // @'wp_default_scripts'
         // see https://wordpress.stackexchange.com/questions/291700/how-to-stop-jquery-migrate-manually
         // https://stackoverflow.com/questions/18421404/how-do-i-stop-wordpress-loading-jquery-and-jquery-migrate#25977181
-        function sek_maybe_dequeue_and_preload_jquery( &$scripts ) {
-            if ( sek_is_front_jquery_preloaded() && !skp_is_customizing() && !is_admin() && !empty( $scripts->registered['jquery'] ) ) {
+        function sek_maybe_dequeue_jquery_and_schedule_jquery_migrate( &$scripts ) {
+            if ( !skp_is_customizing() && !is_admin() && sek_is_jquery_replaced() && !empty( $scripts->registered['jquery'] ) ) {
                 $scripts->registered['jquery']->deps = array_diff(
                     $scripts->registered['jquery']->deps,
                     [ 'jquery-migrate' ]
@@ -13988,7 +14011,58 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 $scripts->remove( 'jquery');
                 //$scripts->add( 'jquery', false, array( 'jquery-core' ), '1.2.1' );
             }
+            // when jquery is loaded async and not replaced we need to dequeue jquery-migrate and load it dynamically on 'nimble-jquery-loaded'
+            if ( !skp_is_customizing() && sek_load_jquery_async() && !sek_is_jquery_replaced() ) {
+                $scripts->registered['jquery']->deps = array_diff(
+                    $scripts->registered['jquery']->deps,
+                    [ 'jquery-migrate' ]
+                );
+                $scripts->remove('jquery-migrate');
+                // Inform Nimble app that jQuery is loaded
+                add_action( 'wp_head', array( $this, 'sek_maybe_inject_jquery_migrate' ), 10 );
+            }
         }
+
+        //@'wp_head'0  when sek_load_jquery_async() && !skp_is_customizing()
+        function sek_maybe_inject_jquery_migrate() {
+            global $wp_scripts;
+            if ( isset($wp_scripts->registered['jquery-migrate']) )
+              return;
+            ?>
+            <script id="nimble-load-jquery-migrate">!function(){var e=function(){var e=document.createElement("script");e.setAttribute("src","<?php echo NIMBLE_JQUERY_MIGRATE_URL; ?>"),e.setAttribute("id","nb-query-migrate"),e.setAttribute("defer","defer"),document.getElementsByTagName("head")[0].appendChild(e);var t=document.getElementById("nimble-load-jquery-migrate");t.parentNode.removeChild(t)};nb_.listenTo("nimble-jquery-loaded",function(){if(nb_.assetPreloadSupported()){var t=document.createElement("link");t.setAttribute("href","<?php echo NIMBLE_JQUERY_MIGRATE_URL; ?>"),t.setAttribute("rel","preload"),t.setAttribute("id","nb-query-migrate"),t.setAttribute("as","script"),t.onload=function(){this.onload=null,this.rel="script",e()},document.getElementsByTagName("head")[0].appendChild(t)}else e()})}();</script>
+            <?php
+        }
+
+
+
+
+
+        // hook : wp_head@PHP_INT_MAX
+        // introduced in march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
+        function sek_maybe_print_inline_split_module_stylesheets() {
+            $is_stylesheet_split_for_performance = !skp_is_customizing() && sek_use_split_stylesheets_on_front();
+            $is_inline_stylesheets_for_performance= !skp_is_customizing() && $is_stylesheet_split_for_performance && sek_inline_module_stylesheets_on_front();
+            if ( !$is_inline_stylesheets_for_performance)
+              return;
+            // css assets are always enqueued when customizing
+            global $wp_filesystem;
+            $contextually_active_modules = sek_get_collection_of_contextually_active_modules();
+            // loop on the map module type (candidates for split) => stylesheet file name
+            foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
+                if ( !array_key_exists($module_type , $contextually_active_modules) )
+                  continue;
+                $uri = NIMBLE_BASE_PATH . '/assets/front/css/modules/' . $stylesheet_name .'.min.css';
+                //sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' SOOO ? => ' . $this->uri . $wp_filesystem->exists( $this->uri ), empty( $file_content ) );
+                if ( $wp_filesystem->exists( $uri ) && $wp_filesystem->is_readable( $uri ) ) {
+                    $file_content = $wp_filesystem->get_contents( $uri );
+                    printf( '<style id="%1$s-stylesheet" type="text/css" media="all">%2$s</style>', $stylesheet_name, $file_content );
+                }
+            }
+        }
+
+
+
+
 
         /**
          * Fired @'script_loader_tag'
@@ -14004,6 +14078,15 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
          * @return string Script HTML string.
         */
         public function sek_filter_script_loader_tag( $tag, $handle ) {
+            // adds an id to jquery core so we can detect when it's loaded
+            if ( 'jquery-core' === $handle ) {
+                // tag is a string and looks like <script src='http://customizr-dev.test/wp-includes/js/jquery/jquery-migrate.js?ver=1.4.1'></script>
+                $tag = str_replace('src=', 'id="'.NIMBLE_JQUERY_ID.'" src=', $tag);
+                if ( sek_load_jquery_async() && !skp_is_customizing() ) {
+                    $tag = str_replace('src=', 'async src=', $tag);
+                }
+            }
+
             if ( skp_is_customizing() )
               return $tag;
 
@@ -14020,7 +14103,18 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             }
             return $tag;
         }
+    }//class
+endif;
+?><?php
+if ( !class_exists( 'SEK_Front_Assets' ) ) :
+    class SEK_Front_Assets_Customizer_Preview extends SEK_Front_Assets {
+        // Fired in __construct()
+        function _schedule_preview_assets_printing() {
+            add_action( 'wp_footer', array( $this, 'sek_handle_customizer_previewed_device_js' ), PHP_INT_MAX  );
 
+            // Load customize preview js
+            add_action( 'customize_preview_init' , array( $this, 'sek_schedule_customize_preview_assets' ) );
+        }//_schedule_preview_assets_printing
 
         // @'wp_footer'
         function sek_handle_customizer_previewed_device_js() {
@@ -14135,30 +14229,6 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                   NIMBLE_ASSETS_VERSION,
                   true
                 );
-            }
-        }
-
-
-        // hook : wp_head@PHP_INT_MAX
-        // introduced in march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
-        function sek_maybe_print_inline_split_module_stylesheets() {
-            $is_stylesheet_split_for_performance = !skp_is_customizing() && sek_use_split_stylesheets_on_front();
-            $is_inline_stylesheets_for_performance= !skp_is_customizing() && $is_stylesheet_split_for_performance && sek_inline_module_stylesheets_on_front();
-            if ( !$is_inline_stylesheets_for_performance)
-              return;
-            // css assets are always enqueued when customizing
-            global $wp_filesystem;
-            $contextually_active_modules = sek_get_collection_of_contextually_active_modules();
-            // loop on the map module type (candidates for split) => stylesheet file name
-            foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
-                if ( !array_key_exists($module_type , $contextually_active_modules) )
-                  continue;
-                $uri = NIMBLE_BASE_PATH . '/assets/front/css/modules/' . $stylesheet_name .'.min.css';
-                //sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' SOOO ? => ' . $this->uri . $wp_filesystem->exists( $this->uri ), empty( $file_content ) );
-                if ( $wp_filesystem->exists( $uri ) && $wp_filesystem->is_readable( $uri ) ) {
-                    $file_content = $wp_filesystem->get_contents( $uri );
-                    printf( '<style id="%1$s-stylesheet" type="text/css" media="all">%2$s</style>', $stylesheet_name, $file_content );
-                }
             }
         }
 
@@ -14333,7 +14403,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 endif;
 ?><?php
 if ( ! class_exists( 'SEK_Front_Render' ) ) :
-    class SEK_Front_Render extends SEK_Front_Assets {
+    class SEK_Front_Render extends SEK_Front_Assets_Customizer_Preview {
         // Fired in __construct()
         function _schedule_front_rendering() {
             if ( !defined( "NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY", PHP_INT_MAX ); }
@@ -14775,15 +14845,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                       <?php
                     }
                     // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
-                    $has_lazy_loaded_bg_img = false;
-                    if ( false !== strpos( $bg_attributes, 'data-sek-lazy-bg="true" data-sek-src="http') ) {
-                        $has_lazy_loaded_bg_img = true;
+                    $has_bg_img = false;
+                    if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
+                        $has_bg_img = true;
                     }
-                    printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s" %6$s %7$s %8$s>%9$s',
+                    printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s %6$s" %7$s %8$s %9$s>%10$s',
                         $id,
                         $is_nested ? 'data-sek-is-nested="true"' : '',
                         $has_at_least_one_module ? 'sek-has-modules' : '',
                         $this->get_level_visibility_css_class( $model ),
+                        $has_bg_img ? 'sek-has-bg' : '',
                         is_null( $custom_css_classes ) ? '' : $custom_css_classes,
 
                         is_null( $custom_anchor ) ? '' : 'id="' . ltrim( $custom_anchor , '#' ) . '"',// make sure we clean the hash if user left it
@@ -14791,7 +14862,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $bg_attributes,
 
                         $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
-                        ( $has_lazy_loaded_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>' : ''
+                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     ); ?>
                           <div class="<?php echo $column_container_class; ?>">
                             <div class="sek-row sek-sektion-inner">
@@ -14853,14 +14924,15 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                       <?php
                     }
                     // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
-                    $has_lazy_loaded_bg_img = false;
-                    if ( false !== strpos( $bg_attributes, 'data-sek-lazy-bg="true" data-sek-src="http') ) {
-                        $has_lazy_loaded_bg_img = true;
+                    $has_bg_img = false;
+                    if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
+                        $has_bg_img = true;
                     }
-                    printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s" %5$s %6$s %7$s %8$s>%9$s',
+                    printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s %5$s" %6$s %7$s %8$s %9$s>%10$s',
                         $id,
                         $grid_column_class,
                         $this->get_level_visibility_css_class( $model ),
+                        $has_bg_img ? 'sek-has-bg' : '',
                         is_null( $custom_css_classes ) ? '' : $custom_css_classes,
 
                         empty( $collection ) ? 'data-sek-no-modules="true"' : '',
@@ -14869,7 +14941,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
 
                         $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
-                        ( $has_lazy_loaded_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>' : ''
+                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     );
                       ?>
                         <?php
@@ -14972,15 +15044,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     }
                     // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
                     $bg_attributes = $this->sek_maybe_add_bg_attributes( $model );
-                    $has_lazy_loaded_bg_img = false;
-                    if ( false !== strpos( $bg_attributes, 'data-sek-lazy-bg="true" data-sek-src="http') ) {
-                        $has_lazy_loaded_bg_img = true;
+                    $has_bg_img = false;
+                    if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
+                        $has_bg_img = true;
                     }
 
-                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s %9$s>%10$s',
+                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s %9$s %10$s>%11$s',
                         $id,
                         $module_type,
                         $this->get_level_visibility_css_class( $model ),
+                        $has_bg_img ? 'sek-has-bg' : '',
                         is_null( $custom_css_classes ) ? '' : $custom_css_classes,
 
                         $title_attribute,
@@ -14990,7 +15063,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                         $this->sek_maybe_print_preview_level_guid_html(), //<= added for #494
                         $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': '',// <= added for #532
-                        ( $has_lazy_loaded_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>' : ''
+                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     );
                       ?>
                         <div class="sek-module-inner">
@@ -15203,7 +15276,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // deactivated when customizing @see function sek_is_img_smartload_enabled()
         function sek_maybe_add_bg_attributes( $model ) {
             $new_attributes = [];
-            $bg_url_for_lazy_load = '';
+            $bg_img_url = '';
             $parallax_enabled = false;
             $fixed_bg_enabled = false;
             $width = '';
@@ -15224,8 +15297,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
                 if ( !empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
                     $new_attributes[] = 'data-sek-has-bg="true"';
-                    if ( sek_is_img_smartload_enabled() ) {
-                        $bg_url_for_lazy_load = wp_get_attachment_url( $bg_options[ 'bg-image'] );
+                    if ( !skp_is_customizing() ) {
+                        $bg_img_url = wp_get_attachment_url( $bg_options[ 'bg-image'] );
                     }
                     // When the fixed background is ckecked, it wins against parallax
                     $fixed_bg_enabled = !empty( $bg_options['bg-attachment'] ) && sek_booleanize_checkbox_val( $bg_options['bg-attachment'] );
@@ -15268,8 +15341,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 }
             }
 
-            if ( !empty( $bg_url_for_lazy_load ) ) {
-                $new_attributes[] = sprintf( 'data-sek-lazy-bg="true" data-sek-src="%1$s"', $bg_url_for_lazy_load );
+            if ( !empty( $bg_img_url ) ) {
+                $new_attributes[] = sprintf( 'data-sek-src="%1$s"', $bg_img_url );
+            }
+            if ( sek_is_img_smartload_enabled() ) {
+                $new_attributes[] = sprintf( 'data-sek-lazy-bg="true"' );
             }
             // data-sek-bg-fixed attribute has been added for https://github.com/presscustomizr/nimble-builder/issues/414
             // @see css rules related
@@ -15313,7 +15389,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // deactivated when customizing @see function sek_is_img_smartload_enabled()
         // @return html string
         function sek_maybe_process_img_for_js_smart_load( $html ) {
-            if ( !sek_is_img_smartload_enabled() )
+            if ( skp_is_customizing() || !sek_is_img_smartload_enabled() )
               return $html;
             if ( ! is_string( $html ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => provided html is not a string', $html );

@@ -154,7 +154,7 @@
   background-size: cover;
 }
 
-[data-sek-level="location"] [data-sek-lazy-bg="true"] {
+[data-sek-level="location"] .sek-has-bg {
   position: relative;
 }
 

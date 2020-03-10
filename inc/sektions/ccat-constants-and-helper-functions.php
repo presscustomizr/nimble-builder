@@ -30,6 +30,10 @@ if ( !defined( 'NIMBLE_WELCOME_NOTICE_ID' ) ) { define ( 'NIMBLE_WELCOME_NOTICE_
 //mt_rand(0, 65535) . 'test-nimble-feedback-notice-04-2019'
 if ( !defined( 'NIMBLE_FEEDBACK_NOTICE_ID' ) ) { define ( 'NIMBLE_FEEDBACK_NOTICE_ID', 'nimble-feedback-notice-04-2019' ); }
 
+if ( !defined( 'NIMBLE_JQUERY_ID' ) ) { define ( 'NIMBLE_JQUERY_ID', 'nb-jquery' ); }
+if ( !defined( 'NIMBLE_JQUERY_LATEST_CDN_URL' ) ) { define ( 'NIMBLE_JQUERY_LATEST_CDN_URL', 'https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js' ); }
+if ( !defined( 'NIMBLE_JQUERY_MIGRATE_URL' ) ) { define ( 'NIMBLE_JQUERY_MIGRATE_URL', site_url() . '/wp-includes/js/jquery/jquery-migrate.min.js' ); }
+
 ?><?php
 /* ------------------------------------------------------------------------- *
  *  LOCATIONS UTILITIES
@@ -274,12 +278,22 @@ function sek_front_needs_video_bg( $bool = false, $recursive_data = null ) {
 
 // @return bool
 // march 2020 introduced https://github.com/presscustomizr/nimble-builder/issues/632
-function sek_is_front_jquery_preloaded() {
+function sek_is_jquery_replaced() {
     if ( skp_is_customizing() )
       return;
     $glob_perf = sek_get_global_option_value( 'performances' );
-    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['preload_jquery'] ) ) {
-        return sek_booleanize_checkbox_val( $glob_perf['preload_jquery'] );
+    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['use_latest_version_jquery'] ) ) {
+        return sek_booleanize_checkbox_val( $glob_perf['use_latest_version_jquery'] );
+    }
+    return false;
+}
+
+// @return bool
+// march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
+function sek_load_jquery_async() {
+    $glob_perf = sek_get_global_option_value( 'performances' );
+    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['load_jquery_async'] ) ) {
+        return sek_booleanize_checkbox_val( $glob_perf['load_jquery_async'] );
     }
     return false;
 }
@@ -349,6 +363,7 @@ function sek_preload_google_fonts_on_front() {
     }
     return false;
 }
+
 
 // Adds async/defer attributes to enqueued / registered scripts.
 // works with ::sek_filter_script_loader_tag loaded @'script_loader_tag'
@@ -444,8 +459,6 @@ function nimble_regex_callback( $matches ) {
 // This option is cached
 // deactivated when customizing
 function sek_is_img_smartload_enabled() {
-    if ( skp_is_customizing() )
-      return false;
     if ( 'not_cached' !== Nimble_Manager()->img_smartload_enabled ) {
         return Nimble_Manager()->img_smartload_enabled;
     }
