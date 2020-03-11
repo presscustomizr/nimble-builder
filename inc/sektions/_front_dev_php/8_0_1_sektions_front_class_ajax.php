@@ -755,7 +755,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         //
         // => The transient name is now : czr_gfonts_june_2017
         function sek_retrieve_decoded_gfonts() {
-            if ( false == get_transient( 'sek_gfonts_may_2018' ) ) {
+            if ( false == get_transient( 'sek_gfonts_march_2020' ) ) {
                 $gfont_raw      = @file_get_contents( NIMBLE_BASE_PATH ."/assets/webfonts.json" );
 
                 if ( $gfont_raw === false ) {
@@ -763,10 +763,10 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 }
 
                 $gfonts_decoded   = json_decode( $gfont_raw, true );
-                set_transient( 'sek_gfonts_may_2018' , $gfonts_decoded , 60*60*24*3000 );
+                set_transient( 'sek_gfonts_march_2020' , $gfonts_decoded , 60*60*24*3000 );
             }
             else {
-              $gfonts_decoded = get_transient( 'sek_gfonts_may_2018' );
+              $gfonts_decoded = get_transient( 'sek_gfonts_march_2020' );
             }
 
             return $gfonts_decoded;
