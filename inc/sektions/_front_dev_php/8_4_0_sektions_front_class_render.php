@@ -383,6 +383,9 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             }
 
             switch ( $level_type ) {
+                /********************************************************
+                 LOCATIONS
+                ********************************************************/
                 case 'location' :
                     //sek_error_log( __FUNCTION__ . ' WHAT ARE WE RENDERING? ' . $id , $collection );
                     //empty sektions wrapper are only printed when customizing
@@ -426,6 +429,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     <?php
                 break;
 
+
+                /********************************************************
+                 SECTIONS
+                ********************************************************/
                 case 'section' :
                     $is_nested = array_key_exists( 'is_nested', $model ) && true == $model['is_nested'];
                     $has_at_least_one_module = sek_section_has_modules( $collection );
@@ -441,6 +448,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         <script>nb_.emit('nb-needs-videobg-js');</script>
                       <?php
                     }
+
                     // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
                     $has_bg_img = false;
                     if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
@@ -474,6 +482,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     <?php
                 break;
 
+
+                /********************************************************
+                 COLUMNS
+                ********************************************************/
                 case 'column' :
                     // if ( defined('DOING_AJAX') && DOING_AJAX ) {
                     //     error_log( print_r( $parent_model, true ) );
@@ -578,6 +590,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     <?php
                 break;
 
+
+                /********************************************************
+                 MODULES
+                ********************************************************/
                 case 'module' :
                     if ( empty( $model['module_type'] ) ) {
                         sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => missing module_type for a module', $model );
@@ -894,9 +910,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
                 if ( !empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
                     $new_attributes[] = 'data-sek-has-bg="true"';
-                    if ( !skp_is_customizing() ) {
-                        $bg_img_url = wp_get_attachment_url( $bg_options[ 'bg-image'] );
-                    }
+                    $bg_img_url = wp_get_attachment_url( $bg_options[ 'bg-image'] );
                     // When the fixed background is ckecked, it wins against parallax
                     $fixed_bg_enabled = !empty( $bg_options['bg-attachment'] ) && sek_booleanize_checkbox_val( $bg_options['bg-attachment'] );
                     $parallax_enabled = !$fixed_bg_enabled && !empty( $bg_options['bg-parallax'] ) && sek_booleanize_checkbox_val( $bg_options['bg-parallax'] );
