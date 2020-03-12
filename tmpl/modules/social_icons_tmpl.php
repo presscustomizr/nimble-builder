@@ -61,7 +61,7 @@ $icons_style = !empty($value['icons_style']) ? $value['icons_style'] : array();
 if ( !empty( $icons_collection ) ) {
     sek_print_social_links( $icons_collection, $icons_style );
     ?>
-    <script>nb_.emit('nb-needs-fontawesome');</script>
+    <script>nb_.emit('nb-needs-fa');</script>
     <?php
 } else {
     if ( skp_is_customizing() ) {

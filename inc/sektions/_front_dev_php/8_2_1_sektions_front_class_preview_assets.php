@@ -40,13 +40,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 NIMBLE_ASSETS_VERSION,
                 'all'
             );
-            wp_enqueue_style(
-                'czr-font-awesome',
-                NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
-                array(),
-                NIMBLE_ASSETS_VERSION,
-                $media = 'all'
-            );
+
             // Communication between preview and customizer panel
             wp_enqueue_script(
                 'sek-customize-preview',

@@ -41,13 +41,7 @@ function sek_get_module_params_for_sek_global_performances() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
-                'load_font_awesome_in_ajax' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Defer loading Font Awesome icons', 'text_doma'),
-                    'default'     => 0,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20'
-                ),
+
 
                 'use_partial_module_stylesheets' => array(
                     'input_type'  => 'nimblecheck',
@@ -78,7 +72,17 @@ function sek_get_module_params_for_sek_global_performances() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
-                'load_js_async' => array(
+                'preload_font_awesome' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Defer loading Font Awesome icons', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
+
+
+
+                'defer_front_js' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Load javascript files asynchronously', 'text_doma'),
                     'default'     => 1,
@@ -86,6 +90,8 @@ function sek_get_module_params_for_sek_global_performances() {
                     'input_width' => 'width-20',
                     'html_before' => '<hr/><h3>' . __('SCRIPTS') .'</h3>'
                 ),
+
+
 
                 'load_jquery_async' => array(
                     'input_type'  => 'nimblecheck',

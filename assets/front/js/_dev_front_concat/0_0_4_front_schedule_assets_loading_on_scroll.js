@@ -234,7 +234,7 @@
 //               return;
 
 //             // Load js plugin if needed
-//             // when the plugin is loaded => it emits "nb-needs-fontawesome" listened to by nb_.listenTo()
+//             // when the plugin is loaded => it emits "nb-needs-fa" listened to by nb_.listenTo()
 //             var doLoad = function() {
 //                   //Load the style
 //                   if ( $('head').find( '#czr-font-awesome' ).length < 1 ) {
@@ -266,6 +266,6 @@
 //     // When loaded with defer, we can not be sure that jQuery will be loaded before
 //     //  on 'nb-app-ready', jQuery is loaded
 //     nb_.listenTo( 'nb-app-ready', function() {
-//         nb_.listenTo( 'nb-needs-fontawesome', callbackFunc );
+//         nb_.listenTo( 'nb-needs-fa', callbackFunc );
 //     });
 // }(window, document));

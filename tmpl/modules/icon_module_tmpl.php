@@ -77,18 +77,22 @@ if ( isset( $spacing_border['use_box_shadow'] ) && true === sek_booleanize_check
 }
 
 // Print
+$icon_html = sek_get_icon_module_icon_html( $value );
 if ( 'no-link' === $icon_settings['link-to'] ) :
     printf('<div class="sek-icon %2$s">%1$s</div>',
-        sek_get_icon_module_icon_html( $value ),
+        $icon_html,
         $visual_effect_class
     );
 else :
     printf('<a class="sek-icon %4$s" href="%1$s" %2$s>%3$s</a>',
         sek_get_icon_module_icon_link( $icon_settings ),
         true === sek_booleanize_checkbox_val( $icon_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
-        sek_get_icon_module_icon_html( $value ),
+        $icon_html,
         $visual_effect_class
     );
 endif;
-?>
-<script>nb_.emit('nb-needs-fontawesome');</script>
+if ( !empty($icon_html) ) {
+  ?>
+  <script>nb_.emit('nb-needs-fa');</script>
+  <?php
+}
