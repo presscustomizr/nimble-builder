@@ -152,9 +152,9 @@
           })( jQuery, window );
       };/////////////// callbackFunc
 
-      // on 'nimble-app-ready', jQuery is loaded
-      nb_.listenTo('nimble-app-ready', function(){
+      // on 'nb-app-ready', jQuery is loaded
+      nb_.listenTo('nb-app-ready', function(){
           callbackFunc();
-          nb_.emit('nimble-parallax-loaded');
+          nb_.emit('nb-parallax-parsed');
       });
 }(window, document));

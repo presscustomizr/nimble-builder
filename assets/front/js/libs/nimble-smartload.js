@@ -234,9 +234,9 @@
           })( jQuery, window );
 
       };////////////// callbackFunc
-      // on 'nimble-app-ready', jQuery is loaded
-      nb_.listenTo('nimble-app-ready', function(){
+      // on 'nb-app-ready', jQuery is loaded
+      nb_.listenTo('nb-app-ready', function(){
           callbackFunc();
-          if ( sekFrontLocalized.lazyload_enabled ) { nb_.emit('nimble-lazyload-loaded'); }
+          if ( sekFrontLocalized.lazyload_enabled ) { nb_.emit('nb-lazyload-parsed'); }
       });
 }(window, document));

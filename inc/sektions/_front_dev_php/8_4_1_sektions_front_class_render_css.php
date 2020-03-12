@@ -39,7 +39,6 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                 $this->_instantiate_css_handler( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) );
             }
             $google_fonts_print_candidates = $this->sek_get_gfont_print_candidates( $local_skope_id );
-
             // GOOGLE FONTS
             if ( !empty( $google_fonts_print_candidates ) ) {
                 // When customizing we get the google font content
@@ -49,6 +48,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                     if ( in_array( current_filter(), array( 'wp_footer', 'wp_head' ) ) ) {
                         $this->sek_gfont_print( $google_fonts_print_candidates );
                     } else {
+
                         // preload implemented for https://github.com/presscustomizr/nimble-builder/issues/629
                         if ( !skp_is_customizing() && sek_preload_google_fonts_on_front() ) {
                             add_action( 'wp_head', array( $this, 'sek_gfont_print_with_preload') );
@@ -91,7 +91,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
 
             if ( ! empty( $print_candidates ) ) {
                 ?>
-                <script id="nimble-preload-gfonts">!function(){var e=document.createElement("link");e.setAttribute("href","//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>"),e.setAttribute("rel",nb_.assetPreloadSupported()?"preload":"stylesheet"),e.setAttribute("as","style"),e.onload=function(){this.onload=null,nb_.assetPreloadSupported()&&(this.rel="stylesheet");var e=document.getElementById("nimble-preload-gfonts");e.parentNode.removeChild(e)},document.getElementsByTagName("head")[0].appendChild(e)}();</script>
+                <script id="nimble-preload-gfonts">nb_.preloadAsset( { id : 'sek-gfonts-local-and-global', as : 'style', href : '//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>', scriptEl : document.currentScript } );</script>
                 <?php
             }
         }

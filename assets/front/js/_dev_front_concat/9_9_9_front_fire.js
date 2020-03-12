@@ -3,7 +3,7 @@
  *  LIGHT BOX WITH MAGNIFIC POPUP
  /* ------------------------------------------------------------------------- */
 (function(w, d){
-    nb_.listenTo('nimble-magnific-popup-loaded', function() {
+    nb_.listenTo('nb-jmp-parsed', function() {
         jQuery(function($){
             var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
             // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
@@ -49,7 +49,7 @@
 /* ------------------------------------------------------------------------- */
 // nimble-lazyload-loaded is fired in lazyload plugin, only when sekFrontLocalized.lazyload_enabled
 (function(w, d){
-    nb_.listenTo('nimble-lazyload-loaded', function() {
+    nb_.listenTo('nb-lazyload-parsed', function() {
         jQuery(function($){
               $('.sektion-wrapper').each( function() {
                     try { $(this).nimbleLazyLoad(); } catch( er ) {
@@ -66,7 +66,7 @@
  *  BG PARALLAX
 /* ------------------------------------------------------------------------- */
 (function(w, d){
-    nb_.listenTo('nimble-parallax-loaded', function() {
+    nb_.listenTo('nb-parallax-parsed', function() {
         jQuery(function($){
               $('[data-sek-bg-parallax="true"]').each( function() {
                     $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );

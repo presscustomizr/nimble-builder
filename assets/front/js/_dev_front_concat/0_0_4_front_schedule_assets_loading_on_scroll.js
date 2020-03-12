@@ -1,6 +1,6 @@
 // global sekFrontLocalized, nimbleListenTo, nb_
 (function(w, d){
-    nb_.listenTo( 'nimble-app-ready', function() {
+    nb_.listenTo( 'nb-app-ready', function() {
         jQuery(function($){
             // params = {
             //  elements : $swiperCandidate,
@@ -27,8 +27,13 @@
 
             };
         });//jQuery(function($){})
-    });//'nimble-app-ready'
+    });//'nb-app-ready'
 }(window, document));
+
+
+
+
+
 
 /* ------------------------------------------------------------------------- *
  *  LOAD MAGNIFIC POPUP
@@ -63,7 +68,7 @@
               };// doLoad
 
             // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
+            // when the plugin is loaded => it emits 'nb-jmp-parsed' listened to by nb_.listenTo()
             nb_.maybeLoadAssetsWhenSelectorInScreen( {
                 id : 'magnific-popup',
                 elements : $linkCandidates,
@@ -73,7 +78,7 @@
     };/////////////// callbackFunc
 
     //When loaded with defer, we can not be sure that jQuery will be loaded before
-    nb_.listenTo( 'nimble-app-ready', function() {
+    nb_.listenTo( 'nb-app-ready', function() {
         nb_.listenTo( 'nb-needs-magnific-popup', callbackFunc );
     });
 }(window, document));
@@ -134,8 +139,8 @@
     };/////////////// callbackFunc
 
     // When loaded with defer, we can not be sure that jQuery will be loaded before
-    // on 'nimble-app-ready', jQuery is loaded
-    nb_.listenTo( 'nimble-app-ready', function() {
+    // on 'nb-app-ready', jQuery is loaded
+    nb_.listenTo( 'nb-app-ready', function() {
         nb_.listenTo('nb-needs-swiper', callbackFunc );
     });
 }(window, document));
@@ -156,7 +161,7 @@
               return;
 
             // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
+            // when the plugin is loaded => it emits 'nb-jmp-parsed' listened to by nb_.listenTo()
             nb_.maybeLoadAssetsWhenSelectorInScreen( {
                 id : 'menu',
                 elements : $candidates,
@@ -169,7 +174,7 @@
             });
         });// jQuery
     };/////////////// callbackFunc
-    nb_.listenTo('nimble-app-ready', function() {
+    nb_.listenTo('nb-app-ready', function() {
         nb_.listenTo('nb-needs-menu-js', callbackFunc );
     });
 }(window, document));
@@ -189,7 +194,7 @@
               return;
 
             // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
+            // when the plugin is loaded => it emits 'nb-jmp-parsed' listened to by nb_.listenTo()
             nb_.maybeLoadAssetsWhenSelectorInScreen( {
                 id : 'menu',
                 elements : $candidates,
@@ -202,7 +207,7 @@
             });
         });// jQuery
     };/////////////// callbackFunc
-    nb_.listenTo('nimble-app-ready', function() {
+    nb_.listenTo('nb-app-ready', function() {
         nb_.listenTo('nb-needs-videobg-js', callbackFunc );
     });
 }(window, document));
@@ -215,52 +220,52 @@
 /* ------------------------------------------------------------------------- *
  *  MAYBE LOAD FONTAWESOME ON SCROLL
 /* ------------------------------------------------------------------------- */
-(function(w, d){
-    var callbackFunc = function() {
-        jQuery(function($){
-            // we don't need to inject font awesome if already enqueued by a theme
-            if ( sekFrontLocalized.fontAwesomeAlreadyEnqueued )
-              return;
-            if ( !sekFrontLocalized.load_font_awesome_on_scroll )
-              return;
-            var $candidates = $('i[class*=fa-]');
+// (function(w, d){
+//     var callbackFunc = function() {
+//         jQuery(function($){
+//             // we don't need to inject font awesome if already enqueued by a theme
+//             if ( sekFrontLocalized.fontAwesomeAlreadyEnqueued )
+//               return;
+//             if ( !sekFrontLocalized.load_font_awesome_on_scroll )
+//               return;
+//             var $candidates = $('i[class*=fa-]');
 
-            if ( $candidates.length < 1 )
-              return;
+//             if ( $candidates.length < 1 )
+//               return;
 
-            // Load js plugin if needed
-            // when the plugin is loaded => it emits "nb-needs-fontawesome" listened to by nb_.listenTo()
-            var doLoad = function() {
-                  //Load the style
-                  if ( $('head').find( '#czr-font-awesome' ).length < 1 ) {
-                        var link = document.createElement('link');
-                        link.setAttribute('href', sekFrontLocalized.frontAssetsPath + 'fonts/css/fontawesome-all.min.css?'+sekFrontLocalized.assetVersion );
-                        link.setAttribute('id', 'czr-font-awesome');
-                        link.setAttribute('rel', nb_.assetPreloadSupported() ? 'preload' : 'stylesheet' );
-                        link.setAttribute('as', 'style');
-                        link.onload = function() {
-                            this.onload=null;
-                            if ( nb_.assetPreloadSupported() ) {
-                                this.rel='stylesheet';
-                            }
+//             // Load js plugin if needed
+//             // when the plugin is loaded => it emits "nb-needs-fontawesome" listened to by nb_.listenTo()
+//             var doLoad = function() {
+//                   //Load the style
+//                   if ( $('head').find( '#czr-font-awesome' ).length < 1 ) {
+//                         var link = document.createElement('link');
+//                         link.setAttribute('href', sekFrontLocalized.frontAssetsPath + 'fonts/css/fontawesome-all.min.css?'+sekFrontLocalized.assetVersion );
+//                         link.setAttribute('id', 'czr-font-awesome');
+//                         link.setAttribute('rel', nb_.assetPreloadSupported() ? 'preload' : 'stylesheet' );
+//                         link.setAttribute('as', 'style');
+//                         link.onload = function() {
+//                             this.onload=null;
+//                             if ( nb_.assetPreloadSupported() ) {
+//                                 this.rel='stylesheet';
+//                             }
 
-                        };
-                        document.getElementsByTagName('head')[0].appendChild(link);
-                  }
-            };// doLoad
-            // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
-            nb_.maybeLoadAssetsWhenSelectorInScreen({
-                id : 'font-awesome',
-                elements : $candidates,
-                func : doLoad
-            });
-        });//jQuery(function($){})
-    };/////////////// callbackFunc
+//                         };
+//                         document.getElementsByTagName('head')[0].appendChild(link);
+//                   }
+//             };// doLoad
+//             // Load js plugin if needed
+//             // when the plugin is loaded => it emits 'nb-jmp-parsed' listened to by nb_.listenTo()
+//             nb_.maybeLoadAssetsWhenSelectorInScreen({
+//                 id : 'font-awesome',
+//                 elements : $candidates,
+//                 func : doLoad
+//             });
+//         });//jQuery(function($){})
+//     };/////////////// callbackFunc
 
-    // When loaded with defer, we can not be sure that jQuery will be loaded before
-    //  on 'nimble-app-ready', jQuery is loaded
-    nb_.listenTo( 'nimble-app-ready', function() {
-        nb_.listenTo( 'nb-needs-fontawesome', callbackFunc );
-    });
-}(window, document));
+//     // When loaded with defer, we can not be sure that jQuery will be loaded before
+//     //  on 'nb-app-ready', jQuery is loaded
+//     nb_.listenTo( 'nb-app-ready', function() {
+//         nb_.listenTo( 'nb-needs-fontawesome', callbackFunc );
+//     });
+// }(window, document));

@@ -8627,5 +8627,5 @@
   return Swiper;
 
 }));
-// on 'nimble-app-ready', jQuery is loaded
-nb_.listenTo('nimble-app-ready', function(){nb_.emit('nimble-swiper-script-loaded');});
+// on 'nb-app-ready', jQuery is loaded
+nb_.listenTo('nb-app-ready', function(){nb_.emit('nb-main-swiper-parsed');});

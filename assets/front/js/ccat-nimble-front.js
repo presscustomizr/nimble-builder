@@ -223,14 +223,38 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                           return func.apply(null, args);
                         }, wait);
                     })
+                    // Browser detection
+                    // @see https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser#9851769
+                    // browserIs : function( browser ) {
+                    //     var bool = false,
+                    //         isIE = false || !!document.documentMode;
+                    //     switch( browser) {
+                    //         case 'safari' :
+                    //             bool = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+                    //         break;
+                    //         case 'firefox' :
+                    //             bool = typeof InstallTrigger !== 'undefined';
+                    //         break;
+                    //         case 'IE' :
+                    //             bool = isIE;
+                    //         break;
+                    //         case 'edge' :
+                    //             bool = !isIE && !!window.StyleMedia;
+                    //         break;
+                    //         case 'chrome' :
+                    //             bool = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+                    //         break;
+                    //     }
+                    //     return bool;
+                    // },
               });//$.extend( nb_
 
               // now that nb_ has been populated, let's say it to the app
-              nb_.emit('nimble-app-ready');
+              nb_.emit('nb-app-ready');
           });// jQuery( function($){
     };
-    // 'nimble-jquery-loaded' is fired @'wp_footer' see inline script in ::_schedule_front_assets_printing()
-    nb_.listenTo('nimble-jquery-loaded', callbackFunc );
+    // 'nb-jquery-loaded' is fired @'wp_footer' see inline script in ::_schedule_front_assets_printing()
+    nb_.listenTo('nb-jquery-loaded', callbackFunc );
 
 }(window, document));/*global jQuery */
 /*!
@@ -296,8 +320,8 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
             // }
       };// onJQueryReady
 
-      // on 'nimble-app-ready', jQuery is loaded
-      nb_.listenTo('nimble-app-ready', callbackFunc );
+      // on 'nb-app-ready', jQuery is loaded
+      nb_.listenTo('nb-app-ready', callbackFunc );
 }(window, document));// global sekFrontLocalized, nimbleListenTo
 /* ------------------------------------------------------------------------- *
  *  SCROLL TO ANCHOR
@@ -360,7 +384,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
         });
     };/////////////// callbackFunc
 
-    nb_.listenTo('nimble-app-ready', callbackFunc );
+    nb_.listenTo('nb-app-ready', callbackFunc );
 }(window, document));// global sekFrontLocalized, nimbleListenTo
 /* ------------------------------------------------------------------------- *
  *  SCROLL LISTENER FOR DYNAMIC ASSET LOADING
@@ -418,10 +442,10 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
         });
     };
 
-    nb_.listenTo('nimble-app-ready', function() {
+    nb_.listenTo('nb-app-ready', function() {
         jQuery(function($){
             // do nothing if dynamic asset loading is not enabled for js and css
-            if ( !sekFrontLocalized.load_front_module_assets_on_scroll && !sekFrontLocalized.load_font_awesome_on_scroll )
+            if ( !sekFrontLocalized.load_front_module_assets_on_scroll )
               return;
             // nb_.scrollHandlers = [
             //    { id : 'swiper', elements : $(), func : function(){} }
@@ -445,7 +469,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
     });
 }(window, document));// global sekFrontLocalized, nimbleListenTo, nb_
 (function(w, d){
-    nb_.listenTo( 'nimble-app-ready', function() {
+    nb_.listenTo( 'nb-app-ready', function() {
         jQuery(function($){
             // params = {
             //  elements : $swiperCandidate,
@@ -472,8 +496,13 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
 
             };
         });//jQuery(function($){})
-    });//'nimble-app-ready'
+    });//'nb-app-ready'
 }(window, document));
+
+
+
+
+
 
 /* ------------------------------------------------------------------------- *
  *  LOAD MAGNIFIC POPUP
@@ -508,7 +537,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
               };// doLoad
 
             // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
+            // when the plugin is loaded => it emits 'nb-jmp-parsed' listened to by nb_.listenTo()
             nb_.maybeLoadAssetsWhenSelectorInScreen( {
                 id : 'magnific-popup',
                 elements : $linkCandidates,
@@ -518,7 +547,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
     };/////////////// callbackFunc
 
     //When loaded with defer, we can not be sure that jQuery will be loaded before
-    nb_.listenTo( 'nimble-app-ready', function() {
+    nb_.listenTo( 'nb-app-ready', function() {
         nb_.listenTo( 'nb-needs-magnific-popup', callbackFunc );
     });
 }(window, document));
@@ -579,8 +608,8 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
     };/////////////// callbackFunc
 
     // When loaded with defer, we can not be sure that jQuery will be loaded before
-    // on 'nimble-app-ready', jQuery is loaded
-    nb_.listenTo( 'nimble-app-ready', function() {
+    // on 'nb-app-ready', jQuery is loaded
+    nb_.listenTo( 'nb-app-ready', function() {
         nb_.listenTo('nb-needs-swiper', callbackFunc );
     });
 }(window, document));
@@ -601,7 +630,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
               return;
 
             // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
+            // when the plugin is loaded => it emits 'nb-jmp-parsed' listened to by nb_.listenTo()
             nb_.maybeLoadAssetsWhenSelectorInScreen( {
                 id : 'menu',
                 elements : $candidates,
@@ -614,7 +643,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
             });
         });// jQuery
     };/////////////// callbackFunc
-    nb_.listenTo('nimble-app-ready', function() {
+    nb_.listenTo('nb-app-ready', function() {
         nb_.listenTo('nb-needs-menu-js', callbackFunc );
     });
 }(window, document));
@@ -634,7 +663,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
               return;
 
             // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
+            // when the plugin is loaded => it emits 'nb-jmp-parsed' listened to by nb_.listenTo()
             nb_.maybeLoadAssetsWhenSelectorInScreen( {
                 id : 'menu',
                 elements : $candidates,
@@ -647,7 +676,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
             });
         });// jQuery
     };/////////////// callbackFunc
-    nb_.listenTo('nimble-app-ready', function() {
+    nb_.listenTo('nb-app-ready', function() {
         nb_.listenTo('nb-needs-videobg-js', callbackFunc );
     });
 }(window, document));
@@ -660,530 +689,60 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
 /* ------------------------------------------------------------------------- *
  *  MAYBE LOAD FONTAWESOME ON SCROLL
 /* ------------------------------------------------------------------------- */
-(function(w, d){
-    var callbackFunc = function() {
-        jQuery(function($){
-            // we don't need to inject font awesome if already enqueued by a theme
-            if ( sekFrontLocalized.fontAwesomeAlreadyEnqueued )
-              return;
-            if ( !sekFrontLocalized.load_font_awesome_on_scroll )
-              return;
-            var $candidates = $('i[class*=fa-]');
+// (function(w, d){
+//     var callbackFunc = function() {
+//         jQuery(function($){
+//             // we don't need to inject font awesome if already enqueued by a theme
+//             if ( sekFrontLocalized.fontAwesomeAlreadyEnqueued )
+//               return;
+//             if ( !sekFrontLocalized.load_font_awesome_on_scroll )
+//               return;
+//             var $candidates = $('i[class*=fa-]');
 
-            if ( $candidates.length < 1 )
-              return;
+//             if ( $candidates.length < 1 )
+//               return;
 
-            // Load js plugin if needed
-            // when the plugin is loaded => it emits "nb-needs-fontawesome" listened to by nb_.listenTo()
-            var doLoad = function() {
-                  //Load the style
-                  if ( $('head').find( '#czr-font-awesome' ).length < 1 ) {
-                        var link = document.createElement('link');
-                        link.setAttribute('href', sekFrontLocalized.frontAssetsPath + 'fonts/css/fontawesome-all.min.css?'+sekFrontLocalized.assetVersion );
-                        link.setAttribute('id', 'czr-font-awesome');
-                        link.setAttribute('rel', nb_.assetPreloadSupported() ? 'preload' : 'stylesheet' );
-                        link.setAttribute('as', 'style');
-                        link.onload = function() {
-                            this.onload=null;
-                            if ( nb_.assetPreloadSupported() ) {
-                                this.rel='stylesheet';
-                            }
+//             // Load js plugin if needed
+//             // when the plugin is loaded => it emits "nb-needs-fontawesome" listened to by nb_.listenTo()
+//             var doLoad = function() {
+//                   //Load the style
+//                   if ( $('head').find( '#czr-font-awesome' ).length < 1 ) {
+//                         var link = document.createElement('link');
+//                         link.setAttribute('href', sekFrontLocalized.frontAssetsPath + 'fonts/css/fontawesome-all.min.css?'+sekFrontLocalized.assetVersion );
+//                         link.setAttribute('id', 'czr-font-awesome');
+//                         link.setAttribute('rel', nb_.assetPreloadSupported() ? 'preload' : 'stylesheet' );
+//                         link.setAttribute('as', 'style');
+//                         link.onload = function() {
+//                             this.onload=null;
+//                             if ( nb_.assetPreloadSupported() ) {
+//                                 this.rel='stylesheet';
+//                             }
 
-                        };
-                        document.getElementsByTagName('head')[0].appendChild(link);
-                  }
-            };// doLoad
-            // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nimble-magnific-popup-loaded' listened to by nb_.listenTo()
-            nb_.maybeLoadAssetsWhenSelectorInScreen({
-                id : 'font-awesome',
-                elements : $candidates,
-                func : doLoad
-            });
-        });//jQuery(function($){})
-    };/////////////// callbackFunc
+//                         };
+//                         document.getElementsByTagName('head')[0].appendChild(link);
+//                   }
+//             };// doLoad
+//             // Load js plugin if needed
+//             // when the plugin is loaded => it emits 'nb-jmp-parsed' listened to by nb_.listenTo()
+//             nb_.maybeLoadAssetsWhenSelectorInScreen({
+//                 id : 'font-awesome',
+//                 elements : $candidates,
+//                 func : doLoad
+//             });
+//         });//jQuery(function($){})
+//     };/////////////// callbackFunc
 
-    // When loaded with defer, we can not be sure that jQuery will be loaded before
-    //  on 'nimble-app-ready', jQuery is loaded
-    nb_.listenTo( 'nimble-app-ready', function() {
-        nb_.listenTo( 'nb-needs-fontawesome', callbackFunc );
-    });
-}(window, document));/* ===================================================
- * jquerynimbleLazyLoad.js v1.0.0
- * ===================================================
- *
- * Replace all img src placeholder in the $element by the real src on scroll window event
- * Bind a 'smartload' event on each transformed img
- *
- * Note : the data-src (data-srcset) attr has to be pre-processed before the actual page load
- * Example of regex to pre-process img server side with php :
- * preg_replace_callback('#<img([^>]+?)src=[\'"]?([^\'"\s>]+)[\'"]?([^>]*)>#', 'regex_callback' , $_html)
- *
- * (c) 2018 Nicolas Guillaume, Nice, France
- *
- * Example of gif 1px x 1px placeholder :
- * 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
- *
- * inspired by the work of Luís Almeida
- * http://luis-almeida.github.com/unveil
- *
- * Requires requestAnimationFrame polyfill:
- * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
- *
- * Feb 2019 : added support for iframe lazyloading for https://github.com/presscustomizr/nimble-builder/issues/361
- * =================================================== */
-// global sekFrontLocalized, nimbleListenTo
-(function(w, d){
-      var callbackFunc = function() {
-           (function ( $, window ) {
-              //defaults
-              var pluginName = 'nimbleLazyLoad',
-                  defaults = {
-                        load_all_images_on_first_scroll : false,
-                        //attribute : [ 'data-sek-src' ],
-                        excludeImg : [],
-                        threshold : 200,
-                        fadeIn_options : { duration : 400 },
-                        delaySmartLoadEvent : 0,
-
-                  },
-                  //with intersecting cointainers:
-                  //- to avoid race conditions
-                  //- to avoid multi processing in general
-                  skipLazyLoadClass = 'smartload-skip';
-
-
-              function Plugin( element, options ) {
-                    this.element = element;
-                    this.options = $.extend( {}, defaults, options) ;
-                    //add .smartload-skip to the excludeImg
-                    if ( nb_.isArray( this.options.excludeImg ) ) {
-                          this.options.excludeImg.push( '.'+skipLazyLoadClass );
-                    } else {
-                          this.options.excludeImg = [ '.'+skipLazyLoadClass ];
-                    }
-
-                    this._defaults = defaults;
-                    this._name = pluginName;
-                    this.init();
-              }
-
-
-              //can access this.element and this.option
-              Plugin.prototype.init = function () {
-                    var self        = this,
-                        $_ImgOrDivOrIFrameElements  = $( '[data-sek-src]:not('+ this.options.excludeImg.join() +'), [data-sek-iframe-src]' , this.element );
-
-                    this.increment  = 1;//used to wait a little bit after the first user scroll actions to trigger the timer
-                    this.timer      = 0;
-
-                    $_ImgOrDivOrIFrameElements
-                          //avoid intersecting containers to parse the same images
-                          .addClass( skipLazyLoadClass )
-                          .bind( 'sek_load_img', {}, function() { self._load_img(this); })
-                          .bind( 'sek_load_iframe', {}, function() { self._load_iframe(this); });
-
-                    //the scroll event gets throttled with the requestAnimationFrame
-                    nb_.cachedElements.$window.scroll( function( _evt ) {
-                          self._better_scroll_event_handler( $_ImgOrDivOrIFrameElements, _evt );
-                    });
-                    //debounced resize event
-                    nb_.cachedElements.$window.resize( nb_.debounce( function( _evt ) {
-                          self._maybe_trigger_load( $_ImgOrDivOrIFrameElements, _evt );
-                    }, 100 ) );
-                    //on load
-                    this._maybe_trigger_load( $_ImgOrDivOrIFrameElements);
-
-              };
-
-
-              /*
-              * @param : array of $img
-              * @param : current event
-              * @return : void
-              * scroll event performance enhancer => avoid browser stack if too much scrolls
-              */
-              Plugin.prototype._better_scroll_event_handler = function( $_Elements , _evt ) {
-                    var self = this;
-                    if ( ! this.doingAnimation ) {
-                          this.doingAnimation = true;
-                          window.requestAnimationFrame(function() {
-                                self._maybe_trigger_load( $_Elements , _evt );
-                                self.doingAnimation = false;
-                          });
-                    }
-              };
-
-
-              /*
-              * @param : array of $img
-              * @param : current event
-              * @return : void
-              */
-              Plugin.prototype._maybe_trigger_load = function( $_Elements , _evt ) {
-                    var self = this,
-                        // get the visible images list
-                        // don't apply a threshold on page load so that Google audit is happy
-                        // for https://github.com/presscustomizr/nimble-builder/issues/619
-                        threshold = ( _evt && 'scroll' === _evt.type ) ? this.options.threshold : 0;
-
-                        _visible_list = $_Elements.filter( function( ind, _el ) {
-                            //force all images to visible if first scroll option enabled
-                            if ( _evt && 'scroll' == _evt.type && self.options.load_all_images_on_first_scroll )
-                              return true;
-                            return nb_.elOrFirstVisibleParentIsInWindow( _el, threshold );
-                        });
-
-                    _visible_list.map( function( ind, _el ) {
-                          if ( 'IFRAME' === $(_el).prop("tagName") ) {
-                                $(_el).trigger( 'sek_load_iframe' );
-                          } else {
-                                $(_el).trigger( 'sek_load_img' );
-                          }
-                    });
-              };
-
-
-              /*
-              * @param single $img object
-              * @return void
-              * replace src place holder by data-src attr val which should include the real src
-              */
-              Plugin.prototype._load_img = function( _el_ ) {
-                    var $_el    = $(_el_),
-                        _src     = $_el.attr( 'data-sek-src' ),
-                        _src_set = $_el.attr( 'data-sek-srcset' ),
-                        _sizes   = $_el.attr( 'data-sek-sizes' ),
-                        self = this,
-                        $jQueryImgToLoad = $("<img />", { src : _src } );
-
-                    $_el.addClass('lazy-loading');
-                    $_el.unbind('sek_load_img');
-
-                    $jQueryImgToLoad
-                          // .hide()
-                          .on( 'load', function () {
-                                //https://api.jquery.com/removeAttr/
-                                //An attribute to remove; as of version 1.7, it can be a space-separated list of attributes.
-                                //minimum supported wp version (3.4+) embeds jQuery 1.7.2
-                                $_el.removeAttr( [ 'data-sek-src', 'data-sek-srcset', 'data-sek-sizes' ].join(' ') );
-                                if( $_el.data("sek-lazy-bg") ){
-                                      $_el.css('backgroundImage', 'url('+_src+')');
-                                } else {
-                                      $_el.attr("src", _src );
-                                      if ( _src_set ) {
-                                            $_el.attr("srcset", _src_set );
-                                      }
-                                      if ( _sizes ) {
-                                            $_el.attr("sizes", _sizes );
-                                      }
-                                }
-                                //prevent executing this twice on an already smartloaded img
-                                if ( ! $_el.hasClass('sek-lazy-loaded') ) {
-                                      $_el.addClass('sek-lazy-loaded');
-                                }
-                                //Following would be executed twice if needed, as some browsers at the
-                                //first execution of the load callback might still have not actually loaded the img
-
-                                $_el.trigger('smartload');
-                                //flag to avoid double triggering
-                                $_el.data('sek-lazy-loaded', true );
-                                self._clean_css_loader( $_el );
-
-                          });//<= create a load() fn
-                    //http://stackoverflow.com/questions/1948672/how-to-tell-if-an-image-is-loaded-or-cached-in-jquery
-                    if ( $jQueryImgToLoad[0].complete ) {
-                          $jQueryImgToLoad.trigger( 'load' );
-                    }
-                    $_el.removeClass('lazy-loading');
-              };
-
-              Plugin.prototype._clean_css_loader = function( $_el ) {
-                    // maybe remove the CSS loader
-                    $.each( [ $_el.find('.sek-css-loader'),  $_el.parent().find('.sek-css-loader') ], function( k, $_el ) {
-                        if ( $_el.length > 0 )
-                          $_el.remove();
-                    });
-              };
-
-
-              /*
-              * @param single iframe el object
-              * @return void
-              */
-              Plugin.prototype._load_iframe = function( _el_ ) {
-                    var $_el    = $(_el_),
-                        self = this;
-
-                    //$_el.addClass('lazy-loading');
-                    $_el.unbind('sek_load_iframe');
-
-                    $_el.attr( 'src', function() {
-                          var src = $(this).attr('data-sek-iframe-src');
-                          $(this).removeAttr('data-sek-iframe-src');
-                          $_el.data('sek-lazy-loaded', true );
-                          $_el.trigger('smartload');
-                          if ( ! $_el.hasClass('sek-lazy-loaded') ) {
-                                $_el.addClass('sek-lazy-loaded');
-                          }
-                          return src;
-                    });
-                    //$_el.removeClass('lazy-loading');
-              };
-
-
-              // prevents against multiple instantiations
-              $.fn[pluginName] = function ( options ) {
-                    return this.each(function () {
-                          if (!$.data(this, 'plugin_' + pluginName)) {
-                                $.data(this, 'plugin_' + pluginName,
-                                new Plugin( this, options ));
-                          }
-                    });
-              };
-          })( jQuery, window );
-
-      };////////////// callbackFunc
-      // on 'nimble-app-ready', jQuery is loaded
-      nb_.listenTo('nimble-app-ready', function(){
-          callbackFunc();
-          if ( sekFrontLocalized.lazyload_enabled ) { nb_.emit('nimble-lazyload-loaded'); }
-      });
-}(window, document));// global sekFrontLocalized, nimbleListenTo
-/* ===================================================
- * jquery.fn.parallaxBg v1.0.0
- * Created in October 2018.
- * Inspired from https://github.com/presscustomizr/front-jquery-plugins/blob/master/jqueryParallax.js
- * ===================================================
-*/
-(function(w, d){
-      var callbackFunc = function() {
-          (function ( $, window ) {
-              //defaults
-              var pluginName = 'parallaxBg',
-                  defaults = {
-                        parallaxForce : 40,
-                        oncustom : [],//list of event here
-                        matchMedia : 'only screen and (max-width: 800px)'
-                  };
-
-              function Plugin( element, options ) {
-                    this.element         = $(element);
-                    //this.element_wrapper = this.element.closest( '.parallax-wrapper' );
-                    this.options         = $.extend( {}, defaults, options, this.parseElementDataOptions() ) ;
-                    this._defaults       = defaults;
-                    this._name           = pluginName;
-                    this.init();
-              }
-
-              Plugin.prototype.parseElementDataOptions = function () {
-                    return this.element.data();
-              };
-
-              //can access this.element and this.option
-              //@return void
-              Plugin.prototype.init = function () {
-                    var self = this;
-                    //cache some element
-                    this.$_window     = nb_.cachedElements.$window;
-                    this.doingAnimation = false;
-                    this.isVisible = false;
-                    this.isBefore = false;//the element is before the scroll point
-                    this.isAfter = true;// the element is after the scroll point
-
-                    // normalize the parallax ratio
-                    // must be a number 0 > ratio > 100
-                    if ( 'number' !== typeof( self.options.parallaxForce ) || self.options.parallaxForce < 0 ) {
-                          if ( sekFrontLocalized.isDevMode ) {
-                                console.log('parallaxBg => the provided parallaxForce is invalid => ' + self.options.parallaxForce );
-                          }
-                          self.options.parallaxForce = this._defaults.parallaxForce;
-                    }
-                    if ( self.options.parallaxForce > 100 ) {
-                          self.options.parallaxForce = 100;
-                    }
-
-                    //the scroll event gets throttled with the requestAnimationFrame
-                    this.$_window.scroll( function(_evt) { self.maybeParallaxMe(_evt); } );
-                    //debounced resize event
-                    this.$_window.resize( nb_.debounce( function(_evt) {
-                          self.maybeParallaxMe(_evt);
-                    }, 100 ) );
-
-                    //on load
-                    this.checkIfIsVisibleAndCacheProperties();
-                    this.setTopPositionAndBackgroundSize();
-              };
-
-              //@see https://www.paulirish.com/2012/why-moving-elements-with-translate-is-better-than-posabs-topleft/
-              Plugin.prototype.setTopPositionAndBackgroundSize = function() {
-                    var self = this;
-
-                    // options.matchMedia is set to 'only screen and (max-width: 768px)' by default
-                    // if a match is found, then reset the top position
-                    if ( nb_.isFunction( window.matchMedia ) && matchMedia( self.options.matchMedia ).matches ) {
-                          this.element.css({'background-position-y' : '', 'background-attachment' : '' });
-                          return;
-                    }
-
-                    var $element       = this.element,
-                        elemHeight = $element.outerHeight(),
-                        winHeight = this.$_window.height(),
-                        offsetTop = $element.offset().top,
-                        scrollTop = this.$_window.scrollTop(),
-                        percentOfPage = 100;
-
-                    // the percentOfPage can vary from -1 to 1
-                    if ( this.isVisible ) {
-                          //percentOfPage = currentDistanceToMiddleScreen / maxDistanceToMiddleScreen;
-                          percentOfPage = ( offsetTop - scrollTop ) / winHeight;
-                    } else if ( this.isBefore ) {
-                          percentOfPage = 1;
-                    } else if ( this.isAfter ) {
-                          percentOfPage = - 1;
-                    }
-
-                    var maxBGYMove = this.options.parallaxForce > 0 ? winHeight * ( 100 - this.options.parallaxForce ) / 100 : winHeight,
-                        bgPositionY = Math.round( percentOfPage *  maxBGYMove );
-
-                    this.element.css({
-                          'background-position-y' : [
-                                'calc(50% ',
-                                bgPositionY > 0 ? '+ ' : '- ',
-                                Math.abs( bgPositionY ) + 'px)'
-                          ].join('')
-                    });
-              };
-
-              // When does the image enter the viewport ?
-              Plugin.prototype.checkIfIsVisibleAndCacheProperties = function( _evt ) {
-                  var $element = this.element;
-                  // bail if the level is display:none;
-                  // because $.offset() won't work
-                  // see because of https://github.com/presscustomizr/nimble-builder/issues/363
-                  if ( ! $element.is(':visible') )
-                      return false;
-
-                  var scrollTop = this.$_window.scrollTop(),
-                      wb = scrollTop + this.$_window.height(),
-                      offsetTop  = $element.offset().top,
-                      ib  = offsetTop + $element.outerHeight();
-
-                  // Cache now
-                  this.isVisible = ib >= scrollTop && offsetTop <= wb;
-                  this.isBefore = offsetTop > wb ;//the element is before the scroll point
-                  this.isAfter = ib < scrollTop;// the element is after the scroll point
-                  return this.isVisible;
-              };
-
-              // a throttle is implemented with window.requestAnimationFrame
-              Plugin.prototype.maybeParallaxMe = function(evt) {
-                    var self = this;
-                    if ( ! this.checkIfIsVisibleAndCacheProperties() )
-                      return;
-
-                    if ( ! this.doingAnimation ) {
-                          this.doingAnimation = true;
-                          window.requestAnimationFrame(function() {
-                                self.setTopPositionAndBackgroundSize();
-                                self.doingAnimation = false;
-                          });
-                    }
-              };
-
-              // prevents against multiple instantiations
-              $.fn[pluginName] = function ( options ) {
-                  return this.each(function () {
-                      if (!$.data(this, 'plugin_' + pluginName)) {
-                          $.data(this, 'plugin_' + pluginName,
-                          new Plugin( this, options ));
-                      }
-                  });
-              };
-          })( jQuery, window );
-      };/////////////// callbackFunc
-
-      // on 'nimble-app-ready', jQuery is loaded
-      nb_.listenTo('nimble-app-ready', function(){
-          callbackFunc();
-          nb_.emit('nimble-parallax-loaded');
-      });
-}(window, document));
-// global sekFrontLocalized, nimbleListenTo
-/* ------------------------------------------------------------------------- *
- *  ACCORDION MODULE
-/* ------------------------------------------------------------------------- */
-(function(w, d){
-      var callbackFunc = function() {
-          jQuery( function($){
-              $( 'body' ).on( 'click sek-expand-accord-item', '.sek-accord-item > .sek-accord-title', function( evt ) {
-                  //evt.preventDefault();
-                  //evt.stopPropagation();
-                  var $item = $(this).closest( '.sek-accord-item'),
-                      $accordion = $(this).closest( '.sek-accord-wrapper');
-
-                  // Note : cast the boolean to a string by adding +''
-                  if ( "true" == $accordion.data('sek-one-expanded')+'' ) {
-                      $accordion.find('.sek-accord-item').not( $item ).each( function() {
-                            var $current_item = $(this);
-                            $current_item.find('.sek-accord-content').stop( true, true ).slideUp( {
-                                  duration : 200,
-                                  start : function() {
-                                        // If already expanded, make sure inline style display:block is set
-                                        // otherwise, the CSS style display:none will apply first, making the transition brutal.
-                                        if ( "true" == $current_item.attr('data-sek-expanded')+'' ) {
-                                              $current_item.find('.sek-accord-content').css('display', 'block');
-                                        }
-                                        $current_item.attr('data-sek-expanded', "false" );
-                                  }
-                            });
-                      });
-                  }
-                  if ( 'sek-expand-accord-item' === evt.type && "true" == $item.attr('data-sek-expanded')+'' ) {
-                      return;
-                  } else {
-                      $item.find('.sek-accord-content').stop( true, true ).slideToggle({
-                            duration : 200,
-                            start : function() {
-                                  // If already expanded, make sure inline style display:block is set
-                                  // otherwise, the CSS style display:none will apply first, making the transition brutal.
-                                  if ( "true" == $item.attr('data-sek-expanded')+'' ) {
-                                        $item.find('.sek-accord-content').css('display', 'block');
-                                  }
-                                  $item.attr('data-sek-expanded', "false" == $item.attr('data-sek-expanded')+'' ? "true" : "false" );
-                                  $item.trigger( "true" == $item.attr('data-sek-expanded') ? 'sek-accordion-expanded' : 'sek-accordion-collapsed' );
-                            }
-                      });
-                  }
-
-              });// on 'click'
-
-              // When customizing, expand the currently edited item
-              // @see CZRItemConstructor in api.czrModuleMap.czr_img_slider_collection_child
-              if ( window.wp && ! nb_.isUndefined( wp.customize ) ) {
-                    wp.customize.preview.bind('sek-item-focus', function( params ) {
-
-                          var $itemEl = $('[data-sek-item-id="' + params.item_id +'"]', '.sek-accord-wrapper').first();
-                          if ( 1 > $itemEl.length )
-                            return;
-
-                          $itemEl.find('.sek-accord-title').trigger('sek-expand-accord-item');
-                    });
-              }
-          });//jQuery()
-
-      };/////////////// callbackFunc
-      // on 'nimble-app-ready', jQuery is loaded
-      nb_.listenTo('nimble-app-ready', callbackFunc );
-}(window, document));
-
-
-// global sekFrontLocalized, nimbleListenTo
+//     // When loaded with defer, we can not be sure that jQuery will be loaded before
+//     //  on 'nb-app-ready', jQuery is loaded
+//     nb_.listenTo( 'nb-app-ready', function() {
+//         nb_.listenTo( 'nb-needs-fontawesome', callbackFunc );
+//     });
+// }(window, document));// global sekFrontLocalized, nimbleListenTo
 /* ------------------------------------------------------------------------- *
  *  LIGHT BOX WITH MAGNIFIC POPUP
  /* ------------------------------------------------------------------------- */
 (function(w, d){
-    nb_.listenTo('nimble-magnific-popup-loaded', function() {
+    nb_.listenTo('nb-jmp-parsed', function() {
         jQuery(function($){
             var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
             // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
@@ -1229,7 +788,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
 /* ------------------------------------------------------------------------- */
 // nimble-lazyload-loaded is fired in lazyload plugin, only when sekFrontLocalized.lazyload_enabled
 (function(w, d){
-    nb_.listenTo('nimble-lazyload-loaded', function() {
+    nb_.listenTo('nb-lazyload-parsed', function() {
         jQuery(function($){
               $('.sektion-wrapper').each( function() {
                     try { $(this).nimbleLazyLoad(); } catch( er ) {
@@ -1246,7 +805,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
  *  BG PARALLAX
 /* ------------------------------------------------------------------------- */
 (function(w, d){
-    nb_.listenTo('nimble-parallax-loaded', function() {
+    nb_.listenTo('nb-parallax-parsed', function() {
         jQuery(function($){
               $('[data-sek-bg-parallax="true"]').each( function() {
                     $(this).parallaxBg( { parallaxForce : $(this).data('sek-parallax-force') } );

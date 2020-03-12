@@ -223,13 +223,37 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                           return func.apply(null, args);
                         }, wait);
                     })
+                    // Browser detection
+                    // @see https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser#9851769
+                    // browserIs : function( browser ) {
+                    //     var bool = false,
+                    //         isIE = false || !!document.documentMode;
+                    //     switch( browser) {
+                    //         case 'safari' :
+                    //             bool = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+                    //         break;
+                    //         case 'firefox' :
+                    //             bool = typeof InstallTrigger !== 'undefined';
+                    //         break;
+                    //         case 'IE' :
+                    //             bool = isIE;
+                    //         break;
+                    //         case 'edge' :
+                    //             bool = !isIE && !!window.StyleMedia;
+                    //         break;
+                    //         case 'chrome' :
+                    //             bool = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+                    //         break;
+                    //     }
+                    //     return bool;
+                    // },
               });//$.extend( nb_
 
               // now that nb_ has been populated, let's say it to the app
-              nb_.emit('nimble-app-ready');
+              nb_.emit('nb-app-ready');
           });// jQuery( function($){
     };
-    // 'nimble-jquery-loaded' is fired @'wp_footer' see inline script in ::_schedule_front_assets_printing()
-    nb_.listenTo('nimble-jquery-loaded', callbackFunc );
+    // 'nb-jquery-loaded' is fired @'wp_footer' see inline script in ::_schedule_front_assets_printing()
+    nb_.listenTo('nb-jquery-loaded', callbackFunc );
 
 }(window, document));

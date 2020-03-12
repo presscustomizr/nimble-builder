@@ -1864,9 +1864,9 @@ $.magnificPopup.registerModule(RETINA_NS, {
 
       };/////////////// callbackFunc
 
-      // on 'nimble-app-ready', jQuery is loaded
-      nb_.listenTo('nimble-app-ready', function(){
+      // on 'nb-app-ready', jQuery is loaded
+      nb_.listenTo('nb-app-ready', function(){
           callbackFunc();
-          nb_.emit('nimble-magnific-popup-loaded');
+          nb_.emit('nb-jmp-parsed');
       });
 }(window, document));

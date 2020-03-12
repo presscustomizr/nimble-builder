@@ -544,6 +544,6 @@
       };/////////////// callbackFunc
 
       // we
-      nb_.listenTo('nimble-app-ready', callbackFunc );
+      nb_.listenTo('nb-app-ready', callbackFunc );
 }(window, document));
 

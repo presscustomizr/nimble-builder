@@ -29,39 +29,19 @@ window.nb_ = {};
               return;
             console.log.apply(console,arguments);
         },
-        // Browser detection
-        // @see https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser#9851769
-        browserIs : function( browser ) {
-            var bool = false,
-                isIE = false || !!document.documentMode;
-            switch( browser) {
-                case 'safari' :
-                    bool = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
-                break;
-                case 'firefox' :
-                    bool = typeof InstallTrigger !== 'undefined';
-                break;
-                case 'IE' :
-                    bool = isIE;
-                break;
-                case 'edge' :
-                    bool = !isIE && !!window.StyleMedia;
-                break;
-                case 'chrome' :
-                    bool = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
-                break;
-            }
-            return bool;
-        },
-        assetPreloadSupported : function() {
-            return !nb_.browserIs('firefox') && !nb_.browserIs('IE') && !nb_.browserIs('edge');
+        hasPreloadSupport : function( browser ) {
+          var link = document.createElement('link');
+          var relList = link.relList;
+          if (!relList || !relList.supports)
+            return false;
+          return relList.supports('preload');
         },
         listenTo : function( evt, func ) {
             var canWeFireCallbackForEvent = {
-                'nimble-jquery-loaded' : function() { return typeof undefined !== typeof jQuery; },
-                'nimble-app-ready' : function() { return ( typeof undefined !== typeof window.nb_ ) && nb_.wasListenedTo('nimble-jquery-loaded'); },
-                'nimble-magnific-popup-loaded' : function() { return ( typeof undefined !== typeof jQuery ) && ( typeof undefined !== typeof jQuery.fn.magnificPopup ); },
-                'nimble-swiper-script-loaded' : function() { return typeof undefined !== typeof window.Swiper; }
+                'nb-jquery-loaded' : function() { return typeof undefined !== typeof jQuery; },
+                'nb-app-ready' : function() { return ( typeof undefined !== typeof window.nb_ ) && nb_.wasListenedTo('nb-jquery-loaded'); },
+                'nb-jmp-parsed' : function() { return ( typeof undefined !== typeof jQuery ) && ( typeof undefined !== typeof jQuery.fn.magnificPopup ); },
+                'nb-main-swiper-parsed' : function() { return typeof undefined !== typeof window.Swiper; }
             };
             // e is the event object passed
             // it is possible to add params but we need to use new CustomEvent with a polyfill for IE
@@ -172,10 +152,10 @@ window.nb_ = {};
 
 // nb_.listenTo = function( evt, func ) {
 //     var bools = {
-//         'nimble-jquery-loaded' : typeof undefined !== typeof jQuery,
-//         'nimble-app-ready' : typeof undefined !== typeof window.nb_ && nb_.isReady === true,
-//         'nimble-magnific-popup-loaded' : typeof undefined !== typeof jQuery && typeof undefined !== typeof jQuery.fn.magnificPopup,
-//         'nimble-swiper-script-loaded' : typeof undefined !== typeof window.Swiper
+//         'nb-jquery-loaded' : typeof undefined !== typeof jQuery,
+//         'nb-app-ready' : typeof undefined !== typeof window.nb_ && nb_.isReady === true,
+//         'nb-jmp-parsed' : typeof undefined !== typeof jQuery && typeof undefined !== typeof jQuery.fn.magnificPopup,
+//         'nb-main-swiper-parsed' : typeof undefined !== typeof window.Swiper
 //     };
 //     if ( 'function' === typeof func ) {
 //       if ( true === bools[evt] ) func();
@@ -203,7 +183,7 @@ window.nb_ = {};
           // Firefox does not support preload
           // @see https://web.dev/preload-critical-assets/
           // https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser#9851769
-          if ( !nb_.assetPreloadSupported() ) {
+          if ( !nb_.hasPreloadSupport() ) {
               appendScript();
           } else {
               var link = document.createElement('link');
@@ -218,7 +198,7 @@ window.nb_ = {};
               };
               document.getElementsByTagName('head')[0].appendChild(link);
           }
-      }, 1000 );//<= add a delay to test 'nimble-jquery-loaded' and mimic the 'defer' option of a cache plugin
+      }, 1000 );//<= add a delay to test 'nb-jquery-loaded' and mimic the 'defer' option of a cache plugin
 })();
 
 
@@ -228,7 +208,7 @@ window.nb_ = {};
 // introduced for https://github.com/presscustomizr/nimble-builder/issues/626
 ( function() {
       var _maybeEmit = function() {
-        var evt = 'nimble-jquery-loaded';
+        var evt = 'nb-jquery-loaded';
         if ( !nb_.wasEmitted(evt) ) {
             nb_.emit(evt);
         }
@@ -274,11 +254,11 @@ window.nb_ = {};
         var elem = document.getElementById("nimble-load-jquery-migrate");
         elem.parentNode.removeChild(elem);
     };
-    nb_.listenTo('nimble-jquery-loaded', function() {
+    nb_.listenTo('nb-jquery-loaded', function() {
         // Firefox does not support preload
         // @see https://web.dev/preload-critical-assets/
         // https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser#9851769
-        if ( !nb_.assetPreloadSupported() ) {
+        if ( !nb_.hasPreloadSupport() ) {
             appendScript();
         } else {
             var link = document.createElement('link');
@@ -314,12 +294,12 @@ window.nb_ = {};
       // https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser#9851769
       var link = document.createElement('link');
       link.setAttribute('href', '<?php echo NIMBLE_BASE_URL . "/assets/front/fonts/css/fontawesome-all.min.css"; ?>');
-      link.setAttribute('rel', nb_.assetPreloadSupported() ? 'preload' : 'stylesheet' );
+      link.setAttribute('rel', nb_.hasPreloadSupport() ? 'preload' : 'stylesheet' );
       link.setAttribute('id', 'czr-font-awesome' );
       link.setAttribute('as', 'style');
       link.onload = function() {
           this.onload=null;
-          if ( nb_.assetPreloadSupported() ) {
+          if ( nb_.hasPreloadSupport() ) {
               this.rel='stylesheet';
           }
           // remove script wrapper when done
@@ -344,11 +324,11 @@ window.nb_ = {};
       // https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser#9851769
       var link = document.createElement('link');
       link.setAttribute('href', '//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>');
-      link.setAttribute('rel', nb_.assetPreloadSupported() ? 'preload' : 'stylesheet' );
+      link.setAttribute('rel', nb_.hasPreloadSupport() ? 'preload' : 'stylesheet' );
       link.setAttribute('as', 'style');
       link.onload = function() {
           this.onload=null;
-          if ( nb_.assetPreloadSupported() ) {
+          if ( nb_.hasPreloadSupport() ) {
               this.rel='stylesheet';
           }
           // remove script wrapper when done
@@ -385,5 +365,5 @@ window.nb_ = {};
             });//jQuery( function($){
       };// onJQueryReady
 
-      nb_.listenTo('nimble-app-ready', callbackFunc );
+      nb_.listenTo('nb-app-ready', callbackFunc );
 }(window, document));
