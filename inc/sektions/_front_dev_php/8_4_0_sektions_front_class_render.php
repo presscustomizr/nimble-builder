@@ -537,6 +537,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         <script>nb_.emit('nb-needs-videobg-js');</script>
                       <?php
                     }
+                    if ( false !== strpos($bg_attributes, 'data-sek-bg-parallax="true"') ) {
+                      ?>
+                        <script>nb_.emit('nb-needs-parallax');</script>
+                      <?php
+                    }
                     // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
                     $has_bg_img = false;
                     if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
@@ -665,6 +670,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     $has_bg_img = false;
                     if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
                         $has_bg_img = true;
+                    }
+                    if ( false !== strpos($bg_attributes, 'data-sek-bg-parallax="true"') ) {
+                      ?>
+                        <script>nb_.emit('nb-needs-parallax');</script>
+                      <?php
                     }
 
                     printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s %9$s %10$s>%11$s',
