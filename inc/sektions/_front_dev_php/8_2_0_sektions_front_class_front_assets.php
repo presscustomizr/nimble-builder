@@ -226,7 +226,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             $global_recaptcha_opts = is_array( $global_recaptcha_opts ) ? $global_recaptcha_opts : array();
 
             // We're done here if preload is active
-            if ( sek_preload_front_scripts() )
+            if ( sek_preload_front_scripts() && !skp_is_customizing() )
               return;
 
             $contextually_active_modules = sek_get_collection_of_contextually_active_modules();
@@ -517,6 +517,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         eventsEmitted : [],
         eventsListenedTo : [],
         emit : function(evt) {
+            //console.log('emitted event', evt );
             // it is possible to add params when dispatching the event, but we need to use new CustomEvent with a polyfill for IE
             // see : https://stackoverflow.com/questions/18613456/trigger-event-with-parameters
             var _evt = document.createEvent('Event');
@@ -556,14 +557,19 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
             var headTag = document.getElementsByTagName('head')[0],
                 link = document.createElement('link'),
-                rel = 'style' === params.as ? 'stylesheet' : 'script',
+                link_rel = 'style' === params.as ? 'stylesheet' : 'script',
                 _injectFinalAsset = function() {
+                    var link = this;
+                    // this is the link element
                     if ( 'style' === params.as ) {
-                       link.rel = rel;
+                       link.rel = link_rel;
                     } else {
                         var _script = document.createElement("script");
                         _script.setAttribute('src', params.href );
                         _script.setAttribute('id', params.id );
+                        if ( !nb_.hasPreloadSupport() && 'script' === params.as ) {
+                            _script.setAttribute('defer', 'defer');
+                        }
                         headTag.appendChild(_script);
                         // clean the loader link
                         if ( link && link.parentNode ) {
@@ -573,18 +579,15 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                   };
 
             link.setAttribute('href', params.href);
-            link.setAttribute('rel', nb_.hasPreloadSupport() ? 'preload' : rel );
+            link.setAttribute('rel', nb_.hasPreloadSupport() ? 'preload' : link_rel );
             link.setAttribute('id', params.id );
             link.setAttribute('as', params.as);
             link.onload = function() {
                 this.onload=null;
-                // if no preload support ( firefox, IE as of March 2020 ), final rel attribute has been set before, no need to set it now
-                if ( !nb_.hasPreloadSupport() )
-                  return;
                 if ( params.onEvent ) {
-                    nb_.listenTo( params.onEvent, _injectFinalAsset );
+                    nb_.listenTo( params.onEvent, function() { _injectFinalAsset.call(this); });
                 } else {
-                    _injectFinalAsset();
+                    _injectFinalAsset.call(this);
                 }
             };
             link.onerror = function() {
@@ -599,6 +602,20 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             if ( params.scriptEl && params.scriptEl.parentNode ) {
                 params.scriptEl.parentNode.removeChild(params.scriptEl);
             }
+        },
+        revealBG : function() {
+            var imgSrc = this.getAttribute('data-sek-src');
+            if ( imgSrc ) {
+                this.setAttribute( 'style', 'background-image:url("' + this.getAttribute('data-sek-src') +'")' );
+                this.className += ' smartload-skip';//<= so we don't parse it twice when lazyload is active
+                // clean css loader
+                var css_loaders = this.querySelectorAll('.sek-css-loader');
+                css_loaders.forEach( function(_cssl) {
+                    if ( nb_.isObject(_cssl) ) {
+                        _cssl.parentNode.removeChild(_cssl);
+                    }
+                });
+            }
         }
     };//window.nb_
 
@@ -612,30 +629,18 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             }
         };
     }
-
     // handle bg images when lazyloading off
     nb_.listenTo('nb-docready', function() {
         var matches = document.querySelectorAll('div.sek-has-bg');
         if ( !nb_.isObject( matches ) || matches.length < 1 )
           return;
-        var imgSrc, isInScreen = false;
+        var imgSrc;
         matches.forEach( function(el) {
             if ( !nb_.isObject(el) )
               return;
 
             if ( !nb_.isLazyLoadEnabled() || ( nb_.isInScreen(el) && nb_.isLazyLoadEnabled() ) ) {
-                imgSrc = el.getAttribute('data-sek-src');
-                if ( imgSrc ) {
-                    el.setAttribute( 'style', 'background-image:url("' + el.getAttribute('data-sek-src') +'")' );
-                    el.className += ' smartload-skip';//<= so we don't parse it twice when lazyload is active
-                    // clean css loader
-                    var css_loaders = el.querySelectorAll('.sek-css-loader');
-                    css_loaders.forEach( function(_cssl) {
-                        if ( nb_.isObject(_cssl) ) {
-                            _cssl.parentNode.removeChild(_cssl);
-                        }
-                    });
-                }
+                nb_.revealBG.call(el);
             }
         });
     });
@@ -828,7 +833,17 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         function sek_preload_jquery_from_dns() {
             if( sek_is_jquery_replaced() && !skp_is_customizing() ) {
             ?>
-            <script id="nb-load-jquery">setTimeout(function(){var e=function(){var e=document.createElement("script");e.setAttribute("src","<?php echo NIMBLE_JQUERY_LATEST_CDN_URL; ?>"),e.setAttribute("id","<?php echo NIMBLE_JQUERY_ID; ?>"),e.setAttribute("defer","defer"),document.getElementsByTagName("head")[0].appendChild(e);var t=document.getElementById("nb-load-jquery");t.parentNode.removeChild(t)};if(nb_.hasPreloadSupport()){var t=document.createElement("link");t.setAttribute("href","<?php echo NIMBLE_JQUERY_LATEST_CDN_URL; ?>"),t.setAttribute("rel","preload"),t.setAttribute("id","<?php echo NIMBLE_JQUERY_ID; ?>"),t.setAttribute("as","script"),t.onload=function(){this.onload=null,this.rel="script",e()},document.getElementsByTagName("head")[0].appendChild(t)}else e()},1e3);</script>
+            <script id="nb-load-jquery">( function() {
+      // Load jQuery
+      setTimeout( function() {
+          nb_.preloadAsset( {
+              id : '<?php echo NIMBLE_JQUERY_ID; ?>',
+              as : 'script',
+              href : '<?php echo NIMBLE_JQUERY_LATEST_CDN_URL; ?>',
+              scriptEl : document.currentScript
+          });
+      }, 1000 );//<= add a delay to test 'nb-jquery-loaded' and mimic the 'defer' option of a cache plugin
+})();</script>
             <?php
             }
         }//sek_preload_jquery_from_dns()

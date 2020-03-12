@@ -196,7 +196,7 @@ function sek_preload_google_fonts_on_front() {
 function sek_preload_front_scripts() {
     $glob_perf = sek_get_global_option_value( 'performances' );
     if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['preload_front_scripts'] ) ) {
-        return sek_booleanize_checkbox_val( $glob_perf['preload_front_scripts'] );
+        return !skp_is_customizing() && sek_booleanize_checkbox_val( $glob_perf['preload_front_scripts'] );
     }
     return false;
 }

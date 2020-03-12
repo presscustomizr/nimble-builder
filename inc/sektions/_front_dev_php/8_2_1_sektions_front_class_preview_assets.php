@@ -3,18 +3,53 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
     class SEK_Front_Assets_Customizer_Preview extends SEK_Front_Assets {
         // Fired in __construct()
         function _schedule_preview_assets_printing() {
-            add_action( 'wp_footer', array( $this, 'sek_handle_customizer_previewed_device_js' ), PHP_INT_MAX  );
+            add_action( 'wp_footer', array( $this, 'sek_customizr_js_stuff' ), PHP_INT_MAX  );
 
             // Load customize preview js
             add_action( 'customize_preview_init' , array( $this, 'sek_schedule_customize_preview_assets' ) );
         }//_schedule_preview_assets_printing
 
         // @'wp_footer'
-        function sek_handle_customizer_previewed_device_js() {
+        function sek_customizr_js_stuff() {
             if( !skp_is_customizing() )
               return;
             ?>
-            <script id="nimble-customizer-previewed-device-handler">window,document,nb_.listenTo("nimble-app-ready",function(){jQuery(function(e){if(nb_.isCustomizing()){var i=function(){wp.customize.preview.bind("previewed-device",function(e){nb_.previewedDevice=e})};wp.customize.preview?i():wp.customize.bind("preview-ready",function(){i()})}})});</script>
+            <script id="nb-customizer-previewed-device-handler">(function(w, d){
+      nb_.listenTo( 'nb-app-ready', function() {
+          //PREVIEWED DEVICE ?
+          //Listen to the customizer previewed device
+          var _setPreviewedDevice = function() {
+                wp.customize.preview.bind( 'previewed-device', function( device ) {
+                      nb_.previewedDevice = device;// desktop, tablet, mobile
+                });
+          };
+          if ( wp.customize.preview ) {
+              _setPreviewedDevice();
+          } else {
+                wp.customize.bind( 'preview-ready', function() {
+                      _setPreviewedDevice();
+                });
+          }
+          // REVEAL BG IMAGE ON CHANGE ?
+          jQuery( function($) {
+              $('body').on( 'sek-level-refreshed', '[data-sek-level="location"]', function( evt, params  ) {
+                    var matches = document.querySelectorAll('div.sek-has-bg');
+                    if ( !nb_.isObject( matches ) || matches.length < 1 )
+                      return;
+
+                    var imgSrc;
+                    matches.forEach( function(el) {
+                        if ( !nb_.isObject(el) )
+                          return;
+
+                        if ( nb_.isCustomizing() ) {
+                            nb_.revealBG.call(el);
+                        }
+                    });
+              });
+          });
+      });
+}(window, document));</script>
             <?php
         }
 

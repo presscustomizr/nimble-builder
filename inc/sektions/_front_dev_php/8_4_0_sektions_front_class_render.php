@@ -443,16 +443,6 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     }
                     // if there's a video background or a parallax bg we need to inform js api
                     $bg_attributes = $this->sek_maybe_add_bg_attributes( $model );
-                    if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
-                      ?>
-                        <script>nb_.emit('nb-needs-videobg-js');</script>
-                      <?php
-                    }
-                    if ( false !== strpos($bg_attributes, 'data-sek-bg-parallax="true"') ) {
-                      ?>
-                        <script>nb_.emit('nb-needs-parallax');</script>
-                      <?php
-                    }
 
                     // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
                     $has_bg_img = false;
@@ -473,7 +463,15 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                         $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
                         ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
-                    ); ?>
+                    );
+                    if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
+                      ?><script>nb_.emit('nb-needs-videobg-js');</script><?php
+                    }
+                    if ( false !== strpos($bg_attributes, 'data-sek-bg-parallax="true"') ) {
+                      ?><script>nb_.emit('nb-needs-parallax');</script><?php
+                    }
+                    ?>
+
                           <div class="<?php echo $column_container_class; ?>">
                             <div class="sek-row sek-sektion-inner">
                                 <?php
@@ -532,16 +530,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $grid_column_class = "sek-global-custom-breakpoint-col-{$col_suffix}";
                     }
                     $bg_attributes = $this->sek_maybe_add_bg_attributes( $model );
-                    if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
-                      ?>
-                        <script>nb_.emit('nb-needs-videobg-js');</script>
-                      <?php
-                    }
-                    if ( false !== strpos($bg_attributes, 'data-sek-bg-parallax="true"') ) {
-                      ?>
-                        <script>nb_.emit('nb-needs-parallax');</script>
-                      <?php
-                    }
+
                     // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
                     $has_bg_img = false;
                     if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
@@ -562,6 +551,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
                         ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     );
+                    if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
+                      ?><script>nb_.emit('nb-needs-videobg-js');</script><?php
+                    }
+                    if ( false !== strpos($bg_attributes, 'data-sek-bg-parallax="true"') ) {
+                      ?><script>nb_.emit('nb-needs-parallax');</script><?php
+                    }
                       ?>
                         <?php
                         // Drop zone : if no modules, the drop zone is wrapped in sek-no-modules-columns
@@ -672,9 +667,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                         $has_bg_img = true;
                     }
                     if ( false !== strpos($bg_attributes, 'data-sek-bg-parallax="true"') ) {
-                      ?>
-                        <script>nb_.emit('nb-needs-parallax');</script>
-                      <?php
+                      ?><script>nb_.emit('nb-needs-parallax');</script><?php
                     }
 
                     printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s %9$s %10$s>%11$s',
