@@ -34,14 +34,6 @@ function sek_get_module_params_for_sek_global_performances() {
                     //     __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
                     // )
                 ),
-                'load_front_assets_in_ajax' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Defer loading module assets when modules are offscreen', 'text_doma'),
-                    'default'     => 1,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20'
-                ),
-
 
                 'use_partial_module_stylesheets' => array(
                     'input_type'  => 'nimblecheck',
@@ -82,9 +74,9 @@ function sek_get_module_params_for_sek_global_performances() {
 
 
 
-                'defer_front_js' => array(
+                'preload_front_scripts' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Load javascript files asynchronously', 'text_doma'),
+                    'title'       => __('Defer loading and parsing of javascript files to avoid render blocking issues', 'text_doma'),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',

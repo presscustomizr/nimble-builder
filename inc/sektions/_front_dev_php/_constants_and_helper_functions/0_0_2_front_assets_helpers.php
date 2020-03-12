@@ -21,9 +21,6 @@ function sek_front_needs_font_awesome( $bool = false, $recursive_data = null ) {
 // Recursively sniff the local and global sections to find a 'img-lightbox' string
 // @see sek_get_module_params_for_czr_image_main_settings_child
 function sek_front_needs_magnific_popup( $bool = false, $recursive_data = null ) {
-    if ( skp_is_customizing() )
-      return true;
-
     if ( !$bool ) {
         if ( is_null( $recursive_data ) ) {
             $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
@@ -51,9 +48,6 @@ function sek_front_needs_magnific_popup( $bool = false, $recursive_data = null )
 // @return bool
 // Fired in 'wp_enqueue_scripts'
 function sek_front_needs_parallax_bg( $bool = false, $recursive_data = null ) {
-    if ( skp_is_customizing() )
-      return true;
-
     if ( !$bool ) {
         if ( is_null( $recursive_data ) ) {
             $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
@@ -81,9 +75,6 @@ function sek_front_needs_parallax_bg( $bool = false, $recursive_data = null ) {
 // @return bool
 // Fired in 'wp_enqueue_scripts'
 function sek_front_needs_video_bg( $bool = false, $recursive_data = null ) {
-    if ( skp_is_customizing() )
-      return true;
-
     if ( !$bool ) {
         if ( is_null( $recursive_data ) ) {
             $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
@@ -186,6 +177,8 @@ function sek_use_split_stylesheets_on_front() {
 // Firefox doesn not support preload
 // IE is supposed to support it, but tests show that google fonts may not be loaded on each page refresh
 function sek_preload_google_fonts_on_front() {
+    // When preload is active, browser support is checked with javascript
+    // with a fallback on regular style fetching
     // if(strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== FALSE) // 'Internet explorer'
     //   return;
     // elseif(strpos($_SERVER['HTTP_USER_AGENT'], 'Firefox') !== FALSE) // 'Mozilla Firefox'
@@ -198,12 +191,20 @@ function sek_preload_google_fonts_on_front() {
 }
 
 
-// Adds async/defer attributes to enqueued / registered scripts.
-// works with ::sek_filter_script_loader_tag loaded @'script_loader_tag'
-function sek_maybe_defer_script( $handle, $attribute = 'async', $bool = true ) {
+// @return bool
+// march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/635
+function sek_preload_front_scripts() {
     $glob_perf = sek_get_global_option_value( 'performances' );
-    if ( !skp_is_customizing() && !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['defer_front_js'] ) && sek_booleanize_checkbox_val( $glob_perf['defer_front_js'] ) ) {
-        wp_script_add_data( $handle, $attribute, $bool );
+    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['preload_front_scripts'] ) ) {
+        return sek_booleanize_checkbox_val( $glob_perf['preload_front_scripts'] );
     }
+    return false;
+}
+
+// Adds defer attribute to enqueued / registered scripts.
+// fired @wp_enqueue_scripts
+function sek_defer_script($handle) {
+    // Adds defer attribute to enqueued / registered scripts.
+    wp_script_add_data( $handle, 'defer', true );
 }
 ?>

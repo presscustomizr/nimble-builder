@@ -441,11 +441,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     if ( !empty( $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) {
                         $column_container_class = 'sek-container';
                     }
-                    // if there's a video background we need to inform js api
+                    // if there's a video background or a parallax bg we need to inform js api
                     $bg_attributes = $this->sek_maybe_add_bg_attributes( $model );
                     if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
                       ?>
                         <script>nb_.emit('nb-needs-videobg-js');</script>
+                      <?php
+                    }
+                    if ( false !== strpos($bg_attributes, 'data-sek-bg-parallax="true"') ) {
+                      ?>
+                        <script>nb_.emit('nb-needs-parallax');</script>
                       <?php
                     }
 
