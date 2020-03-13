@@ -76,7 +76,7 @@ module.exports = function(grunt) {
           'build_front_js' : [
               'concat:sektions_front_js',
               //'comments:sektions_front_js',
-              'copy:sek_stand_alone_module_js_in_main_js_folder',
+              //'copy:sek_stand_alone_module_js_in_main_js_folder',
               'uglify:sektions_front_js',
               'uglify:sektions_front_libs_js'
 

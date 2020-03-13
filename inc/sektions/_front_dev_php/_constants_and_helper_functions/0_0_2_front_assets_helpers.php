@@ -144,13 +144,13 @@ function sek_preload_font_awesome() {
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-function sek_inline_module_stylesheets_on_front() {
-    $glob_perf = sek_get_global_option_value( 'performances' );
-    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['print_partial_module_stylesheets_inline'] ) ) {
-        return sek_booleanize_checkbox_val( $glob_perf['print_partial_module_stylesheets_inline'] );
-    }
-    return false;
-}
+// function sek_inline_module_stylesheets_on_front() {
+//     $glob_perf = sek_get_global_option_value( 'performances' );
+//     if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['print_partial_module_stylesheets_inline'] ) ) {
+//         return sek_booleanize_checkbox_val( $glob_perf['print_partial_module_stylesheets_inline'] );
+//     }
+//     return false;
+// }
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612

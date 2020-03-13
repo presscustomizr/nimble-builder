@@ -283,25 +283,24 @@ module.exports = {
     ],
     tasks : [
       'jshint:front_js',
-      'concat:sektions_front_js',
-      'copy:sek_stand_alone_module_js_in_main_js_folder'
+      'concat:sektions_front_js'
     ]
   },
-  sektions_front_js_stand_alone_module_scripts : {
-    options: {
-      spawn : false,
-      // Start a live reload server on the default port 35729
-      livereload : true
-    },
-    files : [
-      '<%= paths.front_assets %>js/_dev_stand_alone/**/*.js'
-    ],
-    tasks : [
-      'jshint:front_js',
-      'copy:sek_stand_alone_module_js_in_main_js_folder',
-      'uglify:sektions_front_js_stand_alone_module_scripts'
-    ]
-  },
+  // sektions_front_js_stand_alone_module_scripts : {
+  //   options: {
+  //     spawn : false,
+  //     // Start a live reload server on the default port 35729
+  //     livereload : true
+  //   },
+  //   files : [
+  //     '<%= paths.front_assets %>js/_dev_stand_alone/**/*.js'
+  //   ],
+  //   tasks : [
+  //     'jshint:front_js',
+  //     'copy:sek_stand_alone_module_js_in_main_js_folder',
+  //     'uglify:sektions_front_js_stand_alone_module_scripts'
+  //   ]
+  // },
   sektions_front_js_libs : {
     options: {
       spawn : false,

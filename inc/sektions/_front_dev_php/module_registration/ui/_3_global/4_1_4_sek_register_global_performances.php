@@ -43,13 +43,13 @@ function sek_get_module_params_for_sek_global_performances() {
                     'input_width' => 'width-20',
                     'html_before' => '<hr/><h3>' . __('STYLESHEETS') .'</h3>'
                 ),
-                'print_partial_module_stylesheets_inline' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Print modules stylesheets inline', 'text_doma'),
-                    'default'     => 0,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                ),
+                // 'print_partial_module_stylesheets_inline' => array(
+                //     'input_type'  => 'nimblecheck',
+                //     'title'       => __('Print modules stylesheets inline', 'text_doma'),
+                //     'default'     => 0,
+                //     'title_width' => 'width-80',
+                //     'input_width' => 'width-20',
+                // ),
                 'print_dyn_stylesheets_inline' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Print generated stylesheets inline', 'text_doma'),

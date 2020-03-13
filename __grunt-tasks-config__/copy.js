@@ -122,20 +122,20 @@ module.exports = {
   },
 
   // added march 2020 for https://github.com/presscustomizr/nimble-builder/issues/626
-  sek_stand_alone_module_js_in_main_js_folder : {
-    expand: true,
-    //flatten: false,
-    filter:'isFile',
-    cwd : '<%= paths.front_assets %>js/_dev_stand_alone/',
-    src: [ '**' ],
-    dest: '<%= paths.front_assets %>js/',
-    rename : function (dest, srcpath) {
-        // var regex = new RegExp(/_/, 'g');
-        srcpath = srcpath.replace('dev_', 'prod_');
-        srcpath = srcpath.replace(/_/g, '-');
-        return dest + srcpath;
-    }
-  }
+  // sek_stand_alone_module_js_in_main_js_folder : {
+  //   expand: true,
+  //   //flatten: false,
+  //   filter:'isFile',
+  //   cwd : '<%= paths.front_assets %>js/_dev_stand_alone/',
+  //   src: [ '**' ],
+  //   dest: '<%= paths.front_assets %>js/',
+  //   rename : function (dest, srcpath) {
+  //       // var regex = new RegExp(/_/, 'g');
+  //       srcpath = srcpath.replace('dev_', 'prod_');
+  //       srcpath = srcpath.replace(/_/g, '-');
+  //       return dest + srcpath;
+  //   }
+  // }
 
   // czr_social_links_module_in_customizr_theme : {
   //   expand: true,
