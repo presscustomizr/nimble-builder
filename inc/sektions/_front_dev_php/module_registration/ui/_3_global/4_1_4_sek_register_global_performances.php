@@ -15,7 +15,7 @@ function sek_get_module_params_for_sek_global_performances() {
                 'global-img-smart-load' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Defer loading images off screen', 'text_doma'),
-                    'default'     => 0,
+                    'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'notice_after' => sprintf('<strong>%1$s</strong>',
@@ -38,7 +38,7 @@ function sek_get_module_params_for_sek_global_performances() {
                 'use_partial_module_stylesheets' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Use partial CSS stylesheets for modules', 'text_doma'),
-                    'default'     => 1,
+                    'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'html_before' => '<hr/><h3>' . __('STYLESHEETS') .'</h3>'
@@ -77,7 +77,7 @@ function sek_get_module_params_for_sek_global_performances() {
                 'preload_front_scripts' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Defer loading and parsing of javascript files to avoid render blocking issues', 'text_doma'),
-                    'default'     => 1,
+                    'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'html_before' => '<hr/><h3>' . __('SCRIPTS') .'</h3>'
