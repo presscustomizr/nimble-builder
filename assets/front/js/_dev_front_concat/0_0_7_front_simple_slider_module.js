@@ -59,9 +59,10 @@
                           },// init
                           // make sure slides are always lazyloaded
                           slideChange : function(params) {
+                              // when lazy load is active, we want to lazy load the first image of the slider if offscreen
                               // img to be lazy loaded looks like data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7
                               if ( $.fn.nimbleLazyLoad && $swiperWrapper.find('[src*="data:image"]').length > 0 ) {
-                                  $swiperWrapper.nimbleLazyLoad();
+                                  $swiperWrapper.trigger('nb-trigger-lazyload');
                               }
                           }
                         }//on

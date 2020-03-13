@@ -58,11 +58,16 @@ if ( ! function_exists( 'Nimble\sek_slider_parse_template_tags') ) {
 if ( ! function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
     function sek_get_img_slider_module_img_html( $item, $lazy_load_on, $index ) {
         $html = '';
+        $is_first_img = 0 == $index;
         if ( is_int( $item['img'] ) ) {
             // don't parse the first image of the carousel for lazyloading
             // @see https://github.com/presscustomizr/nimble-builder/issues/596
-            if ( $lazy_load_on && 0 !== $index ) {
-                $html = sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $item['img'], empty( $item['img-size'] ) ? 'large' : $item['img-size']);
+            if ( $lazy_load_on && !$is_first_img ) {
+                $html = sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel(
+                  $item['img'],
+                  empty( $item['img-size'] ) ? 'large' : $item['img-size'],
+                  $is_first_img//<= // when lazy load is active, we want to lazy load the first image of the slider if offscreen by adding 'data-sek-src' attribute
+                );
                 $html .= '<div class="swiper-lazy-preloader"></div>';//this element is removed by swiper.js once the image is loaded @see https://swiperjs.com/api/#lazy
             } else {
                 $html = wp_get_attachment_image( $item['img'], empty( $item['img-size'] ) ? 'large' : $item['img-size']);

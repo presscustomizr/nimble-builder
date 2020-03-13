@@ -145,9 +145,9 @@ function sek_is_video_bg_lazyload_enabled() {
 //  added in dec 2019 for https://github.com/presscustomizr/nimble-builder/issues/570
 //  used in tmpl/modules/img_slider_tmpl.php
 // /* ------------------------------------------------------------------------- */
-function sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '' ) {
+function sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $attachment_id, $size = 'thumbnail', $is_first_img ) {
     $html  = '';
-    $image = wp_get_attachment_image_src( $attachment_id, $size, $icon );
+    $image = wp_get_attachment_image_src( $attachment_id, $size, $icon = false );
     if ( $image ) {
         list($src, $width, $height) = $image;
         $hwstring                   = image_hwstring( $width, $height );
@@ -162,7 +162,7 @@ function sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $at
             'alt'   => trim( strip_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ),
         );
 
-        $attr = wp_parse_args( $attr, $default_attr );
+        $attr = $default_attr;
 
         // Generate 'srcset' and 'sizes' if not already present.
         if ( empty( $attr['srcset'] ) ) {
@@ -210,6 +210,10 @@ function sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $at
         if ( !empty( $attr['sizes'] ) ) {
             $attr['data-sek-img-sizes'] = $attr['sizes'];
             unset( $attr['sizes'] );
+        }
+        // when lazy load is active, we want to lazy load the first image of the slider if offscreen
+        if ( $is_first_img && sek_is_img_smartload_enabled() ) {
+            $attr['data-sek-src'] = $attr['src'];
         }
 
         $attr = array_map( 'esc_attr', $attr );

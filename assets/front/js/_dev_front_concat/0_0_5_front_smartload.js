@@ -54,6 +54,11 @@
 
                     this._defaults = defaults;
                     this._name = pluginName;
+                    var self = this;
+                    // 'nb-trigger-lazyload' can be fired from
+                    $(this.element).on('nb-trigger-lazyload', function() {
+                          self.init();
+                    });
                     this.init();
               }
 
@@ -62,10 +67,10 @@
               Plugin.prototype.init = function () {
                     var self        = this,
                         // img to be lazy loaded looks like data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7
-                        // [src*="data:image"] => images in image modules, wp editor module, post grids, slider module, etc..
-                        // [data-sek-src*="http"] => background images
+                        // [src*="data:image"] =>
+                        // [data-sek-src*="http"] => background images, images in image modules, wp editor module, post grids, slider module, etc..
                         // [data-sek-iframe-src] => ?
-                        $_ImgOrDivOrIFrameElements  = $( '[src*="data:image"], [data-sek-src*="http"], [data-sek-iframe-src]' , this.element );
+                        $_ImgOrDivOrIFrameElements  = $( '[data-sek-src*="http"], [data-sek-iframe-src]' , this.element );
 
                     this.increment  = 1;//used to wait a little bit after the first user scroll actions to trigger the timer
                     this.timer      = 0;
