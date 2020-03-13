@@ -1,6 +1,7 @@
 // global sekFrontLocalized, nimbleListenTo
 /* ------------------------------------------------------------------------- *
  *  SWIPER CAROUSEL implemented for the simple slider module czr_img_slider_module
+ *  doc : https://swiperjs.com/api/
  *  dependency : $.fn.nimbleCenterImages()
 /* ------------------------------------------------------------------------- */
 
@@ -51,8 +52,14 @@
                                       //trigger the simple load
                                       nb_.delay( function() {
                                           triggerSimpleLoad( $_imgsToSimpleLoad );
-                                      }, 10 );
+                                      }, 50 );
                                   });//each()
+                              }
+                          },// init
+                          // make sure slides are always lazyloaded
+                          slideChange : function(params) {
+                              if ( $.fn.nimbleLazyLoad ) {
+                                  $swiperWrapper.nimbleLazyLoad();
                               }
                           }
                         }//on

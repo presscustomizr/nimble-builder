@@ -31,7 +31,6 @@
                   defaults = {
                         load_all_images_on_first_scroll : false,
                         //attribute : [ 'data-sek-src' ],
-                        excludeImg : [],
                         threshold : 200,
                         fadeIn_options : { duration : 400 },
                         delaySmartLoadEvent : 0,
@@ -46,12 +45,12 @@
               function Plugin( element, options ) {
                     this.element = element;
                     this.options = $.extend( {}, defaults, options) ;
-                    //add .smartload-skip to the excludeImg
-                    if ( nb_.isArray( this.options.excludeImg ) ) {
-                          this.options.excludeImg.push( '.'+skipLazyLoadClass );
-                    } else {
-                          this.options.excludeImg = [ '.'+skipLazyLoadClass ];
-                    }
+                    // //add .smartload-skip to the excludeImg
+                    // if ( nb_.isArray( this.options.excludeImg ) ) {
+                    //       this.options.excludeImg.push( '.'+skipLazyLoadClass );
+                    // } else {
+                    //       this.options.excludeImg = [ '.'+skipLazyLoadClass ];
+                    // }
 
                     this._defaults = defaults;
                     this._name = pluginName;
@@ -62,14 +61,14 @@
               //can access this.element and this.option
               Plugin.prototype.init = function () {
                     var self        = this,
-                        $_ImgOrDivOrIFrameElements  = $( '[data-sek-src]:not('+ this.options.excludeImg.join() +'), [data-sek-iframe-src]' , this.element );
+                        $_ImgOrDivOrIFrameElements  = $( '[src*="data:image"], [data-sek-iframe-src]' , this.element );
 
                     this.increment  = 1;//used to wait a little bit after the first user scroll actions to trigger the timer
                     this.timer      = 0;
 
                     $_ImgOrDivOrIFrameElements
                           //avoid intersecting containers to parse the same images
-                          .addClass( skipLazyLoadClass )
+                          // .addClass( skipLazyLoadClass )
                           .bind( 'sek_load_img', {}, function() { self._load_img(this); })
                           .bind( 'sek_load_iframe', {}, function() { self._load_iframe(this); });
 

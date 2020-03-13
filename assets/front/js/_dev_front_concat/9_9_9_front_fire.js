@@ -51,11 +51,21 @@
 (function(w, d){
     nb_.listenTo('nb-lazyload-parsed', function() {
         jQuery(function($){
-              $('.sektion-wrapper').each( function() {
-                    try { $(this).nimbleLazyLoad(); } catch( er ) {
-                          nb_.errorLog( 'error with nimbleLazyLoad => ', er );
-                    }
+              var _do = function() {
+                    this.each( function() {
+                          try { $(this).nimbleLazyLoad(); } catch( er ) {
+                                nb_.errorLog( 'error with nimbleLazyLoad => ', er );
+                          }
+                    });
+              };
+              // on page load
+              _do.call( $('.sektion-wrapper') );
+              // when customizing
+              nb_.cachedElements.$body.on( 'sek-section-added sek-level-refreshed sek-location-refreshed', '[data-sek-level="location"]', function(evt) {
+                    console.log('$this when lazy loading ?', evt.type, $(this) );
+                    _do.call($(this));
               });
+
         });
     });
 }(window, document));
