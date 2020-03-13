@@ -1008,7 +1008,9 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // deactivated when customizing @see function sek_is_img_smartload_enabled()
         // @return html string
         function sek_maybe_process_img_for_js_smart_load( $html ) {
-            if ( skp_is_customizing() || !sek_is_img_smartload_enabled() )
+            // if ( skp_is_customizing() || !sek_is_img_smartload_enabled() )
+            //   return $html;
+            if ( !sek_is_img_smartload_enabled() )
               return $html;
             if ( ! is_string( $html ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => provided html is not a string', $html );
