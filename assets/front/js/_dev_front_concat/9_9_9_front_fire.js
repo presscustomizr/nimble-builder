@@ -61,8 +61,7 @@
               // on page load
               _do.call( $('.sektion-wrapper') );
               // when customizing
-              nb_.cachedElements.$body.on( 'sek-section-added sek-level-refreshed sek-location-refreshed', '[data-sek-level="location"]', function(evt) {
-                    console.log('$this when lazy loading ?', evt.type, $(this) );
+              nb_.cachedElements.$body.on( 'sek-section-added sek-level-refreshed sek-location-refreshed sek-columns-refreshed sek-modules-refreshed', '[data-sek-level="location"]', function(evt) {
                     _do.call($(this));
               });
 

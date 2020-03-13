@@ -61,6 +61,7 @@
               //can access this.element and this.option
               Plugin.prototype.init = function () {
                     var self        = this,
+                        // img to be lazy loaded looks like data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7
                         $_ImgOrDivOrIFrameElements  = $( '[src*="data:image"], [data-sek-iframe-src]' , this.element );
 
                     this.increment  = 1;//used to wait a little bit after the first user scroll actions to trigger the timer

@@ -35,6 +35,7 @@
                         grabCursor : true === $swiperWrapper.data('sek-is-multislide'),
                         on : {
                           init : function() {
+                              $swiperWrapper.nimbleLazyLoad();
                               // center images with Nimble wizard when needed
                               if ( 'nimble-wizard' === $swiperWrapper.data('sek-image-layout') ) {
                                   $swiperWrapper.find('.sek-carousel-img').each( function() {
@@ -58,7 +59,8 @@
                           },// init
                           // make sure slides are always lazyloaded
                           slideChange : function(params) {
-                              if ( $.fn.nimbleLazyLoad ) {
+                              // img to be lazy loaded looks like data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7
+                              if ( $.fn.nimbleLazyLoad && $swiperWrapper.find('[src*="data:image"]').length > 0 ) {
                                   $swiperWrapper.nimbleLazyLoad();
                               }
                           }
