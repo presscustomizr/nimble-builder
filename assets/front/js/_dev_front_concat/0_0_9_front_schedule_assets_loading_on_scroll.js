@@ -41,7 +41,7 @@
 (function(w, d){
     var callbackFunc = function() {
         jQuery(function($){
-            if ( !sekFrontLocalized.load_front_module_assets_on_scroll )
+            if ( !sekFrontLocalized.load_front_assets_on_scroll )
                 return;
 
             var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
@@ -59,7 +59,7 @@
                         }) );
                   }
 
-                  if ( !nb_.isFunction( $.fn.magnificPopup ) && sekFrontLocalized.load_front_module_assets_on_scroll ) {
+                  if ( !nb_.isFunction( $.fn.magnificPopup ) && sekFrontLocalized.load_front_assets_on_scroll ) {
                         nb_.ajaxLoadScript({
                             path : 'js/libs/jquery-magnific-popup.min.js',
                             loadcheck : function() { return nb_.isFunction( $.fn.magnificPopup ); }
@@ -94,7 +94,7 @@
 (function(w, d){
     var callbackFunc = function() {
         jQuery(function($){
-            if ( !sekFrontLocalized.load_front_module_assets_on_scroll )
+            if ( !sekFrontLocalized.load_front_assets_on_scroll )
               return;
             // Load js plugin if needed
             // // when the plugin is loaded => it emits 'nimble-swiper-ready' listened to by nb_.listenTo()
@@ -108,15 +108,15 @@
                               href : sekFrontLocalized.frontAssetsPath + 'css/libs/swiper.min.css?'+sekFrontLocalized.assetVersion
                         }) );
                   }
-                  if ( sekFrontLocalized.load_front_module_assets_on_scroll ) {
+                  if ( sekFrontLocalized.load_front_assets_on_scroll ) {
                       nb_.ajaxLoadScript({
-                          path : 'js/libs/swiper.min.js',
+                          path : 'js/libs/swiper.min.js?'+sekFrontLocalized.assetVersion,
                           loadcheck : function() { return nb_.isFunction( window.Swiper ); },
-                          complete : function() {
-                              nb_.ajaxLoadScript({
-                                  path : 'js/prod-front-simple-slider-module.min.js',
-                              });
-                          }
+                          // complete : function() {
+                          //     nb_.ajaxLoadScript({
+                          //         path : 'js/prod-front-simple-slider-module.min.js',
+                          //     });
+                          // }
                       });
                   }
             };// doLoad
@@ -147,38 +147,6 @@
 
 
 
-/* ------------------------------------------------------------------------- *
- *  LOAD MENU MODULE JS
-/* ------------------------------------------------------------------------- */
-(function(w, d){
-    var callbackFunc = function() {
-        jQuery(function($){
-            if ( !sekFrontLocalized.load_front_module_assets_on_scroll )
-              return;
-            var $candidates = $('[data-sek-module-type="czr_menu_module"]');
-            // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
-            if ( $candidates.length < 1 )
-              return;
-
-            // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nb-jmp-parsed' listened to by nb_.listenTo()
-            nb_.maybeLoadAssetsWhenSelectorInScreen( {
-                id : 'menu',
-                elements : $candidates,
-                func : function() {
-                    //Load js
-                    nb_.ajaxLoadScript({
-                        path : 'js/prod-front-menu-module.min.js'
-                    });
-                }// doLoad
-            });
-        });// jQuery
-    };/////////////// callbackFunc
-    nb_.listenTo('nb-app-ready', function() {
-        nb_.listenTo('nb-needs-menu-js', callbackFunc );
-    });
-}(window, document));
-
 
 /* ------------------------------------------------------------------------- *
  *  LOAD VIDEO BACKGROUND JS
@@ -186,7 +154,7 @@
 (function(w, d){
     var callbackFunc = function() {
         jQuery(function($){
-            if ( !sekFrontLocalized.load_front_module_assets_on_scroll )
+            if ( !sekFrontLocalized.load_front_assets_on_scroll )
               return;
             var $candidates = $('[data-sek-video-bg-src]');
             // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
@@ -196,12 +164,12 @@
             // Load js plugin if needed
             // when the plugin is loaded => it emits 'nb-jmp-parsed' listened to by nb_.listenTo()
             nb_.maybeLoadAssetsWhenSelectorInScreen( {
-                id : 'menu',
+                id : 'nb-video-bg',
                 elements : $candidates,
                 func : function() {
                     //Load js
                     nb_.ajaxLoadScript({
-                        path : 'js/prod-front-video-bg.min.js'
+                        path : 'js/libs/nimble-video-bg.min.js?'+sekFrontLocalized.assetVersion
                     });
                 }// doLoad
             });
@@ -216,7 +184,6 @@
 
 
 
-
 /* ------------------------------------------------------------------------- *
  *  MAYBE LOAD FONTAWESOME ON SCROLL
 /* ------------------------------------------------------------------------- */
@@ -226,7 +193,7 @@
             // we don't need to inject font awesome if already enqueued by a theme
             if ( sekFrontLocalized.fontAwesomeAlreadyEnqueued )
               return;
-            if ( !sekFrontLocalized.load_font_awesome_on_scroll )
+            if ( !sekFrontLocalized.load_front_assets_on_scroll )
               return;
             var $candidates = $('i[class*=fa-]');
 
@@ -241,11 +208,11 @@
                         var link = document.createElement('link');
                         link.setAttribute('href', sekFrontLocalized.frontAssetsPath + 'fonts/css/fontawesome-all.min.css?'+sekFrontLocalized.assetVersion );
                         link.setAttribute('id', 'czr-font-awesome');
-                        link.setAttribute('rel', nb_.assetPreloadSupported() ? 'preload' : 'stylesheet' );
+                        link.setAttribute('rel', nb_.hasPreloadSupport() ? 'preload' : 'stylesheet' );
                         link.setAttribute('as', 'style');
                         link.onload = function() {
                             this.onload=null;
-                            if ( nb_.assetPreloadSupported() ) {
+                            if ( nb_.hasPreloadSupport() ) {
                                 this.rel='stylesheet';
                             }
 

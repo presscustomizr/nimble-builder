@@ -58,7 +58,7 @@
     nb_.listenTo('nb-app-ready', function() {
         jQuery(function($){
             // do nothing if dynamic asset loading is not enabled for js and css
-            if ( !sekFrontLocalized.load_front_module_assets_on_scroll )
+            if ( !sekFrontLocalized.load_front_assets_on_scroll )
               return;
             // nb_.scrollHandlers = [
             //    { id : 'swiper', elements : $(), func : function(){} }

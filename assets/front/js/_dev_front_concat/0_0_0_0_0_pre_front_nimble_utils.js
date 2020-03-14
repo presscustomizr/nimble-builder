@@ -103,49 +103,6 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
 
                           return ib >= wt - th && it <= wb + th;
                     },//elOrFirstVisibleParentIsInWindow
-                    // params = {
-                    //  path : 'js/libs/swiper.min.js'
-                    //  complete : function() {
-                    //    $.ajax( {
-                        //       url : sekFrontLocalized.frontAssetsPath + 'js/prod-front-simple-slider-module.min.js?'+sekFrontLocalized.assetVersion,
-                        //       cache : true,// use the browser cached version when available
-                        //       dataType: "script"
-                        // }).done(function() {
-                        // }).fail( function() {
-                        //       nb_.errorLog('script instantiation failed');
-                        // });
-                    //  }
-                    //  loadcheck : 'function' === typeof( window.Swiper )
-                    // }
-                    scriptsLoadingStatus : {},// <= will be populated with the script loading promises
-                    ajaxLoadScript : function( params ) {
-                        params = $.extend( { path : '', complete : '', loadcheck : false }, params );
-                        // Bail if the load request has already been made, but not yet finished.
-                        if ( nb_.scriptsLoadingStatus[params.path] && 'pending' === nb_.scriptsLoadingStatus[params.path].state() ) {
-                          return;
-                        }
-                        // set the script loading status now to avoid several calls
-                        nb_.scriptsLoadingStatus[params.path] = nb_.scriptsLoadingStatus[params.path] || $.Deferred();
-                        $.ajax( {
-                              url : sekFrontLocalized.frontAssetsPath + params.path + '?'+ sekFrontLocalized.assetVersion,
-                              cache : true,// use the browser cached version when available
-                              dataType: "script"
-                        }).done(function() {
-                              //console.log( 'ASSET IS LOADED => ' + params.path, params );
-                              if ( nb_.isFunction(params.loadcheck) && !params.loadcheck() ) {
-                                  nb_.errorLog('ajaxLoadScript success but loadcheck failed for => ' + params.path );
-                                  return;
-                              }
-
-                              if ( 'function' === typeof params.complete ) {
-                                  params.complete();
-                              }
-                        }).fail( function() {
-                              nb_.errorLog('ajaxLoadScript failed for => ' + params.path );
-                        });
-                    },//ajaxLoadScript
-
-
 
                     // HELPERS COPIED FROM UNDERSCORE
                     has : function(obj, path) {

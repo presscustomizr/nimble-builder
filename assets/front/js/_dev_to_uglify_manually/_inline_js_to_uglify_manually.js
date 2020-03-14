@@ -73,7 +73,7 @@ window.nb_ = {};
         emit : function(evt) {
             if ( nb_.wasEmitted(evt) )
               return;
-            console.log('emitted event', evt );
+            //console.log('emitted event', evt );
             // it is possible to add params when dispatching the event, but we need to use new CustomEvent with a polyfill for IE
             // see : https://stackoverflow.com/questions/18613456/trigger-event-with-parameters
             var _evt = document.createEvent('Event');
@@ -379,6 +379,62 @@ nb_.listenTo('nb-needs-videobg-js', function() {
 
 
 
+
+//printed in sek_maybe_load_scripts_in_ajax()
+(function(w, d){
+    nb_.listenTo( 'nb-jquery-loaded', function() {
+        // params = {
+        //  path : 'js/libs/swiper.min.js'
+        //  complete : function() {
+        //    $.ajax( {
+            //       url : sekFrontLocalized.frontAssetsPath + 'js/prod-front-simple-slider-module.min.js?'+sekFrontLocalized.assetVersion,
+            //       cache : true,// use the browser cached version when available
+            //       dataType: "script"
+            // }).done(function() {
+            // }).fail( function() {
+            //       nb_.errorLog('script instantiation failed');
+            // });
+        //  }
+        //  loadcheck : 'function' === typeof( window.Swiper )
+        // }
+        nb_.scriptsLoadingStatus = {};
+        nb_.ajaxLoadScript = function( params ) {
+            params = $.extend( { path : '', complete : '', loadcheck : false }, params );
+            // Bail if the load request has already been made, but not yet finished.
+            if ( nb_.scriptsLoadingStatus[params.path] && 'pending' === nb_.scriptsLoadingStatus[params.path].state() ) {
+              return;
+            }
+            // set the script loading status now to avoid several calls
+            nb_.scriptsLoadingStatus[params.path] = nb_.scriptsLoadingStatus[params.path] || $.Deferred();
+            jQuery.ajax( {
+                  url : sekFrontLocalized.frontAssetsPath + params.path + '?'+ sekFrontLocalized.assetVersion,
+                  cache : true,// use the browser cached version when available
+                  dataType: "script"
+            }).done(function() {
+                  if ( ('function' === typeof params.loadcheck) && !params.loadcheck() ) {
+                      nb_.errorLog('ajaxLoadScript success but loadcheck failed for => ' + params.path );
+                      return;
+                  }
+
+                  if ( 'function' === typeof params.complete ) {
+                      params.complete();
+                  }
+            }).fail( function() {
+                  nb_.errorLog('ajaxLoadScript failed for => ' + params.path );
+            });
+        };//ajaxLoadScript
+
+
+        jQuery(function($){
+            if ( !sekFrontLocalized.load_front_assets_on_scroll )
+                return;
+
+            nb_.ajaxLoadScript({
+                path : sekFrontLocalized.isDevMode ? 'js/ccat-nimble-front.js' : 'js/ccat-nimble-front.min.js'
+            });
+        });//jQuery(function($){})
+    });/////////////// callbackFunc
+}(window, document));
 
 
 

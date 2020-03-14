@@ -190,6 +190,15 @@ function sek_preload_google_fonts_on_front() {
     return false;
 }
 
+// @return bool
+// march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/635
+function sek_load_front_assets_in_ajax() {
+    $glob_perf = sek_get_global_option_value( 'performances' );
+    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['load_assets_in_ajax'] ) ) {
+        return !skp_is_customizing() && sek_booleanize_checkbox_val( $glob_perf['load_assets_in_ajax'] );
+    }
+    return false;
+}
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/635

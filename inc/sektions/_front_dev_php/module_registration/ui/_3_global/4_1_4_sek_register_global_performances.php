@@ -82,7 +82,14 @@ function sek_get_module_params_for_sek_global_performances() {
                     'input_width' => 'width-20',
                     'html_before' => '<hr/><h3>' . __('SCRIPTS') .'</h3>'
                 ),
-
+                'load_assets_in_ajax' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => '[Beta] ' . __('Inject non priority assets dynamically in the page only when needed.', 'text_doma'),
+                    'default'     => 0,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    //'notice_after' => __('Beta feature'),
+                ),
 
 
                 'load_jquery_async' => array(
