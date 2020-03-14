@@ -8,6 +8,10 @@
   /* SWIPER ARROWS */
 }
 
+[data-sek-module-type="czr_img_slider_module"] .sek-swiper-loading .sek-carousel-img img {
+  display: none;
+}
+
 [data-sek-module-type="czr_img_slider_module"] .swiper-container {
   width: 100%;
   height: 100%;

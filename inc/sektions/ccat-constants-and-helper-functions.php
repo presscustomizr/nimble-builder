@@ -311,13 +311,13 @@ function sek_preload_font_awesome() {
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-function sek_inline_module_stylesheets_on_front() {
-    $glob_perf = sek_get_global_option_value( 'performances' );
-    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['print_partial_module_stylesheets_inline'] ) ) {
-        return sek_booleanize_checkbox_val( $glob_perf['print_partial_module_stylesheets_inline'] );
-    }
-    return false;
-}
+// function sek_inline_module_stylesheets_on_front() {
+//     $glob_perf = sek_get_global_option_value( 'performances' );
+//     if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['print_partial_module_stylesheets_inline'] ) ) {
+//         return sek_booleanize_checkbox_val( $glob_perf['print_partial_module_stylesheets_inline'] );
+//     }
+//     return false;
+// }
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
@@ -357,13 +357,22 @@ function sek_preload_google_fonts_on_front() {
     return false;
 }
 
+// @return bool
+// march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/635
+function sek_load_front_assets_in_ajax() {
+    $glob_perf = sek_get_global_option_value( 'performances' );
+    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['load_assets_in_ajax'] ) ) {
+        return !skp_is_customizing() && sek_booleanize_checkbox_val( $glob_perf['load_assets_in_ajax'] );
+    }
+    return false;
+}
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/635
 function sek_preload_front_scripts() {
     $glob_perf = sek_get_global_option_value( 'performances' );
     if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['preload_front_scripts'] ) ) {
-        return sek_booleanize_checkbox_val( $glob_perf['preload_front_scripts'] );
+        return !skp_is_customizing() && sek_booleanize_checkbox_val( $glob_perf['preload_front_scripts'] );
     }
     return false;
 }
@@ -521,9 +530,9 @@ function sek_is_video_bg_lazyload_enabled() {
 //  added in dec 2019 for https://github.com/presscustomizr/nimble-builder/issues/570
 //  used in tmpl/modules/img_slider_tmpl.php
 // /* ------------------------------------------------------------------------- */
-function sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '' ) {
+function sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $attachment_id, $size = 'thumbnail', $is_first_img ) {
     $html  = '';
-    $image = wp_get_attachment_image_src( $attachment_id, $size, $icon );
+    $image = wp_get_attachment_image_src( $attachment_id, $size, $icon = false );
     if ( $image ) {
         list($src, $width, $height) = $image;
         $hwstring                   = image_hwstring( $width, $height );
@@ -538,7 +547,7 @@ function sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $at
             'alt'   => trim( strip_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ),
         );
 
-        $attr = wp_parse_args( $attr, $default_attr );
+        $attr = $default_attr;
 
         // Generate 'srcset' and 'sizes' if not already present.
         if ( empty( $attr['srcset'] ) ) {
@@ -586,6 +595,10 @@ function sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $at
         if ( !empty( $attr['sizes'] ) ) {
             $attr['data-sek-img-sizes'] = $attr['sizes'];
             unset( $attr['sizes'] );
+        }
+        // when lazy load is active, we want to lazy load the first image of the slider if offscreen
+        if ( $is_first_img && sek_is_img_smartload_enabled() ) {
+            $attr['data-sek-src'] = $attr['src'];
         }
 
         $attr = array_map( 'esc_attr', $attr );

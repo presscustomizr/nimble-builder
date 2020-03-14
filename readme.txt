@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.0-alpha
+Stable tag: 2.0.0-betaaaaa
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,24 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 1.10.12 =
-Various fixes and performance improvements. Successfully tested with WordPress 5.4.
+= 2.0.0 =
+Major performance improvements for Nimble Builder 2.0 allowing users to reach A grade with Google performance audit. Fully compatible with next WordPress version 5.4.
 
 == Changelog ==
+= 2.0.0 March 13th 2020 =
+* fixed : [acessibility] Buttons do not have an accessible name
+* fixed : [social icons module][accessibility] Links do not have a discernible name
+* fixed : [slider module] when lazy loading active, make sure all slides are always lazyloaded, both when moving a section when customizing and navigating the slides
+* fixed : [performance] removed fetching for material-icons, not used anymore
+* fixed : [carousel module][performance] lazyload breaks the last image
+* fixed : [performance] make sure lazyload is triggered when refreshing sections during customization
+* improved : [performance] added a set of options to improve Nimble Builder performance when loading stylesheets and javascript files
+* improved : [performance] scripts are now loaded in defer mode to minimize render blocking issues on page load
+* improved : [performance] stylesheets can be loaded in partial mode
+* improved : [performance] Google fonts now be preloaded by default for minimal impact on page load
+* improved : [performance] Font Awesome icons are now loaded asynchronously by default to avoid blocking rendering problems
+* improved : [performance] if activated, smartload should also work when customizing
+
 = 1.10.12 March 3rd 2020 =
 * fixed : when a multi-item module, like carousel or social icon, is updated, its value should be cast as an array
 * fixed : [responsive columns] custom column width might not be applied when using a custom breakpoint < 768px
@@ -143,39 +157,3 @@ Various fixes and performance improvements. Successfully tested with WordPress 5
 * improved : [performance] lazyload => implement a better deferral of offscreen images on page load and apply a higher threshold when scrolling
 * improved : [performance] removed unused CSS => reduced size of main CSS stylesheet
 * improved : [performance] removed Poppin Google font for prebuild menu sections
-
-= 1.10.10 February 15th 2020 =
-* fixed : button style => "-moz-focus-inner" pseudo class breaks CSS validation
-* fixed : Wrong css rule generated 'background-color:rgba(0));' due to issues with php color helpers
-* fixed : [performance] don't load font awesome when already loaded by customizr or hueman
-* fixed : [performance] "ghosts" google fonts can be loaded even when not used anywhere
-* improved : [asset] update Font Awesome to latest version
-* improved : [quote module] cite default font-size set to 14px instead of 13px
-* improved : [menu module][quote module][performance] replaced Font Awesome arrows icon by unicode characters
-
-= 1.10.9 February 12th 2020 =
-* fixed : make sure Nimble doesn't try to render a module not registered. This can occur after importing sections including custom modules
-* fixed : [Carousel module] Lazy load break layout of first slide
-* fixed : [Menu module] Option for full width below the menu hamburger icon is broken
-* added : [Carousel module] lazyload slider images when global or local lazyload is enabled
-
-= 1.10.8 February 11th 2020 =
-* fixed : performance => no need to load front css / js assets when no local and global sections are rendered
-* fixed : removed letter-spacing to font affecting button style
-* fixed : [WP Editor module] image alignment is broken
-* fixed : reduced size of readme.txt to be closer to the limit of 10K
-* fixed : [Accordion module] html error => missing closing quote
-* fixed : [Button module] error in html => Element div not allowed as child of element button
-* fixed : [Accordion module] html errors => aria-controls and aria-labelledby not properly implemented
-* fixed : [Carousel module] fix html errors related to lazyloading
-* improved : performance => added 'async' attribute to main js front
-
-= 1.10.7 January 22nd 2020 =
-* fixed : [Shortcode module] when flex is enabled layout can be broken => disabled flex by default
-* fixed : styling of dl dt can break galleries added with WP editor module
-* fixed : collision with Neve free theme when using tinymce editor
-* fixed : [Html markup validation] attribute duplications
-* fixed : [Form module] missing id for the form element
-* fixed : [Html markup validation] removed 'type' attribute for script
-* fixed : [Form module] removed self-closing syntax (/>) used on textarea
-* fixed : [Form module] "required" attribute not properly rendered
