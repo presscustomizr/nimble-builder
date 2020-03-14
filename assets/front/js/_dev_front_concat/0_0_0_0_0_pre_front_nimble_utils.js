@@ -9,7 +9,10 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
               // see https://underscorejs.org/docs/underscore.html#section-149
               jQuery.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error', 'Symbol', 'Map', 'WeakMap', 'Set', 'WeakSet'], function(index, name) {
                 window.nb_['is' + name] = function(obj) {
-                  return toString.call(obj) === '[object ' + name + ']';
+                    // fix for IE => toString is not a global var
+                    // https://caniuse.com/#search=toString
+                    var _toString = toString || Object.prototype.toString;
+                    return _toString.call(obj) === '[object ' + name + ']';
                 };
               });
 
