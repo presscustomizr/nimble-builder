@@ -62,7 +62,12 @@
               _do.call( $('.sektion-wrapper') );
               // when customizing
               nb_.cachedElements.$body.on( 'sek-section-added sek-level-refreshed sek-location-refreshed sek-columns-refreshed sek-modules-refreshed', '[data-sek-level="location"]', function(evt) {
-                    _do.call($(this));
+                    // if the element already has an instance of nimbleLazyLoad, simply trigger an event
+                    if ( !$(this).data('nimbleLazyLoadDone') ) {
+                        _do.call( $(this) );
+                    } else {
+                        $(this).trigger('nb-trigger-lazyload');
+                    }
               });
 
         });

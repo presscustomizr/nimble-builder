@@ -71,6 +71,8 @@
                         // [data-sek-src*="http"] => background images, images in image modules, wp editor module, post grids, slider module, etc..
                         // [data-sek-iframe-src] => ?
                         $_ImgOrDivOrIFrameElements  = $( '[data-sek-src*="http"], [data-sek-iframe-src]' , this.element );
+                    // flag so we can check wether his element has been lazyloaded
+                    $(this.element).data('nimbleLazyLoadDone', true );
 
                     this.increment  = 1;//used to wait a little bit after the first user scroll actions to trigger the timer
                     this.timer      = 0;
