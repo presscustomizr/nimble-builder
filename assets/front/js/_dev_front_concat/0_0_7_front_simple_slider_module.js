@@ -35,6 +35,11 @@
                         grabCursor : true === $swiperWrapper.data('sek-is-multislide'),
                         on : {
                           init : function() {
+                              // remove the .sek-swiper-loading class from the wrapper => remove the display:none rule
+                              $swiperWrapper.removeClass('sek-swiper-loading');
+
+                              // lazy load the first slider image with Nimble if not done already
+                              // the other images will be lazy loaded by swiper if the option is activated
                               $swiperWrapper.nimbleLazyLoad();
                               // center images with Nimble wizard when needed
                               if ( 'nimble-wizard' === $swiperWrapper.data('sek-image-layout') ) {
