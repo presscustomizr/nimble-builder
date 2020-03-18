@@ -151,15 +151,15 @@ function sek_add_css_rules_for_boxshadow( $rules, $level ) {
       return $rules;
 
     if ( !empty( $normalized_border_options[ 'shadow' ] ) &&  sek_is_checked( $normalized_border_options[ 'shadow'] ) ) {
-        //$css_rules = 'box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2); -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);';
-        $css_rules = '-webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;-moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;';
-        // Set to !important when customizing, to override the sek-highlight-active-ui effect
-        if ( skp_is_customizing() ) {
-            $css_rules = '-webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;-moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;';
-        }
+        // when customizing set to !important, to override the sek-highlight-active-ui effect
+        $rules[]     = array(
+                'selector' => '.customizer-preview [data-sek-id="'.$level['id'].'"]',
+                'css_rules' => '-webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;-moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;',
+                'mq' =>null
+        );
         $rules[]     = array(
                 'selector' => '[data-sek-id="'.$level['id'].'"]',
-                'css_rules' => $css_rules,
+                'css_rules' => '-webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;-moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;',
                 'mq' =>null
         );
     }
