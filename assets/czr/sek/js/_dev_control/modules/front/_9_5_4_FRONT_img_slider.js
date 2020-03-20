@@ -207,7 +207,16 @@
                                                 .always( function() {
                                                       var attachment = this;
                                                       if ( _.isObject( attachment ) && _.has( attachment, 'attributes' ) && _.has( attachment.attributes, 'sizes' ) ) {
-                                                            _src = this.get('sizes').thumbnail.url;
+                                                            var _sizes = attachment.get('sizes');
+                                                            if ( _sizes && _.isObject( _sizes ) ) {
+                                                                  // loop on the various possible image sizes, starting with thumbnail, the smallest.
+                                                                  // as soon as an available size is found, use it as src
+                                                                  _.each( ['thumbnail', 'medium', 'large', 'full' ], function( _val, _k ) {
+                                                                        if ( 'not_set' === _src && _sizes[_val] && _.isObject( _sizes[_val] ) && _sizes[_val].url ) {
+                                                                              _src = _sizes[_val].url;
+                                                                        }
+                                                                  });
+                                                            }
                                                             dfd.resolve( _src );
                                                       }
                                                 });
