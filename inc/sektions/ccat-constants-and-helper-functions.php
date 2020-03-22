@@ -369,7 +369,7 @@ function sek_load_front_assets_in_ajax() {
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/635
-function sek_preload_front_scripts() {
+function sek_preload_some_scripts_and_styles() {
     $glob_perf = sek_get_global_option_value( 'performances' );
     if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['preload_front_scripts'] ) ) {
         return !skp_is_customizing() && sek_booleanize_checkbox_val( $glob_perf['preload_front_scripts'] );

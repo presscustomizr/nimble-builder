@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,14 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 2.0.1 =
-Fixed visibility setting not working. Fully compatible with next WordPress version 5.4.
+= 2.0.2 =
+Fixed a bug in the UI of the carousel module. Improved performance options for javascript.
 
 == Changelog ==
+= 2.0.2 March 22nd 2020 =
+* fixed : [slider module][UI] make sure there's an available img size to use for the slide thumbnail
+* improved : [performance] options for javascript
+
 = 2.0.1 March 18th 2020 =
 * fixed : [visibility option] visibility setting not working
 
