@@ -18,22 +18,15 @@
                     nb_.scrollHandlers[id].loaded = true;
                 }
             });
-            // check if we need to unbind the scroll handle when all assets are loaded
-            var allAssetsLoaded = true;
-            $.each( nb_.scrollHandlers, function( id, handlerParams ) {
-                if ( true !== nb_.scrollHandlers[id].loaded ) {
-                    allAssetsLoaded = false;
-                }
-                return false !== allAssetsLoaded;//break the look on the first asset not loaded found
-            });
-            if ( allAssetsLoaded ) {
-                //console.log('ALL ASSETS LOADED');
-                nb_.cachedElements.$window.unbind('scroll', nb_.scrollHandleForLoadingAssets );
+
+            if ( handlerParams.scrollHandler && nb_.scrollHandlers[id].loaded ) {
+                nb_.cachedElements.$window.unbind('scroll', handlerParams.scrollHandler );
             }
         });
     };//_loadAssetWhenElementVisible
 
     nb_.loopOnScrollHandlers = function() {
+        var _scrollHandler;
         jQuery(function($){
             $.each( nb_.scrollHandlers, function( id, handlerParams ) {
                 // has it been loaded already ?
@@ -43,11 +36,22 @@
                 if ( 1 > handlerParams.elements.length )
                   return true;
 
-                if( nb_.isFunction( handlerParams.func ) ) {
-                    try{ nb_.loadAssetWhenElementVisible( id, handlerParams ); } catch(er){
-                        nb_.errorLog('Nimble error => nb_.loopOnScrollHandlers', er, handlerParams );
-                    }
-                } else {
+                // try on load
+                try{ nb_.loadAssetWhenElementVisible( id, handlerParams ); } catch(er){
+                    nb_.errorLog('Nimble error => nb_.loopOnScrollHandlers', er, handlerParams );
+                }
+
+                // schedule on scroll
+                // the scroll event is unbound once the scrollhandler is executed
+                if( nb_.isFunction( handlerParams.func ) && nb_.isUndefined( handlerParams.scrollHandler ) ) {
+                    handlerParams.scrollHandler = nb_.throttle( function() {
+                        try{ nb_.loadAssetWhenElementVisible( id, handlerParams ); } catch(er){
+                            nb_.errorLog('Nimble error => nb_.loopOnScrollHandlers', er, handlerParams );
+                        }
+                    }, 100 );
+
+                    nb_.cachedElements.$window.on( 'scroll', handlerParams.scrollHandler );
+                } else if ( !nb_.isFunction( handlerParams.func ) ) {
                     nb_.errorLog('Nimble error => nb_.loopOnScrollHandlers => wrong callback func param', handlerParams );
                 }
 
@@ -71,13 +75,6 @@
             // Typically useful on page load if for example the slider is on top of the page and we need to load swiper.js right away before scrolling
             nb_.listenTo('nimble-new-scroll-handler-added', nb_.loopOnScrollHandlers );
 
-            // bound on scroll,
-            // unbound when all assets are loaded
-            nb_.scrollHandleForLoadingAssets = nb_.throttle( nb_.loopOnScrollHandlers, 100 );
-
-            // schedule loading on scroll
-            // unbound when all assets are loaded
-            nb_.cachedElements.$window.on( 'scroll', nb_.scrollHandleForLoadingAssets );
         });//jQuery
     });
 }(window, document));

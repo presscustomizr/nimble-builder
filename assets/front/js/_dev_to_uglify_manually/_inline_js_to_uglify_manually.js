@@ -70,8 +70,11 @@ window.nb_ = {};
         },
         eventsEmitted : [],
         eventsListenedTo : [],
-        emit : function(evt) {
-            if ( nb_.wasEmitted(evt) )
+        // @param params { fire_once : false }
+        // fire_once is used in nb_.maybeLoadAssetsWhenSelectorInScreen()
+        emit : function(evt, params ) {
+            var _fire_once = nb_.isUndefined( params ) || params.fire_once;
+            if ( _fire_once && nb_.wasEmitted(evt) )
               return;
             //console.log('emitted event', evt );
             // it is possible to add params when dispatching the event, but we need to use new CustomEvent with a polyfill for IE
@@ -437,6 +440,8 @@ nb_.listenTo('nb-needs-videobg-js', function() {
         });//jQuery(function($){})
     });/////////////// callbackFunc
 }(window, document));
+
+
 
 
 

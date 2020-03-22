@@ -23,13 +23,11 @@
                 nb_.scrollHandlers = nb_.scrollHandlers || {};
                 var handlerParams = { elements : params.elements, func : params.func };
                 nb_.scrollHandlers[params.id] = handlerParams;
-                nb_.emit('nimble-new-scroll-handler-added' );
-
+                nb_.emit('nimble-new-scroll-handler-added', { fire_once : false } );
             };
         });//jQuery(function($){})
     });//'nb-app-ready'
 }(window, document));
-
 
 
 
@@ -108,17 +106,15 @@
                               href : sekFrontLocalized.frontAssetsPath + 'css/libs/swiper.min.css?'+sekFrontLocalized.assetVersion
                         }) );
                   }
-                  if ( sekFrontLocalized.load_front_assets_on_scroll ) {
-                      nb_.ajaxLoadScript({
-                          path : 'js/libs/swiper.min.js?'+sekFrontLocalized.assetVersion,
-                          loadcheck : function() { return nb_.isFunction( window.Swiper ); },
-                          // complete : function() {
-                          //     nb_.ajaxLoadScript({
-                          //         path : 'js/prod-front-simple-slider-module.min.js',
-                          //     });
-                          // }
-                      });
-                  }
+                  nb_.ajaxLoadScript({
+                      path : 'js/libs/swiper.min.js?'+sekFrontLocalized.assetVersion,
+                      loadcheck : function() { return nb_.isFunction( window.Swiper ); },
+                      // complete : function() {
+                      //     nb_.ajaxLoadScript({
+                      //         path : 'js/prod-front-simple-slider-module.min.js',
+                      //     });
+                      // }
+                  });
             };// doLoad
 
             // is it already loaded ?
