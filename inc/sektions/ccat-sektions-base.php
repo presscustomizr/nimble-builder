@@ -7204,7 +7204,7 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
  *  SUBMIT BUTTON DESIGN
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_simple_form_button_child() {
-    $css_selectors = 'form input[type="submit"]';
+    $css_selectors = '.sek-module-inner form input[type="submit"]';
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_button_child',
@@ -7941,7 +7941,7 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
         }
 
         $rules[] = array(
-            'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] input[type="submit"]:hover',
+            'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner input[type="submit"]:hover',
             'css_rules' => 'background-color:' . $bg_color_hover . ';',
             'mq' =>null
         );
@@ -7957,7 +7957,7 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
                 $rules,
                 $border_settings,
                 $border_type,
-                '[data-sek-id="'.$complete_modul_model['id'].'"] input[type="submit"]'
+                '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner input[type="submit"]'
             );
         }
     }
@@ -7973,7 +7973,7 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
         $selector_list = array( 'form input[type="text"]', 'input[type="text"]:focus', 'form textarea', 'form textarea:focus' );
         $css_selectors = array();
         foreach( $selector_list as $selector ) {
-            $css_selectors[] = '[data-sek-id="'.$complete_modul_model['id'].'"]' . ' ' . $selector;
+            $css_selectors[] = '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner' . ' ' . $selector;
         }
         $rules = sek_generate_css_rules_for_multidimensional_border_options(
             $rules,
@@ -11554,7 +11554,14 @@ class Sek_Dyn_CSS_Handler {
         // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
         else if ( !is_customize_preview() && self::MODE_INLINE == $this->mode ) {
             global $wp_filesystem;
-            if ( $wp_filesystem->exists($this->uri) && $wp_filesystem->is_readable($this->uri) ) {
+            $this->file_exists = $wp_filesystem->exists($this->uri) && $wp_filesystem->is_readable($this->uri);
+            // $this->force_rewrite is set to true when is_user_logged_in() && current_user_can( 'customize' )
+            // @see ::_instantiate_css_handler
+            // By rewriting the CSS, we make sure that a bug fixed when generating a stylesheet gets fixed after an update of the plugin and a refresh of the page on front end, witout the need to open the customizer
+            if ( $this->force_rewrite || ( !$this->file_exists && $this->force_write ) ) {
+                $this->file_exists = $this->sek_dyn_css_maybe_write_css_file();
+            }
+            if ( $this->file_exists ) {
                 $file_content = $wp_filesystem->get_contents($this->uri);
                 printf( '<style id="sek-dyn-%1$s-css" media="all">%2$s</style>', $this->id, $file_content );
                 $this->enqueued_or_printed = true;
@@ -13805,7 +13812,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
              *  LIGHT BOX WITH MAGNIFIC POPUP
             /* ------------------------------------------------------------------------- */
             // when sek_preload_some_scripts_and_styles(), the stylesheet is preloaded
-            if ( sek_front_needs_magnific_popup() && !sek_preload_some_scripts_and_styles() && !sek_load_front_assets_in_ajax() ) {
+            if ( ( sek_front_needs_magnific_popup() && !sek_preload_some_scripts_and_styles() && !sek_load_front_assets_in_ajax() ) || skp_is_customizing() ) {
                 wp_enqueue_style(
                     'nb-magnific-popup',
                     NIMBLE_BASE_URL . '/assets/front/css/libs/magnific-popup.min.css',
@@ -13818,7 +13825,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             /* ------------------------------------------------------------------------- *
              *  SWIPER FOR SLIDERS
             /* ------------------------------------------------------------------------- */
-            if ( array_key_exists('czr_img_slider_module' , $contextually_active_modules) ) {
+            if ( array_key_exists('czr_img_slider_module' , $contextually_active_modules) || skp_is_customizing() ) {
                 // march 2020 : when using split stylesheet, swiper css is already included in assets/front/css/modules/img-slider-module-with-swiper.css
                 // when loading assets in ajax, swiper stylesheet is loaded dynamically
                 // so we don't need to enqueue it
@@ -13838,7 +13845,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             /* ------------------------------------------------------------------------- *
              *  FONT AWESOME STYLESHEET
             /* ------------------------------------------------------------------------- */
-            if ( sek_front_needs_font_awesome() && !sek_preload_font_awesome() && !sek_load_front_assets_in_ajax() ) {
+            if ( ( sek_front_needs_font_awesome() && !sek_preload_font_awesome() && !sek_load_front_assets_in_ajax() ) || skp_is_customizing() ) {
                 wp_enqueue_style(
                     'nb-font-awesome',
                     NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
@@ -14107,7 +14114,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
           // if ( !sek_is_img_smartload_enabled() || skp_is_customizing() )
           //   return;
           ?>
-          <style id="nb-lazyload-css-loader">@-webkit-keyframes sek-mr-loader{0%{-webkit-transform:scale(.1);transform:scale(.1);opacity:1}70%{-webkit-transform:scale(1);transform:scale(1);opacity:.7}100%{opacity:0}}@keyframes sek-mr-loader{0%{-webkit-transform:scale(.1);transform:scale(.1);opacity:1}70%{-webkit-transform:scale(1);transform:scale(1);opacity:.7}100%{opacity:0}}.sek-css-loader{width:50px;height:50px;position:absolute;-webkit-transform:translate3d(-50%,-50%,0);transform:translate3d(-50%,-50%,0);top:50%;left:50%}.csstransforms3d .sek-css-loader{display:block}.sek-mr-loader>div:nth-child(0){-webkit-animation-delay:-.8s;animation-delay:-.8s}.sek-mr-loader>div:nth-child(1){-webkit-animation-delay:-.6s;animation-delay:-.6s}.sek-mr-loader>div:nth-child(2){-webkit-animation-delay:-.4s;animation-delay:-.4s}.sek-mr-loader>div:nth-child(3){-webkit-animation-delay:-.2s;animation-delay:-.2s}.sek-mr-loader>div{-webkit-animation-fill-mode:both;animation-fill-mode:both;position:absolute;top:0;left:0;width:100%;height:100%;border-radius:100%;border:2px solid #777;-webkit-animation:sek-mr-loader 1.25s 0s infinite cubic-bezier(.21,.53,.56,.8);animation:sek-mr-loader 1.25s 0s infinite cubic-bezier(.21,.53,.56,.8)}.white-loader>.sek-mr-loader>div{border:2px solid #fff}</style>
+          <style id="nb-lazyload-css-loader">@-webkit-keyframes sek-mr-loader{0%{-webkit-transform:scale(.1);transform:scale(.1);opacity:1}70%{-webkit-transform:scale(1);transform:scale(1);opacity:.7}100%{opacity:0}}@keyframes sek-mr-loader{0%{-webkit-transform:scale(.1);transform:scale(.1);opacity:1}70%{-webkit-transform:scale(1);transform:scale(1);opacity:.7}100%{opacity:0}}.sek-css-loader{width:50px;height:50px;position:absolute;-webkit-transform:translate3d(-50%,-50%,0);transform:translate3d(-50%,-50%,0);top:50%;left:50%;z-index: 1000;}.csstransforms3d .sek-css-loader{display:block}.sek-mr-loader>div:nth-child(0){-webkit-animation-delay:-.8s;animation-delay:-.8s}.sek-mr-loader>div:nth-child(1){-webkit-animation-delay:-.6s;animation-delay:-.6s}.sek-mr-loader>div:nth-child(2){-webkit-animation-delay:-.4s;animation-delay:-.4s}.sek-mr-loader>div:nth-child(3){-webkit-animation-delay:-.2s;animation-delay:-.2s}.sek-mr-loader>div{-webkit-animation-fill-mode:both;animation-fill-mode:both;position:absolute;top:0;left:0;width:100%;height:100%;border-radius:100%;border:2px solid #777;-webkit-animation:sek-mr-loader 1.25s 0s infinite cubic-bezier(.21,.53,.56,.8);animation:sek-mr-loader 1.25s 0s infinite cubic-bezier(.21,.53,.56,.8)}.white-loader>.sek-mr-loader>div{border:2px solid #fff}</style>
           <?php
         }
 

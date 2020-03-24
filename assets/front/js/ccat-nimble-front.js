@@ -619,6 +619,9 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
 
 
               function Plugin( element, options ) {
+                    if ( !sekFrontLocalized.lazyload_enabled )
+                      return;
+
                     this.element = element;
                     this.options = $.extend( {}, defaults, options) ;
                     // //add .smartload-skip to the excludeImg
@@ -1247,59 +1250,62 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                         loop : true === $swiperWrapper.data('sek-loop') && true === $swiperWrapper.data('sek-is-multislide'),//Set to true to enable continuous loop mode
                         grabCursor : true === $swiperWrapper.data('sek-is-multislide'),
                         on : {
-                          init : function() {
-                              // remove the .sek-swiper-loading class from the wrapper => remove the display:none rule
-                              $swiperWrapper.removeClass('sek-swiper-loading');
+                              init : function() {
+                                    // remove the .sek-swiper-loading class from the wrapper => remove the display:none rule
+                                    $swiperWrapper.removeClass('sek-swiper-loading');
 
-                              // lazy load the first slider image with Nimble if not done already
-                              // the other images will be lazy loaded by swiper if the option is activated
-                              $swiperWrapper.nimbleLazyLoad();
-                              // center images with Nimble wizard when needed
-                              if ( 'nimble-wizard' === $swiperWrapper.data('sek-image-layout') ) {
-                                  $swiperWrapper.find('.sek-carousel-img').each( function() {
-                                      var $_imgsToSimpleLoad = $(this).nimbleCenterImages({
-                                            enableCentering : 1,
-                                            zeroTopAdjust: 0,
-                                            setOpacityWhenCentered : false,//will set the opacity to 1
-                                            oncustom : [ 'simple_load', 'smartload', 'sek-nimble-refreshed', 'recenter']
-                                      })
-                                      //images with src which starts with "data" are our smartload placeholders
-                                      //we don't want to trigger the simple_load on them
-                                      //the centering, will be done on the smartload event (see onCustom above)
-                                      .find( 'img:not([src^="data"])' );
+                                    // remove the css loader
+                                    $swiperWrapper.parent().find('.sek-css-loader').remove();
 
-                                      //trigger the simple load
-                                      nb_.delay( function() {
-                                          triggerSimpleLoad( $_imgsToSimpleLoad );
-                                      }, 50 );
-                                  });//each()
+                                    // lazy load the first slider image with Nimble if not done already
+                                    // the other images will be lazy loaded by swiper if the option is activated
+                                    $swiperWrapper.nimbleLazyLoad();
+                                    // center images with Nimble wizard when needed
+                                    if ( 'nimble-wizard' === $swiperWrapper.data('sek-image-layout') ) {
+                                          $swiperWrapper.find('.sek-carousel-img').each( function() {
+                                                var $_imgsToSimpleLoad = $(this).nimbleCenterImages({
+                                                      enableCentering : 1,
+                                                      zeroTopAdjust: 0,
+                                                      setOpacityWhenCentered : false,//will set the opacity to 1
+                                                      oncustom : [ 'simple_load', 'smartload', 'sek-nimble-refreshed', 'recenter']
+                                                })
+                                                //images with src which starts with "data" are our smartload placeholders
+                                                //we don't want to trigger the simple_load on them
+                                                //the centering, will be done on the smartload event (see onCustom above)
+                                                .find( 'img:not([src^="data"])' );
+
+                                                //trigger the simple load
+                                                nb_.delay( function() {
+                                                    triggerSimpleLoad( $_imgsToSimpleLoad );
+                                                }, 50 );
+                                          });//each()
+                                    }
+                              },// init
+                              // make sure slides are always lazyloaded
+                              slideChange : function(params) {
+                                  // when lazy load is active, we want to lazy load the first image of the slider if offscreen
+                                  // img to be lazy loaded looks like data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7
+                                  if ( $.fn.nimbleLazyLoad && $swiperWrapper.find('[src*="data:image"]').length > 0 ) {
+                                        $swiperWrapper.trigger('nb-trigger-lazyload');
+                                  }
                               }
-                          },// init
-                          // make sure slides are always lazyloaded
-                          slideChange : function(params) {
-                              // when lazy load is active, we want to lazy load the first image of the slider if offscreen
-                              // img to be lazy loaded looks like data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7
-                              if ( $.fn.nimbleLazyLoad && $swiperWrapper.find('[src*="data:image"]').length > 0 ) {
-                                  $swiperWrapper.trigger('nb-trigger-lazyload');
-                              }
-                          }
                         }//on
                     };
 
                     // AUTOPLAY
                     if ( true === $swiperWrapper.data('sek-autoplay') ) {
-                        $.extend( swiperParams, {
-                            autoplay : {
-                                delay : $swiperWrapper.data('sek-autoplay-delay'),
-                                disableOnInteraction : $swiperWrapper.data('sek-pause-on-hover')
-                            }
-                        });
+                          $.extend( swiperParams, {
+                                autoplay : {
+                                      delay : $swiperWrapper.data('sek-autoplay-delay'),
+                                      disableOnInteraction : $swiperWrapper.data('sek-pause-on-hover')
+                                }
+                          });
                     } else {
-                        $.extend( swiperParams, {
-                            autoplay : {
-                                delay : 999999999//<= the autoplay:false doesn't seem to work...
-                            }
-                        });
+                          $.extend( swiperParams, {
+                                autoplay : {
+                                      delay : 999999999//<= the autoplay:false doesn't seem to work...
+                                }
+                          });
                     }
 
                     // NAVIGATION ARROWS && PAGINATION DOTS
@@ -1364,18 +1370,18 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
 
               // On custom events
               $( 'body').on( 'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-level-refreshed', '[data-sek-level="location"]',
-                    function() {
-                      if ( 0 !== mySwipers.length ) {
-                            $.each( mySwipers, function( ind, _swiperInstance ){
-                                  _swiperInstance.destroy();
-                            });
-                      }
-                      mySwipers = [];
-                      doAllSwiperInstanciation();
+                    function(evt) {
+                          if ( 0 !== mySwipers.length ) {
+                                $.each( mySwipers, function( ind, _swiperInstance ){
+                                      _swiperInstance.destroy();
+                                });
+                          }
+                          mySwipers = [];
+                          doAllSwiperInstanciation();
 
-                      $(this).find('.swiper-container img').each( function() {
-                            $(this).trigger('sek-nimble-refreshed');
-                      });
+                          $(this).find('.swiper-container img').each( function() {
+                                $(this).trigger('sek-nimble-refreshed');
+                          });
                     }
               );
 
@@ -1383,9 +1389,9 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
               // this is needed when setting the custom height of the slider wrapper
               $( 'body').on( 'sek-stylesheet-refreshed', '[data-sek-module-type="czr_img_slider_module"]',
                     function() {
-                      $(this).find('.swiper-container img').each( function() {
-                            $(this).trigger('sek-nimble-refreshed');
-                      });
+                          $(this).find('.swiper-container img').each( function() {
+                                $(this).trigger('sek-nimble-refreshed');
+                          });
                     }
               );
 

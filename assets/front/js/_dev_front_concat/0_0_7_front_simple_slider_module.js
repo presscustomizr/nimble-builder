@@ -39,7 +39,6 @@
                                     $swiperWrapper.removeClass('sek-swiper-loading');
 
                                     // remove the css loader
-                                    console.log('$swiperWrapper.siblings() ?', $swiperWrapper.parent());
                                     $swiperWrapper.parent().find('.sek-css-loader').remove();
 
                                     // lazy load the first slider image with Nimble if not done already
