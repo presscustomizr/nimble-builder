@@ -53,9 +53,10 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
                         if ( !skp_is_customizing() && sek_preload_google_fonts_on_front() ) {
                             add_action( 'wp_head', array( $this, 'sek_gfont_print_with_preload') );
                         } else {
+                            // March 2020 added param display=swap => Ensure text remains visible during webfont load #572
                             wp_enqueue_style(
                                 'sek-gfonts-local-and-global',
-                                sprintf( '//fonts.googleapis.com/css?family=%s', $google_fonts_print_candidates ),
+                                sprintf( '//fonts.googleapis.com/css?family=%s&display=swap', $google_fonts_print_candidates ),
                                 array(),
                                 null,
                                 'all'
@@ -73,11 +74,12 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
         // hook : wp_head
         // or fired directly when ajaxing
         // When ajaxing, the link#sek-gfonts-{$this->id} gets removed from the dom and replaced by this string
+        // March 2020 added param display=swap => Ensure text remains visible during webfont load #572
         function sek_gfont_print( $print_candidates ) {
             if ( ! empty( $print_candidates ) ) {
                 printf('<link rel="stylesheet" id="%1$s" href="%2$s">',
                     'sek-gfonts-local-and-global',
-                    "//fonts.googleapis.com/css?family={$print_candidates}"
+                    "//fonts.googleapis.com/css?family={$print_candidates}&display=swap"
                 );
             }
         }
@@ -85,13 +87,14 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
         // hook : wp_head
         // fired on front only when not customizing
         // March 2020 preload implemented for https://github.com/presscustomizr/nimble-builder/issues/629
+        // March 2020 added param display=swap => Ensure text remains visible during webfont load #572
         function sek_gfont_print_with_preload( $print_candidates = '' ) {
             // print candidates must be fetched when sek_preload_google_fonts_on_front()
             $print_candidates = $this->sek_get_gfont_print_candidates();
 
             if ( ! empty( $print_candidates ) ) {
                 ?>
-                <script id="nimble-preload-gfonts">nb_.preloadAsset( { id : 'sek-gfonts-local-and-global', as : 'style', href : '//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>', scriptEl : document.currentScript } );</script>
+                <script id="nimble-preload-gfonts">nb_.preloadAsset( { id : 'sek-gfonts-local-and-global', as : 'style', href : '//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>&display=swap', scriptEl : document.currentScript } );</script>
                 <?php
             }
         }
