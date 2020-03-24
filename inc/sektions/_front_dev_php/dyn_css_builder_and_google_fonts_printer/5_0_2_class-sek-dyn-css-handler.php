@@ -453,7 +453,14 @@ class Sek_Dyn_CSS_Handler {
         // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
         else if ( !is_customize_preview() && self::MODE_INLINE == $this->mode ) {
             global $wp_filesystem;
-            if ( $wp_filesystem->exists($this->uri) && $wp_filesystem->is_readable($this->uri) ) {
+            $this->file_exists = $wp_filesystem->exists($this->uri) && $wp_filesystem->is_readable($this->uri);
+            // $this->force_rewrite is set to true when is_user_logged_in() && current_user_can( 'customize' )
+            // @see ::_instantiate_css_handler
+            // By rewriting the CSS, we make sure that a bug fixed when generating a stylesheet gets fixed after an update of the plugin and a refresh of the page on front end, witout the need to open the customizer
+            if ( $this->force_rewrite || ( !$this->file_exists && $this->force_write ) ) {
+                $this->file_exists = $this->sek_dyn_css_maybe_write_css_file();
+            }
+            if ( $this->file_exists ) {
                 $file_content = $wp_filesystem->get_contents($this->uri);
                 printf( '<style id="sek-dyn-%1$s-css" media="all">%2$s</style>', $this->id, $file_content );
                 $this->enqueued_or_printed = true;
