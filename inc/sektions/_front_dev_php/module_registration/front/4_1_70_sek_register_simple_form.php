@@ -267,7 +267,7 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
  *  SUBMIT BUTTON DESIGN
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_simple_form_button_child() {
-    $css_selectors = 'form input[type="submit"]';
+    $css_selectors = '.sek-module-inner form input[type="submit"]';
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_button_child',
@@ -1004,7 +1004,7 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
         }
 
         $rules[] = array(
-            'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] input[type="submit"]:hover',
+            'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner input[type="submit"]:hover',
             'css_rules' => 'background-color:' . $bg_color_hover . ';',
             'mq' =>null
         );
@@ -1020,7 +1020,7 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
                 $rules,
                 $border_settings,
                 $border_type,
-                '[data-sek-id="'.$complete_modul_model['id'].'"] input[type="submit"]'
+                '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner input[type="submit"]'
             );
         }
     }
@@ -1036,7 +1036,7 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
         $selector_list = array( 'form input[type="text"]', 'input[type="text"]:focus', 'form textarea', 'form textarea:focus' );
         $css_selectors = array();
         foreach( $selector_list as $selector ) {
-            $css_selectors[] = '[data-sek-id="'.$complete_modul_model['id'].'"]' . ' ' . $selector;
+            $css_selectors[] = '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner' . ' ' . $selector;
         }
         $rules = sek_generate_css_rules_for_multidimensional_border_options(
             $rules,
