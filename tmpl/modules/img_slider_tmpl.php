@@ -146,6 +146,11 @@ if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
               <div class="sek-swiper-arrows sek-swiper-next sek-swiper-next<?php echo $model['id']; ?>" title="<?php _e('next', 'textdom'); ?>"><div class="sek-chevron"></div></div>
             </div>
           <?php endif; ?>
+          <?php
+            if ( !skp_is_customizing() ) {
+              echo Nimble_Manager()->css_loader_html;
+            }
+          ?>
         </div><?php //.swiper-container ?>
 
       <?php
