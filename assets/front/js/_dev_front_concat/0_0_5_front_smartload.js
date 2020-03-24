@@ -43,6 +43,9 @@
 
 
               function Plugin( element, options ) {
+                    if ( !sekFrontLocalized.lazyload_enabled )
+                      return;
+
                     this.element = element;
                     this.options = $.extend( {}, defaults, options) ;
                     // //add .smartload-skip to the excludeImg
