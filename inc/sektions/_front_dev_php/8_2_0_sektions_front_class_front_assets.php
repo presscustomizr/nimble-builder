@@ -166,7 +166,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
              *  LIGHT BOX WITH MAGNIFIC POPUP
             /* ------------------------------------------------------------------------- */
             // when sek_preload_some_scripts_and_styles(), the stylesheet is preloaded
-            if ( sek_front_needs_magnific_popup() && !sek_preload_some_scripts_and_styles() && !sek_load_front_assets_in_ajax() ) {
+            if ( ( sek_front_needs_magnific_popup() && !sek_preload_some_scripts_and_styles() && !sek_load_front_assets_in_ajax() ) || skp_is_customizing() ) {
                 wp_enqueue_style(
                     'nb-magnific-popup',
                     NIMBLE_BASE_URL . '/assets/front/css/libs/magnific-popup.min.css',
@@ -179,7 +179,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             /* ------------------------------------------------------------------------- *
              *  SWIPER FOR SLIDERS
             /* ------------------------------------------------------------------------- */
-            if ( array_key_exists('czr_img_slider_module' , $contextually_active_modules) ) {
+            if ( array_key_exists('czr_img_slider_module' , $contextually_active_modules) || skp_is_customizing() ) {
                 // march 2020 : when using split stylesheet, swiper css is already included in assets/front/css/modules/img-slider-module-with-swiper.css
                 // when loading assets in ajax, swiper stylesheet is loaded dynamically
                 // so we don't need to enqueue it
@@ -199,7 +199,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             /* ------------------------------------------------------------------------- *
              *  FONT AWESOME STYLESHEET
             /* ------------------------------------------------------------------------- */
-            if ( sek_front_needs_font_awesome() && !sek_preload_font_awesome() && !sek_load_front_assets_in_ajax() ) {
+            if ( ( sek_front_needs_font_awesome() && !sek_preload_font_awesome() && !sek_load_front_assets_in_ajax() ) || skp_is_customizing() ) {
                 wp_enqueue_style(
                     'nb-font-awesome',
                     NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
