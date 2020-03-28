@@ -156,9 +156,9 @@ window.nb_ = {};
                         _injectFinalAsset.call(link);
                     }
                 };
-                link.onerror = function() {
+                link.onerror = function(er) {
                     nb_.errorLog('Nimble preloadAsset error', er, params );
-                }
+                };
             }
             headTag.appendChild(link);
 
@@ -492,33 +492,6 @@ nb_.listenTo('nb-needs-videobg-js', function() {
 
 
 
-
-// printed SEK_Front_Render_Css::in sek_gfont_print_with_preload()
-// in <script id="nimble-preload-gfonts">
-(function() {
-      // Preload @see https://web.dev/uses-rel-preload/
-      // @see https://web.dev/preload-critical-assets/
-      // @see https://caniuse.com/#search=preload
-      // IE and Firefox do not support preload
-      // edge is supposed to support it, but when refreshing the page several times, google font are sometimes not loaded... so let's not preload with it as well
-      // https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser#9851769
-      var link = document.createElement('link');
-      link.setAttribute('href', '//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>');
-      link.setAttribute('rel', nb_.hasPreloadSupport() ? 'preload' : 'stylesheet' );
-      link.setAttribute('as', 'style');
-      link.onload = function() {
-          this.onload=null;
-          if ( nb_.hasPreloadSupport() ) {
-              this.rel='stylesheet';
-          } else {
-              nb_.
-          }
-          // remove script wrapper when done
-          document.currentScript.parentNode.removeChild(document.currentScript);
-
-      };
-      document.getElementsByTagName('head')[0].appendChild(link);
-})();
 
 
 

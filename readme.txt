@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.3
+Stable tag: 2.0.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,14 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 2.0.3 =
-Fixed a bug when dropping a carousel module. Fixed CSS customizations not taken into account for the button of the form module.
+= 2.0.4 =
+Google fonts and page load performance improvements.
 
 == Changelog ==
+= 2.0.4 March 28th 2020 =
+* improved : [performances][Google fonts] added param "display=swap" to ensure text remains visible during webfont load
+* improved :  [Performance] make sure no enqueued script / inline script / preload stylesheet is printed when no Nimble Sections to print
+
 = 2.0.3 March 24th 2020 =
 * fixed : [form module] add specificity to CSS selectors of the button
 * fixed : [carousel module] when inserting a carousel for the first time, js not instantiated
