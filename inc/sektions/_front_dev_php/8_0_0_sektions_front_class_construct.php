@@ -185,6 +185,9 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
 
         public $css_loader_html = '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>';
 
+        // March 2020, for https://github.com/presscustomizr/nimble-builder/issues/649
+        public $page_has_nimble_content = false;
+
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
         function __construct( $params = array() ) {

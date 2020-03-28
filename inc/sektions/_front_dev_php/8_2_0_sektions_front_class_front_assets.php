@@ -46,7 +46,6 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         }//_schedule_front_and_preview_assets_printing
 
 
-
         // hook : 'wp_enqueue_scripts'
         function sek_enqueue_front_css_assets() {
             /* ------------------------------------------------------------------------- *
@@ -221,7 +220,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
         //@'wp_enqueue_scripts'
         function sek_enqueue_front_js_assets() {
-
+            if ( !sek_local_skope_has_nimble_sections( skp_get_skope_id() ) && !sek_has_global_sections() )
+              return;
             /* ------------------------------------------------------------------------- *
              *  MAIN SCRIPT
              /* ------------------------------------------------------------------------- */
@@ -404,7 +404,11 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
 
         // @wp_head0
+        // replaces wp_localize because we don't need to indicate a dependency to any scripts for local data
         function sek_add_local_script_data() {
+            if ( !sek_local_skope_has_nimble_sections( skp_get_skope_id() ) && !sek_has_global_sections() )
+              return;
+
             $l10n = array(
                 'isDevMode' => sek_is_dev_mode(),
                 //'ajaxUrl' => admin_url( 'admin-ajax.php' ),
@@ -443,6 +447,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // 3) 'nb-app-ready' => fired in footer on 'nb-jquery-loaded' <= all module scripts are fired on this event
         // 4) 'nb-jmp-parsed', ... are emitted in each script files
         function sek_initialize_front_js_app() {
+            if ( !sek_local_skope_has_nimble_sections( skp_get_skope_id() ) && !sek_has_global_sections() )
+              return;
             ?>
             <script id="nimble-app-init">window.nb_={},function(e,n){if(window.nb_={isArray:function(e){return Array.isArray(e)||"[object Array]"===toString.call(e)},inArray:function(e,n){return!(!nb_.isArray(e)||nb_.isUndefined(n))&&e.indexOf(n)>-1},isUndefined:function(e){return void 0===e},isObject:function(e){var n=typeof e;return"function"===n||"object"===n&&!!e},errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},hasPreloadSupport:function(e){var n=document.createElement("link").relList;return!(!n||!n.supports)&&n.supports("preload")},listenTo:function(e,n){var t={"nb-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nb-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nb-jquery-loaded")},"nb-jmp-parsed":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup},"nb-main-swiper-parsed":function(){return void 0!==window.Swiper}},o=function(o){nb_.isUndefined(t[e])||!1!==t[e]()?(n(),nb_.eventsListenedTo.push(e)):nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",e,nb_.eventsListenedTo)};"function"==typeof n?nb_.wasEmitted(e)?o():document.addEventListener(e,o):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",e)},eventsEmitted:[],eventsListenedTo:[],emit:function(e,n){if(!(nb_.isUndefined(n)||n.fire_once)||!nb_.wasEmitted(e)){var t=document.createEvent("Event");t.initEvent(e,!0,!0),document.dispatchEvent(t),nb_.eventsEmitted.push(e)}},wasListenedTo:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsListenedTo,e)},wasEmitted:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsEmitted,e)},isInScreen:function(e,n){var t=window.pageYOffset||document.documentElement.scrollTop,o=t+window.innerHeight,i=e.offsetTop,r=n||0;return i+e.clientHeight>=t-r&&i<=o+r},isCustomizing:function(){return!1},isLazyLoadEnabled:function(){return!nb_.isCustomizing()&&!1},preloadAsset:function(e){if(e=e||{},nb_.preloadedAssets=nb_.preloadedAssets||[],!nb_.inArray(nb_.preloadedAssets,e.id)){var n=document.getElementsByTagName("head")[0],t=document.createElement("link"),o=(e.as,function(){if("style"===e.as)this.setAttribute("rel","stylesheet");else{var t=document.createElement("script");t.setAttribute("src",e.href),t.setAttribute("id",e.id),nb_.hasPreloadSupport()||"script"!==e.as||t.setAttribute("defer","defer"),n.appendChild(t),this&&this.parentNode&&this.parentNode.removeChild(this)}});nb_.hasPreloadSupport()||"script"!==e.as?(t.setAttribute("href",e.href),t.setAttribute("rel",nb_.hasPreloadSupport()?"preload":"stylesheet"),t.setAttribute("id",e.id),t.setAttribute("as",e.as),t.onload=function(){this.onload=null,e.onEvent?nb_.listenTo(e.onEvent,function(){o.call(t)}):o.call(t)},t.onerror=function(){nb_.errorLog("Nimble preloadAsset error",er,e)}):e.onEvent?nb_.listenTo(e.onEvent,function(){o.call(t)}):o.call(t),n.appendChild(t),nb_.preloadedAssets.push(e.id),e.scriptEl&&e.scriptEl.parentNode&&e.scriptEl.parentNode.removeChild(e.scriptEl)}},revealBG:function(){this.getAttribute("data-sek-src")&&(this.setAttribute("style",'background-image:url("'+this.getAttribute("data-sek-src")+'")'),this.className+=" smartload-skip",this.querySelectorAll(".sek-css-loader").forEach(function(e){nb_.isObject(e)&&e.parentNode.removeChild(e)}))}},window.NodeList&&!NodeList.prototype.forEach&&(NodeList.prototype.forEach=function(e,n){n=n||window;for(var t=0;t<this.length;t++)e.call(n,this[t],t,this)}),nb_.listenTo("nb-docready",function(){var e=document.querySelectorAll("div.sek-has-bg");!nb_.isObject(e)||e.length<1||e.forEach(function(e){nb_.isObject(e)&&(!nb_.isLazyLoadEnabled()||nb_.isInScreen(e)&&nb_.isLazyLoadEnabled())&&nb_.revealBG.call(e)})}),"complete"===document.readyState||"loading"!==document.readyState&&!document.documentElement.doScroll)nb_.emit("nb-docready");else{var t=function(){nb_.wasEmitted("nb-docready")||nb_.emit("nb-docready")};document.addEventListener("DOMContentLoaded",t),window.addEventListener("load",t)}}(window,document);</script>
             <?php
@@ -465,6 +471,9 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
         //@'wp_head'PHP_INT_MAX
         function sek_print_style_for_css_loader() {
+          if ( !sek_local_skope_has_nimble_sections( skp_get_skope_id() ) && !sek_has_global_sections() )
+            return;
+
           // if ( !sek_is_img_smartload_enabled() || skp_is_customizing() )
           //   return;
           ?>
@@ -477,6 +486,9 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // introduced for https://github.com/presscustomizr/nimble-builder/issues/626
         // jQuery can potentially be loaded async, so let's react to its load or the presence of window.jQuery
         function sek_detect_jquery() {
+            if ( !sek_local_skope_has_nimble_sections( skp_get_skope_id() ) && !sek_has_global_sections() )
+              return;
+
             ?>
             <script id="nimble-detect-jquery">!function(){var e=function(){var e="nb-jquery-loaded";nb_.wasEmitted(e)||nb_.emit(e)},n=function(t){t=t||0,void 0!==window.jQuery?e():t<30?setTimeout(function(){n(++t)},200):alert("Nimble Builder problem : jQuery.js was not detected on your website")},t=document.getElementById("<?php echo NIMBLE_JQUERY_ID; ?>");t&&t.addEventListener("load",function(){e()}),n()}();</script>
             <?php
@@ -513,6 +525,11 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         //@wp_footer
         // preload is applied when 'preload_front_scripts' is checked by user AND 'load_assets_in_ajax' is not active
         function sek_maybe_preload_front_scripts_and_styles() {
+            // Check that current page has Nimble content before printing anything
+            // For https://github.com/presscustomizr/nimble-builder/issues/649
+            if ( !Nimble_Manager()->page_has_nimble_content )
+              return;
+
             if ( sek_load_front_assets_in_ajax() )
               return;
             /* ------------------------------------------------------------------------- *
@@ -565,6 +582,11 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // @'wp_footer'PHP_INT_MAX
         // introduced for https://github.com/presscustomizr/nimble-builder/issues/626
         function sek_preload_jquery_from_dns() {
+            // Check that current page has Nimble content before printing anything
+            // For https://github.com/presscustomizr/nimble-builder/issues/649
+            if ( !Nimble_Manager()->page_has_nimble_content )
+              return;
+
             if( sek_is_jquery_replaced() && !skp_is_customizing() ) {
             ?>
             <script id="nb-load-jquery">setTimeout( function() {
@@ -583,6 +605,11 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
         //@'wp_footer'PHP_INT_MAX
         function sek_maybe_load_scripts_in_ajax() {
+            // Check that current page has Nimble content before printing anything
+            // For https://github.com/presscustomizr/nimble-builder/issues/649
+            if ( !Nimble_Manager()->page_has_nimble_content )
+              return;
+
             if ( ! sek_load_front_assets_in_ajax() )
               return;
             ?>

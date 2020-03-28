@@ -51,7 +51,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
 
                         // preload implemented for https://github.com/presscustomizr/nimble-builder/issues/629
                         if ( !skp_is_customizing() && sek_preload_google_fonts_on_front() ) {
-                            add_action( 'wp_head', array( $this, 'sek_gfont_print_with_preload') );
+                            add_action( 'wp_footer', array( $this, 'sek_gfont_print_with_preload') );
                         } else {
                             // March 2020 added param display=swap => Ensure text remains visible during webfont load #572
                             wp_enqueue_style(
@@ -84,11 +84,15 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             }
         }
 
-        // hook : wp_head
+        // hook : wp_footer
         // fired on front only when not customizing
         // March 2020 preload implemented for https://github.com/presscustomizr/nimble-builder/issues/629
         // March 2020 added param display=swap => Ensure text remains visible during webfont load #572
         function sek_gfont_print_with_preload( $print_candidates = '' ) {
+            // Check that current page has Nimble content before printing any Google fonts
+            // For https://github.com/presscustomizr/nimble-builder/issues/649
+            if ( !Nimble_Manager()->page_has_nimble_content )
+              return;
             // print candidates must be fetched when sek_preload_google_fonts_on_front()
             $print_candidates = $this->sek_get_gfont_print_candidates();
 

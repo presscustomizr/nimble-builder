@@ -392,6 +392,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                     ?>
                       <?php if ( skp_is_customizing() || ( ! skp_is_customizing() && ! empty( $collection ) ) ) : ?>
                             <?php
+                              Nimble_Manager()->page_has_nimble_content = true;
                               $is_header_location = true === sek_get_registered_location_property( $id, 'is_header_location' );
                               $is_footer_location = true === sek_get_registered_location_property( $id, 'is_footer_location' );
                               printf( '<div class="sektion-wrapper" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s %5$s>',
