@@ -27,6 +27,7 @@
 
 
                   var _do_ = function( contentType ) {
+                        console.log('contentType ??', contentType );
                         input.container.find( '[data-sek-content-type="' + ( contentType || 'module' ) + '"]').trigger('click');
                         _.each( _section_.controls(), function( _control_ ) {
                               if ( ! _.isUndefined( _control_.content_type ) ) {

@@ -71,7 +71,8 @@
                                           alert(sektionsLocalizedData.i18n['Nothing to export.']);
                                           break;
                                     }
-                                    _export( { scope : currentScope } );// local or global
+                                    //_export( { scope : currentScope } );// local or global
+                                    api.czr_sektions.export_template( { scope : currentScope }  );
                               break;//'sek-export'
 
                               case 'sek-pre-import' :
@@ -83,77 +84,82 @@
                                     }
 
                                     // Before actually importing, let's do a preliminary
-                                    _import( { pre_import_check : true } )
-                                          .done( _pre_import_checks )
-                                          .fail( function( error_resp ) {
-                                                api.errare( 'sek_pre_import_checks failed', error_resp );
-                                                _doAlwaysAfterImportApiSettingUpdate();
-                                                _import();
+                                    // _import({
+                                    //     pre_import_check : true,
+                                    //     input : input,
+                                    //     file_input : $file_input
+                                    // })
+                                    // .done( _pre_import_checks )
+                                    // .fail( function( error_resp ) {
+                                    //       api.errare( 'sek_pre_import_checks failed', error_resp );
+                                    //       _doAlwaysAfterImportApiSettingUpdate();
+                                    //       _import({
+                                    //           input : input,
+                                    //           file_input : $file_input
+                                    //       });
+                                    // });
+
+                                    api.czr_sektions.import_template({
+                                        pre_import_check : true,
+                                        input : input,
+                                        file_input : $file_input
+                                    })
+                                    .done( function( server_resp ) {
+                                          api.czr_sektions.pre_import_checks( server_resp, {
+                                              pre_import_check : true,
+                                              input : input,
+                                              file_input : $file_input
                                           });
+                                    })
+                                    .fail( function( error_resp ) {
+                                          api.errare( 'sek_pre_import_checks failed', error_resp );
+                                          api.czr_sektions.doAlwaysAfterImportApiSettingUpdate({
+                                              input : input,
+                                              file_input : $file_input
+                                          });
+                                          api.czr_sektions.import_template({
+                                              input : input,
+                                              file_input : $file_input
+                                          });
+                                    });
+
                               break;//'sek-import'
                               case 'sek-import-as-is' :
-                                    _import();
+                                    // _import({
+                                    //     input : input,
+                                    //     file_input : $file_input
+                                    // });
+                                    api.czr_sektions.import_template({
+                                        input : input,
+                                        file_input : $file_input
+                                    });
                               break;
                               case 'sek-import-assign' :
-                                    _import( { assign_missing_locations : true } );
+                                    // _import({
+                                    //     assign_missing_locations : true,
+                                    //     input : input,
+                                    //     file_input : $file_input
+                                    // });
+                                    api.czr_sektions.import_template({
+                                        assign_missing_locations : true,
+                                        input : input,
+                                        file_input : $file_input
+                                    });
                               break;
                               case 'sek-cancel-import' :
-                                    _doAlwaysAfterImportApiSettingUpdate();
+                                    //_doAlwaysAfterImportApiSettingUpdate();
+                                    api.czr_sektions.doAlwaysAfterImportApiSettingUpdate({
+                                        input : input,
+                                        file_input : $file_input
+                                    });
                               break;
                         }//switch
                   });//input.container.on( 'click' .. )
 
 
 
-                  ////////////////////////////////////////////////////////
-                  // PRE EXPORT CHECKS
-                  ////////////////////////////////////////////////////////
-                  //@params { scope : 'local' or 'global' }
-                  var _export = function( params ) {
-                          var query = [],
-                              query_params = {
-                                    sek_export_nonce : api.settings.nonce.save,
-                                    skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
-                                    active_locations : api.czr_sektions.activeLocations()
-                              };
-                          _.each( query_params, function(v,k) {
-                                query.push( encodeURIComponent(k) + '=' + encodeURIComponent(v) );
-                          });
 
-                          // The ajax action is used to make a pre-check
-                          // the idea is to avoid a white screen when generating the download window afterwards
-                          wp.ajax.post( 'sek_pre_export_checks', {
-                                nonce: api.settings.nonce.save,
-                                sek_export_nonce : api.settings.nonce.save,
-                                skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
-                                active_locations : api.czr_sektions.activeLocations()
-                          }).done( function() {
-                                // disable the 'beforeunload' listeners generating popup window when the changeset is dirty
-                                $(window).off( 'beforeunload' );
-                                // Generate a download window
-                                // @see add_action( 'customize_register', '\Nimble\sek_catch_export_action', PHP_INT_MAX );
-                                window.location.href = [
-                                      sektionsLocalizedData.customizerURL,
-                                      '?',
-                                      query.join('&')
-                                ].join('');
-                                // re-enable the listeners
-                                $(window).on( 'beforeunload' );
-                          }).fail( function( error_resp ) {
-                                api.previewer.trigger('sek-notify', {
-                                      notif_id : 'import-failed',
-                                      type : 'error',
-                                      duration : 30000,
-                                      message : [
-                                            '<span>',
-                                              '<strong>',
-                                              [ sektionsLocalizedData.i18n['Export failed'], encodeURIComponent( error_resp ) ].join(' '),
-                                              '</strong>',
-                                            '</span>'
-                                      ].join('')
-                                });
-                          });
-                  };//_export()
+
 
 
 
@@ -192,7 +198,10 @@
 
                                     api.infoLog('sek-pre-import => imported locations missing in current page.', importedActiveLocationsNotAvailableInCurrentActiveLocations );
                               } else {
-                                    _import();
+                                    _import({
+                                        input : input,
+                                        file_input : $file_input
+                                    });
                               }
                         } else {
                               // if current and imported location are not arrays, there's a problem.
