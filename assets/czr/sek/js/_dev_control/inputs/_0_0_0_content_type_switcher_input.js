@@ -19,10 +19,16 @@
                   // attach click event on data-sek-content-type buttons
                   input.container.on('click', '[data-sek-content-type]', function( evt ) {
                         evt.preventDefault();
+                        var _contentType = $(this).data( 'sek-content-type');
                         // handle the is-selected css class toggling
                         input.container.find('[data-sek-content-type]').removeClass('is-selected').attr( 'aria-pressed', false );
                         $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        api.czr_sektions.currentContentPickerType( $(this).data( 'sek-content-type') );
+                        if ( 'template' === _contentType ) {
+                              api.czr_sektions.import_nimble_template();
+                        } else {
+                              // case for section and module content type
+                              api.czr_sektions.currentContentPickerType( _contentType );
+                        }
                   });
 
 
