@@ -101,9 +101,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             console.log('IMPORT NIMBLE TEMPLATE', resp.lib.templates[template_name] );
                             api.czr_sektions.import_template({
                                   is_manual_import : false,
-                                  pre_import_check : true,
+                                  pre_import_check : false,
                                   template_name : 'test_one',
-                                  template_data : $.Deferred( function() { this.resolve( { success : true, data : _json_data  } ); } )
+                                  template_data : _json_data
                             });
                       })
                       .fail(function( er ) {
@@ -165,9 +165,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // display the uploading message
                         _input.container.find('.sek-uploading').show();
 
-
-
-
                         // make sure a previous warning gets removed
                         api.notifications.remove( 'missing-import-file' );
                         api.notifications.remove( 'import-success' );
@@ -178,7 +175,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         console.log('params.file_input[0].files[0] ??', params.file_input[0].files[0] );
                         var fd = new FormData();
                         fd.append( 'file_candidate', params.file_input[0].files[0] );
-                        fd.append( 'action', 'sek_get_imported_file_content' );
+                        fd.append( 'action', 'sek_get_manually_imported_file_content' );
                         fd.append( 'nonce', api.settings.nonce.save );
 
                         // Make sure we have a correct scope provided
@@ -192,6 +189,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( params.pre_import_check ) {
                               fd.append( 'pre_import_check', params.pre_import_check );
                         }
+                        // fire an uploading message removed on .always()
+                        _input.container.find('.sek-uploading').show();
 
                         __request__ = $.ajax({
                               url: wp.ajax.settings.url,
@@ -205,50 +204,62 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //   alert(data);
                               // }
                         });
+
+                        // When pre checking on manual mode, return a promise
+                        if ( params.pre_import_check ) {
+                              return $.Deferred( function() {
+                                    var dfd = this;
+                                    __request__
+                                          .done( function( server_resp ) {
+                                                console.log('__request__ done in pre_import_check', server_resp );
+                                                if( !server_resp.success ) {
+                                                      dfd.reject( server_resp );
+                                                }
+                                                if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
+                                                      dfd.reject( server_resp );
+                                                }
+                                                console.log('ALORS DONE IN PRE IMPORT CHECK ?');
+                                                dfd.resolve( server_resp );
+                                          })
+                                          .fail( function( server_resp ) {
+                                                dfd.reject( server_resp );
+                                          })
+                                          .always( function() {
+                                                //input.container.find('.sek-uploading').hide();
+                                          });
+                              });
+                        }
                   }//params.is_manual_import
                   else {
                         // remote template import case
-                        if ( !params.template_data || !params.template_data.state ) {
+                        if ( !params.template_data ) {
                               throw new Error( '::import_template => missing remote template data' );
                         }
-                        __request__ = params.template_data;
-                  }
-
-
-                  // When pre checking on manual mode, return a promise
-                  // otherwise, run the pre-check
-                  if ( params.pre_import_check ) {
-                        var _promise = $.Deferred( function() {
-                              var dfd = this;
-                              __request__
-                                    .done( function( server_resp ) {
-                                          console.log('__request__ done in pre_import_check', server_resp );
-                                          if( !server_resp.success ) {
-                                                dfd.reject( server_resp );
-                                          }
-                                          if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
-                                                dfd.reject( server_resp );
-                                          }
-                                          console.log('ALORS DONE IN PRE IMPORT CHECK ?');
-                                          dfd.resolve( server_resp );
-                                    })
-                                    .fail( function( server_resp ) {
-                                          dfd.reject( server_resp );
-                                    })
-                                    .always( function() {
-                                          //input.container.find('.sek-uploading').hide();
-                                    });
+                        __request__ = wp.ajax.post( 'sek_process_template_file_content', {
+                              nonce: api.settings.nonce.save,
+                              template_data : JSON.stringify( params.template_data ),
+                              pre_import_check : false//<= might be used in the future do stuffs. For example when importing manually, this property is used to skip the img sniffing on the first pass.
+                              //sek_export_nonce : api.settings.nonce.save,
+                              //skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
+                              //active_locations : api.czr_sektions.activeLocations()
+                        }).done( function( server_resp ) {
+                              api.infoLog('TEMPLATE PRE PROCESS DONE', server_resp );
+                        }).fail( function( error_resp ) {
+                              api.previewer.trigger('sek-notify', {
+                                    notif_id : 'import-failed',
+                                    type : 'error',
+                                    duration : 30000,
+                                    message : [
+                                          '<span>',
+                                            '<strong>',
+                                            [ sektionsLocalizedData.i18n['Export failed'], encodeURIComponent( error_resp ) ].join(' '),
+                                            '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
                         });
-
-                        if ( params.is_manual_import ) {
-                            return _promise;
-                        }
                   }
 
-                  // fire an uploading message removed on .always()
-                  if ( params.is_manual_import ) {
-                        _input.container.find('.sek-uploading').show();
-                  }
 
                   // fire a previewer loader removed on .always()
                   api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true });
@@ -257,7 +268,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // the ajax request is processed and will upload images if needed
                   __request__
                         .done( function( server_resp ) {
-                              console.log('CROTTE 2?');
+
+                              // When manually importing a file, the server adds a "success" property
+                              // When loading a template this property is not sent. Let's normalize.
+                              if ( !params.is_manual_import && _.isObject(server_resp) ) {
+                                    server_resp = {success:true, data:server_resp};
+                              }
+                              console.log('SERVER RESP ?', server_resp );
+                              if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
+                                    console.log('CROTTE 2?');
+                                    return;
+                              }
+
                               // we have a server_resp well structured { success : true, data : { data : , metas, img_errors } }
                               // Let's set the unique level ids
                               var _setIds = function( _data ) {

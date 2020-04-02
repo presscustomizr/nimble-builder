@@ -145,8 +145,8 @@ function sek_parse_img_and_clean_id( $seks_data ) {
 
 
 // fetch the content from a user imported file
-add_action( 'wp_ajax_sek_get_imported_file_content', '\Nimble\sek_ajax_get_imported_file_content' );
-function sek_ajax_get_imported_file_content() {
+add_action( 'wp_ajax_sek_get_manually_imported_file_content', '\Nimble\sek_ajax_get_manually_imported_file_content' );
+function sek_ajax_get_manually_imported_file_content() {
     // sek_error_log(__FUNCTION__ . ' AJAX $_POST ?', $_POST );
     // sek_error_log(__FUNCTION__ . ' AJAX $_FILES ?', $_FILES );
     // sek_error_log(__FUNCTION__ . ' AJAX $_REQUEST ?', $_REQUEST );
@@ -262,6 +262,99 @@ function sek_ajax_get_imported_file_content() {
     // Send
     wp_send_json_success( $imported_content );
 }
+
+
+
+
+
+
+
+
+
+// fetch the content from a remotely fetched template file
+add_action( 'wp_ajax_sek_process_template_file_content', '\Nimble\sek_ajax_process_template_file_content' );
+function sek_ajax_process_template_file_content() {
+    // sek_error_log(__FUNCTION__ . ' AJAX $_POST ?', $_POST );
+    // sek_error_log(__FUNCTION__ . ' AJAX $_FILES ?', $_FILES );
+    // sek_error_log(__FUNCTION__ . ' AJAX $_REQUEST ?', $_REQUEST );
+
+    $action = 'save-customize_' . get_stylesheet();
+    if ( !check_ajax_referer( $action, 'nonce', false ) ) {
+        wp_send_json_error( __FUNCTION__ . ' => check_ajax_referer_failed' );
+    }
+    if ( !is_user_logged_in() ) {
+        wp_send_json_error( __FUNCTION__ . ' => user_unauthenticated' );
+    }
+    if ( !current_user_can( 'edit_theme_options' ) ) {
+        wp_send_json_error( __FUNCTION__ . ' => user_cant_edit_theme_options' );
+    }
+    if ( !current_user_can( 'customize' ) ) {
+        status_header( 403 );
+        wp_send_json_error( __FUNCTION__ . ' => customize_not_allowed' );
+    } else if ( !isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+        status_header( 405 );
+        wp_send_json_error( __FUNCTION__ . ' => bad_ajax_method' );
+    }
+    if ( !isset($_POST['template_data']) || empty( $_POST['template_data'] ) ) {
+        wp_send_json_error( __FUNCTION__ . ' => missing_template_data' );
+    }
+
+    //$raw_unserialized_data = @unserialize( $raw );
+    $raw_unserialized_data = json_decode( wp_unslash( $_POST['template_data'] ), true );
+    if ( ! is_array( $raw_unserialized_data ) ) {
+        wp_send_json_error( __FUNCTION__ . ' => invalid_template_data' );
+    }
+
+    //sek_error_log( __FUNCTION__ . ' =>TEMPLATE DATA ? ?', $raw_unserialized_data );
+    // VALIDATE IMPORTED CONTENT
+    // data structure :
+    // $raw_unserialized_data = array(
+    //     'data' => $seks_data,
+    //     'metas' => array(
+    //         'skope_id' => $_REQUEST['skope_id'],
+    //         'version' => NIMBLE_VERSION,
+    //         // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
+    //         'active_locations' => is_string( $_REQUEST['active_locations'] ) ? explode( ',', $_REQUEST['active_locations'] ) : array(),
+    //         'date' => date("Y-m-d")
+    //     )
+    // );
+    // check import structure
+    if ( ! is_array( $raw_unserialized_data ) || empty( $raw_unserialized_data['data']) || !is_array( $raw_unserialized_data['data'] ) || empty( $raw_unserialized_data['metas'] ) || !is_array( $raw_unserialized_data['metas'] ) ) {
+        wp_send_json_error(  'invalid_import_content' );
+        return;
+    }
+    // check version
+    // => current Nimble Version must be at least import version
+    if ( !empty( $raw_unserialized_data['metas']['version'] ) && version_compare( NIMBLE_VERSION, $raw_unserialized_data['metas']['version'], '<' ) ) {
+        wp_send_json_error( 'nimble_builder_needs_update' );
+        return;
+    }
+
+    //sek_error_log('IMPORT BEFORE FILTER ?', $raw_unserialized_data );
+
+    // in a pre-import-check context, we don't need to sniff and upload images
+    if ( isset( $_POST['pre_import_check'] ) && true == $_POST['pre_import_check'] ) {
+        remove_filter( 'nimble_pre_import', '\Nimble\sek_sniff_imported_img_url' );
+    }
+
+    $imported_content = array(
+        'data' => sek_sniff_imported_img_url( $raw_unserialized_data['data'] ),
+        'metas' => $raw_unserialized_data['metas'],
+        // the image import errors won't block the import
+        // they are used when notifying user in the customizer
+        'img_errors' => !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array()
+    );
+
+    //sek_error_log( __FUNCTION__ . ' =>IMPORT BEFORE FILTER ?', $imported_content );
+    // Send
+    wp_send_json_success( $imported_content );
+}
+
+
+
+
+
+
 
 
 // IMPORT FILTER
