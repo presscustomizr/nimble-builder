@@ -97,7 +97,7 @@
                                     })
                                     .fail( function( error_resp ) {
                                           api.errare( 'import_export_ input => pre_import_checks failed', error_resp );
-                                          api.czr_sektions.doAlwaysAfterImportApiSettingUpdate({
+                                          api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate({
                                               input : input,
                                               file_input : $file_input
                                           });
@@ -122,7 +122,7 @@
                                     });
                               break;
                               case 'sek-cancel-import' :
-                                    api.czr_sektions.doAlwaysAfterImportApiSettingUpdate({
+                                    api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate({
                                         input : input,
                                         file_input : $file_input
                                     });
