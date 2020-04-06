@@ -95,6 +95,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             var _json_data = resp.lib.templates[template_name];
                             if ( !_json_data ) {
                                   api.errare( '::import_nimble_template => the requested template is not available', resp.lib.templates  );
+                                  api.previewer.trigger('sek-notify', {
+                                        notif_id : 'missing-tmpl',
+                                        type : 'info',
+                                        duration : 10000,
+                                        message : [
+                                              '<span style="color:#0075a2">',
+                                                '<strong>',
+                                                '@missi18n the requested template is not available',
+                                                '</strong>',
+                                              '</span>'
+                                        ].join('')
+                                  });
                                   return;
                             }
 
@@ -130,6 +142,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       _input = params.input,
                       _scope = 'local';//<= when importing a template not manually, scope is always local
 
+
+                  /////////////////////////////////////////////
+                  /// HANDLE TWO CASES :
+                  /// 1) MANUAL IMPORT
+                  /// 2) TEMPLATE IMPORT FROM COLLECTION
                   if ( params.is_manual_import ) {
                         // We must have a params.input when import is manual
                         if ( _.isEmpty( _input ) ) {
@@ -260,6 +277,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   }
 
+
+                  /////////////////////////////////////////////
+                  /// NOW THAT WE HAVE OUR PROMISE
+                  /// 1) CHECK IF CONTENT IS WELL FORMED AND ELIGIBLE FOR API
+                  /// 2) LET'S PROCESS THE SETTING ID'S
+                  /// 3) ATTEMPT TO UPDATE THE SETTING API, LOCAL OR GLOBAL. ( always local for template import )
 
                   // fire a previewer loader removed on .always()
                   api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true });

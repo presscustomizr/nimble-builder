@@ -236,6 +236,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_4_1_sektions_setup_and_react_to_drop.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_7_1_sektions_tinyMceEditor.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_8_0_sektions_import_export.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_8_5_sektions_template_gallery.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_9_0_sektions_instantiate.js',
 
       // Inputs

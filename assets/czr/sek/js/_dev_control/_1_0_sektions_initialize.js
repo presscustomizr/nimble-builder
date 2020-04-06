@@ -384,6 +384,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   });//api.previewer.bind()
 
+                  // April 2020. For https://github.com/presscustomizr/nimble-builder/issues/651
+                  self.setupTemplateGallery();
+
             },//doSektionThinksOnApiReady
 
 
