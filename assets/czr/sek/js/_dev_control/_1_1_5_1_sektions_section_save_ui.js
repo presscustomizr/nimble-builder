@@ -4,28 +4,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       $.extend( CZRSeksPrototype, {
             // SAVE DIALOG BLOCK
             // fired in ::initialize()
-            setupSaveUI : function() {
+            setupSaveSectionUI : function() {
                   var self = this;
-                  self.saveUIVisible = new api.Value( false );
-                  self.saveUIVisible.bind( function( to, from, params ){
-                        self.toggleSaveUI( to, params ? params.id : null );
+                  self.saveSectionUIVisible = new api.Value( false );
+                  self.saveSectionUIVisible.bind( function( to, from, params ){
+                        self.toggleSectionSaveUI( to, params ? params.id : null );
                   });
             },
 
 
             // @return void()
-            // self.saveUIVisible.bind( function( visible ){
-            //       self.toggleSaveUI( visible );
+            // self.saveSectionUIVisible.bind( function( visible ){
+            //       self.toggleSectionSaveUI( visible );
             // });
-            toggleSaveUI : function( visible, sectionId ) {
+            toggleSectionSaveUI : function( visible, sectionId ) {
                   visible = _.isUndefined( visible ) ? true : visible;
                   var self = this,
                       _renderAndSetup = function() {
-                            $.when( self.renderAndSetupSaveUITmpl({}) ).done( function( $_el ) {
+                            $.when( self.renderAndsetupSaveSectionUITmpl({}) ).done( function( $_el ) {
                                   self.saveUIContainer = $_el;
                                   //display
                                   _.delay( function() {
-                                      self.cachedElements.$body.addClass('nimble-save-ui-visible');
+                                      self.cachedElements.$body.addClass('sek-save-section-ui-visible');
                                   }, 200 );
                                   // set section id input value
                                   $('#sek-saved-section-id').val( sectionId );
@@ -33,8 +33,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       },
                       _hide = function() {
                             var dfd = $.Deferred();
-                            self.cachedElements.$body.removeClass('nimble-save-ui-visible');
-                            if ( $( '#nimble-top-save-ui' ).length > 0 ) {
+                            self.cachedElements.$body.removeClass('sek-save-section-ui-visible');
+                            if ( $( '#nimble-top-section-save-ui' ).length > 0 ) {
                                   //remove Dom element after slide up
                                   _.delay( function() {
 
@@ -51,7 +51,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _renderAndSetup();
                   } else {
                         _hide().done( function() {
-                              self.saveUIVisible( false );//should be already false
+                              self.saveSectionUIVisible( false );//should be already false
                         });
                   }
             },
@@ -76,14 +76,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             //@param = { }
-            renderAndSetupSaveUITmpl : function( params ) {
-                  if ( $( '#nimble-top-save-ui' ).length > 0 )
-                    return $( '#nimble-top-save-ui' );
+            renderAndsetupSaveSectionUITmpl : function( params ) {
+                  if ( $( '#nimble-top-section-save-ui' ).length > 0 )
+                    return $( '#nimble-top-section-save-ui' );
 
                   var self = this;
 
                   try {
-                        _tmpl =  wp.template( 'nimble-top-save-ui' )( {} );
+                        _tmpl =  wp.template( 'nimble-top-section-save-ui' )( {} );
                   } catch( er ) {
                         api.errare( 'Error when parsing the the top note template', er );
                         return false;
@@ -91,7 +91,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $('#customize-preview').after( $( _tmpl ) );
 
                   // Attach click events
-                  $('.sek-do-save-section', '#nimble-top-save-ui').on( 'click', function(evt) {
+                  $('.sek-do-save-section', '#nimble-top-section-save-ui').on( 'click', function(evt) {
                         evt.preventDefault();
                         var sectionModel = $.extend( true, {}, self.getLevelModel( $('#sek-saved-section-id').val() ) ),
                             sek_title = $('#sek-saved-section-title').val(),
@@ -125,7 +125,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         })
                         .done( function( response ) {
                               // response is {section_post_id: 436}
-                              //self.saveUIVisible( false );
+                              //self.saveSectionUIVisible( false );
                               api.previewer.trigger('sek-notify', {
                                   type : 'success',
                                   duration : 10000,
@@ -150,12 +150,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   });//on click
 
-                  $('.sek-cancel-save', '#nimble-top-save-ui').on( 'click', function(evt) {
+                  $('.sek-cancel-save', '#nimble-top-section-save-ui').on( 'click', function(evt) {
                         evt.preventDefault();
-                        self.saveUIVisible(false);
+                        self.saveSectionUIVisible(false);
                   });
 
-                  return $( '#nimble-top-save-ui' );
+                  return $( '#nimble-top-section-save-ui' );
             }
       });//$.extend()
 })( wp.customize, jQuery );

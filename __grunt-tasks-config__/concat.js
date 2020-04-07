@@ -216,7 +216,8 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_1_sektions_topbar.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_2_sektions_navigate_history.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_3_sektions_level_tree.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_5_sektions_save_ui.js',
+      //'<%= paths.czr_assets %>sek/js/_dev_control/_1_1_5_1_sektions_section_save_ui.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_5_2_sektions_template_save_ui.js',//<= april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_6_sektions_feedback_ui.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_8_sektions_revision_history.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_2_sektions_setup_collection_setting.js',

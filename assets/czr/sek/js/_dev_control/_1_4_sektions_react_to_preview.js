@@ -728,7 +728,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             'sek-toggle-save-section-ui' : function( params ) {
                                   sendToPreview = false;
-                                  self.saveUIVisible( true, params );
+                                  self.saveSectionUIVisible( true, params );
                                   return $.Deferred(function(_dfd_) {
                                         apiParams = {
                                               // action : 'sek-refresh-level',

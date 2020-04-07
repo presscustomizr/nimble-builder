@@ -293,9 +293,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // SAVE SECTION UI
                   if ( sektionsLocalizedData.isSavedSectionEnabled ) {
-                        self.setupSaveUI();
+                        self.setupSaveSectionUI();
                   }
 
+                  // SAVE TEMPLATE UI
+                  // April 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/655
+                  if ( sektionsLocalizedData.isTemplateSaveEnabled ) {
+                        self.setupSaveTmplUI();
+                  }
 
                   // SETUP DOUBLE CLICK INSERTION THINGS
                   // Stores the preview target for double click insertion

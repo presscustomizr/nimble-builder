@@ -138,6 +138,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         window.open($(this).data('doc-href'), '_blank');
                   });
 
+                  $('.sek-tmpl-saving', self.topBarId ).on( 'click', function(evt) {
+                        // Focus on the Nimble panel
+                        // api.panel( sektionsLocalizedData.sektionsPanelId, function( _panel_ ) {
+                        //       self.rootPanelFocus();
+                        //       _panel_.focus();
+                        // });
+
+                        self.saveTmplUIVisible( true );
+                  });
+
+
                   // NOTIFICATION WHEN USING CUSTOM TEMPLATE
                   // implemented for https://github.com/presscustomizr/nimble-builder/issues/304
                   var maybePrintNotificationForUsageOfNimbleTemplate = function( templateSettingValue ) {

@@ -199,7 +199,8 @@ function sek_enqueue_controls_js_css() {
                 // ),
                 'alreadyUsedFonts' => get_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS ),
                 'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) && NIMBLE_SAVED_SECTIONS_ENABLED,
-                'isTemplateGalleryEnabled' => defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) && NIMBLE_TEMPLATE_GALLERY_ENABLED //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/651
+                'isTemplateGalleryEnabled' => defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) && NIMBLE_TEMPLATE_GALLERY_ENABLED, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/651
+                'isTemplateSaveEnabled' => defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) && NIMBLE_TEMPLATE_SAVE_ENABLED //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/655
             )
         )
     );//wp_localize_script()
@@ -728,6 +729,14 @@ function sek_print_nimble_customizer_tmpl() {
               <span class="screen-reader-text"><?php _e('Global settings', 'text_domain'); ?></span>
             </button>
           </div>
+          <?php // April 2020 => added for https://github.com/presscustomizr/nimble-builder/issues/655 ?>
+          <?php if ( defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) && NIMBLE_TEMPLATE_SAVE_ENABLED ) : ?>
+          <div class="sek-tmpl-saving">
+            <button type="button" class="far fa-save" title="<?php _e('Save as a template', 'text_domain'); ?>" data-nimble-state="enabled">
+              <span class="screen-reader-text"><?php _e('Save as a template', 'text_domain'); ?></span>
+            </button>
+          </div>
+          <?php endif; ?>
           <div class="sek-notifications"></div>
           <div class="sek-nimble-doc" data-doc-href="https://docs.presscustomizr.com/collection/334-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-customizer-topbar">
             <div class="sek-nimble-icon"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php _e('Nimble Builder','text_domain_to_replace'); ?>" title="<?php _e('Nimble online documentation', 'text_domain'); ?>"/></div>
@@ -739,8 +748,9 @@ function sek_print_nimble_customizer_tmpl() {
       </div>
     </script>
 
-    <script type="text/html" id="tmpl-nimble-top-save-ui">
-      <div id="nimble-top-save-ui" class="czr-preview-notification">
+    <?php // SECTION SAVING ?>
+    <script type="text/html" id="tmpl-nimble-top-section-save-ui">
+      <div id="nimble-top-section-save-ui" class="czr-preview-notification">
           <input id="sek-saved-section-id" type="hidden" value="">
           <div class="sek-section-title">
               <label for="sek-saved-section-title" class="customize-control-title"><?php _e('Section title', 'text_doma'); ?></label>
@@ -760,6 +770,32 @@ function sek_print_nimble_customizer_tmpl() {
           </button>
       </div>
     </script>
+
+    <?php // TEMPLATE SAVING
+    // April 2020, for https://github.com/presscustomizr/nimble-builder/issues/655
+    ?>
+    <script type="text/html" id="tmpl-nimble-top-tmpl-save-ui">
+      <div id="nimble-top-tmpl-save-ui" class="czr-preview-notification">
+          <input id="sek-saved-tmpl-id" type="hidden" value="">
+          <div class="sek-tmpl-title">
+              <label for="sek-saved-tmpl-title" class="customize-control-title"><?php _e('Template title', 'text_doma'); ?></label>
+              <input id="sek-saved-tmpl-title" type="text" value="">
+          </div>
+          <div class="sek-tmpl-description">
+              <label for="sek-saved-tmpl-description" class="customize-control-title"><?php _e('Template description', 'text_doma'); ?></label>
+              <textarea id="sek-saved-tmpl-description" type="text" value=""></textarea>
+          </div>
+          <div class="sek-tmpl-save">
+              <button class="button sek-do-save-tmpl far fa-save" type="button" title="<?php _e('Save', 'text_domain'); ?>">
+                <?php _e('Save', 'text_domain'); ?><span class="screen-reader-text"><?php _e('Save', 'text_domain'); ?></span>
+              </button>
+          </div>
+          <button class="button sek-cancel-save far fa-times-circle" type="button" title="<?php _e('Cancel', 'text_domain'); ?>">
+              <?php _e('Cancel', 'text_domain'); ?><span class="screen-reader-text"><?php _e('Cancel', 'text_domain'); ?></span>
+          </button>
+      </div>
+    </script>
+
 
     <script type="text/html" id="tmpl-nimble-level-tree">
       <div id="nimble-level-tree">

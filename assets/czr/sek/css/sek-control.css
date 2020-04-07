@@ -1123,9 +1123,10 @@ body.nimble-top-bar-visible #nimble-top-bar {
   padding: 4px 8px;*/
   color: #fff;
 }
-#nimble-top-bar .sek-settings {
+/* April 2020 : tmpl-saving btn added for https://github.com/presscustomizr/nimble-builder/issues/655 */
+#nimble-top-bar .sek-settings, #nimble-top-bar .sek-tmpl-saving {
   font-size: 18px;
-  padding: 0 10px;
+  padding: 0 5px;
 }
 
 #nimble-top-bar button {
@@ -1332,8 +1333,11 @@ transition: background 200ms linear, color 200ms linear;
 .sek-feedback-step-two-enjoying, .sek-feedback-step-two-not-enjoying, .sek-feedback-step-three-thanks { display: none;}
 
 
+
+
+
 /* TOP SAVE SECTION UI */
-#nimble-top-save-ui {
+#nimble-top-section-save-ui {
   height: 300px;
   padding: 20px;
   position: absolute;
@@ -1363,25 +1367,93 @@ transition: background 200ms linear, color 200ms linear;
   max-width: 100%;
 }
 
-#nimble-top-save-ui > div {
+#nimble-top-section-save-ui > div {
   width: 100%;
 }
 
-body.nimble-save-ui-visible #nimble-top-save-ui {
+body.sek-save-section-ui-visible #nimble-top-section-save-ui {
   /*visibility: inherit;*/
   opacity: 1;
   top:36px;
 }
 
-#nimble-top-save-ui .sek-cancel-save {
+#nimble-top-section-save-ui .sek-cancel-save {
   position: absolute;
   bottom: 10px;
   right: 10px;
 }
 
-#nimble-top-save-ui #sek-saved-section-title.error {
+#nimble-top-section-save-ui #sek-saved-section-title.error {
   border: 1px solid #ff0000;
 }
+
+
+
+
+/* TOP SAVE TMPL UI
+* introduced april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
+*/
+#nimble-top-tmpl-save-ui {
+  height: 300px;
+  padding: 20px;
+  position: absolute;
+  top: -300px;
+  /*text-align: center;*/
+  right: 0;
+  left: 0;
+  z-index: 20;
+  color: #fff;
+  display: block;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all, 0.3s ease-in-out;
+  -ms-transition: all, 0.3s ease-in-out;
+  -o-transition: all, 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  /*visibility: hidden;*/
+  opacity: 0.3;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99999;
+  /*display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+    -ms-flex-align: center;
+        align-items: center;
+  flex: 0 0 100%;*/
+  max-width: 100%;
+}
+
+#nimble-top-tmpl-save-ui > div {
+  width: 100%;
+}
+
+body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
+  /*visibility: inherit;*/
+  opacity: 1;
+  top:36px;
+}
+
+#nimble-top-tmpl-save-ui .sek-cancel-save {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+#nimble-top-tmpl-save-ui #sek-saved-tmpl-title.error {
+  border: 1px solid #ff0000;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*.czr-preview-notification a, .czr-preview-notification h2 {color: #fff; margin: 1em 0;}
 
@@ -1405,6 +1477,11 @@ body.nimble-save-ui-visible #nimble-top-save-ui {
   line-height: 1.5em;
   margin: 0.5em 0;
 }*/
+
+
+
+
+
 
 
 
