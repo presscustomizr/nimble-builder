@@ -259,6 +259,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
               // );
 
               //$sectionContent.css( 'padding-bottom',  windowWidth <= mobileWidth ? args.height : '' );
-      }
+          }
       });//$.extend()
 })( wp.customize, jQuery );
