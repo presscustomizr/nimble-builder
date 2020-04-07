@@ -5,9 +5,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             ////////////////////////////////////////////////////////
             // TEMPLATE GALLERY
             ////////////////////////////////////////////////////////
+            // APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/651
             setupTemplateGallery : function() {
+
+
                   var self = this;
-                  self.templateGalleryExpanded = new api.Value([]);
+                  self.templateGalleryExpanded = new api.Value(false);
+
+                  if ( !sektionsLocalizedData.isTemplateGalleryEnabled )
+                    return;
+
                   self.templateGalleryExpanded.bind( function( expanded ) {
                         self.cachedElements.$body.toggleClass( 'sek-template-gallery-expanded', expanded );
                         if ( expanded ) {

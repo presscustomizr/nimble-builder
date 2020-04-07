@@ -157,7 +157,6 @@ function sek_enqueue_controls_js_css() {
                     '.sek-content-preset_section-drop-zone'//between sections
                 ]),
 
-                'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ? NIMBLE_SAVED_SECTIONS_ENABLED : true,
                 'areBetaFeaturesEnabled' => sek_are_beta_features_enabled(),
 
                 'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'text_doma') ), sek_get_registered_widget_areas() ),
@@ -198,7 +197,9 @@ function sek_enqueue_controls_js_css() {
                 //     '[cfont]Comic Sans MS,Comic Sans MS,cursive',
                 //     '[gfont]Covered+By+Your+Grace:regular'
                 // ),
-                'alreadyUsedFonts' => get_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS )
+                'alreadyUsedFonts' => get_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS ),
+                'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) && NIMBLE_SAVED_SECTIONS_ENABLED,
+                'isTemplateGalleryEnabled' => defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) && NIMBLE_TEMPLATE_GALLERY_ENABLED //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/651
             )
         )
     );//wp_localize_script()

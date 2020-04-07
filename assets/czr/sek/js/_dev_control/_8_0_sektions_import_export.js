@@ -110,7 +110,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   return;
                             }
 
-                            console.log('IMPORT NIMBLE TEMPLATE', resp.lib.templates[template_name] );
+                            //console.log('IMPORT NIMBLE TEMPLATE', resp.lib.templates[template_name] );
                             api.czr_sektions.import_template({
                                   is_manual_import : false,
                                   pre_import_check : false,
@@ -126,7 +126,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
             import_template : function( params ) {
-                  console.log('IN NEW IMPORT TEMPLATE', params );
+                  //console.log('IN NEW IMPORT TEMPLATE', params );
                   params = params || {};
                   // normalize params
                   params = $.extend({
@@ -189,7 +189,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.notifications.remove( 'img-import-errors');
 
 
-                        console.log('params.file_input[0].files[0] ??', params.file_input[0].files[0] );
+                        //console.log('params.file_input[0].files[0] ??', params.file_input[0].files[0] );
                         var fd = new FormData();
                         fd.append( 'file_candidate', params.file_input[0].files[0] );
                         fd.append( 'action', 'sek_get_manually_imported_file_content' );
@@ -228,14 +228,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     var dfd = this;
                                     __request__
                                           .done( function( server_resp ) {
-                                                console.log('__request__ done in pre_import_check', server_resp );
+                                                //console.log('__request__ done in pre_import_check', server_resp );
                                                 if( !server_resp.success ) {
                                                       dfd.reject( server_resp );
                                                 }
                                                 if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
                                                       dfd.reject( server_resp );
                                                 }
-                                                console.log('ALORS DONE IN PRE IMPORT CHECK ?');
+                                                //console.log('ALORS DONE IN PRE IMPORT CHECK ?');
                                                 dfd.resolve( server_resp );
                                           })
                                           .fail( function( server_resp ) {
@@ -297,9 +297,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( !params.is_manual_import && _.isObject(server_resp) ) {
                                     server_resp = {success:true, data:server_resp};
                               }
-                              console.log('SERVER RESP ?', server_resp );
+                              //console.log('SERVER RESP ?', server_resp );
                               if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
-                                    console.log('CROTTE 2?');
+                                    api.infoLog('::import_template problem => !api.czr_sektions.isImportedContentEligibleForAPI', server_resp, params );
                                     return;
                               }
 
@@ -322,7 +322,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     return _data;
                               };
 
-                              console.log('MANUAL IMPORT DATA', server_resp );
+                              //console.log('MANUAL IMPORT DATA', server_resp );
 
                               server_resp.data.data.collection = _setIds( server_resp.data.data.collection );
                               // and try to update the api setting
