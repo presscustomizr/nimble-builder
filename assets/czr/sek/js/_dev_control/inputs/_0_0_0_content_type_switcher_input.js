@@ -19,10 +19,24 @@
                   // attach click event on data-sek-content-type buttons
                   input.container.on('click', '[data-sek-content-type]', function( evt ) {
                         evt.preventDefault();
+                        var _contentType = $(this).data( 'sek-content-type');
                         // handle the is-selected css class toggling
                         input.container.find('[data-sek-content-type]').removeClass('is-selected').attr( 'aria-pressed', false );
-                        $(this).addClass('is-selected').attr( 'aria-pressed', true );
-                        api.czr_sektions.currentContentPickerType( $(this).data( 'sek-content-type') );
+
+                        // April 2020 : template case added for https://github.com/presscustomizr/nimble-builder/issues/651
+                        if ( 'template' === _contentType ) {
+                              var _isExpanded = api.czr_sektions.templateGalleryExpanded();
+                              $(this).toggleClass('is-selected', !_isExpanded ).attr( 'aria-pressed', !_isExpanded );
+
+                              api.czr_sektions.templateGalleryExpanded(!_isExpanded);
+                        } else {
+                              // always close the template picker when selecting something else
+                              api.czr_sektions.templateGalleryExpanded(false);
+
+                              $(this).addClass('is-selected').attr( 'aria-pressed', true );
+                              // case for section and module content type
+                              api.czr_sektions.currentContentPickerType( _contentType );
+                        }
                   });
 
 
