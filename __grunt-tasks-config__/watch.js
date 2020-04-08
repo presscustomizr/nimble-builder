@@ -231,16 +231,18 @@ module.exports = {
     ],
   },
 
-  sektions_czr_css : {
+  sektions_czr_control_css : {
     options: {
       spawn : false,
       // Start a live reload server on the default port 35729
       livereload : true
     },
     files : [
-      '<%= paths.czr_assets %>sek/css/**/*.css'
+      '<%= paths.czr_assets %>sek/css/_dev_control/*.css'
     ],
-    tasks : [],
+    tasks : [
+      'concat:czr_sektions_customizer_control_css',
+    ],
   },
 
   // sektions_front_main_js : {
