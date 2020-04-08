@@ -1,0 +1,235 @@
+
+/* DEFAULT UI BUTTONS STYLE, for unit picker, etc*/
+.sek-unit-wrapper {
+  text-align: center;
+}
+.sek-ui-button-group {
+    display: inline-block;
+}
+.sek-ui-button-group .sek-ui-button:first-child {
+    border-radius: 3px 0 0 3px;
+}
+.sek-ui-button-group .sek-ui-button+.sek-ui-button {
+    margin-left: -1px;
+}
+.sek-ui-button-group .sek-ui-button:last-child {
+    border-radius: 0 3px 3px 0;
+}
+.sek-ui-button {
+    height: 28px;
+    line-height: 25px;
+    padding: 0 10px 2px;
+    border-radius: 3px;
+    white-space: nowrap;
+    border-width: 1px;
+    border-style: solid;
+    display: inline-flex;
+    text-decoration: none;
+    font-size: 12px;
+    margin: 0;
+    cursor: pointer;
+    -webkit-appearance: none;
+    background: none;
+    color: #555;
+    border-color: #ccc;
+    background: #f7f7f7;
+    box-shadow: inset 0 -1px 0 #ccc;
+    vertical-align: top;
+    -webkit-transition: opacity 0.2s ease-in-out;
+    -moz-transition: opacity 0.2s ease-in-out;
+    -ms-transition: opacity 0.2s ease-in-out;
+    -o-transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.2s ease-in-out;
+}
+
+
+.sek-ui-button:hover {
+    background: #fafafa;
+    border-color: #999;
+    box-shadow: inset 0 -1px 0 #999;
+    color: #23282d;
+    opacity: 1!important;
+}
+.sek-ui-button:active:not(:disabled) {
+    background: #eee;
+    border-color: #999;
+    box-shadow: inset 0 1px 0 #999;
+}
+.sek-ui-button:focus:not(:disabled) {
+    background: #fafafa;
+    color: #23282d;
+    border-color: #999;
+    box-shadow: inset 0 -1px 0 #999, 0 0 0 2px #fbfbfb;
+    outline: none;
+}
+
+.sek-ui-button.is-selected {
+    background: #555d66;
+    border-color: #555d66;
+    box-shadow: inset 0 -1px 0 #555d66;
+    color: #fff;
+    text-decoration: none;
+}
+.sek-ui-button.is-selected:focus:not(:disabled), .sek-ui-button.is-selected:hover {
+    background: #555d66;
+    border-color: #4f4f4f;
+    color: #fff;
+}
+.sek-ui-button.is-selected:focus:not(:disabled) {
+  box-shadow: inset 0 -1px 0 #4f4f4f;
+}
+.sek-ui-button.is-selected:focus:not(:disabled) {
+    /*box-shadow: inset 0 -1px 0 #00435d, 0 0 0 2px #bfe7f3;*/
+    outline: none;
+}
+
+
+
+/* Button style for the content type switcher */
+.sek-content-type-wrapper {
+  margin-bottom: 8px;
+  width: 100%;
+  float: left;
+}
+.sek-content-type-wrapper .sek-ui-button-group {
+  display: block;
+}
+.sek-content-type-wrapper .sek-ui-button {
+    width: 49%;
+    text-align: center;
+    display: inline-block;
+    padding: 3px 0;
+    height: auto;
+    text-transform: uppercase;
+}
+/* APRIL 2020 added for https://github.com/presscustomizr/nimble-builder/issues/651 */
+.sek-content-type-wrapper [data-sek-content-type="template"] {
+    width: 98%;
+    margin-top: 5px;
+}
+
+
+/* Button style for the option type switcher */
+[data-input-type="module_option_switcher"] .sek-content-type-wrapper { margin-bottom: 0}
+[data-input-type="module_option_switcher"] [aria-pressed="false"] {
+  opacity: 0.7;
+}
+[data-input-type="module_option_switcher"] [data-sek-option-type] {
+  position: relative;
+}
+.sek-wrap-opt-switch-btn {
+  display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    flex: 0 0 100%;
+    max-width: 100%;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+[data-input-type="module_option_switcher"] [data-sek-option-type] .sek-wrap-opt-switch-btn > i {
+  font-size: 21px;
+  line-height: 24px;
+}
+[data-input-type="module_option_switcher"] [data-sek-option-type] .sek-wrap-opt-switch-btn > span {
+  position: relative;
+  padding-left: 10px;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  text-align: center;
+}
+
+
+
+/* RESET BUTTON */
+.wp-core-ui .button.sek-reset-button {
+  font-size: 11px;
+  padding: 0 5px 1px;
+  line-height: 18px;
+  height: 25px;
+  min-height: 25px;
+  color: #555;
+  border-color: #ccc;
+}
+
+
+
+/* LEVEL UI CHEVRON ICON NEXT TO TITLE */
+.sek-animated-arrow {
+  position: absolute;
+  left: -20px;
+  margin-left: 6px;
+  top: 3px;
+  font-size: 10px;
+  color: #617379;
+  -webkit-transform: rotate(0deg);
+      -ms-transform: rotate(0deg);
+          transform: rotate(0deg);
+  -webkit-transition: -webkit-transform 0.2s ease-in-out;
+  transition: -webkit-transform 0.2s ease-in-out;
+  -o-transition: transform 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  height: 100%;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+[data-sek-expanded="true"] label > .customize-control-title .sek-animated-arrow {
+    -webkit-transform: rotate(180deg);
+        -ms-transform: rotate(180deg);
+            transform: rotate(180deg);
+}
+/* underline the control titles of the Nimble controls */
+[data-sek-expanded="true"] label > .customize-control-title .sek-ctrl-accordion-title, [data-sek-expanded] label > .customize-control-title .sek-ctrl-accordion-title:hover {
+  text-decoration: underline;
+  text-underline-position: under;
+}
+
+/* style the icon if there's one next to the title */
+.customize-control-title .sek-ctrl-accordion-title > i {
+  font-size: 1.2em;
+  position: relative;
+  top: 4px;
+  padding-right: 4px;
+}
+
+/* STYLE FOR THE LEVEL ICON NEXT TO THE CONTROL TITLE */
+.sek-level-option-icon {
+  padding-right: 5px;
+  min-width: 22px;
+  text-align: center;
+}
+
+.sek-input-title-icon {
+  position: relative;
+  top: 6px;
+}
+
+/* HIDE ADD NEW BUTTON IN MULTI-ITEM MODULES WHEN ACCORDION COLLAPSED */
+[data-sek-expanded="false"] > .czr-open-pre-add-new { display: none;}
+[data-sek-expanded="false"] > .czr-items-wrapper { display: none;}
+
+/* Nimble Logo */
+/* this class is added to a .accordion-section-title selector */
+.sek-side-nimble-logo-wrapper {
+  padding: 4px 25px 0 2px!important;
+}
+.sek-side-nimble-logo-wrapper .sek-nimble-logo {
+  height: 45px;
+}
+
+[data-input-type="code_editor"] .czr-input {
+    width: 100%;
+    float: left;
+}

@@ -1,0 +1,76 @@
+
+/* TEMPLATE GALLERY */
+#nimble-template-gallery {
+  -webkit-transition: top 0.3s ease-in-out;
+  -moz-transition: top, 0.3s ease-in-out;
+  -ms-transition: top, 0.3s ease-in-out;
+  -o-transition: top, 0.3s ease-in-out;
+  transition: top 0.3s ease-in-out;
+}
+
+#nimble-template-gallery {
+  background: rgba(240, 240, 240, 0.89)!important;
+  border-bottom: 1px solid #aaa!important;
+  color: #222!important;
+  font-size: 12px!important;
+  position: absolute;
+  top: -100vh;
+  right: 0;
+  left: 0;
+  height: calc(100vh - 36px);
+  overflow: auto;
+  padding: 15px;
+  z-index: 1000;
+}
+.sek-template-gallery-expanded #nimble-template-gallery {
+  top: 36px;
+}
+
+#nimble-template-gallery .sek-tmpl-gallery-inner {
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin-right: -10px;
+  margin-left: -10px;
+}
+#nimble-template-gallery .sek-tmpl-gallery-inner *, #nimble-template-gallery .sek-tmpl-gallery-inner *:after, #nimble-template-gallery .sek-tmpl-gallery-inner *:before{
+  box-sizing: border-box;
+}
+.sek-tmpl-gallery-inner .sek-tmpl-item {
+  -ms-flex: 0 0 33.333%;
+  flex: 0 0 33.333%;
+  max-width: 33.333%;
+  padding: 5px 10px;
+  width: 100%;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+}
+.sek-tmpl-gallery-inner .sek-tmpl-item:hover .sek-tmpl-thumb::after {
+  opacity: 0.45;
+}
+
+/*.sek-tmpl-gallery-inner .sek-tmpl-item:after, .sek-tmpl-gallery-inner .sek-tmpl-item:before {
+    box-sizing: inherit;
+}*/
+.sek-tmpl-gallery-inner .sek-tmpl-thumb {
+    cursor: pointer;
+    position: relative;
+}
+.sek-tmpl-thumb img { max-width: 100%; }
+.sek-tmpl-gallery-inner .sek-tmpl-thumb::after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #000000;
+    opacity: 0;
+    -webkit-transition: opacity 0.3s ease-in-out;
+    -moz-transition: opacity 0.3s ease-in-out;
+    -ms-transition: opacity 0.3s ease-in-out;
+    -o-transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
+}
