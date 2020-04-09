@@ -199,9 +199,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
             // AJAX
             $this->_schedule_front_ajax_actions();
             $this->_schedule_img_import_ajax_actions();
-            if ( defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) && NIMBLE_SAVED_SECTIONS_ENABLED ) {
-                $this->_schedule_section_saving_ajax_actions();
-            }
+
             // FRONT ASSETS
             $this->_schedule_front_assets_printing();
             // CUSTOOMIZER PREVIEW ASSETS

@@ -144,8 +144,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //       self.rootPanelFocus();
                         //       _panel_.focus();
                         // });
-
-                        self.saveTmplUIVisible( true );
+                        evt.preventDefault();
+                        self.saveTmplUIVisible(!self.saveTmplUIVisible());// self.saveTmplUIVisible() is initialized false
                   });
 
 

@@ -59,20 +59,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
-            // @return a tmpl model with clean ids
-            // also removes the tmpl properties "id" and "level", which are dynamically set when dragging and dropping
-            // Example of tmpl model before preprocessing
-            // {
-            //    collection: [{…}]
-            //    id: "" //<= to remove
-            //    level: "tmpl" // <= to remove
-            //    options: {bg: {…}}
-            //    ver_ini: "1.1.8"
-            // }
-            preProcessTmpl : function( tmplModel ) {
-                  console.log('TO DO => make sure template is ok to be saved');
-            },
-
 
             //@param = { }
             renderAndsetupSaveTmplUITmpl : function( params ) {
@@ -92,14 +78,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Attach click events
                   $('#nimble-top-tmpl-save-ui').on( 'click', '.sek-do-save-tmpl', function(evt) {
                         evt.preventDefault();
-                        //var tmplModel = $.extend( true, {}, self.getLevelModel( $('#sek-saved-tmpl-id').val() ) ),
                         var $_title = $('#sek-saved-tmpl-title'),
-                            sek_title = $_title.val(),
-                            sek_description = $('#sek-saved-tmpl-description').val(),
-                            sek_id = self.guid(),
-                            sek_data = self.preProcessTmpl(tmplModel);
+                            tmpl_title = $_title.val(),
+                            tmpl_description = $('#sek-saved-tmpl-description').val(),
+                            collectionSettingId = self.localSectionsSettingId(),
+                            currentLocalSettingValue = self.preProcessTmpl( api( collectionSettingId )() );
 
-                        if ( _.isEmpty( sek_title ) ) {
+                        if ( _.isEmpty( tmpl_title ) ) {
                             $_title.addClass('error');
                             api.previewer.trigger('sek-notify', {
                                   type : 'error',
@@ -116,38 +101,40 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         $('#sek-saved-tmpl-title').removeClass('error');
 
-                        // wp.ajax.post( 'sek_save_template', {
-                        //       nonce: api.settings.nonce.save,
-                        //       sek_title: sek_title,
-                        //       sek_description: sek_description,
-                        //       sek_id: sek_id,
-                        //       sek_data: JSON.stringify( sek_data )
-                        // })
-                        // .done( function( response ) {
-                        //       // response is {tmpl_post_id: 436}
-                        //       //self.saveTmplUIVisible( false );
-                        //       api.previewer.trigger('sek-notify', {
-                        //           type : 'success',
-                        //           duration : 10000,
-                        //           message : [
-                        //                 '<span style="font-size:0.95em">',
-                        //                   '<strong>@missi18n Your template has been saved.</strong>',
-                        //                 '</span>'
-                        //           ].join('')
-                        //       });
-                        // })
-                        // .fail( function( er ) {
-                        //       api.errorLog( 'ajax sek_save_template => error', er );
-                        //       api.previewer.trigger('sek-notify', {
-                        //           type : 'error',
-                        //           duration : 10000,
-                        //           message : [
-                        //                 '<span style="font-size:0.95em">',
-                        //                   '<strong>@missi18n error when saving template</strong>',
-                        //                 '</span>'
-                        //           ].join('')
-                        //       });
-                        // });
+                        wp.ajax.post( 'sek_save_user_template', {
+                              nonce: api.settings.nonce.save,
+                              tmpl_title: tmpl_title,
+                              tmpl_description: tmpl_description,
+                              tmpl_data: JSON.stringify( currentLocalSettingValue ),
+                              //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                        })
+                        .done( function( response ) {
+                              console.log('ALORS SERVER RESP FOR SAVED TEMPLATE ?', response );
+                              // response is {tmpl_post_id: 436}
+                              //self.saveTmplUIVisible( false );
+                              api.previewer.trigger('sek-notify', {
+                                  type : 'success',
+                                  duration : 10000,
+                                  message : [
+                                        '<span style="font-size:0.95em">',
+                                          '<strong>@missi18n Your template has been saved.</strong>',
+                                        '</span>'
+                                  ].join('')
+                              });
+                        })
+                        .fail( function( er ) {
+                              console.log('ER ??', er );
+                              api.errorLog( 'ajax sek_save_template => error', er );
+                              api.previewer.trigger('sek-notify', {
+                                  type : 'error',
+                                  duration : 10000,
+                                  message : [
+                                        '<span style="font-size:0.95em">',
+                                          '<strong>@missi18n error when saving template</strong>',
+                                        '</span>'
+                                  ].join('')
+                              });
+                        });
                   });//on click
 
                   $('.sek-cancel-save', '#nimble-top-tmpl-save-ui').on( 'click', function(evt) {
@@ -156,6 +143,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   return $( '#nimble-top-tmpl-save-ui' );
-            }
+            },
+
+
+
+            // @return a tmpl model with clean ids
+            // also removes the tmpl properties "id" and "level", which are dynamically set when dragging and dropping
+            // Example of tmpl model before preprocessing
+            // {
+            //    collection: [{…}]
+            //    id: "" //<= to remove
+            //    level: "tmpl" // <= to remove
+            //    options: {bg: {…}}
+            //    ver_ini: "1.1.8"
+            // }
+            preProcessTmpl : function( tmpl_data ) {
+                  console.log('TO DO => make sure template is ok to be saved');
+                  return tmpl_data;
+            },
       });//$.extend()
 })( wp.customize, jQuery );

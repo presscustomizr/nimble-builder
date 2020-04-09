@@ -413,8 +413,9 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_6_0_sektions_nimble_customize_link.php',
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_7_0_sektions_retro_compatibilities.php',
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_0_sektions_functions_seks_post_set_get.php',
-      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_1_sektions_functions_saved_sektions.php',
-      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_2_sektions_functions_revision_history.php'
+      //'<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_1_sektions_functions_saved_sektions.php', // <= april 2020 : commented because not used yet
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_2_sektions_functions_save_templates.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_5_sektions_functions_revision_history.php'
     ],
     dest: '<%= paths.sektions %>ccat-constants-and-helper-functions.php',
   },
@@ -534,6 +535,7 @@ module.exports = {
         '<%= paths.sektions %>_customizer_dev_php/2_0_0_sektions_customizer_dynamic_registration.php',
         '<%= paths.sektions %>_customizer_dev_php/7_0_0_sektions_detached_tinymce.php',
         '<%= paths.sektions %>_customizer_dev_php/8_0_0_sektions_customizer_import_export.php',
+        '<%= paths.sektions %>_customizer_dev_php/8_1_0_sektions_customizer_save_template_and_section.php',
         '<%= paths.sektions %>_customizer_dev_php/9_0_0_sektions_wp_5_0_gutenberg_compat.php',
       ],
       dest: '<%= paths.sektions %>ccat-czr-sektions.php',

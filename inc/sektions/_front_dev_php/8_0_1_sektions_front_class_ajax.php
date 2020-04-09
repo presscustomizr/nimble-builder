@@ -105,15 +105,6 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             add_action( 'wp_ajax_sek_import_attachment', array( $this, 'sek_ajax_import_attachment' ) );
         }
 
-        ////////////////////////////////////////////////////////////////
-        // SECTION SAVING
-        // Fired in __construct()
-        function _schedule_section_saving_ajax_actions() {
-            // Writes the saved section in a CPT + update the saved section option
-            add_action( 'wp_ajax_sek_save_section', array( $this, 'sek_ajax_save_section' ) );
-            // Fetches the user_saved sections
-            add_action( 'wp_ajax_sek_get_user_saved_sections', array( $this, 'sek_sek_get_user_saved_sections' ) );
-        }
 
         ////////////////////////////////////////////////////////////////
         // PRESET SECTIONS
@@ -463,93 +454,6 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
 
 
-
-
-
-
-
-
-
-
-        /////////////////////////////////////////////////////////////////
-        // hook : wp_ajax_sek_save_section
-        function sek_ajax_save_section() {
-            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
-
-            // We must have a title and a section_id and sektion data
-            if ( empty( $_POST['sek_title']) ) {
-                wp_send_json_error( __FUNCTION__ . ' => missing title' );
-            }
-            if ( empty( $_POST['sek_id']) ) {
-                wp_send_json_error( __FUNCTION__ . ' => missing sektion_id' );
-            }
-            if ( empty( $_POST['sek_data']) ) {
-                wp_send_json_error( __FUNCTION__ . ' => missing sektion data' );
-            }
-            if ( ! is_string( $_POST['sek_data'] ) ) {
-                wp_send_json_error( __FUNCTION__ . ' => the sektion data must be a json stringified' );
-            }
-            // sek_error_log('SEKS DATA ?', $_POST['sek_data'] );
-            // sek_error_log('json decode ?', json_decode( wp_unslash( $_POST['sek_data'] ), true ) );
-            $sektion_to_save = array(
-                'title' => $_POST['sek_title'],
-                'description' => $_POST['sek_description'],
-                'id' => $_POST['sek_id'],
-                'type' => 'content',//in the future will be used to differentiate header, content and footer sections
-                'creation_date' => date("Y-m-d H:i:s"),
-                'update_date' => '',
-                'data' => $_POST['sek_data']//<= json stringified
-            );
-
-            $saved_section_post = sek_update_saved_seks_post( $sektion_to_save );
-            if ( is_wp_error( $saved_section_post ) ) {
-                wp_send_json_error( __FUNCTION__ . ' => error when invoking sek_update_saved_seks_post()' );
-            } else {
-                // sek_error_log( 'ALORS CE POST?', $saved_section_post );
-                wp_send_json_success( [ 'section_post_id' => $saved_section_post->ID ] );
-            }
-
-            //sek_error_log( __FUNCTION__ . '$_POST' ,  $_POST);
-        }
-
-
-        // @hook wp_ajax_sek_sek_get_user_saved_sections
-        function sek_sek_get_user_saved_sections() {
-            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
-
-            // We must have a section_id provided
-            if ( empty( $_POST['preset_section_id']) || ! is_string( $_POST['preset_section_id'] ) ) {
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => missing or invalid preset_section_id' );
-            }
-            $section_id = $_POST['preset_section_id'];
-
-            $section_data_decoded_from_custom_post_type = sek_get_saved_sektion_data( $section_id );
-            if ( ! empty( $section_data_decoded_from_custom_post_type ) ) {
-                wp_send_json_success( $section_data_decoded_from_custom_post_type );
-            } else {
-                $all_saved_seks = get_option( NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS );
-                if ( ! is_array( $all_saved_seks ) || empty( $all_saved_seks[$section_id]) ) {
-                    sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => missing section data in get_option( NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS )' );
-                }
-                // $section_infos is an array
-                // Array
-                // (
-                //     [post_id] => 399
-                //     [title] => My section one
-                //     [description] =>
-                //     [creation_date] => 2018-10-29 13:52:54
-                //     [type] => content
-                // )
-                $section_infos = $all_saved_seks[$section_id];
-                wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => missing post data for section title ' . $section_infos['title'] );
-            }
-        }
-
-
-
-
-
-
         ////////////////////////////////////////////////////////////////
         // REVISIONS
         // Fired in __construct()
@@ -815,12 +719,6 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
           return ('subsets' == $what) ? apply_filters( 'sek_font_picker_gfonts_subsets ', $subsets ) : apply_filters( 'sek_font_picker_gfonts', $gfonts )  ;
         }
-
-
-
-
-
-
 
 
 
