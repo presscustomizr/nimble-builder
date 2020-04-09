@@ -1,35 +1,5 @@
 <?php
 ////////////////////////////////////////////////////////////////
-// GENERIC HELPER FIRED IN ALL AJAX CALLBACKS
-// @param $params = array('check_nonce' => true )
-function sek_do_ajax_pre_checks( $params = array() ) {
-    $params = wp_parse_args( $params, array( 'check_nonce' => true ) );
-    if ( $params['check_nonce'] ) {
-        $action = 'save-customize_' . get_stylesheet();
-        if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
-             wp_send_json_error( array(
-                'code' => 'invalid_nonce',
-                'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' => check_ajax_referer() failed.' ),
-            ) );
-        }
-    }
-
-    if ( ! is_user_logged_in() ) {
-        wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
-    }
-    if ( ! current_user_can( 'edit_theme_options' ) ) {
-      wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
-    }
-    if ( ! current_user_can( 'customize' ) ) {
-        status_header( 403 );
-        wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-    } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
-        status_header( 405 );
-        wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
-    }
-}//sek_do_ajax_pre_checks()
-
-////////////////////////////////////////////////////////////////
 // TEMPLATE SAVE
 // introduced in april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
 // ENABLED WHEN CONSTANT NIMBLE_TEMPLATE_SAVE_ENABLED === true

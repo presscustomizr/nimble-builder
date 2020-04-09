@@ -198,7 +198,6 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
 
             // AJAX
             $this->_schedule_front_ajax_actions();
-            $this->_schedule_img_import_ajax_actions();
 
             // FRONT ASSETS
             $this->_schedule_front_assets_printing();
