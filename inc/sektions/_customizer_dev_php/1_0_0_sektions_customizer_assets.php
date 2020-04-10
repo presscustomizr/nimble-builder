@@ -776,7 +776,20 @@ function sek_print_nimble_customizer_tmpl() {
     ?>
     <script type="text/html" id="tmpl-nimble-top-tmpl-save-ui">
       <div id="nimble-top-tmpl-save-ui" class="czr-preview-notification">
-          <input id="sek-saved-tmpl-id" type="hidden" value="">
+          <div class="sek-save-tmpl-mode-switcher">
+            <div aria-label="<?php _e('Save mode', 'text_doma'); ?>" class="sek-ui-button-group" role="group">
+              <button aria-pressed="true" data-sek-save-tmpl-mode="add_new" class="sek-ui-button far fa-save" type="button" title="<?php _e('Save as new template', 'text_domain'); ?>">
+                  <?php _e('Save as new template', 'text_domain'); ?>
+              </button>
+              <button aria-pressed="false" data-sek-save-tmpl-mode="update" class="sek-ui-button far fa-edit" type="button" title="<?php _e('Update a template', 'text_domain'); ?>">
+                  <?php _e('Update a template', 'text_domain'); ?>
+              </button>
+              <button aria-pressed="false" data-sek-save-tmpl-mode="remove" class="sek-ui-button fas fa-trash" type="button" title="<?php _e('Remove template(s)', 'text_domain'); ?>">
+                  <?php _e('Remove template(s)', 'text_domain'); ?>
+              </button>
+            </div>
+          </div>
+          <select class="sek-saved-tmpl-picker" style="display:none;"></select>
           <div class="sek-tmpl-title">
               <label for="sek-saved-tmpl-title" class="customize-control-title"><?php _e('Template title', 'text_doma'); ?></label>
               <input id="sek-saved-tmpl-title" type="text" value="">
@@ -786,12 +799,22 @@ function sek_print_nimble_customizer_tmpl() {
               <textarea id="sek-saved-tmpl-description" type="text" value=""></textarea>
           </div>
           <div class="sek-tmpl-save">
-              <button class="button sek-do-save-tmpl far fa-save" type="button" title="<?php _e('Save', 'text_domain'); ?>">
-                <?php _e('Save', 'text_domain'); ?><span class="screen-reader-text"><?php _e('Save', 'text_domain'); ?></span>
+              <button class="button sek-do-save-tmpl far fa-save" type="button" title="<?php _e('Save template', 'text_domain'); ?>">
+                <?php _e('Save template', 'text_domain'); ?>
+              </button>
+          </div>
+          <div class="sek-tmpl-update">
+              <button class="button sek-do-update-tmpl far fa-save" type="button" title="<?php _e('Update template', 'text_domain'); ?>">
+                <?php _e('Update template', 'text_domain'); ?>
+              </button>
+          </div>
+          <div class="sek-tmpl-remove">
+              <button class="button sek-do-update-tmpl fas fa-trash" type="button" title="<?php _e('Remove template', 'text_domain'); ?>">
+                <?php _e('Remove template', 'text_domain'); ?>
               </button>
           </div>
           <button class="button sek-cancel-save far fa-times-circle" type="button" title="<?php _e('Cancel', 'text_domain'); ?>">
-              <?php _e('Cancel', 'text_domain'); ?><span class="screen-reader-text"><?php _e('Cancel', 'text_domain'); ?></span>
+              <?php _e('Cancel', 'text_domain'); ?>
           </button>
       </div>
     </script>

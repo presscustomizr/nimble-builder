@@ -1,8 +1,8 @@
 <?php
 /* ------------------------------------------------------------------------- *
- *  SAVED SEKTIONS
+ *  SAVED TEMPLATES
 /* ------------------------------------------------------------------------- */
-// SAVED SEKTIONS POST TYPE
+// SAVED TEMPLATES POST TYPE
 // CPT for template : 'nimble_template'
 register_post_type( NIMBLE_TEMPLATE_CPT , array(
     'labels' => array(
@@ -38,12 +38,9 @@ register_post_type( NIMBLE_TEMPLATE_CPT , array(
 
 
 /**
- * Fetch the `nimble_saved_seks` post for a given {skope_id}
+ * Fetch the 'nimble_template' post for a given post_name
  *
- * @since 4.7.0
- *
- * @param string $stylesheet Optional. A theme object stylesheet name. Defaults to the current theme.
- * @return WP_Post|null The skope post or null if none exists.
+ * @return WP_Post|null
  */
 function sek_get_saved_tmpl_post( $tmpl_post_name ) {
     // $sek_post_query_vars = array(
@@ -92,7 +89,9 @@ function sek_get_saved_tmpl_post( $tmpl_post_name ) {
     return $post;
 }
 
-// @return the saved sektion data collection : columns, options as an array
+
+
+// @return the saved template data collection
 function sek_get_saved_template_data( $tmpl_post_name ) {
     $sek_post = sek_get_saved_template_post( $tmpl_post_name );
     $tmpl_data = array();
@@ -117,6 +116,45 @@ function sek_get_saved_template_data( $tmpl_post_name ) {
 }
 
 
+// invoked on 'wp_ajax_sek_get_user_saved_templates'
+// @return an unserialized array of all templates saved by user
+function sek_get_all_saved_templates() {
+    $sek_post_query_vars = array(
+        'post_type'              => NIMBLE_TEMPLATE_CPT,
+        'post_status'            => 'publish',
+        //'name'                   => sanitize_title( NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
+        'posts_per_page'         => -1,
+        'no_found_rows'          => true,
+        'cache_results'          => true,
+        'update_post_meta_cache' => false,
+        'update_post_term_cache' => false,
+        'lazy_load_term_meta'    => false,
+
+        'orderby' => 'modified',
+        'order' => 'DESC'
+    );
+    $query = new \WP_Query( $sek_post_query_vars );
+    if ( ! is_array( $query->posts ) || empty( $query->posts ) )
+      return;
+
+    $collection = array();
+
+    sek_error_log('QUERY ??', $query );
+
+    foreach ( $query->posts as $post_object ) {
+        $content = maybe_unserialize( $post_object->post_content );
+        if ( !is_array($content) ) {
+            continue;
+        }
+        // When updating a template, we only need to return title and description
+        $collection[$post_object->post_name] = array(
+            'title' => !empty($content['title']) ? $content['title'] : '',
+            'description' => !empty($content['description']) ? $content['description'] : ''
+        );
+    }
+
+    return $collection;
+}
 
 
 

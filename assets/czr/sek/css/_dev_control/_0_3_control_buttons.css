@@ -86,22 +86,24 @@
 
 
 /* Button style for the content type switcher */
-.sek-content-type-wrapper {
+.sek-content-type-wrapper, .sek-save-tmpl-mode-switcher {
   margin-bottom: 8px;
   width: 100%;
   float: left;
 }
-.sek-content-type-wrapper .sek-ui-button-group {
+.sek-content-type-wrapper .sek-ui-button-group, .sek-save-tmpl-mode-switcher .sek-ui-button-group {
   display: block;
 }
-.sek-content-type-wrapper .sek-ui-button {
-    width: 49%;
+.sek-content-type-wrapper .sek-ui-button, .sek-save-tmpl-mode-switcher .sek-ui-button {
     text-align: center;
     display: inline-block;
     padding: 3px 0;
     height: auto;
     text-transform: uppercase;
 }
+.sek-content-type-wrapper .sek-ui-button { width: 49%; }
+.sek-save-tmpl-mode-switcher .sek-ui-button { width: 32%; }
+
 /* APRIL 2020 added for https://github.com/presscustomizr/nimble-builder/issues/651 */
 .sek-content-type-wrapper [data-sek-content-type="template"] {
     width: 98%;

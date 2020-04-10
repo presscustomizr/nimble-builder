@@ -45,6 +45,23 @@ function sek_ajax_save_user_template() {
     //sek_error_log( __FUNCTION__ . '$_POST' ,  $_POST);
 }
 
+// Fetches the user saved templates
+add_action( 'wp_ajax_sek_get_all_saved_tmpl', '\Nimble\sek_ajax_get_all_saved_templates' );
+// @hook wp_ajax_sek_get_user_saved_templates
+function sek_ajax_get_all_saved_templates() {
+    sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+
+    $decoded_templates = sek_get_all_saved_templates();
+
+    if ( !empty( $decoded_templates ) && is_array($decoded_templates) ) {
+        wp_send_json_success( $decoded_templates );
+    } else {
+        if ( !empty( $decoded_templates ) ) {
+            sek_error_log(  __FUNCTION__ . ' error => invalid templates returned', $decoded_templates );
+            wp_send_json_error(  __FUNCTION__ . ' error => invalid templates returned' );
+        }
+    }
+}
 
 
 
@@ -114,7 +131,7 @@ function sek_sek_get_user_saved_sections() {
 
     // We must have a section_id provided
     if ( empty( $_POST['preset_section_id']) || ! is_string( $_POST['preset_section_id'] ) ) {
-        wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => missing or invalid preset_section_id' );
+        wp_send_json_error( __FUNCTION__ . ' => missing or invalid preset_section_id' );
     }
     $section_id = $_POST['preset_section_id'];
 
@@ -124,7 +141,7 @@ function sek_sek_get_user_saved_sections() {
     } else {
         $all_saved_seks = get_option( NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS );
         if ( ! is_array( $all_saved_seks ) || empty( $all_saved_seks[$section_id]) ) {
-            sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => missing section data in get_option( NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS )' );
+            sek_error_log( __FUNCTION__ . ' => missing section data in get_option( NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS )' );
         }
         // $section_infos is an array
         // Array
@@ -136,7 +153,7 @@ function sek_sek_get_user_saved_sections() {
         //     [type] => content
         // )
         $section_infos = $all_saved_seks[$section_id];
-        wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => missing post data for section title ' . $section_infos['title'] );
+        wp_send_json_error( __FUNCTION__ . ' => missing post data for section title ' . $section_infos['title'] );
     }
 }
 
