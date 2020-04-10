@@ -1250,7 +1250,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             // Search query on Nimble CPT
             $sek_post_query_vars = array(
                 'post_type'              => NIMBLE_CPT,
-                'post_status'            => get_post_stati(),
+                'post_status'            => 'publish',//get_post_stati(),
                 'posts_per_page'         => -1,
                 'no_found_rows'          => true,
                 'cache_results'          => true,
