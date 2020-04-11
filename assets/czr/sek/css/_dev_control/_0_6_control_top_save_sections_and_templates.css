@@ -1,6 +1,4 @@
 
-
-
 /* TOP SAVE TMPL UI
 * introduced april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
 */
@@ -33,11 +31,13 @@
         align-items: center;
   flex: 0 0 100%;*/
   max-width: 100%;
+  font-size: 16px;
+    line-height: 1.5em;
 }
 
-#nimble-top-tmpl-save-ui > div {
+/*#nimble-top-tmpl-save-ui > div {
   width: 100%;
-}
+}*/
 
 body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
   /*visibility: inherit;*/
@@ -45,7 +45,7 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
   top:36px;
 }
 
-#nimble-top-tmpl-save-ui .sek-cancel-save {
+#nimble-top-tmpl-save-ui .sek-close-dialog {
   position: absolute;
   bottom: 10px;
   right: 10px;
@@ -54,6 +54,55 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
 #nimble-top-tmpl-save-ui #sek-saved-tmpl-title.error {
   border: 1px solid #ff0000;
 }
+
+
+/* INPUT STYLE */
+.sek-tmpl-title, .sek-tmpl-description, select.sek-saved-tmpl-picker {
+  margin-top: 10px;
+  float: left;
+  clear: both;
+  width: 100%;
+}
+
+.sek-tmpl-description textarea, input#sek-saved-tmpl-title, select.sek-saved-tmpl-picker {
+  width: 97%;
+  max-width: none;
+}
+.sek-tmpl-description textarea {
+  min-height: 100px;
+}
+.sek-saved-tmpl-picker,
+.sek-tmpl-title,
+.sek-tmpl-description,
+.sek-save-tmpl-action .sek-do-save-tmpl,
+.sek-save-tmpl-action .sek-do-update-tmpl,
+.sek-save-tmpl-action .sek-do-remove-tmpl { display: none;}
+
+/* the template picker is visible when template collection has been ajaxily fetched */
+.tmpl-collection-populated .sek-saved-tmpl-picker{display:block}
+
+.sek-tmpl-remove-dialog {
+  display: none;
+  color: red;
+  background: #ffffff;
+  padding: 5px;
+  text-transform: uppercase;
+}
+/* VISIBILITY = f(mode) */
+[data-sek-tmpl-dialog-mode="save"] .sek-saved-tmpl-picker {display: none;}
+[data-sek-tmpl-dialog-mode="save"] .sek-tmpl-title {display: block;}
+[data-sek-tmpl-dialog-mode="save"] .sek-tmpl-description {display: block;}
+[data-sek-tmpl-dialog-mode="save"] .sek-do-save-tmpl {display: block;}
+
+[data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-tmpl-title {display: block;}
+[data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-tmpl-description {display: block;}
+[data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-do-update-tmpl {display: block;}
+
+[data-sek-tmpl-dialog-mode="remove"].sek-tmpl-remove-selected .sek-do-remove-tmpl {display: block;}
+
+
+
+
 
 
 
@@ -99,7 +148,7 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
   top:36px;
 }
 
-#nimble-top-section-save-ui .sek-cancel-save {
+#nimble-top-section-save-ui .sek-close-dialog {
   position: absolute;
   bottom: 10px;
   right: 10px;

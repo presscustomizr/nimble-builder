@@ -150,7 +150,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   });//on click
 
-                  $('.sek-cancel-save', '#nimble-top-section-save-ui').on( 'click', function(evt) {
+                  $('.sek-close-dialog', '#nimble-top-section-save-ui').on( 'click', function(evt) {
                         evt.preventDefault();
                         self.saveSectionUIVisible(false);
                   });

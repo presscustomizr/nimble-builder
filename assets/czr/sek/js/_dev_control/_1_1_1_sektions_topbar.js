@@ -145,7 +145,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //       _panel_.focus();
                         // });
                         evt.preventDefault();
-                        self.saveTmplUIVisible(!self.saveTmplUIVisible());// self.saveTmplUIVisible() is initialized false
+                        self.tmplDialogVisible(!self.tmplDialogVisible());// self.tmplDialogVisible() is initialized false
                   });
 
 
