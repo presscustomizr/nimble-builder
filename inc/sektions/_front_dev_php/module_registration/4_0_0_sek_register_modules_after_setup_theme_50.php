@@ -2,7 +2,9 @@
 // The base fmk is loaded @after_setup_theme:10
 add_action( 'after_setup_theme', '\Nimble\sek_schedule_module_registration', 50 );
 
-// When not customizing, we don't need to register all modules
+// On front we register only the necessary modules
+// When customizing, we register all of them
+// On admin, we register none
 function sek_schedule_module_registration() {
     // we load all modules when :
     // 1) customizing
@@ -17,7 +19,11 @@ function sek_schedule_module_registration() {
         // prebuilt sections are registered from a JSON since https://github.com/presscustomizr/nimble-builder/issues/431
         sek_register_prebuilt_section_modules();
     } else {
-        add_action( 'wp', '\Nimble\sek_register_modules_when_not_customizing_and_not_ajaxing', PHP_INT_MAX );
+        // Condition is_admin() added in april 2020
+        // fixes https://github.com/presscustomizr/nimble-builder/issues/658
+        if ( ! is_admin() ) {
+            add_action( 'wp', '\Nimble\sek_register_modules_when_not_customizing_and_not_ajaxing', PHP_INT_MAX );
+        }
     }
 }
 
