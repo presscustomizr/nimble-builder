@@ -967,7 +967,6 @@ credits : Gutenberg team @wordpress */
 }
 .sek-ui-button {
     height: 28px;
-    line-height: 25px;
     padding: 0 10px 2px;
     border-radius: 3px;
     white-space: nowrap;
@@ -976,6 +975,8 @@ credits : Gutenberg team @wordpress */
     display: inline-flex;
     text-decoration: none;
     font-size: 12px;
+    line-height: 25px;
+    font-weight: normal;
     margin: 0;
     cursor: pointer;
     -webkit-appearance: none;
@@ -1013,42 +1014,47 @@ credits : Gutenberg team @wordpress */
     outline: none;
 }
 
-.sek-ui-button.is-selected {
+.sek-ui-button[aria-pressed="true"] {
     background: #555d66;
     border-color: #555d66;
     box-shadow: inset 0 -1px 0 #555d66;
     color: #fff;
     text-decoration: none;
 }
-.sek-ui-button.is-selected:focus:not(:disabled), .sek-ui-button.is-selected:hover {
+.sek-ui-button[aria-pressed="true"]:focus:not(:disabled), .sek-ui-button[aria-pressed="true"]:hover {
     background: #555d66;
     border-color: #4f4f4f;
     color: #fff;
 }
-.sek-ui-button.is-selected:focus:not(:disabled) {
+.sek-ui-button[aria-pressed="true"]:focus:not(:disabled) {
   box-shadow: inset 0 -1px 0 #4f4f4f;
 }
-.sek-ui-button.is-selected:focus:not(:disabled) {
+.sek-ui-button[aria-pressed="true"]:focus:not(:disabled) {
     /*box-shadow: inset 0 -1px 0 #00435d, 0 0 0 2px #bfe7f3;*/
     outline: none;
 }
 
 
 
-/* Button style for the content type switcher */
-.sek-content-type-wrapper, .sek-save-tmpl-mode-switcher {
+/* Button style for the content type switcher and template dialog */
+.sek-content-type-wrapper,
+.sek-save-tmpl-mode-switcher,
+.sek-save-tmpl-action {
   margin-bottom: 8px;
   width: 100%;
   float: left;
 }
-.sek-content-type-wrapper .sek-ui-button-group, .sek-save-tmpl-mode-switcher .sek-ui-button-group {
+.sek-content-type-wrapper .sek-ui-button-group,
+.sek-save-tmpl-mode-switcher .sek-ui-button-group,
+.sek-save-tmpl-action .sek-ui-button-group {
   display: block;
 }
-
-.sek-content-type-wrapper .sek-ui-button, .sek-save-tmpl-mode-switcher .sek-ui-button {
+.sek-content-type-wrapper .sek-ui-button,
+.sek-save-tmpl-mode-switcher .sek-ui-button,
+.sek-save-tmpl-action .sek-ui-button {
     text-align: center;
     display: inline-block;
-    padding: 3px 0;
+    padding: 3px 10px;
     height: auto;
     text-transform: uppercase;
 }
@@ -1459,6 +1465,114 @@ transition: background 200ms linear, color 200ms linear;
 }
 
 .sek-feedback-step-two-enjoying, .sek-feedback-step-two-not-enjoying, .sek-feedback-step-three-thanks { display: none;}
+/* TOP SAVE TMPL UI
+* introduced april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
+*/
+#nimble-top-tmpl-save-ui {
+  height: auto;
+  min-height: 300px;
+  padding: 20px;
+  position: absolute;
+  top: -300px;
+  /*text-align: center;*/
+  right: 0;
+  left: 0;
+  z-index: 20;
+  color: #fff;
+  display: block;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all, 0.3s ease-in-out;
+  -ms-transition: all, 0.3s ease-in-out;
+  -o-transition: all, 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  /*visibility: hidden;*/
+  opacity: 0.3;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99999;
+  /*display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+    -ms-flex-align: center;
+        align-items: center;
+  flex: 0 0 100%;*/
+  max-width: 100%;
+  font-size: 16px;
+    line-height: 1.5em;
+}
+
+/*#nimble-top-tmpl-save-ui > div {
+  width: 100%;
+}*/
+
+body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
+  /*visibility: inherit;*/
+  opacity: 1;
+  top:36px;
+}
+
+#nimble-top-tmpl-save-ui .sek-close-dialog {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+#nimble-top-tmpl-save-ui #sek-saved-tmpl-title.error {
+  border: 1px solid #ff0000;
+}
+
+
+/* INPUT STYLE */
+.sek-tmpl-title, .sek-tmpl-description, select.sek-saved-tmpl-picker {
+  margin-top: 10px;
+  float: left;
+  clear: both;
+  width: 100%;
+}
+
+.sek-tmpl-description textarea, input#sek-saved-tmpl-title, select.sek-saved-tmpl-picker {
+  width: 97%;
+  max-width: none;
+}
+.sek-tmpl-description textarea {
+  min-height: 100px;
+}
+.sek-saved-tmpl-picker,
+.sek-tmpl-title,
+.sek-tmpl-description,
+.sek-save-tmpl-action .sek-do-save-tmpl,
+.sek-save-tmpl-action .sek-do-update-tmpl,
+.sek-save-tmpl-action .sek-do-remove-tmpl { display: none;}
+
+/* the template picker is visible when template collection has been ajaxily fetched */
+.tmpl-collection-populated .sek-saved-tmpl-picker{display:block}
+
+.sek-tmpl-remove-dialog {
+  display: none;
+  color: red;
+  background: #ffffff;
+  padding: 5px;
+  text-transform: uppercase;
+}
+/* VISIBILITY = f(mode) */
+[data-sek-tmpl-dialog-mode="save"] .sek-saved-tmpl-picker {display: none;}
+[data-sek-tmpl-dialog-mode="save"] .sek-tmpl-title {display: block;}
+[data-sek-tmpl-dialog-mode="save"] .sek-tmpl-description {display: block;}
+[data-sek-tmpl-dialog-mode="save"] .sek-do-save-tmpl {display: block;}
+
+[data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-tmpl-title {display: block;}
+[data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-tmpl-description {display: block;}
+[data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-do-update-tmpl {display: block;}
+
+[data-sek-tmpl-dialog-mode="remove"].sek-tmpl-remove-selected .sek-do-remove-tmpl {display: block;}
+
+
+
+
+
+
+
+
 /* TOP SAVE SECTION UI */
 #nimble-top-section-save-ui {
   height: 300px;
@@ -1500,7 +1614,7 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
   top:36px;
 }
 
-#nimble-top-section-save-ui .sek-cancel-save {
+#nimble-top-section-save-ui .sek-close-dialog {
   position: absolute;
   bottom: 10px;
   right: 10px;
@@ -1509,63 +1623,6 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
 #nimble-top-section-save-ui #sek-saved-section-title.error {
   border: 1px solid #ff0000;
 }
-
-
-
-/* TOP SAVE TMPL UI
-* introduced april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
-*/
-#nimble-top-tmpl-save-ui {
-  height: auto;
-  min-height: 300px;
-  padding: 20px;
-  position: absolute;
-  top: -300px;
-  /*text-align: center;*/
-  right: 0;
-  left: 0;
-  z-index: 20;
-  color: #fff;
-  display: block;
-  -webkit-transition: all 0.3s ease-in-out;
-  -moz-transition: all, 0.3s ease-in-out;
-  -ms-transition: all, 0.3s ease-in-out;
-  -o-transition: all, 0.3s ease-in-out;
-  transition: all 0.3s ease-in-out;
-  /*visibility: hidden;*/
-  opacity: 0.3;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 99999;
-  /*display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-    -ms-flex-align: center;
-        align-items: center;
-  flex: 0 0 100%;*/
-  max-width: 100%;
-}
-
-#nimble-top-tmpl-save-ui > div {
-  width: 100%;
-}
-
-body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
-  /*visibility: inherit;*/
-  opacity: 1;
-  top:36px;
-}
-
-#nimble-top-tmpl-save-ui .sek-cancel-save {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-}
-
-#nimble-top-tmpl-save-ui #sek-saved-tmpl-title.error {
-  border: 1px solid #ff0000;
-}
-
 /* TEMPLATE GALLERY */
 #nimble-template-gallery {
   -webkit-transition: top 0.3s ease-in-out;
