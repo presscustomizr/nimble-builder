@@ -167,20 +167,18 @@ if ( ! function_exists( 'Nimble\sek_render_post') ) {
 
 
 
-// Solves the problem of setting both the maximum number of posts and the posts_per_page in a custom WP_Query
-// Filter is added and removed before and after the query call
-if ( ! function_exists( 'Nimble\sek_filter_found_posts') ) {
-  function sek_filter_found_posts() {
-    $model = Nimble_Manager()->model;
-    $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
-    $main_settings = $value['grid_main'];
-    $post_nb = (int)$main_settings['post_number'];
-    $post_nb = $post_nb < 0 ? 0 : $post_nb;
-    $posts_per_page = (int)$main_settings['posts_per_page'];
-    $posts_per_page = $posts_per_page <= 0 ? 1 : $posts_per_page;
-    return $post_nb;
-  }
-}
+// // Solves the problem of setting both the maximum number of posts and the posts_per_page in a custom WP_Query
+// // Filter is added and removed before and after the query call
+// if ( ! function_exists( 'Nimble\sek_filter_found_posts') ) {
+//   function sek_filter_found_posts() {
+//     $model = Nimble_Manager()->model;
+//     $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
+//     $main_settings = $value['grid_main'];
+//     $post_nb = (int)$main_settings['post_number'];
+//     $post_nb = $post_nb < 0 ? 0 : $post_nb;
+//     return $post_nb;
+//   }
+// }
 
 
 // filters @hook 'excerpt_length'
@@ -267,7 +265,7 @@ if ( true === sek_booleanize_checkbox_val($main_settings['display_pagination']) 
   $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
   $query_params = wp_parse_args( [
     'paged' => $paged,
-    'posts_per_page' => $posts_per_page >= $post_nb ? $post_nb : $posts_per_page,
+    'posts_per_page' => $posts_per_page,
   ], $default_query_params );
 }
 
@@ -277,10 +275,10 @@ if ( $post_nb > 0 ) {
   $query_params = apply_filters( 'nimble_post_grid_module_query_params', $query_params , Nimble_Manager()->model );
 
   if ( is_array( $query_params ) ) {
-    add_filter( 'found_posts', '\Nimble\sek_filter_found_posts', 10, 2 );
+    //add_filter( 'found_posts', '\Nimble\sek_filter_found_posts', 10, 2 );
     // Query featured entries
     $post_collection = new \WP_Query($query_params);
-    remove_filter( 'found_posts', '\Nimble\sek_filter_found_posts', 10, 2 );
+    //remove_filter( 'found_posts', '\Nimble\sek_filter_found_posts', 10, 2 );
   } else {
     sek_error_log('post_grid_module_tmpl => query params is invalid');
   }
