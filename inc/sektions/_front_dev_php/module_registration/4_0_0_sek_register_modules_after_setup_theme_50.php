@@ -19,10 +19,10 @@ function sek_schedule_module_registration() {
         // prebuilt sections are registered from a JSON since https://github.com/presscustomizr/nimble-builder/issues/431
         sek_register_prebuilt_section_modules();
     } else {
-        // Condition is_admin() added in april 2020
+        // Condition !is_admin() added in april 2020
         // fixes https://github.com/presscustomizr/nimble-builder/issues/658
-        if ( ! is_admin() ) {
-            add_action( 'wp', '\Nimble\sek_register_modules_when_not_customizing_and_not_ajaxing', PHP_INT_MAX );
+        if ( !is_admin() ) {
+            add_action( 'wp', '\Nimble\sek_register_active_modules_on_front', PHP_INT_MAX );
         }
     }
 }
@@ -44,12 +44,16 @@ function sek_register_modules_when_customizing_or_ajaxing() {
     sek_do_register_module_collection( $modules );
 }
 
-
-
 // @return void();
 // @hook 'wp'@PHP_INT_MAX
-function sek_register_modules_when_not_customizing_and_not_ajaxing() {
-    $contextually_actives_raw = sek_get_collection_of_contextually_active_modules();
+function sek_register_active_modules_on_front() {
+    sek_register_modules_when_not_customizing_and_not_ajaxing();
+}
+
+
+// @param $skope_id added in april 2020 for for https://github.com/presscustomizr/nimble-builder/issues/657
+function sek_register_modules_when_not_customizing_and_not_ajaxing( $skope_id = '' ) {
+    $contextually_actives_raw = sek_get_collection_of_contextually_active_modules( $skope_id );
     $contextually_actives_raw = array_keys( $contextually_actives_raw );
 
     $contextually_actives_candidates = array();

@@ -84,9 +84,14 @@ function nimble_regex_callback( $matches ) {
 // This option is cached
 // deactivated when customizing
 function sek_is_img_smartload_enabled() {
+    // condition added in april 2020 when implementing yoast compat https://github.com/presscustomizr/nimble-builder/issues/657
+    if ( is_admin() && !skp_is_customizing() )
+      return false;
+
     if ( 'not_cached' !== Nimble_Manager()->img_smartload_enabled ) {
         return Nimble_Manager()->img_smartload_enabled;
     }
+
     $is_img_smartload_enabled = false;
     // LOCAL OPTION
     // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'

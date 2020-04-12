@@ -4,7 +4,6 @@ namespace Nimble;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 
-
 // /* ------------------------------------------------------------------------- *
 // *  VERSIONNING
 // /* ------------------------------------------------------------------------- */
@@ -913,4 +912,10 @@ function sek_filter_post_row_actions( $actions, $post ) {
         );
     }
     return $actions;
+}
+
+
+// APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/657
+if ( defined('NIMBLE_YOAST_COMPAT_ENABLED') && NIMBLE_YOAST_COMPAT_ENABLED ) {
+    require_once( NIMBLE_BASE_PATH . '/inc/admin/nimble-yoast-compat.php' );
 }

@@ -198,7 +198,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         }
 
         // the $location_data can be provided. Typically when using the function render_content_sections_for_nimble_template in the Nimble page template.
-        public function _render_seks_for_location( $location_id = '', $location_data = array() ) {
+        // @param $skope_id added april 2020 for https://github.com/presscustomizr/nimble-builder/issues/657
+        public function _render_seks_for_location( $location_id = '', $location_data = array(), $skope_id = '' ) {
             $all_locations = sek_get_locations();
 
             if ( ! array_key_exists( $location_id, $all_locations ) ) {
@@ -208,7 +209,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $locationSettingValue = array();
             $is_global_location = sek_is_global_location( $location_id );
             if ( empty( $location_data ) ) {
-                $skope_id = $is_global_location ? NIMBLE_GLOBAL_SKOPE_ID : skp_build_skope_id();
+                // APRIL 2020 added for for https://github.com/presscustomizr/nimble-builder/issues/657
+                if ( empty($skope_id) ) {
+                    $skope_id = $is_global_location ? NIMBLE_GLOBAL_SKOPE_ID : skp_build_skope_id();
+                }
                 $locationSettingValue = sek_get_skoped_seks( $skope_id, $location_id );
             } else {
                 $locationSettingValue = $location_data;
