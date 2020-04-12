@@ -38,8 +38,9 @@ module.exports = {
       // skope php dev
       '!inc/czr-skope/_dev/**',
 
-      // sektions customizer dev js
+      // sektions customizer dev js and css
       '!assets/czr/sek/js/_dev_control/**',
+      '!assets/czr/sek/css/_dev_control/**',
       '!assets/czr/sek/js/_dev_preview/**',
       // sektions dev php
       '!inc/sektions/_front_dev_php/**',
