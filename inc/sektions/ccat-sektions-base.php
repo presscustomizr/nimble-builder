@@ -967,7 +967,9 @@ function sek_extract_css_font_family_from_customizer_option( $family ) {
 // The base fmk is loaded @after_setup_theme:10
 add_action( 'after_setup_theme', '\Nimble\sek_schedule_module_registration', 50 );
 
-// When not customizing, we don't need to register all modules
+// On front we register only the necessary modules
+// When customizing, we register all of them
+// On admin, we register none
 function sek_schedule_module_registration() {
     // we load all modules when :
     // 1) customizing
@@ -982,7 +984,11 @@ function sek_schedule_module_registration() {
         // prebuilt sections are registered from a JSON since https://github.com/presscustomizr/nimble-builder/issues/431
         sek_register_prebuilt_section_modules();
     } else {
-        add_action( 'wp', '\Nimble\sek_register_modules_when_not_customizing_and_not_ajaxing', PHP_INT_MAX );
+        // Condition !is_admin() added in april 2020
+        // fixes https://github.com/presscustomizr/nimble-builder/issues/658
+        if ( !is_admin() ) {
+            add_action( 'wp', '\Nimble\sek_register_active_modules_on_front', PHP_INT_MAX );
+        }
     }
 }
 
@@ -1003,12 +1009,16 @@ function sek_register_modules_when_customizing_or_ajaxing() {
     sek_do_register_module_collection( $modules );
 }
 
-
-
 // @return void();
 // @hook 'wp'@PHP_INT_MAX
-function sek_register_modules_when_not_customizing_and_not_ajaxing() {
-    $contextually_actives_raw = sek_get_collection_of_contextually_active_modules();
+function sek_register_active_modules_on_front() {
+    sek_register_modules_when_not_customizing_and_not_ajaxing();
+}
+
+
+// @param $skope_id added in april 2020 for for https://github.com/presscustomizr/nimble-builder/issues/657
+function sek_register_modules_when_not_customizing_and_not_ajaxing( $skope_id = '' ) {
+    $contextually_actives_raw = sek_get_collection_of_contextually_active_modules( $skope_id );
     $contextually_actives_raw = array_keys( $contextually_actives_raw );
 
     $contextually_actives_candidates = array();
@@ -8041,14 +8051,6 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'step'        => 1,
                     'width-100'   => true
                 ),//0,
-                'display_pagination' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Display pagination links', 'text_doma'),
-                    'default'     => false,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20'
-                    //'html_before' => '<hr>'
-                ),
                 'posts_per_page'  => array(
                     'input_type'  => 'range_simple',
                     'title'       => __( 'Posts per page', 'text_doma' ),
@@ -8059,6 +8061,14 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'width-100'   => true,
                     'title_width' => 'width-100'
                 ),//0,
+                'display_pagination' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Display pagination links', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                    //'html_before' => '<hr>'
+                ),
                 'categories'  => array(
                     'input_type'  => 'category_picker',
                     'title'       => __( 'Filter posts by category', 'text_doma' ),
@@ -14286,7 +14296,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         }
 
         // the $location_data can be provided. Typically when using the function render_content_sections_for_nimble_template in the Nimble page template.
-        public function _render_seks_for_location( $location_id = '', $location_data = array() ) {
+        // @param $skope_id added april 2020 for https://github.com/presscustomizr/nimble-builder/issues/657
+        public function _render_seks_for_location( $location_id = '', $location_data = array(), $skope_id = '' ) {
             $all_locations = sek_get_locations();
 
             if ( ! array_key_exists( $location_id, $all_locations ) ) {
@@ -14296,7 +14307,10 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $locationSettingValue = array();
             $is_global_location = sek_is_global_location( $location_id );
             if ( empty( $location_data ) ) {
-                $skope_id = $is_global_location ? NIMBLE_GLOBAL_SKOPE_ID : skp_build_skope_id();
+                // APRIL 2020 added for for https://github.com/presscustomizr/nimble-builder/issues/657
+                if ( empty($skope_id) ) {
+                    $skope_id = $is_global_location ? NIMBLE_GLOBAL_SKOPE_ID : skp_build_skope_id();
+                }
                 $locationSettingValue = sek_get_skoped_seks( $skope_id, $location_id );
             } else {
                 $locationSettingValue = $location_data;
@@ -14759,7 +14773,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                       ?><script>nb_.emit('nb-needs-parallax');</script><?php
                     }
 
-                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s" %5$s %6$s %7$s %8$s %9$s %10$s>%11$s',
+                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s %5$s" %6$s %7$s %8$s %9$s %10$s>%11$s',
                         $id,
                         $module_type,
                         $this->get_level_visibility_css_class( $model ),

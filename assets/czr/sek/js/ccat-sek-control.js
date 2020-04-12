@@ -16796,9 +16796,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                             });
                                       break;
                                       case 'display_pagination' :
-                                            _.each( [ 'posts_per_page' ] , function( _inputId_ ) {
+                                            _.each( [ 'posts_per_page', 'post_number' ] , function( _inputId_ ) {
                                                   try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        return input();
+                                                        return 'posts_per_page' === _inputId_ ? input() : !input();
                                                   }); } catch( er ) {
                                                         api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
                                                   }

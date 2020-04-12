@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.5-beta
+Stable tag: 2.0.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,16 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 2.0.4 =
-Google fonts and page load performance improvements.
+= 2.0.5 =
+[Grid module] Fixed pagination problems. [SEO] Nimble Builder content is now included to Yoast SEO analyser's tool when editing a page or post. Fixed custom css class name broken in the module markup.
 
 == Changelog ==
+= 2.0.5 March 28th 2020 =
+* fixed : [performance] prevent trying to register modules when is_admin()
+* fixed : [HTML][CSS] custom css class name broken in the module markup
+* fixed : [Grid module] pagination could be broken in some cases.
+* added : [SEO] Nimble Builder content is now included to Yoast SEO analyser's tool when editing a page or post
+
 = 2.0.4 March 28th 2020 =
 * improved : [performances][Google fonts] added param "display=swap" to ensure text remains visible during webfont load
 * improved :  [Performance] make sure no enqueued script / inline script / preload stylesheet is printed when no Nimble Sections to print
@@ -155,23 +161,3 @@ Google fonts and page load performance improvements.
 * improved : [performance] Google fonts now be preloaded by default for minimal impact on page load
 * improved : [performance] Font Awesome icons are now loaded asynchronously by default to avoid blocking rendering problems
 * improved : [performance] if activated, smartload should also work when customizing
-
-= 1.10.12 March 3rd 2020 =
-* fixed : when a multi-item module, like carousel or social icon, is updated, its value should be cast as an array
-* fixed : [responsive columns] custom column width might not be applied when using a custom breakpoint < 768px
-* fixed : [nested sections] duplicating a nested section should trigger a preview refresh in order to regenerate a proper column layout
-* fixed : [carousel module] disable autoplay by default
-* updated : [carousel module] set default navigation to arrows only, not arrows + dots
-* fixed : [CSS grid] columns of a section with property "flex-direction: column-reverse" needs to be set on "flex:auto"
-* fixed : [breakpoint] possible php error notice when custom breakpoint is set to an empty value
-* updated : use "adapt images to carousel's width" instead of "Nimble wizard" by default
-* improved : [performance] avoid potential multiple db queries when fetching the sektion posts
-* improved : [performance] added an experiment to load some of the largest module stylesheets per module instead of bundled in the main one. Can be enabled with constants in wp-config : NIMBLE_USE_SPLIT_STYLESHEET, NIMBLE_PRINT_MODULE_STYLESHEETS_INLINE
-
-= 1.10.11 February 29th 2020 =
-* fixed : figcaption => adjust margin top only when wrapped inside .wp-caption
-* fixed : [accordion module] wrong cursor pointer on +/- icons
-* fixed : [WP Widget module] implement basic styling for WP search form
-* improved : [performance] lazyload => implement a better deferral of offscreen images on page load and apply a higher threshold when scrolling
-* improved : [performance] removed unused CSS => reduced size of main CSS stylesheet
-* improved : [performance] removed Poppin Google font for prebuild menu sections

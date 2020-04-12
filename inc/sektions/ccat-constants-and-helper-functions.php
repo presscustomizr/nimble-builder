@@ -472,9 +472,14 @@ function nimble_regex_callback( $matches ) {
 // This option is cached
 // deactivated when customizing
 function sek_is_img_smartload_enabled() {
+    // condition added in april 2020 when implementing yoast compat https://github.com/presscustomizr/nimble-builder/issues/657
+    if ( is_admin() && !skp_is_customizing() )
+      return false;
+
     if ( 'not_cached' !== Nimble_Manager()->img_smartload_enabled ) {
         return Nimble_Manager()->img_smartload_enabled;
     }
+
     $is_img_smartload_enabled = false;
     // LOCAL OPTION
     // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
@@ -1017,9 +1022,12 @@ function sek_get_module_collection() {
 // Fired in 'wp_enqueue_scripts'
 // Recursively sniff the local and global sections to populate Nimble_Manager()->contextually_active_modules
 // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-function sek_populate_collection_of_contextually_active_modules( $recursive_data = null, $module_collection = null ) {
+function sek_populate_collection_of_contextually_active_modules( $skope_id = '', $recursive_data = null, $module_collection = null ) {
+
+    $skope_id = empty( $skope_id ) ? skp_get_skope_id() : $skope_id;
+
     if ( is_null( $recursive_data ) ) {
-        $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
+        $local_skope_settings = sek_get_skoped_seks( $skope_id );
         $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
         $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
         $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
@@ -1041,7 +1049,7 @@ function sek_populate_collection_of_contextually_active_modules( $recursive_data
                 $module_collection[$module_type][] = $value['id'];
             }
         } else if ( is_array( $value ) ) {
-            $module_collection = sek_populate_collection_of_contextually_active_modules( $value, $module_collection );
+            $module_collection = sek_populate_collection_of_contextually_active_modules( $skope_id, $value, $module_collection);
         }
     }
     Nimble_Manager()->contextually_active_modules = $module_collection;
@@ -1049,9 +1057,10 @@ function sek_populate_collection_of_contextually_active_modules( $recursive_data
 }
 
 // return the cached collection or build it when needed
-function sek_get_collection_of_contextually_active_modules( $recursive_data = null, $module_collection = null ) {
+function sek_get_collection_of_contextually_active_modules( $skope_id = '' ) {
+    $skope_id = empty( $skope_id ) ? skp_get_skope_id() : $skope_id;
     if ( 'not_set' === Nimble_Manager()->contextually_active_modules ) {
-        return sek_populate_collection_of_contextually_active_modules();
+        return sek_populate_collection_of_contextually_active_modules( $skope_id );
     }
     return Nimble_Manager()->contextually_active_modules;
 }
