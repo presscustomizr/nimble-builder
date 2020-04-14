@@ -6,8 +6,22 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             add_action( 'wp_footer', array( $this, 'sek_customizr_js_stuff' ), PHP_INT_MAX  );
 
             // Load customize preview js
-            add_action( 'customize_preview_init' , array( $this, 'sek_schedule_customize_preview_assets' ) );
+            add_action( 'customize_preview_init', array( $this, 'sek_schedule_customize_preview_assets' ) );
+
+            // add customizer-preview class when customizing
+            add_filter( 'body_class', array( $this, 'sek_add_body_class' ) );
         }//_schedule_preview_assets_printing
+
+        // @'body_class'
+        function sek_add_body_class( $classes ) {
+            $classes = is_array($classes) ? $classes : array();
+            // Check whether we're in the customizer preview.
+            if ( is_customize_preview() ) {
+              $classes[] = 'customizer-preview';
+            }
+            return $classes;
+        }
+
 
         // @'wp_footer'
         function sek_customizr_js_stuff() {
