@@ -33,6 +33,18 @@ function sek_get_module_params_for_sek_local_imp_exp() {
                     'refresh_stylesheet' => false,
                     'refresh_preview' => true,
                     'notice_after' => __( 'Check this option if you want to keep the existing sections of this page, and combine them with the imported ones.', 'text_doma'),
+                ),
+                // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
+                'import_img' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Import images in your media library.', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => false,
+                    'refresh_preview' => true,
+                    'notice_after' => __( 'When this option is unchecked, Nimble Builder will not import images and use instead the url of the original images.', 'text_doma'),
                 )
             )
         )//tmpl

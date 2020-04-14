@@ -921,16 +921,30 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
-                if ( !empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
+                if ( !empty( $bg_options[ 'bg-image'] ) ) {
+                    $bg_image_id_or_url = $bg_options[ 'bg-image'];
+                    // April 2020 :
+                    // on import, user can decide to use the image url instead of importing
+                    // we need to check if the image is set as an attachement id or starts with 'http'
+                    // introduced for https://github.com/presscustomizr/nimble-builder/issues/663
                     $new_attributes[] = 'data-sek-has-bg="true"';
-                    $bg_img_url = wp_get_attachment_url( $bg_options[ 'bg-image'] );
-                    // When the fixed background is ckecked, it wins against parallax
-                    $fixed_bg_enabled = !empty( $bg_options['bg-attachment'] ) && sek_booleanize_checkbox_val( $bg_options['bg-attachment'] );
-                    $parallax_enabled = !$fixed_bg_enabled && !empty( $bg_options['bg-parallax'] ) && sek_booleanize_checkbox_val( $bg_options['bg-parallax'] );
-                    if ( $parallax_enabled ) {
-                        $image = wp_get_attachment_image_src( $bg_options[ 'bg-image'], 'full' );
-                        if ( $image ) {
-                            list( $src, $width, $height ) = $image;
+                    if ( is_numeric( $bg_image_id_or_url ) ) {
+                        $bg_img_url = wp_get_attachment_url( $bg_image_id_or_url );
+                    } else if ( "http" === substr( $bg_image_id_or_url, 0, 4 ) ) {
+                        $bg_img_url = $bg_image_id_or_url;
+                    }
+
+                    // At this point we may not have a valid $bg_img_url
+                    // let's check
+                    if ( !empty( $bg_img_url ) ) {
+                        // When the fixed background is ckecked, it wins against parallax
+                        $fixed_bg_enabled = !empty( $bg_options['bg-attachment'] ) && sek_booleanize_checkbox_val( $bg_options['bg-attachment'] );
+                        $parallax_enabled = !$fixed_bg_enabled && !empty( $bg_options['bg-parallax'] ) && sek_booleanize_checkbox_val( $bg_options['bg-parallax'] );
+                        if ( $parallax_enabled && is_numeric( $bg_image_id_or_url ) ) {
+                            $image = wp_get_attachment_image_src( $bg_image_id_or_url, 'full' );
+                            if ( $image ) {
+                                list( $src, $width, $height ) = $image;
+                            }
                         }
                     }
                 }

@@ -623,6 +623,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Export failed' => __('Export failed', 'text_doma'),
             'Nothing to export.' => __('Nimble Builder : you have nothing to export. Start adding sections to this page!', 'text_doma'),
             'Import failed' => __('Import failed', 'text_doma'),
+            'Import exceeds server response time, try to uncheck "import images" option.' => __('Import exceeds server response time, try to uncheck "import images" option.', 'text_doma'),
             'The current page has no available locations to import Nimble Builder sections.' => __('The current page has no available locations to import Nimble Builder sections.', 'text_doma'),
             'Missing file' => __('Missing file', 'text_doma'),
             'File successfully imported' => __('File successfully imported', 'text_doma'),
