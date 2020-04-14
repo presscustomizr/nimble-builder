@@ -681,6 +681,7 @@ function sek_sideload_img_and_return_attachment_id( $img_url ) {
 
     // If error storing temporarily, return the error.
     if ( is_wp_error( $file_array['tmp_name'] ) ) {
+        sek_error_log( __FUNCTION__ . ' error when firing download_url() for image : ' . $img_url );
         return $file_array['tmp_name'];
     }
 
@@ -689,6 +690,7 @@ function sek_sideload_img_and_return_attachment_id( $img_url ) {
 
     // If error storing permanently, unlink.
     if ( is_wp_error( $id ) ) {
+        sek_error_log( __FUNCTION__ . ' error when firing media_handle_sideload() for image : ' . $img_url );
         @unlink( $file_array['tmp_name'] );
     } else {
         // Store the title as image alt property

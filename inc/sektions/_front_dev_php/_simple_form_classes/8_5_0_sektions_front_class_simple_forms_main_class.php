@@ -12,7 +12,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         //Hooks
         add_action( 'parse_request', array( $this, 'simple_form_parse_request' ), 20 );
         add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_recaptcha_scripts' ), 0 );
-        add_action( 'body_class', array( $this, 'set_the_recaptcha_badge_visibility_class') );
+        add_filter( 'body_class', array( $this, 'set_the_recaptcha_badge_visibility_class') );
 
         // Note : form input need to be prefixed to avoid a collision with reserved WordPress input
         // @see : https://stackoverflow.com/questions/15685020/wordpress-form-submission-and-the-404-error-page#16636051

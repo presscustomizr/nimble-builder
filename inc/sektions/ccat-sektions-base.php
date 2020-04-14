@@ -3558,6 +3558,18 @@ function sek_get_module_params_for_sek_local_imp_exp() {
                     'refresh_stylesheet' => false,
                     'refresh_preview' => true,
                     'notice_after' => __( 'Check this option if you want to keep the existing sections of this page, and combine them with the imported ones.', 'text_doma'),
+                ),
+                // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
+                'import_img' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Import images in your media library.', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => false,
+                    'refresh_preview' => true,
+                    'notice_after' => __( 'When this option is unchecked, Nimble Builder will not import images and use instead the url of the original images.', 'text_doma'),
                 )
             )
         )//tmpl
@@ -13779,8 +13791,22 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             add_action( 'wp_footer', array( $this, 'sek_customizr_js_stuff' ), PHP_INT_MAX  );
 
             // Load customize preview js
-            add_action( 'customize_preview_init' , array( $this, 'sek_schedule_customize_preview_assets' ) );
+            add_action( 'customize_preview_init', array( $this, 'sek_schedule_customize_preview_assets' ) );
+
+            // add customizer-preview class when customizing
+            add_filter( 'body_class', array( $this, 'sek_add_body_class' ) );
         }//_schedule_preview_assets_printing
+
+        // @'body_class'
+        function sek_add_body_class( $classes ) {
+            $classes = is_array($classes) ? $classes : array();
+            // Check whether we're in the customizer preview.
+            if ( is_customize_preview() ) {
+              $classes[] = 'customizer-preview';
+            }
+            return $classes;
+        }
+
 
         // @'wp_footer'
         function sek_customizr_js_stuff() {
@@ -15019,16 +15045,30 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
                 $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
-                if ( !empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
+                if ( !empty( $bg_options[ 'bg-image'] ) ) {
+                    $bg_image_id_or_url = $bg_options[ 'bg-image'];
+                    // April 2020 :
+                    // on import, user can decide to use the image url instead of importing
+                    // we need to check if the image is set as an attachement id or starts with 'http'
+                    // introduced for https://github.com/presscustomizr/nimble-builder/issues/663
                     $new_attributes[] = 'data-sek-has-bg="true"';
-                    $bg_img_url = wp_get_attachment_url( $bg_options[ 'bg-image'] );
-                    // When the fixed background is ckecked, it wins against parallax
-                    $fixed_bg_enabled = !empty( $bg_options['bg-attachment'] ) && sek_booleanize_checkbox_val( $bg_options['bg-attachment'] );
-                    $parallax_enabled = !$fixed_bg_enabled && !empty( $bg_options['bg-parallax'] ) && sek_booleanize_checkbox_val( $bg_options['bg-parallax'] );
-                    if ( $parallax_enabled ) {
-                        $image = wp_get_attachment_image_src( $bg_options[ 'bg-image'], 'full' );
-                        if ( $image ) {
-                            list( $src, $width, $height ) = $image;
+                    if ( is_numeric( $bg_image_id_or_url ) ) {
+                        $bg_img_url = wp_get_attachment_url( $bg_image_id_or_url );
+                    } else if ( "http" === substr( $bg_image_id_or_url, 0, 4 ) ) {
+                        $bg_img_url = $bg_image_id_or_url;
+                    }
+
+                    // At this point we may not have a valid $bg_img_url
+                    // let's check
+                    if ( !empty( $bg_img_url ) ) {
+                        // When the fixed background is ckecked, it wins against parallax
+                        $fixed_bg_enabled = !empty( $bg_options['bg-attachment'] ) && sek_booleanize_checkbox_val( $bg_options['bg-attachment'] );
+                        $parallax_enabled = !$fixed_bg_enabled && !empty( $bg_options['bg-parallax'] ) && sek_booleanize_checkbox_val( $bg_options['bg-parallax'] );
+                        if ( $parallax_enabled && is_numeric( $bg_image_id_or_url ) ) {
+                            $image = wp_get_attachment_image_src( $bg_image_id_or_url, 'full' );
+                            if ( $image ) {
+                                list( $src, $width, $height ) = $image;
+                            }
                         }
                     }
                 }
@@ -15631,7 +15671,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         //Hooks
         add_action( 'parse_request', array( $this, 'simple_form_parse_request' ), 20 );
         add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_recaptcha_scripts' ), 0 );
-        add_action( 'body_class', array( $this, 'set_the_recaptcha_badge_visibility_class') );
+        add_filter( 'body_class', array( $this, 'set_the_recaptcha_badge_visibility_class') );
 
         // Note : form input need to be prefixed to avoid a collision with reserved WordPress input
         // @see : https://stackoverflow.com/questions/15685020/wordpress-form-submission-and-the-404-error-page#16636051

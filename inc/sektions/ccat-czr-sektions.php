@@ -623,6 +623,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Export failed' => __('Export failed', 'text_doma'),
             'Nothing to export.' => __('Nimble Builder : you have nothing to export. Start adding sections to this page!', 'text_doma'),
             'Import failed' => __('Import failed', 'text_doma'),
+            'Import exceeds server response time, try to uncheck "import images" option.' => __('Import exceeds server response time, try to uncheck "import images" option.', 'text_doma'),
             'The current page has no available locations to import Nimble Builder sections.' => __('The current page has no available locations to import Nimble Builder sections.', 'text_doma'),
             'Missing file' => __('Missing file', 'text_doma'),
             'File successfully imported' => __('File successfully imported', 'text_doma'),
@@ -4347,15 +4348,19 @@ function sek_ajax_get_manually_imported_file_content() {
         return;
     }
 
-    //sek_error_log('IMPORT BEFORE FILTER ?', $raw_unserialized_data );
-
+    $maybe_import_images = true;
     // in a pre-import-check context, we don't need to sniff and upload images
-    if ( isset( $_POST['pre_import_check'] ) && true == $_POST['pre_import_check'] ) {
-        remove_filter( 'nimble_pre_import', '\Nimble\sek_sniff_imported_img_url' );
+    if ( array_key_exists( 'pre_import_check', $_POST ) && true === sek_booleanize_checkbox_val( $_POST['pre_import_check'] ) ) {
+        $maybe_import_images = false;
+    }
+    // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
+    if ( array_key_exists( 'import_img', $_POST ) && false === sek_booleanize_checkbox_val( $_POST['import_img'] ) ) {
+        $maybe_import_images = false;
     }
 
     $imported_content = array(
-        'data' => apply_filters( 'nimble_pre_import', $raw_unserialized_data['data'] ),
+        //'data' => apply_filters( 'nimble_pre_import', $raw_unserialized_data['data'], $do_import_images ),
+        'data' => sek_maybe_import_imgs( $raw_unserialized_data['data'], $maybe_import_images ),
         'metas' => $raw_unserialized_data['metas'],
         // the image import errors won't block the import
         // they are used when notifying user in the customizer
@@ -4439,13 +4444,8 @@ function sek_ajax_process_template_file_content() {
 
     //sek_error_log('IMPORT BEFORE FILTER ?', $raw_unserialized_data );
 
-    // in a pre-import-check context, we don't need to sniff and upload images
-    if ( isset( $_POST['pre_import_check'] ) && true == $_POST['pre_import_check'] ) {
-        remove_filter( 'nimble_pre_import', '\Nimble\sek_sniff_imported_img_url' );
-    }
-
     $imported_content = array(
-        'data' => sek_sniff_imported_img_url( $raw_unserialized_data['data'] ),
+        'data' => sek_maybe_import_imgs( $raw_unserialized_data['data'], $do_import_images = true ),
         'metas' => $raw_unserialized_data['metas'],
         // the image import errors won't block the import
         // they are used when notifying user in the customizer
@@ -4464,25 +4464,32 @@ function sek_ajax_process_template_file_content() {
 
 
 
-// IMPORT FILTER
-add_filter( 'nimble_pre_import', '\Nimble\sek_sniff_imported_img_url' );
-function sek_sniff_imported_img_url( $seks_data ) {
+// IMPORT IMG HELPER
+// recursive
+//add_filter( 'nimble_pre_import', '\Nimble\sek_maybe_import_imgs' );
+function sek_maybe_import_imgs( $seks_data, $do_import_images = true ) {
     $new_seks_data = array();
     foreach ( $seks_data as $key => $value ) {
         if ( is_array($value) ) {
-            $new_seks_data[$key] = sek_sniff_imported_img_url( $value );
+            $new_seks_data[$key] = sek_maybe_import_imgs( $value, $do_import_images );
         } else {
             if ( is_string( $value ) && false !== strpos( $value, '__img_url__' ) && sek_is_img_url( $value ) ) {
                 $url = str_replace( '__img_url__', '', $value );
-                //sek_error_log( __FUNCTION__ . ' URL?', $url );
-                $id = sek_sideload_img_and_return_attachment_id( $url );
-                if ( is_wp_error( $id ) ) {
-                    $value = null;
-                    $img_errors = Nimble_Manager()->img_import_errors;
-                    $img_errors[] = $url;
-                    Nimble_Manager()->img_import_errors = $img_errors;
+                // april 2020 : new option to skip importing images
+                // introduced for https://github.com/presscustomizr/nimble-builder/issues/663
+                if ( !$do_import_images ) {
+                    $value = $url;
                 } else {
-                    $value = $id;
+                    //sek_error_log( __FUNCTION__ . ' URL?', $url );
+                    $id = sek_sideload_img_and_return_attachment_id( $url );
+                    if ( is_wp_error( $id ) ) {
+                        $value = null;
+                        $img_errors = Nimble_Manager()->img_import_errors;
+                        $img_errors[] = $url;
+                        Nimble_Manager()->img_import_errors = $img_errors;
+                    } else {
+                        $value = $id;
+                    }
                 }
             }
             $new_seks_data[$key] = $value;

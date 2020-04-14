@@ -9695,6 +9695,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( params.pre_import_check ) {
                               fd.append( 'pre_import_check', params.pre_import_check );
                         }
+
+                        // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
+                        fd.append( 'import_img', _input.input_parent.czr_Input('import_img')() );
+
                         // fire an uploading message removed on .always()
                         _input.container.find('.sek-uploading').show();
 
@@ -9774,7 +9778,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   /// 3) ATTEMPT TO UPDATE THE SETTING API, LOCAL OR GLOBAL. ( always local for template import )
 
                   // fire a previewer loader removed on .always()
-                  api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true });
+                  api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
+
+                  // After 30 s display a failure notification
+                  // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
+                  _.delay( function() {
+                        if ( 'pending' !== __request__.state() )
+                          return;
+                        api.previewer.trigger('sek-notify', {
+                              notif_id : 'import-too-long',
+                              type : 'error',
+                              duration : 20000,
+                              message : [
+                                    '<span>',
+                                      '<strong>',
+                                      sektionsLocalizedData.i18n['Import exceeds server response time, try to uncheck "import images" option.'],
+                                      '</strong>',
+                                    '</span>'
+                              ].join('')
+                        });
+                  }, 30000 );
+
 
                   // At this stage, we are not in a pre-check case
                   // the ajax request is processed and will upload images if needed
@@ -9786,7 +9810,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( !params.is_manual_import && _.isObject(server_resp) ) {
                                     server_resp = {success:true, data:server_resp};
                               }
-                              //console.log('SERVER RESP ?', server_resp );
+                              //console.log('SERVER RESP 2 ?', server_resp );
                               if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
                                     api.infoLog('::import_template problem => !api.czr_sektions.isImportedContentEligibleForAPI', server_resp, params );
                                     return;

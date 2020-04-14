@@ -1552,9 +1552,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             //    element : $(),
             //    action : '',
             //    level,
-            //    loader_located_in_level_id
+            //    loader_located_in_level_id,
+            //    fullPageLoader: false,
+            //    duration:4000
             // }
             mayBePrintLoader : function( params ) {
+                  params = _.isObject( params ) ? params : {};
                   var self = this,
                       levelIdForTheLoader = params.loader_located_in_level_id;
 
@@ -1578,7 +1581,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               clearTimeout( $.data( this, '_nimble_loader_active_timer_') );
                               $.data( this, '_nimble_loader_active_timer_', setTimeout(function() {
                                     self.cleanLoader();
-                              }, 4000 ) );
+                              }, params.duration || 4000 ) );
                         }
                   }
                   if ( true === params.fullPageLoader ) {
@@ -1594,7 +1597,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         clearTimeout( $.data( this, '_nimble_full_page_loader_active_timer_') );
                         $.data( this, '_nimble_full_page_loader_active_timer_', setTimeout(function() {
                               self.cleanLoader( { cleanFullPageLoader : true });
-                        }, 6000 ) );
+                        }, params.duration || 6000 ) );
                   }
             },
 
