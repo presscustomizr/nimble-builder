@@ -2062,9 +2062,17 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
 (function(w, d){
     nb_.listenTo('nb-lazyload-parsed', function() {
         jQuery(function($){
-              var _do = function() {
-                    this.each( function() {
-                          try { $(this).nimbleLazyLoad(); } catch( er ) {
+              var _do = function(evt) {
+                    $(this).each( function() {
+                          var _maybeDoLazyLoad = function() {
+                                // if the element already has an instance of nimbleLazyLoad, simply trigger an event
+                                if ( !$(this).data('nimbleLazyLoadDone') ) {
+                                    $(this).nimbleLazyLoad();
+                                } else {
+                                    $(this).trigger('nb-trigger-lazyload');
+                                }
+                          };
+                          try { _maybeDoLazyLoad.call($(this)); } catch( er ) {
                                 nb_.errorLog( 'error with nimbleLazyLoad => ', er );
                           }
                     });
@@ -2073,12 +2081,10 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
               _do.call( $('.sektion-wrapper') );
               // when customizing
               nb_.cachedElements.$body.on( 'sek-section-added sek-level-refreshed sek-location-refreshed sek-columns-refreshed sek-modules-refreshed', '[data-sek-level="location"]', function(evt) {
-                    // if the element already has an instance of nimbleLazyLoad, simply trigger an event
-                    if ( !$(this).data('nimbleLazyLoadDone') ) {
-                        _do.call( $(this) );
-                    } else {
-                        $(this).trigger('nb-trigger-lazyload');
-                    }
+                    _do.call( $(this), evt );
+                    _.delay( function() {
+                            nb_.cachedElements.$window.trigger('resize');
+                    }, 200 );
               });
 
         });

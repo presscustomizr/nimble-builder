@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.6
+Stable tag: 2.0.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,15 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 2.0.6 =
-Fixed modules visibility settings hiding modules when customizing. Added a new option to skip image import when importing a file.
+= 2.0.7 =
+Fixes several bugs with the Grid module, in particular the pagination broken on home when home is a static page.
 
 == Changelog ==
+= 2.0.7 April 15th 2020 =
+* fixed : [grid module] pagination broken when used on home when home is a static page
+* fixed : [grid module] lazy loading images might break when customizing grids. Disabled when customizing.
+* improved : [grid module] better pagination CSS design
+
 = 2.0.6 April 14th 2020 =
 * fixed : [customizer] modules visibility settings should gray out hidden modules instead of removing them during customization
 * added : [Import/Export] new option to skip image import
