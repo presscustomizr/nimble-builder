@@ -25,12 +25,12 @@ if ( ! function_exists( 'Nimble\sek_render_post_navigation') ) {
 
     /* Generate links */
     $prev_link = get_next_posts_link(
-      '<span class="sek-meta-nav"><span class="sek-meta-nav-title">' . $_older_label . '&nbsp;<i class="fas fa-chevron-' . $prev_dir . '"></i></span></span>', //label
+      '<span class="sek-meta-nav"><span class="sek-meta-nav-title">' . $_older_label . '</span></span>', //label
       $post_collection->max_num_pages //max pages
     );
 
     $next_link  = get_previous_posts_link(
-      '<span class="sek-meta-nav"><span class="sek-meta-nav-title"><i class="fas fa-chevron-' . $next_dir . '"></i>&nbsp;' . $_newer_label . '</span></span>', //label
+      '<span class="sek-meta-nav"><span class="sek-meta-nav-title">' . $_newer_label . '</span></span>', //label
         $post_collection->max_num_pages //max pages
     );
 
@@ -52,11 +52,18 @@ if ( ! function_exists( 'Nimble\sek_render_post_navigation') ) {
           <li class="sek-pagination sek-col-base sek-col-33">
             <ul class="sek-pag-list">
             <?php
+              // April 2020 : fixes pagination not working on a static page used as front page
+              // see https://github.com/presscustomizr/nimble-builder/issues/664
+              // https://developer.wordpress.org/reference/classes/wp_query/#pagination-parameters
+              $pagination_query_var = is_front_page() ? 'page' :'paged';
+              $paged = get_query_var($pagination_query_var);
+              $paged = $paged ? $paged : 1;
+
               $_paginate_links = paginate_links( array(
                 'prev_next' => false,
                 'mid_size'  => 1,
                 'type'      => 'array',
-                'current'    => max( 1, get_query_var('paged') ),
+                'current'    => max( 1, $paged ),
                 'total'      => $post_collection->max_num_pages
               ));
               if ( is_array( $_paginate_links ) ) {
@@ -266,7 +273,12 @@ $post_collection = null;
 if ( true === sek_booleanize_checkbox_val($main_settings['display_pagination']) ) {
   $posts_per_page = (int)$main_settings['posts_per_page'];
   $posts_per_page = $posts_per_page <= 0 ? 1 : $posts_per_page;
-  $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+  // April 2020 : fixes pagination not working on a static page used as front page
+  // see https://github.com/presscustomizr/nimble-builder/issues/664
+  // https://developer.wordpress.org/reference/classes/wp_query/#pagination-parameters
+  $pagination_query_var = is_front_page() ? 'page' :'paged';
+  $paged = get_query_var($pagination_query_var);
+  $paged = $paged ? $paged : 1;
   $query_params = wp_parse_args( [
     'paged' => $paged,
     'posts_per_page' => $posts_per_page,

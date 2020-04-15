@@ -422,9 +422,10 @@
 
 // PAGINATION LINKS
 // added for https://github.com/presscustomizr/nimble-builder/issues/490
-.sek-post-navigation {
+.sek-post-navigation #sek-nav-below {
   background-color: #f7f8f9;
   margin-top: 20px;
+  padding: 5px;
   .sek-pagination {
     text-align: center;
     ul {
@@ -437,8 +438,15 @@
     // &.sek-post-pagination {
     //   @extend .small;
     // }
-
-    .current { font-weight: 600;}
+    .page-numbers {
+      font-family: inherit;
+      opacity:0.7;
+      text-decoration: none!important;
+    }
+    .current {
+      font-weight: 600;
+      opacity:1;
+    }
 
     .sek-pag-list > * {
       margin: 0 5px;
@@ -456,13 +464,15 @@
   }
   li {
     display: inline-block;
+    font-size: 16px;
   }
-  a {
+  a, .sek-meta-nav-title {
     text-transform: uppercase;
     letter-spacing: 2px;
     color: #5A5A5A;
-    &:hover, &:visited{
+    &:hover{
       color: #3b3b3b;
+      opacity: 1!important;
     }
   }
   .sek-czr-pager > li {
@@ -489,9 +499,6 @@
     // @extend .caps;
     // @extend .letter-spacing-2;
   }
-  .page-numbers {
-    font-family: inherit;
-  }
   //.post-prev a {
   //  left: $base-line-height;
   //}
@@ -508,6 +515,7 @@
   a:hover {
     .sek-meta-nav {
       opacity: 1;
+      text-decoration: underline;
     }
   }
   .sek-meta-nav-title {
