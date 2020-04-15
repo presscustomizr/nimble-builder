@@ -111,7 +111,11 @@ if ( ! function_exists( 'Nimble\sek_render_post') ) {
               <?php
                   if( $has_post_thumbnail ) {
                       $img_html = wp_get_attachment_image( get_post_thumbnail_id(), empty( $thumb_settings['img_size'] ) ? 'medium' : $thumb_settings['img_size']);
-                      $img_html = apply_filters( 'nimble_parse_for_smart_load', $img_html );
+                      if ( !skp_is_customizing() ) {
+                        // april 2020 : when customizing, smart load randomly breaks when refreshing the grids
+                        // so let's apply smart load only on front for now
+                        $img_html = apply_filters( 'nimble_parse_for_smart_load', $img_html );
+                      }
                       if ( !skp_is_customizing() && false !== strpos($img_html, 'data-sek-src="http') ) {
                           $img_html = $img_html.Nimble_Manager()->css_loader_html;
                       }
