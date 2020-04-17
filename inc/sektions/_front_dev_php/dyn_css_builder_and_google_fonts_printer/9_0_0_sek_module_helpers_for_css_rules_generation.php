@@ -328,7 +328,7 @@ function sek_set_mq_css_rules( $params, $rules ) {
             sek_error_log( __FUNCTION__ . ' => missing level id, needed to determine if there is a custom breakpoint to use', $params );
         } else {
             $level_id = $params['level_id'];
-            $tablet_breakpoint = sek_get_user_defined_tablet_breakpoint_for_css_rules( $level_id );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
+            $tablet_breakpoint = sek_get_section_or_global_tablet_breakpoint_for_css_rules( $level_id, $for_responsive_columns = false );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
 
             // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
             $mobile_breakpoint = $mobile_breakpoint >= $tablet_breakpoint ? $tablet_breakpoint : $mobile_breakpoint;
@@ -336,19 +336,19 @@ function sek_set_mq_css_rules( $params, $rules ) {
     }
 
     $css_value_by_devices = $params['value'];
-    $_font_size_mq = array('desktop' => null , 'tablet' => null , 'mobile' => null );
+    $media_q = array('desktop' => null , 'tablet' => null , 'mobile' => null );
 
     if ( !empty( $css_value_by_devices ) ) {
           if ( ! empty( $css_value_by_devices[ 'desktop' ] ) ) {
-              $_font_size_mq[ 'desktop' ] = null;
+              $media_q[ 'desktop' ] = null;
           }
 
           if ( ! empty( $css_value_by_devices[ 'tablet' ] ) ) {
-              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; // default is max-width: 767
+              $media_q[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; // default is max-width: 767
           }
 
           if ( ! empty( $css_value_by_devices[ 'mobile' ] ) ) {
-              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; // default is max-width: 575
+              $media_q[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; // default is max-width: 575
           }
 
           // $css_value_by_devices looks like
@@ -378,7 +378,7 @@ function sek_set_mq_css_rules( $params, $rules ) {
                   $rules[] = array(
                       'selector' => $params['selector'],
                       'css_rules' => $css_rules,
-                      'mq' => $_font_size_mq[ $device ]
+                      'mq' => $media_q[ $device ]
                   );
               }
           }
@@ -452,7 +452,7 @@ function sek_set_mq_css_rules_supporting_vendor_prefixes( $params, $rules ) {
             sek_error_log( __FUNCTION__ . ' => missing level id, needed to determine if there is a custom breakpoint to use', $params );
         } else {
             $level_id = $params['level_id'];
-            $tablet_breakpoint = sek_get_user_defined_tablet_breakpoint_for_css_rules( $level_id );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
+            $tablet_breakpoint = sek_get_section_or_global_tablet_breakpoint_for_css_rules( $level_id, $for_responsive_columns = false );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
 
             // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
             $mobile_breakpoint = $mobile_breakpoint >= $tablet_breakpoint ? $tablet_breakpoint : $mobile_breakpoint;
@@ -460,25 +460,25 @@ function sek_set_mq_css_rules_supporting_vendor_prefixes( $params, $rules ) {
     }
 
     $css_rules_by_device = $params['css_rules_by_device'];
-    $_font_size_mq = array('desktop' => null , 'tablet' => null , 'mobile' => null );
+    $media_q = array('desktop' => null , 'tablet' => null , 'mobile' => null );
 
     if ( !empty( $css_rules_by_device ) ) {
           if ( ! empty( $css_rules_by_device[ 'desktop' ] ) ) {
-              $_font_size_mq[ 'desktop' ] = null;
+              $media_q[ 'desktop' ] = null;
           }
 
           if ( ! empty( $css_rules_by_device[ 'tablet' ] ) ) {
-              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; //max-width: 767
+              $media_q[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; //max-width: 767
           }
 
           if ( ! empty( $css_rules_by_device[ 'mobile' ] ) ) {
-              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; //max-width: 575
+              $media_q[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; //max-width: 575
           }
           foreach ( $css_rules_by_device as $device => $rules_for_device ) {
               $rules[] = array(
                   'selector' => $params['selector'],
                   'css_rules' => $rules_for_device,
-                  'mq' => $_font_size_mq[ $device ]
+                  'mq' => $media_q[ $device ]
               );
           }
     } else {
@@ -496,18 +496,24 @@ function sek_set_mq_css_rules_supporting_vendor_prefixes( $params, $rules ) {
 // BREAKPOINT HELPER
 // A custom breakpoint can be set globally or by section
 // It replaces the default tablet breakpoint ( 768 px )
-function sek_get_user_defined_tablet_breakpoint_for_css_rules( $level_id = '' ) {
+//
+// the 'for_responsive_columns' param has been introduced for https://github.com/presscustomizr/nimble-builder/issues/564
+// so we can differentiate when the custom breakpoint is requested for column responsiveness or for css rules generation
+// when for columns, we always apply the custom breakpoint defined by the user
+// otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
+// 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
+function sek_get_section_or_global_tablet_breakpoint_for_css_rules( $level_id = '', $for_responsive_columns = false ) {
     //sek_error_log('ALORS CLOSEST PARENT SECTION MODEL ?' . $level_id , sek_get_closest_section_custom_breakpoint( $level_id ) );
 
     // define a default breakpoint : 768
-    $tablet_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];
+    $tablet_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints[Sek_Dyn_CSS_Builder::COLS_MOBILE_BREAKPOINT];//COLS_MOBILE_BREAKPOINT = 'md' <=> 768px
 
     // Is there a custom breakpoint set by a parent section?
     // Order :
     // 1) custom breakpoint set on a nested section
     // 2) custom breakpoint set on a regular section
     //sek_error_log('WE SEARCH FOR => ' . $level_id );
-    $closest_section_custom_breakpoint = sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $level_id ) );
+    $closest_section_custom_breakpoint = sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $level_id, 'for_responsive_columns' => false ) );
     //sek_error_log('WE FOUND A BREAKPOINT ', $closest_section_custom_breakpoint  );
 
     if ( is_array( $closest_section_custom_breakpoint ) ) {
