@@ -328,7 +328,7 @@ function sek_set_mq_css_rules( $params, $rules ) {
             sek_error_log( __FUNCTION__ . ' => missing level id, needed to determine if there is a custom breakpoint to use', $params );
         } else {
             $level_id = $params['level_id'];
-            $tablet_breakpoint = sek_get_user_defined_tablet_breakpoint_for_css_rules( $level_id );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
+            $tablet_breakpoint = sek_get_section_or_global_tablet_breakpoint_for_css_rules( $level_id, $for_responsive_columns = false );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
 
             // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
             $mobile_breakpoint = $mobile_breakpoint >= $tablet_breakpoint ? $tablet_breakpoint : $mobile_breakpoint;
@@ -336,19 +336,19 @@ function sek_set_mq_css_rules( $params, $rules ) {
     }
 
     $css_value_by_devices = $params['value'];
-    $_font_size_mq = array('desktop' => null , 'tablet' => null , 'mobile' => null );
+    $media_q = array('desktop' => null , 'tablet' => null , 'mobile' => null );
 
     if ( !empty( $css_value_by_devices ) ) {
           if ( ! empty( $css_value_by_devices[ 'desktop' ] ) ) {
-              $_font_size_mq[ 'desktop' ] = null;
+              $media_q[ 'desktop' ] = null;
           }
 
           if ( ! empty( $css_value_by_devices[ 'tablet' ] ) ) {
-              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; // default is max-width: 767
+              $media_q[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; // default is max-width: 767
           }
 
           if ( ! empty( $css_value_by_devices[ 'mobile' ] ) ) {
-              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; // default is max-width: 575
+              $media_q[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; // default is max-width: 575
           }
 
           // $css_value_by_devices looks like
@@ -378,7 +378,7 @@ function sek_set_mq_css_rules( $params, $rules ) {
                   $rules[] = array(
                       'selector' => $params['selector'],
                       'css_rules' => $css_rules,
-                      'mq' => $_font_size_mq[ $device ]
+                      'mq' => $media_q[ $device ]
                   );
               }
           }
@@ -452,7 +452,7 @@ function sek_set_mq_css_rules_supporting_vendor_prefixes( $params, $rules ) {
             sek_error_log( __FUNCTION__ . ' => missing level id, needed to determine if there is a custom breakpoint to use', $params );
         } else {
             $level_id = $params['level_id'];
-            $tablet_breakpoint = sek_get_user_defined_tablet_breakpoint_for_css_rules( $level_id );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
+            $tablet_breakpoint = sek_get_section_or_global_tablet_breakpoint_for_css_rules( $level_id, $for_responsive_columns = false );// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
 
             // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
             $mobile_breakpoint = $mobile_breakpoint >= $tablet_breakpoint ? $tablet_breakpoint : $mobile_breakpoint;
@@ -460,25 +460,25 @@ function sek_set_mq_css_rules_supporting_vendor_prefixes( $params, $rules ) {
     }
 
     $css_rules_by_device = $params['css_rules_by_device'];
-    $_font_size_mq = array('desktop' => null , 'tablet' => null , 'mobile' => null );
+    $media_q = array('desktop' => null , 'tablet' => null , 'mobile' => null );
 
     if ( !empty( $css_rules_by_device ) ) {
           if ( ! empty( $css_rules_by_device[ 'desktop' ] ) ) {
-              $_font_size_mq[ 'desktop' ] = null;
+              $media_q[ 'desktop' ] = null;
           }
 
           if ( ! empty( $css_rules_by_device[ 'tablet' ] ) ) {
-              $_font_size_mq[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; //max-width: 767
+              $media_q[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; //max-width: 767
           }
 
           if ( ! empty( $css_rules_by_device[ 'mobile' ] ) ) {
-              $_font_size_mq[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; //max-width: 575
+              $media_q[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; //max-width: 575
           }
           foreach ( $css_rules_by_device as $device => $rules_for_device ) {
               $rules[] = array(
                   'selector' => $params['selector'],
                   'css_rules' => $rules_for_device,
-                  'mq' => $_font_size_mq[ $device ]
+                  'mq' => $media_q[ $device ]
               );
           }
     } else {
@@ -496,18 +496,24 @@ function sek_set_mq_css_rules_supporting_vendor_prefixes( $params, $rules ) {
 // BREAKPOINT HELPER
 // A custom breakpoint can be set globally or by section
 // It replaces the default tablet breakpoint ( 768 px )
-function sek_get_user_defined_tablet_breakpoint_for_css_rules( $level_id = '' ) {
+//
+// the 'for_responsive_columns' param has been introduced for https://github.com/presscustomizr/nimble-builder/issues/564
+// so we can differentiate when the custom breakpoint is requested for column responsiveness or for css rules generation
+// when for columns, we always apply the custom breakpoint defined by the user
+// otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
+// 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
+function sek_get_section_or_global_tablet_breakpoint_for_css_rules( $level_id = '', $for_responsive_columns = false ) {
     //sek_error_log('ALORS CLOSEST PARENT SECTION MODEL ?' . $level_id , sek_get_closest_section_custom_breakpoint( $level_id ) );
 
     // define a default breakpoint : 768
-    $tablet_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];
+    $tablet_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints[Sek_Dyn_CSS_Builder::COLS_MOBILE_BREAKPOINT];//COLS_MOBILE_BREAKPOINT = 'md' <=> 768px
 
     // Is there a custom breakpoint set by a parent section?
     // Order :
     // 1) custom breakpoint set on a nested section
     // 2) custom breakpoint set on a regular section
     //sek_error_log('WE SEARCH FOR => ' . $level_id );
-    $closest_section_custom_breakpoint = sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $level_id ) );
+    $closest_section_custom_breakpoint = sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $level_id, 'for_responsive_columns' => false ) );
     //sek_error_log('WE FOUND A BREAKPOINT ', $closest_section_custom_breakpoint  );
 
     if ( is_array( $closest_section_custom_breakpoint ) ) {
@@ -2332,24 +2338,84 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
     if ( ! is_array( $pad_marg_options ) )
       return $rules;
 
+    // GENERATE SPACING RULES BY DEVICE
     $rules = sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $pad_marg_options, '[data-sek-id="'.$level['id'].'"]' );
 
+    // ADAPT COLUMN WIDTH IF A MARGIN IS SET, BY DEVICE
+    // april 2020 : fixes https://github.com/presscustomizr/nimble-builder/issues/665
     // if the column has a positive ( > 0 ) margin-right and / or a margin-left set , let's adapt the column widths so we fit the 100%
-    if ( 'column' === $level['level'] && ! empty( $pad_marg_options['desktop'] ) ) {
-        $margin_left = array_key_exists('margin-left', $pad_marg_options['desktop'] ) ? $pad_marg_options['desktop']['margin-left'] : 0;
-        $margin_right = array_key_exists('margin-right', $pad_marg_options['desktop'] ) ? $pad_marg_options['desktop']['margin-right'] : 0;
-        $device_unit = array_key_exists('unit', $pad_marg_options['desktop'] ) ? $pad_marg_options['desktop']['unit'] : 'px';
+    if ( 'column' === $level['level'] ) {
 
-        $total_horizontal_margin = (int)$margin_left + (int)$margin_right;
+        // Declare 'not_set' values here that will be only set if there are margin option set for the column
+        $parent_section = 'not_set';
+        $column_breakpoint = 'not_set';
 
-        $parent_section = sek_get_parent_level_model( $level['id'] );
-        if ( 'no_match' === $parent_section ) {
-            sek_error_log( __FUNCTION__ . ' => $parent_section not found for level id : ' . $level['id'] );
-            return $rules;
+        foreach (['desktop', 'tablet', 'mobile'] as $_device ) {
+            $pad_marg_options[$_device] = !empty($pad_marg_options[$_device]) ? $pad_marg_options[$_device] : array();
+            if ( 'not_set' === $parent_section ) {
+                $parent_section = sek_get_parent_level_model( $level['id'] );
+                if ( 'no_match' === $parent_section ) {
+                    sek_error_log( __FUNCTION__ . ' => $parent_section not found for level id : ' . $level['id'] );
+                    break;
+                }
+            }
+            if ( 'not_set' === $column_breakpoint ) {
+                // COLUMN BREAKPOINT
+                // define a default breakpoint : 768
+                $column_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints[Sek_Dyn_CSS_Builder::COLS_MOBILE_BREAKPOINT];//COLS_MOBILE_BREAKPOINT = 'md' <=> 768px
+
+                // Is there a global custom breakpoint set ?
+                $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
+                $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
+
+                // Does the parent section have a custom breakpoint set ?
+                $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( array( 'section_model' => $parent_section, 'for_responsive_columns' => true ) ) );
+                $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
+                if ( $has_section_custom_breakpoint ) {
+                    $column_breakpoint = $section_custom_breakpoint;
+                } else if ( $has_global_custom_breakpoint ) {
+                    $column_breakpoint = $global_custom_breakpoint;
+                }
+            }
+
+            $rules = sek_process_column_width_for_device( array(
+                'device' => $_device,
+                'rules' => $rules,
+                'pad_marg_options' => $pad_marg_options,
+                'level' => $level,
+                'parent_section' => $parent_section,
+                'column_breakpoint' => $column_breakpoint,
+                'has_global_custom_breakpoint' => $has_global_custom_breakpoint,
+                'has_section_custom_breakpoint' => $has_section_custom_breakpoint
+            ));
         }
+    }
+    return $rules;
+}
 
-        if ( $total_horizontal_margin > 0 && is_array( $parent_section ) && !empty( $parent_section ) ) {
-            $total_horizontal_margin_with_unit = $total_horizontal_margin . $device_unit;//20px
+
+// @return array of $rules
+function sek_process_column_width_for_device( $params ) {
+    $_device = $params['device'];
+    $rules = $params['rules'];
+    $pad_marg_options = $params['pad_marg_options'];
+    $level = $params['level'];
+    $parent_section = $params['parent_section'];
+    $column_breakpoint = $params['column_breakpoint'];
+    $has_global_custom_breakpoint = $params['has_global_custom_breakpoint'];
+    $has_section_custom_breakpoint = $params['has_section_custom_breakpoint'];
+
+
+    // RECURSIVELY CALCULATE TOTAL HORIZONTAL MARGIN FOR THE DEVICE, OR THE ONE INHERITED FROM WIDER ONES
+    // implemented for https://github.com/presscustomizr/nimble-builder/issues/665
+    $total_horizontal_margin_with_unit = sek_get_maybe_inherited_total_horizontal_margins( $_device, $pad_marg_options );
+
+    // WRITE RULES
+    switch ( $_device ) {
+        case 'desktop':
+            // no valid parent section ? stop here
+            if ( !is_array( $parent_section ) || empty( $parent_section) )
+              return $rules;
 
             $col_number = ( array_key_exists( 'collection', $parent_section ) && is_array( $parent_section['collection'] ) ) ? count( $parent_section['collection'] ) : 1;
             $col_number = 12 < $col_number ? 12 : $col_number;
@@ -2384,22 +2450,13 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
             if ( $col_suffix < 1 )
               return $rules;
 
-            // define a default breakpoint : 768
-            $breakpoint = Sek_Dyn_CSS_Builder::$breakpoints[ Sek_Dyn_CSS_Builder::COLS_MOBILE_BREAKPOINT ];//COLS_MOBILE_BREAKPOINT = 'md' <=> 768px
-
             // define a default selector
+            // will be more specific depending on the fact that a local or global custom breakpoint is set
             $selector = sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] );
 
-            // Is there a global custom breakpoint set ?
-            $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
-            $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
 
-            // Does the parent section have a custom breakpoint set ?
-            $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( array( 'section_model' => $parent_section, 'for_responsive_columns' => true ) ) );
-            $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
-
+            // SELECTOR DEPENDING ON THE CUSTOM BREAKPOINT
             if ( $has_section_custom_breakpoint ) {
-                $breakpoint = $section_custom_breakpoint;
                 // In this case, we need to use ".sek-section-custom-breakpoint-col-{}"
                 // @see sek_add_css_rules_for_sections_breakpoint
                 $selector =  sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-section-custom-breakpoint-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] );
@@ -2407,20 +2464,36 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
                 // In this case, we need to use ".sek-global-custom-breakpoint-col-{}"
                 // @see sek_add_css_rules_for_sections_breakpoint
                 $selector =  sprintf('[data-sek-level="location"] [data-sek-id="%1$s"] .sek-sektion-inner > .sek-global-custom-breakpoint-col-%2$s[data-sek-id="%3$s"]', $parent_section['id'], $col_suffix, $level['id'] );
-                $breakpoint = $global_custom_breakpoint;
             }
 
             // Format width in percent with 3 digits after decimal
             $col_width_in_percent = number_format( $col_width_in_percent, 3 );
-            $responsive_css_rules = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', $col_width_in_percent, $total_horizontal_margin_with_unit );
+            $responsive_css_rules_for_desktop = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', $col_width_in_percent, $total_horizontal_margin_with_unit );
 
             // we need to override the rule defined in : Sek_Dyn_CSS_Builder::sek_add_rules_for_column_width
             // that's why we use a long specific selector here
             $rules[] = array(
                 'selector' => $selector,
-                'css_rules' => $responsive_css_rules,
-                'mq' => "(min-width: {$breakpoint}px)"
+                'css_rules' => $responsive_css_rules_for_desktop,
+                'mq' => "(min-width: {$column_breakpoint}px)"
             );
+        break;
+
+        case 'tablet':
+            // the horizontal margin should be subtracted also to the column width of 100%, below the mobile breakpoint: basically the margin should be always subtracted to the column width for each viewport it is set
+            // @see https://github.com/presscustomizr/nimble-builder/issues/217
+            $responsive_css_rules_for_100_percent_width = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', 100, $total_horizontal_margin_with_unit );
+            $rules[] = array(
+                'selector' => sprintf('.sek-sektion-inner > [data-sek-id="%1$s"]', $level['id'] ),
+                'css_rules' => $responsive_css_rules_for_100_percent_width,
+                'mq' => "(max-width: {$column_breakpoint}px)"
+            );
+        break;
+
+        case 'mobile':
+            $mobile_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['sm'];//max-width: 576
+            // If user define breakpoint ( => that determines the column_breakpoint ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to column_breakpoint
+            $mobile_breakpoint = $mobile_breakpoint >= $column_breakpoint ? $column_breakpoint : $mobile_breakpoint;
 
             // the horizontal margin should be subtracted also to the column width of 100%, below the mobile breakpoint: basically the margin should be always subtracted to the column width for each viewport it is set
             // @see https://github.com/presscustomizr/nimble-builder/issues/217
@@ -2428,16 +2501,44 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
             $rules[] = array(
                 'selector' => sprintf('.sek-sektion-inner > [data-sek-id="%1$s"]', $level['id'] ),
                 'css_rules' => $responsive_css_rules_for_100_percent_width,
-                //$breakpoint_for_100_percent_width = $breakpoint-1;
-                'mq' => null,// "(max-width: {$breakpoint_for_100_percent_width}px)"
+                'mq' => "(max-width: {$mobile_breakpoint}px)"
             );
-            //sek_error_log('padding margin', $rules );
-        }//if ( $total_horizontal_margin > 0 && !empty( $parent_section ) ) {
-    }// if column
+        break;
+    }//switch device
 
+    //sek_error_log('padding margin', $rules );
     return $rules;
 }
 
+
+
+// Recursive helper to get the total horizontal margin of the current device
+// or the one inherited from the parent device
+// implemented for https://github.com/presscustomizr/nimble-builder/issues/665
+function sek_get_maybe_inherited_total_horizontal_margins( $_device, $pad_marg_options ) {
+      $total_horizontal_margin_with_unit = '0px';
+      if ( array_key_exists('margin-left', $pad_marg_options[$_device] ) || array_key_exists('margin-right', $pad_marg_options[$_device] ) ) {
+          $margin_left = array_key_exists('margin-left', $pad_marg_options[$_device] ) ? $pad_marg_options[$_device]['margin-left'] : 0;
+          $margin_right = array_key_exists('margin-right', $pad_marg_options[$_device] ) ? $pad_marg_options[$_device]['margin-right'] : 0;
+          $device_unit = array_key_exists('unit', $pad_marg_options[$_device] ) ? $pad_marg_options[$_device]['unit'] : 'px';
+          $total_horizontal_margin = (int)$margin_left + (int)$margin_right;
+
+          // IF NO HORIZONTAL MARGIN, LET'S STOP HERE
+          if ( $total_horizontal_margin <= 0 ) {
+              return $total_horizontal_margin_with_unit;
+          }
+
+          return $total_horizontal_margin . $device_unit;//example : 20px
+      } else {
+          $device_hierarchy = array( 'mobile' , 'tablet', 'desktop' );
+          $device_index = array_search( $_device, $device_hierarchy );
+          if ( $device_index < ( count( $device_hierarchy ) - 1 ) ) {
+              $next_device = $device_hierarchy[ $device_index + 1 ];
+              return sek_get_maybe_inherited_total_horizontal_margins( $next_device, $pad_marg_options );
+          }
+      }
+      return $total_horizontal_margin_with_unit;
+}
 ?><?php
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 function sek_get_module_params_for_sek_level_width_module() {

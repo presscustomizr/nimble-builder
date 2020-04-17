@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.7
+Stable tag: 2.0.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,16 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 2.0.7 =
-Fixes several bugs with the Grid module, in particular the pagination broken on home when home is a static page.
+= 2.0.8 =
+Fixes problems when setting custom margins to responsive columns.
 
 == Changelog ==
+= 2.0.8 April 17th 2020 =
+* fixed : [column][responsive] custom margins on columns not considered when calculating responsive width for mobile devices
+* fixed : [column][responsive] custom margins should be inherited if not set for a device, when calculating responsive width for mobile devices
+* fixed : [customizer][spacing input] when switching device, the unit of the input value is inconsistent with the one actually active
+* fixed : [customizer] make sure the font-size of "Insert a new section here" is set by Nimble Builder
+
 = 2.0.7 April 15th 2020 =
 * fixed : [grid module] pagination broken when used on home when home is a static page
 * fixed : [grid module] lazy loading images might break when customizing grids. Disabled when customizing.

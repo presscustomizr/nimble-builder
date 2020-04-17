@@ -10713,6 +10713,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                               }
                         });
+
                         $('.sek-unit-wrapper', input.container ).find('[data-sek-unit="' + validateUnit.call( input, unitToActivate ) + '"]').trigger('click', { previewed_device_switched : true });// We don't want to update the input();
                   };
 
@@ -10752,6 +10753,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         } else {
                               // this allow users to reset a given padding / margin instead of reseting them all at once with the "reset all spacing" option
                               _newInputVal[ previewedDevice ] = _.omit( _newInputVal[ previewedDevice ], changedSpacingType );
+                        }
+
+                        // Make sure the current device unit is consistent with the input value
+                        // fixes https://github.com/presscustomizr/nimble-builder/issues/667
+                        if ( !_newInputVal[previewedDevice]['unit'] || input.css_unit() != _newInputVal[ previewedDevice ][ 'unit' ] ) {
+                            _newInputVal[previewedDevice]['unit'] = input.css_unit();
                         }
 
                         input( _newInputVal );
