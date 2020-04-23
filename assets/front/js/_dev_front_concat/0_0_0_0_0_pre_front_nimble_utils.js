@@ -100,8 +100,8 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
 
                           var wt = this.cachedElements.$window.scrollTop(),
                               wb = wt + this.cachedElements.$window.height(),
-                              it  = $_el.offset().top,
-                              ib  = it + $_el.height(),
+                              it  = $el_candidate.offset().top,
+                              ib  = it + $el_candidate.height(),
                               th = threshold || 0;
 
                           return ib >= wt - th && it <= wb + th;
