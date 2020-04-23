@@ -31,9 +31,10 @@
                   defaults = {
                         load_all_images_on_first_scroll : false,
                         //attribute : [ 'data-sek-src' ],
-                        threshold : 200,
+                        threshold : 100,
                         fadeIn_options : { duration : 400 },
                         delaySmartLoadEvent : 0,
+                        imgSelectors : '[data-sek-src*="http"], [data-sek-iframe-src]'
 
                   },
                   //with intersecting cointainers:
@@ -45,6 +46,11 @@
               function Plugin( element, options ) {
                     if ( !sekFrontLocalized.lazyload_enabled )
                       return;
+                    // Do we already have an instance for this element ?
+                    if ( $(this.element).data('nimbleLazyLoadDone') ) {
+                        $(this.element).trigger('nb-trigger-lazyload' );
+                        return;
+                    }
 
                     this.element = element;
                     this.options = $.extend( {}, defaults, options) ;
@@ -58,29 +64,25 @@
                     this._defaults = defaults;
                     this._name = pluginName;
                     var self = this;
-                    // 'nb-trigger-lazyload' can be fired from
+                    // 'nb-trigger-lazyload' can be fired from the slider module
                     $(this.element).on('nb-trigger-lazyload', function() {
-                          self.init();
+                          self._maybe_trigger_load( 'nb-trigger-lazyload' );
                     });
                     this.init();
               }
 
+              Plugin.prototype._getImgs = function() {
+                    return $( this.options.imgSelectors, this.element );
+              };
 
               //can access this.element and this.option
               Plugin.prototype.init = function () {
-                    var self        = this,
-                        // img to be lazy loaded looks like data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7
-                        // [src*="data:image"] =>
-                        // [data-sek-src*="http"] => background images, images in image modules, wp editor module, post grids, slider module, etc..
-                        // [data-sek-iframe-src] => ?
-                        $_ImgOrDivOrIFrameElements  = $( '[data-sek-src*="http"], [data-sek-iframe-src]' , this.element );
-                    // flag so we can check wether his element has been lazyloaded
-                    $(this.element).data('nimbleLazyLoadDone', true );
-
-                    this.increment  = 1;//used to wait a little bit after the first user scroll actions to trigger the timer
-                    this.timer      = 0;
-
-                    $_ImgOrDivOrIFrameElements
+                    var self        = this;
+                    // img to be lazy loaded looks like data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7
+                    // [src*="data:image"] =>
+                    // [data-sek-src*="http"] => background images, images in image modules, wp editor module, post grids, slider module, etc..
+                    // [data-sek-iframe-src] => ?
+                    this._getImgs()
                           //avoid intersecting containers to parse the same images
                           // .addClass( skipLazyLoadClass )
                           .bind( 'sek_load_img', {}, function() { self._load_img(this); })
@@ -88,14 +90,18 @@
 
                     //the scroll event gets throttled with the requestAnimationFrame
                     nb_.cachedElements.$window.scroll( function( _evt ) {
-                          self._better_scroll_event_handler( $_ImgOrDivOrIFrameElements, _evt );
+                          self._better_scroll_event_handler( _evt );
                     });
                     //debounced resize event
                     nb_.cachedElements.$window.resize( nb_.debounce( function( _evt ) {
-                          self._maybe_trigger_load( $_ImgOrDivOrIFrameElements, _evt );
+                          self._maybe_trigger_load( _evt );
                     }, 100 ) );
-                    //on load
-                    this._maybe_trigger_load( $_ImgOrDivOrIFrameElements);
+
+                    //on DOM ready
+                    this._maybe_trigger_load();
+
+                    // flag so we can check whether his element has been lazyloaded
+                    $(this.element).data('nimbleLazyLoadDone', true );
 
               };
 
@@ -106,12 +112,12 @@
               * @return : void
               * scroll event performance enhancer => avoid browser stack if too much scrolls
               */
-              Plugin.prototype._better_scroll_event_handler = function( $_Elements , _evt ) {
+              Plugin.prototype._better_scroll_event_handler = function( _evt ) {
                     var self = this;
                     if ( ! this.doingAnimation ) {
                           this.doingAnimation = true;
                           window.requestAnimationFrame(function() {
-                                self._maybe_trigger_load( $_Elements , _evt );
+                                self._maybe_trigger_load(_evt );
                                 self.doingAnimation = false;
                           });
                     }
@@ -123,14 +129,15 @@
               * @param : current event
               * @return : void
               */
-              Plugin.prototype._maybe_trigger_load = function( $_Elements , _evt ) {
+              Plugin.prototype._maybe_trigger_load = function(_evt ) {
                     var self = this,
+                        $_imgs = self._getImgs(),
                         // get the visible images list
                         // don't apply a threshold on page load so that Google audit is happy
                         // for https://github.com/presscustomizr/nimble-builder/issues/619
                         threshold = ( _evt && 'scroll' === _evt.type ) ? this.options.threshold : 0;
 
-                        _visible_list = $_Elements.filter( function( ind, _el ) {
+                        _visible_list = $_imgs.filter( function( ind, _el ) {
                             //force all images to visible if first scroll option enabled
                             if ( _evt && 'scroll' == _evt.type && self.options.load_all_images_on_first_scroll )
                               return true;
@@ -153,8 +160,13 @@
               * replace src place holder by data-src attr val which should include the real src
               */
               Plugin.prototype._load_img = function( _el_ ) {
-                    var $_el    = $(_el_),
-                        _src     = $_el.attr( 'data-sek-src' ),
+                    var $_el    = $(_el_);
+
+                    if ( !$_el.attr( 'data-sek-src' ) || $_el.data('sek-lazy-loaded') ) {
+                        return;
+                    }
+
+                    var _src     = $_el.attr( 'data-sek-src' ),
                         _src_set = $_el.attr( 'data-sek-srcset' ),
                         _sizes   = $_el.attr( 'data-sek-sizes' ),
                         self = this,
