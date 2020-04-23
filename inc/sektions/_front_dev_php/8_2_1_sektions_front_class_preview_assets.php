@@ -56,8 +56,9 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                         if ( !nb_.isObject(el) )
                           return;
 
+                        // Maybe reveal BG if lazyload is on
                         if ( nb_.isCustomizing() ) {
-                            nb_.revealBG.call(el);
+                            nb_.mayBeRevealBG.call(el);
                         }
                     });
               });

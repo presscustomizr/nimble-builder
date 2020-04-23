@@ -170,11 +170,11 @@ window.nb_ = {};
                 params.scriptEl.parentNode.removeChild(params.scriptEl);
             }
         },
-        revealBG : function() {
+        mayBeRevealBG : function() {
             var imgSrc = this.getAttribute('data-sek-src');
             if ( imgSrc ) {
                 this.setAttribute( 'style', 'background-image:url("' + this.getAttribute('data-sek-src') +'")' );
-                this.className += ' smartload-skip';//<= so we don't parse it twice when lazyload is active
+                this.className += ' sek-lazy-loaded';//<= so we don't parse it twice when lazyload is active
                 // clean css loader
                 var css_loaders = this.querySelectorAll('.sek-css-loader');
                 css_loaders.forEach( function(_cssl) {
@@ -196,7 +196,8 @@ window.nb_ = {};
             }
         };
     }
-    // handle bg images when lazyloading off
+    // maybe reveal bg images on dom ready
+    // if lazyload is not loaded yet, and container is visible
     nb_.listenTo('nb-docready', function() {
         var matches = document.querySelectorAll('div.sek-has-bg');
         if ( !nb_.isObject( matches ) || matches.length < 1 )
@@ -205,9 +206,8 @@ window.nb_ = {};
         matches.forEach( function(el) {
             if ( !nb_.isObject(el) )
               return;
-
-            if ( !nb_.isLazyLoadEnabled() || ( nb_.isInScreen(el) && nb_.isLazyLoadEnabled() ) ) {
-                nb_.revealBG.call(el);
+            if ( nb_.isInScreen(el) ) {
+                nb_.mayBeRevealBG.call(el);
             }
         });
     });
