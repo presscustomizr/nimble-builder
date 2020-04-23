@@ -533,92 +533,6 @@ function sek_is_video_bg_lazyload_enabled() {
 
 
 
-// /* ------------------------------------------------------------------------- *
-// *  Adaptation of wp_get_attachment_image() for preprocessing lazy loading carousel images
-//  added in dec 2019 for https://github.com/presscustomizr/nimble-builder/issues/570
-//  used in tmpl/modules/img_slider_tmpl.php
-// /* ------------------------------------------------------------------------- */
-function sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel( $attachment_id, $size = 'thumbnail', $is_first_img ) {
-    $html  = '';
-    $image = wp_get_attachment_image_src( $attachment_id, $size, $icon = false );
-    if ( $image ) {
-        list($src, $width, $height) = $image;
-        $hwstring                   = image_hwstring( $width, $height );
-        $size_class                 = $size;
-        if ( is_array( $size_class ) ) {
-            $size_class = join( 'x', $size_class );
-        }
-        $attachment   = get_post( $attachment_id );
-        $default_attr = array(
-            'src'   => $src,
-            'class' => "attachment-$size_class size-$size_class swiper-lazy",// add swiper class for lazyloading @see https://swiperjs.com/api/#lazy
-            'alt'   => trim( strip_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ),
-        );
-
-        $attr = $default_attr;
-
-        // Generate 'srcset' and 'sizes' if not already present.
-        if ( empty( $attr['srcset'] ) ) {
-            $image_meta = wp_get_attachment_metadata( $attachment_id );
-
-            if ( is_array( $image_meta ) ) {
-                $size_array = array( absint( $width ), absint( $height ) );
-                $srcset     = wp_calculate_image_srcset( $size_array, $src, $image_meta, $attachment_id );
-                $sizes      = wp_calculate_image_sizes( $size_array, $src, $image_meta, $attachment_id );
-
-                if ( $srcset && ( $sizes || ! empty( $attr['sizes'] ) ) ) {
-                    $attr['srcset'] = $srcset;
-
-                    if ( empty( $attr['sizes'] ) ) {
-                        $attr['sizes'] = $sizes;
-                    }
-                }
-            }
-        }
-
-        /**
-         * Filters the list of attachment image attributes.
-         *
-         * @since 2.8.0
-         *
-         * @param array        $attr       Attributes for the image markup.
-         * @param WP_Post      $attachment Image attachment post.
-         * @param string|array $size       Requested size. Image size or array of width and height values
-         *                                 (in that order). Default 'thumbnail'.
-         */
-        $attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $attachment, $size );
-
-        // add swiper data-* stuffs for lazyloading now, after all filters
-        // @see https://swiperjs.com/api/#lazy
-        if ( !empty( $attr['srcset'] ) ) {
-            $attr['data-srcset'] = $attr['srcset'];
-            unset( $attr['srcset'] );
-        }
-
-        if ( !empty( $attr['src'] ) ) {
-            $attr['data-src'] = $attr['src'];
-            $attr['src'] = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-            //unset( $attr['src'] );
-        }
-        if ( !empty( $attr['sizes'] ) ) {
-            $attr['data-sek-img-sizes'] = $attr['sizes'];
-            unset( $attr['sizes'] );
-        }
-        // when lazy load is active, we want to lazy load the first image of the slider if offscreen
-        if ( $is_first_img && sek_is_img_smartload_enabled() ) {
-            $attr['data-sek-src'] = $attr['src'];
-        }
-
-        $attr = array_map( 'esc_attr', $attr );
-        $html = rtrim( "<img $hwstring" );
-        foreach ( $attr as $name => $value ) {
-            $html .= " $name=" . '"' . $value . '"';
-        }
-        $html .= ' />';
-    }
-
-    return $html;
-}
 
 
 // /* ------------------------------------------------------------------------- *
@@ -889,7 +803,7 @@ function sek_get_module_collection() {
         array(
           'content-type' => 'module',
           'content-id' => 'czr_tiny_mce_editor_module',
-          'title' => __( 'WordPress Editor', 'text_doma' ),
+          'title' => __( 'Rich Text Editor', 'text_doma' ),
           'icon' => 'Nimble_rich-text-editor_icon.svg'
         ),
         array(

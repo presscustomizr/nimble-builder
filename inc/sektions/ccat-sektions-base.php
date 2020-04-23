@@ -4502,6 +4502,19 @@ function sek_get_module_params_for_sek_global_imp_exp() {
                     'html_before' => sprintf('<span class="czr-notice">%1$s</span><br/>',__('These options allows you to export and import global sections like a global header-footer.', 'text_doma') )
                     // 'notice_after' => __('Select a revision from the drop-down list to preview it. You can then restore it by clicking the Publish button at the top of the page.', 'text_doma')
                 ),
+                // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
+                // https://github.com/presscustomizr/nimble-builder/issues/676
+                'import_img' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Import images in your media library.', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => false,
+                    'refresh_preview' => true,
+                    'notice_after' => __( 'When this option is unchecked, Nimble Builder will not import images and use instead the url of the original images.', 'text_doma'),
+                )
                 // 'keep_existing_sections' => array(
                 //     'input_type'  => 'nimblecheck',
                 //     'title'       => __('Combine the imported sections with the current ones.', 'text_doma'),
@@ -13716,7 +13729,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             if ( !sek_local_skope_has_nimble_sections( skp_get_skope_id() ) && !sek_has_global_sections() )
               return;
             ?>
-            <script id="nimble-app-init">window.nb_={},function(e,n){if(window.nb_={isArray:function(e){return Array.isArray(e)||"[object Array]"===toString.call(e)},inArray:function(e,n){return!(!nb_.isArray(e)||nb_.isUndefined(n))&&e.indexOf(n)>-1},isUndefined:function(e){return void 0===e},isObject:function(e){var n=typeof e;return"function"===n||"object"===n&&!!e},errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},hasPreloadSupport:function(e){var n=document.createElement("link").relList;return!(!n||!n.supports)&&n.supports("preload")},listenTo:function(e,n){var t={"nb-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nb-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nb-jquery-loaded")},"nb-jmp-parsed":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup},"nb-main-swiper-parsed":function(){return void 0!==window.Swiper}},o=function(o){nb_.isUndefined(t[e])||!1!==t[e]()?(n(),nb_.eventsListenedTo.push(e)):nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",e,nb_.eventsListenedTo)};"function"==typeof n?nb_.wasEmitted(e)?o():document.addEventListener(e,o):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",e)},eventsEmitted:[],eventsListenedTo:[],emit:function(e,n){if(!(nb_.isUndefined(n)||n.fire_once)||!nb_.wasEmitted(e)){var t=document.createEvent("Event");t.initEvent(e,!0,!0),document.dispatchEvent(t),nb_.eventsEmitted.push(e)}},wasListenedTo:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsListenedTo,e)},wasEmitted:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsEmitted,e)},isInScreen:function(e,n){var t=window.pageYOffset||document.documentElement.scrollTop,o=t+window.innerHeight,i=e.offsetTop,r=n||0;return i+e.clientHeight>=t-r&&i<=o+r},isCustomizing:function(){return!1},isLazyLoadEnabled:function(){return!nb_.isCustomizing()&&!1},preloadAsset:function(e){if(e=e||{},nb_.preloadedAssets=nb_.preloadedAssets||[],!nb_.inArray(nb_.preloadedAssets,e.id)){var n=document.getElementsByTagName("head")[0],t=document.createElement("link"),o=(e.as,function(){if("style"===e.as)this.setAttribute("rel","stylesheet");else{var t=document.createElement("script");t.setAttribute("src",e.href),t.setAttribute("id",e.id),nb_.hasPreloadSupport()||"script"!==e.as||t.setAttribute("defer","defer"),n.appendChild(t),this&&this.parentNode&&this.parentNode.removeChild(this)}});nb_.hasPreloadSupport()||"script"!==e.as?(t.setAttribute("href",e.href),t.setAttribute("rel",nb_.hasPreloadSupport()?"preload":"stylesheet"),t.setAttribute("id",e.id),t.setAttribute("as",e.as),t.onload=function(){this.onload=null,e.onEvent?nb_.listenTo(e.onEvent,function(){o.call(t)}):o.call(t)},t.onerror=function(){nb_.errorLog("Nimble preloadAsset error",er,e)}):e.onEvent?nb_.listenTo(e.onEvent,function(){o.call(t)}):o.call(t),n.appendChild(t),nb_.preloadedAssets.push(e.id),e.scriptEl&&e.scriptEl.parentNode&&e.scriptEl.parentNode.removeChild(e.scriptEl)}},revealBG:function(){this.getAttribute("data-sek-src")&&(this.setAttribute("style",'background-image:url("'+this.getAttribute("data-sek-src")+'")'),this.className+=" smartload-skip",this.querySelectorAll(".sek-css-loader").forEach(function(e){nb_.isObject(e)&&e.parentNode.removeChild(e)}))}},window.NodeList&&!NodeList.prototype.forEach&&(NodeList.prototype.forEach=function(e,n){n=n||window;for(var t=0;t<this.length;t++)e.call(n,this[t],t,this)}),nb_.listenTo("nb-docready",function(){var e=document.querySelectorAll("div.sek-has-bg");!nb_.isObject(e)||e.length<1||e.forEach(function(e){nb_.isObject(e)&&(!nb_.isLazyLoadEnabled()||nb_.isInScreen(e)&&nb_.isLazyLoadEnabled())&&nb_.revealBG.call(e)})}),"complete"===document.readyState||"loading"!==document.readyState&&!document.documentElement.doScroll)nb_.emit("nb-docready");else{var t=function(){nb_.wasEmitted("nb-docready")||nb_.emit("nb-docready")};document.addEventListener("DOMContentLoaded",t),window.addEventListener("load",t)}}(window,document);</script>
+            <script id="nimble-app-init">window.nb_={},function(){if(window.nb_={isArray:function(e){return Array.isArray(e)||"[object Array]"===toString.call(e)},inArray:function(e,n){return!(!nb_.isArray(e)||nb_.isUndefined(n))&&-1<e.indexOf(n)},isUndefined:function(e){return void 0===e},isObject:function(e){var n=typeof e;return"function"==n||"object"==n&&!!e},errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},hasPreloadSupport:function(e){var n=document.createElement("link").relList;return!(!n||!n.supports)&&n.supports("preload")},listenTo:function(n,t){function e(e){nb_.isUndefined(o[n])||!1!==o[n]()?(t(),nb_.eventsListenedTo.push(n)):nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",n,nb_.eventsListenedTo)}var o={"nb-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nb-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nb-jquery-loaded")},"nb-jmp-parsed":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup},"nb-main-swiper-parsed":function(){return void 0!==window.Swiper}};"function"==typeof t?nb_.wasEmitted(n)?e():document.addEventListener(n,e):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",n)},eventsEmitted:[],eventsListenedTo:[],emit:function(e,n){if(!(nb_.isUndefined(n)||n.fire_once)||!nb_.wasEmitted(e)){var t=document.createEvent("Event");t.initEvent(e,!0,!0),document.dispatchEvent(t),nb_.eventsEmitted.push(e)}},wasListenedTo:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsListenedTo,e)},wasEmitted:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsEmitted,e)},isInScreen:function(e,n){var t=window.pageYOffset||document.documentElement.scrollTop,o=t+window.innerHeight,r=e.offsetTop,i=n||0;return t-i<=r+e.clientHeight&&r<=o+i},isCustomizing:function(){return!1},isLazyLoadEnabled:function(){return!nb_.isCustomizing()&&!1},preloadAsset:function(t){if(t=t||{},nb_.preloadedAssets=nb_.preloadedAssets||[],!nb_.inArray(nb_.preloadedAssets,t.id)){function e(){var e=this;if("style"===t.as)e.setAttribute("rel","stylesheet");else{var n=document.createElement("script");n.setAttribute("src",t.href),n.setAttribute("id",t.id),nb_.hasPreloadSupport()||"script"!==t.as||n.setAttribute("defer","defer"),o.appendChild(n),e&&e.parentNode&&e.parentNode.removeChild(e)}}var o=document.getElementsByTagName("head")[0],n=document.createElement("link");t.as;nb_.hasPreloadSupport()||"script"!==t.as?(n.setAttribute("href",t.href),n.setAttribute("rel",nb_.hasPreloadSupport()?"preload":"stylesheet"),n.setAttribute("id",t.id),n.setAttribute("as",t.as),n.onload=function(){this.onload=null,t.onEvent?nb_.listenTo(t.onEvent,function(){e.call(n)}):e.call(n)},n.onerror=function(e){nb_.errorLog("Nimble preloadAsset error",e,t)}):t.onEvent?nb_.listenTo(t.onEvent,function(){e.call(n)}):e.call(n),o.appendChild(n),nb_.preloadedAssets.push(t.id),t.scriptEl&&t.scriptEl.parentNode&&t.scriptEl.parentNode.removeChild(t.scriptEl)}},mayBeRevealBG:function(){this.getAttribute("data-sek-src")&&(this.setAttribute("style",'background-image:url("'+this.getAttribute("data-sek-src")+'")'),this.className+=" sek-lazy-loaded",this.querySelectorAll(".sek-css-loader").forEach(function(e){nb_.isObject(e)&&e.parentNode.removeChild(e)}))}},window.NodeList&&!NodeList.prototype.forEach&&(NodeList.prototype.forEach=function(e,n){n=n||window;for(var t=0;t<this.length;t++)e.call(n,this[t],t,this)}),nb_.listenTo("nb-docready",function(){var e=document.querySelectorAll("div.sek-has-bg");!nb_.isObject(e)||e.length<1||e.forEach(function(e){nb_.isObject(e)&&nb_.isInScreen(e)&&nb_.mayBeRevealBG.call(e)})}),"complete"===document.readyState||"loading"!==document.readyState&&!document.documentElement.doScroll)nb_.emit("nb-docready");else{function e(){nb_.wasEmitted("nb-docready")||nb_.emit("nb-docready")}document.addEventListener("DOMContentLoaded",e),window.addEventListener("load",e)}}((window,document));</script>
             <?php
         }
 
@@ -13942,8 +13955,9 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                         if ( !nb_.isObject(el) )
                           return;
 
+                        // Maybe reveal BG if lazyload is on
                         if ( nb_.isCustomizing() ) {
-                            nb_.revealBG.call(el);
+                            nb_.mayBeRevealBG.call(el);
                         }
                     });
               });
@@ -15479,6 +15493,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         //
         // May 2019 => note that this implementation won't include Nimble sections created in other contexts than page or post.
         // This could be added in the future.
+        // April 2020 : the found_posts number is not correct when search results are paginated. see https://github.com/presscustomizr/nimble-builder/issues/666
         //
         // partially inspired by https://stackoverflow.com/questions/24195818/add-results-into-wordpress-search-results
         function sek_maybe_include_nimble_content_in_search_results(){
@@ -15503,43 +15518,59 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 's' => $query_vars['s']
             );
             $query = new \WP_Query( $sek_post_query_vars );
-
+            $nimble_post_candidates = array();
             // The search string has been found in a set of Nimble posts
             if ( is_array( $query->posts ) ) {
                 foreach ( $query->posts as $post_object ) {
                     // The related WP object ( == skope ) is written in the title of Nimble CPT
-                    // ex : nimble___skp__post_post_114
+                    // ex : nimble___skp__post_post_114, where 114 is the post_id
                     if ( preg_match('(post_page|post_post)', $post_object->post_title ) ) {
-                        $post_number = preg_replace('/[^0-9]/', '', $post_object->post_title );
-                        $post_number = intval($post_number);
-
-                        $post_candidate = get_post( $post_number );
-
+                        $_post_id = preg_replace('/[^0-9]/', '', $post_object->post_title );
+                        $_post_id = intval($_post_id);
+                        $post_candidate = get_post( $_post_id );
                         if ( is_object( $post_candidate ) ) {
-                            // Merge Nimble posts to WP posts
-                            array_push( $wp_query->posts, $post_candidate );
+                            array_push($nimble_post_candidates, $post_candidate);
                         }
                     }
                 }
             }
 
-            // Maybe clean duplicated posts
-            $maybe_includes_duplicated = $wp_query->posts;
-            $without_duplicated = array();
-            $post_ids = array();
+            // april 2020 : found post for https://github.com/presscustomizr/nimble-builder/issues/666
+            $nimble_found_posts = (int)count($nimble_post_candidates);
 
-            foreach ( $maybe_includes_duplicated as $post_obj ) {
-                if ( in_array( $post_obj->ID, $post_ids ) )
-                  continue;
-                $post_ids[] = $post_obj->ID;
-                $without_duplicated[] = $post_obj;
+            // Merge Nimble posts to WP posts but only on the first result page
+            // => this means that the first paginated result page may be > to the user post_per_page setting
+            // fixes https://github.com/presscustomizr/nimble-builder/issues/666
+            if ( !is_paged() ) {
+                // important : when search results are paginated, $wp_query->posts includes the posts of the result page only, not ALL the search results posts.
+                // => this means that $wp_query->posts is not equal to $wp_query->found_posts when results are paginated.
+                $wp_query->posts = is_array($wp_query->posts) ? $wp_query->posts : array();
+
+                // $wp_query->post_count : make sure we remove posts found both by initial query and Nimble search query
+                // => this way we avoid pagination problems by setting a correct value for $wp_query->post_count
+                $maybe_includes_duplicated = array_merge( $wp_query->posts, $nimble_post_candidates );
+                $without_duplicated = array();
+                $post_ids = array();
+                foreach ( $maybe_includes_duplicated as $post_obj ) {
+                    if ( in_array( $post_obj->ID, $post_ids ) )
+                      continue;
+                    $post_ids[] = $post_obj->ID;
+                    $without_duplicated[] = $post_obj;
+                }
+                $wp_query->posts = $without_duplicated;
+                $wp_query->post_count = (int)count($without_duplicated);
             }
-            $wp_query->posts = $without_duplicated;
 
-            // Make sure the post_count and found_posts are updated
-            $wp_query->post_count = count($wp_query->posts);
-            $wp_query->found_posts = $wp_query->post_count;
+            // Found post may include duplicated posts because the search result has been found both in the WP search query and in Nimble one.
+            // This should be improved in the future.
+            // The problem to solve here is that when a search query is paginated, $wp_query->posts only includes the posts of the current page, not all the posts of the search results.
+            // If we had the entire set of WP results, we could create an array merging WP results with Nimble results, remove the duplicates and then calculate a real found_posts value. A possible solution would be to get the wp_query->request, remove the limit per page, and re-run a new query to get the entire set of search results.
+            if ( is_numeric($nimble_found_posts) ) {
+                $wp_query->found_posts = $wp_query->found_posts + $nimble_found_posts;
+            }
         }// sek_maybe_include_nimble_content_in_search_results
+
+
 
 
         // @return html string

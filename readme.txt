@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.8
+Stable tag: 2.0.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,20 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 2.0.8 =
-Fixes problems when setting custom margins to responsive columns.
+= 2.0.9 =
+Fixed image lazy loading issues in slider module ( leading to extra space on top and bottom ). PHP 7.4.2 compatibility fixes. Import/Export fix for global sections.
 
 == Changelog ==
+= 2.0.9 April 24th 2020 =
+* fixed : [slider module] lazy loading broken, leading to extra space on top and bottom of the slider
+* fixed : [PHP compatibility] PHP notice with PHP 7.4.2 ( Array and string offset access syntax with curly braces is deprecated )
+* fixed : [import/export] Site wide import/export doesn’t work
+* fixed : [Lazy load][Performance] make sure images are lazy loaded when dynamic content is inserted in the DOM ( via ajax )
+* fixed : [Lazy load][Performance] when images are set to display:none; lazyload is fired even when an image is off the viewport
+* fixed : [search] the found_posts number updated with Nimble Builder results is not correct when search results are paginated
+* updated : name of the WP editor module to Rich Text Editor
+* added : [performance][shortcode module] support for image lazy loading
+
 = 2.0.8 April 17th 2020 =
 * fixed : [column][responsive] custom margins on columns not considered when calculating responsive width for mobile devices
 * fixed : [column][responsive] custom margins should be inherited if not set for a device, when calculating responsive width for mobile devices
