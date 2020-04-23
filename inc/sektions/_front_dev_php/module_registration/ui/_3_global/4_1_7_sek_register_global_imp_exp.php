@@ -23,6 +23,19 @@ function sek_get_module_params_for_sek_global_imp_exp() {
                     'html_before' => sprintf('<span class="czr-notice">%1$s</span><br/>',__('These options allows you to export and import global sections like a global header-footer.', 'text_doma') )
                     // 'notice_after' => __('Select a revision from the drop-down list to preview it. You can then restore it by clicking the Publish button at the top of the page.', 'text_doma')
                 ),
+                // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
+                // https://github.com/presscustomizr/nimble-builder/issues/676
+                'import_img' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Import images in your media library.', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => false,
+                    'refresh_preview' => true,
+                    'notice_after' => __( 'When this option is unchecked, Nimble Builder will not import images and use instead the url of the original images.', 'text_doma'),
+                )
                 // 'keep_existing_sections' => array(
                 //     'input_type'  => 'nimblecheck',
                 //     'title'       => __('Combine the imported sections with the current ones.', 'text_doma'),
