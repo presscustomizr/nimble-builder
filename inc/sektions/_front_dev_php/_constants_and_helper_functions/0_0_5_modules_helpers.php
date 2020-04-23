@@ -27,7 +27,7 @@ function sek_get_module_collection() {
         array(
           'content-type' => 'module',
           'content-id' => 'czr_tiny_mce_editor_module',
-          'title' => __( 'WordPress Editor', 'text_doma' ),
+          'title' => __( 'Rich Text Editor', 'text_doma' ),
           'icon' => 'Nimble_rich-text-editor_icon.svg'
         ),
         array(
