@@ -1254,6 +1254,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         //
         // May 2019 => note that this implementation won't include Nimble sections created in other contexts than page or post.
         // This could be added in the future.
+        // April 2020 : the found_posts number is not correct when search results are paginated. see https://github.com/presscustomizr/nimble-builder/issues/666
         //
         // partially inspired by https://stackoverflow.com/questions/24195818/add-results-into-wordpress-search-results
         function sek_maybe_include_nimble_content_in_search_results(){
@@ -1278,43 +1279,59 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 's' => $query_vars['s']
             );
             $query = new \WP_Query( $sek_post_query_vars );
-
+            $nimble_post_candidates = array();
             // The search string has been found in a set of Nimble posts
             if ( is_array( $query->posts ) ) {
                 foreach ( $query->posts as $post_object ) {
                     // The related WP object ( == skope ) is written in the title of Nimble CPT
-                    // ex : nimble___skp__post_post_114
+                    // ex : nimble___skp__post_post_114, where 114 is the post_id
                     if ( preg_match('(post_page|post_post)', $post_object->post_title ) ) {
-                        $post_number = preg_replace('/[^0-9]/', '', $post_object->post_title );
-                        $post_number = intval($post_number);
-
-                        $post_candidate = get_post( $post_number );
-
+                        $_post_id = preg_replace('/[^0-9]/', '', $post_object->post_title );
+                        $_post_id = intval($_post_id);
+                        $post_candidate = get_post( $_post_id );
                         if ( is_object( $post_candidate ) ) {
-                            // Merge Nimble posts to WP posts
-                            array_push( $wp_query->posts, $post_candidate );
+                            array_push($nimble_post_candidates, $post_candidate);
                         }
                     }
                 }
             }
 
-            // Maybe clean duplicated posts
-            $maybe_includes_duplicated = $wp_query->posts;
-            $without_duplicated = array();
-            $post_ids = array();
+            // april 2020 : found post for https://github.com/presscustomizr/nimble-builder/issues/666
+            $nimble_found_posts = (int)count($nimble_post_candidates);
 
-            foreach ( $maybe_includes_duplicated as $post_obj ) {
-                if ( in_array( $post_obj->ID, $post_ids ) )
-                  continue;
-                $post_ids[] = $post_obj->ID;
-                $without_duplicated[] = $post_obj;
+            // Merge Nimble posts to WP posts but only on the first result page
+            // => this means that the first paginated result page may be > to the user post_per_page setting
+            // fixes https://github.com/presscustomizr/nimble-builder/issues/666
+            if ( !is_paged() ) {
+                // important : when search results are paginated, $wp_query->posts includes the posts of the result page only, not ALL the search results posts.
+                // => this means that $wp_query->posts is not equal to $wp_query->found_posts when results are paginated.
+                $wp_query->posts = is_array($wp_query->posts) ? $wp_query->posts : array();
+
+                // $wp_query->post_count : make sure we remove posts found both by initial query and Nimble search query
+                // => this way we avoid pagination problems by setting a correct value for $wp_query->post_count
+                $maybe_includes_duplicated = array_merge( $wp_query->posts, $nimble_post_candidates );
+                $without_duplicated = array();
+                $post_ids = array();
+                foreach ( $maybe_includes_duplicated as $post_obj ) {
+                    if ( in_array( $post_obj->ID, $post_ids ) )
+                      continue;
+                    $post_ids[] = $post_obj->ID;
+                    $without_duplicated[] = $post_obj;
+                }
+                $wp_query->posts = $without_duplicated;
+                $wp_query->post_count = (int)count($without_duplicated);
             }
-            $wp_query->posts = $without_duplicated;
 
-            // Make sure the post_count and found_posts are updated
-            $wp_query->post_count = count($wp_query->posts);
-            $wp_query->found_posts = $wp_query->post_count;
+            // Found post may include duplicated posts because the search result has been found both in the WP search query and in Nimble one.
+            // This should be improved in the future.
+            // The problem to solve here is that when a search query is paginated, $wp_query->posts only includes the posts of the current page, not all the posts of the search results.
+            // If we had the entire set of WP results, we could create an array merging WP results with Nimble results, remove the duplicates and then calculate a real found_posts value. A possible solution would be to get the wp_query->request, remove the limit per page, and re-run a new query to get the entire set of search results.
+            if ( is_numeric($nimble_found_posts) ) {
+                $wp_query->found_posts = $wp_query->found_posts + $nimble_found_posts;
+            }
         }// sek_maybe_include_nimble_content_in_search_results
+
+
 
 
         // @return html string
