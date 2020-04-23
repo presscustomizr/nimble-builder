@@ -7,7 +7,7 @@ function sek_setup_nimble_editor( $content, $editor_id, $settings = array() ) {
 
 
 /**
- * started from a copy of class-wp-editor.php as of March 2019
+ * started from a copy of wp-includes/class-wp-editor.php as of March 2019
  * _NIMBLE_Editors::nimble_editor() is fired with sek_setup_nimble_editor() in hook 'customize_controls_print_footer_scripts'
  * the job of this class is to print the js parameters for the detached tinyMce editor for Nimble
  * the editor is then destroyed and re-instantiated each time a WP text editor module is customized
@@ -749,8 +749,8 @@ final class _NIMBLE_Editors {
         $options .= $key . ':' . $val . ',';
         continue;
       } elseif ( ! empty( $value ) && is_string( $value ) && (
-        ( '{' == $value{0} && '}' == $value{strlen( $value ) - 1} ) ||
-        ( '[' == $value{0} && ']' == $value{strlen( $value ) - 1} ) ||
+        ( '{' == $value[0] && '}' == $value[ strlen( $value ) - 1 ] ) ||
+        ( '[' == $value[0] && ']' == $value[ strlen( $value ) - 1 ] ) ||
         preg_match( '/^\(?function ?\(/', $value ) ) ) {
 
         $options .= $key . ':' . $value . ',';
