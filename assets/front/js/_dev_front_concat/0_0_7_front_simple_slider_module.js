@@ -43,7 +43,11 @@
 
                                     // lazy load the first slider image with Nimble if not done already
                                     // the other images will be lazy loaded by swiper if the option is activated
-                                    $swiperWrapper.nimbleLazyLoad();
+                                    // if ( sekFrontLocalized.lazyload_enabled && $.fn.nimbleLazyLoad ) {
+
+                                    // }
+                                    $swiperWrapper.trigger('nb-trigger-lazyload');
+
                                     // center images with Nimble wizard when needed
                                     if ( 'nimble-wizard' === $swiperWrapper.data('sek-image-layout') ) {
                                           $swiperWrapper.find('.sek-carousel-img').each( function() {
@@ -69,8 +73,30 @@
                               slideChange : function(params) {
                                   // when lazy load is active, we want to lazy load the first image of the slider if offscreen
                                   // img to be lazy loaded looks like data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7
-                                  if ( $.fn.nimbleLazyLoad && $swiperWrapper.find('[src*="data:image"]').length > 0 ) {
-                                        $swiperWrapper.trigger('nb-trigger-lazyload');
+                                  $swiperWrapper.trigger('nb-trigger-lazyload');
+
+                                  if ( $swiperWrapper.find('[src*="data:image/gif;"]').length > 0 ) {
+                                      // Make sure we load clean lazy loaded slides on change
+                                      // for https://github.com/presscustomizr/nimble-builder/issues/677
+                                      $swiperWrapper.find('[src*="data:image/gif;"]').each( function() {
+                                          var $img = $(this);
+                                          if ( $img.attr('data-sek-img-sizes') ) {
+                                              $img.attr('sizes', $img.attr('data-sek-img-sizes') );
+                                              $img.removeAttr('data-sek-img-sizes');
+                                          }
+                                          if ( $img.attr('data-src') ) {
+                                              $img.attr('src', $img.attr('data-src') );
+                                              $img.removeAttr('data-src');
+                                          }
+                                          if ( $img.attr('data-sek-src') ) {
+                                              $img.attr('src', $img.attr('data-sek-src') );
+                                              $img.removeAttr('data-sek-src');
+                                          }
+                                          if ( $img.attr('data-srcset') ) {
+                                              $img.attr('srcset', $img.attr('data-srcset') );
+                                              $img.removeAttr('data-srcset');
+                                          }
+                                      });
                                   }
                               }
                         }//on
@@ -137,13 +163,17 @@
                               $(imageEl).trigger('recenter');
                           });
                           _swiperInstance.on( 'lazyImageLoad', function( slideEl, imageEl ) {
+                              // clean the extra attribute added when preprocessing for lazy loading
                               var $img = $(imageEl);
-                              $img.attr('sizes', $img.attr('data-sek-img-sizes') );
-                              $img.removeAttr('data-sek-img-sizes');
+                              if ( $img.attr('data-sek-img-sizes') ) {
+                                  $img.attr('sizes', $img.attr('data-sek-img-sizes') );
+                                  $img.removeAttr('data-sek-img-sizes');
+                              }
                           });
                     });
 
               };
+
               var doAllSwiperInstanciation = function() {
                     $('.sektion-wrapper').find('[data-sek-swiper-id]').each( function() {
                           doSingleSwiperInstantiation.call($(this));
@@ -153,7 +183,7 @@
 
 
               // On custom events
-              $( 'body').on( 'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-level-refreshed', '[data-sek-level="location"]',
+              nb_.cachedElements.$body.on( 'sek-columns-refreshed sek-modules-refreshed sek-section-added sek-level-refreshed', '[data-sek-level="location"]',
                     function(evt) {
                           if ( 0 !== mySwipers.length ) {
                                 $.each( mySwipers, function( ind, _swiperInstance ){
@@ -171,7 +201,7 @@
 
               // When the stylesheet is refreshed, update the centering with a custom event
               // this is needed when setting the custom height of the slider wrapper
-              $( 'body').on( 'sek-stylesheet-refreshed', '[data-sek-module-type="czr_img_slider_module"]',
+              nb_.cachedElements.$body.on( 'sek-stylesheet-refreshed', '[data-sek-module-type="czr_img_slider_module"]',
                     function() {
                           $(this).find('.swiper-container img').each( function() {
                                 $(this).trigger('sek-nimble-refreshed');
@@ -236,6 +266,15 @@
                     });
               }
           });
+
+
+
+
+
+
+
+
+
 
 
           /* ===================================================

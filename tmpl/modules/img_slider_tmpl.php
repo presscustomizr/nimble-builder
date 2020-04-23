@@ -55,22 +55,123 @@ if ( ! function_exists( 'Nimble\sek_slider_parse_template_tags') ) {
     }
 }
 
+
+if ( !function_exists('Nimble\sek_maybe_parse_slider_img_html_for_lazyload') ) {
+    // @return html string
+    function sek_maybe_parse_slider_img_html_for_lazyload( $attachment_id, $size = 'thumbnail', $is_first_img, $lazy_load_on ) {
+        // Skip when :
+        // 1) slider lazy loading is not active
+        // 2) global Nimble lazy load is active, and this is the first image ( in this case we want to lazy load the first image of the slider if offscreen )
+        if ( !$lazy_load_on || ( sek_is_img_smartload_enabled() && $is_first_img ) ) {
+            return wp_get_attachment_image( $attachment_id, $size );
+        }
+
+        // If lazy loaded, preprocess the image like wp_get_attachment_image()
+        // added in dec 2019 for https://github.com/presscustomizr/nimble-builder/issues/570
+        $html  = '';
+        $image = wp_get_attachment_image_src( $attachment_id, $size, $icon = false );
+        if ( $image ) {
+            list($src, $width, $height) = $image;
+            $hwstring                   = image_hwstring( $width, $height );
+            $size_class                 = $size;
+            if ( is_array( $size_class ) ) {
+                $size_class = join( 'x', $size_class );
+            }
+            $attachment   = get_post( $attachment_id );
+            $default_attr = array(
+                'src'   => $src,
+                'class' => "attachment-$size_class size-$size_class swiper-lazy",// add swiper class for lazyloading @see https://swiperjs.com/api/#lazy
+                'alt'   => trim( strip_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ),
+            );
+
+            $attr = $default_attr;
+
+            // Generate 'srcset' and 'sizes' if not already present.
+            if ( empty( $attr['srcset'] ) ) {
+                $image_meta = wp_get_attachment_metadata( $attachment_id );
+
+                if ( is_array( $image_meta ) ) {
+                    $size_array = array( absint( $width ), absint( $height ) );
+                    $srcset     = wp_calculate_image_srcset( $size_array, $src, $image_meta, $attachment_id );
+                    $sizes      = wp_calculate_image_sizes( $size_array, $src, $image_meta, $attachment_id );
+
+                    if ( $srcset && ( $sizes || ! empty( $attr['sizes'] ) ) ) {
+                        $attr['srcset'] = $srcset;
+
+                        if ( empty( $attr['sizes'] ) ) {
+                            $attr['sizes'] = $sizes;
+                        }
+                    }
+                }
+            }
+
+            /**
+             * Filters the list of attachment image attributes.
+             *
+             * @since 2.8.0
+             *
+             * @param array        $attr       Attributes for the image markup.
+             * @param WP_Post      $attachment Image attachment post.
+             * @param string|array $size       Requested size. Image size or array of width and height values
+             *                                 (in that order). Default 'thumbnail'.
+             */
+            $attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $attachment, $size );
+
+            // add swiper data-* stuffs for lazyloading now, after all filters
+            // @see https://swiperjs.com/api/#lazy
+            if ( !empty( $attr['srcset'] ) ) {
+                $attr['data-srcset'] = $attr['srcset'];
+                unset( $attr['srcset'] );
+            }
+
+            if ( !empty( $attr['src'] ) ) {
+                $attr['data-src'] = $attr['src'];
+                $attr['src'] = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                //unset( $attr['src'] );
+            }
+            if ( !empty( $attr['sizes'] ) ) {
+                $attr['data-sek-img-sizes'] = $attr['sizes'];
+                unset( $attr['sizes'] );
+            }
+
+            $attr = array_map( 'esc_attr', $attr );
+            $html = rtrim( "<img $hwstring" );
+            foreach ( $attr as $name => $value ) {
+                $html .= " $name=" . '"' . $value . '"';
+            }
+            $html .= ' />';
+        }
+
+        return $html;
+    }
+}
+
 if ( ! function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
     function sek_get_img_slider_module_img_html( $item, $lazy_load_on, $index ) {
         $html = '';
         $is_first_img = 0 == $index;
         if ( is_int( $item['img'] ) ) {
             // don't parse the first image of the carousel for lazyloading
-            // @see https://github.com/presscustomizr/nimble-builder/issues/596
+            // @see https://github.com/presscustomizr/nimble-builder/issues/596 ( Lazy load break layout of first slide )
+            // if ( $lazy_load_on && !$is_first_img ) {
+            //     $html = sek_maybe_parse_slider_img_html_for_lazyload(
+            //       $item['img'],
+            //       empty( $item['img-size'] ) ? 'large' : $item['img-size'],
+            //       $is_first_img//<= // when lazy load is active, we want to lazy load the first image of the slider if offscreen by adding 'data-sek-src' attribute
+            //     );
+            //     $html .= '<div class="swiper-lazy-preloader"></div>';//this element is removed by swiper.js once the image is loaded @see https://swiperjs.com/api/#lazy
+            // } else {
+            //     $html = wp_get_attachment_image( $item['img'], empty( $item['img-size'] ) ? 'large' : $item['img-size']);
+            // }
+
+            $html = sek_maybe_parse_slider_img_html_for_lazyload(
+              $item['img'],
+              empty( $item['img-size'] ) ? 'large' : $item['img-size'],
+              $is_first_img,//<= // when lazy load is active, we want to lazy load the first image of the slider if offscreen by adding 'data-sek-src' attribute
+              $lazy_load_on
+            );
             if ( $lazy_load_on && !$is_first_img ) {
-                $html = sek_get_attachment_image_for_lazyloading_images_in_swiper_carousel(
-                  $item['img'],
-                  empty( $item['img-size'] ) ? 'large' : $item['img-size'],
-                  $is_first_img//<= // when lazy load is active, we want to lazy load the first image of the slider if offscreen by adding 'data-sek-src' attribute
-                );
                 $html .= '<div class="swiper-lazy-preloader"></div>';//this element is removed by swiper.js once the image is loaded @see https://swiperjs.com/api/#lazy
-            } else {
-                $html = wp_get_attachment_image( $item['img'], empty( $item['img-size'] ) ? 'large' : $item['img-size']);
             }
         } else if ( ! empty( $item['img'] ) && is_string( $item['img'] ) ) {
             // the default img is excluded from the Nimble Builder smart loading parsing @see nimble_regex_callback()

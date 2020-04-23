@@ -6,6 +6,9 @@
 }
 
 [data-sek-module-type="czr_img_slider_module"] {
+    .sek-carousel-img [src*="data:image/gif;"] {
+      display: none;
+    }
     .sek-swiper-loading .sek-carousel-img img {
       display: none;//<= sek-swiper-loading is removed on swiper init event
     }
