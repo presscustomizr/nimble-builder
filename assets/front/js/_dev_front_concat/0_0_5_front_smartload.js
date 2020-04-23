@@ -3,7 +3,8 @@
  * ===================================================
  *
  * Replace all img src placeholder in the $element by the real src on scroll window event
- * Bind a 'smartload' event on each transformed img
+ * Handles background image for sections
+ * Hacked to lazyload iframes
  *
  * Note : the data-src (data-srcset) attr has to be pre-processed before the actual page load
  * Example of regex to pre-process img server side with php :
@@ -34,13 +35,10 @@
                         threshold : 100,
                         fadeIn_options : { duration : 400 },
                         delaySmartLoadEvent : 0,
-                        imgSelectors : '[data-sek-src*="http"], [data-sek-iframe-src]'
-
+                        candidateSelectors : '[data-sek-src*="http"], [data-sek-iframe-src]'
                   },
-                  //with intersecting cointainers:
-                  //- to avoid race conditions
                   //- to avoid multi processing in general
-                  skipLazyLoadClass = 'smartload-skip';
+                  _skipLoadClass = 'sek-lazy-loaded';
 
 
               function Plugin( element, options ) {
@@ -53,13 +51,8 @@
                     }
 
                     this.element = element;
-                    this.options = $.extend( {}, defaults, options) ;
-                    // //add .smartload-skip to the excludeImg
-                    // if ( nb_.isArray( this.options.excludeImg ) ) {
-                    //       this.options.excludeImg.push( '.'+skipLazyLoadClass );
-                    // } else {
-                    //       this.options.excludeImg = [ '.'+skipLazyLoadClass ];
-                    // }
+                    this.options = $.extend( {}, defaults, options);
+
 
                     this._defaults = defaults;
                     this._name = pluginName;
@@ -71,8 +64,8 @@
                     this.init();
               }
 
-              Plugin.prototype._getImgs = function() {
-                    return $( this.options.imgSelectors, this.element );
+              Plugin.prototype._getCandidateEls = function() {
+                    return $( this.options.candidateSelectors, this.element );
               };
 
               //can access this.element and this.option
@@ -82,11 +75,20 @@
                     // [src*="data:image"] =>
                     // [data-sek-src*="http"] => background images, images in image modules, wp editor module, post grids, slider module, etc..
                     // [data-sek-iframe-src] => ?
-                    this._getImgs()
-                          //avoid intersecting containers to parse the same images
-                          // .addClass( skipLazyLoadClass )
-                          .bind( 'sek_load_img', {}, function() { self._load_img(this); })
-                          .bind( 'sek_load_iframe', {}, function() { self._load_iframe(this); });
+
+                    // Bind with delegation
+                    // April 2020 : implemented for https://github.com/presscustomizr/nimble-builder/issues/669
+                    $('body').on( 'sek_load_img sek_load_iframe', self.options.candidateSelectors , function( evt ) {
+                            // has this image been lazy loaded ?
+                            if ( true === $(this).data( 'sek-lazy-loaded' ) )
+                              return;
+                            if ( 'sek_load_img' === evt.type ) {
+                                self._load_img(this);
+                            } else if ( 'sek_load_iframe' === evt.type ) {
+                                self._load_iframe(this);
+                            }
+
+                    });
 
                     //the scroll event gets throttled with the requestAnimationFrame
                     nb_.cachedElements.$window.scroll( function( _evt ) {
@@ -98,7 +100,7 @@
                     }, 100 ) );
 
                     //on DOM ready
-                    this._maybe_trigger_load();
+                    this._maybe_trigger_load('dom-ready');
 
                     // flag so we can check whether his element has been lazyloaded
                     $(this.element).data('nimbleLazyLoadDone', true );
@@ -131,7 +133,7 @@
               */
               Plugin.prototype._maybe_trigger_load = function(_evt ) {
                     var self = this,
-                        $_imgs = self._getImgs(),
+                        $_imgs = self._getCandidateEls(),
                         // get the visible images list
                         // don't apply a threshold on page load so that Google audit is happy
                         // for https://github.com/presscustomizr/nimble-builder/issues/619
@@ -144,12 +146,16 @@
                             return nb_.elOrFirstVisibleParentIsInWindow( _el, threshold );
                         });
 
+                    //trigger load_img event for visible images
                     _visible_list.map( function( ind, _el ) {
-                          if ( 'IFRAME' === $(_el).prop("tagName") ) {
-                                $(_el).trigger( 'sek_load_iframe' );
-                          } else {
-                                $(_el).trigger( 'sek_load_img' );
-                          }
+                        // trigger a lazy load if image not processed yet
+                        if ( true !== $(_el).data( 'sek-lazy-loaded' ) ) {
+                            if ( 'IFRAME' === $(_el).prop("tagName") ) {
+                                  $(_el).trigger( 'sek_load_iframe' );
+                            } else {
+                                  $(_el).trigger( 'sek_load_img' );
+                            }
+                        }
                     });
               };
 
@@ -162,9 +168,12 @@
               Plugin.prototype._load_img = function( _el_ ) {
                     var $_el    = $(_el_);
 
-                    if ( !$_el.attr( 'data-sek-src' ) || $_el.data('sek-lazy-loaded') ) {
+                    // Stop here if
+                    // - the image has no data-sek-src attribute
+                    // - the image has already been lazyloaded
+                    // - the image is being lazyloaded
+                    if ( !$_el.attr( 'data-sek-src' ) || $_el.hasClass( _skipLoadClass ) || $_el.hasClass( 'lazy-loading' ) )
                         return;
-                    }
 
                     var _src     = $_el.attr( 'data-sek-src' ),
                         _src_set = $_el.attr( 'data-sek-srcset' ),
@@ -182,9 +191,11 @@
                                 //An attribute to remove; as of version 1.7, it can be a space-separated list of attributes.
                                 //minimum supported wp version (3.4+) embeds jQuery 1.7.2
                                 $_el.removeAttr( [ 'data-sek-src', 'data-sek-srcset', 'data-sek-sizes' ].join(' ') );
+                                // Case of a lazyloaded background
                                 if( $_el.data("sek-lazy-bg") ){
                                       $_el.css('backgroundImage', 'url('+_src+')');
                                 } else {
+                                // Case of a regular image
                                       $_el.attr("src", _src );
                                       if ( _src_set ) {
                                             $_el.attr("srcset", _src_set );
@@ -194,8 +205,8 @@
                                       }
                                 }
                                 //prevent executing this twice on an already smartloaded img
-                                if ( ! $_el.hasClass('sek-lazy-loaded') ) {
-                                      $_el.addClass('sek-lazy-loaded');
+                                if ( ! $_el.hasClass(_skipLoadClass) ) {
+                                      $_el.addClass(_skipLoadClass);
                                 }
                                 //Following would be executed twice if needed, as some browsers at the
                                 //first execution of the load callback might still have not actually loaded the img
@@ -213,6 +224,7 @@
                     $_el.removeClass('lazy-loading');
               };
 
+              // Remove CSS loaded markup close to the element if any
               Plugin.prototype._clean_css_loader = function( $_el ) {
                     // maybe remove the CSS loader
                     $.each( [ $_el.find('.sek-css-loader'),  $_el.parent().find('.sek-css-loader') ], function( k, $_el ) {
@@ -238,8 +250,8 @@
                           $(this).removeAttr('data-sek-iframe-src');
                           $_el.data('sek-lazy-loaded', true );
                           $_el.trigger('smartload');
-                          if ( ! $_el.hasClass('sek-lazy-loaded') ) {
-                                $_el.addClass('sek-lazy-loaded');
+                          if ( ! $_el.hasClass(_skipLoadClass) ) {
+                                $_el.addClass(_skipLoadClass);
                           }
                           return src;
                     });

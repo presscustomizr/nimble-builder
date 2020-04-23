@@ -76,6 +76,39 @@
                     }, 200 );
               });
 
+
+              // TO EXPLORE : implement a mutation observer like in Hueman theme for images dynamically inserted in the DOM via ajax ?
+              // Is it really needed now that lazyload uses event delegation to trigger image loading ?
+              // ( see https://github.com/presscustomizr/nimble-builder/issues/669 )
+              // Observer Mutations of the DOM for a given element selector
+              // <=> of previous $(document).bind( 'DOMNodeInserted', fn );
+              // implemented to fix https://github.com/presscustomizr/hueman/issues/880
+              // see https://stackoverflow.com/questions/10415400/jquery-detecting-div-of-certain-class-has-been-added-to-dom#10415599
+              //   observeAddedNodesOnDom : function(containerSelector, elementSelector, callback) {
+              //       var onMutationsObserved = function(mutations) {
+              //               mutations.forEach(function(mutation) {
+              //                   if (mutation.addedNodes.length) {
+              //                       var elements = $(mutation.addedNodes).find(elementSelector);
+              //                       for (var i = 0, len = elements.length; i < len; i++) {
+              //                           callback(elements[i]);
+              //                       }
+              //                   }
+              //               });
+              //           },
+              //           target = $(containerSelector)[0],
+              //           config = { childList: true, subtree: true },
+              //           MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
+              //           observer = new MutationObserver(onMutationsObserved);
+
+              //       observer.observe(target, config);
+              // }
+              // Observer Mutations off the DOM to detect images
+              // <=> of previous $(document).bind( 'DOMNodeInserted', fn );
+              // implemented to fix https://github.com/presscustomizr/hueman/issues/880
+              // this.observeAddedNodesOnDom('body', 'img', _.debounce( function(element) {
+              //       _doLazyLoad();
+              // }, 50 ));
+
         });
     });
 }(window, document));
