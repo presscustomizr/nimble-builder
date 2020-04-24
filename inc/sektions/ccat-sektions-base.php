@@ -10615,6 +10615,13 @@ function sek_get_module_params_for_czr_shortcode_module() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
                 ),
+                'lazyload' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Enable image lazy-loading', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
                 // flex-box should be enabled by user and not active by default.
                 // It's been implemented primarily to ease centering ( see https://github.com/presscustomizr/nimble-builder/issues/565 )
                 // When enabled, it can create layout issues like : https://github.com/presscustomizr/nimble-builder/issues/576
@@ -14630,25 +14637,33 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                  LOCATIONS
                 ********************************************************/
                 case 'location' :
+                    $is_header_location = true === sek_get_registered_location_property( $id, 'is_header_location' );
+                    $is_footer_location = true === sek_get_registered_location_property( $id, 'is_footer_location' );
+                    $is_content_pwd_protected = !skp_is_customizing() && !$is_header_location && !$is_footer_location && post_password_required();
                     //sek_error_log( __FUNCTION__ . ' WHAT ARE WE RENDERING? ' . $id , $collection );
                     //empty sektions wrapper are only printed when customizing
                     ?>
                       <?php if ( skp_is_customizing() || ( ! skp_is_customizing() && ! empty( $collection ) ) ) : ?>
                             <?php
                               Nimble_Manager()->page_has_nimble_content = true;
-                              $is_header_location = true === sek_get_registered_location_property( $id, 'is_header_location' );
-                              $is_footer_location = true === sek_get_registered_location_property( $id, 'is_footer_location' );
-                              printf( '<div class="sektion-wrapper" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s %5$s>',
+                              printf( '<div class="sektion-wrapper %6$s" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s %5$s>',
                                   $id,
                                   sprintf('data-sek-is-global-location="%1$s"', sek_is_global_location( $id ) ? 'true' : 'false'),
                                   $is_header_location ? 'data-sek-is-header-location="true"' : '',
                                   $is_footer_location ? 'data-sek-is-footer-location="true"' : '',
-                                  $this->sek_maybe_print_preview_level_guid_html()//<= added for #494
+                                  $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
+                                  $is_content_pwd_protected ? 'sek-password-protected' : ''//<= added for #673
                               );
                             ?>
                             <?php
-                              $this->parent_model = $model;
-                              foreach ( $collection as $_key => $sec_model ) { $this->render( $sec_model ); }
+                              // If the page/post is password protect, stop the recursive walker here and print the password form
+                              // for https://github.com/presscustomizr/nimble-builder/issues/673
+                              if ( $is_content_pwd_protected ) {
+                                  echo get_the_password_form();
+                              } else {
+                                  $this->parent_model = $model;
+                                  foreach ( $collection as $_key => $sec_model ) { $this->render( $sec_model ); }
+                              }
                             ?>
                             <?php
                               // empty global locations placeholders are only printed when customizing But not previewing a changeset post

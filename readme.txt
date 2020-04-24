@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.9
+Stable tag: 2.0.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,16 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 2.0.9 =
-Fixed image lazy loading issues in slider module ( leading to extra space on top and bottom ). PHP 7.4.2 compatibility fixes. Import/Export fix for global sections.
+= 2.0.10 =
+Added support for password protected page / post. [grid module] Focus on post grid when navigating pagination. [shortcode module] Fixed possible lazy loading problem with third party plugins. Improved RTL support in the customizer UI.
 
 == Changelog ==
+= 2.0.10 April 24th 2020 =
+* fixed : [Password protected pages/posts] Nimble Builder content ( excluding header and footer ) should not be revealed before password submission
+* fixed : [RTL][customizer][nimble top menu] broken in RTL mode => all items are in the same place
+* improved : [grid module] updated pagination urls to ensure user focus on grid module when navigating post pages
+* added : [shortcode module][performance] lazy loading can break shortcodes
+
 = 2.0.9 April 24th 2020 =
 * fixed : [slider module] lazy loading broken, leading to extra space on top and bottom of the slider
 * fixed : [PHP compatibility] PHP notice with PHP 7.4.2 ( Array and string offset access syntax with curly braces is deprecated )
@@ -165,24 +171,3 @@ Fixed image lazy loading issues in slider module ( leading to extra space on top
 * added : [carousel module] a css loader until initialization of the slider
 * improved : [lazyload] lazyload js should not be ran when disabled in options
 * improved : [CSS] always re-generate front dynamic stylesheet when user is logged in and has "customize" capabilities
-
-= 2.0.2 March 22nd 2020 =
-* fixed : [slider module][UI] make sure there's an available img size to use for the slide thumbnail
-* improved : [performance] options for javascript
-
-= 2.0.1 March 18th 2020 =
-* fixed : [visibility option] visibility setting not working
-
-= 2.0.0 March 13th 2020 =
-* fixed : [acessibility] Buttons do not have an accessible name
-* fixed : [social icons module][accessibility] Links do not have a discernible name
-* fixed : [slider module] when lazy loading active, make sure all slides are always lazyloaded, both when moving a section when customizing and navigating the slides
-* fixed : [performance] removed fetching for material-icons, not used anymore
-* fixed : [carousel module][performance] lazyload breaks the last image
-* fixed : [performance] make sure lazyload is triggered when refreshing sections during customization
-* improved : [performance] added a set of options to improve Nimble Builder performance when loading stylesheets and javascript files
-* improved : [performance] scripts are now loaded in defer mode to minimize render blocking issues on page load
-* improved : [performance] stylesheets can be loaded in partial mode
-* improved : [performance] Google fonts now be preloaded by default for minimal impact on page load
-* improved : [performance] Font Awesome icons are now loaded asynchronously by default to avoid blocking rendering problems
-* improved : [performance] if activated, smartload should also work when customizing

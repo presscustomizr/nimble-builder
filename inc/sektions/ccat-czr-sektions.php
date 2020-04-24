@@ -718,12 +718,21 @@ function sek_print_nimble_customizer_tmpl() {
             </button>
           </div>
           <div class="sek-do-undo">
-            <button type="button" class="icon undo" title="<?php _e('Undo', 'text_domain'); ?>" data-nimble-history="undo" data-nimble-state="disabled">
-              <span class="screen-reader-text"><?php _e('Undo', 'text_domain'); ?></span>
-            </button>
-            <button type="button" class="icon do" title="<?php _e('Redo', 'text_domain'); ?>" data-nimble-history="redo" data-nimble-state="disabled">
-              <span class="screen-reader-text"><?php _e('Redo', 'text_domain'); ?></span>
-            </button>
+            <?php if ( is_rtl() ) : ?>
+                <button type="button" class="icon do" title="<?php _e('Undo', 'text_domain'); ?>" data-nimble-history="undo" data-nimble-state="disabled">
+                  <span class="screen-reader-text"><?php _e('Undo', 'text_domain'); ?></span>
+                </button>
+                <button type="button" class="icon undo" title="<?php _e('Redo', 'text_domain'); ?>" data-nimble-history="redo" data-nimble-state="disabled">
+                  <span class="screen-reader-text"><?php _e('Redo', 'text_domain'); ?></span>
+                </button>
+            <?php else : ?>
+                <button type="button" class="icon undo" title="<?php _e('Undo', 'text_domain'); ?>" data-nimble-history="undo" data-nimble-state="disabled">
+                  <span class="screen-reader-text"><?php _e('Undo', 'text_domain'); ?></span>
+                </button>
+                <button type="button" class="icon do" title="<?php _e('Redo', 'text_domain'); ?>" data-nimble-history="redo" data-nimble-state="disabled">
+                  <span class="screen-reader-text"><?php _e('Redo', 'text_domain'); ?></span>
+                </button>
+            <?php endif; ?>
           </div>
           <div class="sek-settings">
             <button type="button" class="fas fa-sliders-h" title="<?php _e('Global settings', 'text_domain'); ?>" data-nimble-state="enabled">

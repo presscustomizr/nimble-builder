@@ -888,6 +888,19 @@ button.sek-btn,
   padding: 7px 8px;
 }
 
+.sektion-wrapper.sek-password-protected {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sektion-wrapper.sek-password-protected form.post-password-form {
+  max-width: 450px;
+  height: auto;
+  padding: 4em 1em;
+  font-size: 1em;
+}
+
 .sek-module-inner h1, .sek-module-inner h2, .sek-module-inner h3, .sek-module-inner h4, .sek-module-inner h5, .sek-module-inner h6 {
   font-weight: 400;
   line-height: 1.5em;
