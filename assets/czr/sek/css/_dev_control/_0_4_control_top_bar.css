@@ -123,6 +123,10 @@ body.nimble-top-bar-visible #nimble-top-bar {
   flex: 0 0 100%;
   max-width: 100%;
 }
+.rtl #nimble-top-bar .sek-nimble-doc {
+  left:10px;
+  right: auto;
+}
 #nimble-top-bar .sek-nimble-doc img {
   width: 30px;
   height: 30px;
