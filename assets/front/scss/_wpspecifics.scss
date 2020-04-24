@@ -101,3 +101,17 @@
     padding: 7px 8px;
   }
 }
+
+// Password Protected page/post
+// april 2020 for https://github.com/presscustomizr/nimble-builder/issues/673
+.sektion-wrapper.sek-password-protected {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  form.post-password-form {
+    max-width: 450px;
+    height: auto;
+    padding: 4em 1em;
+    font-size: 1em;
+  }
+}
