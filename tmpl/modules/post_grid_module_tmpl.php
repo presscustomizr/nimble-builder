@@ -11,6 +11,14 @@ $metas_settings = $value['grid_metas'];
 $thumb_settings = $value['grid_thumb'];
 
 
+// filter for 'get_pagenum_link' and 'paginate_links'
+// for https://github.com/presscustomizr/nimble-builder/issues/672
+if ( ! function_exists( 'Nimble\sek_filter_pagination_nav_url') ) {
+    function sek_filter_pagination_nav_url( $result ) {
+          return trailingslashit($result) . '#' . Nimble_Manager()->model['id'];
+    }
+}
+
 /**
  * The template for displaying the pagination links
  */
@@ -23,6 +31,8 @@ if ( ! function_exists( 'Nimble\sek_render_post_navigation') ) {
     $_older_label      = __( 'Older' , 'text_doma' );
     $_newer_label      = __( 'Newer' , 'text_doma' );
 
+    // filter to add nimble module id ( ex : #__nimble__b4b942df40e5 ) at the end of the url so we focus on grid when navigating pagination
+    add_filter('get_pagenum_link', 'Nimble\sek_filter_pagination_nav_url' );
     /* Generate links */
     $prev_link = get_next_posts_link(
       '<span class="sek-meta-nav"><span class="sek-meta-nav-title">' . $_older_label . '</span></span>', //label
@@ -33,7 +43,7 @@ if ( ! function_exists( 'Nimble\sek_render_post_navigation') ) {
       '<span class="sek-meta-nav"><span class="sek-meta-nav-title">' . $_newer_label . '</span></span>', //label
         $post_collection->max_num_pages //max pages
     );
-
+    remove_filter('get_pagenum_link', 'Nimble\sek_filter_pagination_nav_url' );
 
     /* If no links are present do not display this */
     if ( null != $prev_link || null != $next_link ) :
@@ -59,13 +69,17 @@ if ( ! function_exists( 'Nimble\sek_render_post_navigation') ) {
               $paged = get_query_var($pagination_query_var);
               $paged = $paged ? $paged : 1;
 
+              // filter to add nimble module id ( ex : #__nimble__b4b942df40e5 ) at the end of the url so we focus on grid when navigating pagination
+              add_filter('paginate_links', 'Nimble\sek_filter_pagination_nav_url' );
               $_paginate_links = paginate_links( array(
-                'prev_next' => false,
-                'mid_size'  => 1,
-                'type'      => 'array',
-                'current'    => max( 1, $paged ),
-                'total'      => $post_collection->max_num_pages
+                  'prev_next' => false,
+                  'mid_size'  => 1,
+                  'type'      => 'array',
+                  'current'    => max( 1, $paged ),
+                  'total'      => $post_collection->max_num_pages
               ));
+              remove_filter('paginate_links', 'Nimble\sek_filter_pagination_nav_url' );
+
               if ( is_array( $_paginate_links ) ) {
                 foreach ( $_paginate_links as $_page ) {
                   echo "<li class='sek-paginat-item'>$_page</li>";
@@ -396,7 +410,7 @@ if ( is_object( $post_collection ) && $post_collection->have_posts() ) {
   $grid_items_classes = implode(' ', $grid_items_classes );
 
   ?>
-  <div class="sek-post-grid-wrapper <?php echo $grid_wrapper_classes; ?>">
+  <div class="sek-post-grid-wrapper <?php echo $grid_wrapper_classes; ?>" id="<?php echo $model['id']; ?>">
     <div class="sek-grid-items <?php echo $grid_items_classes; ?>">
       <?php
         // $post_collection->have_posts() fires 'loop_end', which we don't want
