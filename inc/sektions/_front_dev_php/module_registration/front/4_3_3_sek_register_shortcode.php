@@ -33,6 +33,13 @@ function sek_get_module_params_for_czr_shortcode_module() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
                 ),
+                'lazyload' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Enable image lazy-loading', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                ),
                 // flex-box should be enabled by user and not active by default.
                 // It's been implemented primarily to ease centering ( see https://github.com/presscustomizr/nimble-builder/issues/565 )
                 // When enabled, it can create layout issues like : https://github.com/presscustomizr/nimble-builder/issues/576
