@@ -7,6 +7,8 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             if ( !defined( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY", PHP_INT_MAX ); }
             if ( !defined( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY" ) ) { define( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY", - PHP_INT_MAX ); }
 
+            add_action( 'wp', array( $this, 'sek_set_password_protection_status') );
+
             // Fires after 'wp' and before the 'get_header' template file is loaded.
             add_action( 'template_redirect', array( $this, 'sek_schedule_rendering_hooks') );
 
@@ -38,8 +40,43 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             // INCLUDE NIMBLE CONTENT IN SEARCH RESULTS
             add_action( 'wp_head', array( $this, 'sek_maybe_include_nimble_content_in_search_results' ) );
+
+            // PASSWORD FORM : make the wp pwd form is rendered only one time in a singular ( see #673 and #679 )
+            add_action( 'the_password_form', array( $this, 'sek_maybe_empty_password_form' ), PHP_INT_MAX );
         }//_schedule_front_rendering()
 
+        // hook : 'wp'
+        // april 2020 for #673 and #679
+        // @return void
+        function sek_set_password_protection_status() {
+            Nimble_Manager()->is_page_password_protected = is_singular() && post_password_required();
+        }
+
+        // hook : 'the_password_form'@PHP_INT_MAX documented in wp-includes/post-template.php
+        // Empty the password form if it's been already rendered, either in the WP content or in a Nimble location before the content.
+        // april 2020 for see #673 and #679
+        // @return html output for the form
+        function sek_maybe_empty_password_form( $output ) {
+            // bail if there's no local Nimble section in the page
+            if ( !sek_local_skope_has_nimble_sections( skp_get_skope_id() ) )
+              return $output;
+
+            if ( skp_is_customizing() || !post_password_required() )
+              return $output;
+
+            if ( is_singular() && post_password_required() ) {
+                if ( !did_action('nimble_wp_pwd_form_rendered') ) {
+                    // fire an action => we know the password form has been rendered so we won't have to render it several times
+                    // see ::render() location
+                    do_action('nimble_wp_pwd_form_rendered');
+                    return $output;
+                } else {
+                    // Empty the form if it's been already rendered, either in the WP content or in a Nimble location before the content.
+                    return '';
+                }
+            }
+            return $output;
+        }
 
 
         // Encapsulate the singular post / page content so we can generate a dynamic ui around it when customizing
@@ -393,9 +430,24 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 case 'location' :
                     $is_header_location = true === sek_get_registered_location_property( $id, 'is_header_location' );
                     $is_footer_location = true === sek_get_registered_location_property( $id, 'is_footer_location' );
-                    $is_content_pwd_protected = !skp_is_customizing() && !$is_header_location && !$is_footer_location && post_password_required();
+
                     //sek_error_log( __FUNCTION__ . ' WHAT ARE WE RENDERING? ' . $id , $collection );
-                    //empty sektions wrapper are only printed when customizing
+
+
+                    // PASSWORD PROTECTION see #673 and #679
+                    // If the page/post is password protect, and this is not a header or footer location,
+                    // => stop the recursive walker here and print the password form
+                    // for https://github.com/presscustomizr/nimble-builder/issues/673
+                    // Nimble_Manager()->is_page_password_protected is set at 'wp', see ::sek_maybe_empty_password_form
+
+                    // 1) we want to protect content added with Nimble Builder, but not if header or footer
+                    // 2) we want to apply the protection on front, not when customizing
+                    // 3) we need to check if the single page or post is password protected
+                    // 4) we don't want to render the password form multiple times
+                    $is_password_protection_active_for_location = !skp_is_customizing() && Nimble_Manager()->is_page_password_protected && !$is_header_location && !$is_footer_location;
+                    $is_password_form_needed = $is_password_protection_active_for_location && !did_action('nimble_wp_pwd_form_rendered');
+
+                    // NOTE : empty sektions wrapper are only printed when customizing
                     ?>
                       <?php if ( skp_is_customizing() || ( ! skp_is_customizing() && ! empty( $collection ) ) ) : ?>
                             <?php
@@ -406,14 +458,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                   $is_header_location ? 'data-sek-is-header-location="true"' : '',
                                   $is_footer_location ? 'data-sek-is-footer-location="true"' : '',
                                   $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
-                                  $is_content_pwd_protected ? 'sek-password-protected' : ''//<= added for #673
+                                  $is_password_form_needed ? 'sek-password-protected' : ''//<= added for #673
                               );
                             ?>
                             <?php
-                              // If the page/post is password protect, stop the recursive walker here and print the password form
-                              // for https://github.com/presscustomizr/nimble-builder/issues/673
-                              if ( $is_content_pwd_protected ) {
-                                  echo get_the_password_form();
+                              if ( $is_password_protection_active_for_location ) {
+                                  echo get_the_password_form();//<= we filter the output of this function to maybe empty and fire the action 'nimble_wp_pwd_form_rendered'
                               } else {
                                   $this->parent_model = $model;
                                   foreach ( $collection as $_key => $sec_model ) { $this->render( $sec_model ); }

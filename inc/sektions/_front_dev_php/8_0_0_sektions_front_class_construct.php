@@ -187,6 +187,8 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
 
         // March 2020, for https://github.com/presscustomizr/nimble-builder/issues/649
         public $page_has_nimble_content = false;
+        // April 2020 for https://github.com/presscustomizr/nimble-builder/issues/679
+        public $is_page_password_protected = false; //<= set at 'wp'
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
