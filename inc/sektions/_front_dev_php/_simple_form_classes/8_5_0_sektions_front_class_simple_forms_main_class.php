@@ -1,5 +1,5 @@
 <?php
-if ( ! class_exists( '\Nimble\Sek_Simple_Form' ) ) :
+if ( !class_exists( '\Nimble\Sek_Simple_Form' ) ) :
 class Sek_Simple_Form extends SEK_Front_Render_Css {
 
     private $form;
@@ -70,7 +70,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
 
     //@hook: parse_request
     function simple_form_parse_request() {
-        if ( ! isset( $_POST['nimble_simple_cf'] ) )
+        if ( !isset( $_POST['nimble_simple_cf'] ) )
           return;
 
         // get the module options
@@ -81,7 +81,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             if ( is_array( $local_sektions ) && !empty( $local_sektions ) ) {
             $sektion_collection = array_key_exists('collection', $local_sektions) ? $local_sektions['collection'] : array();
             }
-            if ( is_array($sektion_collection) && ! empty( $sektion_collection ) && isset( $_POST['nimble_level_id'] ) ) {
+            if ( is_array($sektion_collection) && !empty( $sektion_collection ) && isset( $_POST['nimble_level_id'] ) ) {
                 $module_model = sek_get_level_model($_POST['nimble_level_id'], $sektion_collection );
                 $module_model = sek_normalize_module_value_with_defaults( $module_model );
             }
@@ -181,7 +181,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         // Shall we print the badge ?
         // @todo : we don't handle the case when recaptcha badge is globally displayed but
         // the current page has disabled recaptcha
-        if ( ! sek_is_recaptcha_badge_globally_displayed() ) {
+        if ( !sek_is_recaptcha_badge_globally_displayed() ) {
             $classes[] = 'sek-hide-rc-badge';
         }
         return $classes;
@@ -214,7 +214,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             $echo_form = true;
             // When loading the page after a send attempt, focus on the module html element with a javascript animation
             // In this case, don't echo the form, but only the user defined message which should be displayed after submitting the form
-            if ( ! is_null( $this->mailer ) ) {
+            if ( !is_null( $this->mailer ) ) {
                 // Make sure we target the right form if several forms are displayed in a page
                 $current_form_has_been_submitted = isset( $_POST['nimble_level_id'] ) && $_POST['nimble_level_id'] === $module_id;
 
@@ -270,7 +270,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     private function _set_form_composition( $form_composition, $module_model = array() ) {
 
         $user_form_composition = array();
-        if ( ! is_array( $module_model ) ) {
+        if ( !is_array( $module_model ) ) {
               sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => ERROR : invalid module options array');
               return $user_form_composition;
         }
@@ -284,21 +284,21 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             //sek_error_log( '$field_data', $field_data );
             switch ( $field_id ) {
                 case 'nimble_name':
-                    if ( ! empty( $form_fields_options['show_name_field'] ) && sek_is_checked( $form_fields_options['show_name_field'] ) ) {
+                    if ( !empty( $form_fields_options['show_name_field'] ) && sek_is_checked( $form_fields_options['show_name_field'] ) ) {
                         $user_form_composition[$field_id] = $field_data;
                         $user_form_composition[$field_id]['required'] = sek_is_checked( $form_fields_options['name_field_required'] );
                         $user_form_composition[$field_id]['label'] = esc_attr( $form_fields_options['name_field_label'] );
                     }
                 break;
                 case 'nimble_subject':
-                    if ( ! empty( $form_fields_options['show_subject_field'] ) && sek_is_checked( $form_fields_options['show_subject_field'] ) ) {
+                    if ( !empty( $form_fields_options['show_subject_field'] ) && sek_is_checked( $form_fields_options['show_subject_field'] ) ) {
                         $user_form_composition[$field_id] = $field_data;
                         $user_form_composition[$field_id]['required'] = sek_is_checked( $form_fields_options['subject_field_required'] );
                         $user_form_composition[$field_id]['label'] = esc_attr( $form_fields_options['subject_field_label'] );
                     }
                 break;
                 case 'nimble_message':
-                    if ( ! empty( $form_fields_options['show_message_field'] ) && sek_is_checked( $form_fields_options['show_message_field'] ) ) {
+                    if ( !empty( $form_fields_options['show_message_field'] ) && sek_is_checked( $form_fields_options['show_message_field'] ) ) {
                         $user_form_composition[$field_id] = $field_data;
                         $user_form_composition[$field_id]['required'] = sek_is_checked( $form_fields_options['message_field_required'] );
                         $user_form_composition[$field_id]['label'] = esc_attr( $form_fields_options['message_field_label'] );
@@ -327,7 +327,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                     // When the form is submitted, we grab the skope_id from the posted value, because it is too early to build it.
                     // of course we don't need to set this input value when customizing.
                     $skope_id = '';
-                    if ( ! skp_is_customizing() ) {
+                    if ( !skp_is_customizing() ) {
                         $skope_id = isset( $_POST['nimble_skope_id'] ) ? $_POST['nimble_skope_id'] : sek_get_level_skope_id( $module_model['id'] );
                     }
 
@@ -343,7 +343,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 // 1) reCAPTCHA enabled in the global options AND properly setup with non empty keys
                 // 2) reCAPTCHA enabled for this particular form
                 case 'nimble_recaptcha_resp' :
-                    if ( ! skp_is_customizing() && sek_is_recaptcha_globally_enabled() && 'disabled' !== $form_submission_options['recaptcha_enabled'] ) {
+                    if ( !skp_is_customizing() && sek_is_recaptcha_globally_enabled() && 'disabled' !== $form_submission_options['recaptcha_enabled'] ) {
                         $user_form_composition[$field_id] = $field_data;
                     }
                 break;
@@ -380,7 +380,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     //generate the fields
     function simple_form_generate_form( $fields, $module_model ) {
         $form   = new Sek_Form( [
-            'action' => is_array( $module_model ) && ! empty( $module_model['id']) ? '#' . $module_model['id'] :'#',
+            'action' => is_array( $module_model ) && !empty( $module_model['id']) ? '#' . $module_model['id'] :'#',
             'method' => 'post'
         ] );
         $form->add_fields( $fields );

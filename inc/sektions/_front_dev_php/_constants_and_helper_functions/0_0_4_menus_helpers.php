@@ -15,7 +15,7 @@ function sek_page_menu_fallback( $args = array() ) {
     $list_args = $args;
 
     // Show Home in the menu
-    if ( ! empty($args['show_home']) ) {
+    if ( !empty($args['show_home']) ) {
         if ( true === $args['show_home'] || '1' === $args['show_home'] || 1 === $args['show_home'] ) {
             $text = __('Home' , 'text_domain_to_replace');
         } else {
@@ -88,7 +88,7 @@ function sek_list_pages( $args = '' ) {
      // Query pages.
     $r['hierarchical'] = 0;
     $pages = get_pages( $r );
-    if ( ! empty( $pages ) ) {
+    if ( !empty( $pages ) ) {
       if ( $r['title_li'] ) {
         $output .= '<li class="pagenav">' . $r['title_li'] . '<ul>';
       }
@@ -138,7 +138,7 @@ function sek_walk_page_tree( $pages, $depth, $current_page, $r ) {
 }
 
 function sek_get_user_created_menus() {
-    // if ( ! skp_is_customizing() )
+    // if ( !skp_is_customizing() )
     //   return array();
     $all_menus = get_terms( 'nav_menu', array( 'hide_empty' => true ) );
     $user_menus = array();

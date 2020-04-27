@@ -1,7 +1,7 @@
 <?php
 /* Developers : you can override this template from a theme with a file that has this path : 'nimble_templates/modules/{original-module-template-file-name}.php' */
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 
@@ -11,17 +11,17 @@ $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $content_settings = $value['content'];
 $design_settings = $value['design'];
 
-if ( ! function_exists( 'Nimble\sek_get_button_module_link' ) ) {
+if ( !function_exists( 'Nimble\sek_get_button_module_link' ) ) {
     function sek_get_button_module_link( $content_settings ) {
         $link = 'javascript:void(0);';
         // if ( skp_is_customizing() ) {
         //     return $link;
         // }
         if ( 'url' == $content_settings['link-to'] ) {
-            if ( ! empty( $content_settings['link-pick-url'] ) && ! empty( $content_settings['link-pick-url']['id'] ) ) {
-                if ( '_custom_' == $content_settings['link-pick-url']['id']  && ! empty( $content_settings['link-custom-url'] ) ) {
+            if ( !empty( $content_settings['link-pick-url'] ) && !empty( $content_settings['link-pick-url']['id'] ) ) {
+                if ( '_custom_' == $content_settings['link-pick-url']['id']  && !empty( $content_settings['link-custom-url'] ) ) {
                     $link = esc_url( $content_settings['link-custom-url'] );
-                } else if ( ! empty( $content_settings['link-pick-url']['url'] ) ) {
+                } else if ( !empty( $content_settings['link-pick-url']['url'] ) ) {
                     $link = esc_url( $content_settings['link-pick-url']['url'] );
                 }
             }
@@ -30,9 +30,9 @@ if ( ! function_exists( 'Nimble\sek_get_button_module_link' ) ) {
     }
 }
 
-if ( ! function_exists( 'Nimble\sek_get_button_module_icon' ) ) {
+if ( !function_exists( 'Nimble\sek_get_button_module_icon' ) ) {
     function sek_get_button_module_icon( $content_settings ) {
-        return ! empty( $content_settings[ 'icon' ] ) ? sprintf( '<i class="%1$s"></i>', $content_settings[ 'icon' ] ) : '';
+        return !empty( $content_settings[ 'icon' ] ) ? sprintf( '<i class="%1$s"></i>', $content_settings[ 'icon' ] ) : '';
     }
 }
 

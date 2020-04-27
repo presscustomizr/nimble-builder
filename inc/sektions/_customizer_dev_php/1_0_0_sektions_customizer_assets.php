@@ -1,6 +1,6 @@
 <?php
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 
@@ -55,7 +55,7 @@ function sek_get_all_gfonts() {
         'lazy_load_term_meta'    => false,
     );
     $query = new \WP_Query( $sek_post_query_vars );
-    if ( ! is_array( $query->posts ) || empty( $query->posts ) )
+    if ( !is_array( $query->posts ) || empty( $query->posts ) )
       return;
 
     foreach ($query->posts as $post_object ) {
@@ -358,7 +358,7 @@ function nimble_get_code_editor_settings( $args ) {
             ),
         ) );
 
-        if ( ! current_user_can( 'unfiltered_html' ) ) {
+        if ( !current_user_can( 'unfiltered_html' ) ) {
             $settings['htmlhint']['kses'] = wp_kses_allowed_html( 'post' );
         }
     } elseif ( 'text/x-gfm' === $type ) {
@@ -435,7 +435,7 @@ function nimble_get_code_editor_settings( $args ) {
         $settings['codemirror']['mode'] = $type;
     }
 
-    if ( ! empty( $settings['codemirror']['lint'] ) ) {
+    if ( !empty( $settings['codemirror']['lint'] ) ) {
         $settings['codemirror']['gutters'][] = 'CodeMirror-lint-markers';
     }
 
@@ -658,12 +658,12 @@ function nimble_add_i18n_localized_control_params( $params ) {
 // ADD SEKTION VALUES TO EXPORTED DATA IN THE CUSTOMIZER PREVIEW
 add_filter( 'skp_json_export_ready_skopes', '\Nimble\add_sektion_values_to_skope_export' );
 function add_sektion_values_to_skope_export( $skopes ) {
-    if ( ! is_array( $skopes ) ) {
+    if ( !is_array( $skopes ) ) {
         sek_error_log( __FUNCTION__ . ' error => skp_json_export_ready_skopes filter => the filtered skopes must be an array.' );
     }
     $new_skopes = array();
     foreach ( $skopes as $skp_data ) {
-        if ( ! is_array( $skp_data ) || empty( $skp_data['skope'] ) ) {
+        if ( !is_array( $skp_data ) || empty( $skp_data['skope'] ) ) {
             sek_error_log( __FUNCTION__ . ' error => missing skope informations' );
             continue;
         }
@@ -671,7 +671,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
             $new_skopes[] = $skp_data;
             continue;
         }
-        if ( ! is_array( $skp_data ) ) {
+        if ( !is_array( $skp_data ) ) {
             error_log( 'skp_json_export_ready_skopes filter => the skope data must be an array.' );
             continue;
         }
@@ -984,7 +984,7 @@ function sek_is_plugin_active( $plugin ) {
 * @return bool True, if active for the network, otherwise false.
 */
 function sek_is_plugin_active_for_network( $plugin ) {
-  if ( ! is_multisite() )
+  if ( !is_multisite() )
     return false;
 
   $plugins = get_site_option( 'active_sitewide_plugins');

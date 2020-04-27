@@ -985,7 +985,7 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
     $value = $complete_modul_model['value'];
 
     // BUTTON
-    if ( ! empty( $value['form_button'] ) && is_array( $value['form_button'] ) ) {
+    if ( !empty( $value['form_button'] ) && is_array( $value['form_button'] ) ) {
         $form_button_options = $value['form_button'];
         $bg_color = $form_button_options['bg_color_css'];
         if ( sek_booleanize_checkbox_val( $form_button_options['use_custom_bg_color_on_hover'] ) ) {

@@ -1,6 +1,6 @@
 <?php
 
-if ( ! class_exists( '\Nimble\Sek_Nimble_Manager' ) ) :
+if ( !class_exists( '\Nimble\Sek_Nimble_Manager' ) ) :
   final class Sek_Nimble_Manager extends Sek_Simple_Form {}
 endif;
 

@@ -264,7 +264,7 @@ function sek_add_css_rules_for_czr_image_module( $rules, $complete_modul_model )
             // same treatment as in sek_add_css_rules_for_css_sniffed_input_id() => 'width'
             if ( is_string( $width ) ) {
                   $numeric = sek_extract_numeric_value($width);
-                  if ( ! empty( $numeric ) ) {
+                  if ( !empty( $numeric ) ) {
                       $unit = sek_extract_unit( $width );
                       $css_rules .= 'width:' . $numeric . $unit . ';';
                   }
@@ -278,7 +278,7 @@ function sek_add_css_rules_for_czr_image_module( $rules, $complete_modul_model )
                   $ready_value = $width;
                   foreach ($width as $device => $num_unit ) {
                       $numeric = sek_extract_numeric_value( $num_unit );
-                      if ( ! empty( $numeric ) ) {
+                      if ( !empty( $numeric ) ) {
                           $unit = sek_extract_unit( $num_unit );
                           $ready_value[$device] = $numeric . $unit;
                       }

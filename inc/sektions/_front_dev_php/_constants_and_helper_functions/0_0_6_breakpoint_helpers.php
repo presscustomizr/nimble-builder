@@ -57,7 +57,7 @@ function sek_get_section_custom_breakpoint( $params ) {
 
     $section = $params['section_model'];
 
-    if ( ! is_array( $section ) )
+    if ( !is_array( $section ) )
       return;
 
     if ( empty($section['id']) )
@@ -105,7 +105,7 @@ function sek_get_section_custom_breakpoint( $params ) {
 //    'apply-to-all' => bool
 // )
 function sek_is_section_custom_breakpoint_applied_to_all_customizations_by_device( $section_breakpoint_options ) {
-    if ( ! is_array( $section_breakpoint_options ) || empty( $section_breakpoint_options ) )
+    if ( !is_array( $section_breakpoint_options ) || empty( $section_breakpoint_options ) )
       return;
 
     if ( empty( $section_breakpoint_options[ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $section_breakpoint_options[ 'use-custom-breakpoint'] ) )
@@ -150,7 +150,7 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
 
     extract( $params, EXTR_OVERWRITE );
 
-    if ( ! is_string( $searched_level_id ) || empty( $searched_level_id ) ) {
+    if ( !is_string( $searched_level_id ) || empty( $searched_level_id ) ) {
         sek_error_log( __FUNCTION__ . ' => missing or invalid child_level_id param.');
         return $last_section_breakpoint_found;;
     }
@@ -161,7 +161,7 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
     // When no collection is provided, we must walk all collections, local and global.
     if ( 'not_set' === $collection  ) {
         if ( empty( $skope_id ) ) {
-            if ( is_array( $_POST ) && ! empty( $_POST['location_skope_id'] ) ) {
+            if ( is_array( $_POST ) && !empty( $_POST['location_skope_id'] ) ) {
                 $skope_id = $_POST['location_skope_id'];
             } else {
                 // When fired during an ajax 'customize_save' action, the skp_get_skope_id() is determined with $_POST['local_skope_id']
@@ -209,7 +209,7 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
 
         if ( array_key_exists( 'id', $level_data ) && $searched_level_id == $level_data['id'] ) {
             //match found, break this loop
-            // sek_error_log('MATCH FOUND! => ' . $last_section_breakpoint_found );
+            // sek_error_log('MATCH FOUND!=> ' . $last_section_breakpoint_found );
             // sek_error_log('MATCH FOUND => ALORS ???', compact(
             //     'searched_level_id_found',
             //     'last_section_breakpoint_found',

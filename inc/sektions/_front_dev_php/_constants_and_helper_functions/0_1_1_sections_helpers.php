@@ -85,7 +85,7 @@ function sek_site_has_nimble_sections_created() {
     );
     $query = new \WP_Query( $sek_post_query_vars );
     //sek_error_log('DO WE HAVE SECTIONS ?', $query );
-    return is_array( $query->posts ) && ! empty( $query->posts );
+    return is_array( $query->posts ) && !empty( $query->posts );
 }
 
 
@@ -93,7 +93,7 @@ function sek_site_has_nimble_sections_created() {
 
 // recursive helper to count the number of sections in a given set of sections data
 function sek_count_not_empty_sections_in_page( $seks_data, $count = 0 ) {
-    if ( ! is_array( $seks_data ) ) {
+    if ( !is_array( $seks_data ) ) {
         sek_error_log( __FUNCTION__ . ' => invalid seks_data param');
         return $count;
     }

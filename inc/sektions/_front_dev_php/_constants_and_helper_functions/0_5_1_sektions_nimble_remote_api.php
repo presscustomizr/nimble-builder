@@ -59,7 +59,7 @@ function sek_get_nimble_api_data( $force_update = false ) {
 
         $info_data = json_decode( wp_remote_retrieve_body( $response ), true );
 
-        if ( empty( $info_data ) || ! is_array( $info_data ) ) {
+        if ( empty( $info_data ) || !is_array( $info_data ) ) {
             set_transient( $api_data_transient_name, [], 2 * HOUR_IN_SECONDS );
             return false;
         }

@@ -31,16 +31,16 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
     $is_multi_items = $params['is_multi_items'];
     $item_id = $params['item_id'];
 
-    if ( ! is_string( $input_id ) || empty( $input_id ) ) {
+    if ( !is_string( $input_id ) || empty( $input_id ) ) {
         sek_error_log( __FUNCTION__ . ' => missing input_id', $parent_level);
         return $rules;
     }
-    if ( ! is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
+    if ( !is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
         sek_error_log( __FUNCTION__ . ' => missing input_list', $parent_level);
         return $rules;
     }
     $input_registration_params = $registered_input_list[ $input_id ];
-    if ( ! is_string( $input_registration_params['css_identifier'] ) || empty( $input_registration_params['css_identifier'] ) ) {
+    if ( !is_string( $input_registration_params['css_identifier'] ) || empty( $input_registration_params['css_identifier'] ) ) {
         sek_error_log( __FUNCTION__ . ' => missing css_identifier for parent level', $parent_level );
         sek_error_log('$registered_input_list', $registered_input_list );
         return $rules;
@@ -80,12 +80,12 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
     // => Overrides the module level specific selector, if it was set.
     if ( 'module' === $parent_level['level'] ) {
         //$start = microtime(true) * 1000;
-        if ( ! is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
+        if ( !is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
             sek_error_log( __FUNCTION__ . ' => missing input list' );
         } else if ( is_array( $registered_input_list ) && empty( $registered_input_list[ $input_id ] ) ) {
             sek_error_log( __FUNCTION__ . ' => missing input id ' . $input_id . ' in input list for module type ' . $parent_level['module_type'] );
         }
-        if ( is_array( $registered_input_list ) && ! empty( $registered_input_list[ $input_id ] ) && ! empty( $registered_input_list[ $input_id ]['css_selectors'] ) ) {
+        if ( is_array( $registered_input_list ) && !empty( $registered_input_list[ $input_id ] ) && !empty( $registered_input_list[ $input_id ]['css_selectors'] ) ) {
             // reset the selector to the level id selector, in case it was previously set spcifically at the module level
             $selector = '[data-sek-id="'.$parent_level['id'].'"]';
             if ( $is_multi_items ) {
@@ -124,7 +124,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         case 'font_size' :
             if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
-                  if ( ! empty( $numeric ) ) {
+                  if ( !empty( $numeric ) ) {
                       $properties_to_render['font-size'] = $value;
                   }
             } else if ( is_array( $value ) ) { // <= by device
@@ -281,7 +281,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         case 'height' :
             if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
-                  if ( ! empty( $numeric ) ) {
+                  if ( !empty( $numeric ) ) {
                       $unit = sek_extract_unit( $value );
                       $unit = '%' === $unit ? 'vh' : $unit;
                       $properties_to_render['height'] = $numeric . $unit;
@@ -300,7 +300,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                   $ready_value = $value;
                   foreach ($value as $device => $num_unit ) {
                       $numeric = sek_extract_numeric_value( $num_unit );
-                      if ( ! empty( $numeric ) ) {
+                      if ( !empty( $numeric ) ) {
                           $unit = sek_extract_unit( $num_unit );
                           $unit = '%' === $unit ? 'vh' : $unit;
                           $ready_value[$device] = $numeric . $unit;
@@ -319,7 +319,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         /* Quote border */
         case 'border_width' :
             $numeric = sek_extract_numeric_value( $value );
-            if ( 0 === intval($numeric) || ! empty( $numeric ) ) {
+            if ( 0 === intval($numeric) || !empty( $numeric ) ) {
                 $unit = sek_extract_unit( $value );
                 $properties_to_render['border-width'] = $numeric . $unit;
             }
@@ -330,7 +330,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         /* Divider */
         case 'border_top_width' :
             $numeric = sek_extract_numeric_value( $value );
-            if ( ! empty( $numeric ) ) {
+            if ( !empty( $numeric ) ) {
                 $unit = sek_extract_unit( $value );
                 $unit = '%' === $unit ? 'vh' : $unit;
                 $properties_to_render['border-top-width'] = $numeric . $unit;
@@ -346,7 +346,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         case 'border_radius' :
             if ( is_string( $value ) ) {
                 $numeric = sek_extract_numeric_value( $value );
-                if ( ! empty( $numeric ) ) {
+                if ( !empty( $numeric ) ) {
                     $unit = sek_extract_unit( $value );
                     $properties_to_render['border-radius'] = $numeric . $unit;
                 }
@@ -358,7 +358,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         case 'width' :
             if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
-                  if ( ! empty( $numeric ) ) {
+                  if ( !empty( $numeric ) ) {
                       $unit = sek_extract_unit( $value );
                       $properties_to_render['width'] = $numeric . $unit;
                   }
@@ -376,7 +376,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                   $ready_value = $value;
                   foreach ($value as $device => $num_unit ) {
                       $numeric = sek_extract_numeric_value( $num_unit );
-                      if ( ! empty( $numeric ) ) {
+                      if ( !empty( $numeric ) ) {
                           $unit = sek_extract_unit( $num_unit );
                           $ready_value[$device] = $numeric . $unit;
                       }
@@ -395,7 +395,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         case 'v_spacing' :
             if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
-                  if ( ! empty( $numeric ) ) {
+                  if ( !empty( $numeric ) ) {
                       $unit = sek_extract_unit( $value );
                       $unit = '%' === $unit ? 'vh' : $unit;
                       $properties_to_render = array(
@@ -417,7 +417,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                   $ready_value = $value;
                   foreach ($value as $device => $num_unit ) {
                       $numeric = sek_extract_numeric_value( $num_unit );
-                      if ( ! empty( $numeric ) ) {
+                      if ( !empty( $numeric ) ) {
                           $unit = sek_extract_unit( $num_unit );
                           $unit = '%' === $unit ? 'vh' : $unit;
                           $ready_value[$device] = $numeric . $unit;
@@ -487,7 +487,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
             }, $unit );
         break;
         case 'spacing_with_device_switcher' :
-            if ( ! empty( $value ) && is_array( $value ) ) {
+            if ( !empty( $value ) && is_array( $value ) ) {
                 $rules = sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $value, $selector );
             }
         break;
@@ -501,7 +501,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
     // when the module has an '*_flag_important' input,
     // => check if the input_id belongs to the list of "important_input_list"
     // => and maybe flag the css rules with !important
-    if ( ! empty( $properties_to_render ) ) {
+    if ( !empty( $properties_to_render ) ) {
         $important = false;
         if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
             $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
@@ -557,7 +557,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
 function sek_is_flagged_important( $input_id, $module_value, $registered_input_list ) {
     $important = false;
 
-    if ( ! is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
+    if ( !is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
         sek_error_log( __FUNCTION__ . ' => error => the $registered_input_list param should be an array not empty');
         return $important;
     }

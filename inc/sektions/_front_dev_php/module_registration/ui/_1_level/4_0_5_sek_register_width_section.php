@@ -89,16 +89,16 @@ function sek_get_module_params_for_sek_level_width_section() {
 add_filter( 'sek_add_css_rules_for__section__options', '\Nimble\sek_add_css_rules_for_section_width', 10, 3 );
 function sek_add_css_rules_for_section_width( $rules, $section ) {
     $options = empty( $section[ 'options' ] ) ? array() : $section['options'];
-    if ( empty( $options[ 'width' ] ) || ! is_array( $options[ 'width' ] ) )
+    if ( empty( $options[ 'width' ] ) || !is_array( $options[ 'width' ] ) )
       return $rules;
 
     $width_options = $options[ 'width' ];
     $user_defined_widths = array();
 
-    if ( ! empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
+    if ( !empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
         $user_defined_widths['outer-section-width'] = 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"]';
     }
-    if ( ! empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
+    if ( !empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
         $user_defined_widths['inner-section-width'] = 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner';
     }
 
@@ -108,12 +108,12 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
     // Note that the option 'outer-section-width' and 'inner-section-width' can be empty when set to a value === default
     // @see js czr_setions::normalizeAndSanitizeSingleItemInputValues()
     foreach ( $user_defined_widths as $width_opt_name => $selector ) {
-        if ( ! empty( $width_options[ $width_opt_name ] ) && ! is_array( $width_options[ $width_opt_name ] ) ) {
+        if ( !empty( $width_options[ $width_opt_name ] ) && !is_array( $width_options[ $width_opt_name ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the width option should be an array( {device} => {number}{unit} )');
         }
         // $width_options[ $width_opt_name ] should be an array( {device} => {number}{unit} )
         // If not set in the width options , it means that it is equal to default
-        $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || ! is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
+        $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || !is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
         $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
             'desktop' => '100%',
             'tablet' => '',
@@ -124,7 +124,7 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
 
         foreach ( $user_custom_width_value as $device => $num_unit ) {
             $numeric = sek_extract_numeric_value( $num_unit );
-            if ( ! empty( $numeric ) ) {
+            if ( !empty( $numeric ) ) {
                 $unit = sek_extract_unit( $num_unit );
                 $max_width_value[$device] = $numeric . $unit;
                 $margin_value[$device] = '0 auto';
@@ -156,7 +156,7 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
             ), $rules );
         }
 
-        if ( ! empty( $margin_value ) ) {
+        if ( !empty( $margin_value ) ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $margin_value,
                 'css_property' => 'margin',

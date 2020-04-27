@@ -49,7 +49,7 @@ function sek_get_saved_sektion_data( $saved_section_id ) {
         //     'data' => array(),<= this is where we describe the columns and options
         //     'nimble_version' => NIMBLE_VERSION
         // )
-        if ( is_array( $section_data_decoded ) && ! empty( $section_data_decoded['data'] ) && is_string( $section_data_decoded['data'] ) ) {
+        if ( is_array( $section_data_decoded ) && !empty( $section_data_decoded['data'] ) && is_string( $section_data_decoded['data'] ) ) {
             $section_data = json_decode( wp_unslash( $section_data_decoded['data'], true ) );
         }
     }
@@ -88,8 +88,8 @@ function sek_get_saved_seks_post( $saved_section_id ) {
         return;
     }
 
-    if ( ! is_int( $post_id ) ) {
-        error_log( __FUNCTION__ .' => post_id ! is_int() for options => ' . $saved_section_id );
+    if ( !is_int( $post_id ) ) {
+        error_log( __FUNCTION__ .' => post_id !is_int() for options => ' . $saved_section_id );
     }
 
     if ( is_int( $post_id ) && $post_id > 0 && get_post( $post_id ) ) {
@@ -97,7 +97,7 @@ function sek_get_saved_seks_post( $saved_section_id ) {
     }
 
     // // `-1` indicates no post exists; no query necessary.
-    // if ( ! $post && -1 !== $post_id ) {
+    // if ( !$post && -1 !== $post_id ) {
     //     $query = new WP_Query( $sek_post_query_vars );
     //     $post = $query->post;
     //     $post_id = $post ? $post->ID : -1;
@@ -127,7 +127,7 @@ function sek_get_saved_seks_post( $saved_section_id ) {
 // )
 // @return WP_Post|WP_Error Post on success, error on failure.
 function sek_update_saved_seks_post( $seks_data ) {
-    if ( ! is_array( $seks_data ) ) {
+    if ( !is_array( $seks_data ) ) {
         error_log( 'sek_update_saved_seks_post => $seks_data is not an array' );
         return new \WP_Error( 'sek_update_saved_seks_post => $seks_data is not an array');
     }
@@ -161,7 +161,7 @@ function sek_update_saved_seks_post( $seks_data ) {
         $r = wp_update_post( wp_slash( $post_data ), true );
     } else {
         $r = wp_insert_post( wp_slash( $post_data ), true );
-        if ( ! is_wp_error( $r ) ) {
+        if ( !is_wp_error( $r ) ) {
             $post_id = $r;//$r is the post ID
 
             $all_saved_seks = get_option(NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS);

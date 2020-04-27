@@ -95,16 +95,16 @@ add_action('wp_head', '\Nimble\sek_write_global_custom_section_widths', 1000 );
 function sek_write_global_custom_section_widths() {
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
 
-    if ( ! is_array( $global_options ) || empty( $global_options['widths'] ) || !is_array( $global_options['widths'] ) )
+    if ( !is_array( $global_options ) || empty( $global_options['widths'] ) || !is_array( $global_options['widths'] ) )
       return;
 
     $width_options = $global_options['widths'];
     $user_defined_widths = array();
 
-    if ( ! empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
+    if ( !empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
         $user_defined_widths['outer-section-width'] = '[data-sek-level="section"]';
     }
-    if ( ! empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
+    if ( !empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
         $user_defined_widths['inner-section-width'] = '[data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner';
     }
 
@@ -113,12 +113,12 @@ function sek_write_global_custom_section_widths() {
     // Note that the option 'outer-section-width' and 'inner-section-width' can be empty when set to a value === default
     // @see js czr_setions::normalizeAndSanitizeSingleItemInputValues()
     foreach ( $user_defined_widths as $width_opt_name => $selector ) {
-        if ( ! empty( $width_options[ $width_opt_name ] ) && ! is_array( $width_options[ $width_opt_name ] ) ) {
+        if ( !empty( $width_options[ $width_opt_name ] ) && !is_array( $width_options[ $width_opt_name ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the width option should be an array( {device} => {number}{unit} )');
         }
         // $width_options[ $width_opt_name ] should be an array( {device} => {number}{unit} )
         // If not set in the width options , it means that it is equal to default
-        $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || ! is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
+        $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || !is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
         $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
             'desktop' => '100%',
             'tablet' => '',
@@ -129,7 +129,7 @@ function sek_write_global_custom_section_widths() {
 
         foreach ( $user_custom_width_value as $device => $num_unit ) {
             $numeric = sek_extract_numeric_value( $num_unit );
-            if ( ! empty( $numeric ) ) {
+            if ( !empty( $numeric ) ) {
                 $unit = sek_extract_unit( $num_unit );
                 $max_width_value[$device] = $numeric . $unit;
                 $margin_value[$device] = '0 auto';
@@ -161,7 +161,7 @@ function sek_write_global_custom_section_widths() {
             ), $rules );
         }
 
-        if ( ! empty( $margin_value ) ) {
+        if ( !empty( $margin_value ) ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $margin_value,
                 'css_property' => 'margin',
@@ -173,7 +173,7 @@ function sek_write_global_custom_section_widths() {
 
     $width_options_css = Sek_Dyn_CSS_Builder::sek_generate_css_stylesheet_for_a_set_of_rules( $rules );
 
-    if ( is_string( $width_options_css ) && ! empty( $width_options_css ) ) {
+    if ( is_string( $width_options_css ) && !empty( $width_options_css ) ) {
         printf('<style type="text/css" id="nimble-global-widths-options">%1$s</style>', $width_options_css );
     }
 }

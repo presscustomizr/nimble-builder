@@ -1,6 +1,6 @@
 <?php
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 
@@ -42,7 +42,7 @@ function sek_print_nimble_input_templates() {
             <span class="czr-notice"><# print(input_data.notice_before_title); #></span><br/>
           <# } #>
           <# if ( 'hidden' !== input_type ) { #>
-            <# var title_width = ! _.isEmpty( input_data.title_width ) ? input_data.title_width : ''; #>
+            <# var title_width = !_.isEmpty( input_data.title_width ) ? input_data.title_width : ''; #>
             <div class="customize-control-title {{title_width}}"><# print( input_data.title ); #></div>
           <# } #>
           <# if ( input_data.notice_before ) { #>
@@ -556,10 +556,10 @@ function sek_print_nimble_input_templates() {
                 },
                 modData = jQuery.extend( defaultModParams, modData );
 
-                if ( ! _.isEmpty( modData['icon'] ) ) {
+                if ( !_.isEmpty( modData['icon'] ) ) {
                     icon_img_src = sektionsLocalizedData.moduleIconPath + modData['icon'];
                     icon_img_html = '<img draggable="false" title="' + modData['title'] + '" alt="' +  modData['title'] + '" class="nimble-module-icons" src="' + icon_img_src + '"/>';
-                } else if ( ! _.isEmpty( modData['font_icon'] ) ) {
+                } else if ( !_.isEmpty( modData['font_icon'] ) ) {
                     icon_img_html = modData['font_icon'];
                 }
                 var title_attr = "<?php _e('Drag and drop or double-click to insert in your chosen target element.', 'text_doma'); ?>",
@@ -606,7 +606,7 @@ function sek_print_nimble_input_templates() {
                 },
                 modData = jQuery.extend( defaultParams, secParams );
 
-                if ( ! _.isEmpty( secParams['section_type'] ) ) {
+                if ( !_.isEmpty( secParams['section_type'] ) ) {
                     section_type = secParams['section_type'];
                 }
 

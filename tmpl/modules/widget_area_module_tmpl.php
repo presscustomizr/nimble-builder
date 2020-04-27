@@ -1,7 +1,7 @@
 <?php
 /* Developers : you can override this template from a theme with a file that has this path : 'nimble_templates/modules/{original-module-template-file-name}.php' */
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 
@@ -10,10 +10,10 @@ $module_type = $model['module_type'];
 $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $widget_area_has_at_least_one_widget = is_active_sidebar( $value['widget-area-id'] );
 
-if ( ! function_exists( 'Nimble\sek_maybe_print_widget_placeholder') ) {
+if ( !function_exists( 'Nimble\sek_maybe_print_widget_placeholder') ) {
   function sek_maybe_print_widget_placeholder( $id ) {
       global $wp_registered_sidebars;
-      if ( ! sek_is_nimble_widget_id( $id ) || ! array_key_exists( $id, $wp_registered_sidebars ) ) {
+      if ( !sek_is_nimble_widget_id( $id ) || !array_key_exists( $id, $wp_registered_sidebars ) ) {
           $placeholder_text = __('Select a Nimble widget area and start adding widgets.', 'text_domain_to_replace');
       } else {
           $widget_area_model = $wp_registered_sidebars[ $id ];

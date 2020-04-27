@@ -220,7 +220,7 @@ function sek_get_registered_module_type_property( $module_type, $property = '' )
     }
     // registered modules
     $registered_modules = CZR_Fmk_Base()->registered_modules;
-    if ( ! array_key_exists( $module_type, $registered_modules ) ) {
+    if ( !array_key_exists( $module_type, $registered_modules ) ) {
         sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
         return;
     }
@@ -268,11 +268,11 @@ function sek_get_registered_module_type_property( $module_type, $property = '' )
 // @param $input_id ( string )
 // @param $module_model ( array )
 function sek_get_input_value_in_module_model( $input_id, $module_model ) {
-    if ( ! is_string( $input_id ) ) {
+    if ( !is_string( $input_id ) ) {
         sek_error_log( __FUNCTION__ . ' => error => the $input_id param should be a string', $module_model);
         return;
     }
-    if ( ! is_array( $module_model ) ) {
+    if ( !is_array( $module_model ) ) {
         sek_error_log( __FUNCTION__ . ' => error => the $module_model param should be an array', $module_model );
         return;
     }
@@ -319,11 +319,11 @@ function sek_get_default_module_model( $module_type = '' ) {
 
     // Did we already cache it ?
     $default_models = Nimble_Manager()->default_models;
-    if ( ! empty( $default_models[ $module_type ] ) ) {
+    if ( !empty( $default_models[ $module_type ] ) ) {
         $default = $default_models[ $module_type ];
     } else {
         $registered_modules = CZR_Fmk_Base()->registered_modules;
-        if ( ! array( $registered_modules ) || !CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+        if ( !array( $registered_modules ) || !CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
             sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
             return $default;
         }
@@ -334,7 +334,7 @@ function sek_get_default_module_model( $module_type = '' ) {
                 sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
                 return $default;
             }
-            if ( ! is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
+            if ( !is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
                 sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
                 return $default;
             }
@@ -454,12 +454,12 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
 
     // Did we already cache it ?
     $cached_input_lists = Nimble_Manager()->cached_input_lists;
-    if ( ! empty( $cached_input_lists[ $module_type ] ) ) {
+    if ( !empty( $cached_input_lists[ $module_type ] ) ) {
         $input_list = $cached_input_lists[ $module_type ];
     } else {
         $registered_modules = CZR_Fmk_Base()->registered_modules;
         // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
-        if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
+        if ( !array( $registered_modules ) || !array_key_exists( $module_type, $registered_modules ) ) {
             sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
             return $input_list;
         }
@@ -471,7 +471,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
                 sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
                 return $input_list;
             }
-            if ( ! is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
+            if ( !is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
                 sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
                 return $input_list;
             }
@@ -597,7 +597,7 @@ function sek_normalize_module_value_with_defaults( $raw_module_model ) {
     $module_type = $normalized_model['module_type'];
     $is_father = sek_get_registered_module_type_property( $module_type, 'is_father' );
 
-    $raw_module_value = ( ! empty( $raw_module_model['value'] ) && is_array( $raw_module_model['value'] ) ) ? $raw_module_model['value'] : array();
+    $raw_module_value = ( !empty( $raw_module_model['value'] ) && is_array( $raw_module_model['value'] ) ) ? $raw_module_model['value'] : array();
 
     // reset the model value and rewrite it normalized with the defaults
     $normalized_model['value'] = array();
@@ -607,12 +607,12 @@ function sek_normalize_module_value_with_defaults( $raw_module_model ) {
             sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
             return $default;
         }
-        if ( ! is_array( $children ) ) {
+        if ( !is_array( $children ) ) {
             sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
             return $default;
         }
         foreach ( $children as $opt_group => $child_mod_type ) {
-            $children_value = ( ! empty( $raw_module_value[$opt_group] ) && is_array( $raw_module_value[$opt_group] ) ) ? $raw_module_value[$opt_group] : array();
+            $children_value = ( !empty( $raw_module_value[$opt_group] ) && is_array( $raw_module_value[$opt_group] ) ) ? $raw_module_value[$opt_group] : array();
             $normalized_model['value'][ $opt_group ] = _sek_normalize_single_module_values( $children_value, $child_mod_type );
         }
     } else {

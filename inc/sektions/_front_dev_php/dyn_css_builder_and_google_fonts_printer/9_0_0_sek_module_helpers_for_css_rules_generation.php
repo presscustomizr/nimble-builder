@@ -29,7 +29,7 @@ namespace Nimble;
 //                 )
 // @param $border_type is a string. solid, dashed, ...
 function sek_generate_css_rules_for_multidimensional_border_options( $rules, $border_settings, $border_type, $css_selectors = '' ) {
-    if ( ! is_array( $rules ) )
+    if ( !is_array( $rules ) )
       return array();
 
     $default_data = array( 'wght' => '1px', 'col' => '#000000' );
@@ -39,7 +39,7 @@ function sek_generate_css_rules_for_multidimensional_border_options( $rules, $bo
 
     $css_rules = array();
     foreach ( $border_settings as $border_dimension => $data ) {
-        if ( ! is_array( $data ) ) {
+        if ( !is_array( $data ) ) {
             sek_error_log( __FUNCTION__ . " => ERROR, the border setting should be an array formed like : array( 'wght' => '1px', 'col' => '#000000' )");
         }
         $data = wp_parse_args( $data, $default_data );
@@ -55,7 +55,7 @@ function sek_generate_css_rules_for_multidimensional_border_options( $rules, $bo
             $border_properties[] = $border_type;
             //border color
             //(needs validation: we need a sanitize hex or rgba color)
-            if ( ! empty( $data[ 'col' ] ) ) {
+            if ( !empty( $data[ 'col' ] ) ) {
                 $border_properties[] = $data[ 'col' ];
             }
 
@@ -96,7 +96,7 @@ function sek_generate_css_rules_for_multidimensional_border_options( $rules, $bo
 //     [bottom_left] => 413px
 // )
 function sek_generate_css_rules_for_border_radius_options( $rules, $border_radius_settings, $css_selectors = '' ) {
-    if ( ! is_array( $rules ) )
+    if ( !is_array( $rules ) )
       return array();
 
     if ( empty( $border_radius_settings ) )
@@ -143,7 +143,7 @@ function sek_generate_css_rules_for_border_radius_options( $rules, $border_radiu
         $css_rules = "border-radius:" . implode( ' ', array_filter( $normalized_border_radius_values ) ).';';
     }
 
-    if ( ! empty( $css_rules ) ) {
+    if ( !empty( $css_rules ) ) {
         //append border radius rules
         $rules[]     = array(
             'selector' => $css_selectors,
@@ -176,7 +176,7 @@ function sek_generate_css_rules_for_border_radius_options( $rules, $border_radiu
 // )
 function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spacing_settings, $css_selectors = '' ) {
     //spacing
-    if ( empty( $spacing_settings ) || ! is_array( $spacing_settings ) )
+    if ( empty( $spacing_settings ) || !is_array( $spacing_settings ) )
       return $rules;
 
 
@@ -235,15 +235,15 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
     //     'lg' => 992,
     //     'xl' => 1200
     // ];
-    if ( ! empty( $_pad_marg[ 'desktop' ] ) ) {
+    if ( !empty( $_pad_marg[ 'desktop' ] ) ) {
         $_pad_marg[ 'desktop' ][ 'mq' ] = null;
     }
 
-    if ( ! empty( $_pad_marg[ 'tablet' ] ) ) {
+    if ( !empty( $_pad_marg[ 'tablet' ] ) ) {
         $_pad_marg[ 'tablet' ][ 'mq' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
     }
 
-    if ( ! empty( $_pad_marg[ 'mobile' ] ) ) {
+    if ( !empty( $_pad_marg[ 'mobile' ] ) ) {
         $_pad_marg[ 'mobile' ][ 'mq' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
     }
 
@@ -339,15 +339,15 @@ function sek_set_mq_css_rules( $params, $rules ) {
     $media_q = array('desktop' => null , 'tablet' => null , 'mobile' => null );
 
     if ( !empty( $css_value_by_devices ) ) {
-          if ( ! empty( $css_value_by_devices[ 'desktop' ] ) ) {
+          if ( !empty( $css_value_by_devices[ 'desktop' ] ) ) {
               $media_q[ 'desktop' ] = null;
           }
 
-          if ( ! empty( $css_value_by_devices[ 'tablet' ] ) ) {
+          if ( !empty( $css_value_by_devices[ 'tablet' ] ) ) {
               $media_q[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; // default is max-width: 767
           }
 
-          if ( ! empty( $css_value_by_devices[ 'mobile' ] ) ) {
+          if ( !empty( $css_value_by_devices[ 'mobile' ] ) ) {
               $media_q[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; // default is max-width: 575
           }
 
@@ -358,11 +358,11 @@ function sek_set_mq_css_rules( $params, $rules ) {
           //     'mobile' => ''
           // );
           foreach ( $css_value_by_devices as $device => $val ) {
-              if ( ! in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
+              if ( !in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
                   sek_error_log( __FUNCTION__ . ' => error => unknown device : ' . $device );
                   continue;
               }
-              if ( ! empty(  $val ) ) {
+              if ( !empty(  $val ) ) {
                   // the css_property can be an array
                   // this is needed for example to write properties supporting several vendor prefixes
                   $css_property = $params['css_property'];
@@ -463,15 +463,15 @@ function sek_set_mq_css_rules_supporting_vendor_prefixes( $params, $rules ) {
     $media_q = array('desktop' => null , 'tablet' => null , 'mobile' => null );
 
     if ( !empty( $css_rules_by_device ) ) {
-          if ( ! empty( $css_rules_by_device[ 'desktop' ] ) ) {
+          if ( !empty( $css_rules_by_device[ 'desktop' ] ) ) {
               $media_q[ 'desktop' ] = null;
           }
 
-          if ( ! empty( $css_rules_by_device[ 'tablet' ] ) ) {
+          if ( !empty( $css_rules_by_device[ 'tablet' ] ) ) {
               $media_q[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; //max-width: 767
           }
 
-          if ( ! empty( $css_rules_by_device[ 'mobile' ] ) ) {
+          if ( !empty( $css_rules_by_device[ 'mobile' ] ) ) {
               $media_q[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; //max-width: 575
           }
           foreach ( $css_rules_by_device as $device => $rules_for_device ) {
@@ -937,7 +937,7 @@ function sek_extract_unit( $value ) {
 // 1.5em => 1.5
 // note : using preg_replace('/[^0-9]/', '', $data); would remove the dots or comma.
 function sek_extract_numeric_value( $value ) {
-    if ( ! is_scalar( $value ) )
+    if ( !is_scalar( $value ) )
       return null;
     $numeric = preg_replace('/px|em|%/', '', $value);
     return is_numeric( $numeric ) ? $numeric : null;

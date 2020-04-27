@@ -1,6 +1,6 @@
 <?php
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 function sek_is_debug_mode() {
@@ -43,7 +43,7 @@ if ( !defined( 'NIMBLE_JQUERY_MIGRATE_URL' ) ) { define ( 'NIMBLE_JQUERY_MIGRATE
 /* ------------------------------------------------------------------------- */
 // @return array
 function sek_get_locations() {
-    if ( ! is_array( Nimble_Manager()->registered_locations ) ) {
+    if ( !is_array( Nimble_Manager()->registered_locations ) ) {
         sek_error_log( __FUNCTION__ . ' error => the registered locations must be an array');
         return Nimble_Manager()->default_locations;
     }
@@ -70,7 +70,7 @@ function sek_get_local_content_locations() {
             if ( true === $loc_data['is_header_location'] || true === $loc_data['is_footer_location'] )
               continue;
 
-            if ( ! sek_is_global_location( $loc_id ) ) {
+            if ( !sek_is_global_location( $loc_id ) ) {
                 $locations[$loc_id] = $loc_data;
             }
         }
@@ -104,23 +104,23 @@ function sek_get_registered_location_property( $location_id, $property_name = ''
     $all_locations = sek_get_locations();
     $default_property_val = 'not_set';
     //sek_error_log( __FUNCTION__ .' => locations ?',  $all_locations );
-    if ( ! isset( $all_locations[$location_id] ) || ! is_array( $all_locations[$location_id] ) ) {
+    if ( !isset( $all_locations[$location_id] ) || !is_array( $all_locations[$location_id] ) ) {
         sek_error_log( __FUNCTION__ . ' error => the location ' . $location_id . ' is invalid or not registered.');
         return $default_property_val;
     }
 
-    if ( empty( $property_name ) || ! is_string( $property_name ) ) {
+    if ( empty( $property_name ) || !is_string( $property_name ) ) {
         sek_error_log( __FUNCTION__ . ' error => the requested property for location ' . $location_id . ' is invalid');
         return $default_property_val;
     }
 
     $location_params = wp_parse_args( $all_locations[$location_id], Nimble_Manager()->default_registered_location_model );
-    return ! empty( $location_params[$property_name] ) ? $location_params[$property_name] : $default_property_val;
+    return !empty( $location_params[$property_name] ) ? $location_params[$property_name] : $default_property_val;
 }
 
 // @return bool
 function sek_is_global_location( $location_id ) {
-    if ( ! is_string( $location_id ) || empty( $location_id ) ) {
+    if ( !is_string( $location_id ) || empty( $location_id ) ) {
         sek_error_log( __FUNCTION__ . ' error => missing or invalid location_id param' );
         return false;
     }
@@ -153,9 +153,9 @@ function sek_get_default_location_model( $skope_id = null ) {
     }
     foreach( sek_get_locations() as $location_id => $params ) {
         $is_global_location = sek_is_global_location( $location_id );
-        if ( $is_global_skope && ! $is_global_location )
+        if ( $is_global_skope && !$is_global_location )
           continue;
-        if ( ! $is_global_skope && $is_global_location )
+        if ( !$is_global_skope && $is_global_location )
           continue;
 
         $location_model = wp_parse_args( [ 'id' => $location_id ], Nimble_Manager()->default_location_model );
@@ -487,7 +487,7 @@ function sek_is_img_smartload_enabled() {
     $local_performances_data = sek_get_local_option_value( 'local_performances' );
     $local_smartload = 'inherit';
     if ( !is_null( $local_performances_data ) && is_array( $local_performances_data ) ) {
-        if ( ! empty( $local_performances_data['local-img-smart-load'] ) && 'inherit' !== $local_performances_data['local-img-smart-load'] ) {
+        if ( !empty( $local_performances_data['local-img-smart-load'] ) && 'inherit' !== $local_performances_data['local-img-smart-load'] ) {
               $local_smartload = 'yes' === $local_performances_data['local-img-smart-load'];
         }
     }
@@ -634,7 +634,7 @@ function sek_page_menu_fallback( $args = array() ) {
     $list_args = $args;
 
     // Show Home in the menu
-    if ( ! empty($args['show_home']) ) {
+    if ( !empty($args['show_home']) ) {
         if ( true === $args['show_home'] || '1' === $args['show_home'] || 1 === $args['show_home'] ) {
             $text = __('Home' , 'text_domain_to_replace');
         } else {
@@ -707,7 +707,7 @@ function sek_list_pages( $args = '' ) {
      // Query pages.
     $r['hierarchical'] = 0;
     $pages = get_pages( $r );
-    if ( ! empty( $pages ) ) {
+    if ( !empty( $pages ) ) {
       if ( $r['title_li'] ) {
         $output .= '<li class="pagenav">' . $r['title_li'] . '<ul>';
       }
@@ -757,7 +757,7 @@ function sek_walk_page_tree( $pages, $depth, $current_page, $r ) {
 }
 
 function sek_get_user_created_menus() {
-    // if ( ! skp_is_customizing() )
+    // if ( !skp_is_customizing() )
     //   return array();
     $all_menus = get_terms( 'nav_menu', array( 'hide_empty' => true ) );
     $user_menus = array();
@@ -996,7 +996,7 @@ function sek_get_registered_module_type_property( $module_type, $property = '' )
     }
     // registered modules
     $registered_modules = CZR_Fmk_Base()->registered_modules;
-    if ( ! array_key_exists( $module_type, $registered_modules ) ) {
+    if ( !array_key_exists( $module_type, $registered_modules ) ) {
         sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' not registered.' );
         return;
     }
@@ -1044,11 +1044,11 @@ function sek_get_registered_module_type_property( $module_type, $property = '' )
 // @param $input_id ( string )
 // @param $module_model ( array )
 function sek_get_input_value_in_module_model( $input_id, $module_model ) {
-    if ( ! is_string( $input_id ) ) {
+    if ( !is_string( $input_id ) ) {
         sek_error_log( __FUNCTION__ . ' => error => the $input_id param should be a string', $module_model);
         return;
     }
-    if ( ! is_array( $module_model ) ) {
+    if ( !is_array( $module_model ) ) {
         sek_error_log( __FUNCTION__ . ' => error => the $module_model param should be an array', $module_model );
         return;
     }
@@ -1095,11 +1095,11 @@ function sek_get_default_module_model( $module_type = '' ) {
 
     // Did we already cache it ?
     $default_models = Nimble_Manager()->default_models;
-    if ( ! empty( $default_models[ $module_type ] ) ) {
+    if ( !empty( $default_models[ $module_type ] ) ) {
         $default = $default_models[ $module_type ];
     } else {
         $registered_modules = CZR_Fmk_Base()->registered_modules;
-        if ( ! array( $registered_modules ) || !CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+        if ( !array( $registered_modules ) || !CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
             sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
             return $default;
         }
@@ -1110,7 +1110,7 @@ function sek_get_default_module_model( $module_type = '' ) {
                 sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
                 return $default;
             }
-            if ( ! is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
+            if ( !is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
                 sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
                 return $default;
             }
@@ -1230,12 +1230,12 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
 
     // Did we already cache it ?
     $cached_input_lists = Nimble_Manager()->cached_input_lists;
-    if ( ! empty( $cached_input_lists[ $module_type ] ) ) {
+    if ( !empty( $cached_input_lists[ $module_type ] ) ) {
         $input_list = $cached_input_lists[ $module_type ];
     } else {
         $registered_modules = CZR_Fmk_Base()->registered_modules;
         // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
-        if ( ! array( $registered_modules ) || ! array_key_exists( $module_type, $registered_modules ) ) {
+        if ( !array( $registered_modules ) || !array_key_exists( $module_type, $registered_modules ) ) {
             sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
             return $input_list;
         }
@@ -1247,7 +1247,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
                 sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
                 return $input_list;
             }
-            if ( ! is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
+            if ( !is_array( $registered_modules[ $module_type ][ 'children' ] ) ) {
                 sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
                 return $input_list;
             }
@@ -1373,7 +1373,7 @@ function sek_normalize_module_value_with_defaults( $raw_module_model ) {
     $module_type = $normalized_model['module_type'];
     $is_father = sek_get_registered_module_type_property( $module_type, 'is_father' );
 
-    $raw_module_value = ( ! empty( $raw_module_model['value'] ) && is_array( $raw_module_model['value'] ) ) ? $raw_module_model['value'] : array();
+    $raw_module_value = ( !empty( $raw_module_model['value'] ) && is_array( $raw_module_model['value'] ) ) ? $raw_module_model['value'] : array();
 
     // reset the model value and rewrite it normalized with the defaults
     $normalized_model['value'] = array();
@@ -1383,12 +1383,12 @@ function sek_normalize_module_value_with_defaults( $raw_module_model ) {
             sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' missing children modules' );
             return $default;
         }
-        if ( ! is_array( $children ) ) {
+        if ( !is_array( $children ) ) {
             sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' children modules should be an array' );
             return $default;
         }
         foreach ( $children as $opt_group => $child_mod_type ) {
-            $children_value = ( ! empty( $raw_module_value[$opt_group] ) && is_array( $raw_module_value[$opt_group] ) ) ? $raw_module_value[$opt_group] : array();
+            $children_value = ( !empty( $raw_module_value[$opt_group] ) && is_array( $raw_module_value[$opt_group] ) ) ? $raw_module_value[$opt_group] : array();
             $normalized_model['value'][ $opt_group ] = _sek_normalize_single_module_values( $children_value, $child_mod_type );
         }
     } else {
@@ -1474,7 +1474,7 @@ function sek_get_section_custom_breakpoint( $params ) {
 
     $section = $params['section_model'];
 
-    if ( ! is_array( $section ) )
+    if ( !is_array( $section ) )
       return;
 
     if ( empty($section['id']) )
@@ -1522,7 +1522,7 @@ function sek_get_section_custom_breakpoint( $params ) {
 //    'apply-to-all' => bool
 // )
 function sek_is_section_custom_breakpoint_applied_to_all_customizations_by_device( $section_breakpoint_options ) {
-    if ( ! is_array( $section_breakpoint_options ) || empty( $section_breakpoint_options ) )
+    if ( !is_array( $section_breakpoint_options ) || empty( $section_breakpoint_options ) )
       return;
 
     if ( empty( $section_breakpoint_options[ 'use-custom-breakpoint'] ) || false === sek_booleanize_checkbox_val( $section_breakpoint_options[ 'use-custom-breakpoint'] ) )
@@ -1567,7 +1567,7 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
 
     extract( $params, EXTR_OVERWRITE );
 
-    if ( ! is_string( $searched_level_id ) || empty( $searched_level_id ) ) {
+    if ( !is_string( $searched_level_id ) || empty( $searched_level_id ) ) {
         sek_error_log( __FUNCTION__ . ' => missing or invalid child_level_id param.');
         return $last_section_breakpoint_found;;
     }
@@ -1578,7 +1578,7 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
     // When no collection is provided, we must walk all collections, local and global.
     if ( 'not_set' === $collection  ) {
         if ( empty( $skope_id ) ) {
-            if ( is_array( $_POST ) && ! empty( $_POST['location_skope_id'] ) ) {
+            if ( is_array( $_POST ) && !empty( $_POST['location_skope_id'] ) ) {
                 $skope_id = $_POST['location_skope_id'];
             } else {
                 // When fired during an ajax 'customize_save' action, the skp_get_skope_id() is determined with $_POST['local_skope_id']
@@ -1626,7 +1626,7 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
 
         if ( array_key_exists( 'id', $level_data ) && $searched_level_id == $level_data['id'] ) {
             //match found, break this loop
-            // sek_error_log('MATCH FOUND! => ' . $last_section_breakpoint_found );
+            // sek_error_log('MATCH FOUND!=> ' . $last_section_breakpoint_found );
             // sek_error_log('MATCH FOUND => ALORS ???', compact(
             //     'searched_level_id_found',
             //     'last_section_breakpoint_found',
@@ -1704,7 +1704,7 @@ function sek_get_local_option_value( $option_name = '', $skope_id = null ) {
         }
     }
     // maybe normalizes with default values
-    $values = ( ! empty( $local_options ) && ! empty( $local_options[ $option_name ] ) ) ? $local_options[ $option_name ] : null;
+    $values = ( !empty( $local_options ) && !empty( $local_options[ $option_name ] ) ) ? $local_options[ $option_name ] : null;
     if ( did_action('nimble_front_classes_ready') ) {
         $values = sek_normalize_local_options_with_defaults( $option_name, $values );
     }
@@ -1864,12 +1864,12 @@ function sek_get_the_content() {
       $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
       if ( $is_singular && is_int($post_id) ) {
           $post_object = get_post( $post_id );
-          return ! empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
+          return !empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
       }
   } else {
       if( is_singular() ) {
         $post_object = get_post();
-        return ! empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
+        return !empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
       }
   }
 }
@@ -1946,11 +1946,11 @@ function sek_get_theme_template_base_paths() {
 // )
 // @param
 function sek_maybe_get_overriden_local_template_path( $params = array() ) {
-    if ( empty( $params ) || ! is_array( $params ))
+    if ( empty( $params ) || !is_array( $params ))
       return;
     $params = wp_parse_args( $params, array( 'file_name' => '', 'folder' => 'page-templates' ) );
 
-    if ( ! in_array( $params['folder'] , array( 'page-templates', 'header', 'footer' ) ) )
+    if ( !in_array( $params['folder'] , array( 'page-templates', 'header', 'footer' ) ) )
       return;
 
     $overriden_template_path = '';
@@ -1971,7 +1971,7 @@ function sek_maybe_get_overriden_local_template_path( $params = array() ) {
 function sek_get_locale_template(){
     $template_path = null;
     $local_template_data = sek_get_local_option_value( 'template' );
-    if ( ! empty( $local_template_data ) && ! empty( $local_template_data['local_template'] ) && 'default' !== $local_template_data['local_template'] ) {
+    if ( !empty( $local_template_data ) && !empty( $local_template_data['local_template'] ) && 'default' !== $local_template_data['local_template'] ) {
         $template_file_name = $local_template_data['local_template'];
         $template_file_name_with_php_extension = $template_file_name . '.php';
 
@@ -1988,7 +1988,7 @@ function sek_get_locale_template(){
             $template_path = $overriden_template_path;
         }
 
-        if ( ! file_exists( $template_path ) ) {
+        if ( !file_exists( $template_path ) ) {
             sek_error_log( __FUNCTION__ .' the custom template does not exist', $template_path );
             $template_path = null;
         }
@@ -2025,7 +2025,7 @@ function render_content_sections_for_nimble_template() {
 // @param $collection = sek_get_skoped_seks( $skope_id )['collection']; <= the root collection must always be provided, so we are sure it's
 function sek_get_level_model( $id, $collection = array() ) {
     $_data = 'no_match';
-    if ( ! is_array( $collection ) ) {
+    if ( !is_array( $collection ) ) {
         sek_error_log( __FUNCTION__ . ' => invalid collection param when getting model for id : ' . $id );
         return $_data;
     }
@@ -2051,7 +2051,7 @@ function sek_get_level_model( $id, $collection = array() ) {
 // @param collection : optional <= that's why if missing we must walk all collections : local and global
 function sek_get_parent_level_model( $child_level_id = '', $collection = array(), $skope_id = '' ) {
     $_parent_level_data = 'no_match';
-    if ( ! is_string( $child_level_id ) || empty( $child_level_id ) ) {
+    if ( !is_string( $child_level_id ) || empty( $child_level_id ) ) {
         sek_error_log( __FUNCTION__ . ' => missing or invalid child_level_id param.');
         return $_parent_level_data;
     }
@@ -2059,7 +2059,7 @@ function sek_get_parent_level_model( $child_level_id = '', $collection = array()
     // When no collection is provided, we must walk all collections, local and global.
     if ( empty( $collection ) ) {
         if ( empty( $skope_id ) ) {
-            if ( is_array( $_POST ) && ! empty( $_POST['location_skope_id'] ) ) {
+            if ( is_array( $_POST ) && !empty( $_POST['location_skope_id'] ) ) {
                 $skope_id = $_POST['location_skope_id'];
             } else {
                 // When fired during an ajax 'customize_save' action, the skp_get_skope_id() is determined with $_POST['local_skope_id']
@@ -2109,7 +2109,7 @@ function sek_get_parent_level_model( $child_level_id = '', $collection = array()
 // @param collection : optional <= that's why if missing we must walk all collections : local and global
 function sek_get_level_skope_id( $level_id = '' ) {
     $level_skope_id = skp_get_skope_id();
-    if ( ! is_string( $level_id ) || empty( $level_id ) ) {
+    if ( !is_string( $level_id ) || empty( $level_id ) ) {
         sek_error_log( __FUNCTION__ . ' => missing or invalid child_level_id param.');
         return $level_skope_id;
     }
@@ -2219,7 +2219,7 @@ function sek_site_has_nimble_sections_created() {
     );
     $query = new \WP_Query( $sek_post_query_vars );
     //sek_error_log('DO WE HAVE SECTIONS ?', $query );
-    return is_array( $query->posts ) && ! empty( $query->posts );
+    return is_array( $query->posts ) && !empty( $query->posts );
 }
 
 
@@ -2227,7 +2227,7 @@ function sek_site_has_nimble_sections_created() {
 
 // recursive helper to count the number of sections in a given set of sections data
 function sek_count_not_empty_sections_in_page( $seks_data, $count = 0 ) {
-    if ( ! is_array( $seks_data ) ) {
+    if ( !is_array( $seks_data ) ) {
         sek_error_log( __FUNCTION__ . ' => invalid seks_data param');
         return $count;
     }
@@ -2266,7 +2266,7 @@ function sek_get_feedback_notif_status() {
     //sek_error_log('START VERSION ?' . $start_version, version_compare( $start_version, '1.6.0', '<=' ) );
 
     // Bail if user did not start before v1.10.10, February 15th 2020 ( set on March 3rd 2020 )
-    if ( ! version_compare( $start_version, '1.10.10', '<=' ) )
+    if ( !version_compare( $start_version, '1.10.10', '<=' ) )
       return;
 
     $sek_post_query_vars = array(
@@ -2281,7 +2281,7 @@ function sek_get_feedback_notif_status() {
         'lazy_load_term_meta'    => false,
     );
     $query = new \WP_Query( $sek_post_query_vars );
-    if ( ! is_array( $query->posts ) || empty( $query->posts ) )
+    if ( !is_array( $query->posts ) || empty( $query->posts ) )
       return;
 
     $customized_pages = 0;
@@ -2315,7 +2315,7 @@ function sek_get_feedback_notif_status() {
 // recursive helper to generate a list of module used in a given set of sections data
 function sek_populate_list_of_modules_used( $seks_data ) {
     global $modules_used;
-    if ( ! is_array( $seks_data ) ) {
+    if ( !is_array( $seks_data ) ) {
         sek_error_log( __FUNCTION__ . ' => invalid seks_data param');
         return $count;
     }
@@ -2431,7 +2431,7 @@ function sek_filter_skp_get_skope_id( $skope_id, $level ) {
     //       $.extend( query, { local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ) } );
     // });
     // implemented to fix : https://github.com/presscustomizr/nimble-builder/issues/242
-    if ( 'local' === $level && is_array( $_POST ) && ! empty( $_POST['local_skope_id'] ) && 'customize_save' === $_POST['action'] ) {
+    if ( 'local' === $level && is_array( $_POST ) && !empty( $_POST['local_skope_id'] ) && 'customize_save' === $_POST['action'] ) {
         $skope_id = $_POST['local_skope_id'];
     }
     return $skope_id;
@@ -2468,7 +2468,7 @@ function sek_is_checked( $val ) {
 }
 
 function sek_booleanize_checkbox_val( $val ) {
-    if ( ! $val || is_array( $val ) ) {
+    if ( !$val || is_array( $val ) ) {
       return false;
     }
     if ( is_bool( $val ) && $val )
@@ -2496,10 +2496,10 @@ function sek_booleanize_checkbox_val( $val ) {
 function sek_get_registered_widget_areas() {
     global $wp_registered_sidebars;
     $widget_areas = array();
-    if ( is_array( $wp_registered_sidebars ) && ! empty( $wp_registered_sidebars ) ) {
+    if ( is_array( $wp_registered_sidebars ) && !empty( $wp_registered_sidebars ) ) {
         foreach ( $wp_registered_sidebars as $registered_sb ) {
             $id = $registered_sb['id'];
-            if ( ! sek_is_nimble_widget_id( $id ) )
+            if ( !sek_is_nimble_widget_id( $id ) )
               continue;
             $widget_areas[ $id ] = $registered_sb['name'];
         }
@@ -2551,10 +2551,10 @@ function sek_is_pro() {
 function sek_user_started_before_version( $requested_version ) {
     $started_with = get_option( 'nimble_started_with_version' );
     //the transient is set in HU_utils::hu_init_properties()
-    if ( ! $started_with )
+    if ( !$started_with )
       return false;
 
-    if ( ! is_string( $requested_version ) )
+    if ( !is_string( $requested_version ) )
       return false;
 
     return version_compare( $started_with , $requested_version, '<' );
@@ -2566,13 +2566,13 @@ function sek_user_started_before_version( $requested_version ) {
  *   VARIOUS HELPERS
 /* ------------------------------------------------------------------------- */
 function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true ) {
-    if ( ! $text )
+    if ( !$text )
         return '';
 
     if ( $strip_tags )
         $text       = strip_tags( $text );
 
-    if ( ! $max_text_length )
+    if ( !$max_text_length )
         return $text;
 
     $end_substr = $text_length = strlen( $text );
@@ -2624,7 +2624,7 @@ function sek_get_parent_theme_slug() {
 
 
 function sek_error_log( $title, $content = null ) {
-    if ( ! sek_is_dev_mode() )
+    if ( !sek_is_dev_mode() )
       return;
     if ( is_null( $content ) ) {
         error_log( '<' . $title . '>' );
@@ -2745,7 +2745,7 @@ function sek_get_nimble_api_data( $force_update = false ) {
 
         $info_data = json_decode( wp_remote_retrieve_body( $response ), true );
 
-        if ( empty( $info_data ) || ! is_array( $info_data ) ) {
+        if ( empty( $info_data ) || !is_array( $info_data ) ) {
             set_transient( $api_data_transient_name, [], 2 * HOUR_IN_SECONDS );
             return false;
         }
@@ -3029,7 +3029,7 @@ add_action( 'admin_bar_menu', '\Nimble\sek_add_customize_link', 1000 );
 function sek_add_customize_link() {
     global $wp_admin_bar;
     // Don't show for users who can't access the customizer
-    if ( ! current_user_can( 'customize' ) )
+    if ( !current_user_can( 'customize' ) )
       return;
 
     $return_customize_url = '';
@@ -3042,7 +3042,7 @@ function sek_add_customize_link() {
     } else {
         global $wp_customize;
         // Don't show if the user cannot edit a given customize_changeset post currently being previewed.
-        if ( is_customize_preview() && $wp_customize->changeset_post_id() && ! current_user_can( get_post_type_object( 'customize_changeset' )->cap->edit_post, $wp_customize->changeset_post_id() ) ) {
+        if ( is_customize_preview() && $wp_customize->changeset_post_id() && !current_user_can( get_post_type_object( 'customize_changeset' )->cap->edit_post, $wp_customize->changeset_post_id() ) ) {
           return;
         }
 
@@ -3109,11 +3109,11 @@ function sek_get_customize_url_when_is_admin( $post = null ) {
         && ( $post_type_object->public )
         && ( $post_type_object->show_in_admin_bar )
         && ( get_post_type_archive_link( $post_type_object->name ) )
-        && ! ( 'post' === $post_type_object->name && 'posts' === get_option( 'show_on_front' ) ) )
+        && !( 'post' === $post_type_object->name && 'posts' === get_option( 'show_on_front' ) ) )
     {
         $customize_url = get_post_type_archive_link( $current_screen->post_type );
     } elseif ( 'term' == $current_screen->base
-        && isset( $tag ) && is_object( $tag ) && ! is_wp_error( $tag )
+        && isset( $tag ) && is_object( $tag ) && !is_wp_error( $tag )
         && ( $tax = get_taxonomy( $tag->taxonomy ) )
         && $tax->public )
     {
@@ -3127,7 +3127,7 @@ function sek_get_customize_url_when_is_admin( $post = null ) {
         $customize_url = $view_link;
     }
 
-    if ( ! empty( $customize_url ) ) {
+    if ( !empty( $customize_url ) ) {
         $return_customize_url = add_query_arg( 'return', urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) ), wp_customize_url() );
         $customize_url = add_query_arg( 'url', urlencode( $customize_url ), $return_customize_url );
     }
@@ -3160,7 +3160,7 @@ function sek_get_customize_url_for_post_id( $post_id, $return_url = '' ) {
 // fired @wp_loaded
 // Note : if fired @plugins_loaded, invoking wp_update_post() generates php notices
 function sek_maybe_do_version_mapping() {
-    if ( ! is_user_logged_in() || ! current_user_can( 'edit_theme_options' ) )
+    if ( !is_user_logged_in() || !current_user_can( 'edit_theme_options' ) )
       return;
     //delete_option(NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS);
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
@@ -3169,14 +3169,14 @@ function sek_maybe_do_version_mapping() {
 
     // To 1_0_4 was introduced in december 2018
     // It's related to a modification of the skope_id when home is a static page
-    if ( ! array_key_exists( 'to_1_4_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['to_1_4_0'] ) {
+    if ( !array_key_exists( 'to_1_4_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['to_1_4_0'] ) {
         $status_to_1_4_0 = sek_do_compat_to_1_4_0();
         //sek_error_log('$status_1_0_4_to_1_1_0 ' . $status_1_0_4_to_1_1_0, $global_options );
         $global_options['retro_compat_mappings']['to_1_4_0'] = 'done';
     }
 
     // 1_0_4_to_1_1_0 introduced in October 2018
-    if ( ! array_key_exists( '1_0_4_to_1_1_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] ) {
+    if ( !array_key_exists( '1_0_4_to_1_1_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] ) {
         $status_1_0_4_to_1_1_0 = sek_do_compat_1_0_4_to_1_1_0();
         //sek_error_log('$status_1_0_4_to_1_1_0 ' . $status_1_0_4_to_1_1_0, $global_options );
         $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] = 'done';
@@ -3231,7 +3231,7 @@ function sek_do_compat_1_0_4_to_1_1_0() {
         'lazy_load_term_meta'    => false,
     );
     $query = new \WP_Query( $sek_post_query_vars );
-    if ( ! is_array( $query->posts ) || empty( $query->posts ) )
+    if ( !is_array( $query->posts ) || empty( $query->posts ) )
       return;
 
     $status = 'success';
@@ -3274,7 +3274,7 @@ function sek_walk_levels_and_do_map_compat_1_0_4_to_1_1_0( $seks_data ) {
         // Set level ver_ini
         // If the ver_ini property is not set, it means the level has been created with the previous version of Nimble ( v1.0.4 )
         // Let's add it
-        if ( is_array($value) && array_key_exists('level', $value) && ! array_key_exists('ver_ini', $value) ) {
+        if ( is_array($value) && array_key_exists('level', $value) && !array_key_exists('ver_ini', $value) ) {
             $value['ver_ini'] = '1.0.4';
         }
         $new_seks_data[$key] = $value;
@@ -3287,7 +3287,7 @@ function sek_walk_levels_and_do_map_compat_1_0_4_to_1_1_0( $seks_data ) {
         //    height => array(),
         //    bg_border => array()
         // )
-        if ( ! empty( $value ) && is_array( $value ) && 'options' === $key ) {
+        if ( !empty( $value ) && is_array( $value ) && 'options' === $key ) {
             // bail if the mapping has already been done
             if ( array_key_exists( 'bg', $value ) )
               continue;
@@ -3528,8 +3528,8 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
         return;
     }
 
-    if ( ! is_int( $post_id ) ) {
-        error_log( 'sek_get_seks_post => post_id ! is_int() for options => ' . $option_name );
+    if ( !is_int( $post_id ) ) {
+        error_log( 'sek_get_seks_post => post_id !is_int() for options => ' . $option_name );
     }
 
     if ( is_int( $post_id ) && $post_id > 0 && get_post( $post_id ) ) {
@@ -3537,7 +3537,7 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
     }
 
     // `-1` indicates no post exists; no query necessary.
-    if ( ! $post && -1 !== $post_id ) {
+    if ( !$post && -1 !== $post_id ) {
         $query = new \WP_Query( $sek_post_query_vars );
         $post = $query->post;
         $post_id = $post ? $post->ID : -1;
@@ -3584,7 +3584,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         }
     }
 
-    if ( ! $is_cached ) {
+    if ( !$is_cached ) {
         $seks_data = array();
         $post = sek_get_seks_post( $skope_id, $is_global_skope ? 'global' : 'local' );
         if ( $post ) {
@@ -3607,7 +3607,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
 
         foreach( sek_get_locations() as $loc_id => $params ) {
             if ( !in_array( $loc_id, $maybe_incomplete_locations ) ) {
-                if ( ( sek_is_global_location( $loc_id ) && $is_global_skope ) || ( ! sek_is_global_location( $loc_id ) && ! $is_global_skope  ) ) {
+                if ( ( sek_is_global_location( $loc_id ) && $is_global_skope ) || ( !sek_is_global_location( $loc_id ) && !$is_global_skope  ) ) {
                     $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], Nimble_Manager()->default_location_model );
                 }
             }
@@ -3631,8 +3631,8 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
 
     // sek_error_log( '<sek_get_skoped_seks() location => ' . $location .  array_key_exists( 'collection', $seks_data ), $seks_data );
     // if a location is specified, return specifically the sections of this location
-    if ( array_key_exists( 'collection', $seks_data ) && ! empty( $location_id ) ) {
-        if ( ! array_key_exists( $location_id, sek_get_locations() ) ) {
+    if ( array_key_exists( 'collection', $seks_data ) && !empty( $location_id ) ) {
+        if ( !array_key_exists( $location_id, sek_get_locations() ) ) {
             error_log( __FUNCTION__ . ' Error => location ' . $location_id . ' is not registered in the available locations' );
         } else {
             $seks_data = sek_get_level_model( $location_id, $seks_data['collection'] );
@@ -3658,7 +3658,7 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
         'skope_id' => ''
     ) );
 
-    if ( ! is_array( $seks_data ) ) {
+    if ( !is_array( $seks_data ) ) {
         error_log( 'sek_update_sek_post => $seks_data is not an array' );
         return new \WP_Error( 'sek_update_sek_post => $seks_data is not an array');
     }
@@ -3687,7 +3687,7 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
         $r = wp_update_post( wp_slash( $post_data ), true );
     } else {
         $r = wp_insert_post( wp_slash( $post_data ), true );
-        if ( ! is_wp_error( $r ) ) {
+        if ( !is_wp_error( $r ) ) {
             $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
             $post_id = $r;//$r is the post ID
 
@@ -3774,8 +3774,8 @@ function sek_get_saved_tmpl_post( $tmpl_post_name ) {
         return;
     }
 
-    if ( ! is_int( $post_id ) ) {
-        error_log( __FUNCTION__ .' => post_id ! is_int() for options => ' . $saved_tmpl_id );
+    if ( !is_int( $post_id ) ) {
+        error_log( __FUNCTION__ .' => post_id !is_int() for options => ' . $saved_tmpl_id );
     }
 
     if ( is_int( $post_id ) && $post_id > 0 && get_post( $post_id ) ) {
@@ -3783,7 +3783,7 @@ function sek_get_saved_tmpl_post( $tmpl_post_name ) {
     }
 
     // // `-1` indicates no post exists; no query necessary.
-    // if ( ! $post && -1 !== $post_id ) {
+    // if ( !$post && -1 !== $post_id ) {
     //     $query = new WP_Query( $sek_post_query_vars );
     //     $post = $query->post;
     //     $post_id = $post ? $post->ID : -1;
@@ -3816,7 +3816,7 @@ function sek_get_saved_template_data( $tmpl_post_name ) {
         //     'data' => array(),<= this is where we describe the columns and options
         //     'nimble_version' => NIMBLE_VERSION
         // )
-        if ( is_array( $tmpl_data_decoded ) && ! empty( $tmpl_data_decoded['data'] ) && is_string( $tmpl_data_decoded['data'] ) ) {
+        if ( is_array( $tmpl_data_decoded ) && !empty( $tmpl_data_decoded['data'] ) && is_string( $tmpl_data_decoded['data'] ) ) {
             $tmpl_data = json_decode( wp_unslash( $tmpl_data_decoded['data'], true ) );
         }
     }
@@ -3842,7 +3842,7 @@ function sek_get_all_saved_templates() {
         'order' => 'DESC'
     );
     $query = new \WP_Query( $sek_post_query_vars );
-    if ( ! is_array( $query->posts ) || empty( $query->posts ) )
+    if ( !is_array( $query->posts ) || empty( $query->posts ) )
       return;
 
     $collection = array();
@@ -3875,7 +3875,7 @@ function sek_get_all_saved_templates() {
   // );
 // @return WP_Post|WP_Error Post on success, error on failure.
 function sek_update_saved_tmpl_post( $tmpl_data, $post_name_to_update = '' ) {
-    if ( ! is_array( $tmpl_data ) ) {
+    if ( !is_array( $tmpl_data ) ) {
         sek_error_log( __FUNCTION__ . ' => $tmpl_data is not an array' );
         return new \WP_Error( __FUNCTION__ . ' => $tmpl_data is not an array');
     }
@@ -3912,7 +3912,7 @@ function sek_update_saved_tmpl_post( $tmpl_data, $post_name_to_update = '' ) {
         $r = wp_update_post( wp_slash( $post_data ), true );
     } else {
         $r = wp_insert_post( wp_slash( $post_data ), true );
-        if ( ! is_wp_error( $r ) ) {
+        if ( !is_wp_error( $r ) ) {
             $post_id = $r;//$r is the post ID
             // Trigger creation of a revision. This should be removed once #30854 is resolved.
             if ( 0 === count( wp_get_post_revisions( $r ) ) ) {

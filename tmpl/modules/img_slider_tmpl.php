@@ -1,17 +1,17 @@
 <?php
 /* Developers : you can override this template from a theme with a file that has this path : 'nimble_templates/modules/{original-module-template-file-name}.php' */
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 
-if ( ! function_exists( 'Nimble\sek_slider_find_pattern_match') ) {
+if ( !function_exists( 'Nimble\sek_slider_find_pattern_match') ) {
     function sek_slider_find_pattern_match( $matches, $item ) {
         $img_attr = '';
         if ( empty( $item ) )
           return $img_attr;
         $replace_values = array('caption', 'title', 'description');
-        if ( ! in_array( $matches[1], $replace_values ) )
+        if ( !in_array( $matches[1], $replace_values ) )
           return $img_attr;
 
 
@@ -44,7 +44,7 @@ if ( ! function_exists( 'Nimble\sek_slider_find_pattern_match') ) {
     }
 }
 
-if ( ! function_exists( 'Nimble\sek_slider_parse_template_tags') ) {
+if ( !function_exists( 'Nimble\sek_slider_parse_template_tags') ) {
     // fired @filter 'nimble_parse_template_tags'
     function sek_slider_parse_template_tags( $val, $item = array() ) {
         //the pattern could also be '!\{\{(\w+)\}\}!', but adding \s? allows us to allow spaces around the term inside curly braces
@@ -95,7 +95,7 @@ if ( !function_exists('Nimble\sek_maybe_parse_slider_img_html_for_lazyload') ) {
                     $srcset     = wp_calculate_image_srcset( $size_array, $src, $image_meta, $attachment_id );
                     $sizes      = wp_calculate_image_sizes( $size_array, $src, $image_meta, $attachment_id );
 
-                    if ( $srcset && ( $sizes || ! empty( $attr['sizes'] ) ) ) {
+                    if ( $srcset && ( $sizes || !empty( $attr['sizes'] ) ) ) {
                         $attr['srcset'] = $srcset;
 
                         if ( empty( $attr['sizes'] ) ) {
@@ -146,7 +146,7 @@ if ( !function_exists('Nimble\sek_maybe_parse_slider_img_html_for_lazyload') ) {
     }
 }
 
-if ( ! function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
+if ( !function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
     function sek_get_img_slider_module_img_html( $item, $lazy_load_on, $index ) {
         $html = '';
         $is_first_img = 0 == $index;
@@ -173,7 +173,7 @@ if ( ! function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
             if ( $lazy_load_on && !$is_first_img ) {
                 $html .= '<div class="swiper-lazy-preloader"></div>';//this element is removed by swiper.js once the image is loaded @see https://swiperjs.com/api/#lazy
             }
-        } else if ( ! empty( $item['img'] ) && is_string( $item['img'] ) ) {
+        } else if ( !empty( $item['img'] ) && is_string( $item['img'] ) ) {
             // the default img is excluded from the Nimble Builder smart loading parsing @see nimble_regex_callback()
             // => this is needed because this image has no specific dimensions set. And therefore can create false javascript computations of other element's distance to top on page load.
             // in particular when calculting if is_visible() to decide if we smart load.
@@ -185,11 +185,11 @@ if ( ! function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
 }
 
 
-if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
+if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
   function sek_print_img_slider( $img_collection = array(), $slider_options, $model ) {
       $img_collection = is_array( $img_collection ) ? $img_collection : array();
       $is_multislide = count( $img_collection ) > 1;
-      $autoplay = ( ! skp_is_customizing() && true === sek_booleanize_checkbox_val( $slider_options['autoplay'] ) ) ? "true" : "false";
+      $autoplay = ( !skp_is_customizing() && true === sek_booleanize_checkbox_val( $slider_options['autoplay'] ) ) ? "true" : "false";
       // don't authorize value < 300 ms
       $autoplay_delay = intval( $slider_options['autoplay_delay'] ) < 300 ? 1000 : intval( $slider_options['autoplay_delay'] );
       $pause_on_hover = true === sek_booleanize_checkbox_val( $slider_options['pause_on_hover'] ) ? "true" : "false";
@@ -216,9 +216,9 @@ if ( ! function_exists( 'Nimble\sek_print_img_slider' ) ) {
               foreach( $img_collection as $index => $item ) {
                   $is_text_enabled = true === sek_booleanize_checkbox_val( $item['enable_text'] );
                   $text_content = $is_text_enabled ? $item['text_content'] : '';
-                  $has_text_content = ! empty( $text_content );
+                  $has_text_content = !empty( $text_content );
                   $text_html = sprintf('<div class="sek-slider-text-wrapper"><div class="sek-slider-text-content">%1$s</div></div>', $text_content );
-                  if ( ! skp_is_customizing() ) {
+                  if ( !skp_is_customizing() ) {
                       $text_html = !$has_text_content ? '' : $text_html;
                   }
 

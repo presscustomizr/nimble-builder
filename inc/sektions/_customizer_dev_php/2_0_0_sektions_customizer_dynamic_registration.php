@@ -3,13 +3,13 @@
  *  SETUP DYNAMIC SERVER REGISTRATION FOR SETTING
 /* ------------------------------------------------------------------------- */
 // Fired @'after_setup_theme:20'
-if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
+if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
     class SEK_CZR_Dyn_Register {
         static $instance;
         public $sanitize_callbacks = array();// <= will be populated to cache the callbacks when invoking sek_get_module_sanitize_callbacks().
 
         public static function get_instance( $params ) {
-            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof SEK_CZR_Dyn_Register ) )
+            if ( !isset( self::$instance ) && !( self::$instance instanceof SEK_CZR_Dyn_Register ) )
               self::$instance = new SEK_CZR_Dyn_Register( $params );
             return self::$instance;
         }
@@ -72,9 +72,9 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
                     if ( is_array( $sektion_collection ) ) {
                         $model = sek_get_level_model( $setting_instance->id, $sektion_collection );
-                        if ( is_array( $model ) && ! empty( $model['module_type'] ) ) {
+                        if ( is_array( $model ) && !empty( $model['module_type'] ) ) {
                             $sanitize_callback = sek_get_registered_module_type_property( $model['module_type'], 'sanitize_callback' );
-                            if ( ! empty( $sanitize_callback ) && is_string( $sanitize_callback ) && function_exists( $sanitize_callback ) ) {
+                            if ( !empty( $sanitize_callback ) && is_string( $sanitize_callback ) && function_exists( $sanitize_callback ) ) {
                                 $setting_data = $sanitize_callback( $setting_data );
                             }
                         }
@@ -95,9 +95,9 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
                     if ( is_array( $sektion_collection ) ) {
                         $model = sek_get_level_model( $setting_instance->id, $sektion_collection );
-                        if ( is_array( $model ) && ! empty( $model['module_type'] ) ) {
+                        if ( is_array( $model ) && !empty( $model['module_type'] ) ) {
                             $validate_callback = sek_get_registered_module_type_property( $model['module_type'], 'validate_callback' );
-                            if ( ! empty( $validate_callback ) && is_string( $validate_callback ) && function_exists( $validate_callback ) ) {
+                            if ( !empty( $validate_callback ) && is_string( $validate_callback ) && function_exists( $validate_callback ) ) {
                                 $validated = $validate_callback( $setting_data );
                             }
                         }

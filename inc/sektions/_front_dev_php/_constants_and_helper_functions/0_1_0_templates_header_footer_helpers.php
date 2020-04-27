@@ -52,11 +52,11 @@ function sek_get_theme_template_base_paths() {
 // )
 // @param
 function sek_maybe_get_overriden_local_template_path( $params = array() ) {
-    if ( empty( $params ) || ! is_array( $params ))
+    if ( empty( $params ) || !is_array( $params ))
       return;
     $params = wp_parse_args( $params, array( 'file_name' => '', 'folder' => 'page-templates' ) );
 
-    if ( ! in_array( $params['folder'] , array( 'page-templates', 'header', 'footer' ) ) )
+    if ( !in_array( $params['folder'] , array( 'page-templates', 'header', 'footer' ) ) )
       return;
 
     $overriden_template_path = '';
@@ -77,7 +77,7 @@ function sek_maybe_get_overriden_local_template_path( $params = array() ) {
 function sek_get_locale_template(){
     $template_path = null;
     $local_template_data = sek_get_local_option_value( 'template' );
-    if ( ! empty( $local_template_data ) && ! empty( $local_template_data['local_template'] ) && 'default' !== $local_template_data['local_template'] ) {
+    if ( !empty( $local_template_data ) && !empty( $local_template_data['local_template'] ) && 'default' !== $local_template_data['local_template'] ) {
         $template_file_name = $local_template_data['local_template'];
         $template_file_name_with_php_extension = $template_file_name . '.php';
 
@@ -94,7 +94,7 @@ function sek_get_locale_template(){
             $template_path = $overriden_template_path;
         }
 
-        if ( ! file_exists( $template_path ) ) {
+        if ( !file_exists( $template_path ) ) {
             sek_error_log( __FUNCTION__ .' the custom template does not exist', $template_path );
             $template_path = null;
         }

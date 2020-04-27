@@ -429,8 +429,8 @@ function sek_add_css_rules_for_items_in_czr_accordion_collection_child( $rules, 
     $item_model = isset( $params['input_list'] ) ? $params['input_list'] : array();
 
     // VERTICAL ALIGNMENT
-    // if ( ! empty( $item_model[ 'v_alignment' ] ) ) {
-    //     if ( ! is_array( $item_model[ 'v_alignment' ] ) ) {
+    // if ( !empty( $item_model[ 'v_alignment' ] ) ) {
+    //     if ( !is_array( $item_model[ 'v_alignment' ] ) ) {
     //         sek_error_log( __FUNCTION__ . ' => error => the v_alignment option should be an array( {device} => {alignment} )');
     //     }
     //     $v_alignment_value = is_array( $item_model[ 'v_alignment' ] ) ? $item_model[ 'v_alignment' ] : array();
@@ -486,7 +486,7 @@ function sek_add_css_rules_for_czr_accordion_module( $rules, $complete_modul_mod
     //sek_error_log('sek_get_default_module_model() ?', sek_get_default_module_model( 'czr_accordion_module') );
 
     // TEXT COLOR ( for the plus / minus icon )
-    if ( ! empty( $accord_opts[ 'color_css' ] ) && $accord_defaults[ 'color_css' ] != $accord_opts[ 'color_css' ] ) {
+    if ( !empty( $accord_opts[ 'color_css' ] ) && $accord_defaults[ 'color_css' ] != $accord_opts[ 'color_css' ] ) {
         $rules[] = array(
             'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item .expander span', $complete_modul_model['id'] ),
             'css_rules' => 'background:'. $accord_opts[ 'color_css' ] .';',
@@ -494,7 +494,7 @@ function sek_add_css_rules_for_czr_accordion_module( $rules, $complete_modul_mod
         );
     }
     // ACTIVE / HOVER TEXT COLOR ( for the plus / minus icon )
-    if ( ! empty( $accord_opts[ 'color_active_css' ] ) && $accord_defaults[ 'color_active_css' ] != $accord_opts[ 'color_active_css' ] ) {
+    if ( !empty( $accord_opts[ 'color_active_css' ] ) && $accord_defaults[ 'color_active_css' ] != $accord_opts[ 'color_active_css' ] ) {
         $rules[] = array(
             'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper [data-sek-expanded="true"] .sek-accord-title .expander span, [data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item .sek-accord-title:hover .expander span', $complete_modul_model['id'] ),
             'css_rules' => sprintf('background:%s;', $accord_opts[ 'color_active_css' ] ),

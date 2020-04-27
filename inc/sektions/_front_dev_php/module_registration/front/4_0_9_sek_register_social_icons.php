@@ -306,7 +306,7 @@ function sek_add_css_rules_for_czr_social_icons_module( $rules, $complete_modul_
         // Leave the device value empty if === to default
         // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
         // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-        if ( ! empty( $num_unit ) && $num_val.'px' !== $defaults[$device].'' ) {
+        if ( !empty( $num_unit ) && $num_val.'px' !== $defaults[$device].'' ) {
             $unit = sek_extract_unit( $num_unit );
             $num_val = $num_val < 0 ? 0 : $num_val;
             $padding_right_ready_val[$device] = $num_val . $unit;

@@ -1,7 +1,7 @@
 <?php
 /* Developers : you can override this template from a theme with a file that has this path : 'nimble_templates/modules/{original-module-template-file-name}.php' */
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 $model = Nimble_Manager()->model;
@@ -13,7 +13,7 @@ $thumb_settings = $value['grid_thumb'];
 
 // filter for 'get_pagenum_link' and 'paginate_links'
 // for https://github.com/presscustomizr/nimble-builder/issues/672
-if ( ! function_exists( 'Nimble\sek_filter_pagination_nav_url') ) {
+if ( !function_exists( 'Nimble\sek_filter_pagination_nav_url') ) {
     function sek_filter_pagination_nav_url( $result ) {
           return trailingslashit($result) . '#' . Nimble_Manager()->model['id'];
     }
@@ -22,7 +22,7 @@ if ( ! function_exists( 'Nimble\sek_filter_pagination_nav_url') ) {
 /**
  * The template for displaying the pagination links
  */
-if ( ! function_exists( 'Nimble\sek_render_post_navigation') ) {
+if ( !function_exists( 'Nimble\sek_render_post_navigation') ) {
   function sek_render_post_navigation( $post_collection ) {
     $next_dir          = is_rtl() ? 'right' : 'left';
     $prev_dir          = is_rtl() ? 'left' : 'right';
@@ -103,7 +103,7 @@ if ( ! function_exists( 'Nimble\sek_render_post_navigation') ) {
 
 
 
-if ( ! function_exists( 'Nimble\sek_render_post') ) {
+if ( !function_exists( 'Nimble\sek_render_post') ) {
   function sek_render_post( $main_settings, $metas_settings, $thumb_settings ) {
     // thumb, title, excerpt visibility
     foreach ( ['thumb'] as $element ) {
@@ -194,7 +194,7 @@ if ( ! function_exists( 'Nimble\sek_render_post') ) {
 
 // // Solves the problem of setting both the maximum number of posts and the posts_per_page in a custom WP_Query
 // // Filter is added and removed before and after the query call
-// if ( ! function_exists( 'Nimble\sek_filter_found_posts') ) {
+// if ( !function_exists( 'Nimble\sek_filter_found_posts') ) {
 //   function sek_filter_found_posts() {
 //     $model = Nimble_Manager()->model;
 //     $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
@@ -207,7 +207,7 @@ if ( ! function_exists( 'Nimble\sek_render_post') ) {
 
 
 // filters @hook 'excerpt_length'
-if ( ! function_exists( 'Nimble\sek_pg_get_excerpt_length') ) {
+if ( !function_exists( 'Nimble\sek_pg_get_excerpt_length') ) {
   function sek_pg_get_excerpt_length( $original_length ) {
     $model = Nimble_Manager()->model;
     $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
@@ -319,7 +319,7 @@ if ( $post_nb > 0 ) {
 
 // Copy of WP_Query::have_post(), without do_action_ref_array( 'loop_start', array( &$this ) );
 // implemented to fix https://github.com/presscustomizr/nimble-builder/issues/467
-if ( ! function_exists( 'Nimble\sek_pg_the_nimble_have_post') ) {
+if ( !function_exists( 'Nimble\sek_pg_the_nimble_have_post') ) {
   function sek_pg_the_nimble_have_post( $query ) {
     if ( $query->current_post + 1 < $query->post_count ) {
       return true;
@@ -353,7 +353,7 @@ if ( ! function_exists( 'Nimble\sek_pg_the_nimble_have_post') ) {
 
 // Copy of WP_Query::the_post(), without do_action_ref_array( 'loop_start', array( &$this ) );
 // implemented to fix https://github.com/presscustomizr/nimble-builder/issues/467
-if ( ! function_exists( 'Nimble\sek_pg_the_nimble_post') ) {
+if ( !function_exists( 'Nimble\sek_pg_the_nimble_post') ) {
   function sek_pg_the_nimble_post( $query ) {
     global $post;
     $query->in_the_loop = true;

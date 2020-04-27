@@ -2,7 +2,7 @@
 // fired @wp_loaded
 // Note : if fired @plugins_loaded, invoking wp_update_post() generates php notices
 function sek_maybe_do_version_mapping() {
-    if ( ! is_user_logged_in() || ! current_user_can( 'edit_theme_options' ) )
+    if ( !is_user_logged_in() || !current_user_can( 'edit_theme_options' ) )
       return;
     //delete_option(NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS);
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
@@ -11,14 +11,14 @@ function sek_maybe_do_version_mapping() {
 
     // To 1_0_4 was introduced in december 2018
     // It's related to a modification of the skope_id when home is a static page
-    if ( ! array_key_exists( 'to_1_4_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['to_1_4_0'] ) {
+    if ( !array_key_exists( 'to_1_4_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['to_1_4_0'] ) {
         $status_to_1_4_0 = sek_do_compat_to_1_4_0();
         //sek_error_log('$status_1_0_4_to_1_1_0 ' . $status_1_0_4_to_1_1_0, $global_options );
         $global_options['retro_compat_mappings']['to_1_4_0'] = 'done';
     }
 
     // 1_0_4_to_1_1_0 introduced in October 2018
-    if ( ! array_key_exists( '1_0_4_to_1_1_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] ) {
+    if ( !array_key_exists( '1_0_4_to_1_1_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] ) {
         $status_1_0_4_to_1_1_0 = sek_do_compat_1_0_4_to_1_1_0();
         //sek_error_log('$status_1_0_4_to_1_1_0 ' . $status_1_0_4_to_1_1_0, $global_options );
         $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] = 'done';
@@ -73,7 +73,7 @@ function sek_do_compat_1_0_4_to_1_1_0() {
         'lazy_load_term_meta'    => false,
     );
     $query = new \WP_Query( $sek_post_query_vars );
-    if ( ! is_array( $query->posts ) || empty( $query->posts ) )
+    if ( !is_array( $query->posts ) || empty( $query->posts ) )
       return;
 
     $status = 'success';
@@ -116,7 +116,7 @@ function sek_walk_levels_and_do_map_compat_1_0_4_to_1_1_0( $seks_data ) {
         // Set level ver_ini
         // If the ver_ini property is not set, it means the level has been created with the previous version of Nimble ( v1.0.4 )
         // Let's add it
-        if ( is_array($value) && array_key_exists('level', $value) && ! array_key_exists('ver_ini', $value) ) {
+        if ( is_array($value) && array_key_exists('level', $value) && !array_key_exists('ver_ini', $value) ) {
             $value['ver_ini'] = '1.0.4';
         }
         $new_seks_data[$key] = $value;
@@ -129,7 +129,7 @@ function sek_walk_levels_and_do_map_compat_1_0_4_to_1_1_0( $seks_data ) {
         //    height => array(),
         //    bg_border => array()
         // )
-        if ( ! empty( $value ) && is_array( $value ) && 'options' === $key ) {
+        if ( !empty( $value ) && is_array( $value ) && 'options' === $key ) {
             // bail if the mapping has already been done
             if ( array_key_exists( 'bg', $value ) )
               continue;

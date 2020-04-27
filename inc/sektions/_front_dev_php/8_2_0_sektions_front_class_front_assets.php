@@ -249,7 +249,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
             // when front scripts are preloaded or loaded in ajax, jquery is not declared as dependency
             // we need to make sure its enqueued, unless it's replaced by a cdn version
-            if ( ! sek_is_jquery_replaced() ) {
+            if ( !sek_is_jquery_replaced() ) {
                 wp_enqueue_script('jquery');
             }
 
@@ -428,7 +428,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 'fontAwesomeAlreadyEnqueued' => wp_style_is('customizr-fa', 'enqueued') || wp_style_is('hueman-font-awesome', 'enqueued')
             );
             foreach ( (array) $l10n as $key => $value ) {
-                if ( ! is_scalar( $value ) ) {
+                if ( !is_scalar( $value ) ) {
                   continue;
                 }
                 $l10n[ $key ] = html_entity_decode( (string) $value, ENT_QUOTES, 'UTF-8' );
@@ -610,7 +610,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             if ( !Nimble_Manager()->page_has_nimble_content )
               return;
 
-            if ( ! sek_load_front_assets_in_ajax() )
+            if ( !sek_load_front_assets_in_ajax() )
               return;
             ?>
             <script id="nb-load-assets-dynamically">window,document,nb_.listenTo("nb-jquery-loaded",function(){nb_.scriptsLoadingStatus={},nb_.ajaxLoadScript=function(t){jQuery(function(a){t=a.extend({path:"",complete:"",loadcheck:!1},t),nb_.scriptsLoadingStatus[t.path]&&"pending"===nb_.scriptsLoadingStatus[t.path].state()||(nb_.scriptsLoadingStatus[t.path]=nb_.scriptsLoadingStatus[t.path]||a.Deferred(),jQuery.ajax({url:sekFrontLocalized.frontAssetsPath+t.path+"?"+sekFrontLocalized.assetVersion,cache:!0,dataType:"script"}).done(function(){"function"!=typeof t.loadcheck||t.loadcheck()?"function"==typeof t.complete&&t.complete():nb_.errorLog("ajaxLoadScript success but loadcheck failed for => "+t.path)}).fail(function(){nb_.errorLog("ajaxLoadScript failed for => "+t.path)}))})},jQuery(function(t){sekFrontLocalized.load_front_assets_on_scroll&&nb_.ajaxLoadScript({path:sekFrontLocalized.isDevMode?"js/ccat-nimble-front.js":"js/ccat-nimble-front.min.js"})})});</script>

@@ -1,5 +1,5 @@
 <?php
-if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
+if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
     class SEK_Front_Render_Css extends SEK_Front_Render {
         // Fired in __construct()
         function _setup_hook_for_front_css_printing_or_enqueuing() {
@@ -21,8 +21,8 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             //    - we set the hook to ''
 
             // AJAX REQUESTED STYLESHEET
-            if ( ( ! is_null( $skope_id ) && ! empty( $skope_id ) ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
-                if ( ! isset($_POST['local_skope_id']) ) {
+            if ( ( !is_null( $skope_id ) && !empty( $skope_id ) ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+                if ( !isset($_POST['local_skope_id']) ) {
                     sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => error missing local_skope_id');
                     return;
                 }
@@ -76,7 +76,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
         // When ajaxing, the link#sek-gfonts-{$this->id} gets removed from the dom and replaced by this string
         // March 2020 added param display=swap => Ensure text remains visible during webfont load #572
         function sek_gfont_print( $print_candidates ) {
-            if ( ! empty( $print_candidates ) ) {
+            if ( !empty( $print_candidates ) ) {
                 printf('<link rel="stylesheet" id="%1$s" href="%2$s">',
                     'sek-gfonts-local-and-global',
                     "//fonts.googleapis.com/css?family={$print_candidates}&display=swap"
@@ -96,7 +96,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             // print candidates must be fetched when sek_preload_google_fonts_on_front()
             $print_candidates = $this->sek_get_gfont_print_candidates();
 
-            if ( ! empty( $print_candidates ) ) {
+            if ( !empty( $print_candidates ) ) {
                 ?>
                 <script id="nimble-preload-gfonts">nb_.preloadAsset( { id : 'sek-gfonts-local-and-global', as : 'style', href : '//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>&display=swap', scriptEl : document.currentScript } );</script>
                 <?php
@@ -135,7 +135,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             // remove duplicate if any
             $ffamilies = array_unique( $ffamilies );
 
-            if ( ! empty( $ffamilies ) ) {
+            if ( !empty( $ffamilies ) ) {
                 $ffamilies = implode( "|", $ffamilies );
                 $print_candidates = str_replace( '|', '%7C', $ffamilies );
                 $print_candidates = str_replace( '[gfont]', '' , $print_candidates );

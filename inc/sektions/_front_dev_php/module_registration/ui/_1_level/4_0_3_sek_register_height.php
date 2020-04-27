@@ -68,8 +68,8 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
     $height_options = is_array( $options[ 'height' ] ) ? $options[ 'height' ] : array();
 
     // VERTICAL ALIGNMENT
-    if ( ! empty( $height_options[ 'v_alignment' ] ) ) {
-        if ( ! is_array( $height_options[ 'v_alignment' ] ) ) {
+    if ( !empty( $height_options[ 'v_alignment' ] ) ) {
+        if ( !is_array( $height_options[ 'v_alignment' ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the v_alignment option should be an array( {device} => {alignment} )');
         }
         $v_alignment_value = is_array( $height_options[ 'v_alignment' ] ) ? $height_options[ 'v_alignment' ] : array();
@@ -100,11 +100,11 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
     }
 
     // CUSTOM HEIGHT BY DEVICE
-    if ( ! empty( $height_options[ 'height-type' ] ) ) {
+    if ( !empty( $height_options[ 'height-type' ] ) ) {
         if ( 'custom' === $height_options[ 'height-type' ] ) {
             $custom_user_height = array_key_exists( 'custom-height', $height_options ) ? $height_options[ 'custom-height' ] : array();
             $selector = '[data-sek-id="'.$level['id'].'"]';
-            if ( ! is_array( $custom_user_height ) ) {
+            if ( !is_array( $custom_user_height ) ) {
                 sek_error_log( __FUNCTION__ . ' => error => the height option should be an array( {device} => {number}{unit} )', $custom_user_height);
             }
             $custom_user_height = is_array( $custom_user_height ) ? $custom_user_height : array();
@@ -116,7 +116,7 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
             $height_value = $custom_user_height;
             foreach ( $custom_user_height as $device => $num_unit ) {
                 $numeric = sek_extract_numeric_value( $num_unit );
-                if ( ! empty( $numeric ) ) {
+                if ( !empty( $numeric ) ) {
                     $unit = sek_extract_unit( $num_unit );
                     $unit = '%' === $unit ? 'vh' : $unit;
                     $height_value[$device] = $numeric . $unit;
@@ -134,7 +134,7 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
 
     // OVERFLOW HIDDEN
     // implemented to fix https://github.com/presscustomizr/nimble-builder/issues/365
-    if ( ! empty( $height_options[ 'overflow_hidden' ] ) && sek_booleanize_checkbox_val( $height_options[ 'overflow_hidden' ] ) ) {
+    if ( !empty( $height_options[ 'overflow_hidden' ] ) && sek_booleanize_checkbox_val( $height_options[ 'overflow_hidden' ] ) ) {
         $rules[] = array(
             'selector' => '[data-sek-id="'.$level['id'].'"]',
             'css_rules' => 'overflow:hidden',

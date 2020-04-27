@@ -66,8 +66,8 @@ function sek_get_saved_tmpl_post( $tmpl_post_name ) {
         return;
     }
 
-    if ( ! is_int( $post_id ) ) {
-        error_log( __FUNCTION__ .' => post_id ! is_int() for options => ' . $saved_tmpl_id );
+    if ( !is_int( $post_id ) ) {
+        error_log( __FUNCTION__ .' => post_id !is_int() for options => ' . $saved_tmpl_id );
     }
 
     if ( is_int( $post_id ) && $post_id > 0 && get_post( $post_id ) ) {
@@ -75,7 +75,7 @@ function sek_get_saved_tmpl_post( $tmpl_post_name ) {
     }
 
     // // `-1` indicates no post exists; no query necessary.
-    // if ( ! $post && -1 !== $post_id ) {
+    // if ( !$post && -1 !== $post_id ) {
     //     $query = new WP_Query( $sek_post_query_vars );
     //     $post = $query->post;
     //     $post_id = $post ? $post->ID : -1;
@@ -108,7 +108,7 @@ function sek_get_saved_template_data( $tmpl_post_name ) {
         //     'data' => array(),<= this is where we describe the columns and options
         //     'nimble_version' => NIMBLE_VERSION
         // )
-        if ( is_array( $tmpl_data_decoded ) && ! empty( $tmpl_data_decoded['data'] ) && is_string( $tmpl_data_decoded['data'] ) ) {
+        if ( is_array( $tmpl_data_decoded ) && !empty( $tmpl_data_decoded['data'] ) && is_string( $tmpl_data_decoded['data'] ) ) {
             $tmpl_data = json_decode( wp_unslash( $tmpl_data_decoded['data'], true ) );
         }
     }
@@ -134,7 +134,7 @@ function sek_get_all_saved_templates() {
         'order' => 'DESC'
     );
     $query = new \WP_Query( $sek_post_query_vars );
-    if ( ! is_array( $query->posts ) || empty( $query->posts ) )
+    if ( !is_array( $query->posts ) || empty( $query->posts ) )
       return;
 
     $collection = array();
@@ -167,7 +167,7 @@ function sek_get_all_saved_templates() {
   // );
 // @return WP_Post|WP_Error Post on success, error on failure.
 function sek_update_saved_tmpl_post( $tmpl_data, $post_name_to_update = '' ) {
-    if ( ! is_array( $tmpl_data ) ) {
+    if ( !is_array( $tmpl_data ) ) {
         sek_error_log( __FUNCTION__ . ' => $tmpl_data is not an array' );
         return new \WP_Error( __FUNCTION__ . ' => $tmpl_data is not an array');
     }
@@ -204,7 +204,7 @@ function sek_update_saved_tmpl_post( $tmpl_data, $post_name_to_update = '' ) {
         $r = wp_update_post( wp_slash( $post_data ), true );
     } else {
         $r = wp_insert_post( wp_slash( $post_data ), true );
-        if ( ! is_wp_error( $r ) ) {
+        if ( !is_wp_error( $r ) ) {
             $post_id = $r;//$r is the post ID
             // Trigger creation of a revision. This should be removed once #30854 is resolved.
             if ( 0 === count( wp_get_post_revisions( $r ) ) ) {

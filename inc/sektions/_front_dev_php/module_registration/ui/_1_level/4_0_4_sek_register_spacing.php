@@ -43,7 +43,7 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
       return $rules;
     $pad_marg_options = $options[ 'spacing' ][ 'pad_marg' ];
     // array( desktop => array( margin-right => 10, padding-top => 5, unit => 'px' ) )
-    if ( ! is_array( $pad_marg_options ) )
+    if ( !is_array( $pad_marg_options ) )
       return $rules;
 
     // GENERATE SPACING RULES BY DEVICE
@@ -147,10 +147,10 @@ function sek_process_column_width_for_device( $params ) {
             } else {
                 // Backward compat since June 2019
                 // After implementing https://github.com/presscustomizr/nimble-builder/issues/279
-                $custom_width   = ( ! empty( $level[ 'width' ] ) && is_numeric( $level[ 'width' ] ) ) ? $level['width'] : null;
+                $custom_width   = ( !empty( $level[ 'width' ] ) && is_numeric( $level[ 'width' ] ) ) ? $level['width'] : null;
             }
 
-            if ( ! is_null( $custom_width ) ) {
+            if ( !is_null( $custom_width ) ) {
                 $col_width_in_percent = $custom_width;
             }
 

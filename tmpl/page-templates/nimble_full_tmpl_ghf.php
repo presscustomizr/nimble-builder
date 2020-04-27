@@ -7,7 +7,7 @@
 // The template has been kept to ensure retro-compatibility with users using if before transitionning to v1.4.0
 // nimble_full_tmpl_ghf =>  nimble full tmpl with global header and footer
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
   exit;
 }
 // load the Nimble template which includes a call to wp_head()

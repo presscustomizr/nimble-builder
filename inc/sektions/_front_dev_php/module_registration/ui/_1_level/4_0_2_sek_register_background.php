@@ -204,7 +204,7 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     //     [shadow] => 0
     // )
     $default_value_model  = sek_get_default_module_model( 'sek_level_bg_module' );
-    $bg_options = ( ! empty( $options[ 'bg' ] ) && is_array( $options[ 'bg' ] ) ) ? $options[ 'bg' ] : array();
+    $bg_options = ( !empty( $options[ 'bg' ] ) && is_array( $options[ 'bg' ] ) ) ? $options[ 'bg' ] : array();
     $bg_options = wp_parse_args( $bg_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
     if ( empty( $bg_options ) )
@@ -218,14 +218,14 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     * background: [background-image] [background-position] / [background-size] [background-repeat] [background-attachment] [background-origin] [background-clip] [background-color];
     */
     // Img background
-    if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
+    if ( !empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
         // deactivated when customizing @see function sek_is_img_smartload_enabled()
 
         //$background_properties[ 'background-image' ] = 'url("'. wp_get_attachment_url( $bg_options[ 'bg-image'] ) .'")';
 
         // Img Bg Position
         // 'center' is the default value. the CSS rule is declared in assets/front/scss/sek-base.scss
-        if ( ! empty( $bg_options[ 'bg-position'] ) && 'center' != $bg_options[ 'bg-position'] ) {
+        if ( !empty( $bg_options[ 'bg-position'] ) && 'center' != $bg_options[ 'bg-position'] ) {
             $pos_map = array(
                 'top_left'    => '0% 0%',
                 'top'         => '50% 0%',
@@ -245,7 +245,7 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
                 $mapped_bg_options = array();
                 // map option with css value
                 foreach ($bg_options[ 'bg-position'] as $device => $user_val ) {
-                    if ( ! in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
+                    if ( !in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
                         sek_error_log( __FUNCTION__ . ' => error => unknown device : ' . $device );
                         continue;
                     }
@@ -263,32 +263,32 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
 
         // background size
         // 'cover' is the default value. the CSS rule is declared in assets/front/scss/sek-base.scss
-        if ( ! empty( $bg_options['bg-scale'] ) && 'default' != $bg_options['bg-scale'] && 'cover' != $bg_options['bg-scale'] ) {
+        if ( !empty( $bg_options['bg-scale'] ) && 'default' != $bg_options['bg-scale'] && 'cover' != $bg_options['bg-scale'] ) {
             //When specifying a background-size value, it must immediately follow the background-position value.
             $background_properties['background-size'] = $bg_options['bg-scale'];
         }
 
         // add no-repeat by default?
         // 'no-repeat' is the default value. the CSS rule is declared in assets/front/scss/sek-base.scss
-        if ( ! empty( $bg_options['bg-repeat'] ) && 'default' != $bg_options['bg-repeat'] ) {
+        if ( !empty( $bg_options['bg-repeat'] ) && 'default' != $bg_options['bg-repeat'] ) {
             $background_properties['background-repeat'] = $bg_options['bg-repeat'];
         }
 
         // write the bg-attachment rule only if true <=> set to "fixed"
-        if ( ! empty( $bg_options['bg-attachment'] ) && sek_is_checked( $bg_options['bg-attachment'] ) ) {
+        if ( !empty( $bg_options['bg-attachment'] ) && sek_is_checked( $bg_options['bg-attachment'] ) ) {
             $background_properties['background-attachment'] = 'fixed';
         }
 
     }
 
     //background color (needs validation: we need a sanitize hex or rgba color)
-    if ( ! empty( $bg_options['bg-color'] ) ) {
+    if ( !empty( $bg_options['bg-color'] ) ) {
         $background_properties['background-color'] = $bg_options[ 'bg-color' ];
     }
 
 
     //build background rule
-    if ( ! empty( $background_properties ) ) {
+    if ( !empty( $background_properties ) ) {
         $background_css_rules = '';
         foreach ($background_properties as $bg_prop => $bg_css_val ) {
             $background_css_rules .= sprintf('%1$s:%2$s;', $bg_prop, $bg_css_val );
@@ -348,7 +348,7 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
                 'mq' =>null
             );
         }
-    }//if ( ! empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {}
+    }//if ( !empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {}
 
     return $rules;
 }

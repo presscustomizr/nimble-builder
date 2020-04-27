@@ -1,5 +1,5 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 
@@ -297,7 +297,7 @@ class Sek_Dyn_CSS_Handler {
         // 4) front, user not logged in :
         //    the normal behaviour is that the css file is enqueued.
         //    It should have been written when saving in the customizer. If no file available, we try to write it. If writing a css file is not possible, we fallback on inline printing.
-        if ( is_customize_preview() || ! $this->_sek_dyn_css_file_exists() || $this->force_rewrite || $this->customizer_save ) {
+        if ( is_customize_preview() || !$this->_sek_dyn_css_file_exists() || $this->force_rewrite || $this->customizer_save ) {
             $this->sek_model = sek_get_skoped_seks( $this->skope_id );
 
             //  on front, when no stylesheet is available, the fallback hook must be set to wp_head, because the hook property might be empty
@@ -319,7 +319,7 @@ class Sek_Dyn_CSS_Handler {
 
         //hook setup for printing or enqueuing
         //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Customizer_Setting::update()
-        if ( ! $this->customizer_save ) {
+        if ( !$this->customizer_save ) {
             $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
         } else {
             //sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' ?? => $this->css_string_to_enqueue_or_print => ', $this->css_string_to_enqueue_or_print );
@@ -361,7 +361,7 @@ class Sek_Dyn_CSS_Handler {
         $this->file_exists          = $this->_sek_dyn_css_file_exists();
 
         if ( self::MODE_FILE == $this->mode ) {
-            if ( ! $this->_sek_dyn_css_write_file_is_possible() ) {
+            if ( !$this->_sek_dyn_css_write_file_is_possible() ) {
                 $this->mode = self::MODE_INLINE;
             }
         }
@@ -470,7 +470,7 @@ class Sek_Dyn_CSS_Handler {
 
         //if $this->mode != 'file' or the file enqueuing didn't go through (fall back)
         //print inline style
-        if ( $this->css_string_to_enqueue_or_print && ! $this->enqueued_or_printed ) {
+        if ( $this->css_string_to_enqueue_or_print && !$this->enqueued_or_printed ) {
             $dep =  array_pop( $this->dep );
 
             if ( !$dep || wp_style_is( $dep, 'done' ) || !wp_style_is( $dep, 'done' ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
@@ -505,7 +505,7 @@ class Sek_Dyn_CSS_Handler {
         $base_uri = $this->base_uri;
 
         // Can we create the folder?
-        if ( ! $wp_filesystem->is_dir( $base_uri ) ) {
+        if ( !$wp_filesystem->is_dir( $base_uri ) ) {
             $error = !wp_mkdir_p( $base_uri );
         }
 
@@ -513,13 +513,13 @@ class Sek_Dyn_CSS_Handler {
             return false;
         }
 
-        if ( ! file_exists( $index_path = wp_normalize_path( trailingslashit( $base_uri ) . 'index.php' ) ) ) {
+        if ( !file_exists( $index_path = wp_normalize_path( trailingslashit( $base_uri ) . 'index.php' ) ) ) {
             // predefined mode settings for WP files
             $wp_filesystem->put_contents( $index_path, "<?php\n// Silence is golden.\n", FS_CHMOD_FILE );
         }
 
 
-        if ( ! wp_is_writable( $base_uri ) ) {
+        if ( !wp_is_writable( $base_uri ) ) {
             return false;
         }
 
@@ -592,7 +592,7 @@ class Sek_Dyn_CSS_Handler {
      * @return string The absolute CSS file URI
      */
     private function _sek_dyn_css_build_uri() {
-        if ( ! isset( $this->base_uri ) ) {
+        if ( !isset( $this->base_uri ) ) {
             $this->_sek_dyn_css_build_base_uri();
         }
         return wp_normalize_path( trailingslashit( $this->base_uri ) . "{$this->id}.css" );
@@ -610,7 +610,7 @@ class Sek_Dyn_CSS_Handler {
      * @return string The absolute CSS file URL
      */
     private function _sek_dyn_css_build_url() {
-        if ( ! isset( $this->base_url ) ) {
+        if ( !isset( $this->base_url ) ) {
             $this->_sek_dyn_css_build_base_url();
         }
         return trailingslashit( $this->base_url ) . "{$this->id}.css";
@@ -698,7 +698,7 @@ class Sek_Dyn_CSS_Handler {
             $creds = request_filesystem_credentials( '', '', false, false, array() );
 
             /* initialize the API */
-            if ( ! WP_Filesystem($creds) ) {
+            if ( !WP_Filesystem($creds) ) {
                 /* any problems and we exit */
                 return false;
             }

@@ -42,14 +42,14 @@ function sek_get_module_params_for_sek_level_width_column() {
 add_filter( 'sek_add_css_rules_for__column__options', '\Nimble\sek_add_css_rules_for_column_width', 10, 3 );
 function sek_add_css_rules_for_column_width( $rules, $column ) {
     $options = empty( $column[ 'options' ] ) ? array() : $column['options'];
-    if ( empty( $options[ 'width' ] ) || ! is_array( $options[ 'width' ] ) )
+    if ( empty( $options[ 'width' ] ) || !is_array( $options[ 'width' ] ) )
       return $rules;
 
     $width_options = is_array( $options[ 'width' ] ) ? $options[ 'width' ] : array();
 
     // ALIGNMENT BY DEVICE
-    // if ( ! empty( $width_options[ 'h_alignment' ] ) ) {
-    //     if ( ! is_array( $width_options[ 'h_alignment' ] ) ) {
+    // if ( !empty( $width_options[ 'h_alignment' ] ) ) {
+    //     if ( !is_array( $width_options[ 'h_alignment' ] ) ) {
     //         sek_error_log( __FUNCTION__ . ' => error => the h_alignment option should be an array( {device} => {alignment} )');
     //     }
     //     $h_alignment_value = is_array( $width_options[ 'h_alignment' ] ) ? $width_options[ 'h_alignment' ] : array();
@@ -82,12 +82,12 @@ function sek_add_css_rules_for_column_width( $rules, $column ) {
 
 
     // CUSTOM WIDTH
-    if ( ! empty( $width_options[ 'width-type' ] ) ) {
+    if ( !empty( $width_options[ 'width-type' ] ) ) {
         if ( 'custom' == $width_options[ 'width-type' ] && array_key_exists( 'custom-width', $width_options ) ) {
             $user_custom_width_value = $width_options[ 'custom-width' ];
             $selector = '[data-sek-id="'.$column['id'].'"]';
 
-            if ( ! empty( $user_custom_width_value ) && ! is_array( $user_custom_width_value ) ) {
+            if ( !empty( $user_custom_width_value ) && !is_array( $user_custom_width_value ) ) {
                 sek_error_log( __FUNCTION__ . ' => error => the width option should be an array( {device} => {number}{unit} )');
             }
             $user_custom_width_value = is_array( $user_custom_width_value ) ? $user_custom_width_value : array();
@@ -99,7 +99,7 @@ function sek_add_css_rules_for_column_width( $rules, $column ) {
             $width_value = $user_custom_width_value;
             foreach ( $user_custom_width_value as $device => $num_unit ) {
                 $numeric = sek_extract_numeric_value( $num_unit );
-                if ( ! empty( $numeric ) ) {
+                if ( !empty( $numeric ) ) {
                     $unit = sek_extract_unit( $num_unit );
                     $width_value[$device] = $numeric . $unit;
                 }

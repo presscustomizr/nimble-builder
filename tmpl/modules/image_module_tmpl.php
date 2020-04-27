@@ -1,7 +1,7 @@
 <?php
 /* Developers : you can override this template from a theme with a file that has this path : 'nimble_templates/modules/{original-module-template-file-name}.php' */
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 // this.defaultItemModel = {
@@ -19,7 +19,7 @@ $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $main_settings = $value['main_settings'];
 //$borders_corners_settings = $value['borders_corners'];
 
-if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
+if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
     function sek_get_img_module_img_html( $value ) {
         $visual_effect_class = '';
         //visual effect classes
@@ -33,7 +33,7 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
         $html = '';
         if ( is_int( $value['img'] ) ) {
             $html = wp_get_attachment_image( $value['img'], empty( $value['img-size'] ) ? 'large' : $value['img-size']);
-        } else if ( ! empty( $value['img'] ) && is_string( $value['img'] ) ) {
+        } else if ( !empty( $value['img'] ) && is_string( $value['img'] ) ) {
             // the default img is excluded from the smart loading parsing @see nimble_regex_callback()
             // => this is needed because this image has no specific dimensions set. And therefore can create false javascript computations of other element's distance to top on page load.
             // in particular when calculting if is_visible() to decide if we smart load.
@@ -77,7 +77,7 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
     }
 }
 
-if ( ! function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
+if ( !function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
     function sek_get_img_module_img_link( $value ) {
         $link = 'javascript:void(0);';
         // if ( skp_is_customizing() ) {
@@ -85,11 +85,11 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
         // }
         switch( $value['link-to'] ) {
             case 'url' :
-                if ( ! empty( $value['link-pick-url'] ) && ! empty( $value['link-pick-url']['id'] ) ) {
-                    if ( '_custom_' == $value['link-pick-url']['id']  && ! empty( $value['link-custom-url'] ) ) {
+                if ( !empty( $value['link-pick-url'] ) && !empty( $value['link-pick-url']['id'] ) ) {
+                    if ( '_custom_' == $value['link-pick-url']['id']  && !empty( $value['link-custom-url'] ) ) {
                         $custom_url = apply_filters( 'nimble_parse_template_tags', $value['link-custom-url'] );
                         $link = esc_url( $custom_url );
-                    } else if ( ! empty( $value['link-pick-url']['url'] ) ) {
+                    } else if ( !empty( $value['link-pick-url']['url'] ) ) {
                         $link = esc_url( $value['link-pick-url']['url'] );
                     }
                 }

@@ -1,7 +1,7 @@
 <?php
 /* Developers : you can override this template from a theme with a file that has this path : 'nimble_templates/modules/{original-module-template-file-name}.php' */
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 $model = Nimble_Manager()->model;
@@ -29,13 +29,13 @@ Array
     [color_hover_css] => #590606
 )
 */
-if ( ! function_exists( 'Nimble\sek_get_icon_module_icon_html') ) {
+if ( !function_exists( 'Nimble\sek_get_icon_module_icon_html') ) {
     function sek_get_icon_module_icon_html( $value ) {
         $html = '';
         $icon_settings = $value['icon_settings'];
         $spacing_border = $value['spacing_border'];
 
-        if ( ! empty( $icon_settings['icon'] ) ) {
+        if ( !empty( $icon_settings['icon'] ) ) {
             $html = sprintf( '<div class="sek-icon-wrapper"><i class="%1$s"></i></div>', $icon_settings[ 'icon' ] );
         } else {
             //falls back on an icon if previewing
@@ -48,17 +48,17 @@ if ( ! function_exists( 'Nimble\sek_get_icon_module_icon_html') ) {
 }
 
 
-if ( ! function_exists( 'Nimble\sek_get_icon_module_icon_link' ) ) {
+if ( !function_exists( 'Nimble\sek_get_icon_module_icon_link' ) ) {
     function sek_get_icon_module_icon_link( $icon_settings ) {
         $link = 'javascript:void(0);';
         // if ( skp_is_customizing() ) {
         //     return $link;
         // }
         if ( 'url' == $icon_settings['link-to'] ) {
-            if ( ! empty( $icon_settings['link-pick-url'] ) && ! empty( $icon_settings['link-pick-url']['id'] ) ) {
-                if ( '_custom_' == $icon_settings['link-pick-url']['id']  && ! empty( $icon_settings['link-custom-url'] ) ) {
+            if ( !empty( $icon_settings['link-pick-url'] ) && !empty( $icon_settings['link-pick-url']['id'] ) ) {
+                if ( '_custom_' == $icon_settings['link-pick-url']['id']  && !empty( $icon_settings['link-custom-url'] ) ) {
                     $link = esc_url( $icon_settings['link-custom-url'] );
-                } else if ( ! empty( $icon_settings['link-pick-url']['url'] ) ) {
+                } else if ( !empty( $icon_settings['link-pick-url']['url'] ) ) {
                     $link = esc_url( $icon_settings['link-pick-url']['url'] );
                 }
             }

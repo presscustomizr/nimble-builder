@@ -89,7 +89,7 @@ final class _NIMBLE_Editors {
       $settings,
       array(
         // Disable autop if the current post has blocks in it.
-        'wpautop'             => ! has_blocks(),
+        'wpautop'             => !has_blocks(),
         'media_buttons'       => true,
         'default_editor'      => '',
         'drag_drop_upload'    => false,
@@ -171,13 +171,13 @@ final class _NIMBLE_Editors {
       self::$drag_drop_upload = true;
     }
 
-    if ( ! empty( $set['editor_height'] ) ) {
+    if ( !empty( $set['editor_height'] ) ) {
       $height = ' style="height: ' . (int) $set['editor_height'] . 'px"';
     } else {
       $height = ' rows="' . (int) $set['textarea_rows'] . '"';
     }
 
-    if ( ! current_user_can( 'upload_files' ) ) {
+    if ( !current_user_can( 'upload_files' ) ) {
       $set['media_buttons'] = false;
     }
 
@@ -214,17 +214,17 @@ final class _NIMBLE_Editors {
       self::$editor_buttons_css = false;
     }
 
-    if ( ! empty( $set['editor_css'] ) ) {
+    if ( !empty( $set['editor_css'] ) ) {
       echo $set['editor_css'] . "\n";
     }
 
-    if ( ! empty( $buttons ) || $set['media_buttons'] ) {
+    if ( !empty( $buttons ) || $set['media_buttons'] ) {
       echo '<div id="wp-' . $editor_id_attr . '-editor-tools" class="wp-editor-tools hide-if-no-js">';
 
       if ( $set['media_buttons'] ) {
         self::$has_medialib = true;
 
-        if ( ! function_exists( 'media_buttons' ) ) {
+        if ( !function_exists( 'media_buttons' ) ) {
           include( ABSPATH . 'wp-admin/includes/media.php' );
         }
 
@@ -248,7 +248,7 @@ final class _NIMBLE_Editors {
     $quicktags_toolbar = '';
 
     if ( self::$this_quicktags ) {
-      if ( 'content' === $editor_id && ! empty( $GLOBALS['current_screen'] ) && $GLOBALS['current_screen']->base === 'post' ) {
+      if ( 'content' === $editor_id && !empty( $GLOBALS['current_screen'] ) && $GLOBALS['current_screen']->base === 'post' ) {
         $toolbar_id = 'ed_toolbar';
       } else {
         $toolbar_id = 'qt_' . $editor_id_attr . '_toolbar';
@@ -423,7 +423,7 @@ final class _NIMBLE_Editors {
             'wpview',
           );
 
-          if ( ! self::$has_medialib ) {
+          if ( !self::$has_medialib ) {
             $plugins[] = 'image';
           }
 
@@ -445,7 +445,7 @@ final class _NIMBLE_Editors {
             unset( $plugins[ $key ] );
           }
 
-          if ( ! empty( $mce_external_plugins ) ) {
+          if ( !empty( $mce_external_plugins ) ) {
 
             /**
              * Filters the translations loaded for external TinyMCE 3.x plugins.
@@ -465,7 +465,7 @@ final class _NIMBLE_Editors {
             $loaded_langs = array();
             $strings      = '';
 
-            if ( ! empty( $mce_external_languages ) ) {
+            if ( !empty( $mce_external_languages ) ) {
               foreach ( $mce_external_languages as $name => $path ) {
                 if ( @is_file( $path ) && @is_readable( $path ) ) {
                   include_once( $path );
@@ -487,7 +487,7 @@ final class _NIMBLE_Editors {
               $strings                       = '';
 
               // Try to load langs/[locale].js and langs/[locale]_dlg.js
-              if ( ! in_array( $name, $loaded_langs, true ) ) {
+              if ( !in_array( $name, $loaded_langs, true ) ) {
                 $path = str_replace( content_url(), '', $plugurl );
                 $path = WP_CONTENT_DIR . $path . '/langs/';
 
@@ -515,7 +515,7 @@ final class _NIMBLE_Editors {
                   }
                 }
 
-                if ( ! empty( $strings ) ) {
+                if ( !empty( $strings ) ) {
                   $ext_plugins .= "\n" . $strings . "\n";
                 }
               }
@@ -531,7 +531,7 @@ final class _NIMBLE_Editors {
         $settings            = self::default_settings();
         $settings['plugins'] = implode( ',', $plugins );
 
-        if ( ! empty( $mce_external_plugins ) ) {
+        if ( !empty( $mce_external_plugins ) ) {
           $settings['external_plugins'] = wp_json_encode( $mce_external_plugins );
         }
 
@@ -543,7 +543,7 @@ final class _NIMBLE_Editors {
         $mce_css       = $settings['content_css'];
         $editor_styles = get_editor_stylesheets();
 
-        if ( ! empty( $editor_styles ) ) {
+        if ( !empty( $editor_styles ) ) {
           // Force urlencoding of commas.
           foreach ( $editor_styles as $key => $url ) {
             if ( strpos( $url, ',' ) !== false ) {
@@ -563,7 +563,7 @@ final class _NIMBLE_Editors {
          */
         $mce_css = trim( apply_filters( 'nimble_mce_css', $mce_css ), ' ,' );
 
-        if ( ! empty( $mce_css ) ) {
+        if ( !empty( $mce_css ) ) {
           $settings['content_css'] = $mce_css;
         } else {
           unset( $settings['content_css'] );
@@ -589,7 +589,7 @@ final class _NIMBLE_Editors {
         //$mce_buttons = array( 'formatselect', 'bold', 'italic', 'bullist', 'numlist', 'blockquote', 'alignleft', 'aligncenter', 'alignright', 'link', 'wp_more', 'spellchecker' );
         $mce_buttons = array( 'formatselect', 'bold', 'italic', 'bullist', 'numlist', 'blockquote', 'alignleft', 'aligncenter', 'alignright', 'link', 'spellchecker' );
 
-        if ( ! wp_is_mobile() ) {
+        if ( !wp_is_mobile() ) {
           if ( $set['_content_editor_dfw'] ) {
             $mce_buttons[] = 'dfw';
           } else {
@@ -612,7 +612,7 @@ final class _NIMBLE_Editors {
         $mce_buttons_2 = array( 'strikethrough', 'hr', 'forecolor', 'pastetext', 'removeformat', 'charmap', 'outdent', 'indent', 'undo', 'redo' );
 
         // @nikeo modif
-        // if ( ! wp_is_mobile() ) {
+        // if ( !wp_is_mobile() ) {
         //   $mce_buttons_2[] = 'wp_help';
         // }
 
@@ -654,7 +654,7 @@ final class _NIMBLE_Editors {
 
         if ( post_type_supports( $post->post_type, 'post-formats' ) ) {
           $post_format = get_post_format( $post );
-          if ( $post_format && ! is_wp_error( $post_format ) ) {
+          if ( $post_format && !is_wp_error( $post_format ) ) {
             $body_class .= ' post-format-' . sanitize_html_class( $post_format );
           } else {
             $body_class .= ' post-format-standard';
@@ -671,7 +671,7 @@ final class _NIMBLE_Editors {
 
       $body_class .= ' locale-' . sanitize_html_class( strtolower( str_replace( '_', '-', get_user_locale() ) ) );
 
-      if ( ! empty( $set['tinymce']['body_class'] ) ) {
+      if ( !empty( $set['tinymce']['body_class'] ) ) {
         $body_class .= ' ' . $set['tinymce']['body_class'];
         unset( $set['tinymce']['body_class'] );
       }
@@ -679,7 +679,7 @@ final class _NIMBLE_Editors {
       $mceInit = array(
         'selector'          => "#$editor_id",
         'wpautop'           => (bool) $set['wpautop'],
-        'indent'            => ! $set['wpautop'],
+        'indent'            => !$set['wpautop'],
         'toolbar1'          => implode( ',', $mce_buttons ),
         'toolbar2'          => implode( ',', $mce_buttons_2 ),
         'toolbar3'          => implode( ',', $mce_buttons_3 ),
@@ -727,7 +727,7 @@ final class _NIMBLE_Editors {
         $mceInit = apply_filters( 'tiny_mce_before_init', $mceInit, $editor_id );
       }
 
-      if ( empty( $mceInit['toolbar3'] ) && ! empty( $mceInit['toolbar4'] ) ) {
+      if ( empty( $mceInit['toolbar3'] ) && !empty( $mceInit['toolbar4'] ) ) {
         $mceInit['toolbar3'] = $mceInit['toolbar4'];
         $mceInit['toolbar4'] = '';
       }
@@ -748,7 +748,7 @@ final class _NIMBLE_Editors {
         $val      = $value ? 'true' : 'false';
         $options .= $key . ':' . $val . ',';
         continue;
-      } elseif ( ! empty( $value ) && is_string( $value ) && (
+      } elseif ( !empty( $value ) && is_string( $value ) && (
         ( '{' == $value[0] && '}' == $value[ strlen( $value ) - 1 ] ) ||
         ( '[' == $value[0] && ']' == $value[ strlen( $value ) - 1 ] ) ||
         preg_match( '/^\(?function ?\(/', $value ) ) ) {
@@ -1349,7 +1349,7 @@ final class _NIMBLE_Editors {
    * @return string Translation object, JSON encoded.
    */
   public static function wp_mce_translation( $mce_locale = '', $json_only = false ) {
-    if ( ! $mce_locale ) {
+    if ( !$mce_locale ) {
       $mce_locale = self::get_mce_locale();
     }
 
@@ -1408,13 +1408,13 @@ final class _NIMBLE_Editors {
   public static function force_uncompressed_tinymce() {
     $has_custom_theme = false;
     foreach ( self::$mce_settings as $init ) {
-      if ( ! empty( $init['theme_url'] ) ) {
+      if ( !empty( $init['theme_url'] ) ) {
         $has_custom_theme = true;
         break;
       }
     }
 
-    if ( ! $has_custom_theme ) {
+    if ( !$has_custom_theme ) {
       return;
     }
 
@@ -1442,7 +1442,7 @@ final class _NIMBLE_Editors {
 
     self::$tinymce_scripts_printed = true;
 
-    if ( ! isset( $concatenate_scripts ) ) {
+    if ( !isset( $concatenate_scripts ) ) {
       script_concat_settings();
     }
 
@@ -1459,7 +1459,7 @@ final class _NIMBLE_Editors {
   public static function editor_js() {
     global $tinymce_version;
 
-    $tmce_on = ! empty( self::$mce_settings );
+    $tmce_on = !empty( self::$mce_settings );
     $mceInit = $qtInit = '';
 
     if ( $tmce_on ) {
@@ -1472,7 +1472,7 @@ final class _NIMBLE_Editors {
       $mceInit = '{}';
     }
 
-    if ( ! empty( self::$qt_settings ) ) {
+    if ( !empty( self::$qt_settings ) ) {
       foreach ( self::$qt_settings as $editor_id => $init ) {
         $options = self::_parse_init( $init );
         $qtInit .= "'$editor_id':{$options},";
@@ -1548,7 +1548,7 @@ final class _NIMBLE_Editors {
       echo self::$ext_plugins . "\n";
     }
 
-    if ( ! is_admin() ) {
+    if ( !is_admin() ) {
       echo 'var ajaxurl = "' . admin_url( 'admin-ajax.php', 'relative' ) . '";';
     }
 
@@ -1567,9 +1567,9 @@ final class _NIMBLE_Editors {
           init = nimbleTinyMCEPreInit.mceInit[id];
           $wrap = tinymce.$( '#wp-' + id + '-wrap' );
 
-          if ( ( $wrap.hasClass( 'tmce-active' ) || ! nimbleTinyMCEPreInit.qtInit.hasOwnProperty( id ) ) && ! init.wp_skip_init ) {
+          if ( ( $wrap.hasClass( 'tmce-active' ) || !nimbleTinyMCEPreInit.qtInit.hasOwnProperty( id ) ) && !init.wp_skip_init ) {
             tinymce.init( init );
-            if ( ! window.wpActiveEditor ) {
+            if ( !window.wpActiveEditor ) {
               window.wpActiveEditor = id;//<= where is this used ?
             }
           }
@@ -1580,7 +1580,7 @@ final class _NIMBLE_Editors {
         for ( id in nimbleTinyMCEPreInit.qtInit ) {
           quicktags( nimbleTinyMCEPreInit.qtInit[id] );
 
-          if ( ! window.wpActiveEditor ) {
+          if ( !window.wpActiveEditor ) {
             window.wpActiveEditor = id;//<= where is this used ?
           }
         }
@@ -1700,7 +1700,7 @@ final class _NIMBLE_Editors {
      */
     $results = apply_filters( 'wp_link_query', $results, $query );
 
-    return ! empty( $results ) ? $results : false;
+    return !empty( $results ) ? $results : false;
   }
 
   /**

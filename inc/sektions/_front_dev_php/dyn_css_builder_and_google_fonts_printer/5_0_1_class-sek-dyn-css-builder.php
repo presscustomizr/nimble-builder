@@ -1,5 +1,5 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 
@@ -73,7 +73,7 @@ class Sek_Dyn_CSS_Builder {
         $level      = is_array( $level ) ? $level : array();
 
         // The parent level is set when the function is invoked recursively, from a level where we actually have a 'level' property
-        if ( ! empty( $parent_level ) ) {
+        if ( !empty( $parent_level ) ) {
             $this->parent_level_model = $parent_level;
         }
 
@@ -104,7 +104,7 @@ class Sek_Dyn_CSS_Builder {
                               $children = sek_get_registered_module_type_property( $father_mod_type, 'children' );
                               // Loop on the children
                               foreach ( $entry as $opt_group_type => $input_candidates ) {
-                                  if ( ! is_array( $children ) ) {
+                                  if ( !is_array( $children ) ) {
                                       sek_error_log( 'Father module ' . $father_mod_type . ' has invalid children');
                                       continue;
                                   }
@@ -236,7 +236,7 @@ class Sek_Dyn_CSS_Builder {
 
                 // populate rules for modules values
                 if ( !empty( $entry[ 'level' ] ) && 'module' === $entry['level'] ) {
-                    if ( ! empty( $entry['module_type'] ) ) {
+                    if ( !empty( $entry['module_type'] ) ) {
                         $module_type = $entry['module_type'];
                         // build rules for modules
                         // applying sek_normalize_module_value_with_defaults() allows us to access all the value properties of the module without needing to check their existence
@@ -250,7 +250,7 @@ class Sek_Dyn_CSS_Builder {
             if ( !empty( $rules ) ) {
                 //@TODO: MAKE SURE RULE ARE NORMALIZED
                 foreach( $rules as $rule ) {
-                    if ( ! is_array( $rule ) ) {
+                    if ( !is_array( $rule ) ) {
                         sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => a css rule should be represented by an array', $rule );
                         continue;
                     }
@@ -278,7 +278,7 @@ class Sek_Dyn_CSS_Builder {
             }
 
             // Reset the parent level model because it might have been modified after walking the sublevels
-            if ( ! empty( $parent_level ) ) {
+            if ( !empty( $parent_level ) ) {
                 $this->parent_level_model = $parent_level;
             }
 
@@ -353,9 +353,9 @@ class Sek_Dyn_CSS_Builder {
     // @return void()
     // populates the css rules ::collection property, organized by media queries
     public function sek_populate( $selector, $css_rules, $mq = '' ) {
-        if ( ! is_string( $selector ) )
+        if ( !is_string( $selector ) )
             return;
-        if ( ! is_string( $css_rules ) )
+        if ( !is_string( $css_rules ) )
             return;
 
         // Assign a default media device
@@ -450,16 +450,16 @@ class Sek_Dyn_CSS_Builder {
         $rules_collection = array();
         $css = '';
 
-        if ( empty( $rules ) || ! is_array( $rules ) )
+        if ( empty( $rules ) || !is_array( $rules ) )
           return $css;
 
         // POPULATE THE CSS RULES COLLECTION
         foreach( $rules as $rule ) {
-            if ( ! is_array( $rule ) ) {
+            if ( !is_array( $rule ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => a css rule should be represented by an array', $rule );
                 continue;
             }
-            if ( empty($rule['selector']) || ! is_string( $rule['selector'] ) ) {
+            if ( empty($rule['selector']) || !is_string( $rule['selector'] ) ) {
                 sek_error_log(  __CLASS__ . '::' . __FUNCTION__ . '=> a css rule is missing the selector param', $rule );
                 continue;
             }
@@ -468,7 +468,7 @@ class Sek_Dyn_CSS_Builder {
             $css_rules = $rule[ 'css_rules' ];
             $mq = $rule[ 'mq' ];
 
-            if ( ! is_string( $css_rules ) )
+            if ( !is_string( $css_rules ) )
               continue;
 
             // Assign a default media device
@@ -530,7 +530,7 @@ class Sek_Dyn_CSS_Builder {
     // hook : sek_add_css_rules_for_level_options
     // fired this class constructor
     public function sek_add_rules_for_column_width( $rules, $column ) {
-        if ( ! is_array( $column ) )
+        if ( !is_array( $column ) )
           return $rules;
 
         if ( empty( $column['level'] ) || 'column' !== $column['level'] || empty( $column['id'] ) )

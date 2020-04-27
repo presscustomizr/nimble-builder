@@ -6,7 +6,7 @@ function sek_do_ajax_pre_checks( $params = array() ) {
     $params = wp_parse_args( $params, array( 'check_nonce' => true ) );
     if ( $params['check_nonce'] ) {
         $action = 'save-customize_' . get_stylesheet();
-        if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+        if ( !check_ajax_referer( $action, 'nonce', false ) ) {
              wp_send_json_error( array(
                 'code' => 'invalid_nonce',
                 'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' => check_ajax_referer() failed.' ),
@@ -14,16 +14,16 @@ function sek_do_ajax_pre_checks( $params = array() ) {
         }
     }
 
-    if ( ! is_user_logged_in() ) {
+    if ( !is_user_logged_in() ) {
         wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
     }
-    if ( ! current_user_can( 'edit_theme_options' ) ) {
+    if ( !current_user_can( 'edit_theme_options' ) ) {
       wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
     }
-    if ( ! current_user_can( 'customize' ) ) {
+    if ( !current_user_can( 'customize' ) ) {
         status_header( 403 );
         wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-    } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+    } else if ( !isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
         status_header( 405 );
         wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
     }
@@ -93,7 +93,7 @@ function sek_ajax_import_attachment() {
 function sek_get_revision_history() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 
-    if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+    if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
     }
     $rev_list = sek_get_revision_history_from_posts( $_POST['skope_id'] );
@@ -104,7 +104,7 @@ function sek_get_revision_history() {
 function sek_get_single_revision() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 
-    if ( ! isset( $_POST['revision_post_id'] ) || empty( $_POST['revision_post_id'] ) ) {
+    if ( !isset( $_POST['revision_post_id'] ) || empty( $_POST['revision_post_id'] ) ) {
         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing revision_post_id' );
     }
     $revision = sek_get_single_post_revision( $_POST['revision_post_id'] );

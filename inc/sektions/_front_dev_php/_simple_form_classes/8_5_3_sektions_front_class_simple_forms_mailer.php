@@ -4,7 +4,7 @@
 * Mailer class definition
 *
 */
-if ( ! class_exists( '\Nimble\Sek_Mailer' ) ) :
+if ( !class_exists( '\Nimble\Sek_Mailer' ) ) :
 class Sek_Mailer {
     private $form;
     private $status;
@@ -13,12 +13,12 @@ class Sek_Mailer {
     public $recaptcha_errors = '_no_error_';//will store array( 'endpoint' => $endpoint, 'request' => $request, 'response' => '' );
 
     public function __construct( Sek_Form $form ) {
-        $this-> form = $form;
+        $this->form = $form;
 
         $this->messages = array(
             //status          => message
             //'not_sent'        => __( 'Message was not sent. Try Again.', 'text_doma'),
-            //'sent'            => __( 'Thanks! Your message has been sent.', 'text_doma'),
+            //'sent'            => __( 'Thanks!Your message has been sent.', 'text_doma'),
             'aborted'         => __( 'Please supply correct information.', 'text_doma') //<-todo too much generic
         );
         $this->status = 'init';

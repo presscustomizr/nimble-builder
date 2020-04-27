@@ -3,7 +3,7 @@ add_action( 'admin_bar_menu', '\Nimble\sek_add_customize_link', 1000 );
 function sek_add_customize_link() {
     global $wp_admin_bar;
     // Don't show for users who can't access the customizer
-    if ( ! current_user_can( 'customize' ) )
+    if ( !current_user_can( 'customize' ) )
       return;
 
     $return_customize_url = '';
@@ -16,7 +16,7 @@ function sek_add_customize_link() {
     } else {
         global $wp_customize;
         // Don't show if the user cannot edit a given customize_changeset post currently being previewed.
-        if ( is_customize_preview() && $wp_customize->changeset_post_id() && ! current_user_can( get_post_type_object( 'customize_changeset' )->cap->edit_post, $wp_customize->changeset_post_id() ) ) {
+        if ( is_customize_preview() && $wp_customize->changeset_post_id() && !current_user_can( get_post_type_object( 'customize_changeset' )->cap->edit_post, $wp_customize->changeset_post_id() ) ) {
           return;
         }
 
@@ -83,11 +83,11 @@ function sek_get_customize_url_when_is_admin( $post = null ) {
         && ( $post_type_object->public )
         && ( $post_type_object->show_in_admin_bar )
         && ( get_post_type_archive_link( $post_type_object->name ) )
-        && ! ( 'post' === $post_type_object->name && 'posts' === get_option( 'show_on_front' ) ) )
+        && !( 'post' === $post_type_object->name && 'posts' === get_option( 'show_on_front' ) ) )
     {
         $customize_url = get_post_type_archive_link( $current_screen->post_type );
     } elseif ( 'term' == $current_screen->base
-        && isset( $tag ) && is_object( $tag ) && ! is_wp_error( $tag )
+        && isset( $tag ) && is_object( $tag ) && !is_wp_error( $tag )
         && ( $tax = get_taxonomy( $tag->taxonomy ) )
         && $tax->public )
     {
@@ -101,7 +101,7 @@ function sek_get_customize_url_when_is_admin( $post = null ) {
         $customize_url = $view_link;
     }
 
-    if ( ! empty( $customize_url ) ) {
+    if ( !empty( $customize_url ) ) {
         $return_customize_url = add_query_arg( 'return', urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) ), wp_customize_url() );
         $customize_url = add_query_arg( 'url', urlencode( $customize_url ), $return_customize_url );
     }

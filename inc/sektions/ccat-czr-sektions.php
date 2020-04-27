@@ -1,6 +1,6 @@
 <?php
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 
@@ -55,7 +55,7 @@ function sek_get_all_gfonts() {
         'lazy_load_term_meta'    => false,
     );
     $query = new \WP_Query( $sek_post_query_vars );
-    if ( ! is_array( $query->posts ) || empty( $query->posts ) )
+    if ( !is_array( $query->posts ) || empty( $query->posts ) )
       return;
 
     foreach ($query->posts as $post_object ) {
@@ -358,7 +358,7 @@ function nimble_get_code_editor_settings( $args ) {
             ),
         ) );
 
-        if ( ! current_user_can( 'unfiltered_html' ) ) {
+        if ( !current_user_can( 'unfiltered_html' ) ) {
             $settings['htmlhint']['kses'] = wp_kses_allowed_html( 'post' );
         }
     } elseif ( 'text/x-gfm' === $type ) {
@@ -435,7 +435,7 @@ function nimble_get_code_editor_settings( $args ) {
         $settings['codemirror']['mode'] = $type;
     }
 
-    if ( ! empty( $settings['codemirror']['lint'] ) ) {
+    if ( !empty( $settings['codemirror']['lint'] ) ) {
         $settings['codemirror']['gutters'][] = 'CodeMirror-lint-markers';
     }
 
@@ -658,12 +658,12 @@ function nimble_add_i18n_localized_control_params( $params ) {
 // ADD SEKTION VALUES TO EXPORTED DATA IN THE CUSTOMIZER PREVIEW
 add_filter( 'skp_json_export_ready_skopes', '\Nimble\add_sektion_values_to_skope_export' );
 function add_sektion_values_to_skope_export( $skopes ) {
-    if ( ! is_array( $skopes ) ) {
+    if ( !is_array( $skopes ) ) {
         sek_error_log( __FUNCTION__ . ' error => skp_json_export_ready_skopes filter => the filtered skopes must be an array.' );
     }
     $new_skopes = array();
     foreach ( $skopes as $skp_data ) {
-        if ( ! is_array( $skp_data ) || empty( $skp_data['skope'] ) ) {
+        if ( !is_array( $skp_data ) || empty( $skp_data['skope'] ) ) {
             sek_error_log( __FUNCTION__ . ' error => missing skope informations' );
             continue;
         }
@@ -671,7 +671,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
             $new_skopes[] = $skp_data;
             continue;
         }
-        if ( ! is_array( $skp_data ) ) {
+        if ( !is_array( $skp_data ) ) {
             error_log( 'skp_json_export_ready_skopes filter => the skope data must be an array.' );
             continue;
         }
@@ -984,7 +984,7 @@ function sek_is_plugin_active( $plugin ) {
 * @return bool True, if active for the network, otherwise false.
 */
 function sek_is_plugin_active_for_network( $plugin ) {
-  if ( ! is_multisite() )
+  if ( !is_multisite() )
     return false;
 
   $plugins = get_site_option( 'active_sitewide_plugins');
@@ -998,7 +998,7 @@ function sek_is_plugin_active_for_network( $plugin ) {
 
 ?><?php
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 
@@ -1040,7 +1040,7 @@ function sek_print_nimble_input_templates() {
             <span class="czr-notice"><# print(input_data.notice_before_title); #></span><br/>
           <# } #>
           <# if ( 'hidden' !== input_type ) { #>
-            <# var title_width = ! _.isEmpty( input_data.title_width ) ? input_data.title_width : ''; #>
+            <# var title_width = !_.isEmpty( input_data.title_width ) ? input_data.title_width : ''; #>
             <div class="customize-control-title {{title_width}}"><# print( input_data.title ); #></div>
           <# } #>
           <# if ( input_data.notice_before ) { #>
@@ -1554,10 +1554,10 @@ function sek_print_nimble_input_templates() {
                 },
                 modData = jQuery.extend( defaultModParams, modData );
 
-                if ( ! _.isEmpty( modData['icon'] ) ) {
+                if ( !_.isEmpty( modData['icon'] ) ) {
                     icon_img_src = sektionsLocalizedData.moduleIconPath + modData['icon'];
                     icon_img_html = '<img draggable="false" title="' + modData['title'] + '" alt="' +  modData['title'] + '" class="nimble-module-icons" src="' + icon_img_src + '"/>';
-                } else if ( ! _.isEmpty( modData['font_icon'] ) ) {
+                } else if ( !_.isEmpty( modData['font_icon'] ) ) {
                     icon_img_html = modData['font_icon'];
                 }
                 var title_attr = "<?php _e('Drag and drop or double-click to insert in your chosen target element.', 'text_doma'); ?>",
@@ -1604,7 +1604,7 @@ function sek_print_nimble_input_templates() {
                 },
                 modData = jQuery.extend( defaultParams, secParams );
 
-                if ( ! _.isEmpty( secParams['section_type'] ) ) {
+                if ( !_.isEmpty( secParams['section_type'] ) ) {
                     section_type = secParams['section_type'];
                 }
 
@@ -1865,13 +1865,13 @@ function sek_print_nimble_input_templates() {
  *  SETUP DYNAMIC SERVER REGISTRATION FOR SETTING
 /* ------------------------------------------------------------------------- */
 // Fired @'after_setup_theme:20'
-if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
+if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
     class SEK_CZR_Dyn_Register {
         static $instance;
         public $sanitize_callbacks = array();// <= will be populated to cache the callbacks when invoking sek_get_module_sanitize_callbacks().
 
         public static function get_instance( $params ) {
-            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof SEK_CZR_Dyn_Register ) )
+            if ( !isset( self::$instance ) && !( self::$instance instanceof SEK_CZR_Dyn_Register ) )
               self::$instance = new SEK_CZR_Dyn_Register( $params );
             return self::$instance;
         }
@@ -1934,9 +1934,9 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
                     if ( is_array( $sektion_collection ) ) {
                         $model = sek_get_level_model( $setting_instance->id, $sektion_collection );
-                        if ( is_array( $model ) && ! empty( $model['module_type'] ) ) {
+                        if ( is_array( $model ) && !empty( $model['module_type'] ) ) {
                             $sanitize_callback = sek_get_registered_module_type_property( $model['module_type'], 'sanitize_callback' );
-                            if ( ! empty( $sanitize_callback ) && is_string( $sanitize_callback ) && function_exists( $sanitize_callback ) ) {
+                            if ( !empty( $sanitize_callback ) && is_string( $sanitize_callback ) && function_exists( $sanitize_callback ) ) {
                                 $setting_data = $sanitize_callback( $setting_data );
                             }
                         }
@@ -1957,9 +1957,9 @@ if ( ! class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
                     if ( is_array( $sektion_collection ) ) {
                         $model = sek_get_level_model( $setting_instance->id, $sektion_collection );
-                        if ( is_array( $model ) && ! empty( $model['module_type'] ) ) {
+                        if ( is_array( $model ) && !empty( $model['module_type'] ) ) {
                             $validate_callback = sek_get_registered_module_type_property( $model['module_type'], 'validate_callback' );
-                            if ( ! empty( $validate_callback ) && is_string( $validate_callback ) && function_exists( $validate_callback ) ) {
+                            if ( !empty( $validate_callback ) && is_string( $validate_callback ) && function_exists( $validate_callback ) ) {
                                 $validated = $validate_callback( $setting_data );
                             }
                         }
@@ -2075,7 +2075,7 @@ final class _NIMBLE_Editors {
       $settings,
       array(
         // Disable autop if the current post has blocks in it.
-        'wpautop'             => ! has_blocks(),
+        'wpautop'             => !has_blocks(),
         'media_buttons'       => true,
         'default_editor'      => '',
         'drag_drop_upload'    => false,
@@ -2157,13 +2157,13 @@ final class _NIMBLE_Editors {
       self::$drag_drop_upload = true;
     }
 
-    if ( ! empty( $set['editor_height'] ) ) {
+    if ( !empty( $set['editor_height'] ) ) {
       $height = ' style="height: ' . (int) $set['editor_height'] . 'px"';
     } else {
       $height = ' rows="' . (int) $set['textarea_rows'] . '"';
     }
 
-    if ( ! current_user_can( 'upload_files' ) ) {
+    if ( !current_user_can( 'upload_files' ) ) {
       $set['media_buttons'] = false;
     }
 
@@ -2200,17 +2200,17 @@ final class _NIMBLE_Editors {
       self::$editor_buttons_css = false;
     }
 
-    if ( ! empty( $set['editor_css'] ) ) {
+    if ( !empty( $set['editor_css'] ) ) {
       echo $set['editor_css'] . "\n";
     }
 
-    if ( ! empty( $buttons ) || $set['media_buttons'] ) {
+    if ( !empty( $buttons ) || $set['media_buttons'] ) {
       echo '<div id="wp-' . $editor_id_attr . '-editor-tools" class="wp-editor-tools hide-if-no-js">';
 
       if ( $set['media_buttons'] ) {
         self::$has_medialib = true;
 
-        if ( ! function_exists( 'media_buttons' ) ) {
+        if ( !function_exists( 'media_buttons' ) ) {
           include( ABSPATH . 'wp-admin/includes/media.php' );
         }
 
@@ -2234,7 +2234,7 @@ final class _NIMBLE_Editors {
     $quicktags_toolbar = '';
 
     if ( self::$this_quicktags ) {
-      if ( 'content' === $editor_id && ! empty( $GLOBALS['current_screen'] ) && $GLOBALS['current_screen']->base === 'post' ) {
+      if ( 'content' === $editor_id && !empty( $GLOBALS['current_screen'] ) && $GLOBALS['current_screen']->base === 'post' ) {
         $toolbar_id = 'ed_toolbar';
       } else {
         $toolbar_id = 'qt_' . $editor_id_attr . '_toolbar';
@@ -2409,7 +2409,7 @@ final class _NIMBLE_Editors {
             'wpview',
           );
 
-          if ( ! self::$has_medialib ) {
+          if ( !self::$has_medialib ) {
             $plugins[] = 'image';
           }
 
@@ -2431,7 +2431,7 @@ final class _NIMBLE_Editors {
             unset( $plugins[ $key ] );
           }
 
-          if ( ! empty( $mce_external_plugins ) ) {
+          if ( !empty( $mce_external_plugins ) ) {
 
             /**
              * Filters the translations loaded for external TinyMCE 3.x plugins.
@@ -2451,7 +2451,7 @@ final class _NIMBLE_Editors {
             $loaded_langs = array();
             $strings      = '';
 
-            if ( ! empty( $mce_external_languages ) ) {
+            if ( !empty( $mce_external_languages ) ) {
               foreach ( $mce_external_languages as $name => $path ) {
                 if ( @is_file( $path ) && @is_readable( $path ) ) {
                   include_once( $path );
@@ -2473,7 +2473,7 @@ final class _NIMBLE_Editors {
               $strings                       = '';
 
               // Try to load langs/[locale].js and langs/[locale]_dlg.js
-              if ( ! in_array( $name, $loaded_langs, true ) ) {
+              if ( !in_array( $name, $loaded_langs, true ) ) {
                 $path = str_replace( content_url(), '', $plugurl );
                 $path = WP_CONTENT_DIR . $path . '/langs/';
 
@@ -2501,7 +2501,7 @@ final class _NIMBLE_Editors {
                   }
                 }
 
-                if ( ! empty( $strings ) ) {
+                if ( !empty( $strings ) ) {
                   $ext_plugins .= "\n" . $strings . "\n";
                 }
               }
@@ -2517,7 +2517,7 @@ final class _NIMBLE_Editors {
         $settings            = self::default_settings();
         $settings['plugins'] = implode( ',', $plugins );
 
-        if ( ! empty( $mce_external_plugins ) ) {
+        if ( !empty( $mce_external_plugins ) ) {
           $settings['external_plugins'] = wp_json_encode( $mce_external_plugins );
         }
 
@@ -2529,7 +2529,7 @@ final class _NIMBLE_Editors {
         $mce_css       = $settings['content_css'];
         $editor_styles = get_editor_stylesheets();
 
-        if ( ! empty( $editor_styles ) ) {
+        if ( !empty( $editor_styles ) ) {
           // Force urlencoding of commas.
           foreach ( $editor_styles as $key => $url ) {
             if ( strpos( $url, ',' ) !== false ) {
@@ -2549,7 +2549,7 @@ final class _NIMBLE_Editors {
          */
         $mce_css = trim( apply_filters( 'nimble_mce_css', $mce_css ), ' ,' );
 
-        if ( ! empty( $mce_css ) ) {
+        if ( !empty( $mce_css ) ) {
           $settings['content_css'] = $mce_css;
         } else {
           unset( $settings['content_css'] );
@@ -2575,7 +2575,7 @@ final class _NIMBLE_Editors {
         //$mce_buttons = array( 'formatselect', 'bold', 'italic', 'bullist', 'numlist', 'blockquote', 'alignleft', 'aligncenter', 'alignright', 'link', 'wp_more', 'spellchecker' );
         $mce_buttons = array( 'formatselect', 'bold', 'italic', 'bullist', 'numlist', 'blockquote', 'alignleft', 'aligncenter', 'alignright', 'link', 'spellchecker' );
 
-        if ( ! wp_is_mobile() ) {
+        if ( !wp_is_mobile() ) {
           if ( $set['_content_editor_dfw'] ) {
             $mce_buttons[] = 'dfw';
           } else {
@@ -2598,7 +2598,7 @@ final class _NIMBLE_Editors {
         $mce_buttons_2 = array( 'strikethrough', 'hr', 'forecolor', 'pastetext', 'removeformat', 'charmap', 'outdent', 'indent', 'undo', 'redo' );
 
         // @nikeo modif
-        // if ( ! wp_is_mobile() ) {
+        // if ( !wp_is_mobile() ) {
         //   $mce_buttons_2[] = 'wp_help';
         // }
 
@@ -2640,7 +2640,7 @@ final class _NIMBLE_Editors {
 
         if ( post_type_supports( $post->post_type, 'post-formats' ) ) {
           $post_format = get_post_format( $post );
-          if ( $post_format && ! is_wp_error( $post_format ) ) {
+          if ( $post_format && !is_wp_error( $post_format ) ) {
             $body_class .= ' post-format-' . sanitize_html_class( $post_format );
           } else {
             $body_class .= ' post-format-standard';
@@ -2657,7 +2657,7 @@ final class _NIMBLE_Editors {
 
       $body_class .= ' locale-' . sanitize_html_class( strtolower( str_replace( '_', '-', get_user_locale() ) ) );
 
-      if ( ! empty( $set['tinymce']['body_class'] ) ) {
+      if ( !empty( $set['tinymce']['body_class'] ) ) {
         $body_class .= ' ' . $set['tinymce']['body_class'];
         unset( $set['tinymce']['body_class'] );
       }
@@ -2665,7 +2665,7 @@ final class _NIMBLE_Editors {
       $mceInit = array(
         'selector'          => "#$editor_id",
         'wpautop'           => (bool) $set['wpautop'],
-        'indent'            => ! $set['wpautop'],
+        'indent'            => !$set['wpautop'],
         'toolbar1'          => implode( ',', $mce_buttons ),
         'toolbar2'          => implode( ',', $mce_buttons_2 ),
         'toolbar3'          => implode( ',', $mce_buttons_3 ),
@@ -2713,7 +2713,7 @@ final class _NIMBLE_Editors {
         $mceInit = apply_filters( 'tiny_mce_before_init', $mceInit, $editor_id );
       }
 
-      if ( empty( $mceInit['toolbar3'] ) && ! empty( $mceInit['toolbar4'] ) ) {
+      if ( empty( $mceInit['toolbar3'] ) && !empty( $mceInit['toolbar4'] ) ) {
         $mceInit['toolbar3'] = $mceInit['toolbar4'];
         $mceInit['toolbar4'] = '';
       }
@@ -2734,7 +2734,7 @@ final class _NIMBLE_Editors {
         $val      = $value ? 'true' : 'false';
         $options .= $key . ':' . $val . ',';
         continue;
-      } elseif ( ! empty( $value ) && is_string( $value ) && (
+      } elseif ( !empty( $value ) && is_string( $value ) && (
         ( '{' == $value[0] && '}' == $value[ strlen( $value ) - 1 ] ) ||
         ( '[' == $value[0] && ']' == $value[ strlen( $value ) - 1 ] ) ||
         preg_match( '/^\(?function ?\(/', $value ) ) ) {
@@ -3335,7 +3335,7 @@ final class _NIMBLE_Editors {
    * @return string Translation object, JSON encoded.
    */
   public static function wp_mce_translation( $mce_locale = '', $json_only = false ) {
-    if ( ! $mce_locale ) {
+    if ( !$mce_locale ) {
       $mce_locale = self::get_mce_locale();
     }
 
@@ -3394,13 +3394,13 @@ final class _NIMBLE_Editors {
   public static function force_uncompressed_tinymce() {
     $has_custom_theme = false;
     foreach ( self::$mce_settings as $init ) {
-      if ( ! empty( $init['theme_url'] ) ) {
+      if ( !empty( $init['theme_url'] ) ) {
         $has_custom_theme = true;
         break;
       }
     }
 
-    if ( ! $has_custom_theme ) {
+    if ( !$has_custom_theme ) {
       return;
     }
 
@@ -3428,7 +3428,7 @@ final class _NIMBLE_Editors {
 
     self::$tinymce_scripts_printed = true;
 
-    if ( ! isset( $concatenate_scripts ) ) {
+    if ( !isset( $concatenate_scripts ) ) {
       script_concat_settings();
     }
 
@@ -3445,7 +3445,7 @@ final class _NIMBLE_Editors {
   public static function editor_js() {
     global $tinymce_version;
 
-    $tmce_on = ! empty( self::$mce_settings );
+    $tmce_on = !empty( self::$mce_settings );
     $mceInit = $qtInit = '';
 
     if ( $tmce_on ) {
@@ -3458,7 +3458,7 @@ final class _NIMBLE_Editors {
       $mceInit = '{}';
     }
 
-    if ( ! empty( self::$qt_settings ) ) {
+    if ( !empty( self::$qt_settings ) ) {
       foreach ( self::$qt_settings as $editor_id => $init ) {
         $options = self::_parse_init( $init );
         $qtInit .= "'$editor_id':{$options},";
@@ -3534,7 +3534,7 @@ final class _NIMBLE_Editors {
       echo self::$ext_plugins . "\n";
     }
 
-    if ( ! is_admin() ) {
+    if ( !is_admin() ) {
       echo 'var ajaxurl = "' . admin_url( 'admin-ajax.php', 'relative' ) . '";';
     }
 
@@ -3553,9 +3553,9 @@ final class _NIMBLE_Editors {
           init = nimbleTinyMCEPreInit.mceInit[id];
           $wrap = tinymce.$( '#wp-' + id + '-wrap' );
 
-          if ( ( $wrap.hasClass( 'tmce-active' ) || ! nimbleTinyMCEPreInit.qtInit.hasOwnProperty( id ) ) && ! init.wp_skip_init ) {
+          if ( ( $wrap.hasClass( 'tmce-active' ) || !nimbleTinyMCEPreInit.qtInit.hasOwnProperty( id ) ) && !init.wp_skip_init ) {
             tinymce.init( init );
-            if ( ! window.wpActiveEditor ) {
+            if ( !window.wpActiveEditor ) {
               window.wpActiveEditor = id;//<= where is this used ?
             }
           }
@@ -3566,7 +3566,7 @@ final class _NIMBLE_Editors {
         for ( id in nimbleTinyMCEPreInit.qtInit ) {
           quicktags( nimbleTinyMCEPreInit.qtInit[id] );
 
-          if ( ! window.wpActiveEditor ) {
+          if ( !window.wpActiveEditor ) {
             window.wpActiveEditor = id;//<= where is this used ?
           }
         }
@@ -3686,7 +3686,7 @@ final class _NIMBLE_Editors {
      */
     $results = apply_filters( 'wp_link_query', $results, $query );
 
-    return ! empty( $results ) ? $results : false;
+    return !empty( $results ) ? $results : false;
   }
 
   /**
@@ -3774,7 +3774,7 @@ function sek_do_ajax_pre_checks( $params = array() ) {
     $params = wp_parse_args( $params, array( 'check_nonce' => true ) );
     if ( $params['check_nonce'] ) {
         $action = 'save-customize_' . get_stylesheet();
-        if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+        if ( !check_ajax_referer( $action, 'nonce', false ) ) {
              wp_send_json_error( array(
                 'code' => 'invalid_nonce',
                 'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' => check_ajax_referer() failed.' ),
@@ -3782,16 +3782,16 @@ function sek_do_ajax_pre_checks( $params = array() ) {
         }
     }
 
-    if ( ! is_user_logged_in() ) {
+    if ( !is_user_logged_in() ) {
         wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
     }
-    if ( ! current_user_can( 'edit_theme_options' ) ) {
+    if ( !current_user_can( 'edit_theme_options' ) ) {
       wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
     }
-    if ( ! current_user_can( 'customize' ) ) {
+    if ( !current_user_can( 'customize' ) ) {
         status_header( 403 );
         wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-    } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+    } else if ( !isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
         status_header( 405 );
         wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
     }
@@ -3861,7 +3861,7 @@ function sek_ajax_import_attachment() {
 function sek_get_revision_history() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 
-    if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+    if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
     }
     $rev_list = sek_get_revision_history_from_posts( $_POST['skope_id'] );
@@ -3872,7 +3872,7 @@ function sek_get_revision_history() {
 function sek_get_single_revision() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 
-    if ( ! isset( $_POST['revision_post_id'] ) || empty( $_POST['revision_post_id'] ) ) {
+    if ( !isset( $_POST['revision_post_id'] ) || empty( $_POST['revision_post_id'] ) ) {
         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing revision_post_id' );
     }
     $revision = sek_get_single_post_revision( $_POST['revision_post_id'] );
@@ -4128,7 +4128,7 @@ function sek_catch_export_action( $wp_customize ) {
 // fire from sek_catch_export_action() @hook 'customize_register'
 function sek_maybe_export() {
     $nonce = 'save-customize_' . get_stylesheet();
-    if ( ! isset( $_REQUEST['sek_export_nonce'] ) ) {
+    if ( !isset( $_REQUEST['sek_export_nonce'] ) ) {
         sek_error_log( __FUNCTION__ . ' => missing nonce.');
         return;
     }
@@ -4140,15 +4140,15 @@ function sek_maybe_export() {
         sek_error_log( __FUNCTION__ . ' => missing active locations param.');
         return;
     }
-    if ( ! wp_verify_nonce( $_REQUEST['sek_export_nonce'], $nonce ) ) {
+    if ( !wp_verify_nonce( $_REQUEST['sek_export_nonce'], $nonce ) ) {
         sek_error_log( __FUNCTION__ . ' => invalid none.');
         return;
     }
-    if ( ! is_user_logged_in() ) {
+    if ( !is_user_logged_in() ) {
         sek_error_log( __FUNCTION__ . ' => user not logged in.');
         return;
     }
-    if ( ! current_user_can( 'customize' ) ) {
+    if ( !current_user_can( 'customize' ) ) {
         sek_error_log( __FUNCTION__ . ' => missing customize capabilities.');
         return;
     }
@@ -4199,26 +4199,26 @@ add_action( 'wp_ajax_sek_pre_export_checks', '\Nimble\sek_ajax_pre_export_checks
 function sek_ajax_pre_export_checks() {
     //sek_error_log('PRE EXPORT CHECKS ?', $_POST );
     $action = 'save-customize_' . get_stylesheet();
-    if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+    if ( !check_ajax_referer( $action, 'nonce', false ) ) {
         wp_send_json_error( 'check_ajax_referer_failed' );
     }
-    if ( ! is_user_logged_in() ) {
+    if ( !is_user_logged_in() ) {
         wp_send_json_error( 'user_unauthenticated' );
     }
-    if ( ! current_user_can( 'edit_theme_options' ) ) {
+    if ( !current_user_can( 'edit_theme_options' ) ) {
         wp_send_json_error( 'user_cant_edit_theme_options' );
     }
-    if ( ! current_user_can( 'customize' ) ) {
+    if ( !current_user_can( 'customize' ) ) {
         status_header( 403 );
         wp_send_json_error( 'customize_not_allowed' );
-    } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+    } else if ( !isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
         status_header( 405 );
         wp_send_json_error( 'bad_ajax_method' );
     }
-    if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+    if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
         wp_send_json_error( 'missing_skope_id' );
     }
-    if ( ! isset( $_POST['active_locations'] ) || empty( $_POST['active_locations'] ) ) {
+    if ( !isset( $_POST['active_locations'] ) || empty( $_POST['active_locations'] ) ) {
         wp_send_json_error( 'no_active_locations_to_export' );
     }
     wp_send_json_success();
@@ -4269,31 +4269,31 @@ function sek_ajax_get_manually_imported_file_content() {
     // sek_error_log(__FUNCTION__ . ' AJAX $_REQUEST ?', $_REQUEST );
 
     $action = 'save-customize_' . get_stylesheet();
-    if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+    if ( !check_ajax_referer( $action, 'nonce', false ) ) {
         wp_send_json_error( 'check_ajax_referer_failed' );
     }
-    if ( ! is_user_logged_in() ) {
+    if ( !is_user_logged_in() ) {
         wp_send_json_error( 'user_unauthenticated' );
     }
-    if ( ! current_user_can( 'edit_theme_options' ) ) {
+    if ( !current_user_can( 'edit_theme_options' ) ) {
         wp_send_json_error( 'user_cant_edit_theme_options' );
     }
-    if ( ! current_user_can( 'customize' ) ) {
+    if ( !current_user_can( 'customize' ) ) {
         status_header( 403 );
         wp_send_json_error( 'customize_not_allowed' );
-    } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+    } else if ( !isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
         status_header( 405 );
         wp_send_json_error( 'bad_ajax_method' );
     }
-    if ( ! isset( $_FILES['file_candidate'] ) || empty( $_FILES['file_candidate'] ) ) {
+    if ( !isset( $_FILES['file_candidate'] ) || empty( $_FILES['file_candidate'] ) ) {
         wp_send_json_error( 'missing_file_candidate' );
     }
-    if ( ! isset( $_POST['skope'] ) || empty( $_POST['skope'] ) ) {
+    if ( !isset( $_POST['skope'] ) || empty( $_POST['skope'] ) ) {
         wp_send_json_error( 'missing_skope' );
     }
 
     // load WP upload if not done yet
-    if ( ! function_exists( 'wp_handle_upload' ) ) {
+    if ( !function_exists( 'wp_handle_upload' ) ) {
         require_once( ABSPATH . 'wp-admin/includes/file.php' );
     }
 
@@ -4344,7 +4344,7 @@ function sek_ajax_get_manually_imported_file_content() {
     //     )
     // );
     // check import structure
-    if ( ! is_array( $raw_unserialized_data ) || empty( $raw_unserialized_data['data']) || !is_array( $raw_unserialized_data['data'] ) || empty( $raw_unserialized_data['metas'] ) || !is_array( $raw_unserialized_data['metas'] ) ) {
+    if ( !is_array( $raw_unserialized_data ) || empty( $raw_unserialized_data['data']) || !is_array( $raw_unserialized_data['data'] ) || empty( $raw_unserialized_data['metas'] ) || !is_array( $raw_unserialized_data['metas'] ) ) {
         unlink( $file['file'] );
         wp_send_json_error(  'invalid_import_content' );
         return;
@@ -4422,7 +4422,7 @@ function sek_ajax_process_template_file_content() {
 
     //$raw_unserialized_data = @unserialize( $raw );
     $raw_unserialized_data = json_decode( wp_unslash( $_POST['template_data'] ), true );
-    if ( ! is_array( $raw_unserialized_data ) ) {
+    if ( !is_array( $raw_unserialized_data ) ) {
         wp_send_json_error( __FUNCTION__ . ' => invalid_template_data' );
     }
 
@@ -4440,7 +4440,7 @@ function sek_ajax_process_template_file_content() {
     //     )
     // );
     // check import structure
-    if ( ! is_array( $raw_unserialized_data ) || empty( $raw_unserialized_data['data']) || !is_array( $raw_unserialized_data['data'] ) || empty( $raw_unserialized_data['metas'] ) || !is_array( $raw_unserialized_data['metas'] ) ) {
+    if ( !is_array( $raw_unserialized_data ) || empty( $raw_unserialized_data['data']) || !is_array( $raw_unserialized_data['data'] ) || empty( $raw_unserialized_data['metas'] ) || !is_array( $raw_unserialized_data['metas'] ) ) {
         wp_send_json_error(  'invalid_import_content' );
         return;
     }
@@ -4534,16 +4534,16 @@ function sek_ajax_save_user_template() {
     if ( empty( $_POST['tmpl_title']) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_template_title' );
     }
-    // if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+    // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
     //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
     // }
     if ( empty( $_POST['tmpl_data']) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_template_data' );
     }
-    if ( ! is_string( $_POST['tmpl_data'] ) ) {
+    if ( !is_string( $_POST['tmpl_data'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_template_data_must_be_a_json_stringified' );
     }
-    if ( ! is_string( $_POST['tmpl_description'] ) ) {
+    if ( !is_string( $_POST['tmpl_description'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_template_description_must_be_a_string' );
     }
     // sek_error_log('SEKS DATA ?', $_POST['sek_data'] );
@@ -4616,7 +4616,7 @@ function sek_ajax_save_section() {
     if ( empty( $_POST['sek_data']) ) {
         wp_send_json_error( __FUNCTION__ . ' => missing sektion data' );
     }
-    if ( ! is_string( $_POST['sek_data'] ) ) {
+    if ( !is_string( $_POST['sek_data'] ) ) {
         wp_send_json_error( __FUNCTION__ . ' => the sektion data must be a json stringified' );
     }
     // sek_error_log('SEKS DATA ?', $_POST['sek_data'] );
@@ -4649,17 +4649,17 @@ function sek_sek_get_user_saved_sections() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 
     // We must have a section_id provided
-    if ( empty( $_POST['preset_section_id']) || ! is_string( $_POST['preset_section_id'] ) ) {
+    if ( empty( $_POST['preset_section_id']) || !is_string( $_POST['preset_section_id'] ) ) {
         wp_send_json_error( __FUNCTION__ . ' => missing or invalid preset_section_id' );
     }
     $section_id = $_POST['preset_section_id'];
 
     $section_data_decoded_from_custom_post_type = sek_get_saved_sektion_data( $section_id );
-    if ( ! empty( $section_data_decoded_from_custom_post_type ) ) {
+    if ( !empty( $section_data_decoded_from_custom_post_type ) ) {
         wp_send_json_success( $section_data_decoded_from_custom_post_type );
     } else {
         $all_saved_seks = get_option( NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS );
-        if ( ! is_array( $all_saved_seks ) || empty( $all_saved_seks[$section_id]) ) {
+        if ( !is_array( $all_saved_seks ) || empty( $all_saved_seks[$section_id]) ) {
             sek_error_log( __FUNCTION__ . ' => missing section data in get_option( NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS )' );
         }
         // $section_infos is an array

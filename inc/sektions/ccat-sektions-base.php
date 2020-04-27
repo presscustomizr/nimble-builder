@@ -29,7 +29,7 @@ namespace Nimble;
 //                 )
 // @param $border_type is a string. solid, dashed, ...
 function sek_generate_css_rules_for_multidimensional_border_options( $rules, $border_settings, $border_type, $css_selectors = '' ) {
-    if ( ! is_array( $rules ) )
+    if ( !is_array( $rules ) )
       return array();
 
     $default_data = array( 'wght' => '1px', 'col' => '#000000' );
@@ -39,7 +39,7 @@ function sek_generate_css_rules_for_multidimensional_border_options( $rules, $bo
 
     $css_rules = array();
     foreach ( $border_settings as $border_dimension => $data ) {
-        if ( ! is_array( $data ) ) {
+        if ( !is_array( $data ) ) {
             sek_error_log( __FUNCTION__ . " => ERROR, the border setting should be an array formed like : array( 'wght' => '1px', 'col' => '#000000' )");
         }
         $data = wp_parse_args( $data, $default_data );
@@ -55,7 +55,7 @@ function sek_generate_css_rules_for_multidimensional_border_options( $rules, $bo
             $border_properties[] = $border_type;
             //border color
             //(needs validation: we need a sanitize hex or rgba color)
-            if ( ! empty( $data[ 'col' ] ) ) {
+            if ( !empty( $data[ 'col' ] ) ) {
                 $border_properties[] = $data[ 'col' ];
             }
 
@@ -96,7 +96,7 @@ function sek_generate_css_rules_for_multidimensional_border_options( $rules, $bo
 //     [bottom_left] => 413px
 // )
 function sek_generate_css_rules_for_border_radius_options( $rules, $border_radius_settings, $css_selectors = '' ) {
-    if ( ! is_array( $rules ) )
+    if ( !is_array( $rules ) )
       return array();
 
     if ( empty( $border_radius_settings ) )
@@ -143,7 +143,7 @@ function sek_generate_css_rules_for_border_radius_options( $rules, $border_radiu
         $css_rules = "border-radius:" . implode( ' ', array_filter( $normalized_border_radius_values ) ).';';
     }
 
-    if ( ! empty( $css_rules ) ) {
+    if ( !empty( $css_rules ) ) {
         //append border radius rules
         $rules[]     = array(
             'selector' => $css_selectors,
@@ -176,7 +176,7 @@ function sek_generate_css_rules_for_border_radius_options( $rules, $border_radiu
 // )
 function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spacing_settings, $css_selectors = '' ) {
     //spacing
-    if ( empty( $spacing_settings ) || ! is_array( $spacing_settings ) )
+    if ( empty( $spacing_settings ) || !is_array( $spacing_settings ) )
       return $rules;
 
 
@@ -235,15 +235,15 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
     //     'lg' => 992,
     //     'xl' => 1200
     // ];
-    if ( ! empty( $_pad_marg[ 'desktop' ] ) ) {
+    if ( !empty( $_pad_marg[ 'desktop' ] ) ) {
         $_pad_marg[ 'desktop' ][ 'mq' ] = null;
     }
 
-    if ( ! empty( $_pad_marg[ 'tablet' ] ) ) {
+    if ( !empty( $_pad_marg[ 'tablet' ] ) ) {
         $_pad_marg[ 'tablet' ][ 'mq' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
     }
 
-    if ( ! empty( $_pad_marg[ 'mobile' ] ) ) {
+    if ( !empty( $_pad_marg[ 'mobile' ] ) ) {
         $_pad_marg[ 'mobile' ][ 'mq' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
     }
 
@@ -339,15 +339,15 @@ function sek_set_mq_css_rules( $params, $rules ) {
     $media_q = array('desktop' => null , 'tablet' => null , 'mobile' => null );
 
     if ( !empty( $css_value_by_devices ) ) {
-          if ( ! empty( $css_value_by_devices[ 'desktop' ] ) ) {
+          if ( !empty( $css_value_by_devices[ 'desktop' ] ) ) {
               $media_q[ 'desktop' ] = null;
           }
 
-          if ( ! empty( $css_value_by_devices[ 'tablet' ] ) ) {
+          if ( !empty( $css_value_by_devices[ 'tablet' ] ) ) {
               $media_q[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; // default is max-width: 767
           }
 
-          if ( ! empty( $css_value_by_devices[ 'mobile' ] ) ) {
+          if ( !empty( $css_value_by_devices[ 'mobile' ] ) ) {
               $media_q[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; // default is max-width: 575
           }
 
@@ -358,11 +358,11 @@ function sek_set_mq_css_rules( $params, $rules ) {
           //     'mobile' => ''
           // );
           foreach ( $css_value_by_devices as $device => $val ) {
-              if ( ! in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
+              if ( !in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
                   sek_error_log( __FUNCTION__ . ' => error => unknown device : ' . $device );
                   continue;
               }
-              if ( ! empty(  $val ) ) {
+              if ( !empty(  $val ) ) {
                   // the css_property can be an array
                   // this is needed for example to write properties supporting several vendor prefixes
                   $css_property = $params['css_property'];
@@ -463,15 +463,15 @@ function sek_set_mq_css_rules_supporting_vendor_prefixes( $params, $rules ) {
     $media_q = array('desktop' => null , 'tablet' => null , 'mobile' => null );
 
     if ( !empty( $css_rules_by_device ) ) {
-          if ( ! empty( $css_rules_by_device[ 'desktop' ] ) ) {
+          if ( !empty( $css_rules_by_device[ 'desktop' ] ) ) {
               $media_q[ 'desktop' ] = null;
           }
 
-          if ( ! empty( $css_rules_by_device[ 'tablet' ] ) ) {
+          if ( !empty( $css_rules_by_device[ 'tablet' ] ) ) {
               $media_q[ 'tablet' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; //max-width: 767
           }
 
-          if ( ! empty( $css_rules_by_device[ 'mobile' ] ) ) {
+          if ( !empty( $css_rules_by_device[ 'mobile' ] ) ) {
               $media_q[ 'mobile' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; //max-width: 575
           }
           foreach ( $css_rules_by_device as $device => $rules_for_device ) {
@@ -937,7 +937,7 @@ function sek_extract_unit( $value ) {
 // 1.5em => 1.5
 // note : using preg_replace('/[^0-9]/', '', $data); would remove the dots or comma.
 function sek_extract_numeric_value( $value ) {
-    if ( ! is_scalar( $value ) )
+    if ( !is_scalar( $value ) )
       return null;
     $numeric = preg_replace('/px|em|%/', '', $value);
     return is_numeric( $numeric ) ? $numeric : null;
@@ -1663,7 +1663,7 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     //     [shadow] => 0
     // )
     $default_value_model  = sek_get_default_module_model( 'sek_level_bg_module' );
-    $bg_options = ( ! empty( $options[ 'bg' ] ) && is_array( $options[ 'bg' ] ) ) ? $options[ 'bg' ] : array();
+    $bg_options = ( !empty( $options[ 'bg' ] ) && is_array( $options[ 'bg' ] ) ) ? $options[ 'bg' ] : array();
     $bg_options = wp_parse_args( $bg_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
     if ( empty( $bg_options ) )
@@ -1677,14 +1677,14 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     * background: [background-image] [background-position] / [background-size] [background-repeat] [background-attachment] [background-origin] [background-clip] [background-color];
     */
     // Img background
-    if ( ! empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
+    if ( !empty( $bg_options[ 'bg-image'] ) && is_numeric( $bg_options[ 'bg-image'] ) ) {
         // deactivated when customizing @see function sek_is_img_smartload_enabled()
 
         //$background_properties[ 'background-image' ] = 'url("'. wp_get_attachment_url( $bg_options[ 'bg-image'] ) .'")';
 
         // Img Bg Position
         // 'center' is the default value. the CSS rule is declared in assets/front/scss/sek-base.scss
-        if ( ! empty( $bg_options[ 'bg-position'] ) && 'center' != $bg_options[ 'bg-position'] ) {
+        if ( !empty( $bg_options[ 'bg-position'] ) && 'center' != $bg_options[ 'bg-position'] ) {
             $pos_map = array(
                 'top_left'    => '0% 0%',
                 'top'         => '50% 0%',
@@ -1704,7 +1704,7 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
                 $mapped_bg_options = array();
                 // map option with css value
                 foreach ($bg_options[ 'bg-position'] as $device => $user_val ) {
-                    if ( ! in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
+                    if ( !in_array( $device, array( 'desktop', 'tablet', 'mobile' ) ) ) {
                         sek_error_log( __FUNCTION__ . ' => error => unknown device : ' . $device );
                         continue;
                     }
@@ -1722,32 +1722,32 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
 
         // background size
         // 'cover' is the default value. the CSS rule is declared in assets/front/scss/sek-base.scss
-        if ( ! empty( $bg_options['bg-scale'] ) && 'default' != $bg_options['bg-scale'] && 'cover' != $bg_options['bg-scale'] ) {
+        if ( !empty( $bg_options['bg-scale'] ) && 'default' != $bg_options['bg-scale'] && 'cover' != $bg_options['bg-scale'] ) {
             //When specifying a background-size value, it must immediately follow the background-position value.
             $background_properties['background-size'] = $bg_options['bg-scale'];
         }
 
         // add no-repeat by default?
         // 'no-repeat' is the default value. the CSS rule is declared in assets/front/scss/sek-base.scss
-        if ( ! empty( $bg_options['bg-repeat'] ) && 'default' != $bg_options['bg-repeat'] ) {
+        if ( !empty( $bg_options['bg-repeat'] ) && 'default' != $bg_options['bg-repeat'] ) {
             $background_properties['background-repeat'] = $bg_options['bg-repeat'];
         }
 
         // write the bg-attachment rule only if true <=> set to "fixed"
-        if ( ! empty( $bg_options['bg-attachment'] ) && sek_is_checked( $bg_options['bg-attachment'] ) ) {
+        if ( !empty( $bg_options['bg-attachment'] ) && sek_is_checked( $bg_options['bg-attachment'] ) ) {
             $background_properties['background-attachment'] = 'fixed';
         }
 
     }
 
     //background color (needs validation: we need a sanitize hex or rgba color)
-    if ( ! empty( $bg_options['bg-color'] ) ) {
+    if ( !empty( $bg_options['bg-color'] ) ) {
         $background_properties['background-color'] = $bg_options[ 'bg-color' ];
     }
 
 
     //build background rule
-    if ( ! empty( $background_properties ) ) {
+    if ( !empty( $background_properties ) ) {
         $background_css_rules = '';
         foreach ($background_properties as $bg_prop => $bg_css_val ) {
             $background_css_rules .= sprintf('%1$s:%2$s;', $bg_prop, $bg_css_val );
@@ -1807,7 +1807,7 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
                 'mq' =>null
             );
         }
-    }//if ( ! empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {}
+    }//if ( !empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {}
 
     return $rules;
 }
@@ -2078,22 +2078,22 @@ function sek_add_css_rules_for_border( $rules, $level ) {
     //     [shadow] => 0
     // )
     $default_value_model  = sek_get_default_module_model( 'sek_level_border_module' );
-    $normalized_border_options = ( ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
+    $normalized_border_options = ( !empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
     $normalized_border_options = wp_parse_args( $normalized_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
     if ( empty( $normalized_border_options ) )
       return $rules;
 
-    $border_settings = ! empty( $normalized_border_options[ 'borders' ] ) ? $normalized_border_options[ 'borders' ] : FALSE;
+    $border_settings = !empty( $normalized_border_options[ 'borders' ] ) ? $normalized_border_options[ 'borders' ] : FALSE;
     $border_type = $normalized_border_options[ 'border-type' ];
-    $has_border_settings  = FALSE !== $border_settings && is_array( $border_settings ) && ! empty( $border_type ) && 'none' != $border_type;
+    $has_border_settings  = FALSE !== $border_settings && is_array( $border_settings ) && !empty( $border_type ) && 'none' != $border_type;
 
     //border width + type + color
     if ( $has_border_settings ) {
         $rules = sek_generate_css_rules_for_multidimensional_border_options( $rules, $border_settings, $border_type, '[data-sek-id="'.$level['id'].'"]'  );
     }
 
-    $has_border_radius = ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) && !empty( $options[ 'border' ]['border-radius'] );
+    $has_border_radius = !empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) && !empty( $options[ 'border' ]['border-radius'] );
     if ( $has_border_radius ) {
         $radius_settings = $normalized_border_options['border-radius'];
         $rules = sek_generate_css_rules_for_border_radius_options( $rules, $normalized_border_options['border-radius'], '[data-sek-id="'.$level['id'].'"]' );
@@ -2122,7 +2122,7 @@ function sek_add_css_rules_for_boxshadow( $rules, $level ) {
     //     [shadow] => 0
     // )
     $default_value_model  = sek_get_default_module_model( 'sek_level_border_module' );
-    $normalized_border_options = ( ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
+    $normalized_border_options = ( !empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
     $normalized_border_options = wp_parse_args( $normalized_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
     if ( empty( $normalized_border_options) )
@@ -2213,8 +2213,8 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
     $height_options = is_array( $options[ 'height' ] ) ? $options[ 'height' ] : array();
 
     // VERTICAL ALIGNMENT
-    if ( ! empty( $height_options[ 'v_alignment' ] ) ) {
-        if ( ! is_array( $height_options[ 'v_alignment' ] ) ) {
+    if ( !empty( $height_options[ 'v_alignment' ] ) ) {
+        if ( !is_array( $height_options[ 'v_alignment' ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the v_alignment option should be an array( {device} => {alignment} )');
         }
         $v_alignment_value = is_array( $height_options[ 'v_alignment' ] ) ? $height_options[ 'v_alignment' ] : array();
@@ -2245,11 +2245,11 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
     }
 
     // CUSTOM HEIGHT BY DEVICE
-    if ( ! empty( $height_options[ 'height-type' ] ) ) {
+    if ( !empty( $height_options[ 'height-type' ] ) ) {
         if ( 'custom' === $height_options[ 'height-type' ] ) {
             $custom_user_height = array_key_exists( 'custom-height', $height_options ) ? $height_options[ 'custom-height' ] : array();
             $selector = '[data-sek-id="'.$level['id'].'"]';
-            if ( ! is_array( $custom_user_height ) ) {
+            if ( !is_array( $custom_user_height ) ) {
                 sek_error_log( __FUNCTION__ . ' => error => the height option should be an array( {device} => {number}{unit} )', $custom_user_height);
             }
             $custom_user_height = is_array( $custom_user_height ) ? $custom_user_height : array();
@@ -2261,7 +2261,7 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
             $height_value = $custom_user_height;
             foreach ( $custom_user_height as $device => $num_unit ) {
                 $numeric = sek_extract_numeric_value( $num_unit );
-                if ( ! empty( $numeric ) ) {
+                if ( !empty( $numeric ) ) {
                     $unit = sek_extract_unit( $num_unit );
                     $unit = '%' === $unit ? 'vh' : $unit;
                     $height_value[$device] = $numeric . $unit;
@@ -2279,7 +2279,7 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
 
     // OVERFLOW HIDDEN
     // implemented to fix https://github.com/presscustomizr/nimble-builder/issues/365
-    if ( ! empty( $height_options[ 'overflow_hidden' ] ) && sek_booleanize_checkbox_val( $height_options[ 'overflow_hidden' ] ) ) {
+    if ( !empty( $height_options[ 'overflow_hidden' ] ) && sek_booleanize_checkbox_val( $height_options[ 'overflow_hidden' ] ) ) {
         $rules[] = array(
             'selector' => '[data-sek-id="'.$level['id'].'"]',
             'css_rules' => 'overflow:hidden',
@@ -2335,7 +2335,7 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
       return $rules;
     $pad_marg_options = $options[ 'spacing' ][ 'pad_marg' ];
     // array( desktop => array( margin-right => 10, padding-top => 5, unit => 'px' ) )
-    if ( ! is_array( $pad_marg_options ) )
+    if ( !is_array( $pad_marg_options ) )
       return $rules;
 
     // GENERATE SPACING RULES BY DEVICE
@@ -2439,10 +2439,10 @@ function sek_process_column_width_for_device( $params ) {
             } else {
                 // Backward compat since June 2019
                 // After implementing https://github.com/presscustomizr/nimble-builder/issues/279
-                $custom_width   = ( ! empty( $level[ 'width' ] ) && is_numeric( $level[ 'width' ] ) ) ? $level['width'] : null;
+                $custom_width   = ( !empty( $level[ 'width' ] ) && is_numeric( $level[ 'width' ] ) ) ? $level['width'] : null;
             }
 
-            if ( ! is_null( $custom_width ) ) {
+            if ( !is_null( $custom_width ) ) {
                 $col_width_in_percent = $custom_width;
             }
 
@@ -2588,14 +2588,14 @@ function sek_get_module_params_for_sek_level_width_module() {
 add_filter( 'sek_add_css_rules_for__module__options', '\Nimble\sek_add_css_rules_for_module_width', 10, 3 );
 function sek_add_css_rules_for_module_width( $rules, $module ) {
     $options = empty( $module[ 'options' ] ) ? array() : $module['options'];
-    if ( empty( $options[ 'width' ] ) || ! is_array( $options[ 'width' ] ) )
+    if ( empty( $options[ 'width' ] ) || !is_array( $options[ 'width' ] ) )
       return $rules;
 
     $width_options = is_array( $options[ 'width' ] ) ? $options[ 'width' ] : array();
 
     // ALIGNMENT BY DEVICE
-    if ( ! empty( $width_options[ 'h_alignment' ] ) ) {
-        if ( ! is_array( $width_options[ 'h_alignment' ] ) ) {
+    if ( !empty( $width_options[ 'h_alignment' ] ) ) {
+        if ( !is_array( $width_options[ 'h_alignment' ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the h_alignment option should be an array( {device} => {alignment} )');
         }
         $h_alignment_value = is_array( $width_options[ 'h_alignment' ] ) ? $width_options[ 'h_alignment' ] : array();
@@ -2628,12 +2628,12 @@ function sek_add_css_rules_for_module_width( $rules, $module ) {
 
 
     // CUSTOM WIDTH BY DEVICE
-    if ( ! empty( $width_options[ 'width-type' ] ) ) {
+    if ( !empty( $width_options[ 'width-type' ] ) ) {
         if ( 'custom' == $width_options[ 'width-type' ] && array_key_exists( 'custom-width', $width_options ) ) {
             $user_custom_width_value = $width_options[ 'custom-width' ];
             $selector = '[data-sek-id="'.$module['id'].'"]';
 
-            if ( ! empty( $user_custom_width_value ) && ! is_array( $user_custom_width_value ) ) {
+            if ( !empty( $user_custom_width_value ) && !is_array( $user_custom_width_value ) ) {
                 sek_error_log( __FUNCTION__ . ' => error => the width option should be an array( {device} => {number}{unit} )');
             }
             $user_custom_width_value = is_array( $user_custom_width_value ) ? $user_custom_width_value : array();
@@ -2645,7 +2645,7 @@ function sek_add_css_rules_for_module_width( $rules, $module ) {
             $width_value = $user_custom_width_value;
             foreach ( $user_custom_width_value as $device => $num_unit ) {
                 $numeric = sek_extract_numeric_value( $num_unit );
-                if ( ! empty( $numeric ) ) {
+                if ( !empty( $numeric ) ) {
                     $unit = sek_extract_unit( $num_unit );
                     $width_value[$device] = $numeric . $unit;
                 }
@@ -2707,14 +2707,14 @@ function sek_get_module_params_for_sek_level_width_column() {
 add_filter( 'sek_add_css_rules_for__column__options', '\Nimble\sek_add_css_rules_for_column_width', 10, 3 );
 function sek_add_css_rules_for_column_width( $rules, $column ) {
     $options = empty( $column[ 'options' ] ) ? array() : $column['options'];
-    if ( empty( $options[ 'width' ] ) || ! is_array( $options[ 'width' ] ) )
+    if ( empty( $options[ 'width' ] ) || !is_array( $options[ 'width' ] ) )
       return $rules;
 
     $width_options = is_array( $options[ 'width' ] ) ? $options[ 'width' ] : array();
 
     // ALIGNMENT BY DEVICE
-    // if ( ! empty( $width_options[ 'h_alignment' ] ) ) {
-    //     if ( ! is_array( $width_options[ 'h_alignment' ] ) ) {
+    // if ( !empty( $width_options[ 'h_alignment' ] ) ) {
+    //     if ( !is_array( $width_options[ 'h_alignment' ] ) ) {
     //         sek_error_log( __FUNCTION__ . ' => error => the h_alignment option should be an array( {device} => {alignment} )');
     //     }
     //     $h_alignment_value = is_array( $width_options[ 'h_alignment' ] ) ? $width_options[ 'h_alignment' ] : array();
@@ -2747,12 +2747,12 @@ function sek_add_css_rules_for_column_width( $rules, $column ) {
 
 
     // CUSTOM WIDTH
-    if ( ! empty( $width_options[ 'width-type' ] ) ) {
+    if ( !empty( $width_options[ 'width-type' ] ) ) {
         if ( 'custom' == $width_options[ 'width-type' ] && array_key_exists( 'custom-width', $width_options ) ) {
             $user_custom_width_value = $width_options[ 'custom-width' ];
             $selector = '[data-sek-id="'.$column['id'].'"]';
 
-            if ( ! empty( $user_custom_width_value ) && ! is_array( $user_custom_width_value ) ) {
+            if ( !empty( $user_custom_width_value ) && !is_array( $user_custom_width_value ) ) {
                 sek_error_log( __FUNCTION__ . ' => error => the width option should be an array( {device} => {number}{unit} )');
             }
             $user_custom_width_value = is_array( $user_custom_width_value ) ? $user_custom_width_value : array();
@@ -2764,7 +2764,7 @@ function sek_add_css_rules_for_column_width( $rules, $column ) {
             $width_value = $user_custom_width_value;
             foreach ( $user_custom_width_value as $device => $num_unit ) {
                 $numeric = sek_extract_numeric_value( $num_unit );
-                if ( ! empty( $numeric ) ) {
+                if ( !empty( $numeric ) ) {
                     $unit = sek_extract_unit( $num_unit );
                     $width_value[$device] = $numeric . $unit;
                 }
@@ -2873,16 +2873,16 @@ function sek_get_module_params_for_sek_level_width_section() {
 add_filter( 'sek_add_css_rules_for__section__options', '\Nimble\sek_add_css_rules_for_section_width', 10, 3 );
 function sek_add_css_rules_for_section_width( $rules, $section ) {
     $options = empty( $section[ 'options' ] ) ? array() : $section['options'];
-    if ( empty( $options[ 'width' ] ) || ! is_array( $options[ 'width' ] ) )
+    if ( empty( $options[ 'width' ] ) || !is_array( $options[ 'width' ] ) )
       return $rules;
 
     $width_options = $options[ 'width' ];
     $user_defined_widths = array();
 
-    if ( ! empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
+    if ( !empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
         $user_defined_widths['outer-section-width'] = 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"]';
     }
-    if ( ! empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
+    if ( !empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
         $user_defined_widths['inner-section-width'] = 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner';
     }
 
@@ -2892,12 +2892,12 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
     // Note that the option 'outer-section-width' and 'inner-section-width' can be empty when set to a value === default
     // @see js czr_setions::normalizeAndSanitizeSingleItemInputValues()
     foreach ( $user_defined_widths as $width_opt_name => $selector ) {
-        if ( ! empty( $width_options[ $width_opt_name ] ) && ! is_array( $width_options[ $width_opt_name ] ) ) {
+        if ( !empty( $width_options[ $width_opt_name ] ) && !is_array( $width_options[ $width_opt_name ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the width option should be an array( {device} => {number}{unit} )');
         }
         // $width_options[ $width_opt_name ] should be an array( {device} => {number}{unit} )
         // If not set in the width options , it means that it is equal to default
-        $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || ! is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
+        $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || !is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
         $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
             'desktop' => '100%',
             'tablet' => '',
@@ -2908,7 +2908,7 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
 
         foreach ( $user_custom_width_value as $device => $num_unit ) {
             $numeric = sek_extract_numeric_value( $num_unit );
-            if ( ! empty( $numeric ) ) {
+            if ( !empty( $numeric ) ) {
                 $unit = sek_extract_unit( $num_unit );
                 $max_width_value[$device] = $numeric . $unit;
                 $margin_value[$device] = '0 auto';
@@ -2940,7 +2940,7 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
             ), $rules );
         }
 
-        if ( ! empty( $margin_value ) ) {
+        if ( !empty( $margin_value ) ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $margin_value,
                 'css_property' => 'margin',
@@ -3373,16 +3373,16 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
     // otherwise we fallback on the normal utility skp_build_skope_id()
     $local_options = sek_get_skoped_seks( !empty( $_POST['local_skope_id'] ) ? $_POST['local_skope_id'] : skp_build_skope_id() );
 
-    if ( ! is_array( $local_options ) || empty( $local_options['local_options']) || empty( $local_options['local_options']['widths'] ) )
+    if ( !is_array( $local_options ) || empty( $local_options['local_options']) || empty( $local_options['local_options']['widths'] ) )
       return $css;
 
     $width_options = $local_options['local_options']['widths'];
     $user_defined_widths = array();
 
-    if ( ! empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
+    if ( !empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
         $user_defined_widths['outer-section-width'] = '.sektion-wrapper [data-sek-level="section"]';
     }
-    if ( ! empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
+    if ( !empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
         $user_defined_widths['inner-section-width'] = '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner';
     }
 
@@ -3391,12 +3391,12 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
     // Note that the option 'outer-section-width' and 'inner-section-width' can be empty when set to a value === default
     // @see js czr_setions::normalizeAndSanitizeSingleItemInputValues()
     foreach ( $user_defined_widths as $width_opt_name => $selector ) {
-        if ( ! empty( $width_options[ $width_opt_name ] ) && ! is_array( $width_options[ $width_opt_name ] ) ) {
+        if ( !empty( $width_options[ $width_opt_name ] ) && !is_array( $width_options[ $width_opt_name ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the width option should be an array( {device} => {number}{unit} )');
         }
         // $width_options[ $width_opt_name ] should be an array( {device} => {number}{unit} )
         // If not set in the width options , it means that it is equal to default
-        $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || ! is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
+        $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || !is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
         $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
             'desktop' => '100%',
             'tablet' => '',
@@ -3407,7 +3407,7 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
 
         foreach ( $user_custom_width_value as $device => $num_unit ) {
             $numeric = sek_extract_numeric_value( $num_unit );
-            if ( ! empty( $numeric ) ) {
+            if ( !empty( $numeric ) ) {
                 $unit = sek_extract_unit( $num_unit );
                 $max_width_value[$device] = $numeric . $unit;
                 $margin_value[$device] = '0 auto';
@@ -3439,7 +3439,7 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
             ), $rules );
         }
 
-        if ( ! empty( $margin_value ) ) {
+        if ( !empty( $margin_value ) ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $margin_value,
                 'css_property' => 'margin',
@@ -3494,9 +3494,9 @@ function sek_add_raw_local_custom_css( $css, $is_global_stylesheet ) {
     // we use the ajaxily posted skope_id when available <= typically in a customizing ajax action 'sek-refresh-stylesheet'
     // otherwise we fallback on the normal utility skp_build_skope_id()
     $local_options = sek_get_skoped_seks( !empty( $_POST['local_skope_id'] ) ? $_POST['local_skope_id'] : skp_build_skope_id() );
-    if ( is_array( $local_options ) && !empty( $local_options['local_options']) && ! empty( $local_options['local_options']['custom_css'] ) ) {
+    if ( is_array( $local_options ) && !empty( $local_options['local_options']) && !empty( $local_options['local_options']['custom_css'] ) ) {
         $options = $local_options['local_options']['custom_css'];
-        if ( ! empty( $options['local_custom_css'] ) ) {
+        if ( !empty( $options['local_custom_css'] ) ) {
             $css .= $options['local_custom_css'];
         }
     }
@@ -3808,11 +3808,11 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
     $css = is_string( $css ) ? $css : '';
 
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-    if ( ! is_array( $global_options ) || empty( $global_options['global_text'] ) || !is_array( $global_options['global_text'] ) )
+    if ( !is_array( $global_options ) || empty( $global_options['global_text'] ) || !is_array( $global_options['global_text'] ) )
       return $css;
 
     $text_options = $global_options['global_text'];
-    if ( ! is_array( $text_options  ) )
+    if ( !is_array( $text_options  ) )
       return $css;
 
     $rules = array();
@@ -3920,12 +3920,12 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
     // // Note that the option 'outer-section-width' and 'inner-section-width' can be empty when set to a value === default
     // // @see js czr_setions::normalizeAndSanitizeSingleItemInputValues()
     // foreach ( $user_defined_widths as $width_opt_name => $selector ) {
-    //     if ( ! empty( $width_options[ $width_opt_name ] ) && ! is_array( $width_options[ $width_opt_name ] ) ) {
+    //     if ( !empty( $width_options[ $width_opt_name ] ) && !is_array( $width_options[ $width_opt_name ] ) ) {
     //         sek_error_log( __FUNCTION__ . ' => error => the width option should be an array( {device} => {number}{unit} )');
     //     }
     //     // $width_options[ $width_opt_name ] should be an array( {device} => {number}{unit} )
     //     // If not set in the width options , it means that it is equal to default
-    //     $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || ! is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
+    //     $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || !is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
     //     $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
     //         'desktop' => '100%',
     //         'tablet' => '',
@@ -3936,7 +3936,7 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
 
     //     foreach ( $user_custom_width_value as $device => $num_unit ) {
     //         $numeric = sek_extract_numeric_value( $num_unit );
-    //         if ( ! empty( $numeric ) ) {
+    //         if ( !empty( $numeric ) ) {
     //             $unit = sek_extract_unit( $num_unit );
     //             $max_width_value[$device] = $numeric . $unit;
     //             $margin_value[$device] = '0 auto';
@@ -3965,7 +3965,7 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
     //         ), $rules );
     //     }
 
-    //     if ( ! empty( $margin_value ) ) {
+    //     if ( !empty( $margin_value ) ) {
     //         $rules = sek_set_mq_css_rules(array(
     //             'value' => $margin_value,
     //             'css_property' => 'margin',
@@ -4138,16 +4138,16 @@ add_action('wp_head', '\Nimble\sek_write_global_custom_section_widths', 1000 );
 function sek_write_global_custom_section_widths() {
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
 
-    if ( ! is_array( $global_options ) || empty( $global_options['widths'] ) || !is_array( $global_options['widths'] ) )
+    if ( !is_array( $global_options ) || empty( $global_options['widths'] ) || !is_array( $global_options['widths'] ) )
       return;
 
     $width_options = $global_options['widths'];
     $user_defined_widths = array();
 
-    if ( ! empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
+    if ( !empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
         $user_defined_widths['outer-section-width'] = '[data-sek-level="section"]';
     }
-    if ( ! empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
+    if ( !empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
         $user_defined_widths['inner-section-width'] = '[data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner';
     }
 
@@ -4156,12 +4156,12 @@ function sek_write_global_custom_section_widths() {
     // Note that the option 'outer-section-width' and 'inner-section-width' can be empty when set to a value === default
     // @see js czr_setions::normalizeAndSanitizeSingleItemInputValues()
     foreach ( $user_defined_widths as $width_opt_name => $selector ) {
-        if ( ! empty( $width_options[ $width_opt_name ] ) && ! is_array( $width_options[ $width_opt_name ] ) ) {
+        if ( !empty( $width_options[ $width_opt_name ] ) && !is_array( $width_options[ $width_opt_name ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the width option should be an array( {device} => {number}{unit} )');
         }
         // $width_options[ $width_opt_name ] should be an array( {device} => {number}{unit} )
         // If not set in the width options , it means that it is equal to default
-        $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || ! is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
+        $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || !is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
         $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
             'desktop' => '100%',
             'tablet' => '',
@@ -4172,7 +4172,7 @@ function sek_write_global_custom_section_widths() {
 
         foreach ( $user_custom_width_value as $device => $num_unit ) {
             $numeric = sek_extract_numeric_value( $num_unit );
-            if ( ! empty( $numeric ) ) {
+            if ( !empty( $numeric ) ) {
                 $unit = sek_extract_unit( $num_unit );
                 $max_width_value[$device] = $numeric . $unit;
                 $margin_value[$device] = '0 auto';
@@ -4204,7 +4204,7 @@ function sek_write_global_custom_section_widths() {
             ), $rules );
         }
 
-        if ( ! empty( $margin_value ) ) {
+        if ( !empty( $margin_value ) ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $margin_value,
                 'css_property' => 'margin',
@@ -4216,7 +4216,7 @@ function sek_write_global_custom_section_widths() {
 
     $width_options_css = Sek_Dyn_CSS_Builder::sek_generate_css_stylesheet_for_a_set_of_rules( $rules );
 
-    if ( is_string( $width_options_css ) && ! empty( $width_options_css ) ) {
+    if ( is_string( $width_options_css ) && !empty( $width_options_css ) ) {
         printf('<style type="text/css" id="nimble-global-widths-options">%1$s</style>', $width_options_css );
     }
 }
@@ -5113,7 +5113,7 @@ function sek_add_css_rules_for_czr_image_module( $rules, $complete_modul_model )
             // same treatment as in sek_add_css_rules_for_css_sniffed_input_id() => 'width'
             if ( is_string( $width ) ) {
                   $numeric = sek_extract_numeric_value($width);
-                  if ( ! empty( $numeric ) ) {
+                  if ( !empty( $numeric ) ) {
                       $unit = sek_extract_unit( $width );
                       $css_rules .= 'width:' . $numeric . $unit . ';';
                   }
@@ -5127,7 +5127,7 @@ function sek_add_css_rules_for_czr_image_module( $rules, $complete_modul_model )
                   $ready_value = $width;
                   foreach ($width as $device => $num_unit ) {
                       $numeric = sek_extract_numeric_value( $num_unit );
-                      if ( ! empty( $numeric ) ) {
+                      if ( !empty( $numeric ) ) {
                           $unit = sek_extract_unit( $num_unit );
                           $ready_value[$device] = $numeric . $unit;
                       }
@@ -5571,7 +5571,7 @@ function sek_add_css_rules_for_czr_social_icons_module( $rules, $complete_modul_
         // Leave the device value empty if === to default
         // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
         // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-        if ( ! empty( $num_unit ) && $num_val.'px' !== $defaults[$device].'' ) {
+        if ( !empty( $num_unit ) && $num_val.'px' !== $defaults[$device].'' ) {
             $unit = sek_extract_unit( $num_unit );
             $num_val = $num_val < 0 ? 0 : $num_val;
             $padding_right_ready_val[$device] = $num_val . $unit;
@@ -8058,7 +8058,7 @@ function sek_add_css_rules_for_czr_simple_form_module( $rules, $complete_modul_m
     $value = $complete_modul_model['value'];
 
     // BUTTON
-    if ( ! empty( $value['form_button'] ) && is_array( $value['form_button'] ) ) {
+    if ( !empty( $value['form_button'] ) && is_array( $value['form_button'] ) ) {
         $form_button_options = $value['form_button'];
         $bg_color = $form_button_options['bg_color_css'];
         if ( sek_booleanize_checkbox_val( $form_button_options['use_custom_bg_color_on_hover'] ) ) {
@@ -8962,7 +8962,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
         // Leave the device value empty if === to default
         // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
         // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-        if ( ! empty( $num_unit ) && $num_val.'px' !== $defaults[$device].'' ) {
+        if ( !empty( $num_unit ) && $num_val.'px' !== $defaults[$device].'' ) {
             $unit = sek_extract_unit( $num_unit );
             $num_val = $num_val < 0 ? 0 : $num_val;
             $margin_bottom_ready_val[$device] = $num_val . $unit;
@@ -8998,7 +8998,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
         // Leave the device value empty if === to default
         // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
         // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-        if ( ! empty( $num_unit ) && $num_val.'px' !== $defaults[$device].'' ) {
+        if ( !empty( $num_unit ) && $num_val.'px' !== $defaults[$device].'' ) {
             $unit = sek_extract_unit( $num_unit );
             $num_val = $num_val < 0 ? 0 : $num_val;
             $content_padding_ready_val[$device] = $num_val . $unit;
@@ -9034,7 +9034,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             // Leave the device value empty if === to default
             // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
             // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-            if ( ! empty( $num_val ) && $num_val.'%' !== $defaults[$device].'' ) {
+            if ( !empty( $num_val ) && $num_val.'%' !== $defaults[$device].'' ) {
                 $num_val = $num_val > 100 ? 100 : $num_val;
                 $num_val = $num_val < 1 ? 1 : $num_val;
                 $img_column_width_ready_value[$device] = sprintf('%s minmax(0,1fr);', $num_val . '%');
@@ -9071,7 +9071,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             // Leave the device value empty if === to default
             // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
             // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-            if ( ! empty( $num_val ) && $num_val.'%' !== $defaults[$device].'' ) {
+            if ( !empty( $num_val ) && $num_val.'%' !== $defaults[$device].'' ) {
                 $num_val = $num_val < 1 ? 1 : $num_val;
                 $img_height_ready_value[$device] = sprintf('%s;', $num_val .'%');
             }
@@ -9106,7 +9106,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
               // Leave the device value empty if === to default
               // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
               // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-              if ( ! empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
+              if ( !empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
                   $unit = sek_extract_unit( $num_unit );
                   $gap_ready_value[$device] = $numeric . $unit;
               }
@@ -9143,7 +9143,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
               // Leave the device value empty if === to default
               // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
               // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-              if ( ! empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
+              if ( !empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
                   $unit = sek_extract_unit( $num_unit );
                   $v_gap_ready_value[$device] = $numeric . $unit;
               }
@@ -9939,8 +9939,8 @@ function sek_add_css_rules_for_items_in_czr_img_slider_collection_child( $rules,
     //     [desktop] => center
     // )
     // VERTICAL ALIGNMENT
-    if ( ! empty( $item_model[ 'v_alignment' ] ) && $all_defaults['v_alignment'] != $item_model[ 'v_alignment' ] ) {
-        if ( ! is_array( $item_model[ 'v_alignment' ] ) ) {
+    if ( !empty( $item_model[ 'v_alignment' ] ) && $all_defaults['v_alignment'] != $item_model[ 'v_alignment' ] ) {
+        if ( !is_array( $item_model[ 'v_alignment' ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the v_alignment option should be an array( {device} => {alignment} )');
         }
         $v_alignment_value = is_array( $item_model[ 'v_alignment' ] ) ? $item_model[ 'v_alignment' ] : array();
@@ -10019,11 +10019,11 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
 
 
     // CUSTOM HEIGHT BY DEVICE
-    if ( ! empty( $slider_options[ 'height-type' ] ) ) {
+    if ( !empty( $slider_options[ 'height-type' ] ) ) {
         if ( 'custom' === $slider_options[ 'height-type' ] ) {
             $custom_user_height = array_key_exists( 'custom-height', $slider_options ) ? $slider_options[ 'custom-height' ] : array();
 
-            if ( ! is_array( $custom_user_height ) ) {
+            if ( !is_array( $custom_user_height ) ) {
                 sek_error_log( __FUNCTION__ . ' => error => the height option should be an array( {device} => {number}{unit} )', $custom_user_height);
             }
             $custom_user_height = is_array( $custom_user_height ) ? $custom_user_height : array();
@@ -10044,7 +10044,7 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
                 $height_value = $custom_user_height;
                 foreach ( $custom_user_height as $device => $num_unit ) {
                     $numeric = sek_extract_numeric_value( $num_unit );
-                    if ( ! empty( $numeric ) ) {
+                    if ( !empty( $numeric ) ) {
                         $unit = sek_extract_unit( $num_unit );
                         $unit = '%' === $unit ? 'vh' : $unit;
                         $height_value[$device] = $numeric . $unit;
@@ -10503,8 +10503,8 @@ function sek_add_css_rules_for_items_in_czr_accordion_collection_child( $rules, 
     $item_model = isset( $params['input_list'] ) ? $params['input_list'] : array();
 
     // VERTICAL ALIGNMENT
-    // if ( ! empty( $item_model[ 'v_alignment' ] ) ) {
-    //     if ( ! is_array( $item_model[ 'v_alignment' ] ) ) {
+    // if ( !empty( $item_model[ 'v_alignment' ] ) ) {
+    //     if ( !is_array( $item_model[ 'v_alignment' ] ) ) {
     //         sek_error_log( __FUNCTION__ . ' => error => the v_alignment option should be an array( {device} => {alignment} )');
     //     }
     //     $v_alignment_value = is_array( $item_model[ 'v_alignment' ] ) ? $item_model[ 'v_alignment' ] : array();
@@ -10560,7 +10560,7 @@ function sek_add_css_rules_for_czr_accordion_module( $rules, $complete_modul_mod
     //sek_error_log('sek_get_default_module_model() ?', sek_get_default_module_model( 'czr_accordion_module') );
 
     // TEXT COLOR ( for the plus / minus icon )
-    if ( ! empty( $accord_opts[ 'color_css' ] ) && $accord_defaults[ 'color_css' ] != $accord_opts[ 'color_css' ] ) {
+    if ( !empty( $accord_opts[ 'color_css' ] ) && $accord_defaults[ 'color_css' ] != $accord_opts[ 'color_css' ] ) {
         $rules[] = array(
             'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item .expander span', $complete_modul_model['id'] ),
             'css_rules' => 'background:'. $accord_opts[ 'color_css' ] .';',
@@ -10568,7 +10568,7 @@ function sek_add_css_rules_for_czr_accordion_module( $rules, $complete_modul_mod
         );
     }
     // ACTIVE / HOVER TEXT COLOR ( for the plus / minus icon )
-    if ( ! empty( $accord_opts[ 'color_active_css' ] ) && $accord_defaults[ 'color_active_css' ] != $accord_opts[ 'color_active_css' ] ) {
+    if ( !empty( $accord_opts[ 'color_active_css' ] ) && $accord_defaults[ 'color_active_css' ] != $accord_opts[ 'color_active_css' ] ) {
         $rules[] = array(
             'selector' => sprintf( '[data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper [data-sek-expanded="true"] .sek-accord-title .expander span, [data-sek-id="%1$s"] .sek-module-inner .sek-accord-wrapper .sek-accord-item .sek-accord-title:hover .expander span', $complete_modul_model['id'] ),
             'css_rules' => sprintf('background:%s;', $accord_opts[ 'color_active_css' ] ),
@@ -10651,7 +10651,7 @@ function sek_get_module_params_for_czr_shortcode_module() {
     );
 }
 ?><?php
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 
@@ -10725,7 +10725,7 @@ class Sek_Dyn_CSS_Builder {
         $level      = is_array( $level ) ? $level : array();
 
         // The parent level is set when the function is invoked recursively, from a level where we actually have a 'level' property
-        if ( ! empty( $parent_level ) ) {
+        if ( !empty( $parent_level ) ) {
             $this->parent_level_model = $parent_level;
         }
 
@@ -10756,7 +10756,7 @@ class Sek_Dyn_CSS_Builder {
                               $children = sek_get_registered_module_type_property( $father_mod_type, 'children' );
                               // Loop on the children
                               foreach ( $entry as $opt_group_type => $input_candidates ) {
-                                  if ( ! is_array( $children ) ) {
+                                  if ( !is_array( $children ) ) {
                                       sek_error_log( 'Father module ' . $father_mod_type . ' has invalid children');
                                       continue;
                                   }
@@ -10888,7 +10888,7 @@ class Sek_Dyn_CSS_Builder {
 
                 // populate rules for modules values
                 if ( !empty( $entry[ 'level' ] ) && 'module' === $entry['level'] ) {
-                    if ( ! empty( $entry['module_type'] ) ) {
+                    if ( !empty( $entry['module_type'] ) ) {
                         $module_type = $entry['module_type'];
                         // build rules for modules
                         // applying sek_normalize_module_value_with_defaults() allows us to access all the value properties of the module without needing to check their existence
@@ -10902,7 +10902,7 @@ class Sek_Dyn_CSS_Builder {
             if ( !empty( $rules ) ) {
                 //@TODO: MAKE SURE RULE ARE NORMALIZED
                 foreach( $rules as $rule ) {
-                    if ( ! is_array( $rule ) ) {
+                    if ( !is_array( $rule ) ) {
                         sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => a css rule should be represented by an array', $rule );
                         continue;
                     }
@@ -10930,7 +10930,7 @@ class Sek_Dyn_CSS_Builder {
             }
 
             // Reset the parent level model because it might have been modified after walking the sublevels
-            if ( ! empty( $parent_level ) ) {
+            if ( !empty( $parent_level ) ) {
                 $this->parent_level_model = $parent_level;
             }
 
@@ -11005,9 +11005,9 @@ class Sek_Dyn_CSS_Builder {
     // @return void()
     // populates the css rules ::collection property, organized by media queries
     public function sek_populate( $selector, $css_rules, $mq = '' ) {
-        if ( ! is_string( $selector ) )
+        if ( !is_string( $selector ) )
             return;
-        if ( ! is_string( $css_rules ) )
+        if ( !is_string( $css_rules ) )
             return;
 
         // Assign a default media device
@@ -11102,16 +11102,16 @@ class Sek_Dyn_CSS_Builder {
         $rules_collection = array();
         $css = '';
 
-        if ( empty( $rules ) || ! is_array( $rules ) )
+        if ( empty( $rules ) || !is_array( $rules ) )
           return $css;
 
         // POPULATE THE CSS RULES COLLECTION
         foreach( $rules as $rule ) {
-            if ( ! is_array( $rule ) ) {
+            if ( !is_array( $rule ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => a css rule should be represented by an array', $rule );
                 continue;
             }
-            if ( empty($rule['selector']) || ! is_string( $rule['selector'] ) ) {
+            if ( empty($rule['selector']) || !is_string( $rule['selector'] ) ) {
                 sek_error_log(  __CLASS__ . '::' . __FUNCTION__ . '=> a css rule is missing the selector param', $rule );
                 continue;
             }
@@ -11120,7 +11120,7 @@ class Sek_Dyn_CSS_Builder {
             $css_rules = $rule[ 'css_rules' ];
             $mq = $rule[ 'mq' ];
 
-            if ( ! is_string( $css_rules ) )
+            if ( !is_string( $css_rules ) )
               continue;
 
             // Assign a default media device
@@ -11182,7 +11182,7 @@ class Sek_Dyn_CSS_Builder {
     // hook : sek_add_css_rules_for_level_options
     // fired this class constructor
     public function sek_add_rules_for_column_width( $rules, $column ) {
-        if ( ! is_array( $column ) )
+        if ( !is_array( $column ) )
           return $rules;
 
         if ( empty( $column['level'] ) || 'column' !== $column['level'] || empty( $column['id'] ) )
@@ -11243,7 +11243,7 @@ class Sek_Dyn_CSS_Builder {
 }//end class
 
 ?><?php
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 
@@ -11541,7 +11541,7 @@ class Sek_Dyn_CSS_Handler {
         // 4) front, user not logged in :
         //    the normal behaviour is that the css file is enqueued.
         //    It should have been written when saving in the customizer. If no file available, we try to write it. If writing a css file is not possible, we fallback on inline printing.
-        if ( is_customize_preview() || ! $this->_sek_dyn_css_file_exists() || $this->force_rewrite || $this->customizer_save ) {
+        if ( is_customize_preview() || !$this->_sek_dyn_css_file_exists() || $this->force_rewrite || $this->customizer_save ) {
             $this->sek_model = sek_get_skoped_seks( $this->skope_id );
 
             //  on front, when no stylesheet is available, the fallback hook must be set to wp_head, because the hook property might be empty
@@ -11563,7 +11563,7 @@ class Sek_Dyn_CSS_Handler {
 
         //hook setup for printing or enqueuing
         //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Customizer_Setting::update()
-        if ( ! $this->customizer_save ) {
+        if ( !$this->customizer_save ) {
             $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
         } else {
             //sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' ?? => $this->css_string_to_enqueue_or_print => ', $this->css_string_to_enqueue_or_print );
@@ -11605,7 +11605,7 @@ class Sek_Dyn_CSS_Handler {
         $this->file_exists          = $this->_sek_dyn_css_file_exists();
 
         if ( self::MODE_FILE == $this->mode ) {
-            if ( ! $this->_sek_dyn_css_write_file_is_possible() ) {
+            if ( !$this->_sek_dyn_css_write_file_is_possible() ) {
                 $this->mode = self::MODE_INLINE;
             }
         }
@@ -11714,7 +11714,7 @@ class Sek_Dyn_CSS_Handler {
 
         //if $this->mode != 'file' or the file enqueuing didn't go through (fall back)
         //print inline style
-        if ( $this->css_string_to_enqueue_or_print && ! $this->enqueued_or_printed ) {
+        if ( $this->css_string_to_enqueue_or_print && !$this->enqueued_or_printed ) {
             $dep =  array_pop( $this->dep );
 
             if ( !$dep || wp_style_is( $dep, 'done' ) || !wp_style_is( $dep, 'done' ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
@@ -11749,7 +11749,7 @@ class Sek_Dyn_CSS_Handler {
         $base_uri = $this->base_uri;
 
         // Can we create the folder?
-        if ( ! $wp_filesystem->is_dir( $base_uri ) ) {
+        if ( !$wp_filesystem->is_dir( $base_uri ) ) {
             $error = !wp_mkdir_p( $base_uri );
         }
 
@@ -11757,13 +11757,13 @@ class Sek_Dyn_CSS_Handler {
             return false;
         }
 
-        if ( ! file_exists( $index_path = wp_normalize_path( trailingslashit( $base_uri ) . 'index.php' ) ) ) {
+        if ( !file_exists( $index_path = wp_normalize_path( trailingslashit( $base_uri ) . 'index.php' ) ) ) {
             // predefined mode settings for WP files
             $wp_filesystem->put_contents( $index_path, "<?php\n// Silence is golden.\n", FS_CHMOD_FILE );
         }
 
 
-        if ( ! wp_is_writable( $base_uri ) ) {
+        if ( !wp_is_writable( $base_uri ) ) {
             return false;
         }
 
@@ -11836,7 +11836,7 @@ class Sek_Dyn_CSS_Handler {
      * @return string The absolute CSS file URI
      */
     private function _sek_dyn_css_build_uri() {
-        if ( ! isset( $this->base_uri ) ) {
+        if ( !isset( $this->base_uri ) ) {
             $this->_sek_dyn_css_build_base_uri();
         }
         return wp_normalize_path( trailingslashit( $this->base_uri ) . "{$this->id}.css" );
@@ -11854,7 +11854,7 @@ class Sek_Dyn_CSS_Handler {
      * @return string The absolute CSS file URL
      */
     private function _sek_dyn_css_build_url() {
-        if ( ! isset( $this->base_url ) ) {
+        if ( !isset( $this->base_url ) ) {
             $this->_sek_dyn_css_build_base_url();
         }
         return trailingslashit( $this->base_url ) . "{$this->id}.css";
@@ -11942,7 +11942,7 @@ class Sek_Dyn_CSS_Handler {
             $creds = request_filesystem_credentials( '', '', false, false, array() );
 
             /* initialize the API */
-            if ( ! WP_Filesystem($creds) ) {
+            if ( !WP_Filesystem($creds) ) {
                 /* any problems and we exit */
                 return false;
             }
@@ -12005,16 +12005,16 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
     $is_multi_items = $params['is_multi_items'];
     $item_id = $params['item_id'];
 
-    if ( ! is_string( $input_id ) || empty( $input_id ) ) {
+    if ( !is_string( $input_id ) || empty( $input_id ) ) {
         sek_error_log( __FUNCTION__ . ' => missing input_id', $parent_level);
         return $rules;
     }
-    if ( ! is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
+    if ( !is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
         sek_error_log( __FUNCTION__ . ' => missing input_list', $parent_level);
         return $rules;
     }
     $input_registration_params = $registered_input_list[ $input_id ];
-    if ( ! is_string( $input_registration_params['css_identifier'] ) || empty( $input_registration_params['css_identifier'] ) ) {
+    if ( !is_string( $input_registration_params['css_identifier'] ) || empty( $input_registration_params['css_identifier'] ) ) {
         sek_error_log( __FUNCTION__ . ' => missing css_identifier for parent level', $parent_level );
         sek_error_log('$registered_input_list', $registered_input_list );
         return $rules;
@@ -12054,12 +12054,12 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
     // => Overrides the module level specific selector, if it was set.
     if ( 'module' === $parent_level['level'] ) {
         //$start = microtime(true) * 1000;
-        if ( ! is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
+        if ( !is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
             sek_error_log( __FUNCTION__ . ' => missing input list' );
         } else if ( is_array( $registered_input_list ) && empty( $registered_input_list[ $input_id ] ) ) {
             sek_error_log( __FUNCTION__ . ' => missing input id ' . $input_id . ' in input list for module type ' . $parent_level['module_type'] );
         }
-        if ( is_array( $registered_input_list ) && ! empty( $registered_input_list[ $input_id ] ) && ! empty( $registered_input_list[ $input_id ]['css_selectors'] ) ) {
+        if ( is_array( $registered_input_list ) && !empty( $registered_input_list[ $input_id ] ) && !empty( $registered_input_list[ $input_id ]['css_selectors'] ) ) {
             // reset the selector to the level id selector, in case it was previously set spcifically at the module level
             $selector = '[data-sek-id="'.$parent_level['id'].'"]';
             if ( $is_multi_items ) {
@@ -12098,7 +12098,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         case 'font_size' :
             if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
-                  if ( ! empty( $numeric ) ) {
+                  if ( !empty( $numeric ) ) {
                       $properties_to_render['font-size'] = $value;
                   }
             } else if ( is_array( $value ) ) { // <= by device
@@ -12255,7 +12255,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         case 'height' :
             if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
-                  if ( ! empty( $numeric ) ) {
+                  if ( !empty( $numeric ) ) {
                       $unit = sek_extract_unit( $value );
                       $unit = '%' === $unit ? 'vh' : $unit;
                       $properties_to_render['height'] = $numeric . $unit;
@@ -12274,7 +12274,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                   $ready_value = $value;
                   foreach ($value as $device => $num_unit ) {
                       $numeric = sek_extract_numeric_value( $num_unit );
-                      if ( ! empty( $numeric ) ) {
+                      if ( !empty( $numeric ) ) {
                           $unit = sek_extract_unit( $num_unit );
                           $unit = '%' === $unit ? 'vh' : $unit;
                           $ready_value[$device] = $numeric . $unit;
@@ -12293,7 +12293,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         /* Quote border */
         case 'border_width' :
             $numeric = sek_extract_numeric_value( $value );
-            if ( 0 === intval($numeric) || ! empty( $numeric ) ) {
+            if ( 0 === intval($numeric) || !empty( $numeric ) ) {
                 $unit = sek_extract_unit( $value );
                 $properties_to_render['border-width'] = $numeric . $unit;
             }
@@ -12304,7 +12304,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         /* Divider */
         case 'border_top_width' :
             $numeric = sek_extract_numeric_value( $value );
-            if ( ! empty( $numeric ) ) {
+            if ( !empty( $numeric ) ) {
                 $unit = sek_extract_unit( $value );
                 $unit = '%' === $unit ? 'vh' : $unit;
                 $properties_to_render['border-top-width'] = $numeric . $unit;
@@ -12320,7 +12320,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         case 'border_radius' :
             if ( is_string( $value ) ) {
                 $numeric = sek_extract_numeric_value( $value );
-                if ( ! empty( $numeric ) ) {
+                if ( !empty( $numeric ) ) {
                     $unit = sek_extract_unit( $value );
                     $properties_to_render['border-radius'] = $numeric . $unit;
                 }
@@ -12332,7 +12332,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         case 'width' :
             if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
-                  if ( ! empty( $numeric ) ) {
+                  if ( !empty( $numeric ) ) {
                       $unit = sek_extract_unit( $value );
                       $properties_to_render['width'] = $numeric . $unit;
                   }
@@ -12350,7 +12350,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                   $ready_value = $value;
                   foreach ($value as $device => $num_unit ) {
                       $numeric = sek_extract_numeric_value( $num_unit );
-                      if ( ! empty( $numeric ) ) {
+                      if ( !empty( $numeric ) ) {
                           $unit = sek_extract_unit( $num_unit );
                           $ready_value[$device] = $numeric . $unit;
                       }
@@ -12369,7 +12369,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         case 'v_spacing' :
             if ( is_string( $value ) ) { // <= simple
                   $numeric = sek_extract_numeric_value($value);
-                  if ( ! empty( $numeric ) ) {
+                  if ( !empty( $numeric ) ) {
                       $unit = sek_extract_unit( $value );
                       $unit = '%' === $unit ? 'vh' : $unit;
                       $properties_to_render = array(
@@ -12391,7 +12391,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                   $ready_value = $value;
                   foreach ($value as $device => $num_unit ) {
                       $numeric = sek_extract_numeric_value( $num_unit );
-                      if ( ! empty( $numeric ) ) {
+                      if ( !empty( $numeric ) ) {
                           $unit = sek_extract_unit( $num_unit );
                           $unit = '%' === $unit ? 'vh' : $unit;
                           $ready_value[$device] = $numeric . $unit;
@@ -12461,7 +12461,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
             }, $unit );
         break;
         case 'spacing_with_device_switcher' :
-            if ( ! empty( $value ) && is_array( $value ) ) {
+            if ( !empty( $value ) && is_array( $value ) ) {
                 $rules = sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $value, $selector );
             }
         break;
@@ -12475,7 +12475,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
     // when the module has an '*_flag_important' input,
     // => check if the input_id belongs to the list of "important_input_list"
     // => and maybe flag the css rules with !important
-    if ( ! empty( $properties_to_render ) ) {
+    if ( !empty( $properties_to_render ) ) {
         $important = false;
         if ( 'module' === $parent_level['level'] && !empty( $parent_level['value'] ) ) {
             $important = sek_is_flagged_important( $input_id, $parent_level['value'], $registered_input_list );
@@ -12531,7 +12531,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
 function sek_is_flagged_important( $input_id, $module_value, $registered_input_list ) {
     $important = false;
 
-    if ( ! is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
+    if ( !is_array( $registered_input_list ) || empty( $registered_input_list ) ) {
         sek_error_log( __FUNCTION__ . ' => error => the $registered_input_list param should be an array not empty');
         return $important;
     }
@@ -12554,7 +12554,7 @@ function sek_is_flagged_important( $input_id, $module_value, $registered_input_l
 ?><?php
 ////////////////////////////////////////////////////////////////
 // SEK Front Class
-if ( ! class_exists( 'SEK_Front_Construct' ) ) :
+if ( !class_exists( 'SEK_Front_Construct' ) ) :
     class SEK_Front_Construct {
         static $instance;
         public $local_seks = 'not_cached';// <= used to cache the sektions for the local skope_id
@@ -12590,7 +12590,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $rendered_levels = [];//<= stores the ids of the level rendered with ::render()
 
         public static function get_instance( $params ) {
-            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Sek_Nimble_Manager ) ) {
+            if ( !isset( self::$instance ) && !( self::$instance instanceof Sek_Nimble_Manager ) ) {
                 self::$instance = new Sek_Nimble_Manager( $params );
 
                 // this hook is used to add_action( 'nimble_front_classes_ready', array( $this, 'sek_register_nimble_global_locations') );
@@ -12740,6 +12740,8 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
 
         // March 2020, for https://github.com/presscustomizr/nimble-builder/issues/649
         public $page_has_nimble_content = false;
+        // April 2020 for https://github.com/presscustomizr/nimble-builder/issues/679
+        public $is_page_password_protected = false; //<= set at 'wp'
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
@@ -12896,7 +12898,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
     }//class
 endif;
 ?><?php
-if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
+if ( !class_exists( 'SEK_Front_Ajax' ) ) :
     class SEK_Front_Ajax extends SEK_Front_Construct {
         // Fired in __construct()
         function _schedule_front_ajax_actions() {
@@ -12942,7 +12944,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             $params = wp_parse_args( $params, array( 'check_nonce' => true ) );
             if ( $params['check_nonce'] ) {
                 $action = 'save-customize_' . get_stylesheet();
-                if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+                if ( !check_ajax_referer( $action, 'nonce', false ) ) {
                      wp_send_json_error( array(
                         'code' => 'invalid_nonce',
                         'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' => check_ajax_referer() failed.' ),
@@ -12950,16 +12952,16 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 }
             }
 
-            if ( ! is_user_logged_in() ) {
+            if ( !is_user_logged_in() ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
             }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
+            if ( !current_user_can( 'edit_theme_options' ) ) {
               wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
             }
-            if ( ! current_user_can( 'customize' ) ) {
+            if ( !current_user_can( 'customize' ) ) {
                 status_header( 403 );
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+            } else if ( !isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
                 status_header( 405 );
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
             }
@@ -12971,7 +12973,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         function sek_get_level_content_for_injection( $params ) {
             $this->sek_do_ajax_pre_checks( array( 'check_nonce' => false ) );
 
-            if ( ! isset( $_POST['location_skope_id'] ) || empty( $_POST['location_skope_id'] ) ) {
+            if ( !isset( $_POST['location_skope_id'] ) || empty( $_POST['location_skope_id'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
             }
 
@@ -12980,11 +12982,11 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             // this guid is used to differentiate dynamically rendered content from static content that may include a Nimble generated HTML structure
             // an attribute "data-sek-preview-level-guid" is added to each rendered level when customizing or ajaxing
             // otherwise the preview UI can be broken
-            if ( ! isset( $_POST['preview-level-guid'] ) || empty( $_POST['preview-level-guid'] ) ) {
+            if ( !isset( $_POST['preview-level-guid'] ) || empty( $_POST['preview-level-guid'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing preview-level-guid' );
             }
 
-            if ( ! isset( $_POST['sek_action'] ) || empty( $_POST['sek_action'] ) ) {
+            if ( !isset( $_POST['sek_action'] ) || empty( $_POST['sek_action'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing sek_action' );
             }
             $sek_action = $_POST['sek_action'];
@@ -13091,7 +13093,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             // so invoking sek_get_skoped_seks() will ensure that we get the latest data
             // since wp has not been fired yet, we need to use the posted skope_id param.
             $sektionSettingValue = sek_get_skoped_seks( $_POST['location_skope_id'] );
-            if ( ! is_array( $sektionSettingValue ) ) {
+            if ( !is_array( $sektionSettingValue ) ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => invalid sektionSettingValue => it should be an array().' );
                 return;
             }
@@ -13100,7 +13102,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 return;
             }
             $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
-            if ( ! is_array( $sektion_collection ) ) {
+            if ( !is_array( $sektion_collection ) ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => invalid sektion_collection => it should be an array().' );
                 return;
             }
@@ -13134,11 +13136,11 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                         $content_type = $_POST['content_type'];
                     }
                     if ( 'preset_section' === $content_type ) {
-                        if ( ! array_key_exists( 'collection_of_preset_section_id', $_POST ) || ! is_array( $_POST['collection_of_preset_section_id'] ) ) {
+                        if ( !array_key_exists( 'collection_of_preset_section_id', $_POST ) || !is_array( $_POST['collection_of_preset_section_id'] ) ) {
                             wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing param collection_of_preset_section_id when injecting a preset section' );
                             break;
                         }
-                        if ( ! is_string( $maybe_preset_section_id ) || empty( $maybe_preset_section_id ) ) {
+                        if ( !is_string( $maybe_preset_section_id ) || empty( $maybe_preset_section_id ) ) {
                             wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => inavalid preset section id' );
                             break;
                         }
@@ -13161,7 +13163,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
                 //only used for nested section
                 case 'sek-remove-section' :
-                    if ( ! array_key_exists( 'is_nested', $_POST ) || true !== json_decode( $_POST['is_nested'] ) ) {
+                    if ( !array_key_exists( 'is_nested', $_POST ) || true !== json_decode( $_POST['is_nested'] ) ) {
                         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => the section must be nested in this ajax action' );
                         break;
                     } else {
@@ -13176,7 +13178,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 case 'sek-remove-column' :
                 case 'sek-duplicate-column' :
                 case 'sek-refresh-columns-in-sektion' :
-                    if ( ! array_key_exists( 'in_sektion', $_POST ) || empty( $_POST['in_sektion'] ) ) {
+                    if ( !array_key_exists( 'in_sektion', $_POST ) || empty( $_POST['in_sektion'] ) ) {
                         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing in_sektion param' );
                         break;
                     }
@@ -13189,11 +13191,11 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 case 'sek-remove-module' :
                 case 'sek-refresh-modules-in-column' :
                 case 'sek-duplicate-module' :
-                    if ( ! array_key_exists( 'in_column', $_POST ) || empty( $_POST['in_column'] ) ) {
+                    if ( !array_key_exists( 'in_column', $_POST ) || empty( $_POST['in_column'] ) ) {
                         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing in_column param' );
                         break;
                     }
-                    if ( ! array_key_exists( 'in_sektion', $_POST ) || empty( $_POST[ 'in_sektion' ] ) ) {
+                    if ( !array_key_exists( 'in_sektion', $_POST ) || empty( $_POST[ 'in_sektion' ] ) ) {
                         $this->parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
                     } else {
                         $this->parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
@@ -13202,7 +13204,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 break;
 
                 case 'sek-resize-columns' :
-                    if ( ! array_key_exists( 'resized_column', $_POST ) || empty( $_POST['resized_column'] ) ) {
+                    if ( !array_key_exists( 'resized_column', $_POST ) || empty( $_POST['resized_column'] ) ) {
                         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing resized_column' );
                         break;
                     }
@@ -13214,7 +13216,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 break;
 
                  case 'sek-refresh-level' :
-                    if ( ! array_key_exists( 'id', $_POST ) || empty( $_POST['id'] ) ) {
+                    if ( !array_key_exists( 'id', $_POST ) || empty( $_POST['id'] ) ) {
                         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing level id' );
                         break;
                     }
@@ -13238,7 +13240,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                     ob_end_clean();
                     return;
                 }
-                if ( empty( $level_model ) || ! is_array( $level_model ) ) {
+                if ( empty( $level_model ) || !is_array( $level_model ) ) {
                     wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => empty or invalid $level_model' );
                     ob_end_clean();
                     return;
@@ -13252,7 +13254,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             } else {
                 // the $html content should not be empty when ajaxing a template
                 // it can be empty when ajaxing a stylesheet
-                if ( ! $is_stylesheet && empty( $html ) ) {
+                if ( !$is_stylesheet && empty( $html ) ) {
                       // return a new WP_Error that will be intercepted in sek_get_level_content_for_injection
                       $html = new \WP_Error( 'ajax_fetch_content_error', __CLASS__ . '::' . __FUNCTION__ . ' => no content returned for sek_action : ' . $sek_action );
                 }
@@ -13269,7 +13271,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         function sek_get_customize_url_for_nimble_edit_button() {
             $this->sek_do_ajax_pre_checks( array( 'check_nonce' => false ) );
 
-            if ( ! isset( $_POST['nimble_edit_post_id'] ) || empty( $_POST['nimble_edit_post_id'] ) ) {
+            if ( !isset( $_POST['nimble_edit_post_id'] ) || empty( $_POST['nimble_edit_post_id'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing post_id' );
             }
 
@@ -13535,7 +13537,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
             // when front scripts are preloaded or loaded in ajax, jquery is not declared as dependency
             // we need to make sure its enqueued, unless it's replaced by a cdn version
-            if ( ! sek_is_jquery_replaced() ) {
+            if ( !sek_is_jquery_replaced() ) {
                 wp_enqueue_script('jquery');
             }
 
@@ -13714,7 +13716,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 'fontAwesomeAlreadyEnqueued' => wp_style_is('customizr-fa', 'enqueued') || wp_style_is('hueman-font-awesome', 'enqueued')
             );
             foreach ( (array) $l10n as $key => $value ) {
-                if ( ! is_scalar( $value ) ) {
+                if ( !is_scalar( $value ) ) {
                   continue;
                 }
                 $l10n[ $key ] = html_entity_decode( (string) $value, ENT_QUOTES, 'UTF-8' );
@@ -13896,7 +13898,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             if ( !Nimble_Manager()->page_has_nimble_content )
               return;
 
-            if ( ! sek_load_front_assets_in_ajax() )
+            if ( !sek_load_front_assets_in_ajax() )
               return;
             ?>
             <script id="nb-load-assets-dynamically">window,document,nb_.listenTo("nb-jquery-loaded",function(){nb_.scriptsLoadingStatus={},nb_.ajaxLoadScript=function(t){jQuery(function(a){t=a.extend({path:"",complete:"",loadcheck:!1},t),nb_.scriptsLoadingStatus[t.path]&&"pending"===nb_.scriptsLoadingStatus[t.path].state()||(nb_.scriptsLoadingStatus[t.path]=nb_.scriptsLoadingStatus[t.path]||a.Deferred(),jQuery.ajax({url:sekFrontLocalized.frontAssetsPath+t.path+"?"+sekFrontLocalized.assetVersion,cache:!0,dataType:"script"}).done(function(){"function"!=typeof t.loadcheck||t.loadcheck()?"function"==typeof t.complete&&t.complete():nb_.errorLog("ajaxLoadScript success but loadcheck failed for => "+t.path)}).fail(function(){nb_.errorLog("ajaxLoadScript failed for => "+t.path)}))})},jQuery(function(t){sekFrontLocalized.load_front_assets_on_scroll&&nb_.ajaxLoadScript({path:sekFrontLocalized.isDevMode?"js/ccat-nimble-front.js":"js/ccat-nimble-front.min.js"})})});</script>
@@ -14245,13 +14247,15 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
     }//class
 endif;
 ?><?php
-if ( ! class_exists( 'SEK_Front_Render' ) ) :
+if ( !class_exists( 'SEK_Front_Render' ) ) :
     class SEK_Front_Render extends SEK_Front_Assets_Customizer_Preview {
         // Fired in __construct()
         function _schedule_front_rendering() {
             if ( !defined( "NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY", PHP_INT_MAX ); }
             if ( !defined( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY", PHP_INT_MAX ); }
             if ( !defined( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY" ) ) { define( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY", - PHP_INT_MAX ); }
+
+            add_action( 'wp', array( $this, 'sek_set_password_protection_status') );
 
             // Fires after 'wp' and before the 'get_header' template file is loaded.
             add_action( 'template_redirect', array( $this, 'sek_schedule_rendering_hooks') );
@@ -14284,14 +14288,49 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
             // INCLUDE NIMBLE CONTENT IN SEARCH RESULTS
             add_action( 'wp_head', array( $this, 'sek_maybe_include_nimble_content_in_search_results' ) );
+
+            // PASSWORD FORM : make the wp pwd form is rendered only one time in a singular ( see #673 and #679 )
+            add_action( 'the_password_form', array( $this, 'sek_maybe_empty_password_form' ), PHP_INT_MAX );
         }//_schedule_front_rendering()
 
+        // hook : 'wp'
+        // april 2020 for #673 and #679
+        // @return void
+        function sek_set_password_protection_status() {
+            Nimble_Manager()->is_page_password_protected = is_singular() && post_password_required();
+        }
+
+        // hook : 'the_password_form'@PHP_INT_MAX documented in wp-includes/post-template.php
+        // Empty the password form if it's been already rendered, either in the WP content or in a Nimble location before the content.
+        // april 2020 for see #673 and #679
+        // @return html output for the form
+        function sek_maybe_empty_password_form( $output ) {
+            // bail if there's no local Nimble section in the page
+            if ( !sek_local_skope_has_nimble_sections( skp_get_skope_id() ) )
+              return $output;
+
+            if ( skp_is_customizing() || !post_password_required() )
+              return $output;
+
+            if ( is_singular() && post_password_required() ) {
+                if ( !did_action('nimble_wp_pwd_form_rendered') ) {
+                    // fire an action => we know the password form has been rendered so we won't have to render it several times
+                    // see ::render() location
+                    do_action('nimble_wp_pwd_form_rendered');
+                    return $output;
+                } else {
+                    // Empty the form if it's been already rendered, either in the WP content or in a Nimble location before the content.
+                    return '';
+                }
+            }
+            return $output;
+        }
 
 
         // Encapsulate the singular post / page content so we can generate a dynamic ui around it when customizing
         // @filter the_content::NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY
         function sek_wrap_wp_content( $html ) {
-            if ( ! skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) )
+            if ( !skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) )
               return $html;
             if ( is_singular() && in_the_loop() && is_main_query() ) {
                 global $post;
@@ -14353,7 +14392,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                             // and in Customizr-Pro/Hueman-Pro infinite scroll code. They both use the same $_GET var too.
                             // Actually this is not needed anymore for our themes, see:
                             // https://github.com/presscustomizr/nimble-builder/issues/228#issuecomment-449362111
-                            if ( ! ( apply_filters( 'infinite_scroll_got_infinity', isset( $_GET[ 'infinity' ] ) ) ) ) {
+                            if ( !( apply_filters( 'infinite_scroll_got_infinity', isset( $_GET[ 'infinity' ] ) ) ) ) {
                                 add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
                             }
                         break;
@@ -14384,7 +14423,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             // query object is passed by reference
             // accidentally this would also fix the same point 1. of the same issue if the 'sek_schedule_rendering_hooks' method will be fired
             // with an early hook (earlier than wp_head).
-            if ( is_object( $query ) && is_a( $query, 'WP_Query' ) && ! $query->is_main_query() ) {
+            if ( is_object( $query ) && is_a( $query, 'WP_Query' ) && !$query->is_main_query() ) {
                 return;
             }
 
@@ -14448,7 +14487,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         public function _render_seks_for_location( $location_id = '', $location_data = array(), $skope_id = '' ) {
             $all_locations = sek_get_locations();
 
-            if ( ! array_key_exists( $location_id, $all_locations ) ) {
+            if ( !array_key_exists( $location_id, $all_locations ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location_id . ' is not registered in sek_get_locations()');
                 return;
             }
@@ -14502,16 +14541,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // Note that a location can be rendered only once in a given page.
         // That's why we need to check if did_action(''), like in ::sek_schedule_sektions_rendering
         function render_nimble_locations( $locations, $options = array() ) {
-            if ( is_string( $locations ) && ! empty( $locations ) ) {
+            if ( is_string( $locations ) && !empty( $locations ) ) {
                 $locations = array( $locations );
             }
-            if ( ! is_array( $locations ) ) {
+            if ( !is_array( $locations ) ) {
                 sek_error_log( __FUNCTION__ . ' error => missing or invalid locations provided');
                 return;
             }
 
             // Normalize the $options
-            $options = ! is_array( $options ) ? array() : $options;
+            $options = !is_array( $options ) ? array() : $options;
             $options = wp_parse_args( $options, array(
                 // fallback_location => the location rendered even if empty.
                 // This way, the user starts customizing with only one location for the content instead of four
@@ -14530,7 +14569,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             //sek_error_log( __FUNCTION__ . ' sek_get_skoped_seks(  ', sek_get_skoped_seks() );
 
             foreach( $locations as $location_id ) {
-                if ( ! is_string( $location_id ) || empty( $location_id ) ) {
+                if ( !is_string( $location_id ) || empty( $location_id ) ) {
                     sek_error_log( __FUNCTION__ . ' => error => a location_id is not valid in the provided locations', $locations );
                     continue;
                 }
@@ -14547,11 +14586,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 $skope_id = $is_global ? NIMBLE_GLOBAL_SKOPE_ID : skp_get_skope_id();
                 $locationSettingValue = sek_get_skoped_seks( $skope_id, $location_id );
                 //sek_error_log('$locationSettingValue ??? => ' . $location_id, $locationSettingValue );
-                if ( ! is_null( $options[ 'fallback_location' ]) ) {
+                if ( !is_null( $options[ 'fallback_location' ]) ) {
                     // We don't need to render the locations with no sections
                     // But we need at least one location : let's always render loop_start.
                     // => so if the user switches from the nimble_template to the default theme one, the loop_start section will always be rendered.
-                    if ( $options[ 'fallback_location' ] === $location_id || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
+                    if ( $options[ 'fallback_location' ] === $location_id || ( is_array( $locationSettingValue ) && !empty( $locationSettingValue['collection'] ) ) ) {
                         do_action( "sek_before_location_{$location_id}" );
                         Nimble_Manager()->_render_seks_for_location( $location_id, $locationSettingValue );
                         do_action( "sek_after_location_{$location_id}" );
@@ -14580,24 +14619,24 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             //sek_error_log('LEVEL MODEL IN ::RENDER()', $model );
             // Is it the root level ?
             // The root level has no id and no level entry
-            if ( ! is_array( $model ) ) {
+            if ( !is_array( $model ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => a model must be an array', $model );
                 return;
             }
-            if ( ! array_key_exists( 'level', $model ) || ! array_key_exists( 'id', $model ) ) {
+            if ( !array_key_exists( 'level', $model ) || !array_key_exists( 'id', $model ) ) {
                 error_log( '::render() => a level model is missing the level or the id property' );
                 return;
             }
             // The level "id" is a string not empty
             $id = $model['id'];
-            if ( ! is_string( $id ) || empty( $id ) ) {
+            if ( !is_string( $id ) || empty( $id ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => a level id must be a string not empty', $model );
                 return;
             }
 
             // The level "level" can take 4 values : location, section, column, module
             $level_type = $model['level'];
-            if ( ! is_string( $level_type ) || empty( $level_type ) ) {
+            if ( !is_string( $level_type ) || empty( $level_type ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => a level type must be a string not empty', $model );
                 return;
             }
@@ -14639,11 +14678,26 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 case 'location' :
                     $is_header_location = true === sek_get_registered_location_property( $id, 'is_header_location' );
                     $is_footer_location = true === sek_get_registered_location_property( $id, 'is_footer_location' );
-                    $is_content_pwd_protected = !skp_is_customizing() && !$is_header_location && !$is_footer_location && post_password_required();
+
                     //sek_error_log( __FUNCTION__ . ' WHAT ARE WE RENDERING? ' . $id , $collection );
-                    //empty sektions wrapper are only printed when customizing
+
+
+                    // PASSWORD PROTECTION see #673 and #679
+                    // If the page/post is password protect, and this is not a header or footer location,
+                    // => stop the recursive walker here and print the password form
+                    // for https://github.com/presscustomizr/nimble-builder/issues/673
+                    // Nimble_Manager()->is_page_password_protected is set at 'wp', see ::sek_maybe_empty_password_form
+
+                    // 1) we want to protect content added with Nimble Builder, but not if header or footer
+                    // 2) we want to apply the protection on front, not when customizing
+                    // 3) we need to check if the single page or post is password protected
+                    // 4) we don't want to render the password form multiple times
+                    $is_password_protection_active_for_location = !skp_is_customizing() && Nimble_Manager()->is_page_password_protected && !$is_header_location && !$is_footer_location;
+                    $is_password_form_needed = $is_password_protection_active_for_location && !did_action('nimble_wp_pwd_form_rendered');
+
+                    // NOTE : empty sektions wrapper are only printed when customizing
                     ?>
-                      <?php if ( skp_is_customizing() || ( ! skp_is_customizing() && ! empty( $collection ) ) ) : ?>
+                      <?php if ( skp_is_customizing() || ( !skp_is_customizing() && !empty( $collection ) ) ) : ?>
                             <?php
                               Nimble_Manager()->page_has_nimble_content = true;
                               printf( '<div class="sektion-wrapper %6$s" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s %5$s>',
@@ -14652,14 +14706,12 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                                   $is_header_location ? 'data-sek-is-header-location="true"' : '',
                                   $is_footer_location ? 'data-sek-is-footer-location="true"' : '',
                                   $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
-                                  $is_content_pwd_protected ? 'sek-password-protected' : ''//<= added for #673
+                                  $is_password_form_needed ? 'sek-password-protected' : ''//<= added for #673
                               );
                             ?>
                             <?php
-                              // If the page/post is password protect, stop the recursive walker here and print the password form
-                              // for https://github.com/presscustomizr/nimble-builder/issues/673
-                              if ( $is_content_pwd_protected ) {
-                                  echo get_the_password_form();
+                              if ( $is_password_protection_active_for_location ) {
+                                  echo get_the_password_form();//<= we filter the output of this function to maybe empty and fire the action 'nimble_wp_pwd_form_rendered'
                               } else {
                                   $this->parent_model = $model;
                                   foreach ( $collection as $_key => $sec_model ) { $this->render( $sec_model ); }
@@ -14866,7 +14918,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                     $module_type = $model['module_type'];
 
-                    if ( ! CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+                    if ( !CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
                         sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => module_type not registered', $module_type );
                         break;
                     }
@@ -14984,7 +15036,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // @see sek_add_css_rules_for_level_visibility()
         // @return string
         private function get_level_visibility_css_class( $model ) {
-            if ( ! is_array( $model ) ) {
+            if ( !is_array( $model ) ) {
                 error_log( __FUNCTION__ . ' => $model param should be an array' );
                 return;
             }
@@ -15059,7 +15111,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
          * ( filtered by wp core when invoked in customize-preview )
          */
         function get_unfiltered_edit_post_link( $id = 0, $context = 'display' ) {
-            if ( ! $post = get_post( $id ) )
+            if ( !$post = get_post( $id ) )
               return;
 
             if ( 'revision' === $post->post_type )
@@ -15091,7 +15143,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $skope_id = skp_get_skope_id();
             $skoped_seks = sek_get_skoped_seks( $skope_id );
 
-            if ( ! is_array( $skoped_seks ) || empty( $skoped_seks['collection'] ) )
+            if ( !is_array( $skoped_seks ) || empty( $skoped_seks['collection'] ) )
               return;
 
             $enqueueing_candidates = $this->sek_sniff_assets_to_enqueue( $skoped_seks['collection'] );
@@ -15127,11 +15179,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // @hook sek_sniff_assets_to_enqueue
         function sek_sniff_assets_to_enqueue( $collection, $enqueuing_candidates = array() ) {
             foreach ( $collection as $level_data ) {
-                if ( array_key_exists( 'level', $level_data ) && 'module' === $level_data['level'] && ! empty( $level_data['module_type'] ) ) {
+                if ( array_key_exists( 'level', $level_data ) && 'module' === $level_data['level'] && !empty( $level_data['module_type'] ) ) {
                     $front_assets = sek_get_registered_module_type_property( $level_data['module_type'], 'front_assets' );
                     if ( is_array( $front_assets ) ) {
                         foreach ( $front_assets as $handle => $asset_params ) {
-                            if ( is_string( $handle ) && ! array_key_exists( $handle, $enqueuing_candidates ) ) {
+                            if ( is_string( $handle ) && !array_key_exists( $handle, $enqueuing_candidates ) ) {
                                 $enqueuing_candidates[ $handle ] = $asset_params;
                             }
                         }
@@ -15174,7 +15226,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
-                $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
+                $bg_options = ( !empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
                 if ( !empty( $bg_options[ 'bg-image'] ) ) {
                     $bg_image_id_or_url = $bg_options[ 'bg-image'];
                     // April 2020 :
@@ -15285,7 +15337,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             //   return $html;
             if ( !sek_is_img_smartload_enabled() )
               return $html;
-            if ( ! is_string( $html ) ) {
+            if ( !is_string( $html ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => provided html is not a string', $html );
                 return $html;
             }
@@ -15306,7 +15358,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 'svgz'
             ) );
 
-            if ( empty( $allowed_image_extensions ) || ! is_array( $allowed_image_extensions ) ) {
+            if ( empty( $allowed_image_extensions ) || !is_array( $allowed_image_extensions ) ) {
               return $html;
             }
 
@@ -15517,7 +15569,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             global $wp_query;
 
             $query_vars = $wp_query->query_vars;
-            if ( ! is_array( $query_vars ) || empty( $query_vars['s'] ) )
+            if ( !is_array( $query_vars ) || empty( $query_vars['s'] ) )
               return;
 
             // Search query on Nimble CPT
@@ -15619,7 +15671,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
     }//class
 endif;
 ?><?php
-if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
+if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
     class SEK_Front_Render_Css extends SEK_Front_Render {
         // Fired in __construct()
         function _setup_hook_for_front_css_printing_or_enqueuing() {
@@ -15641,8 +15693,8 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             //    - we set the hook to ''
 
             // AJAX REQUESTED STYLESHEET
-            if ( ( ! is_null( $skope_id ) && ! empty( $skope_id ) ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
-                if ( ! isset($_POST['local_skope_id']) ) {
+            if ( ( !is_null( $skope_id ) && !empty( $skope_id ) ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+                if ( !isset($_POST['local_skope_id']) ) {
                     sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => error missing local_skope_id');
                     return;
                 }
@@ -15696,7 +15748,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
         // When ajaxing, the link#sek-gfonts-{$this->id} gets removed from the dom and replaced by this string
         // March 2020 added param display=swap => Ensure text remains visible during webfont load #572
         function sek_gfont_print( $print_candidates ) {
-            if ( ! empty( $print_candidates ) ) {
+            if ( !empty( $print_candidates ) ) {
                 printf('<link rel="stylesheet" id="%1$s" href="%2$s">',
                     'sek-gfonts-local-and-global',
                     "//fonts.googleapis.com/css?family={$print_candidates}&display=swap"
@@ -15716,7 +15768,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             // print candidates must be fetched when sek_preload_google_fonts_on_front()
             $print_candidates = $this->sek_get_gfont_print_candidates();
 
-            if ( ! empty( $print_candidates ) ) {
+            if ( !empty( $print_candidates ) ) {
                 ?>
                 <script id="nimble-preload-gfonts">nb_.preloadAsset( { id : 'sek-gfonts-local-and-global', as : 'style', href : '//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>&display=swap', scriptEl : document.currentScript } );</script>
                 <?php
@@ -15755,7 +15807,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
             // remove duplicate if any
             $ffamilies = array_unique( $ffamilies );
 
-            if ( ! empty( $ffamilies ) ) {
+            if ( !empty( $ffamilies ) ) {
                 $ffamilies = implode( "|", $ffamilies );
                 $print_candidates = str_replace( '|', '%7C', $ffamilies );
                 $print_candidates = str_replace( '[gfont]', '' , $print_candidates );
@@ -15805,7 +15857,7 @@ if ( ! class_exists( 'SEK_Front_Render_Css' ) ) :
 endif;
 
 ?><?php
-if ( ! class_exists( '\Nimble\Sek_Simple_Form' ) ) :
+if ( !class_exists( '\Nimble\Sek_Simple_Form' ) ) :
 class Sek_Simple_Form extends SEK_Front_Render_Css {
 
     private $form;
@@ -15876,7 +15928,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
 
     //@hook: parse_request
     function simple_form_parse_request() {
-        if ( ! isset( $_POST['nimble_simple_cf'] ) )
+        if ( !isset( $_POST['nimble_simple_cf'] ) )
           return;
 
         // get the module options
@@ -15887,7 +15939,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             if ( is_array( $local_sektions ) && !empty( $local_sektions ) ) {
             $sektion_collection = array_key_exists('collection', $local_sektions) ? $local_sektions['collection'] : array();
             }
-            if ( is_array($sektion_collection) && ! empty( $sektion_collection ) && isset( $_POST['nimble_level_id'] ) ) {
+            if ( is_array($sektion_collection) && !empty( $sektion_collection ) && isset( $_POST['nimble_level_id'] ) ) {
                 $module_model = sek_get_level_model($_POST['nimble_level_id'], $sektion_collection );
                 $module_model = sek_normalize_module_value_with_defaults( $module_model );
             }
@@ -15987,7 +16039,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         // Shall we print the badge ?
         // @todo : we don't handle the case when recaptcha badge is globally displayed but
         // the current page has disabled recaptcha
-        if ( ! sek_is_recaptcha_badge_globally_displayed() ) {
+        if ( !sek_is_recaptcha_badge_globally_displayed() ) {
             $classes[] = 'sek-hide-rc-badge';
         }
         return $classes;
@@ -16020,7 +16072,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             $echo_form = true;
             // When loading the page after a send attempt, focus on the module html element with a javascript animation
             // In this case, don't echo the form, but only the user defined message which should be displayed after submitting the form
-            if ( ! is_null( $this->mailer ) ) {
+            if ( !is_null( $this->mailer ) ) {
                 // Make sure we target the right form if several forms are displayed in a page
                 $current_form_has_been_submitted = isset( $_POST['nimble_level_id'] ) && $_POST['nimble_level_id'] === $module_id;
 
@@ -16076,7 +16128,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     private function _set_form_composition( $form_composition, $module_model = array() ) {
 
         $user_form_composition = array();
-        if ( ! is_array( $module_model ) ) {
+        if ( !is_array( $module_model ) ) {
               sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => ERROR : invalid module options array');
               return $user_form_composition;
         }
@@ -16090,21 +16142,21 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             //sek_error_log( '$field_data', $field_data );
             switch ( $field_id ) {
                 case 'nimble_name':
-                    if ( ! empty( $form_fields_options['show_name_field'] ) && sek_is_checked( $form_fields_options['show_name_field'] ) ) {
+                    if ( !empty( $form_fields_options['show_name_field'] ) && sek_is_checked( $form_fields_options['show_name_field'] ) ) {
                         $user_form_composition[$field_id] = $field_data;
                         $user_form_composition[$field_id]['required'] = sek_is_checked( $form_fields_options['name_field_required'] );
                         $user_form_composition[$field_id]['label'] = esc_attr( $form_fields_options['name_field_label'] );
                     }
                 break;
                 case 'nimble_subject':
-                    if ( ! empty( $form_fields_options['show_subject_field'] ) && sek_is_checked( $form_fields_options['show_subject_field'] ) ) {
+                    if ( !empty( $form_fields_options['show_subject_field'] ) && sek_is_checked( $form_fields_options['show_subject_field'] ) ) {
                         $user_form_composition[$field_id] = $field_data;
                         $user_form_composition[$field_id]['required'] = sek_is_checked( $form_fields_options['subject_field_required'] );
                         $user_form_composition[$field_id]['label'] = esc_attr( $form_fields_options['subject_field_label'] );
                     }
                 break;
                 case 'nimble_message':
-                    if ( ! empty( $form_fields_options['show_message_field'] ) && sek_is_checked( $form_fields_options['show_message_field'] ) ) {
+                    if ( !empty( $form_fields_options['show_message_field'] ) && sek_is_checked( $form_fields_options['show_message_field'] ) ) {
                         $user_form_composition[$field_id] = $field_data;
                         $user_form_composition[$field_id]['required'] = sek_is_checked( $form_fields_options['message_field_required'] );
                         $user_form_composition[$field_id]['label'] = esc_attr( $form_fields_options['message_field_label'] );
@@ -16133,7 +16185,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                     // When the form is submitted, we grab the skope_id from the posted value, because it is too early to build it.
                     // of course we don't need to set this input value when customizing.
                     $skope_id = '';
-                    if ( ! skp_is_customizing() ) {
+                    if ( !skp_is_customizing() ) {
                         $skope_id = isset( $_POST['nimble_skope_id'] ) ? $_POST['nimble_skope_id'] : sek_get_level_skope_id( $module_model['id'] );
                     }
 
@@ -16149,7 +16201,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 // 1) reCAPTCHA enabled in the global options AND properly setup with non empty keys
                 // 2) reCAPTCHA enabled for this particular form
                 case 'nimble_recaptcha_resp' :
-                    if ( ! skp_is_customizing() && sek_is_recaptcha_globally_enabled() && 'disabled' !== $form_submission_options['recaptcha_enabled'] ) {
+                    if ( !skp_is_customizing() && sek_is_recaptcha_globally_enabled() && 'disabled' !== $form_submission_options['recaptcha_enabled'] ) {
                         $user_form_composition[$field_id] = $field_data;
                     }
                 break;
@@ -16186,7 +16238,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     //generate the fields
     function simple_form_generate_form( $fields, $module_model ) {
         $form   = new Sek_Form( [
-            'action' => is_array( $module_model ) && ! empty( $module_model['id']) ? '#' . $module_model['id'] :'#',
+            'action' => is_array( $module_model ) && !empty( $module_model['id']) ? '#' . $module_model['id'] :'#',
             'method' => 'post'
         ] );
         $form->add_fields( $fields );
@@ -16201,14 +16253,14 @@ endif;
 *&
 *
 */
-if ( ! class_exists( '\Nimble\Sek_Form' ) ) :
+if ( !class_exists( '\Nimble\Sek_Form' ) ) :
 class Sek_Form {
     private $fields;
     private $attributes;
 
     // Sek_Form is instantiated from Sek_Simple_Form::simple_form_generate_form
     //$form   = new Sek_Form( [
-    //     'action' => is_array( $module_model ) && ! empty( $module_model['id']) ? $module_model['id'] :'#',
+    //     'action' => is_array( $module_model ) && !empty( $module_model['id']) ? $module_model['id'] :'#',
     //     'method' => 'post'
     // ] );
     public function __construct( $args = array() ) {
@@ -16255,10 +16307,10 @@ class Sek_Form {
             $filter       = $input->get_data( 'filter' );
             $can_be_empty = true !== $input->get_data( 'required' );
 
-            if ( $can_be_empty && ! $value ) {
+            if ( $can_be_empty && !$value ) {
                 continue;
             }
-            if ( $filter && ! filter_var( $value, $filter ) ) {
+            if ( $filter && !filter_var( $value, $filter ) ) {
                 $has_invalid_field = $input->get_data('label');
                 break;
             }
@@ -16310,7 +16362,7 @@ endif;
 *
 * label and/or wrapper + input field
 */
-if ( ! class_exists( '\Nimble\Sek_Field' ) ) :
+if ( !class_exists( '\Nimble\Sek_Field' ) ) :
 class Sek_Field {
     private $input;
     private $data;
@@ -16402,7 +16454,7 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
     public function __construct( $args ) {
         //no name no party
         //TODO: raise exception
-        if ( ! isset( $args['name'] ) ) {
+        if ( !isset( $args['name'] ) ) {
             error_log( __FUNCTION__ . ' => contact form input name not set' );
             return;
         }
@@ -16521,7 +16573,7 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
 
 
 
-if ( ! class_exists( '\Nimble\Sek_Input_Basic' ) ) :
+if ( !class_exists( '\Nimble\Sek_Input_Basic' ) ) :
 class Sek_Input_Basic extends Sek_Input_Abstract {
 
     public function __construct( $args ) {
@@ -16537,7 +16589,7 @@ class Sek_Input_Basic extends Sek_Input_Abstract {
 }
 endif;
 
-if ( ! class_exists( '\Nimble\Sek_Input_Hidden' ) ) :
+if ( !class_exists( '\Nimble\Sek_Input_Hidden' ) ) :
 class Sek_Input_Hidden extends Sek_Input_Basic {
     public function __construct( $args ) {
         $args[ 'type' ]     = 'hidden';
@@ -16546,7 +16598,7 @@ class Sek_Input_Hidden extends Sek_Input_Basic {
 }
 endif;
 
-if ( ! class_exists( '\Nimble\Sek_Input_Text' ) ) :
+if ( !class_exists( '\Nimble\Sek_Input_Text' ) ) :
 class Sek_Input_Text extends Sek_Input_Basic {
     public function __construct( $args ) {
         $args               = is_array( $args ) ? $args : array();
@@ -16567,7 +16619,7 @@ class Sek_Input_Text extends Sek_Input_Basic {
 endif;
 
 
-if ( ! class_exists( '\Nimble\Sek_Input_Email' ) ) :
+if ( !class_exists( '\Nimble\Sek_Input_Email' ) ) :
 class Sek_Input_Email extends Sek_Input_Basic {
     public function __construct($args) {
         $args             = is_array( $args ) ? $args : array();
@@ -16578,7 +16630,7 @@ class Sek_Input_Email extends Sek_Input_Basic {
     }
 
     public function sanitize( $value ) {
-        if ( ! is_email( $value ) ) {
+        if ( !is_email( $value ) ) {
             return '';
         }
         return sanitize_email($value);
@@ -16591,7 +16643,7 @@ class Sek_Input_Email extends Sek_Input_Basic {
 endif;
 
 
-if ( ! class_exists( '\Nimble\Sek_Input_URL' ) ) :
+if ( !class_exists( '\Nimble\Sek_Input_URL' ) ) :
 class Sek_Input_URL extends Sek_Input_Basic {
     public function __construct($args) {
         $args             = is_array( $args ) ? $args : array();
@@ -16612,7 +16664,7 @@ class Sek_Input_URL extends Sek_Input_Basic {
 endif;
 
 
-if ( ! class_exists( '\Nimble\Sek_Input_Submit' ) ) :
+if ( !class_exists( '\Nimble\Sek_Input_Submit' ) ) :
 class Sek_Input_Submit extends Sek_Input_Basic {
     public function __construct($args) {
         $args             = is_array( $args ) ? $args : array();
@@ -16632,7 +16684,7 @@ endif;
 
 
 
-if ( ! class_exists( '\Nimble\Sek_Input_Textarea' ) ) :
+if ( !class_exists( '\Nimble\Sek_Input_Textarea' ) ) :
 class Sek_Input_Textarea extends Sek_Input_Abstract {
 
     public function __construct($args) {
@@ -16665,7 +16717,7 @@ endif;
 * Mailer class definition
 *
 */
-if ( ! class_exists( '\Nimble\Sek_Mailer' ) ) :
+if ( !class_exists( '\Nimble\Sek_Mailer' ) ) :
 class Sek_Mailer {
     private $form;
     private $status;
@@ -16674,12 +16726,12 @@ class Sek_Mailer {
     public $recaptcha_errors = '_no_error_';//will store array( 'endpoint' => $endpoint, 'request' => $request, 'response' => '' );
 
     public function __construct( Sek_Form $form ) {
-        $this-> form = $form;
+        $this->form = $form;
 
         $this->messages = array(
             //status          => message
             //'not_sent'        => __( 'Message was not sent. Try Again.', 'text_doma'),
-            //'sent'            => __( 'Thanks! Your message has been sent.', 'text_doma'),
+            //'sent'            => __( 'Thanks!Your message has been sent.', 'text_doma'),
             'aborted'         => __( 'Please supply correct information.', 'text_doma') //<-todo too much generic
         );
         $this->status = 'init';
@@ -16989,7 +17041,7 @@ function sek_simple_form_mail_template() {
 
 ?><?php
 
-if ( ! class_exists( '\Nimble\Sek_Nimble_Manager' ) ) :
+if ( !class_exists( '\Nimble\Sek_Nimble_Manager' ) ) :
   final class Sek_Nimble_Manager extends Sek_Simple_Form {}
 endif;
 

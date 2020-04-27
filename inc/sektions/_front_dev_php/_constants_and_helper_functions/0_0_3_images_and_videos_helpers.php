@@ -99,7 +99,7 @@ function sek_is_img_smartload_enabled() {
     $local_performances_data = sek_get_local_option_value( 'local_performances' );
     $local_smartload = 'inherit';
     if ( !is_null( $local_performances_data ) && is_array( $local_performances_data ) ) {
-        if ( ! empty( $local_performances_data['local-img-smart-load'] ) && 'inherit' !== $local_performances_data['local-img-smart-load'] ) {
+        if ( !empty( $local_performances_data['local-img-smart-load'] ) && 'inherit' !== $local_performances_data['local-img-smart-load'] ) {
               $local_smartload = 'yes' === $local_performances_data['local-img-smart-load'];
         }
     }

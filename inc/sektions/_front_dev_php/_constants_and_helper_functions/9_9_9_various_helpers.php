@@ -8,7 +8,7 @@ function sek_filter_skp_get_skope_id( $skope_id, $level ) {
     //       $.extend( query, { local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ) } );
     // });
     // implemented to fix : https://github.com/presscustomizr/nimble-builder/issues/242
-    if ( 'local' === $level && is_array( $_POST ) && ! empty( $_POST['local_skope_id'] ) && 'customize_save' === $_POST['action'] ) {
+    if ( 'local' === $level && is_array( $_POST ) && !empty( $_POST['local_skope_id'] ) && 'customize_save' === $_POST['action'] ) {
         $skope_id = $_POST['local_skope_id'];
     }
     return $skope_id;
@@ -45,7 +45,7 @@ function sek_is_checked( $val ) {
 }
 
 function sek_booleanize_checkbox_val( $val ) {
-    if ( ! $val || is_array( $val ) ) {
+    if ( !$val || is_array( $val ) ) {
       return false;
     }
     if ( is_bool( $val ) && $val )
@@ -73,10 +73,10 @@ function sek_booleanize_checkbox_val( $val ) {
 function sek_get_registered_widget_areas() {
     global $wp_registered_sidebars;
     $widget_areas = array();
-    if ( is_array( $wp_registered_sidebars ) && ! empty( $wp_registered_sidebars ) ) {
+    if ( is_array( $wp_registered_sidebars ) && !empty( $wp_registered_sidebars ) ) {
         foreach ( $wp_registered_sidebars as $registered_sb ) {
             $id = $registered_sb['id'];
-            if ( ! sek_is_nimble_widget_id( $id ) )
+            if ( !sek_is_nimble_widget_id( $id ) )
               continue;
             $widget_areas[ $id ] = $registered_sb['name'];
         }
@@ -128,10 +128,10 @@ function sek_is_pro() {
 function sek_user_started_before_version( $requested_version ) {
     $started_with = get_option( 'nimble_started_with_version' );
     //the transient is set in HU_utils::hu_init_properties()
-    if ( ! $started_with )
+    if ( !$started_with )
       return false;
 
-    if ( ! is_string( $requested_version ) )
+    if ( !is_string( $requested_version ) )
       return false;
 
     return version_compare( $started_with , $requested_version, '<' );
@@ -143,13 +143,13 @@ function sek_user_started_before_version( $requested_version ) {
  *   VARIOUS HELPERS
 /* ------------------------------------------------------------------------- */
 function sek_text_truncate( $text, $max_text_length, $more, $strip_tags = true ) {
-    if ( ! $text )
+    if ( !$text )
         return '';
 
     if ( $strip_tags )
         $text       = strip_tags( $text );
 
-    if ( ! $max_text_length )
+    if ( !$max_text_length )
         return $text;
 
     $end_substr = $text_length = strlen( $text );
@@ -201,7 +201,7 @@ function sek_get_parent_theme_slug() {
 
 
 function sek_error_log( $title, $content = null ) {
-    if ( ! sek_is_dev_mode() )
+    if ( !sek_is_dev_mode() )
       return;
     if ( is_null( $content ) ) {
         error_log( '<' . $title . '>' );

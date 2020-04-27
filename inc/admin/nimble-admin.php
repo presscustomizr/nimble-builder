@@ -1,7 +1,7 @@
 <?php
 namespace Nimble;
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( !defined( 'ABSPATH' ) ) exit;
 
 
 // /* ------------------------------------------------------------------------- *
@@ -34,7 +34,7 @@ function sek_versionning() {
 // /* ------------------------------------------------------------------------- */
 add_action('admin_menu', '\Nimble\sek_plugin_menu');
 function sek_plugin_menu() {
-    if ( ! current_user_can( 'update_plugins' ) )
+    if ( !current_user_can( 'update_plugins' ) )
       return;
     // system infos should be displayed to users with admin capabilities only
     add_plugins_page(__( 'System info', 'text_domain' ), __( 'System info', 'text_domain' ), 'read', 'nimble-builder', '\Nimble\sek_plugin_page');
@@ -72,7 +72,7 @@ function sek_config_infos() {
     $theme_data   = wp_get_theme();
     $theme        = $theme_data->Name . ' ' . $theme_data->Version;
     $parent_theme = $theme_data->Template;
-    if ( ! empty( $parent_theme ) ) {
+    if ( !empty( $parent_theme ) ) {
       $parent_theme_data = wp_get_theme( $parent_theme );
       $parent_theme      = $parent_theme_data->Name . ' ' . $parent_theme_data->Version;
     }
@@ -252,7 +252,7 @@ function sek_get_write_permissions_status() {
     $writing_path_candidates[ ABSPATH ] = 'WP root directory';
 
     foreach ( $writing_path_candidates as $dir => $description ) {
-        if ( ! is_writable( $dir ) ) {
+        if ( !is_writable( $dir ) ) {
             $permission_issues[] = $description;
         }
     }
@@ -315,14 +315,14 @@ function sek_may_be_display_update_notice() {
       return;
 
     // always wait for the welcome note to be dismissed before displaying the update notice
-    if ( ! sek_welcome_notice_is_dismissed() )
+    if ( !sek_welcome_notice_is_dismissed() )
       return;
 
     $last_update_notice_values  = get_option( 'nimble_last_update_notice' );
     $show_new_notice = false;
     $display_ct = 5;
 
-    if ( ! $last_update_notice_values || ! is_array($last_update_notice_values) ) {
+    if ( !$last_update_notice_values || !is_array($last_update_notice_values) ) {
         // first time user of the plugin, the option does not exist
         // 1) initialize it => set it to the current version, displayed 0 times.
         // 2) update in db
@@ -360,7 +360,7 @@ function sek_may_be_display_update_notice() {
     //always display in dev mode
     //$show_new_notice = ( defined( 'CZR_DEV' ) && CZR_DEV ) ? true : $show_new_notice;
 
-    if ( ! $show_new_notice )
+    if ( !$show_new_notice )
       return;
 
     ob_start();
@@ -473,7 +473,7 @@ function sek_welcome_notice_is_dismissed() {
 
 add_action( 'admin_notices', '\Nimble\sek_render_welcome_notice' );
 function sek_render_welcome_notice() {
-    if ( ! current_user_can( 'customize' ) )
+    if ( !current_user_can( 'customize' ) )
       return;
 
     if ( sek_welcome_notice_is_dismissed() )
@@ -482,7 +482,7 @@ function sek_render_welcome_notice() {
     // If the notice has not been dismissed, make sure it is still relevant to display it.
     // If user has started created sections, we should not display it anymore => update the dismissed pointers array
     // @see https://developer.wordpress.org/reference/functions/wp_ajax_dismiss_wp_pointer/
-    if ( sek_site_has_nimble_sections_created() && ! ( defined('NIMBLE_DEV') && NIMBLE_DEV ) ) {
+    if ( sek_site_has_nimble_sections_created() && !( defined('NIMBLE_DEV') && NIMBLE_DEV ) ) {
         $dismissed = get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true );
         $dismissed_array = array_filter( explode( ',', (string) $dismissed ) );
         $dismissed_array[] = NIMBLE_WELCOME_NOTICE_ID;
@@ -635,7 +635,7 @@ function sek_nimble_dashboard_callback_fn() {
           __( 'Start building', 'nimble' )
       ); ?>
       </div>
-      <?php if ( ! empty( $post_data ) ) : ?>
+      <?php if ( !empty( $post_data ) ) : ?>
         <div class="nimble-post-list">
           <h3 class="nimble-post-list-title"><?php echo __( 'News & release notes', 'text_doma' ); ?></h3>
           <ul class="nimble-collection">
@@ -723,7 +723,7 @@ function sek_print_edit_with_nimble_btn_for_classic_editor( $post ) {
     return;
   }
   // Void if user can't edit the post or can't customize
-  if ( ! sek_current_user_can_edit( $post->ID ) || ! current_user_can( 'customize' ) ) {
+  if ( !sek_current_user_can_edit( $post->ID ) || !current_user_can( 'customize' ) ) {
     return;
   }
   sek_print_nb_btn_edit_with_nimble( 'classic' );
@@ -739,7 +739,7 @@ function sek_enqueue_js_asset_for_gutenberg_edit_button() {
       return;
     $post = get_post();
     // Void if user can't edit the post or can't customize
-    if ( ! sek_current_user_can_edit( $post->ID ) || ! current_user_can( 'customize' ) ) {
+    if ( !sek_current_user_can_edit( $post->ID ) || !current_user_can( 'customize' ) ) {
       return;
     }
     wp_enqueue_script(
@@ -774,7 +774,7 @@ function sek_print_js_for_nimble_edit_btn() {
   if ( is_object($post) && sek_is_forbidden_post_type_for_nimble_edit_button( $post->post_type ) )
     return;
   // Void if user can't edit the post or can't customize
-  if ( ! sek_current_user_can_edit( $post->ID ) || ! current_user_can( 'customize' ) ) {
+  if ( !sek_current_user_can_edit( $post->ID ) || !current_user_can( 'customize' ) ) {
     return;
   }
   // Only print when Gutenberg editor is enabled
@@ -840,7 +840,7 @@ function sek_print_nb_btn_edit_with_nimble( $editor_type ) {
     $post = get_post();
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
     $customize_url = sek_get_customize_url_when_is_admin( $post );
-    if ( ! empty( $customize_url ) ) {
+    if ( !empty( $customize_url ) ) {
         $customize_url = add_query_arg(
             array( 'autofocus' => array( 'section' => '__content_picker__' ) ),
             $customize_url
@@ -865,7 +865,7 @@ function sek_print_nb_btn_edit_with_nimble( $editor_type ) {
 function sek_current_user_can_edit( $post_id = 0 ) {
     $post = get_post( $post_id );
 
-    if ( ! $post ) {
+    if ( !$post ) {
       return false;
     }
     if ( 'trash' === get_post_status( $post_id ) ) {
@@ -873,11 +873,11 @@ function sek_current_user_can_edit( $post_id = 0 ) {
     }
     $post_type_object = get_post_type_object( $post->post_type );
 
-    if ( ! isset( $post_type_object->cap->edit_post ) ) {
+    if ( !isset( $post_type_object->cap->edit_post ) ) {
       return false;
     }
     $edit_cap = $post_type_object->cap->edit_post;
-    if ( ! current_user_can( $edit_cap, $post_id ) ) {
+    if ( !current_user_can( $edit_cap, $post_id ) ) {
       return false;
     }
     if ( get_option( 'page_for_posts' ) === $post_id ) {

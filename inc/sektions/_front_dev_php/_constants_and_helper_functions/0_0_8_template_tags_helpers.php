@@ -52,12 +52,12 @@ function sek_get_the_content() {
       $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
       if ( $is_singular && is_int($post_id) ) {
           $post_object = get_post( $post_id );
-          return ! empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
+          return !empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
       }
   } else {
       if( is_singular() ) {
         $post_object = get_post();
-        return ! empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
+        return !empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
       }
   }
 }

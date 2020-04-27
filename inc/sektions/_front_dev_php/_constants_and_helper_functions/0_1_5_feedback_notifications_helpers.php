@@ -19,7 +19,7 @@ function sek_get_feedback_notif_status() {
     //sek_error_log('START VERSION ?' . $start_version, version_compare( $start_version, '1.6.0', '<=' ) );
 
     // Bail if user did not start before v1.10.10, February 15th 2020 ( set on March 3rd 2020 )
-    if ( ! version_compare( $start_version, '1.10.10', '<=' ) )
+    if ( !version_compare( $start_version, '1.10.10', '<=' ) )
       return;
 
     $sek_post_query_vars = array(
@@ -34,7 +34,7 @@ function sek_get_feedback_notif_status() {
         'lazy_load_term_meta'    => false,
     );
     $query = new \WP_Query( $sek_post_query_vars );
-    if ( ! is_array( $query->posts ) || empty( $query->posts ) )
+    if ( !is_array( $query->posts ) || empty( $query->posts ) )
       return;
 
     $customized_pages = 0;
@@ -68,7 +68,7 @@ function sek_get_feedback_notif_status() {
 // recursive helper to generate a list of module used in a given set of sections data
 function sek_populate_list_of_modules_used( $seks_data ) {
     global $modules_used;
-    if ( ! is_array( $seks_data ) ) {
+    if ( !is_array( $seks_data ) ) {
         sek_error_log( __FUNCTION__ . ' => invalid seks_data param');
         return $count;
     }

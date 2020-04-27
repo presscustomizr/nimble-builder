@@ -467,8 +467,8 @@ function sek_add_css_rules_for_items_in_czr_img_slider_collection_child( $rules,
     //     [desktop] => center
     // )
     // VERTICAL ALIGNMENT
-    if ( ! empty( $item_model[ 'v_alignment' ] ) && $all_defaults['v_alignment'] != $item_model[ 'v_alignment' ] ) {
-        if ( ! is_array( $item_model[ 'v_alignment' ] ) ) {
+    if ( !empty( $item_model[ 'v_alignment' ] ) && $all_defaults['v_alignment'] != $item_model[ 'v_alignment' ] ) {
+        if ( !is_array( $item_model[ 'v_alignment' ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the v_alignment option should be an array( {device} => {alignment} )');
         }
         $v_alignment_value = is_array( $item_model[ 'v_alignment' ] ) ? $item_model[ 'v_alignment' ] : array();
@@ -547,11 +547,11 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
 
 
     // CUSTOM HEIGHT BY DEVICE
-    if ( ! empty( $slider_options[ 'height-type' ] ) ) {
+    if ( !empty( $slider_options[ 'height-type' ] ) ) {
         if ( 'custom' === $slider_options[ 'height-type' ] ) {
             $custom_user_height = array_key_exists( 'custom-height', $slider_options ) ? $slider_options[ 'custom-height' ] : array();
 
-            if ( ! is_array( $custom_user_height ) ) {
+            if ( !is_array( $custom_user_height ) ) {
                 sek_error_log( __FUNCTION__ . ' => error => the height option should be an array( {device} => {number}{unit} )', $custom_user_height);
             }
             $custom_user_height = is_array( $custom_user_height ) ? $custom_user_height : array();
@@ -572,7 +572,7 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
                 $height_value = $custom_user_height;
                 foreach ( $custom_user_height as $device => $num_unit ) {
                     $numeric = sek_extract_numeric_value( $num_unit );
-                    if ( ! empty( $numeric ) ) {
+                    if ( !empty( $numeric ) ) {
                         $unit = sek_extract_unit( $num_unit );
                         $unit = '%' === $unit ? 'vh' : $unit;
                         $height_value[$device] = $numeric . $unit;

@@ -110,16 +110,16 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
     // otherwise we fallback on the normal utility skp_build_skope_id()
     $local_options = sek_get_skoped_seks( !empty( $_POST['local_skope_id'] ) ? $_POST['local_skope_id'] : skp_build_skope_id() );
 
-    if ( ! is_array( $local_options ) || empty( $local_options['local_options']) || empty( $local_options['local_options']['widths'] ) )
+    if ( !is_array( $local_options ) || empty( $local_options['local_options']) || empty( $local_options['local_options']['widths'] ) )
       return $css;
 
     $width_options = $local_options['local_options']['widths'];
     $user_defined_widths = array();
 
-    if ( ! empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
+    if ( !empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
         $user_defined_widths['outer-section-width'] = '.sektion-wrapper [data-sek-level="section"]';
     }
-    if ( ! empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
+    if ( !empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
         $user_defined_widths['inner-section-width'] = '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner';
     }
 
@@ -128,12 +128,12 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
     // Note that the option 'outer-section-width' and 'inner-section-width' can be empty when set to a value === default
     // @see js czr_setions::normalizeAndSanitizeSingleItemInputValues()
     foreach ( $user_defined_widths as $width_opt_name => $selector ) {
-        if ( ! empty( $width_options[ $width_opt_name ] ) && ! is_array( $width_options[ $width_opt_name ] ) ) {
+        if ( !empty( $width_options[ $width_opt_name ] ) && !is_array( $width_options[ $width_opt_name ] ) ) {
             sek_error_log( __FUNCTION__ . ' => error => the width option should be an array( {device} => {number}{unit} )');
         }
         // $width_options[ $width_opt_name ] should be an array( {device} => {number}{unit} )
         // If not set in the width options , it means that it is equal to default
-        $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || ! is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
+        $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || !is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
         $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
             'desktop' => '100%',
             'tablet' => '',
@@ -144,7 +144,7 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
 
         foreach ( $user_custom_width_value as $device => $num_unit ) {
             $numeric = sek_extract_numeric_value( $num_unit );
-            if ( ! empty( $numeric ) ) {
+            if ( !empty( $numeric ) ) {
                 $unit = sek_extract_unit( $num_unit );
                 $max_width_value[$device] = $numeric . $unit;
                 $margin_value[$device] = '0 auto';
@@ -176,7 +176,7 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
             ), $rules );
         }
 
-        if ( ! empty( $margin_value ) ) {
+        if ( !empty( $margin_value ) ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $margin_value,
                 'css_property' => 'margin',

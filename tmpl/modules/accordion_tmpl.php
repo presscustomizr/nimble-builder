@@ -1,11 +1,11 @@
 <?php
 /* Developers : you can override this template from a theme with a file that has this path : 'nimble_templates/modules/{original-module-template-file-name}.php' */
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 
-if ( ! function_exists( 'Nimble\sek_print_accordion' ) ) {
+if ( !function_exists( 'Nimble\sek_print_accordion' ) ) {
   function sek_print_accordion( $accord_collec = array(), $accord_opts, $model ) {
       $accord_collec = is_array( $accord_collec ) ? $accord_collec : array();
 
@@ -32,7 +32,7 @@ if ( ! function_exists( 'Nimble\sek_print_accordion' ) ) {
               foreach( $accord_collec as $key => $item ) {
                   $title = !empty( $item['title_text'] ) ? $item['title_text'] : sprintf( '%s %s', __('Accordion title', 'text_dom'), '#' . $ind );
                   $item_html_content = $item['text_content'];
-                  if ( ! skp_is_customizing() ) {
+                  if ( !skp_is_customizing() ) {
                       $item_html_content = apply_filters( 'nimble_parse_for_smart_load', $item_html_content );
                   }
 

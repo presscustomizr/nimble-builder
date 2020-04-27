@@ -1,7 +1,7 @@
 <?php
 /* Developers : you can override this template from a theme with a file that has this path : 'nimble_templates/modules/{original-module-template-file-name}.php' */
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 // this.defaultItemModel = {
@@ -19,7 +19,7 @@ $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $main_settings = $value['main_settings'];
 //$borders_corners_settings = $value['borders_corners'];
 
-if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
+if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
     function sek_get_img_module_img_html( $value ) {
         // 'round' => rounded shape
         // 'expanded' => already expaded
@@ -29,13 +29,13 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
         if ( is_int( $value['img'] ) ) {
             $img_src = wp_get_attachment_image_src( $value['img'], empty( $value['img-size'] ) ? 'large' : $value['img-size']);
         }
-        if ( ! empty( $img_src ) && isset( $img_src[0] ) ) {
+        if ( !empty( $img_src ) && isset( $img_src[0] ) ) {
             $img_url = $img_src[0];
         } else {
             $img_url = $value['img'];
         }
 
-        if ( ! empty( $img_url ) && is_string( $img_url ) ) {
+        if ( !empty( $img_url ) && is_string( $img_url ) ) {
             $html = sprintf( '<div class="sek-nimble-image" style="background-image:url(%1$s)"></div>', esc_url($img_url ) );
         } else {
             //falls back on an icon if previewing
@@ -86,7 +86,7 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_html') ) {
     }
 }
 
-if ( ! function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
+if ( !function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
     function sek_get_img_module_img_link( $value ) {
         $link = 'javascript:void(0);';
         // if ( skp_is_customizing() ) {
@@ -94,11 +94,11 @@ if ( ! function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
         // }
         switch( $value['link-to'] ) {
             case 'url' :
-                if ( ! empty( $value['link-pick-url'] ) && ! empty( $value['link-pick-url']['id'] ) ) {
-                    if ( '_custom_' == $value['link-pick-url']['id']  && ! empty( $value['link-custom-url'] ) ) {
+                if ( !empty( $value['link-pick-url'] ) && !empty( $value['link-pick-url']['id'] ) ) {
+                    if ( '_custom_' == $value['link-pick-url']['id']  && !empty( $value['link-custom-url'] ) ) {
                         $custom_url = apply_filters( 'nimble_parse_template_tags', $value['link-custom-url'] );
                         $link = esc_url( $custom_url );
-                    } else if ( ! empty( $value['link-pick-url']['url'] ) ) {
+                    } else if ( !empty( $value['link-pick-url']['url'] ) ) {
                         $link = esc_url( $value['link-pick-url']['url'] );
                     }
                 }

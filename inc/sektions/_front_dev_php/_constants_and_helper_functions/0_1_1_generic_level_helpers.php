@@ -4,7 +4,7 @@
 // @param $collection = sek_get_skoped_seks( $skope_id )['collection']; <= the root collection must always be provided, so we are sure it's
 function sek_get_level_model( $id, $collection = array() ) {
     $_data = 'no_match';
-    if ( ! is_array( $collection ) ) {
+    if ( !is_array( $collection ) ) {
         sek_error_log( __FUNCTION__ . ' => invalid collection param when getting model for id : ' . $id );
         return $_data;
     }
@@ -30,7 +30,7 @@ function sek_get_level_model( $id, $collection = array() ) {
 // @param collection : optional <= that's why if missing we must walk all collections : local and global
 function sek_get_parent_level_model( $child_level_id = '', $collection = array(), $skope_id = '' ) {
     $_parent_level_data = 'no_match';
-    if ( ! is_string( $child_level_id ) || empty( $child_level_id ) ) {
+    if ( !is_string( $child_level_id ) || empty( $child_level_id ) ) {
         sek_error_log( __FUNCTION__ . ' => missing or invalid child_level_id param.');
         return $_parent_level_data;
     }
@@ -38,7 +38,7 @@ function sek_get_parent_level_model( $child_level_id = '', $collection = array()
     // When no collection is provided, we must walk all collections, local and global.
     if ( empty( $collection ) ) {
         if ( empty( $skope_id ) ) {
-            if ( is_array( $_POST ) && ! empty( $_POST['location_skope_id'] ) ) {
+            if ( is_array( $_POST ) && !empty( $_POST['location_skope_id'] ) ) {
                 $skope_id = $_POST['location_skope_id'];
             } else {
                 // When fired during an ajax 'customize_save' action, the skp_get_skope_id() is determined with $_POST['local_skope_id']
@@ -88,7 +88,7 @@ function sek_get_parent_level_model( $child_level_id = '', $collection = array()
 // @param collection : optional <= that's why if missing we must walk all collections : local and global
 function sek_get_level_skope_id( $level_id = '' ) {
     $level_skope_id = skp_get_skope_id();
-    if ( ! is_string( $level_id ) || empty( $level_id ) ) {
+    if ( !is_string( $level_id ) || empty( $level_id ) ) {
         sek_error_log( __FUNCTION__ . ' => missing or invalid child_level_id param.');
         return $level_skope_id;
     }

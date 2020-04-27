@@ -1,5 +1,5 @@
 <?php
-if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
+if ( !class_exists( 'SEK_Front_Ajax' ) ) :
     class SEK_Front_Ajax extends SEK_Front_Construct {
         // Fired in __construct()
         function _schedule_front_ajax_actions() {
@@ -45,7 +45,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             $params = wp_parse_args( $params, array( 'check_nonce' => true ) );
             if ( $params['check_nonce'] ) {
                 $action = 'save-customize_' . get_stylesheet();
-                if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+                if ( !check_ajax_referer( $action, 'nonce', false ) ) {
                      wp_send_json_error( array(
                         'code' => 'invalid_nonce',
                         'message' => __( __CLASS__ . '::' . __FUNCTION__ . ' => check_ajax_referer() failed.' ),
@@ -53,16 +53,16 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 }
             }
 
-            if ( ! is_user_logged_in() ) {
+            if ( !is_user_logged_in() ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
             }
-            if ( ! current_user_can( 'edit_theme_options' ) ) {
+            if ( !current_user_can( 'edit_theme_options' ) ) {
               wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
             }
-            if ( ! current_user_can( 'customize' ) ) {
+            if ( !current_user_can( 'customize' ) ) {
                 status_header( 403 );
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
-            } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+            } else if ( !isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
                 status_header( 405 );
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => bad_method' );
             }
@@ -74,7 +74,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         function sek_get_level_content_for_injection( $params ) {
             $this->sek_do_ajax_pre_checks( array( 'check_nonce' => false ) );
 
-            if ( ! isset( $_POST['location_skope_id'] ) || empty( $_POST['location_skope_id'] ) ) {
+            if ( !isset( $_POST['location_skope_id'] ) || empty( $_POST['location_skope_id'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
             }
 
@@ -83,11 +83,11 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             // this guid is used to differentiate dynamically rendered content from static content that may include a Nimble generated HTML structure
             // an attribute "data-sek-preview-level-guid" is added to each rendered level when customizing or ajaxing
             // otherwise the preview UI can be broken
-            if ( ! isset( $_POST['preview-level-guid'] ) || empty( $_POST['preview-level-guid'] ) ) {
+            if ( !isset( $_POST['preview-level-guid'] ) || empty( $_POST['preview-level-guid'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing preview-level-guid' );
             }
 
-            if ( ! isset( $_POST['sek_action'] ) || empty( $_POST['sek_action'] ) ) {
+            if ( !isset( $_POST['sek_action'] ) || empty( $_POST['sek_action'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing sek_action' );
             }
             $sek_action = $_POST['sek_action'];
@@ -194,7 +194,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             // so invoking sek_get_skoped_seks() will ensure that we get the latest data
             // since wp has not been fired yet, we need to use the posted skope_id param.
             $sektionSettingValue = sek_get_skoped_seks( $_POST['location_skope_id'] );
-            if ( ! is_array( $sektionSettingValue ) ) {
+            if ( !is_array( $sektionSettingValue ) ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => invalid sektionSettingValue => it should be an array().' );
                 return;
             }
@@ -203,7 +203,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 return;
             }
             $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
-            if ( ! is_array( $sektion_collection ) ) {
+            if ( !is_array( $sektion_collection ) ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => invalid sektion_collection => it should be an array().' );
                 return;
             }
@@ -237,11 +237,11 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                         $content_type = $_POST['content_type'];
                     }
                     if ( 'preset_section' === $content_type ) {
-                        if ( ! array_key_exists( 'collection_of_preset_section_id', $_POST ) || ! is_array( $_POST['collection_of_preset_section_id'] ) ) {
+                        if ( !array_key_exists( 'collection_of_preset_section_id', $_POST ) || !is_array( $_POST['collection_of_preset_section_id'] ) ) {
                             wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing param collection_of_preset_section_id when injecting a preset section' );
                             break;
                         }
-                        if ( ! is_string( $maybe_preset_section_id ) || empty( $maybe_preset_section_id ) ) {
+                        if ( !is_string( $maybe_preset_section_id ) || empty( $maybe_preset_section_id ) ) {
                             wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => inavalid preset section id' );
                             break;
                         }
@@ -264,7 +264,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
 
                 //only used for nested section
                 case 'sek-remove-section' :
-                    if ( ! array_key_exists( 'is_nested', $_POST ) || true !== json_decode( $_POST['is_nested'] ) ) {
+                    if ( !array_key_exists( 'is_nested', $_POST ) || true !== json_decode( $_POST['is_nested'] ) ) {
                         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => the section must be nested in this ajax action' );
                         break;
                     } else {
@@ -279,7 +279,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 case 'sek-remove-column' :
                 case 'sek-duplicate-column' :
                 case 'sek-refresh-columns-in-sektion' :
-                    if ( ! array_key_exists( 'in_sektion', $_POST ) || empty( $_POST['in_sektion'] ) ) {
+                    if ( !array_key_exists( 'in_sektion', $_POST ) || empty( $_POST['in_sektion'] ) ) {
                         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing in_sektion param' );
                         break;
                     }
@@ -292,11 +292,11 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 case 'sek-remove-module' :
                 case 'sek-refresh-modules-in-column' :
                 case 'sek-duplicate-module' :
-                    if ( ! array_key_exists( 'in_column', $_POST ) || empty( $_POST['in_column'] ) ) {
+                    if ( !array_key_exists( 'in_column', $_POST ) || empty( $_POST['in_column'] ) ) {
                         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing in_column param' );
                         break;
                     }
-                    if ( ! array_key_exists( 'in_sektion', $_POST ) || empty( $_POST[ 'in_sektion' ] ) ) {
+                    if ( !array_key_exists( 'in_sektion', $_POST ) || empty( $_POST[ 'in_sektion' ] ) ) {
                         $this->parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
                     } else {
                         $this->parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
@@ -305,7 +305,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 break;
 
                 case 'sek-resize-columns' :
-                    if ( ! array_key_exists( 'resized_column', $_POST ) || empty( $_POST['resized_column'] ) ) {
+                    if ( !array_key_exists( 'resized_column', $_POST ) || empty( $_POST['resized_column'] ) ) {
                         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing resized_column' );
                         break;
                     }
@@ -317,7 +317,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                 break;
 
                  case 'sek-refresh-level' :
-                    if ( ! array_key_exists( 'id', $_POST ) || empty( $_POST['id'] ) ) {
+                    if ( !array_key_exists( 'id', $_POST ) || empty( $_POST['id'] ) ) {
                         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing level id' );
                         break;
                     }
@@ -341,7 +341,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
                     ob_end_clean();
                     return;
                 }
-                if ( empty( $level_model ) || ! is_array( $level_model ) ) {
+                if ( empty( $level_model ) || !is_array( $level_model ) ) {
                     wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => empty or invalid $level_model' );
                     ob_end_clean();
                     return;
@@ -355,7 +355,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
             } else {
                 // the $html content should not be empty when ajaxing a template
                 // it can be empty when ajaxing a stylesheet
-                if ( ! $is_stylesheet && empty( $html ) ) {
+                if ( !$is_stylesheet && empty( $html ) ) {
                       // return a new WP_Error that will be intercepted in sek_get_level_content_for_injection
                       $html = new \WP_Error( 'ajax_fetch_content_error', __CLASS__ . '::' . __FUNCTION__ . ' => no content returned for sek_action : ' . $sek_action );
                 }
@@ -372,7 +372,7 @@ if ( ! class_exists( 'SEK_Front_Ajax' ) ) :
         function sek_get_customize_url_for_nimble_edit_button() {
             $this->sek_do_ajax_pre_checks( array( 'check_nonce' => false ) );
 
-            if ( ! isset( $_POST['nimble_edit_post_id'] ) || empty( $_POST['nimble_edit_post_id'] ) ) {
+            if ( !isset( $_POST['nimble_edit_post_id'] ) || empty( $_POST['nimble_edit_post_id'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing post_id' );
             }
 

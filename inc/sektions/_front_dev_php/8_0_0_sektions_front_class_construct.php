@@ -1,7 +1,7 @@
 <?php
 ////////////////////////////////////////////////////////////////
 // SEK Front Class
-if ( ! class_exists( 'SEK_Front_Construct' ) ) :
+if ( !class_exists( 'SEK_Front_Construct' ) ) :
     class SEK_Front_Construct {
         static $instance;
         public $local_seks = 'not_cached';// <= used to cache the sektions for the local skope_id
@@ -37,7 +37,7 @@ if ( ! class_exists( 'SEK_Front_Construct' ) ) :
         public $rendered_levels = [];//<= stores the ids of the level rendered with ::render()
 
         public static function get_instance( $params ) {
-            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Sek_Nimble_Manager ) ) {
+            if ( !isset( self::$instance ) && !( self::$instance instanceof Sek_Nimble_Manager ) ) {
                 self::$instance = new Sek_Nimble_Manager( $params );
 
                 // this hook is used to add_action( 'nimble_front_classes_ready', array( $this, 'sek_register_nimble_global_locations') );

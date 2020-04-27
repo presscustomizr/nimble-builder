@@ -10,7 +10,7 @@
 * License: GPLv3
 * License URI: https://www.gnu.org/licenses/gpl-3.0.html
 */
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
   exit;
 }
 /* ------------------------------------------------------------------------- *
@@ -51,7 +51,7 @@ if ( version_compare( $wp_version, NIMBLE_MIN_WP_VERSION, '<' ) ) {
 
 function nimble_pass_requirements(){
   global $wp_version;
-  return ! version_compare( phpversion(), NIMBLE_MIN_PHP_VERSION, '<' ) && ! version_compare( $wp_version, NIMBLE_MIN_WP_VERSION, '<' );
+  return !version_compare( phpversion(), NIMBLE_MIN_PHP_VERSION, '<' ) && !version_compare( $wp_version, NIMBLE_MIN_WP_VERSION, '<' );
 }
 
 function nimble_display_min_php_message() {
@@ -75,7 +75,7 @@ function nimble_display_min_requirement_notice( $requires_what, $requires_what_v
 /* ------------------------------------------------------------------------- */
 add_action( 'after_setup_theme', 'nimble_load_czr_base_fmk', 10 );
 function nimble_load_czr_base_fmk() {
-    if ( ! nimble_pass_requirements() )
+    if ( !nimble_pass_requirements() )
       return;
     if ( did_action( 'nimble_base_fmk_loaded' ) ) {
         if ( ( defined( 'CZR_DEV' ) && CZR_DEV ) || ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) ) {
@@ -136,7 +136,7 @@ if ( nimble_pass_requirements() ) {
 
     // @return void()
     function nimble_register_location( $location, $params = array() ) {
-        if ( empty( $location ) || ! is_string( $location ) )
+        if ( empty( $location ) || !is_string( $location ) )
           return;
         \Nimble\register_location( $location, $params );
     }

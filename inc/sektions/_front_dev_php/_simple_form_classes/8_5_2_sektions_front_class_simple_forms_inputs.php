@@ -20,7 +20,7 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
     public function __construct( $args ) {
         //no name no party
         //TODO: raise exception
-        if ( ! isset( $args['name'] ) ) {
+        if ( !isset( $args['name'] ) ) {
             error_log( __FUNCTION__ . ' => contact form input name not set' );
             return;
         }
@@ -139,7 +139,7 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
 
 
 
-if ( ! class_exists( '\Nimble\Sek_Input_Basic' ) ) :
+if ( !class_exists( '\Nimble\Sek_Input_Basic' ) ) :
 class Sek_Input_Basic extends Sek_Input_Abstract {
 
     public function __construct( $args ) {
@@ -155,7 +155,7 @@ class Sek_Input_Basic extends Sek_Input_Abstract {
 }
 endif;
 
-if ( ! class_exists( '\Nimble\Sek_Input_Hidden' ) ) :
+if ( !class_exists( '\Nimble\Sek_Input_Hidden' ) ) :
 class Sek_Input_Hidden extends Sek_Input_Basic {
     public function __construct( $args ) {
         $args[ 'type' ]     = 'hidden';
@@ -164,7 +164,7 @@ class Sek_Input_Hidden extends Sek_Input_Basic {
 }
 endif;
 
-if ( ! class_exists( '\Nimble\Sek_Input_Text' ) ) :
+if ( !class_exists( '\Nimble\Sek_Input_Text' ) ) :
 class Sek_Input_Text extends Sek_Input_Basic {
     public function __construct( $args ) {
         $args               = is_array( $args ) ? $args : array();
@@ -185,7 +185,7 @@ class Sek_Input_Text extends Sek_Input_Basic {
 endif;
 
 
-if ( ! class_exists( '\Nimble\Sek_Input_Email' ) ) :
+if ( !class_exists( '\Nimble\Sek_Input_Email' ) ) :
 class Sek_Input_Email extends Sek_Input_Basic {
     public function __construct($args) {
         $args             = is_array( $args ) ? $args : array();
@@ -196,7 +196,7 @@ class Sek_Input_Email extends Sek_Input_Basic {
     }
 
     public function sanitize( $value ) {
-        if ( ! is_email( $value ) ) {
+        if ( !is_email( $value ) ) {
             return '';
         }
         return sanitize_email($value);
@@ -209,7 +209,7 @@ class Sek_Input_Email extends Sek_Input_Basic {
 endif;
 
 
-if ( ! class_exists( '\Nimble\Sek_Input_URL' ) ) :
+if ( !class_exists( '\Nimble\Sek_Input_URL' ) ) :
 class Sek_Input_URL extends Sek_Input_Basic {
     public function __construct($args) {
         $args             = is_array( $args ) ? $args : array();
@@ -230,7 +230,7 @@ class Sek_Input_URL extends Sek_Input_Basic {
 endif;
 
 
-if ( ! class_exists( '\Nimble\Sek_Input_Submit' ) ) :
+if ( !class_exists( '\Nimble\Sek_Input_Submit' ) ) :
 class Sek_Input_Submit extends Sek_Input_Basic {
     public function __construct($args) {
         $args             = is_array( $args ) ? $args : array();
@@ -250,7 +250,7 @@ endif;
 
 
 
-if ( ! class_exists( '\Nimble\Sek_Input_Textarea' ) ) :
+if ( !class_exists( '\Nimble\Sek_Input_Textarea' ) ) :
 class Sek_Input_Textarea extends Sek_Input_Abstract {
 
     public function __construct($args) {

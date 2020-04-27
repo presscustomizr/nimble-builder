@@ -11,7 +11,7 @@ function sek_catch_export_action( $wp_customize ) {
 // fire from sek_catch_export_action() @hook 'customize_register'
 function sek_maybe_export() {
     $nonce = 'save-customize_' . get_stylesheet();
-    if ( ! isset( $_REQUEST['sek_export_nonce'] ) ) {
+    if ( !isset( $_REQUEST['sek_export_nonce'] ) ) {
         sek_error_log( __FUNCTION__ . ' => missing nonce.');
         return;
     }
@@ -23,15 +23,15 @@ function sek_maybe_export() {
         sek_error_log( __FUNCTION__ . ' => missing active locations param.');
         return;
     }
-    if ( ! wp_verify_nonce( $_REQUEST['sek_export_nonce'], $nonce ) ) {
+    if ( !wp_verify_nonce( $_REQUEST['sek_export_nonce'], $nonce ) ) {
         sek_error_log( __FUNCTION__ . ' => invalid none.');
         return;
     }
-    if ( ! is_user_logged_in() ) {
+    if ( !is_user_logged_in() ) {
         sek_error_log( __FUNCTION__ . ' => user not logged in.');
         return;
     }
-    if ( ! current_user_can( 'customize' ) ) {
+    if ( !current_user_can( 'customize' ) ) {
         sek_error_log( __FUNCTION__ . ' => missing customize capabilities.');
         return;
     }
@@ -82,26 +82,26 @@ add_action( 'wp_ajax_sek_pre_export_checks', '\Nimble\sek_ajax_pre_export_checks
 function sek_ajax_pre_export_checks() {
     //sek_error_log('PRE EXPORT CHECKS ?', $_POST );
     $action = 'save-customize_' . get_stylesheet();
-    if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+    if ( !check_ajax_referer( $action, 'nonce', false ) ) {
         wp_send_json_error( 'check_ajax_referer_failed' );
     }
-    if ( ! is_user_logged_in() ) {
+    if ( !is_user_logged_in() ) {
         wp_send_json_error( 'user_unauthenticated' );
     }
-    if ( ! current_user_can( 'edit_theme_options' ) ) {
+    if ( !current_user_can( 'edit_theme_options' ) ) {
         wp_send_json_error( 'user_cant_edit_theme_options' );
     }
-    if ( ! current_user_can( 'customize' ) ) {
+    if ( !current_user_can( 'customize' ) ) {
         status_header( 403 );
         wp_send_json_error( 'customize_not_allowed' );
-    } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+    } else if ( !isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
         status_header( 405 );
         wp_send_json_error( 'bad_ajax_method' );
     }
-    if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+    if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
         wp_send_json_error( 'missing_skope_id' );
     }
-    if ( ! isset( $_POST['active_locations'] ) || empty( $_POST['active_locations'] ) ) {
+    if ( !isset( $_POST['active_locations'] ) || empty( $_POST['active_locations'] ) ) {
         wp_send_json_error( 'no_active_locations_to_export' );
     }
     wp_send_json_success();
@@ -152,31 +152,31 @@ function sek_ajax_get_manually_imported_file_content() {
     // sek_error_log(__FUNCTION__ . ' AJAX $_REQUEST ?', $_REQUEST );
 
     $action = 'save-customize_' . get_stylesheet();
-    if ( ! check_ajax_referer( $action, 'nonce', false ) ) {
+    if ( !check_ajax_referer( $action, 'nonce', false ) ) {
         wp_send_json_error( 'check_ajax_referer_failed' );
     }
-    if ( ! is_user_logged_in() ) {
+    if ( !is_user_logged_in() ) {
         wp_send_json_error( 'user_unauthenticated' );
     }
-    if ( ! current_user_can( 'edit_theme_options' ) ) {
+    if ( !current_user_can( 'edit_theme_options' ) ) {
         wp_send_json_error( 'user_cant_edit_theme_options' );
     }
-    if ( ! current_user_can( 'customize' ) ) {
+    if ( !current_user_can( 'customize' ) ) {
         status_header( 403 );
         wp_send_json_error( 'customize_not_allowed' );
-    } else if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+    } else if ( !isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
         status_header( 405 );
         wp_send_json_error( 'bad_ajax_method' );
     }
-    if ( ! isset( $_FILES['file_candidate'] ) || empty( $_FILES['file_candidate'] ) ) {
+    if ( !isset( $_FILES['file_candidate'] ) || empty( $_FILES['file_candidate'] ) ) {
         wp_send_json_error( 'missing_file_candidate' );
     }
-    if ( ! isset( $_POST['skope'] ) || empty( $_POST['skope'] ) ) {
+    if ( !isset( $_POST['skope'] ) || empty( $_POST['skope'] ) ) {
         wp_send_json_error( 'missing_skope' );
     }
 
     // load WP upload if not done yet
-    if ( ! function_exists( 'wp_handle_upload' ) ) {
+    if ( !function_exists( 'wp_handle_upload' ) ) {
         require_once( ABSPATH . 'wp-admin/includes/file.php' );
     }
 
@@ -227,7 +227,7 @@ function sek_ajax_get_manually_imported_file_content() {
     //     )
     // );
     // check import structure
-    if ( ! is_array( $raw_unserialized_data ) || empty( $raw_unserialized_data['data']) || !is_array( $raw_unserialized_data['data'] ) || empty( $raw_unserialized_data['metas'] ) || !is_array( $raw_unserialized_data['metas'] ) ) {
+    if ( !is_array( $raw_unserialized_data ) || empty( $raw_unserialized_data['data']) || !is_array( $raw_unserialized_data['data'] ) || empty( $raw_unserialized_data['metas'] ) || !is_array( $raw_unserialized_data['metas'] ) ) {
         unlink( $file['file'] );
         wp_send_json_error(  'invalid_import_content' );
         return;
@@ -305,7 +305,7 @@ function sek_ajax_process_template_file_content() {
 
     //$raw_unserialized_data = @unserialize( $raw );
     $raw_unserialized_data = json_decode( wp_unslash( $_POST['template_data'] ), true );
-    if ( ! is_array( $raw_unserialized_data ) ) {
+    if ( !is_array( $raw_unserialized_data ) ) {
         wp_send_json_error( __FUNCTION__ . ' => invalid_template_data' );
     }
 
@@ -323,7 +323,7 @@ function sek_ajax_process_template_file_content() {
     //     )
     // );
     // check import structure
-    if ( ! is_array( $raw_unserialized_data ) || empty( $raw_unserialized_data['data']) || !is_array( $raw_unserialized_data['data'] ) || empty( $raw_unserialized_data['metas'] ) || !is_array( $raw_unserialized_data['metas'] ) ) {
+    if ( !is_array( $raw_unserialized_data ) || empty( $raw_unserialized_data['data']) || !is_array( $raw_unserialized_data['data'] ) || empty( $raw_unserialized_data['metas'] ) || !is_array( $raw_unserialized_data['metas'] ) ) {
         wp_send_json_error(  'invalid_import_content' );
         return;
     }

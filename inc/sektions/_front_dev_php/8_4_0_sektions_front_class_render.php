@@ -1,5 +1,5 @@
 <?php
-if ( ! class_exists( 'SEK_Front_Render' ) ) :
+if ( !class_exists( 'SEK_Front_Render' ) ) :
     class SEK_Front_Render extends SEK_Front_Assets_Customizer_Preview {
         // Fired in __construct()
         function _schedule_front_rendering() {
@@ -82,7 +82,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // Encapsulate the singular post / page content so we can generate a dynamic ui around it when customizing
         // @filter the_content::NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY
         function sek_wrap_wp_content( $html ) {
-            if ( ! skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) )
+            if ( !skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) )
               return $html;
             if ( is_singular() && in_the_loop() && is_main_query() ) {
                 global $post;
@@ -144,7 +144,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                             // and in Customizr-Pro/Hueman-Pro infinite scroll code. They both use the same $_GET var too.
                             // Actually this is not needed anymore for our themes, see:
                             // https://github.com/presscustomizr/nimble-builder/issues/228#issuecomment-449362111
-                            if ( ! ( apply_filters( 'infinite_scroll_got_infinity', isset( $_GET[ 'infinity' ] ) ) ) ) {
+                            if ( !( apply_filters( 'infinite_scroll_got_infinity', isset( $_GET[ 'infinity' ] ) ) ) ) {
                                 add_action( $location_id, array( $this, 'sek_schedule_sektions_rendering' ), $params['priority'] );
                             }
                         break;
@@ -175,7 +175,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             // query object is passed by reference
             // accidentally this would also fix the same point 1. of the same issue if the 'sek_schedule_rendering_hooks' method will be fired
             // with an early hook (earlier than wp_head).
-            if ( is_object( $query ) && is_a( $query, 'WP_Query' ) && ! $query->is_main_query() ) {
+            if ( is_object( $query ) && is_a( $query, 'WP_Query' ) && !$query->is_main_query() ) {
                 return;
             }
 
@@ -239,7 +239,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         public function _render_seks_for_location( $location_id = '', $location_data = array(), $skope_id = '' ) {
             $all_locations = sek_get_locations();
 
-            if ( ! array_key_exists( $location_id, $all_locations ) ) {
+            if ( !array_key_exists( $location_id, $all_locations ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location_id . ' is not registered in sek_get_locations()');
                 return;
             }
@@ -293,16 +293,16 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // Note that a location can be rendered only once in a given page.
         // That's why we need to check if did_action(''), like in ::sek_schedule_sektions_rendering
         function render_nimble_locations( $locations, $options = array() ) {
-            if ( is_string( $locations ) && ! empty( $locations ) ) {
+            if ( is_string( $locations ) && !empty( $locations ) ) {
                 $locations = array( $locations );
             }
-            if ( ! is_array( $locations ) ) {
+            if ( !is_array( $locations ) ) {
                 sek_error_log( __FUNCTION__ . ' error => missing or invalid locations provided');
                 return;
             }
 
             // Normalize the $options
-            $options = ! is_array( $options ) ? array() : $options;
+            $options = !is_array( $options ) ? array() : $options;
             $options = wp_parse_args( $options, array(
                 // fallback_location => the location rendered even if empty.
                 // This way, the user starts customizing with only one location for the content instead of four
@@ -321,7 +321,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             //sek_error_log( __FUNCTION__ . ' sek_get_skoped_seks(  ', sek_get_skoped_seks() );
 
             foreach( $locations as $location_id ) {
-                if ( ! is_string( $location_id ) || empty( $location_id ) ) {
+                if ( !is_string( $location_id ) || empty( $location_id ) ) {
                     sek_error_log( __FUNCTION__ . ' => error => a location_id is not valid in the provided locations', $locations );
                     continue;
                 }
@@ -338,11 +338,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 $skope_id = $is_global ? NIMBLE_GLOBAL_SKOPE_ID : skp_get_skope_id();
                 $locationSettingValue = sek_get_skoped_seks( $skope_id, $location_id );
                 //sek_error_log('$locationSettingValue ??? => ' . $location_id, $locationSettingValue );
-                if ( ! is_null( $options[ 'fallback_location' ]) ) {
+                if ( !is_null( $options[ 'fallback_location' ]) ) {
                     // We don't need to render the locations with no sections
                     // But we need at least one location : let's always render loop_start.
                     // => so if the user switches from the nimble_template to the default theme one, the loop_start section will always be rendered.
-                    if ( $options[ 'fallback_location' ] === $location_id || ( is_array( $locationSettingValue ) && ! empty( $locationSettingValue['collection'] ) ) ) {
+                    if ( $options[ 'fallback_location' ] === $location_id || ( is_array( $locationSettingValue ) && !empty( $locationSettingValue['collection'] ) ) ) {
                         do_action( "sek_before_location_{$location_id}" );
                         Nimble_Manager()->_render_seks_for_location( $location_id, $locationSettingValue );
                         do_action( "sek_after_location_{$location_id}" );
@@ -371,24 +371,24 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             //sek_error_log('LEVEL MODEL IN ::RENDER()', $model );
             // Is it the root level ?
             // The root level has no id and no level entry
-            if ( ! is_array( $model ) ) {
+            if ( !is_array( $model ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => a model must be an array', $model );
                 return;
             }
-            if ( ! array_key_exists( 'level', $model ) || ! array_key_exists( 'id', $model ) ) {
+            if ( !array_key_exists( 'level', $model ) || !array_key_exists( 'id', $model ) ) {
                 error_log( '::render() => a level model is missing the level or the id property' );
                 return;
             }
             // The level "id" is a string not empty
             $id = $model['id'];
-            if ( ! is_string( $id ) || empty( $id ) ) {
+            if ( !is_string( $id ) || empty( $id ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => a level id must be a string not empty', $model );
                 return;
             }
 
             // The level "level" can take 4 values : location, section, column, module
             $level_type = $model['level'];
-            if ( ! is_string( $level_type ) || empty( $level_type ) ) {
+            if ( !is_string( $level_type ) || empty( $level_type ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => a level type must be a string not empty', $model );
                 return;
             }
@@ -449,7 +449,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                     // NOTE : empty sektions wrapper are only printed when customizing
                     ?>
-                      <?php if ( skp_is_customizing() || ( ! skp_is_customizing() && ! empty( $collection ) ) ) : ?>
+                      <?php if ( skp_is_customizing() || ( !skp_is_customizing() && !empty( $collection ) ) ) : ?>
                             <?php
                               Nimble_Manager()->page_has_nimble_content = true;
                               printf( '<div class="sektion-wrapper %6$s" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s %5$s>',
@@ -670,7 +670,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
                     $module_type = $model['module_type'];
 
-                    if ( ! CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
+                    if ( !CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
                         sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => module_type not registered', $module_type );
                         break;
                     }
@@ -788,7 +788,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // @see sek_add_css_rules_for_level_visibility()
         // @return string
         private function get_level_visibility_css_class( $model ) {
-            if ( ! is_array( $model ) ) {
+            if ( !is_array( $model ) ) {
                 error_log( __FUNCTION__ . ' => $model param should be an array' );
                 return;
             }
@@ -863,7 +863,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
          * ( filtered by wp core when invoked in customize-preview )
          */
         function get_unfiltered_edit_post_link( $id = 0, $context = 'display' ) {
-            if ( ! $post = get_post( $id ) )
+            if ( !$post = get_post( $id ) )
               return;
 
             if ( 'revision' === $post->post_type )
@@ -895,7 +895,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             $skope_id = skp_get_skope_id();
             $skoped_seks = sek_get_skoped_seks( $skope_id );
 
-            if ( ! is_array( $skoped_seks ) || empty( $skoped_seks['collection'] ) )
+            if ( !is_array( $skoped_seks ) || empty( $skoped_seks['collection'] ) )
               return;
 
             $enqueueing_candidates = $this->sek_sniff_assets_to_enqueue( $skoped_seks['collection'] );
@@ -931,11 +931,11 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
         // @hook sek_sniff_assets_to_enqueue
         function sek_sniff_assets_to_enqueue( $collection, $enqueuing_candidates = array() ) {
             foreach ( $collection as $level_data ) {
-                if ( array_key_exists( 'level', $level_data ) && 'module' === $level_data['level'] && ! empty( $level_data['module_type'] ) ) {
+                if ( array_key_exists( 'level', $level_data ) && 'module' === $level_data['level'] && !empty( $level_data['module_type'] ) ) {
                     $front_assets = sek_get_registered_module_type_property( $level_data['module_type'], 'front_assets' );
                     if ( is_array( $front_assets ) ) {
                         foreach ( $front_assets as $handle => $asset_params ) {
-                            if ( is_string( $handle ) && ! array_key_exists( $handle, $enqueuing_candidates ) ) {
+                            if ( is_string( $handle ) && !array_key_exists( $handle, $enqueuing_candidates ) ) {
                                 $enqueuing_candidates[ $handle ] = $asset_params;
                             }
                         }
@@ -978,7 +978,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
 
 
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
-                $bg_options = ( ! empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
+                $bg_options = ( !empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
                 if ( !empty( $bg_options[ 'bg-image'] ) ) {
                     $bg_image_id_or_url = $bg_options[ 'bg-image'];
                     // April 2020 :
@@ -1089,7 +1089,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             //   return $html;
             if ( !sek_is_img_smartload_enabled() )
               return $html;
-            if ( ! is_string( $html ) ) {
+            if ( !is_string( $html ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => provided html is not a string', $html );
                 return $html;
             }
@@ -1110,7 +1110,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
                 'svgz'
             ) );
 
-            if ( empty( $allowed_image_extensions ) || ! is_array( $allowed_image_extensions ) ) {
+            if ( empty( $allowed_image_extensions ) || !is_array( $allowed_image_extensions ) ) {
               return $html;
             }
 
@@ -1321,7 +1321,7 @@ if ( ! class_exists( 'SEK_Front_Render' ) ) :
             global $wp_query;
 
             $query_vars = $wp_query->query_vars;
-            if ( ! is_array( $query_vars ) || empty( $query_vars['s'] ) )
+            if ( !is_array( $query_vars ) || empty( $query_vars['s'] ) )
               return;
 
             // Search query on Nimble CPT

@@ -4,7 +4,7 @@
 /* ------------------------------------------------------------------------- */
 // @return array
 function sek_get_locations() {
-    if ( ! is_array( Nimble_Manager()->registered_locations ) ) {
+    if ( !is_array( Nimble_Manager()->registered_locations ) ) {
         sek_error_log( __FUNCTION__ . ' error => the registered locations must be an array');
         return Nimble_Manager()->default_locations;
     }
@@ -31,7 +31,7 @@ function sek_get_local_content_locations() {
             if ( true === $loc_data['is_header_location'] || true === $loc_data['is_footer_location'] )
               continue;
 
-            if ( ! sek_is_global_location( $loc_id ) ) {
+            if ( !sek_is_global_location( $loc_id ) ) {
                 $locations[$loc_id] = $loc_data;
             }
         }
@@ -65,23 +65,23 @@ function sek_get_registered_location_property( $location_id, $property_name = ''
     $all_locations = sek_get_locations();
     $default_property_val = 'not_set';
     //sek_error_log( __FUNCTION__ .' => locations ?',  $all_locations );
-    if ( ! isset( $all_locations[$location_id] ) || ! is_array( $all_locations[$location_id] ) ) {
+    if ( !isset( $all_locations[$location_id] ) || !is_array( $all_locations[$location_id] ) ) {
         sek_error_log( __FUNCTION__ . ' error => the location ' . $location_id . ' is invalid or not registered.');
         return $default_property_val;
     }
 
-    if ( empty( $property_name ) || ! is_string( $property_name ) ) {
+    if ( empty( $property_name ) || !is_string( $property_name ) ) {
         sek_error_log( __FUNCTION__ . ' error => the requested property for location ' . $location_id . ' is invalid');
         return $default_property_val;
     }
 
     $location_params = wp_parse_args( $all_locations[$location_id], Nimble_Manager()->default_registered_location_model );
-    return ! empty( $location_params[$property_name] ) ? $location_params[$property_name] : $default_property_val;
+    return !empty( $location_params[$property_name] ) ? $location_params[$property_name] : $default_property_val;
 }
 
 // @return bool
 function sek_is_global_location( $location_id ) {
-    if ( ! is_string( $location_id ) || empty( $location_id ) ) {
+    if ( !is_string( $location_id ) || empty( $location_id ) ) {
         sek_error_log( __FUNCTION__ . ' error => missing or invalid location_id param' );
         return false;
     }
@@ -114,9 +114,9 @@ function sek_get_default_location_model( $skope_id = null ) {
     }
     foreach( sek_get_locations() as $location_id => $params ) {
         $is_global_location = sek_is_global_location( $location_id );
-        if ( $is_global_skope && ! $is_global_location )
+        if ( $is_global_skope && !$is_global_location )
           continue;
-        if ( ! $is_global_skope && $is_global_location )
+        if ( !$is_global_skope && $is_global_location )
           continue;
 
         $location_model = wp_parse_args( [ 'id' => $location_id ], Nimble_Manager()->default_location_model );

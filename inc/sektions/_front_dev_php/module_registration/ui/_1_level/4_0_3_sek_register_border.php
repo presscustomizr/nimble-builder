@@ -100,22 +100,22 @@ function sek_add_css_rules_for_border( $rules, $level ) {
     //     [shadow] => 0
     // )
     $default_value_model  = sek_get_default_module_model( 'sek_level_border_module' );
-    $normalized_border_options = ( ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
+    $normalized_border_options = ( !empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
     $normalized_border_options = wp_parse_args( $normalized_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
     if ( empty( $normalized_border_options ) )
       return $rules;
 
-    $border_settings = ! empty( $normalized_border_options[ 'borders' ] ) ? $normalized_border_options[ 'borders' ] : FALSE;
+    $border_settings = !empty( $normalized_border_options[ 'borders' ] ) ? $normalized_border_options[ 'borders' ] : FALSE;
     $border_type = $normalized_border_options[ 'border-type' ];
-    $has_border_settings  = FALSE !== $border_settings && is_array( $border_settings ) && ! empty( $border_type ) && 'none' != $border_type;
+    $has_border_settings  = FALSE !== $border_settings && is_array( $border_settings ) && !empty( $border_type ) && 'none' != $border_type;
 
     //border width + type + color
     if ( $has_border_settings ) {
         $rules = sek_generate_css_rules_for_multidimensional_border_options( $rules, $border_settings, $border_type, '[data-sek-id="'.$level['id'].'"]'  );
     }
 
-    $has_border_radius = ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) && !empty( $options[ 'border' ]['border-radius'] );
+    $has_border_radius = !empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) && !empty( $options[ 'border' ]['border-radius'] );
     if ( $has_border_radius ) {
         $radius_settings = $normalized_border_options['border-radius'];
         $rules = sek_generate_css_rules_for_border_radius_options( $rules, $normalized_border_options['border-radius'], '[data-sek-id="'.$level['id'].'"]' );
@@ -144,7 +144,7 @@ function sek_add_css_rules_for_boxshadow( $rules, $level ) {
     //     [shadow] => 0
     // )
     $default_value_model  = sek_get_default_module_model( 'sek_level_border_module' );
-    $normalized_border_options = ( ! empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
+    $normalized_border_options = ( !empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
     $normalized_border_options = wp_parse_args( $normalized_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
 
     if ( empty( $normalized_border_options) )

@@ -82,8 +82,8 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
         return;
     }
 
-    if ( ! is_int( $post_id ) ) {
-        error_log( 'sek_get_seks_post => post_id ! is_int() for options => ' . $option_name );
+    if ( !is_int( $post_id ) ) {
+        error_log( 'sek_get_seks_post => post_id !is_int() for options => ' . $option_name );
     }
 
     if ( is_int( $post_id ) && $post_id > 0 && get_post( $post_id ) ) {
@@ -91,7 +91,7 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
     }
 
     // `-1` indicates no post exists; no query necessary.
-    if ( ! $post && -1 !== $post_id ) {
+    if ( !$post && -1 !== $post_id ) {
         $query = new \WP_Query( $sek_post_query_vars );
         $post = $query->post;
         $post_id = $post ? $post->ID : -1;
@@ -138,7 +138,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         }
     }
 
-    if ( ! $is_cached ) {
+    if ( !$is_cached ) {
         $seks_data = array();
         $post = sek_get_seks_post( $skope_id, $is_global_skope ? 'global' : 'local' );
         if ( $post ) {
@@ -161,7 +161,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
 
         foreach( sek_get_locations() as $loc_id => $params ) {
             if ( !in_array( $loc_id, $maybe_incomplete_locations ) ) {
-                if ( ( sek_is_global_location( $loc_id ) && $is_global_skope ) || ( ! sek_is_global_location( $loc_id ) && ! $is_global_skope  ) ) {
+                if ( ( sek_is_global_location( $loc_id ) && $is_global_skope ) || ( !sek_is_global_location( $loc_id ) && !$is_global_skope  ) ) {
                     $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], Nimble_Manager()->default_location_model );
                 }
             }
@@ -185,8 +185,8 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
 
     // sek_error_log( '<sek_get_skoped_seks() location => ' . $location .  array_key_exists( 'collection', $seks_data ), $seks_data );
     // if a location is specified, return specifically the sections of this location
-    if ( array_key_exists( 'collection', $seks_data ) && ! empty( $location_id ) ) {
-        if ( ! array_key_exists( $location_id, sek_get_locations() ) ) {
+    if ( array_key_exists( 'collection', $seks_data ) && !empty( $location_id ) ) {
+        if ( !array_key_exists( $location_id, sek_get_locations() ) ) {
             error_log( __FUNCTION__ . ' Error => location ' . $location_id . ' is not registered in the available locations' );
         } else {
             $seks_data = sek_get_level_model( $location_id, $seks_data['collection'] );
@@ -212,7 +212,7 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
         'skope_id' => ''
     ) );
 
-    if ( ! is_array( $seks_data ) ) {
+    if ( !is_array( $seks_data ) ) {
         error_log( 'sek_update_sek_post => $seks_data is not an array' );
         return new \WP_Error( 'sek_update_sek_post => $seks_data is not an array');
     }
@@ -241,7 +241,7 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
         $r = wp_update_post( wp_slash( $post_data ), true );
     } else {
         $r = wp_insert_post( wp_slash( $post_data ), true );
-        if ( ! is_wp_error( $r ) ) {
+        if ( !is_wp_error( $r ) ) {
             $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
             $post_id = $r;//$r is the post ID
 

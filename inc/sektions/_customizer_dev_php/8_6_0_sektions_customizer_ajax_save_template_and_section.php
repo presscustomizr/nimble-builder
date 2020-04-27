@@ -15,16 +15,16 @@ function sek_ajax_save_user_template() {
     if ( empty( $_POST['tmpl_title']) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_template_title' );
     }
-    // if ( ! isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+    // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
     //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
     // }
     if ( empty( $_POST['tmpl_data']) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_template_data' );
     }
-    if ( ! is_string( $_POST['tmpl_data'] ) ) {
+    if ( !is_string( $_POST['tmpl_data'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_template_data_must_be_a_json_stringified' );
     }
-    if ( ! is_string( $_POST['tmpl_description'] ) ) {
+    if ( !is_string( $_POST['tmpl_description'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_template_description_must_be_a_string' );
     }
     // sek_error_log('SEKS DATA ?', $_POST['sek_data'] );
@@ -97,7 +97,7 @@ function sek_ajax_save_section() {
     if ( empty( $_POST['sek_data']) ) {
         wp_send_json_error( __FUNCTION__ . ' => missing sektion data' );
     }
-    if ( ! is_string( $_POST['sek_data'] ) ) {
+    if ( !is_string( $_POST['sek_data'] ) ) {
         wp_send_json_error( __FUNCTION__ . ' => the sektion data must be a json stringified' );
     }
     // sek_error_log('SEKS DATA ?', $_POST['sek_data'] );
@@ -130,17 +130,17 @@ function sek_sek_get_user_saved_sections() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 
     // We must have a section_id provided
-    if ( empty( $_POST['preset_section_id']) || ! is_string( $_POST['preset_section_id'] ) ) {
+    if ( empty( $_POST['preset_section_id']) || !is_string( $_POST['preset_section_id'] ) ) {
         wp_send_json_error( __FUNCTION__ . ' => missing or invalid preset_section_id' );
     }
     $section_id = $_POST['preset_section_id'];
 
     $section_data_decoded_from_custom_post_type = sek_get_saved_sektion_data( $section_id );
-    if ( ! empty( $section_data_decoded_from_custom_post_type ) ) {
+    if ( !empty( $section_data_decoded_from_custom_post_type ) ) {
         wp_send_json_success( $section_data_decoded_from_custom_post_type );
     } else {
         $all_saved_seks = get_option( NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS );
-        if ( ! is_array( $all_saved_seks ) || empty( $all_saved_seks[$section_id]) ) {
+        if ( !is_array( $all_saved_seks ) || empty( $all_saved_seks[$section_id]) ) {
             sek_error_log( __FUNCTION__ . ' => missing section data in get_option( NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS )' );
         }
         // $section_infos is an array

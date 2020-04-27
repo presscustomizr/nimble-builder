@@ -1,11 +1,11 @@
 <?php
 /* Developers : you can override this template from a theme with a file that has this path : 'nimble_templates/modules/{original-module-template-file-name}.php' */
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 
-if ( ! function_exists( 'Nimble\sek_print_social_links' ) ) {
+if ( !function_exists( 'Nimble\sek_print_social_links' ) ) {
   function sek_print_social_links( $icons_collection, $icons_style ) {
       // Add more protocols to be allowed as safe urls. See: https://github.com/presscustomizr/nimble-builder/issues/461:wq
       $allowed_protocols =  array_merge( (array) wp_allowed_protocols(), array( 'skype', 'callto' ) );
@@ -28,7 +28,7 @@ if ( ! function_exists( 'Nimble\sek_print_social_links' ) ) {
               $item = wp_parse_args( $item, $default_item );
 
               $social_link = 'javascript:void(0)';
-              if ( isset($item['link']) && ! empty( $item['link'] ) ) {
+              if ( isset($item['link']) && !empty( $item['link'] ) ) {
                   $social_link = esc_url( $item['link'], $allowed_protocols );
               }
 
@@ -43,9 +43,9 @@ if ( ! function_exists( 'Nimble\sek_print_social_links' ) ) {
                   esc_attr( $item['title_attr'] ),
                   $social_link,
                   implode( ' ', $link_attr ),
-                  ( ( empty( $item['icon'] ) || ! is_string( $item['icon'] ) ) && skp_is_customizing() ) ? '<i class="material-icons">pan_tool</i>' : '<i class="sek-social-icon ' . $item['icon'] .'"></i>',
+                  ( ( empty( $item['icon'] ) || !is_string( $item['icon'] ) ) && skp_is_customizing() ) ? '<i class="material-icons">pan_tool</i>' : '<i class="sek-social-icon ' . $item['icon'] .'"></i>',
                   $item['id'],
-                  ( empty( $item['icon'] ) || ! is_string( $item['icon'] ) ) ? 'social-link' : $item['icon']
+                  ( empty( $item['icon'] ) || !is_string( $item['icon'] ) ) ? 'social-link' : $item['icon']
               );
           }//foreach
       echo '</ul>';

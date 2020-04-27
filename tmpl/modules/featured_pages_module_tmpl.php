@@ -1,7 +1,7 @@
 <?php
 /* Developers : you can override this template from a theme with a file that has this path : 'nimble_templates/modules/{original-module-template-file-name}.php' */
 namespace Nimble;
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 // this.defaultItemModel = {
@@ -109,21 +109,21 @@ $fp_col_suffix  = isset( $fp_col_map[$fp_per_row] ) ? $fp_col_map[$fp_per_row] :
 * and at least one [page-id][id] must be numeric or _custom_, and in this case [padge-id][url] must be set?
 */
 
-if ( ! function_exists( 'Nimble\sek_fp_is_fp_set' ) ) :
+if ( !function_exists( 'Nimble\sek_fp_is_fp_set' ) ) :
     function sek_fp_is_fp_set( array $fp ) {
-        return ( ! empty( $fp[ 'page-id' ]['id'] ) &&
+        return ( !empty( $fp[ 'page-id' ]['id'] ) &&
             ( sek_fp_can_be_wp_page( $fp ) || sek_fp_is_custom( $fp ) ) );
     }
 endif;
 
 
-if ( ! function_exists( 'Nimble\sek_fp_is_custom' ) ) :
+if ( !function_exists( 'Nimble\sek_fp_is_custom' ) ) :
     function sek_fp_is_custom( array $fp ) {
         return ( '_custom_' == $fp[ 'page-id' ]['id'] && esc_url( $fp[ 'page-id' ]['url'] ) );
     }
 endif;
 
-if ( ! function_exists( 'Nimble\sek_fp_can_be_wp_page' ) ) :
+if ( !function_exists( 'Nimble\sek_fp_can_be_wp_page' ) ) :
     function sek_fp_can_be_wp_page( array $fp ) {
         return is_numeric( $fp[ 'page-id' ]['id'] );
     }
@@ -156,7 +156,7 @@ endif;
             $is_custom_url   = false;
             $is_wp_post_type = false;
 
-            if ( ! empty( $fp[ 'page-id' ]['id'] ) ) {
+            if ( !empty( $fp[ 'page-id' ]['id'] ) ) {
                 $is_custom_url    = sek_fp_is_custom( $fp ) ;
                 $is_wp_post_type  = !$is_custom_url && sek_fp_can_be_wp_page( $fp ) && $page = get_post($fp[ 'page-id' ][ 'id' ]);
 
@@ -171,7 +171,7 @@ endif;
                 //IMAGE
                 switch ( $fp[ 'img-type' ] ) {
                     case 'custom':
-                                if ( ! empty( $fp[ 'img-id' ] ) ) {
+                                if ( !empty( $fp[ 'img-id' ] ) ) {
                                    $fp_image         =  wp_get_attachment_image( $fp[ 'img-id' ], $fp['img-size'] );
                                    break;
                                 }

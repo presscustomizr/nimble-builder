@@ -3,14 +3,14 @@
 *&
 *
 */
-if ( ! class_exists( '\Nimble\Sek_Form' ) ) :
+if ( !class_exists( '\Nimble\Sek_Form' ) ) :
 class Sek_Form {
     private $fields;
     private $attributes;
 
     // Sek_Form is instantiated from Sek_Simple_Form::simple_form_generate_form
     //$form   = new Sek_Form( [
-    //     'action' => is_array( $module_model ) && ! empty( $module_model['id']) ? $module_model['id'] :'#',
+    //     'action' => is_array( $module_model ) && !empty( $module_model['id']) ? $module_model['id'] :'#',
     //     'method' => 'post'
     // ] );
     public function __construct( $args = array() ) {
@@ -57,10 +57,10 @@ class Sek_Form {
             $filter       = $input->get_data( 'filter' );
             $can_be_empty = true !== $input->get_data( 'required' );
 
-            if ( $can_be_empty && ! $value ) {
+            if ( $can_be_empty && !$value ) {
                 continue;
             }
-            if ( $filter && ! filter_var( $value, $filter ) ) {
+            if ( $filter && !filter_var( $value, $filter ) ) {
                 $has_invalid_field = $input->get_data('label');
                 break;
             }
@@ -112,7 +112,7 @@ endif;
 *
 * label and/or wrapper + input field
 */
-if ( ! class_exists( '\Nimble\Sek_Field' ) ) :
+if ( !class_exists( '\Nimble\Sek_Field' ) ) :
 class Sek_Field {
     private $input;
     private $data;
