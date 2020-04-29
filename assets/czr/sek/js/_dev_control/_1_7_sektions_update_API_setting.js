@@ -525,8 +525,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // start from a deep cloned object
                                           // important => fixes https://github.com/presscustomizr/nimble-builder/issues/455
                                           var _new_options_values = $.extend( true, {}, _candidate_.options || {} );
-
-                                          _new_options_values.width = _.isObject( _new_options_values.width ) ? _new_options_values.width : {};
+                                          // april 2020 : due to a previous implementation of width option as an array, there could be a bug when trying to set the width
+                                          // because the check on _.isObject() was true for an array
+                                          // Fixes https://github.com/presscustomizr/nimble-builder/issues/620
+                                          _new_options_values.width = ( _.isObject( _new_options_values.width ) && _new_options_values.width['custom-width'] ) ? _new_options_values.width : {};
                                           _new_options_values.width['custom-width'] = newWidthValue;
                                           _candidate_.options = _new_options_values;
 
@@ -534,11 +536,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           self.cachedElements.$body.find('[data-sek-width-range-column-id="'+ _candidate_.id +'"]').val( newWidthValue ).trigger('input', { is_resize_column_trigger : true } );
                                           return newWidthValue;
                                     };
-                                    ///
-
 
                                     // DEPRECATED SINCE JUNE 2019 => resizedColumn.width = parseFloat( params.resizedColumnWidthInPercent );
-
                                     var resizedColumnWidthInPercent = _setColumnWidth( resizedColumn, parseFloat( params.resizedColumnWidthInPercent ) );
                                     // cast to number
                                     resizedColumnWidthInPercent = parseFloat( resizedColumnWidthInPercent );
