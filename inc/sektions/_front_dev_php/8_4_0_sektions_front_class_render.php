@@ -1415,6 +1415,8 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'nimble_is_content_restricted', array( $this, 'sek_is_content_restricted_by_paidmembershippro_plugin') );
             // Compatibility with WP Members
             add_filter( 'nimble_is_content_restricted', array( $this, 'sek_is_content_restricted_by_wp_members_plugin') );
+            // Compatibility with Simple Membership plugin
+            add_filter( 'nimble_is_content_restricted', array( $this, 'sek_is_content_restricted_by_simple_membership_plugin') );
         }
 
         // hook : 'wp'
@@ -1476,11 +1478,36 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         function sek_is_content_restricted_by_paidmembershippro_plugin( $bool ) {
             if ( !function_exists('pmpro_has_membership_access') )
               return $bool;
-            $hasaccess = pmpro_has_membership_access(NULL, NULL, true);
-            if ( is_array($hasaccess) ){
+            $hasaccess = pmpro_has_membership_access( NULL, NULL, true );
+            if ( is_array( $hasaccess ) ){
                 $hasaccess = $hasaccess[0];
             }
             return !$hasaccess;
+        }
+
+        // hook : 'nimble_is_content_restricted'
+        // Compatibility with Simple WP Membership Protection plugin
+        // for #685
+        function sek_is_content_restricted_by_simple_membership_plugin( $bool ) {
+            if ( !class_exists('\SwpmAccessControl') || !class_exists('\SwpmUtils') || !is_singular() )
+              return $bool;
+
+            $acl = \SwpmAccessControl::get_instance();
+            global $post;
+            if ( $acl->expired_user_has_access_to_this_page() ) {
+                return false;
+            }
+            $content = '';
+            if( \SwpmUtils::is_first_click_free($content) ) {
+                return false;
+            }
+            if ( !method_exists($acl, 'can_i_read_post') )
+              return false;
+            if( $acl->can_i_read_post($post) ) {
+                return false;
+            }
+            // Content is protected
+            return true;
         }
 
         // hook : 'nimble_is_content_restricted'
