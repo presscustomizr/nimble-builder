@@ -7,8 +7,6 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             if ( !defined( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY" ) ) { define( "NIMBLE_AFTER_CONTENT_FILTER_PRIORITY", PHP_INT_MAX ); }
             if ( !defined( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY" ) ) { define( "NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY", - PHP_INT_MAX ); }
 
-            add_action( 'wp', array( $this, 'sek_set_password_protection_status') );
-
             // Fires after 'wp' and before the 'get_header' template file is loaded.
             add_action( 'template_redirect', array( $this, 'sek_schedule_rendering_hooks') );
 
@@ -41,42 +39,9 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             // INCLUDE NIMBLE CONTENT IN SEARCH RESULTS
             add_action( 'wp_head', array( $this, 'sek_maybe_include_nimble_content_in_search_results' ) );
 
-            // PASSWORD FORM : make the wp pwd form is rendered only one time in a singular ( see #673 and #679 )
-            add_action( 'the_password_form', array( $this, 'sek_maybe_empty_password_form' ), PHP_INT_MAX );
+            // PASSWORD FORM AND CONTENT RESTRICTION ( PLUGINS )
+            $this->sek_schedule_content_restriction_actions();
         }//_schedule_front_rendering()
-
-        // hook : 'wp'
-        // april 2020 for #673 and #679
-        // @return void
-        function sek_set_password_protection_status() {
-            Nimble_Manager()->is_page_password_protected = is_singular() && post_password_required();
-        }
-
-        // hook : 'the_password_form'@PHP_INT_MAX documented in wp-includes/post-template.php
-        // Empty the password form if it's been already rendered, either in the WP content or in a Nimble location before the content.
-        // april 2020 for see #673 and #679
-        // @return html output for the form
-        function sek_maybe_empty_password_form( $output ) {
-            // bail if there's no local Nimble section in the page
-            if ( !sek_local_skope_has_nimble_sections( skp_get_skope_id() ) )
-              return $output;
-
-            if ( skp_is_customizing() || !post_password_required() )
-              return $output;
-
-            if ( is_singular() && post_password_required() ) {
-                if ( !did_action('nimble_wp_pwd_form_rendered') ) {
-                    // fire an action => we know the password form has been rendered so we won't have to render it several times
-                    // see ::render() location
-                    do_action('nimble_wp_pwd_form_rendered');
-                    return $output;
-                } else {
-                    // Empty the form if it's been already rendered, either in the WP content or in a Nimble location before the content.
-                    return '';
-                }
-            }
-            return $output;
-        }
 
 
         // Encapsulate the singular post / page content so we can generate a dynamic ui around it when customizing
@@ -438,14 +403,19 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     // If the page/post is password protect, and this is not a header or footer location,
                     // => stop the recursive walker here and print the password form
                     // for https://github.com/presscustomizr/nimble-builder/issues/673
-                    // Nimble_Manager()->is_page_password_protected is set at 'wp', see ::sek_maybe_empty_password_form
+                    // Nimble_Manager()->is_content_restricted is set at 'wp', see ::sek_maybe_empty_password_form
 
                     // 1) we want to protect content added with Nimble Builder, but not if header or footer
                     // 2) we want to apply the protection on front, not when customizing
                     // 3) we need to check if the single page or post is password protected
                     // 4) we don't want to render the password form multiple times
-                    $is_password_protection_active_for_location = !skp_is_customizing() && Nimble_Manager()->is_page_password_protected && !$is_header_location && !$is_footer_location;
-                    $is_password_form_needed = $is_password_protection_active_for_location && !did_action('nimble_wp_pwd_form_rendered');
+                    $has_content_restriction_for_location = Nimble_Manager()->is_content_restricted && !$is_header_location && !$is_footer_location;
+                    $location_needs_css_class_to_style_password_form = false;
+
+                    if ( $has_content_restriction_for_location ) {
+                        // in the case of the built-in WP password form, we only print it once, so we don't need to add the CSS class to each locations
+                        $location_needs_css_class_to_style_password_form = !did_action('nimble_wp_pwd_form_rendered');
+                    }
 
                     // NOTE : empty sektions wrapper are only printed when customizing
                     ?>
@@ -458,12 +428,13 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                                   $is_header_location ? 'data-sek-is-header-location="true"' : '',
                                   $is_footer_location ? 'data-sek-is-footer-location="true"' : '',
                                   $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
-                                  $is_password_form_needed ? 'sek-password-protected' : ''//<= added for #673
+                                  $location_needs_css_class_to_style_password_form ? 'sek-password-protected' : ''//<= added for #673
                               );
                             ?>
                             <?php
-                              if ( $is_password_protection_active_for_location ) {
-                                  echo get_the_password_form();//<= we filter the output of this function to maybe empty and fire the action 'nimble_wp_pwd_form_rendered'
+                              if ( $has_content_restriction_for_location ) {
+                                  // april 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/685
+                                  do_action('nimble_content_restriction_for_location', $model );
                               } else {
                                   $this->parent_model = $model;
                                   foreach ( $collection as $_key => $sec_model ) { $this->render( $sec_model ); }
@@ -1419,6 +1390,97 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
 
               }
               return $this->preview_level_guid;
+        }
+
+
+
+
+
+        /* ------------------------------------------------------------------------- *
+         *  CONTENT RESTRICTION
+        /* ------------------------------------------------------------------------- */
+
+        // fired in _schedule_front_rendering()
+        // PASSWORD FORM AND CONTENT RESTRICTION ( PLUGINS )
+        // - built-in WP password protection => make the wp pwd form is rendered only one time in a singular ( see #673 and #679 )
+        // - membership and content restriction plugins => https://github.com/presscustomizr/nimble-builder/issues/685
+        function sek_schedule_content_restriction_actions() {
+            add_action( 'wp', array( $this, 'sek_set_password_protection_status') );
+            // built-in WP password form
+            add_action( 'the_password_form', array( $this, 'sek_maybe_empty_password_form' ), PHP_INT_MAX );
+            add_action( 'nimble_content_restriction_for_location', array( $this, 'sek_maybe_print_restriction_stuffs' ), PHP_INT_MAX );
+            // april 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/685
+            // Compatibility with Members plugin : https://wordpress.org/plugins/members/
+            add_filter( 'nimble_content_restriction_status', array( $this, 'sek_add_members_plugin_compat') );
+        }
+
+        // hook : 'wp'
+        // april 2020 for #673 and #679
+        // Never restrict when customizing
+        // @return void
+        function sek_set_password_protection_status() {
+            if ( skp_is_customizing() ) {
+                Nimble_Manager()->is_content_restricted = false;
+            } else {
+                // the default restriction status is the one provided by the built-in WP password protection
+                // the filter allows us to add compatibility with other membership or content restriction plugins
+                Nimble_Manager()->is_content_restricted = apply_filters('nimble_content_restriction_status', is_singular() && post_password_required() );
+            }
+
+        }
+
+
+        // hook : 'the_password_form'@PHP_INT_MAX documented in wp-includes/post-template.php
+        // Empty the password form if it's been already rendered, either in the WP content or in a Nimble location before the content.
+        // april 2020 for see #673 and #679
+        // @return html output for the form
+        function sek_maybe_empty_password_form( $output ) {
+            // bail if there's no local Nimble section in the page
+            if ( !sek_local_skope_has_nimble_sections( skp_get_skope_id() ) )
+              return $output;
+
+            if ( skp_is_customizing() || !post_password_required() )
+              return $output;
+
+            if ( is_singular() && post_password_required() ) {
+                if ( !did_action('nimble_wp_pwd_form_rendered') ) {
+                    // fire an action => we know the password form has been rendered so we won't have to render it several times
+                    // see ::render() location
+                    do_action('nimble_wp_pwd_form_rendered');
+                    return $output;
+                } else {
+                    // Empty the form if it's been already rendered, either in the WP content or in a Nimble location before the content.
+                    return '';
+                }
+            }
+            return $output;
+        }
+
+
+        // hook : 'nimble_content_restriction_status'
+        // Compatibility with Members plugin : https://wordpress.org/plugins/members/
+        // for #685
+        function sek_add_members_plugin_compat( $bool ) {
+            if ( function_exists('members_can_current_user_view_post') && is_singular() ) {
+                return is_singular() && !members_can_current_user_view_post( get_the_ID() );
+            }
+            return $bool;
+        }
+
+        // hook : 'nimble_content_restriction_for_location'
+        // april 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/685
+        function sek_maybe_print_restriction_stuffs( $location_model ) {
+            if ( post_password_required() ) {
+                echo get_the_password_form();//<= we filter the output of this function to maybe empty and fire the action 'nimble_wp_pwd_form_rendered'
+            }
+
+            // Compatibility with Members plugin : https://wordpress.org/plugins/members/
+            if ( function_exists('members_can_current_user_view_post') ) {
+                $post_id = get_the_ID();
+                if ( !members_can_current_user_view_post( $post_id ) && function_exists('members_get_post_error_message') ) {
+                    echo members_get_post_error_message( $post_id );
+                }
+            }
         }
     }//class
 endif;
