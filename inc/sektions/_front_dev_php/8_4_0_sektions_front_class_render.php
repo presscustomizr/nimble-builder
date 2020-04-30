@@ -1411,7 +1411,9 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             add_action( 'nimble_content_restriction_for_location', array( $this, 'sek_maybe_print_restriction_stuffs' ), PHP_INT_MAX );
             // april 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/685
             // Compatibility with Members plugin : https://wordpress.org/plugins/members/
-            add_filter( 'nimble_content_restriction_status', array( $this, 'sek_add_members_plugin_compat') );
+            add_filter( 'nimble_is_content_restricted', array( $this, 'sek_is_content_restricted_by_members_plugin') );
+            // Compatibility with Paid Memberships Pro
+            add_filter( 'nimble_is_content_restricted', array( $this, 'sek_is_content_restricted_by_paidmembershippro_plugin') );
         }
 
         // hook : 'wp'
@@ -1424,7 +1426,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             } else {
                 // the default restriction status is the one provided by the built-in WP password protection
                 // the filter allows us to add compatibility with other membership or content restriction plugins
-                Nimble_Manager()->is_content_restricted = apply_filters('nimble_content_restriction_status', is_singular() && post_password_required() );
+                Nimble_Manager()->is_content_restricted = apply_filters('nimble_is_content_restricted', is_singular() && post_password_required() );
             }
 
         }
@@ -1457,14 +1459,27 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         }
 
 
-        // hook : 'nimble_content_restriction_status'
+        // hook : 'nimble_is_content_restricted'
         // Compatibility with Members plugin : https://wordpress.org/plugins/members/
         // for #685
-        function sek_add_members_plugin_compat( $bool ) {
-            if ( function_exists('members_can_current_user_view_post') && is_singular() ) {
-                return is_singular() && !members_can_current_user_view_post( get_the_ID() );
+        function sek_is_content_restricted_by_members_plugin( $bool ) {
+            if ( !function_exists('members_can_current_user_view_post') || !is_singular() ) {
+                return $bool;
             }
-            return $bool;
+            return !members_can_current_user_view_post( get_the_ID() );
+        }
+
+        // hook : 'nimble_is_content_restricted'
+        // Compatibility with Paid Membership Pro plugin
+        // for #685
+        function sek_is_content_restricted_by_paidmembershippro_plugin( $bool ) {
+            if ( !function_exists('pmpro_has_membership_access') || !is_singular() )
+              return $bool;
+            $hasaccess = pmpro_has_membership_access(NULL, NULL, true);
+            if ( is_array($hasaccess) ){
+                $hasaccess = $hasaccess[0];
+            }
+            return !$hasaccess;
         }
 
         // hook : 'nimble_content_restriction_for_location'
