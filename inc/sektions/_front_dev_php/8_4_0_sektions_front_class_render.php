@@ -1399,7 +1399,6 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         /* ------------------------------------------------------------------------- *
          *  CONTENT RESTRICTION
         /* ------------------------------------------------------------------------- */
-
         // fired in _schedule_front_rendering()
         // PASSWORD FORM AND CONTENT RESTRICTION ( PLUGINS )
         // - built-in WP password protection => make the wp pwd form is rendered only one time in a singular ( see #673 and #679 )
@@ -1414,6 +1413,8 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'nimble_is_content_restricted', array( $this, 'sek_is_content_restricted_by_members_plugin') );
             // Compatibility with Paid Memberships Pro
             add_filter( 'nimble_is_content_restricted', array( $this, 'sek_is_content_restricted_by_paidmembershippro_plugin') );
+            // Compatibility with WP Members
+            add_filter( 'nimble_is_content_restricted', array( $this, 'sek_is_content_restricted_by_wp_members_plugin') );
         }
 
         // hook : 'wp'
@@ -1473,13 +1474,23 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         // Compatibility with Paid Membership Pro plugin
         // for #685
         function sek_is_content_restricted_by_paidmembershippro_plugin( $bool ) {
-            if ( !function_exists('pmpro_has_membership_access') || !is_singular() )
+            if ( !function_exists('pmpro_has_membership_access') )
               return $bool;
             $hasaccess = pmpro_has_membership_access(NULL, NULL, true);
             if ( is_array($hasaccess) ){
                 $hasaccess = $hasaccess[0];
             }
             return !$hasaccess;
+        }
+
+        // hook : 'nimble_is_content_restricted'
+        // Compatibility with WP Members plugin : https://wordpress.org/plugins/wp-members/
+        // for #685
+        function sek_is_content_restricted_by_wp_members_plugin( $bool ) {
+            if ( !function_exists('wpmem_is_blocked') || !is_singular() ) {
+                return $bool;
+            }
+            return !is_user_logged_in() && wpmem_is_blocked( get_the_ID() );
         }
 
         // hook : 'nimble_content_restriction_for_location'
