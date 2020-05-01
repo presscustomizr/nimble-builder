@@ -1523,16 +1523,23 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         // hook : 'nimble_content_restriction_for_location'
         // april 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/685
         function sek_maybe_print_restriction_stuffs( $location_model ) {
+            if ( !Nimble_Manager()->is_content_restricted )
+              return;
+
             if ( post_password_required() ) {
                 echo get_the_password_form();//<= we filter the output of this function to maybe empty and fire the action 'nimble_wp_pwd_form_rendered'
             }
 
-            // Compatibility with Members plugin : https://wordpress.org/plugins/members/
+            // 1) Compatibility with Members plugin : https://wordpress.org/plugins/members/
             if ( function_exists('members_can_current_user_view_post') ) {
                 $post_id = get_the_ID();
                 if ( !members_can_current_user_view_post( $post_id ) && function_exists('members_get_post_error_message') ) {
                     echo members_get_post_error_message( $post_id );
                 }
+            // 2) for other plugins, if not printed already, print a default fitrable message
+            } else if ( !did_action('nimble_after_restricted_content_html') ) {
+                echo apply_filters('nimble_restricted_content_html', sprintf( '<p>%1$s</p>', __('You need to login to view this content.') ) );
+                do_action('nimble_after_restricted_content_html');
             }
         }
     }//class
