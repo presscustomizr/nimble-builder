@@ -120,13 +120,13 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 2.0.10 =
-Added support for password protected page / post. [grid module] Focus on post grid when navigating pagination. [shortcode module] Fixed possible lazy loading problem with third party plugins. Improved RTL support in the customizer UI.
+= 2.0.11 =
+Added compatibility with the following membership plugins : "Members", "Paid Membership Pro", "WP Members", "Simple WP Membership Protection". [password protection] prevent printing multiple password protection forms in a single page / post. 
 
 == Changelog ==
 = 2.0.11 May 1st 2020 =
 * fixed : [password protection] prevent printing multiple password protection forms in a single page / post
-* fixed : customize ui][column width] Fix possible error when trying to set a column width
+* fixed : [customize ui][column width] Fix possible error when trying to set a column width
 * added : implemented compatibility with "Members" plugins
 * added : implemented compatibility with "Paid Membership Pro" plugin
 * added : implemented compatibility with "WP Members" plugin
