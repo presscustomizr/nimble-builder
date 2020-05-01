@@ -1538,7 +1538,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 }
             // 2) for other plugins, if not printed already, print a default fitrable message
             } else if ( !did_action('nimble_after_restricted_content_html') ) {
-                echo apply_filters('nimble_restricted_content_html', sprintf( '<p>%1$s</p>', __('You need to login to view this content.') ) );
+                echo apply_filters('nimble_restricted_content_html', sprintf( '<p>%1$s</p>', __('You need to login to view this content.', 'text_doma') ) );
                 do_action('nimble_after_restricted_content_html');
             }
         }

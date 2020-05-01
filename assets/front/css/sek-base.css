@@ -926,6 +926,8 @@ button.sek-btn,
   align-items: center;
   -ms-flex-pack: center;
   justify-content: center;
+  -ms-flex-direction: column;
+  flex-direction: column;
 }
 
 .sektion-wrapper.sek-password-protected form.post-password-form {

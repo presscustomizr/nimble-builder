@@ -108,6 +108,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  -ms-flex-direction: column;
+  flex-direction: column;
   form.post-password-form {
     max-width: 450px;
     height: auto;

@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.10
+Stable tag: 2.0.11
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -124,6 +124,15 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 Added support for password protected page / post. [grid module] Focus on post grid when navigating pagination. [shortcode module] Fixed possible lazy loading problem with third party plugins. Improved RTL support in the customizer UI.
 
 == Changelog ==
+= 2.0.11 May 1st 2020 =
+* fixed : [password protection] prevent printing multiple password protection forms in a single page / post
+* fixed : customize ui][column width] Fix possible error when trying to set a column width
+* added : implemented compatibility with "Members" plugins
+* added : implemented compatibility with "Paid Membership Pro" plugin
+* added : implemented compatibility with "WP Members" plugin
+* added : implemented compatibility with "Simple WP Membership Protection" plugin
+* added : a default filtrable message when content is restricted for membership plugins
+
 = 2.0.10 April 24th 2020 =
 * fixed : [Password protected pages/posts] Nimble Builder content ( excluding header and footer ) should not be revealed before password submission
 * fixed : [RTL][customizer][nimble top menu] broken in RTL mode => all items are in the same place
