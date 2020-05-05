@@ -253,10 +253,6 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 wp_enqueue_script('jquery');
             }
 
-            // Google reCAPTCHA
-            $global_recaptcha_opts = sek_get_global_option_value('recaptcha');
-            $global_recaptcha_opts = is_array( $global_recaptcha_opts ) ? $global_recaptcha_opts : array();
-
 
             $contextually_active_modules = sek_get_collection_of_contextually_active_modules();
 
@@ -409,6 +405,10 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             if ( !sek_local_skope_has_nimble_sections( skp_get_skope_id() ) && !sek_has_global_sections() )
               return;
 
+            // Google reCAPTCHA
+            $global_recaptcha_opts = sek_get_global_option_value('recaptcha');
+            $global_recaptcha_opts = is_array( $global_recaptcha_opts ) ? $global_recaptcha_opts : array();
+
             $l10n = array(
                 'isDevMode' => sek_is_dev_mode(),
                 //'ajaxUrl' => admin_url( 'admin-ajax.php' ),
@@ -416,7 +416,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 'localSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks() ) : '',
                 'globalSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID ) ) : '',
                 'skope_id' => skp_get_skope_id(), //added for debugging purposes
-                'recaptcha_public_key' => !empty ( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : '',
+                'recaptcha_public_key' => !empty( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : '',
 
                 'lazyload_enabled' => sek_is_img_smartload_enabled(),
                 'video_bg_lazyload_enabled' => sek_is_video_bg_lazyload_enabled(),

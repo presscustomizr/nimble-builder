@@ -148,30 +148,37 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     function print_recaptcha_inline_js() {
         ?>
             <script id="nimble-inline-recaptcha">
-              !( function( grecaptcha, sitekey ) {
-                  var recaptcha = {
-                      execute: function() {
-                          grecaptcha.execute(
-                              sitekey,
-                              // see https://developers.google.com/recaptcha/docs/v3#actions
-                              { action: ( window.sekFrontLocalized && sekFrontLocalized.skope_id ) ? sekFrontLocalized.skope_id.replace( 'skp__' , 'nimble_form__' ) : 'nimble_builder_form' }
-                          ).then( function( token ) {
-                              var forms = document.getElementsByTagName( 'form' );
-                              for ( var i = 0; i < forms.length; i++ ) {
-                                  var fields = forms[ i ].getElementsByTagName( 'input' );
-                                  for ( var j = 0; j < fields.length; j++ ) {
-                                      var field = fields[ j ];
-                                      if ( 'nimble_recaptcha_resp' === field.getAttribute( 'name' ) ) {
-                                          field.setAttribute( 'value', token );
-                                          break;
-                                      }
-                                  }
-                              }
-                          } );
-                      }
-                  };
-                  grecaptcha.ready( recaptcha.execute );
-              })( grecaptcha, sekFrontLocalized.recaptcha_public_key );
+              if ( sekFrontLocalized.recaptcha_public_key ) {
+                !( function( grecaptcha, sitekey ) {
+                    var recaptcha = {
+                        execute: function() {
+                            var _action = ( window.sekFrontLocalized && sekFrontLocalized.skope_id ) ? sekFrontLocalized.skope_id.replace( 'skp__' , 'nimble_form__' ) : 'nimble_builder_form';
+                            grecaptcha.execute(
+                                sitekey,
+                                // see https://developers.google.com/recaptcha/docs/v3#actions
+                                { action: _action }
+                            ).then( function( token ) {
+                                var forms = document.getElementsByTagName( 'form' );
+                                for ( var i = 0; i < forms.length; i++ ) {
+                                    var fields = forms[ i ].getElementsByTagName( 'input' );
+                                    for ( var j = 0; j < fields.length; j++ ) {
+                                        var field = fields[ j ];
+                                        if ( 'nimble_recaptcha_resp' === field.getAttribute( 'name' ) ) {
+                                            field.setAttribute( 'value', token );
+                                            break;
+                                        }
+                                    }
+                                }
+                            } );
+                        }
+                    };
+                    grecaptcha.ready( recaptcha.execute );
+                })( grecaptcha, sekFrontLocalized.recaptcha_public_key );
+              } else {
+                if ( window.console && window.console.log ) {
+                    console.log('Nimble Builder form error => missing reCAPTCHA key');
+                }
+              }
             </script>
         <?php
     }
