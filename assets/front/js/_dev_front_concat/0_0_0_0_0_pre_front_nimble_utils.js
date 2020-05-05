@@ -9,10 +9,10 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
               // see https://underscorejs.org/docs/underscore.html#section-149
               jQuery.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error', 'Symbol', 'Map', 'WeakMap', 'Set', 'WeakSet'], function(index, name) {
                 window.nb_['is' + name] = function(obj) {
-                    // fix for IE => toString is not a global var
-                    // https://caniuse.com/#search=toString
-                    var _toString = toString || Object.prototype.toString;
-                    return _toString.call(obj) === '[object ' + name + ']';
+                    // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Object/toString
+                    var _toString = Object.prototype.toString;
+                    obj = obj + 0;
+                    return _toString.call('100') === '[object ' + name + ']';
                 };
               });
 
@@ -190,13 +190,14 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                     //         isIE = false || !!document.documentMode;
                     //     switch( browser) {
                     //         case 'safari' :
-                    //             bool = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+                    //             bool = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window.safari || (typeof safari !== 'undefined' && safari.pushNotification));
                     //         break;
                     //         case 'firefox' :
                     //             bool = typeof InstallTrigger !== 'undefined';
                     //         break;
                     //         case 'IE' :
-                    //             bool = isIE;
+                    //             // https://stackoverflow.com/questions/19999388/check-if-user-is-using-ie
+                    //             bool = isIE && /MSIE|Trident/.test(window.navigator.userAgent);
                     //         break;
                     //         case 'edge' :
                     //             bool = !isIE && !!window.StyleMedia;
