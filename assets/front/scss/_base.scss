@@ -295,6 +295,19 @@
      object-fit: cover;
 }
 
+// added for https://github.com/presscustomizr/nimble-builder/issues/688
+.sek-module-inner .sek-debug-modules {
+    margin: 1em;
+    padding: 5px;
+    border: 1px solid rgba(221, 221, 221, 0.43);
+    box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);
+    -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);
+    background-color: #fff;
+    font-size: 15px;
+    font-weight: normal;
+    color: #6d6d6d;
+    background: rgba(255, 255, 255, 0.6);
+}
 
 // @media (min-width:575px) and (max-width:768px){
 //   .customizer-preview [data-sek-video-bg-on-mobile="false"] .sek-bg-video-wrapper {
