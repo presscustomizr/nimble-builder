@@ -84,7 +84,7 @@ function sek_get_module_params_for_sek_global_performances() {
                 ),
                 'load_assets_in_ajax' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => '[Beta] ' . __('Inject non priority assets dynamically in the page only when needed.', 'text_doma'),
+                    'title'       => __('Inject non priority assets dynamically in the page only when needed.', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
