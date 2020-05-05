@@ -11,8 +11,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                 window.nb_['is' + name] = function(obj) {
                     // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Object/toString
                     var _toString = Object.prototype.toString;
-                    obj = obj + 0;
-                    return _toString.call('100') === '[object ' + name + ']';
+                    return _toString.call(obj) === '[object ' + name + ']';
                 };
               });
 
