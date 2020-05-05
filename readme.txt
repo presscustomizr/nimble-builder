@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.12-beta
+Stable tag: 2.0.12
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,15 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 2.0.11 =
-Added compatibility with the following membership plugins : "Members", "Paid Membership Pro", "WP Members", "Simple WP Membership Protection". [password protection] prevent printing multiple password protection forms in a single page / post. 
+= 2.0.12 =
+[Form module][reCaptcha] fixed possible error on form submission. [Lazy Loading] image lazy loading was broken when using IE11.
 
 == Changelog ==
+= 2.0.12 May 5th 2020 =
+* fixed : [Form module][reCaptcha] possible error on submission
+* fixed : [Lazy Loading][IE11 browser] lazy load is broken on IE11
+* added : introduction of a debug mode, enabled with url param ?nimble_debug=1, in order to prevent javascript breakage when troubleshooting
+
 = 2.0.11 May 1st 2020 =
 * fixed : [password protection] prevent printing multiple password protection forms in a single page / post
 * fixed : [customize ui][column width] Fix possible error when trying to set a column width
