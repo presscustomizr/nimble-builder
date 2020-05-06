@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.12
+Stable tag: 2.0.13
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,14 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 2.0.12 =
-[Form module][reCaptcha] fixed possible error on form submission. [Lazy Loading] image lazy loading was broken when using IE11.
+= 2.0.13 =
+[section width] zeroing inner width of a section could generate a php notice. Fixed [column width] can be broken when a custom margin is set and a custom breakpoint is used 
 
 == Changelog ==
+= 2.0.13 May 6th 2020 =
+* fixed : [section width] zeroing inner width of a section could generate a php notice
+* fixed : [column width] column width can be broken when a custom margin is set and a custom breakpoint is used 
+
 = 2.0.12 May 5th 2020 =
 * fixed : [Form module][reCaptcha] possible error on submission
 * fixed : [Lazy Loading][IE11 browser] lazy load is broken on IE11
