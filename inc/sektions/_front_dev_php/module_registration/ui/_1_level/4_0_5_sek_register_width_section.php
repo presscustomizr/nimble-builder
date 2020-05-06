@@ -121,14 +121,13 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
         ));
         $max_width_value = $user_custom_width_value;
         $margin_value = array();
-
         foreach ( $user_custom_width_value as $device => $num_unit ) {
+            $padding_of_the_parent_container[$device] = 'inherit';
             $numeric = sek_extract_numeric_value( $num_unit );
             if ( !empty( $numeric ) ) {
                 $unit = sek_extract_unit( $num_unit );
                 $max_width_value[$device] = $numeric . $unit;
                 $margin_value[$device] = '0 auto';
-                $padding_of_the_parent_container[$device] = 'inherit';
             }
         }
 

@@ -129,11 +129,11 @@ function sek_write_global_custom_section_widths() {
 
         foreach ( $user_custom_width_value as $device => $num_unit ) {
             $numeric = sek_extract_numeric_value( $num_unit );
+            $padding_of_the_parent_container[$device] = 'inherit';
             if ( !empty( $numeric ) ) {
                 $unit = sek_extract_unit( $num_unit );
                 $max_width_value[$device] = $numeric . $unit;
                 $margin_value[$device] = '0 auto';
-                $padding_of_the_parent_container[$device] = 'inherit';
             }
         }
 
