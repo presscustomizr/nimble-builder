@@ -47,59 +47,60 @@ function sek_add_css_rules_for_spacing( $rules, $level ) {
       return $rules;
 
     // GENERATE SPACING RULES BY DEVICE
-    $rules = sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $pad_marg_options, '[data-sek-id="'.$level['id'].'"]' );
-
-    // ADAPT COLUMN WIDTH IF A MARGIN IS SET, BY DEVICE
-    // april 2020 : fixes https://github.com/presscustomizr/nimble-builder/issues/665
-    // if the column has a positive ( > 0 ) margin-right and / or a margin-left set , let's adapt the column widths so we fit the 100%
+    // SPECIFIC CASE FOR COLUMNS see https://github.com/presscustomizr/nimble-builder/issues/665
     if ( 'column' === $level['level'] ) {
+        // Get the parent section level model
+        $parent_column_section = sek_get_parent_level_model( $level['id'] );
+        if ( 'no_match' === $parent_column_section ) {
+            sek_error_log( __FUNCTION__ . ' => $parent_column_section not found for level id : ' . $level['id'] );
+            return $rules;
+        }
 
-        // Declare 'not_set' values here that will be only set if there are margin option set for the column
-        $parent_section = 'not_set';
-        $column_breakpoint = 'not_set';
+        // COLUMN BREAKPOINT
+        // define a default breakpoint : 768
+        $column_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints[Sek_Dyn_CSS_Builder::COLS_MOBILE_BREAKPOINT];//COLS_MOBILE_BREAKPOINT = 'md' <=> 768
 
+        // Is there a global custom breakpoint set ?
+        $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
+        $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
+
+        // Does the parent section have a custom breakpoint set ?
+        $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( array( 'section_model' => $parent_column_section, 'for_responsive_columns' => true ) ) );
+        $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
+        if ( $has_section_custom_breakpoint ) {
+            $column_breakpoint = $section_custom_breakpoint;
+        } else if ( $has_global_custom_breakpoint ) {
+            $column_breakpoint = $global_custom_breakpoint;
+        }
+
+        // PADDING / MARGIN RULES
+        $rules = sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $pad_marg_options, '[data-sek-id="'.$level['id'].'"]', $custom_column_breakpoint = $column_breakpoint );
+
+        // ADAPT COLUMN WIDTH IF A MARGIN IS SET, BY DEVICE
+        // april 2020 : fixes https://github.com/presscustomizr/nimble-builder/issues/665
+        // if the column has a positive ( > 0 ) margin-right and / or a margin-left set , let's adapt the column widths so we fit the 100%
         foreach (['desktop', 'tablet', 'mobile'] as $_device ) {
             $pad_marg_options[$_device] = !empty($pad_marg_options[$_device]) ? $pad_marg_options[$_device] : array();
-            if ( 'not_set' === $parent_section ) {
-                $parent_section = sek_get_parent_level_model( $level['id'] );
-                if ( 'no_match' === $parent_section ) {
-                    sek_error_log( __FUNCTION__ . ' => $parent_section not found for level id : ' . $level['id'] );
-                    break;
-                }
-            }
-            if ( 'not_set' === $column_breakpoint ) {
-                // COLUMN BREAKPOINT
-                // define a default breakpoint : 768
-                $column_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints[Sek_Dyn_CSS_Builder::COLS_MOBILE_BREAKPOINT];//COLS_MOBILE_BREAKPOINT = 'md' <=> 768px
-
-                // Is there a global custom breakpoint set ?
-                $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
-                $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
-
-                // Does the parent section have a custom breakpoint set ?
-                $section_custom_breakpoint = intval( sek_get_section_custom_breakpoint( array( 'section_model' => $parent_section, 'for_responsive_columns' => true ) ) );
-                $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
-                if ( $has_section_custom_breakpoint ) {
-                    $column_breakpoint = $section_custom_breakpoint;
-                } else if ( $has_global_custom_breakpoint ) {
-                    $column_breakpoint = $global_custom_breakpoint;
-                }
-            }
-
             $rules = sek_process_column_width_for_device( array(
                 'device' => $_device,
                 'rules' => $rules,
                 'pad_marg_options' => $pad_marg_options,
                 'level' => $level,
-                'parent_section' => $parent_section,
+                'parent_section' => $parent_column_section,
                 'column_breakpoint' => $column_breakpoint,
                 'has_global_custom_breakpoint' => $has_global_custom_breakpoint,
                 'has_section_custom_breakpoint' => $has_section_custom_breakpoint
             ));
         }
+    } else {
+        // OTHER LEVEL CASES : SECTION, MODULE
+        $rules = sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $pad_marg_options, '[data-sek-id="'.$level['id'].'"]' );
     }
+
     return $rules;
 }
+
+
 
 
 // @return array of $rules
@@ -113,10 +114,13 @@ function sek_process_column_width_for_device( $params ) {
     $has_global_custom_breakpoint = $params['has_global_custom_breakpoint'];
     $has_section_custom_breakpoint = $params['has_section_custom_breakpoint'];
 
-
     // RECURSIVELY CALCULATE TOTAL HORIZONTAL MARGIN FOR THE DEVICE, OR THE ONE INHERITED FROM WIDER ONES
     // implemented for https://github.com/presscustomizr/nimble-builder/issues/665
     $total_horizontal_margin_with_unit = sek_get_maybe_inherited_total_horizontal_margins( $_device, $pad_marg_options );
+    //sek_error_log('soo ?$total_horizontal_margin_with_unit ' .$_device . $level['id'] . ' | ' . $total_horizontal_margin_with_unit );
+    // When no horizontal margin, no need to add a custom css rule for column width
+    // + it can break rendering on Edge see https://github.com/presscustomizr/nimble-builder/issues/690
+    $margin_without_unit = preg_replace("/[^0-9]/", "", $total_horizontal_margin_with_unit );
 
     // WRITE RULES
     switch ( $_device ) {
@@ -176,7 +180,13 @@ function sek_process_column_width_for_device( $params ) {
 
             // Format width in percent with 3 digits after decimal
             $col_width_in_percent = number_format( $col_width_in_percent, 3 );
-            $responsive_css_rules_for_desktop = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', $col_width_in_percent, $total_horizontal_margin_with_unit );
+            // When no horizontal margin, no need to add a custom css rule for column width
+            // + it can break rendering on Edge see https://github.com/presscustomizr/nimble-builder/issues/690
+            if ( 0 === (int)$margin_without_unit ) {
+                $responsive_css_rules_for_desktop = sprintf( '-ms-flex: 0 0 %1$s%%;flex: 0 0 %1$s%%;max-width: %1$s%%', $col_width_in_percent );
+            } else {
+                $responsive_css_rules_for_desktop = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', $col_width_in_percent, $total_horizontal_margin_with_unit );
+            }
 
             // we need to override the rule defined in : Sek_Dyn_CSS_Builder::sek_add_rules_for_column_width
             // that's why we use a long specific selector here
@@ -190,7 +200,14 @@ function sek_process_column_width_for_device( $params ) {
         case 'tablet':
             // the horizontal margin should be subtracted also to the column width of 100%, below the mobile breakpoint: basically the margin should be always subtracted to the column width for each viewport it is set
             // @see https://github.com/presscustomizr/nimble-builder/issues/217
-            $responsive_css_rules_for_100_percent_width = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', 100, $total_horizontal_margin_with_unit );
+            // When no horizontal margin, no need to add a custom css rule for column width
+            // + it can break rendering on Edge see https://github.com/presscustomizr/nimble-builder/issues/690
+            if ( 0 === (int)$margin_without_unit ) {
+                $responsive_css_rules_for_100_percent_width = '-ms-flex: 0 0 100%;flex: 0 0 100%;max-width:100%';
+            } else {
+                $responsive_css_rules_for_100_percent_width = sprintf( '-ms-flex: 0 0 calc(100%% - %1$s) ;flex: 0 0 calc(100%% - %1$s);max-width: calc(100%% - %1$s)', $total_horizontal_margin_with_unit );
+            }
+            //sek_error_log('FOR TABLET =>'. $responsive_css_rules_for_100_percent_width );
             $rules[] = array(
                 'selector' => sprintf('.sek-sektion-inner > [data-sek-id="%1$s"]', $level['id'] ),
                 'css_rules' => $responsive_css_rules_for_100_percent_width,
@@ -198,19 +215,27 @@ function sek_process_column_width_for_device( $params ) {
             );
         break;
 
+        // If user define column breakpoint ( the tablet one ) is < to $mobile_breakpoint, make sure $mobile_breakpoint inherit tablet ones
         case 'mobile':
             $mobile_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['sm'];//max-width: 576
-            // If user define breakpoint ( => that determines the column_breakpoint ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to column_breakpoint
-            $mobile_breakpoint = $mobile_breakpoint >= $column_breakpoint ? $column_breakpoint : $mobile_breakpoint;
-
+            //$mobile_breakpoint = $mobile_breakpoint >= $column_breakpoint ? $column_breakpoint : $mobile_breakpoint;
+            //if ( $mobile_breakpoint < $column_breakpoint ) {
             // the horizontal margin should be subtracted also to the column width of 100%, below the mobile breakpoint: basically the margin should be always subtracted to the column width for each viewport it is set
             // @see https://github.com/presscustomizr/nimble-builder/issues/217
-            $responsive_css_rules_for_100_percent_width = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', 100, $total_horizontal_margin_with_unit );
+            // When no horizontal margin, no need to add a custom css rule for column width
+            // + it can break rendering on Edge see https://github.com/presscustomizr/nimble-builder/issues/690
+            if ( 0 === (int)$margin_without_unit ) {
+                $responsive_css_rules_for_100_percent_width = '-ms-flex: 0 0 100%;flex: 0 0 100%;max-width:100%';
+            } else {
+                $responsive_css_rules_for_100_percent_width = sprintf( '-ms-flex: 0 0 calc(%1$s%% - %2$s) ;flex: 0 0 calc(%1$s%% - %2$s);max-width: calc(%1$s%% - %2$s)', 100, $total_horizontal_margin_with_unit );
+            }
+
             $rules[] = array(
                 'selector' => sprintf('.sek-sektion-inner > [data-sek-id="%1$s"]', $level['id'] ),
                 'css_rules' => $responsive_css_rules_for_100_percent_width,
                 'mq' => "(max-width: {$mobile_breakpoint}px)"
             );
+            //}
         break;
     }//switch device
 

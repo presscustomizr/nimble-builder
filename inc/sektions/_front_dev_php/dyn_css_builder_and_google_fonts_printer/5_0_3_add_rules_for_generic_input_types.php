@@ -486,6 +486,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
                     $val .= $unit;
             }, $unit );
         break;
+        // May 2020 => @todo those media query css rules doesn't take into account the custom breakpoint if set
         case 'spacing_with_device_switcher' :
             if ( !empty( $value ) && is_array( $value ) ) {
                 $rules = sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $value, $selector );

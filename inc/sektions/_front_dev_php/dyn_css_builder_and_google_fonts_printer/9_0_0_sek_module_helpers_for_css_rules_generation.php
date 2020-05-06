@@ -174,7 +174,8 @@ function sek_generate_css_rules_for_border_radius_options( $rules, $border_radiu
 //         )
 
 // )
-function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spacing_settings, $css_selectors = '' ) {
+// May 2020 => @todo those media query css rules doesn't take into account the custom breakpoint if set
+function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spacing_settings, $css_selectors = '', $custom_column_breakpoint = false ) {
     //spacing
     if ( empty( $spacing_settings ) || !is_array( $spacing_settings ) )
       return $rules;
@@ -224,6 +225,18 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
         }
     }
 
+    // Default breakpoint
+    // may be overriden by user defined once
+    $mobile_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['sm'];//max-width: 576
+    $tablet_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];// 768
+
+    // since https://github.com/presscustomizr/nimble-builder/issues/552,
+    // we need the parent_level id ( <=> the level on which the CSS rule is applied ) to determine if there's any inherited custom breakpoint to use
+    // Exceptions :
+    // - when generating media queries for local options, the level_id is set to '_excluded_from_section_custom_breakpoint_', @see sek_add_raw_local_widths_css()
+    if ( false !== $custom_column_breakpoint ) {
+            $tablet_breakpoint = $custom_column_breakpoint;// default is Sek_Dyn_CSS_Builder::$breakpoints['md'] <=> max-width: 768
+    }
 
     /*
     * TABLETS AND MOBILES WILL INHERIT UPPER MQ LEVELS IF NOT OTHERWISE SPECIFIED
@@ -236,15 +249,21 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
     //     'xl' => 1200
     // ];
     if ( !empty( $_pad_marg[ 'desktop' ] ) ) {
+        // if ( false !== $custom_column_breakpoint ) {
+        //     // added for https://github.com/presscustomizr/nimble-builder/issues/665
+        //     $_pad_marg[ 'desktop' ][ 'mq' ] = "(min-width: {$tablet_breakpoint}px)";
+        // } else {
+        //     $_pad_marg[ 'desktop' ][ 'mq' ] = null;
+        // }
         $_pad_marg[ 'desktop' ][ 'mq' ] = null;
     }
 
     if ( !empty( $_pad_marg[ 'tablet' ] ) ) {
-        $_pad_marg[ 'tablet' ][ 'mq' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['md'] - 1 ) . 'px)'; //max-width: 767
+        $_pad_marg[ 'tablet' ][ 'mq' ]  = '(max-width:'. ( $tablet_breakpoint - 1 ) . 'px)'; //max-width: 767
     }
 
     if ( !empty( $_pad_marg[ 'mobile' ] ) ) {
-        $_pad_marg[ 'mobile' ][ 'mq' ]  = '(max-width:'. ( Sek_Dyn_CSS_Builder::$breakpoints['sm'] - 1 ) . 'px)'; //max-width: 575
+        $_pad_marg[ 'mobile' ][ 'mq' ]  = '(max-width:'. ( $mobile_breakpoint - 1 ) . 'px)'; //max-width: 575
     }
 
     foreach( array_filter( $_pad_marg ) as $_spacing_rules ) {
@@ -253,12 +272,13 @@ function sek_generate_css_rules_for_spacing_with_device_switcher( $rules, $spaci
                 return "$key:{$value};";
             }, array_keys( $_spacing_rules[ 'rules' ] ), array_values( $_spacing_rules[ 'rules' ] )
         ) );
-
-        $rules[] = array(
-            'selector' => $css_selectors,//'[data-sek-id="'.$level['id'].'"]',
-            'css_rules' => $css_rules,
-            'mq' =>$_spacing_rules[ 'mq' ]
-        );
+        if ( array_key_exists('mq', $_spacing_rules) ) {
+            $rules[] = array(
+                'selector' => $css_selectors,//'[data-sek-id="'.$level['id'].'"]',
+                'css_rules' => $css_rules,
+                'mq' =>$_spacing_rules[ 'mq' ]
+            );
+        }
     }
     return $rules;
 }
