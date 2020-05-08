@@ -16,11 +16,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Will store the collection of saved templates
                   self.allSavedTemplates = new api.Value('_not_populated_');
-
+                  // When the collection is refreshed
+                  // - populate select options
+                  // - set the select value to default 'none'
+                  self.allSavedTemplates.bind( function( tmpl_collection ) {
+                        if ( !_.isObject(tmpl_collection) ) {
+                              api.errare('error => tmpl collection should be an object');
+                              return;
+                        }
+                        tmpl_collection = _.isEmpty(tmpl_collection) ? {} : tmpl_collection;
+                        self.refreshTmplPickerHtml( tmpl_collection );
+                  });
 
                   self.tmplDialogMode = new api.Value('hidden');// 'save' default mode is set when dialog html is rendered
                   self.tmplDialogMode.bind( function(mode){
-                        console.log('TMPL DIALOG MODE ?', mode );
                         if ( !_.contains(['hidden', 'save', 'update', 'remove' ], mode ) ) {
                               api.errare('::setupSaveTmplUI => unknown tmpl dialog mode', mode );
                               mode = 'save';
@@ -53,35 +62,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         // Make sure the select value is always reset when switching mode
                                         $selectEl.val('none').trigger('change');
 
-                                    self.getAllSavedTemplate().done( function( template_collection ) {
-                                          if ( _.isObject(template_collection) && !_.isEmpty(template_collection) ) {
-                                                // update the saved value
-                                                self.allSavedTemplates( template_collection );
-
-                                                // Make sure we don't populate the collection twice ( if user clicks two times fast )
-                                                if ( $tmplDialogWrapper.hasClass('tmpl-collection-populated') )
-                                                  return;
-
-                                                var _default_title = 'template title not set',
-                                                    _title,
-                                                    _html = '';
-                                                _.each( template_collection, function( _tmpl_data, _tmpl_post_name ) {
-                                                      if ( !_.isObject(_tmpl_data) )
-                                                        return;
-
-                                                      _title = _tmpl_data.title ? _tmpl_data.title : _default_title;
-                                                      _html +='<option value="' + _tmpl_post_name + '">' + _title + '</option>';
-                                                });
-                                                console.log('_html ??', _html );
-                                                $selectEl.append(_html);
-
-                                                // flag so we know it's done
-                                                $tmplDialogWrapper.addClass('tmpl-collection-populated');
-                                          }
+                                    self.setSavedTmplCollection().done( function( tmpl_collection ) {
+                                          // refresh tmpl picker in case the user updated without changing anything
+                                          self.refreshTmplPickerHtml();
                                     });
                               break;
                         }//switch
-                  });
+                  });//self.tmplDialogMode.bind()
 
             },
 
@@ -89,8 +76,47 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             ///////////////////////////////////////////////
             ///// RENDER DIALOG BOX AND SCHEDULE CLICK ACTIONS
+            refreshTmplPickerHtml : function( tmpl_collection ) {
+                  tmpl_collection = tmpl_collection || this.allSavedTemplates();
+
+                  var $tmplDialogWrapper = $('#nimble-top-tmpl-save-ui'),
+                      $selectEl = $tmplDialogWrapper.find('.sek-saved-tmpl-picker');
+                  // Make sure the select value is always reset when switching mode
+                  $selectEl.val('none').trigger('change');
+
+                  // empty all options but the default 'none' one
+                  $selectEl.find('option').each( function() {
+                        if ( 'none' !== $(this).attr('value') ) {
+                              $(this).remove();
+                        }
+                  });
+
+                  // Make sure we don't populate the collection twice ( if user clicks two times fast )
+                  // if ( $tmplDialogWrapper.hasClass('tmpl-collection-populated') )
+                  //   return;
+
+                  var _default_title = 'template title not set',
+                      _title,
+                      _last_modified_date,
+                      _html = '';
+                  _.each( tmpl_collection, function( _tmpl_data, _tmpl_post_name ) {
+                        if ( !_.isObject(_tmpl_data) )
+                          return;
+                        _last_modified_date = _tmpl_data.last_modified_date ? _tmpl_data.last_modified_date : '';
+                        _title = _tmpl_data.title ? _tmpl_data.title : _default_title;
+                        _html +='<option value="' + _tmpl_post_name + '">' + [ _title, '@missi18n Last modified : ' + _last_modified_date ].join(' | ') + '</option>';
+                  });
+
+                  $selectEl.append(_html);
+
+                  // flag so we know it's done
+                  // => controls the CSS visibility of the select element
+                  $tmplDialogWrapper.addClass('tmpl-collection-populated');
+            },
+
+
             //@param = { }
-            renderAndsetupSaveTmplUITmpl : function( params ) {
+            renderTmplUI : function( params ) {
                   if ( $('#nimble-top-tmpl-save-ui').length > 0 )
                     return $('#nimble-top-tmpl-save-ui');
 
@@ -103,8 +129,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return false;
                   }
                   $('#customize-preview').after( $( _tmpl ) );
+                  return $('#nimble-top-tmpl-save-ui');
+            },
 
-                  var $tmplDialogWrapper = $('#nimble-top-tmpl-save-ui');
+
+            // Fired once, on first rendering
+            scheduleDOMEvents : function() {
+                  var self = this, $tmplDialogWrapper = $('#nimble-top-tmpl-save-ui');
+                  if ( $tmplDialogWrapper.data('nimble-tmpl-dom-events-scheduled') )
+                    return;
 
                   // ATTACH DOM EVENTS
                   // Dialog Mode Switcher
@@ -117,13 +150,44 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // update title and description fields on template selection
                   $tmplDialogWrapper.on( 'change', '.sek-saved-tmpl-picker', function(evt){ self.reactOnTemplateSelection(evt, $(this) ); });
 
-                  // Save
-                  $tmplDialogWrapper.on( 'click', '.sek-do-save-tmpl', function(evt){ self.saveOrUpdateTemplate(evt); });
+                  // SAVE
+                  $tmplDialogWrapper.on( 'click', '.sek-do-save-tmpl', function(evt){
+                        $tmplDialogWrapper.addClass('nimble-tmpl-processing-ajax');
+                        self.saveOrUpdateTemplate(evt).done( function( response ) {
+                              $tmplDialogWrapper.removeClass('nimble-tmpl-processing-ajax');
+                              if ( response.success ) {
+                                    self.setSavedTmplCollection( { refresh : true } );// <= true for refresh
+                              }
+                        });
+                  });
 
+                  // UPDATE
+                  $tmplDialogWrapper.on( 'click', '.sek-do-update-tmpl', function(evt){
+                        var $selectEl = $tmplDialogWrapper.find('.sek-saved-tmpl-picker'),
+                            tmplPostNameCandidateForUpdate = $selectEl.val();
+                        // make sure we don't try to remove the default option
+                        if ( 'none' === tmplPostNameCandidateForUpdate || _.isEmpty(tmplPostNameCandidateForUpdate) )
+                          return;
+
+                        $tmplDialogWrapper.addClass('nimble-tmpl-processing-ajax');
+                        self.saveOrUpdateTemplate(evt, tmplPostNameCandidateForUpdate).done( function(response) {
+                              $tmplDialogWrapper.removeClass('nimble-tmpl-processing-ajax');
+                              if ( response.success ) {
+                                    self.setSavedTmplCollection( { refresh : true } )// <= true for refresh
+                                          .done( function( tmpl_collection ) {
+                                                // refresh tmpl picker in case the user updated without changing anything
+                                                self.refreshTmplPickerHtml();
+                                          });
+                              }
+                        });
+                  });
+
+                  // REMOVE
                   // Reveal remove dialog
                   $tmplDialogWrapper.on( 'click', '.sek-open-remove-confirmation', function(evt){
                         $tmplDialogWrapper.addClass('sek-removal-confirmation-opened');
                   });
+
                   // Do Remove
                   $tmplDialogWrapper.on( 'click', '.sek-do-remove-tmpl', function(evt){
                         var $selectEl = $tmplDialogWrapper.find('.sek-saved-tmpl-picker'),
@@ -132,36 +196,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( 'none' === tmplPostNameCandidateForRemoval || _.isEmpty(tmplPostNameCandidateForRemoval) )
                           return;
 
+                        $tmplDialogWrapper.addClass('nimble-tmpl-processing-ajax');
                         self.removeTemplate(evt, tmplPostNameCandidateForRemoval).done( function(response) {
+                              $tmplDialogWrapper.removeClass('nimble-tmpl-processing-ajax');
                               $tmplDialogWrapper.removeClass('sek-removal-confirmation-opened');
-
-                              // reset the select value
-                              $selectEl.val('none').trigger('change');
-
-                              //$tmplDialogWrapper.find('.sek-open-remove-confirmation').show('fast');
                               if ( response.success ) {
-                                    // update the template collection
-                                    var oldTmplCollection = self.allSavedTemplates(),
-                                        newTmplCollection = {};
-
-                                    console.log('oldTemplateCollection', oldTmplCollection );
-                                    console.log('tmplPostNameCandidateForRemoval', tmplPostNameCandidateForRemoval );
-
-                                    // populate new tmpl collection
-                                    _.each( oldTmplCollection, function( _data, _key ) {
-                                        if ( tmplPostNameCandidateForRemoval !== _key ) {
-                                            newTmplCollection[_key] = _data;
-                                        }
-                                    });
-                                    console.log('newTmplCollection', newTmplCollection );
-                                    self.allSavedTemplates( newTmplCollection );
-
-
-
-                                    // remove the select option ( if not the default one 'none')
-                                    if ( 'none' !== tmplPostNameCandidateForRemoval ) {
-                                          $selectEl.find('[value="' + tmplPostNameCandidateForRemoval +'"]').remove();
-                                    }
+                                    self.setSavedTmplCollection( { refresh : true } );// <= true for refresh
                               }
                         });
                   });
@@ -180,54 +220,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.tmplDialogVisible(false);
                   });
 
-                  return $tmplDialogWrapper;
+                  // Say we're done with DOM event scheduling
+                  $tmplDialogWrapper.data('nimble-tmpl-dom-events-scheduled', true );
             },
 
-            // Fired on 'click on .sek-do-remove-tmpl btn
-            removeTemplate : function(evt, tmplPostNameCandidateForRemoval ) {
-                  var self = this, _dfd_ = $.Deferred();
-                  evt.preventDefault();
-                  wp.ajax.post( 'sek_remove_user_template', {
-                        nonce: api.settings.nonce.save,
-                        tmpl_post_name: tmplPostNameCandidateForRemoval
-                        //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
-                  })
-                  .done( function( response ) {
-                        console.log('ALORS SERVER RESP FOR REMOVED TEMPLATE ?', response );
-                        _dfd_.resolve( {success:true});
-                        // response is {tmpl_post_id: 436}
-                        //self.tmplDialogVisible( false );
-                        api.previewer.trigger('sek-notify', {
-                            type : 'success',
-                            duration : 10000,
-                            message : [
-                                  '<span style="font-size:0.95em">',
-                                    '<strong>@missi18n Your template has been removed.</strong>',
-                                  '</span>'
-                            ].join('')
-                        });
-                  })
-                  .fail( function( er ) {
-                        console.log('ER ??', er );
-                        _dfd_.resolve( {success:false});
-                        api.errorLog( 'ajax sek_remove_template => error', er );
-                        api.previewer.trigger('sek-notify', {
-                            type : 'error',
-                            duration : 10000,
-                            message : [
-                                  '<span style="font-size:0.95em">',
-                                    '<strong>@missi18n error when removing template</strong>',
-                                  '</span>'
-                            ].join('')
-                        });
-                  });
-
-                  return _dfd_;
-            },
 
             // Fired on 'click' on .sek-do-save-tmpl btn
-            saveOrUpdateTemplate : function(evt) {
-                  var self = this;
+            saveOrUpdateTemplate : function(evt, tmplPostNameCandidateForUpdate ) {
+                  var self = this, _dfd_ = $.Deferred();
                   evt.preventDefault();
                   var $_title = $('#sek-saved-tmpl-title'),
                       tmpl_title = $_title.val(),
@@ -257,10 +257,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         tmpl_title: tmpl_title,
                         tmpl_description: tmpl_description,
                         tmpl_data: JSON.stringify( currentLocalSettingValue ),
+                        tmpl_post_name: tmplPostNameCandidateForUpdate || ''
                         //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
                   })
                   .done( function( response ) {
-                        console.log('ALORS SERVER RESP FOR SAVED TEMPLATE ?', response );
+                        //console.log('SAVED POST ID', response );
+                        _dfd_.resolve( {success:true});
                         // response is {tmpl_post_id: 436}
                         //self.tmplDialogVisible( false );
                         api.previewer.trigger('sek-notify', {
@@ -274,7 +276,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   })
                   .fail( function( er ) {
-                        console.log('ER ??', er );
+                        _dfd_.resolve( {success:false});
                         api.errorLog( 'ajax sek_save_template => error', er );
                         api.previewer.trigger('sek-notify', {
                             type : 'error',
@@ -286,15 +288,54 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             ].join('')
                         });
                   });
+                  return _dfd_;
             },//saveOrUpdateTemplate
 
 
 
+            // Fired on 'click on .sek-do-remove-tmpl btn
+            removeTemplate : function(evt, tmplPostNameCandidateForRemoval ) {
+                  var self = this, _dfd_ = $.Deferred();
+                  evt.preventDefault();
+                  wp.ajax.post( 'sek_remove_user_template', {
+                        nonce: api.settings.nonce.save,
+                        tmpl_post_name: tmplPostNameCandidateForRemoval
+                        //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                  })
+                  .done( function( response ) {
+                        _dfd_.resolve( {success:true});
+                        // response is {tmpl_post_id: 436}
+                        //self.tmplDialogVisible( false );
+                        api.previewer.trigger('sek-notify', {
+                            type : 'success',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>@missi18n Your template has been removed.</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                  })
+                  .fail( function( er ) {
+                        _dfd_.resolve( {success:false});
+                        api.errorLog( 'ajax sek_remove_template => error', er );
+                        api.previewer.trigger('sek-notify', {
+                            type : 'error',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>@missi18n error when removing template</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                  });
+
+                  return _dfd_;
+            },
+
 
             // Is used in update and remove modes
             reactOnTemplateSelection : function(evt, $selectEl ){
-
-                  //console.log('REACT ON TEMPLATE UPDATE SELECT', $selectEl, $selectEl.val() );
                   var self = this,
                       $tmplDialogWrapper = $('#nimble-top-tmpl-save-ui'),
                       _tmplPostName = $selectEl.val(),
@@ -312,18 +353,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var _selectedTmpl = _tmplPostName;
 
                         // normalize
-                        _allSavedTemplates = _.isObject(_allSavedTemplates) ? _allSavedTemplates : {};
+                        _allSavedTemplates = ( _.isObject(_allSavedTemplates) && !_.isArray(_allSavedTemplates) ) ? _allSavedTemplates : {};
                         _allSavedTemplates[_tmplPostName] = $.extend( {
                             title : '',
-                            description : ''
+                            description : '',
+                            last_modified_date : ''
                         }, _allSavedTemplates[_tmplPostName] || {} );
 
-                        console.log('SOOO? _tmplPostName', _tmplPostName, _allSavedTemplates );
                         $titleInput.val( _allSavedTemplates[_tmplPostName].title );
                         $descInput.val( _allSavedTemplates[_tmplPostName].description );
                         $tmplDialogWrapper.addClass(_informativeClass);
-
-                        console.log("$titleInput.closest('div')??", $titleInput.closest('div') );
                   }
             },
 
@@ -338,10 +377,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // });
             toggleSaveTmplUI : function( visible ) {
                   visible = _.isUndefined( visible ) ? true : visible;
-                  //console.log('visible dialog?', visible );
                   var self = this,
                       _renderAndSetup = function() {
-                            $.when( self.renderAndsetupSaveTmplUITmpl({}) ).done( function( $_el ) {
+                            $.when( self.renderTmplUI({}) ).done( function( $_el ) {
+                                  self.scheduleDOMEvents();
                                   self.saveUIContainer = $_el;
                                   //display
                                   _.delay( function() {
@@ -386,15 +425,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             ///////////////////////////////////////////////
             ///// AJAX ACTIONS
             // @return $.promise
-            getAllSavedTemplate : function() {
+            setSavedTmplCollection : function( params ) {
                   var self = this,
                       $tmplDialogWrapper = $('#nimble-top-tmpl-save-ui'),
-                      $selectEl = $tmplDialogWrapper.find('.sek-saved-tmpl-picker'),
-                      templateCollection = self.allSavedTemplates();
+                      $selectEl = $tmplDialogWrapper.find('.sek-saved-tmpl-picker');
 
-                  // Make sure we don't fetch the collection twice
-                  if ( $tmplDialogWrapper.hasClass('tmpl-collection-populated') )
-                    return $.Deferred( function() { this.resolve( self.allSavedTemplates() );} );
+                  // refresh is true on save, update, remove success
+                  params = params || {refresh : false};
+
+                  // If the collection is already set, return it.
+                  // unless this is a "refresh" case
+                  if ( !params.refresh && '_not_populated_' !== self.allSavedTemplates() ) {
+                        return $.Deferred( function() { this.resolve( self.allSavedTemplates() );} );
+                  }
 
                   // Prevent a double request while ajax request is being processed
                   if ( self.templateCollectionPromise && 'pending' === self.templateCollectionPromise.state() )
@@ -404,9 +447,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         nonce: api.settings.nonce.save
                         //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
                   })
-                  .done( function( response ) {
-                        console.log('SERVER RESP FOR GET ALL SAVED TEMPLATE ?', response );
-                        console.log('typeof response', typeof response );
+                  .done( function( tmpl_collection ) {
+                        if ( _.isObject(tmpl_collection) ) {
+                              // update the saved value
+                              self.allSavedTemplates( tmpl_collection );
+                        }
+
+
                         // response is {tmpl_post_id: 436}
                         //self.tmplDialogVisible( false );
                         // api.previewer.trigger('sek-notify', {
@@ -420,7 +467,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // });
                   })
                   .fail( function( er ) {
-                        console.log('ER ??', er );
                         api.errorLog( 'ajax sek_get_all_saved_tmpl => error', er );
                         api.previewer.trigger('sek-notify', {
                             type : 'error',

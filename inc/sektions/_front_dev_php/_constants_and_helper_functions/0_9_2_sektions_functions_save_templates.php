@@ -118,22 +118,27 @@ function sek_get_all_saved_templates() {
         'order' => 'DESC'
     );
     $query = new \WP_Query( $sek_post_query_vars );
-    if ( !is_array( $query->posts ) || empty( $query->posts ) )
-      return;
-
     $collection = array();
-
-    sek_error_log('QUERY ??', $query );
+    if ( is_wp_error( $query ) ) {
+        wp_send_json_error(  __FUNCTION__ . '_error_when_querying_nimble_templates' );
+    }
+    if ( !is_array( $query->posts ) || empty( $query->posts ) ) {
+      return $collection;
+    }
 
     foreach ( $query->posts as $post_object ) {
         $content = maybe_unserialize( $post_object->post_content );
         if ( !is_array($content) ) {
             continue;
         }
+
+        //sek_error_log( __FUNCTION__ . ' POST OBJECT ?', $post_object->post_modified .  get_option('date_format') );
+
         // When updating a template, we only need to return title and description
         $collection[$post_object->post_name] = array(
             'title' => !empty($content['title']) ? $content['title'] : '',
-            'description' => !empty($content['description']) ? $content['description'] : ''
+            'description' => !empty($content['description']) ? $content['description'] : '',
+            'last_modified_date' => mysql2date( 'Y-m-d H:i:s', $post_object->post_modified )
         );
     }
 
@@ -148,9 +153,10 @@ function sek_get_all_saved_templates() {
   //     'title' => $_POST['sek_tmpl_title'],
   //     'description' => $_POST['sek_tmpl_description'],
   //     'data' => $_POST['sek_tmpl_data']//<= json stringified
+  //     'tmpl_post_name' => $_POST['tmpl_post_name'] (string)
   // );
 // @return WP_Post|WP_Error Post on success, error on failure.
-function sek_update_saved_tmpl_post( $tmpl_data, $post_name_to_update = '' ) {
+function sek_update_saved_tmpl_post( $tmpl_data ) {
     if ( !is_array( $tmpl_data ) ) {
         sek_error_log( __FUNCTION__ . ' => $tmpl_data is not an array' );
         return new \WP_Error( __FUNCTION__ . ' => $tmpl_data is not an array');
@@ -160,14 +166,18 @@ function sek_update_saved_tmpl_post( $tmpl_data, $post_name_to_update = '' ) {
         'title' => '',
         'description' => '',
         'data' => array(),
+        'tmpl_post_name' => null,
         'nimble_version' => NIMBLE_VERSION
     ));
 
+    // the template post name is provided only when updating
+    $is_update_case = !is_null($tmpl_data['tmpl_post_name']);
+
     // $post_name_to_update will be used when user updates an existing template
-    if ( !empty($post_name_to_update) ) {
-        $tmpl_post_name = $post_name_to_update;
+    if ( !is_null($tmpl_data['tmpl_post_name']) ) {
+        $tmpl_post_name = $tmpl_data['tmpl_post_name'];
     } else {
-        $tmpl_post_name = NIMBLE_PREFIX_FOR_SAVED_TMPL .  sanitize_title( $tmpl_data['title'] );
+        $tmpl_post_name = NIMBLE_PREFIX_FOR_SAVED_TMPL .  sanitize_title( $tmpl_data['title'] );//nimble_tmpl_my-template-name
     }
 
     $post_data = array(
@@ -179,12 +189,14 @@ function sek_update_saved_tmpl_post( $tmpl_data, $post_name_to_update = '' ) {
     );
 
     // Update post if it already exists, otherwise create a new one.
-    $post = sek_get_saved_tmpl_post( $tmpl_post_name );
+    if ( $is_update_case ) {
+        $tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
+    }
 
     sek_error_log( __FUNCTION__ . ' => so $tmpl_data for skope ' . $tmpl_post_name, $tmpl_data );
 
-    if ( $post ) {
-        $post_data['ID'] = $post->ID;
+    if ( $tmpl_post && is_object($tmpl_post) ) {
+        $post_data['ID'] = $tmpl_post->ID;
         $r = wp_update_post( wp_slash( $post_data ), true );
     } else {
         $r = wp_insert_post( wp_slash( $post_data ), true );

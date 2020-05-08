@@ -108,7 +108,14 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
 [data-sek-tmpl-dialog-mode="remove"].sek-removal-confirmation-opened .sek-open-remove-confirmation {display: none!important;}
 [data-sek-tmpl-dialog-mode="remove"].sek-removal-confirmation-opened .sek-tmpl-remove-dialog { display: block;}
 
+#nimble-top-tmpl-save-ui .spinner {
+  display: none;
+}
 
+#nimble-top-tmpl-save-ui.nimble-tmpl-processing-ajax .spinner {
+  display: block;
+  visibility: visible;
+}
 
 
 

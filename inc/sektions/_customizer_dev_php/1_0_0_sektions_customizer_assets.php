@@ -803,6 +803,7 @@ function sek_print_nimble_customizer_tmpl() {
               </button>
             </div>
           </div>
+          <?php // the select input is printed with a default 'none' option, other options will be populated dynamically with ajax fetching results ?>
           <select class="sek-saved-tmpl-picker"><option selected="selected" value="none"><?php _e('Select a template', 'text_doma'); ?></option></select>
           <div class="sek-tmpl-title">
               <label for="sek-saved-tmpl-title" class="customize-control-title"><?php _e('Template title', 'text_doma'); ?></label>
@@ -815,13 +816,13 @@ function sek_print_nimble_customizer_tmpl() {
           <div class="sek-save-tmpl-action">
             <div class="sek-ui-button-group" role="group">
               <button class="sek-ui-button sek-do-save-tmpl" type="button" title="<?php _e('Save template', 'text_domain'); ?>">
-                <i class="far fa-save"></i>&nbsp;<?php _e('Save template', 'text_domain'); ?>
+                <i class="far fa-save"></i>&nbsp;<?php _e('Save template', 'text_domain'); ?><span class="spinner"></span>
               </button>
               <button class="sek-ui-button sek-do-update-tmpl" type="button" title="<?php _e('Update template', 'text_domain'); ?>">
-                <i class="far fa-save"></i>&nbsp;<?php _e('Update template', 'text_domain'); ?>
+                <i class="far fa-save"></i>&nbsp;<?php _e('Update template', 'text_domain'); ?><span class="spinner"></span>
               </button>
               <button class="sek-ui-button sek-open-remove-confirmation" type="button" title="<?php _e('Remove template', 'text_domain'); ?>">
-                <i class="fas fa-trash"></i>&nbsp;<?php _e('Remove template', 'text_domain'); ?>
+                <i class="fas fa-trash"></i>&nbsp;<?php _e('Remove template', 'text_domain'); ?><span class="spinner"></span>
               </button>
               <button class="sek-ui-button sek-close-dialog" type="button" title="<?php _e('Close', 'text_domain'); ?>">
                   <i class="far fa-times-circle"></i>&nbsp;<?php _e('Close', 'text_domain'); ?>
@@ -832,7 +833,7 @@ function sek_print_nimble_customizer_tmpl() {
             <p><?php _e('Removing a template cannot be undone. Are you sure you want to continue?', 'text_doma'); ?>
             <div class="sek-ui-button-group" role="group">
               <button class="sek-ui-button sek-do-remove-tmpl" type="button" title="<?php _e('Remove template', 'text_domain'); ?>">
-                <?php _e('Remove template', 'text_domain'); ?>
+                <?php _e('Remove template', 'text_domain'); ?><span class="spinner"></span>
               </button>
               <button class="sek-ui-button sek-cancel-remove-tmpl" type="button" title="<?php _e('Cancel', 'text_domain'); ?>">
                 <?php _e('Cancel', 'text_domain'); ?>

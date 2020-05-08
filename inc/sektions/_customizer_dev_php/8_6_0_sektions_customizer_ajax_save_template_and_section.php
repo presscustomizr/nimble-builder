@@ -8,7 +8,7 @@ function sek_ajax_get_all_saved_templates() {
 
     $decoded_templates = sek_get_all_saved_templates();
 
-    if ( !empty( $decoded_templates ) && is_array($decoded_templates) ) {
+    if ( is_array($decoded_templates) ) {
         wp_send_json_success( $decoded_templates );
     } else {
         if ( !empty( $decoded_templates ) ) {
@@ -26,7 +26,7 @@ add_action( 'wp_ajax_sek_save_user_template', '\Nimble\sek_ajax_save_user_templa
 /////////////////////////////////////////////////////////////////
 // hook : wp_ajax_sek_save_user_template
 function sek_ajax_save_user_template() {
-    sek_error_log( __FUNCTION__ . ' ALORS YEAH ? ?', $_POST );
+    //sek_error_log( __FUNCTION__ . ' ALORS YEAH ? ?', $_POST );
 
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 
@@ -46,12 +46,15 @@ function sek_ajax_save_user_template() {
     if ( !is_string( $_POST['tmpl_description'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_template_description_must_be_a_string' );
     }
-    // sek_error_log('SEKS DATA ?', $_POST['sek_data'] );
+
+    //sek_error_log(__FUNCTION__ .  '$_POST?', $_POST );
+
     // sek_error_log('json decode ?', json_decode( wp_unslash( $_POST['sek_data'] ), true ) );
     $template_to_save = array(
         'title' => $_POST['tmpl_title'],
         'description' => $_POST['tmpl_description'],
-        'data' => $_POST['tmpl_data']//<= json stringified
+        'data' => $_POST['tmpl_data'],//<= json stringified
+        'tmpl_post_name' => ( !empty( $_POST['tmpl_post_name'] ) && is_string( $_POST['tmpl_post_name'] ) ) ? $_POST['tmpl_post_name'] : null
     );
 
     $saved_template_post = sek_update_saved_tmpl_post( $template_to_save );
