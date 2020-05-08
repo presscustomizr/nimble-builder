@@ -812,9 +812,6 @@ function sek_print_nimble_customizer_tmpl() {
               <label for="sek-saved-tmpl-description" class="customize-control-title"><?php _e('Template description', 'text_doma'); ?></label>
               <textarea id="sek-saved-tmpl-description" type="text" value=""></textarea>
           </div>
-          <div class="sek-tmpl-remove-dialog">
-            <p><?php _e('Removing a template cannot be undone. Are you sure you want to continue?', 'text_doma'); ?>
-          </div>
           <div class="sek-save-tmpl-action">
             <div class="sek-ui-button-group" role="group">
               <button class="sek-ui-button sek-do-save-tmpl" type="button" title="<?php _e('Save template', 'text_domain'); ?>">
@@ -823,7 +820,7 @@ function sek_print_nimble_customizer_tmpl() {
               <button class="sek-ui-button sek-do-update-tmpl" type="button" title="<?php _e('Update template', 'text_domain'); ?>">
                 <i class="far fa-save"></i>&nbsp;<?php _e('Update template', 'text_domain'); ?>
               </button>
-              <button class="sek-ui-button sek-do-remove-tmpl" type="button" title="<?php _e('Remove template', 'text_domain'); ?>">
+              <button class="sek-ui-button sek-open-remove-confirmation" type="button" title="<?php _e('Remove template', 'text_domain'); ?>">
                 <i class="fas fa-trash"></i>&nbsp;<?php _e('Remove template', 'text_domain'); ?>
               </button>
               <button class="sek-ui-button sek-close-dialog" type="button" title="<?php _e('Close', 'text_domain'); ?>">
@@ -831,7 +828,17 @@ function sek_print_nimble_customizer_tmpl() {
               </button>
             </div>
           </div>
-
+          <div class="sek-tmpl-remove-dialog">
+            <p><?php _e('Removing a template cannot be undone. Are you sure you want to continue?', 'text_doma'); ?>
+            <div class="sek-ui-button-group" role="group">
+              <button class="sek-ui-button sek-do-remove-tmpl" type="button" title="<?php _e('Remove template', 'text_domain'); ?>">
+                <?php _e('Remove template', 'text_domain'); ?>
+              </button>
+              <button class="sek-ui-button sek-cancel-remove-tmpl" type="button" title="<?php _e('Cancel', 'text_domain'); ?>">
+                <?php _e('Cancel', 'text_domain'); ?>
+              </button>
+            </div>
+          </div>
       </div>
     </script>
 

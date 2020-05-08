@@ -37,6 +37,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // update the current mode
                         $('#nimble-top-tmpl-save-ui').attr('data-sek-tmpl-dialog-mode', mode );
 
+                        // make sure the remove dialog is hidden
+                        $tmplDialogWrapper.removeClass('sek-removal-confirmation-opened');
+
                         // execute actions depending on the selected mode
                         switch( mode ) {
                               case 'save' :
@@ -46,7 +49,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
                               case 'update' :
                               case 'remove' :
-                                    var $selectEl = $( '#nimble-top-tmpl-save-ui' ).find('.sek-saved-tmpl-picker');
+                                    var $selectEl = $tmplDialogWrapper.find('.sek-saved-tmpl-picker');
                                         // Make sure the select value is always reset when switching mode
                                         $selectEl.val('none').trigger('change');
 
@@ -117,8 +120,60 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Save
                   $tmplDialogWrapper.on( 'click', '.sek-do-save-tmpl', function(evt){ self.saveOrUpdateTemplate(evt); });
 
+                  // Reveal remove dialog
+                  $tmplDialogWrapper.on( 'click', '.sek-open-remove-confirmation', function(evt){
+                        $tmplDialogWrapper.addClass('sek-removal-confirmation-opened');
+                  });
+                  // Do Remove
+                  $tmplDialogWrapper.on( 'click', '.sek-do-remove-tmpl', function(evt){
+                        var $selectEl = $tmplDialogWrapper.find('.sek-saved-tmpl-picker'),
+                            tmplPostNameCandidateForRemoval = $selectEl.val();
+                        // make sure we don't try to remove the default option
+                        if ( 'none' === tmplPostNameCandidateForRemoval || _.isEmpty(tmplPostNameCandidateForRemoval) )
+                          return;
+
+                        self.removeTemplate(evt, tmplPostNameCandidateForRemoval).done( function(response) {
+                              $tmplDialogWrapper.removeClass('sek-removal-confirmation-opened');
+
+                              // reset the select value
+                              $selectEl.val('none').trigger('change');
+
+                              //$tmplDialogWrapper.find('.sek-open-remove-confirmation').show('fast');
+                              if ( response.success ) {
+                                    // update the template collection
+                                    var oldTmplCollection = self.allSavedTemplates(),
+                                        newTmplCollection = {};
+
+                                    console.log('oldTemplateCollection', oldTmplCollection );
+                                    console.log('tmplPostNameCandidateForRemoval', tmplPostNameCandidateForRemoval );
+
+                                    // populate new tmpl collection
+                                    _.each( oldTmplCollection, function( _data, _key ) {
+                                        if ( tmplPostNameCandidateForRemoval !== _key ) {
+                                            newTmplCollection[_key] = _data;
+                                        }
+                                    });
+                                    console.log('newTmplCollection', newTmplCollection );
+                                    self.allSavedTemplates( newTmplCollection );
+
+
+
+                                    // remove the select option ( if not the default one 'none')
+                                    if ( 'none' !== tmplPostNameCandidateForRemoval ) {
+                                          $selectEl.find('[value="' + tmplPostNameCandidateForRemoval +'"]').remove();
+                                    }
+                              }
+                        });
+                  });
+
+                  // Cancel Remove
+                  $tmplDialogWrapper.on( 'click', '.sek-cancel-remove-tmpl', function(evt){
+                        $tmplDialogWrapper.removeClass('sek-removal-confirmation-opened');
+                  });
+
+
                   // Switch to update mode
-                  $tmplDialogWrapper.on( 'click', '[data-tmpl-mode-switcher="update"]', function(evt){  });
+                  //$tmplDialogWrapper.on( 'click', '[data-tmpl-mode-switcher="update"]', function(evt){  });
 
                   $('.sek-close-dialog', $tmplDialogWrapper ).on( 'click', function(evt) {
                         evt.preventDefault();
@@ -128,11 +183,118 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return $tmplDialogWrapper;
             },
 
+            // Fired on 'click on .sek-do-remove-tmpl btn
+            removeTemplate : function(evt, tmplPostNameCandidateForRemoval ) {
+                  var self = this, _dfd_ = $.Deferred();
+                  evt.preventDefault();
+                  wp.ajax.post( 'sek_remove_user_template', {
+                        nonce: api.settings.nonce.save,
+                        tmpl_post_name: tmplPostNameCandidateForRemoval
+                        //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                  })
+                  .done( function( response ) {
+                        console.log('ALORS SERVER RESP FOR REMOVED TEMPLATE ?', response );
+                        _dfd_.resolve( {success:true});
+                        // response is {tmpl_post_id: 436}
+                        //self.tmplDialogVisible( false );
+                        api.previewer.trigger('sek-notify', {
+                            type : 'success',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>@missi18n Your template has been removed.</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                  })
+                  .fail( function( er ) {
+                        console.log('ER ??', er );
+                        _dfd_.resolve( {success:false});
+                        api.errorLog( 'ajax sek_remove_template => error', er );
+                        api.previewer.trigger('sek-notify', {
+                            type : 'error',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>@missi18n error when removing template</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                  });
+
+                  return _dfd_;
+            },
+
+            // Fired on 'click' on .sek-do-save-tmpl btn
+            saveOrUpdateTemplate : function(evt) {
+                  var self = this;
+                  evt.preventDefault();
+                  var $_title = $('#sek-saved-tmpl-title'),
+                      tmpl_title = $_title.val(),
+                      tmpl_description = $('#sek-saved-tmpl-description').val(),
+                      collectionSettingId = self.localSectionsSettingId(),
+                      currentLocalSettingValue = self.preProcessTmpl( api( collectionSettingId )() );
+
+                  if ( _.isEmpty( tmpl_title ) ) {
+                      $_title.addClass('error');
+                      api.previewer.trigger('sek-notify', {
+                            type : 'error',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>@missi18n You need to set a title</strong>',
+                                  '</span>'
+                            ].join('')
+
+                      });
+                      return;
+                  }
+
+                  $('#sek-saved-tmpl-title').removeClass('error');
+
+                  wp.ajax.post( 'sek_save_user_template', {
+                        nonce: api.settings.nonce.save,
+                        tmpl_title: tmpl_title,
+                        tmpl_description: tmpl_description,
+                        tmpl_data: JSON.stringify( currentLocalSettingValue ),
+                        //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                  })
+                  .done( function( response ) {
+                        console.log('ALORS SERVER RESP FOR SAVED TEMPLATE ?', response );
+                        // response is {tmpl_post_id: 436}
+                        //self.tmplDialogVisible( false );
+                        api.previewer.trigger('sek-notify', {
+                            type : 'success',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>@missi18n Your template has been saved.</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                  })
+                  .fail( function( er ) {
+                        console.log('ER ??', er );
+                        api.errorLog( 'ajax sek_save_template => error', er );
+                        api.previewer.trigger('sek-notify', {
+                            type : 'error',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>@missi18n error when saving template</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                  });
+            },//saveOrUpdateTemplate
+
+
+
 
             // Is used in update and remove modes
             reactOnTemplateSelection : function(evt, $selectEl ){
 
-                  console.log('REACT ON TEMPLATE UPDATE SELECT', $selectEl, $selectEl.val() );
+                  //console.log('REACT ON TEMPLATE UPDATE SELECT', $selectEl, $selectEl.val() );
                   var self = this,
                       $tmplDialogWrapper = $('#nimble-top-tmpl-save-ui'),
                       _tmplPostName = $selectEl.val(),
@@ -176,7 +338,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // });
             toggleSaveTmplUI : function( visible ) {
                   visible = _.isUndefined( visible ) ? true : visible;
-                  console.log('SIO?', visible );
+                  //console.log('visible dialog?', visible );
                   var self = this,
                       _renderAndSetup = function() {
                             $.when( self.renderAndsetupSaveTmplUITmpl({}) ).done( function( $_el ) {
@@ -273,72 +435,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   return self.templateCollectionPromise;
             },
-
-
-
-            // Fired on 'click' on .sek-do-save-tmpl button
-            saveOrUpdateTemplate : function(evt) {
-                  var self = this;
-                  evt.preventDefault();
-                  var $_title = $('#sek-saved-tmpl-title'),
-                      tmpl_title = $_title.val(),
-                      tmpl_description = $('#sek-saved-tmpl-description').val(),
-                      collectionSettingId = self.localSectionsSettingId(),
-                      currentLocalSettingValue = self.preProcessTmpl( api( collectionSettingId )() );
-
-                  if ( _.isEmpty( tmpl_title ) ) {
-                      $_title.addClass('error');
-                      api.previewer.trigger('sek-notify', {
-                            type : 'error',
-                            duration : 10000,
-                            message : [
-                                  '<span style="font-size:0.95em">',
-                                    '<strong>@missi18n You need to set a title</strong>',
-                                  '</span>'
-                            ].join('')
-
-                      });
-                      return;
-                  }
-
-                  $('#sek-saved-tmpl-title').removeClass('error');
-
-                  wp.ajax.post( 'sek_save_user_template', {
-                        nonce: api.settings.nonce.save,
-                        tmpl_title: tmpl_title,
-                        tmpl_description: tmpl_description,
-                        tmpl_data: JSON.stringify( currentLocalSettingValue ),
-                        //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
-                  })
-                  .done( function( response ) {
-                        console.log('ALORS SERVER RESP FOR SAVED TEMPLATE ?', response );
-                        // response is {tmpl_post_id: 436}
-                        //self.tmplDialogVisible( false );
-                        api.previewer.trigger('sek-notify', {
-                            type : 'success',
-                            duration : 10000,
-                            message : [
-                                  '<span style="font-size:0.95em">',
-                                    '<strong>@missi18n Your template has been saved.</strong>',
-                                  '</span>'
-                            ].join('')
-                        });
-                  })
-                  .fail( function( er ) {
-                        console.log('ER ??', er );
-                        api.errorLog( 'ajax sek_save_template => error', er );
-                        api.previewer.trigger('sek-notify', {
-                            type : 'error',
-                            duration : 10000,
-                            message : [
-                                  '<span style="font-size:0.95em">',
-                                    '<strong>@missi18n error when saving template</strong>',
-                                  '</span>'
-                            ].join('')
-                        });
-                  });
-            },//saveOrUpdateTemplate
-
 
             // @return a tmpl model with clean ids
             // also removes the tmpl properties "id" and "level", which are dynamically set when dragging and dropping

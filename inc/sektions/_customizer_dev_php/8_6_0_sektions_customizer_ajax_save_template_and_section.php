@@ -1,11 +1,30 @@
 <?php
 ////////////////////////////////////////////////////////////////
+// Fetches the user saved templates
+add_action( 'wp_ajax_sek_get_all_saved_tmpl', '\Nimble\sek_ajax_get_all_saved_templates' );
+// @hook wp_ajax_sek_get_user_saved_templates
+function sek_ajax_get_all_saved_templates() {
+    sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+
+    $decoded_templates = sek_get_all_saved_templates();
+
+    if ( !empty( $decoded_templates ) && is_array($decoded_templates) ) {
+        wp_send_json_success( $decoded_templates );
+    } else {
+        if ( !empty( $decoded_templates ) ) {
+            sek_error_log(  __FUNCTION__ . ' error => invalid templates returned', $decoded_templates );
+            wp_send_json_error(  __FUNCTION__ . ' error => invalid templates returned' );
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////
 // TEMPLATE SAVE
 // introduced in april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
 // ENABLED WHEN CONSTANT NIMBLE_TEMPLATE_SAVE_ENABLED === true
 add_action( 'wp_ajax_sek_save_user_template', '\Nimble\sek_ajax_save_user_template' );
 /////////////////////////////////////////////////////////////////
-// hook : wp_ajax_sek_save_section
+// hook : wp_ajax_sek_save_user_template
 function sek_ajax_save_user_template() {
     sek_error_log( __FUNCTION__ . ' ALORS YEAH ? ?', $_POST );
 
@@ -45,23 +64,47 @@ function sek_ajax_save_user_template() {
     //sek_error_log( __FUNCTION__ . '$_POST' ,  $_POST);
 }
 
-// Fetches the user saved templates
-add_action( 'wp_ajax_sek_get_all_saved_tmpl', '\Nimble\sek_ajax_get_all_saved_templates' );
-// @hook wp_ajax_sek_get_user_saved_templates
-function sek_ajax_get_all_saved_templates() {
+////////////////////////////////////////////////////////////////
+// TEMPLATE REMOVE
+// introduced in may 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
+// ENABLED WHEN CONSTANT NIMBLE_TEMPLATE_SAVE_ENABLED === true
+add_action( 'wp_ajax_sek_remove_user_template', '\Nimble\sek_ajax_remove_user_template' );
+/////////////////////////////////////////////////////////////////
+// hook : wp_ajax_sek_remove_user_template
+function sek_ajax_remove_user_template() {
+    //sek_error_log( __FUNCTION__ . ' ALORS YEAH IN REMOVAL ? ?', $_POST );
+
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 
-    $decoded_templates = sek_get_all_saved_templates();
-
-    if ( !empty( $decoded_templates ) && is_array($decoded_templates) ) {
-        wp_send_json_success( $decoded_templates );
-    } else {
-        if ( !empty( $decoded_templates ) ) {
-            sek_error_log(  __FUNCTION__ . ' error => invalid templates returned', $decoded_templates );
-            wp_send_json_error(  __FUNCTION__ . ' error => invalid templates returned' );
-        }
+    // We must have a tmpl_post_name
+    if ( empty( $_POST['tmpl_post_name']) || !is_string( $_POST['tmpl_post_name'] ) ) {
+        wp_send_json_error( __FUNCTION__ . '_missing_tmpl_post_name' );
     }
+    // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+    //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
+    // }
+    $tmpl_post_to_remove = sek_get_saved_tmpl_post( $_POST['tmpl_post_name'] );
+
+    sek_error_log( __FUNCTION__ . ' => so $tmpl_post_to_remove ' . $_POST['tmpl_post_name'], $tmpl_post_to_remove );
+
+    if ( $tmpl_post_to_remove ) {
+        $r = wp_delete_post( $tmpl_post_to_remove->ID, true );
+        if ( is_wp_error( $r ) ) {
+            wp_send_json_error( __FUNCTION__ . '_removal_error' );
+        }
+    } else {
+        wp_send_json_error( __FUNCTION__ . '_tmpl_post_not_found' );
+    }
+
+    if ( is_wp_error( $tmpl_post_to_remove ) || is_null($tmpl_post_to_remove) || empty($tmpl_post_to_remove) ) {
+        wp_send_json_error( __FUNCTION__ . '_removal_error' );
+    } else {
+        // sek_error_log( 'ALORS CE POST?', $saved_template_post );
+        wp_send_json_success( [ 'tmpl_post_removed' => $_POST['tmpl_post_name'] ] );
+    }
+    //sek_error_log( __FUNCTION__ . '$_POST' ,  $_POST);
 }
+
 
 
 

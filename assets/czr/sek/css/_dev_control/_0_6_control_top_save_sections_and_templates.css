@@ -76,7 +76,7 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
 .sek-tmpl-description,
 .sek-save-tmpl-action .sek-do-save-tmpl,
 .sek-save-tmpl-action .sek-do-update-tmpl,
-.sek-save-tmpl-action .sek-do-remove-tmpl { display: none;}
+.sek-save-tmpl-action .sek-open-remove-confirmation { display: none;}
 
 /* the template picker is visible when template collection has been ajaxily fetched */
 .tmpl-collection-populated .sek-saved-tmpl-picker{display:block}
@@ -87,7 +87,13 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
   background: #ffffff;
   padding: 5px;
   text-transform: uppercase;
+  float: left;
+  width: 96%;
 }
+.sek-tmpl-remove-dialog .sek-do-remove-tmpl {
+  color: red;
+}
+
 /* VISIBILITY = f(mode) */
 [data-sek-tmpl-dialog-mode="save"] .sek-saved-tmpl-picker {display: none;}
 [data-sek-tmpl-dialog-mode="save"] .sek-tmpl-title {display: block;}
@@ -98,7 +104,9 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
 [data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-tmpl-description {display: block;}
 [data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-do-update-tmpl {display: block;}
 
-[data-sek-tmpl-dialog-mode="remove"].sek-tmpl-remove-selected .sek-do-remove-tmpl {display: block;}
+[data-sek-tmpl-dialog-mode="remove"].sek-tmpl-remove-selected .sek-open-remove-confirmation {display: block;}
+[data-sek-tmpl-dialog-mode="remove"].sek-removal-confirmation-opened .sek-open-remove-confirmation {display: none!important;}
+[data-sek-tmpl-dialog-mode="remove"].sek-removal-confirmation-opened .sek-tmpl-remove-dialog { display: block;}
 
 
 

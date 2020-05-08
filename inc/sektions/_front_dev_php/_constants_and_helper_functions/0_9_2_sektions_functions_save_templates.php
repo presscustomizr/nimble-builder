@@ -43,77 +43,61 @@ register_post_type( NIMBLE_TEMPLATE_CPT , array(
  * @return WP_Post|null
  */
 function sek_get_saved_tmpl_post( $tmpl_post_name ) {
-    // $sek_post_query_vars = array(
-    //     'post_type'              => NIMBLE_CPT,
-    //     'post_status'            => get_post_stati(),
-    //     'name'                   => sanitize_title( $tmpl_post_name ),
-    //     'posts_per_page'         => 1,
-    //     'no_found_rows'          => true,
-    //     'cache_results'          => true,
-    //     'update_post_meta_cache' => false,
-    //     'update_post_term_cache' => false,
-    //     'lazy_load_term_meta'    => false,
-    // );
-
-    $post = null;
-    $all_saved_seks = get_option( NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS );
-    $tmpl_data = array_key_exists( $saved_tmpl_id, $all_saved_seks ) ? $all_saved_seks[$saved_tmpl_id] : array();
-    $post_id = array_key_exists( 'post_id', $tmpl_data ) ? $tmpl_data['post_id'] : -1;
-
-    // if the options has not been set yet, it will return (int) 0
-    if ( 0 > $post_id ) {
-        //error_log( 'sek_get_seks_post => post_id is not valid for options => ' . $saved_tmpl_id );
-        return;
+    $cache_group = 'nimble_template_post';
+    $template_post = wp_cache_get( $tmpl_post_name, $cache_group );
+    // is it cached already ?
+    if ( $template_post && is_object($template_post) && NIMBLE_TEMPLATE_CPT === get_post_type( $template_post->id ) ) {
+      return $template_post;
     }
 
-    if ( !is_int( $post_id ) ) {
-        error_log( __FUNCTION__ .' => post_id !is_int() for options => ' . $saved_tmpl_id );
+    $tmpl_post_query = new \WP_Query(
+      array(
+        'post_type'              => NIMBLE_TEMPLATE_CPT,
+        'post_status'            => get_post_stati(),
+        'name'                   => sanitize_title( $tmpl_post_name ),
+        'posts_per_page'         => 1,
+        'no_found_rows'          => true,
+        'cache_results'          => true,
+        'update_post_meta_cache' => false,
+        'update_post_term_cache' => false,
+        'lazy_load_term_meta'    => false,
+      )
+    );
+    if ( !empty( $tmpl_post_query->posts ) ) {
+        $template_post = $tmpl_post_query->posts[0];
+        wp_cache_set( $tmpl_post_name, $template_post, $cache_group );
+        return $template_post;
     }
 
-    if ( is_int( $post_id ) && $post_id > 0 && get_post( $post_id ) ) {
-        $post = get_post( $post_id );
-    }
-
-    // // `-1` indicates no post exists; no query necessary.
-    // if ( !$post && -1 !== $post_id ) {
-    //     $query = new WP_Query( $sek_post_query_vars );
-    //     $post = $query->post;
-    //     $post_id = $post ? $post->ID : -1;
-    //     /*
-    //      * Cache the lookup. See sek_update_sek_post().
-    //      * @todo This should get cleared if a skope post is added/removed.
-    //      */
-    //     update_option( $option_name, (int)$post_id );
-    // }
-
-    return $post;
+    return null;
 }
 
 
 
-// @return the saved template data collection
-function sek_get_saved_template_data( $tmpl_post_name ) {
-    $sek_post = sek_get_saved_template_post( $tmpl_post_name );
-    $tmpl_data = array();
-    if ( $sek_post ) {
-        $tmpl_data_decoded = maybe_unserialize( $sek_post->post_content );
-        // The section data are described as an array
-        // array(
-        //     'title' => '',
-        //     'description' => '',
-        //     'id' => '',
-        //     'type' => 'content',//in the future will be used to differentiate header, content and footer sections
-        //     'creation_date' => date("Y-m-d H:i:s"),
-        //     'update_date' => '',
-        //     'data' => array(),<= this is where we describe the columns and options
-        //     'nimble_version' => NIMBLE_VERSION
-        // )
-        if ( is_array( $tmpl_data_decoded ) && !empty( $tmpl_data_decoded['data'] ) && is_string( $tmpl_data_decoded['data'] ) ) {
-            $tmpl_data = json_decode( wp_unslash( $tmpl_data_decoded['data'], true ) );
-        }
-    }
-    return $tmpl_data;
-}
+// // @return the saved template data collection
+// // NOT USED
+// function sek_get_saved_template_data( $tmpl_post_name ) {
+//     $sek_post = sek_get_saved_template_post( $tmpl_post_name );
+//     $tmpl_data = array();
+//     if ( $sek_post ) {
+//         $tmpl_data_decoded = maybe_unserialize( $sek_post->post_content );
+//         // The section data are described as an array
+//         // array(
+//         //     'title' => '',
+//         //     'description' => '',
+//         //     'id' => '',
+//         //     'type' => 'content',//in the future will be used to differentiate header, content and footer sections
+//         //     'creation_date' => date("Y-m-d H:i:s"),
+//         //     'update_date' => '',
+//         //     'data' => array(),<= this is where we describe the columns and options
+//         //     'nimble_version' => NIMBLE_VERSION
+//         // )
+//         if ( is_array( $tmpl_data_decoded ) && !empty( $tmpl_data_decoded['data'] ) && is_string( $tmpl_data_decoded['data'] ) ) {
+//             $tmpl_data = json_decode( wp_unslash( $tmpl_data_decoded['data'], true ) );
+//         }
+//     }
+//     return $tmpl_data;
+// }
 
 
 // invoked on 'wp_ajax_sek_get_user_saved_templates'
