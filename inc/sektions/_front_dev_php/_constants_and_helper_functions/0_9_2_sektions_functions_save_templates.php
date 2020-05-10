@@ -218,7 +218,7 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
         $tmpl_post_name = NIMBLE_PREFIX_FOR_SAVED_TMPL .  sanitize_title( $tmpl_data['metas']['title'] );//nimble_tmpl_my-template-name
     }
 
-    sek_error_log('$tmpl_data??', $tmpl_data );
+    //sek_error_log('$tmpl_data??', $tmpl_data );
 
     $post_data = array(
         'post_title' => esc_attr( $tmpl_data['metas']['title'] ),
@@ -228,7 +228,7 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
         'post_content' => maybe_serialize( $tmpl_data )
     );
 
-    sek_error_log('serialized $tmpl_data??', maybe_serialize( $tmpl_data ) );
+    //sek_error_log('serialized $tmpl_data??', maybe_serialize( $tmpl_data ) );
     // Update post if it already exists, otherwise create a new one.
     $tmpl_post = null;
     if ( $is_update_case ) {

@@ -73,7 +73,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $galleryInner.html('');
                   // Wait for the gallery to be fetched and rendered
                   self.getTemplateGalleryHtml().done( function( html ) {
-                        console.log('HTML? ', html );
                         $galleryInner.html( html );
                   });
             },
@@ -137,7 +136,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   self.getSavedTmplCollection().done( function( tmpl_collection ) {
                         _.each( tmpl_collection, function( _data, _temp_id ) {
-                              console.log('SO?', _data );
                               _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '">';
                                 _html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
                                 _html += '<div class="sek-tmpl-info">';
