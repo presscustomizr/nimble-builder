@@ -83,25 +83,25 @@
                                           break;
                                     }
 
-                                    api.czr_sektions.import_template({
+                                    api.czr_sektions.import_template_from_file({
                                         pre_import_check : true,
                                         input : input,
                                         file_input : $file_input
                                     })
                                     .done( function( server_resp ) {
-                                          api.czr_sektions.pre_import_checks( server_resp, {
+                                          api.czr_sektions.pre_checks_from_file_import( server_resp, {
                                               pre_import_check : false,
                                               input : input,
                                               file_input : $file_input
                                           });
                                     })
                                     .fail( function( error_resp ) {
-                                          api.errare( 'import_export_ input => pre_import_checks failed', error_resp );
+                                          api.errare( 'import_export_ input => pre_checks_from_file_import failed', error_resp );
                                           api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate({
                                               input : input,
                                               file_input : $file_input
                                           });
-                                          api.czr_sektions.import_template({
+                                          api.czr_sektions.import_template_from_file({
                                               input : input,
                                               file_input : $file_input
                                           });
@@ -109,13 +109,13 @@
 
                               break;//'sek-import'
                               case 'sek-import-as-is' :
-                                    api.czr_sektions.import_template({
+                                    api.czr_sektions.import_template_from_file({
                                         input : input,
                                         file_input : $file_input
                                     });
                               break;
                               case 'sek-import-assign' :
-                                    api.czr_sektions.import_template({
+                                    api.czr_sektions.import_template_from_file({
                                         assign_missing_locations : true,
                                         input : input,
                                         file_input : $file_input

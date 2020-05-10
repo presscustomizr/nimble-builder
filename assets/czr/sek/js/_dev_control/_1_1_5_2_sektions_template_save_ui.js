@@ -133,6 +133,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
+
+            ///////////////////////////////////////////////
+            ///// DOM EVENTS
             // Fired once, on first rendering
             scheduleDOMEvents : function() {
                   var self = this, $tmplDialogWrapper = $('#nimble-top-tmpl-save-ui');
@@ -225,6 +228,44 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
+
+            // Is used in update and remove modes
+            reactOnTemplateSelection : function(evt, $selectEl ){
+                  var self = this,
+                      $tmplDialogWrapper = $('#nimble-top-tmpl-save-ui'),
+                      _tmplPostName = $selectEl.val(),
+                      $titleInput = $tmplDialogWrapper.find('#sek-saved-tmpl-title'),
+                      $descInput = $tmplDialogWrapper.find('#sek-saved-tmpl-description'),
+                      // The informative class control the visibility of the title and the description in CSS
+                      _informativeClass = 'update' === self.tmplDialogMode() ? 'sek-tmpl-update-selected' : 'sek-tmpl-remove-selected';
+
+                  if ( 'none' === _tmplPostName ) {
+                        $titleInput.val('');
+                        $descInput.val('');
+                        $tmplDialogWrapper.removeClass(_informativeClass);
+                  } else {
+                        var _allSavedTemplates = self.allSavedTemplates();
+                        var _selectedTmpl = _tmplPostName;
+
+                        // normalize
+                        _allSavedTemplates = ( _.isObject(_allSavedTemplates) && !_.isArray(_allSavedTemplates) ) ? _allSavedTemplates : {};
+                        _allSavedTemplates[_tmplPostName] = $.extend( {
+                            title : '',
+                            description : '',
+                            last_modified_date : ''
+                        }, _allSavedTemplates[_tmplPostName] || {} );
+
+                        $titleInput.val( _allSavedTemplates[_tmplPostName].title );
+                        $descInput.val( _allSavedTemplates[_tmplPostName].description );
+                        $tmplDialogWrapper.addClass(_informativeClass);
+                  }
+            },
+
+
+
+
+            ///////////////////////////////////////////////
+            ///// AJAX ACTIONS
             // Fired on 'click' on .sek-do-save-tmpl btn
             saveOrUpdateTemplate : function(evt, tmplPostNameCandidateForUpdate ) {
                   var self = this, _dfd_ = $.Deferred();
@@ -334,38 +375,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
-            // Is used in update and remove modes
-            reactOnTemplateSelection : function(evt, $selectEl ){
-                  var self = this,
-                      $tmplDialogWrapper = $('#nimble-top-tmpl-save-ui'),
-                      _tmplPostName = $selectEl.val(),
-                      $titleInput = $tmplDialogWrapper.find('#sek-saved-tmpl-title'),
-                      $descInput = $tmplDialogWrapper.find('#sek-saved-tmpl-description'),
-                      // The informative class control the visibility of the title and the description in CSS
-                      _informativeClass = 'update' === self.tmplDialogMode() ? 'sek-tmpl-update-selected' : 'sek-tmpl-remove-selected';
-
-                  if ( 'none' === _tmplPostName ) {
-                        $titleInput.val('');
-                        $descInput.val('');
-                        $tmplDialogWrapper.removeClass(_informativeClass);
-                  } else {
-                        var _allSavedTemplates = self.allSavedTemplates();
-                        var _selectedTmpl = _tmplPostName;
-
-                        // normalize
-                        _allSavedTemplates = ( _.isObject(_allSavedTemplates) && !_.isArray(_allSavedTemplates) ) ? _allSavedTemplates : {};
-                        _allSavedTemplates[_tmplPostName] = $.extend( {
-                            title : '',
-                            description : '',
-                            last_modified_date : ''
-                        }, _allSavedTemplates[_tmplPostName] || {} );
-
-                        $titleInput.val( _allSavedTemplates[_tmplPostName].title );
-                        $descInput.val( _allSavedTemplates[_tmplPostName].description );
-                        $tmplDialogWrapper.addClass(_informativeClass);
-                  }
-            },
-
 
 
             ///////////////////////////////////////////////
@@ -423,12 +432,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             ///////////////////////////////////////////////
-            ///// AJAX ACTIONS
+            ///// TMPL COLLECTION
             // @return $.promise
             setSavedTmplCollection : function( params ) {
-                  var self = this,
-                      $tmplDialogWrapper = $('#nimble-top-tmpl-save-ui'),
-                      $selectEl = $tmplDialogWrapper.find('.sek-saved-tmpl-picker');
+                  var self = this, _dfd_ = $.Deferred();
 
                   // refresh is true on save, update, remove success
                   params = params || {refresh : false};
@@ -436,23 +443,39 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // If the collection is already set, return it.
                   // unless this is a "refresh" case
                   if ( !params.refresh && '_not_populated_' !== self.allSavedTemplates() ) {
-                        return $.Deferred( function() { this.resolve( self.allSavedTemplates() );} );
+                        return _dfd_.resolve( self.allSavedTemplates() );
                   }
 
+                  var _promise;
                   // Prevent a double request while ajax request is being processed
-                  if ( self.templateCollectionPromise && 'pending' === self.templateCollectionPromise.state() )
-                    return self.templateCollectionPromise;
+                  if ( self.templateCollectionPromise && 'pending' === self.templateCollectionPromise.state() ) {
+                        _promise = self.templateCollectionPromise;
+                  } else {
+                        _promise = self.getSavedTmplCollection();
+                  }
+                  _promise.done( function( tmpl_collection ) {
+                        self.allSavedTemplates( tmpl_collection );
+                        _dfd_.resolve( tmpl_collection );
+                  });
+                  return _dfd_.promise();
+            },
 
-                  self.templateCollectionPromise = wp.ajax.post( 'sek_get_all_saved_tmpl', {
+            // @return a promise
+            getSavedTmplCollection : function() {
+                  var self = this;
+                  self.templateCollectionPromise = $.Deferred();
+
+                  wp.ajax.post( 'sek_get_all_saved_tmpl', {
                         nonce: api.settings.nonce.save
                         //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
                   })
                   .done( function( tmpl_collection ) {
-                        if ( _.isObject(tmpl_collection) ) {
-                              // update the saved value
-                              self.allSavedTemplates( tmpl_collection );
+                        if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
+                              self.templateCollectionPromise.resolve( tmpl_collection );
+                        } else {
+                              self.templateCollectionPromise.resolve( {} );
+                              api.errare('control::getSavedTmplCollection => error => tmpl collection is invalid');
                         }
-
 
                         // response is {tmpl_post_id: 436}
                         //self.tmplDialogVisible( false );
@@ -477,6 +500,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   '</span>'
                             ].join('')
                         });
+                        self.templateCollectionPromise.resolve({});
                   });
 
                   return self.templateCollectionPromise;

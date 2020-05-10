@@ -193,7 +193,7 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
         $tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
     }
 
-    sek_error_log( __FUNCTION__ . ' => so $tmpl_data for skope ' . $tmpl_post_name, $tmpl_data );
+    //sek_error_log( __FUNCTION__ . ' => so $tmpl_data for skope ' . $tmpl_post_name, $tmpl_data );
 
     if ( $tmpl_post && is_object($tmpl_post) ) {
         $post_data['ID'] = $tmpl_post->ID;
