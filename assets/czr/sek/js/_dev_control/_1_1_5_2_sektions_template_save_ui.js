@@ -295,11 +295,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   wp.ajax.post( 'sek_save_user_template', {
                         nonce: api.settings.nonce.save,
+                        tmpl_data: JSON.stringify( currentLocalSettingValue ),
+                        // the following will be saved in 'metas'
                         tmpl_title: tmpl_title,
                         tmpl_description: tmpl_description,
-                        tmpl_data: JSON.stringify( currentLocalSettingValue ),
-                        tmpl_post_name: tmplPostNameCandidateForUpdate || ''
-                        //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                        tmpl_post_name: tmplPostNameCandidateForUpdate || '',// <= provided when updating a template
+                        skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                        active_locations : api.czr_sektions.activeLocations()
                   })
                   .done( function( response ) {
                         //console.log('SAVED POST ID', response );

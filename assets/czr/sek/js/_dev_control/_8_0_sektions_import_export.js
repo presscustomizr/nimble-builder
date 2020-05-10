@@ -77,10 +77,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @return promise
             getTmplJsonFromUserTmpl : function( template_name ) {
                   var self = this, _dfd_ = $.Deferred();
-                  evt.preventDefault();
                   wp.ajax.post( 'sek_get_user_tmpl_json', {
                         nonce: api.settings.nonce.save,
-                        tmpl_post_name: tmplPostNameCandidateForRemoval
+                        tmpl_post_name: template_name
                         //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
                   })
                   .done( function( response ) {
@@ -105,12 +104,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // @return promise
             getTmplJsonFromApi : function( template_name ) {
-                  var self, _dfd_ = $.Deferred;
+                  var self, _dfd_ = $.Deferred();
                   $.getJSON( 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan' )
                             .done( function( resp ) {
                                   if ( !_.isObject( resp ) || !resp.lib || !resp.lib.templates ) {
                                         api.errare( '::import_nimble_template success but invalid response => ', resp  );
-                                        _dfd_.resolved({success:false});
+                                        _dfd_.resolve({success:false});
                                   }
                                   var _json_data = resp.lib.templates[template_name];
                                   if ( !_json_data ) {
@@ -127,14 +126,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                     '</span>'
                                               ].join('')
                                         });
-                                        _dfd_.resolved({success:false});
+                                        _dfd_.resolve({success:false});
                                   }
-                                  _dfd_.resolved( {success:true, tmpl_json:_json_data } );
+                                  _dfd_.resolve( {success:true, tmpl_json:_json_data } );
 
                             })
                             .fail(function( er ) {
                                   api.errare( '::import_nimble_template failed => ', er  );
-                                  _dfd_.resolved({success:false});
+                                  _dfd_.resolve({success:false});
                             });
 
                     return _dfd_.promise();
@@ -142,7 +141,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // @params
             // {
-            //     is_manual_import : true,
+            //     is_file_import : true,
             //     pre_import_check : false,
             //     assign_missing_locations : false,
             //     input : <= input instance when import is manual
@@ -184,8 +183,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //  }
                   // }
                   _promise.done( function( response ) {
+                        console.log('SO IMPORT ??', response );
                         if ( response.success ) {
-                              //console.log('IMPORT NIMBLE TEMPLATE', resp.lib.templates[template_name] );
+                              //console.log('IMPORT NIMBLE TEMPLATE', response.lib.templates[template_name] );
                               self.import_template_from_user_collection_or_remote_api({
                                     pre_import_check : false,
                                     template_name : tmpl_name,
@@ -195,13 +195,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
             },
 
-
+            // @param params
+            // {
+            //       pre_import_check : false,
+            //       template_name : tmpl_name,
+            //       template_data : response.tmpl_json
+            // }
             import_template_from_user_collection_or_remote_api : function( params ) {
                   console.log('import_template_from_user_collection_or_remote_api', params );
-
+                  var self = this;
                   params = params || {};
                   // normalize params
                   params = $.extend({
+                      is_file_import : false,
                       pre_import_check : false,
                       assign_missing_locations : false,
                   }, params );
@@ -215,7 +221,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( !params.template_data ) {
                         throw new Error( '::import_template => missing remote template data' );
                   }
-                  __request__ = wp.ajax.post( 'sek_process_template_file_content', {
+                  __request__ = wp.ajax.post( 'sek_process_template_json', {
                         nonce: api.settings.nonce.save,
                         template_data : JSON.stringify( params.template_data ),
                         pre_import_check : false//<= might be used in the future do stuffs. For example when importing manually, this property is used to skip the img sniffing on the first pass.
@@ -331,6 +337,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   params = params || {};
                   // normalize params
                   params = $.extend({
+                      is_file_import : true,
                       pre_import_check : false,
                       assign_missing_locations : false,
                       input : '',
@@ -523,7 +530,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   params = params || {};
                   // normalize params
                   params = $.extend({
-                      is_manual_import : true,
+                      is_file_import : true,
                       pre_import_check : false,
                       assign_missing_locations : false,
                       input : '',
@@ -531,7 +538,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }, params );
 
                   // We must have a params.input when import is manual
-                  if ( params.is_manual_import && _.isEmpty( params.input ) ) {
+                  if ( params.is_file_import && _.isEmpty( params.input ) ) {
                       throw new Error( '::pre_checks_from_file_import => missing file_input param' );
                   }
 
@@ -549,7 +556,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var importedActiveLocationsNotAvailableInCurrentActiveLocations = $(importedActiveLocations).not(currentActiveLocations).get();
 
                         if ( !_.isEmpty( importedActiveLocationsNotAvailableInCurrentActiveLocations ) ) {
-                              if ( params.is_manual_import ) {
+                              if ( params.is_file_import ) {
                                     input.container.find('button[data-czr-action="sek-pre-import"]').hide();
 
                                     // Different messages for local and global
@@ -579,7 +586,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     '</span>'
                               ].join('')
                         });
-                        if ( params.is_manual_import ) {
+                        if ( params.is_file_import ) {
                               api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate( params );
                         }
                   }
@@ -665,7 +672,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var currentSetId = api.czr_sektions.localSectionsSettingId();
 
                   // Manual import => set the relevant setting ID
-                  if ( params.is_manual_import ) {
+                  if ( params.is_file_import ) {
                       var _input = params.input,
                           inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( _input.id, _input.module.module_type );
 
@@ -733,7 +740,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // We can try to the update the api setting
             doUpdateApiSettingAfterTmplImport : function( server_resp, params ){
                   params = params || {};
-                  if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_manual_import ) {
+                  if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_file_import ) {
                         api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate( params );
                         return;
                   }
@@ -742,7 +749,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       _keep_existing_sections = false;//<= only possibly true when importing manually
 
                   // Manual import => set the relevant scope
-                  if ( params.is_manual_import ) {
+                  if ( params.is_file_import ) {
                       var _input = params.input,
                           inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( _input.id, _input.module.module_type );
 
@@ -820,21 +827,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-            // Fired when params.is_manual_import only
+            // Fired when params.is_file_import only
             doAlwaysAfterManualImportAndApiSettingUpdate : function( params ) {
                   api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
 
                   params = params || {};
                   // normalize params
                   params = $.extend({
-                      is_manual_import : true,
+                      is_file_import : true,
                       pre_import_check : false,
                       assign_missing_locations : false,
                       input : '',
                       file_input : ''
                   }, params );
 
-                  if ( !params.is_manual_import )
+                  if ( !params.is_file_import )
                     return;
 
                   var input = params.input;

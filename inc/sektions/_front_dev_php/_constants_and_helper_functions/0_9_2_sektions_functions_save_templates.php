@@ -128,16 +128,35 @@ function sek_get_all_saved_templates() {
 
     foreach ( $query->posts as $post_object ) {
         $content = maybe_unserialize( $post_object->post_content );
+        //sek_error_log( __FUNCTION__ . ' POST OBJECT ?', $post_object->post_modified .  get_option('date_format') );
+        // Structure of $content :
+        // array(
+        //     'data' => $_POST['tmpl_data'],//<= json stringified
+        //     'tmpl_post_name' => ( !empty( $_POST['tmpl_post_name'] ) && is_string( $_POST['tmpl_post_name'] ) ) ? $_POST['tmpl_post_name'] : null,
+        //     'metas' => array(
+        //         'title' => $_POST['tmpl_title'],
+        //         'description' => $_POST['tmpl_description'],
+        //         'skope_id' => $_POST['skope_id'],
+        //         'version' => NIMBLE_VERSION,
+        //         // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
+        //         'active_locations' => is_string( $_POST['active_locations'] ) ? explode( ',', $_POST['active_locations'] ) : array(),
+        //         'date' => date("Y-m-d"),
+        //         'theme' => sanitize_title_with_dashes( get_stylesheet() )
+        //     )
+        // );
         if ( !is_array($content) ) {
+            sek_error_log(__FUNCTION__ . ' error in content structure for template post name : ' . $post_object->post_name );
+            continue;
+        }
+        if ( empty($content['metas']) ) {
+            sek_error_log(__FUNCTION__ . ' error => missing metas for template post name : ' . $post_object->post_name );
             continue;
         }
 
-        //sek_error_log( __FUNCTION__ . ' POST OBJECT ?', $post_object->post_modified .  get_option('date_format') );
-
         // When updating a template, we only need to return title and description
         $collection[$post_object->post_name] = array(
-            'title' => !empty($content['title']) ? $content['title'] : '',
-            'description' => !empty($content['description']) ? $content['description'] : '',
+            'title' => !empty($content['metas']['title']) ? $content['metas']['title'] : '',
+            'description' => !empty($content['metas']['description']) ? $content['metas']['description'] : '',
             'last_modified_date' => mysql2date( 'Y-m-d H:i:s', $post_object->post_modified )
         );
     }
@@ -150,10 +169,18 @@ function sek_get_all_saved_templates() {
  // Update the 'nimble_template' post
  // Inserts a 'nimble_template' post when one doesn't yet exist.
  // $tmpl_data = array(
-  //     'title' => $_POST['sek_tmpl_title'],
-  //     'description' => $_POST['sek_tmpl_description'],
-  //     'data' => $_POST['sek_tmpl_data']//<= json stringified
-  //     'tmpl_post_name' => $_POST['tmpl_post_name'] (string)
+  //     'data' => $_POST['tmpl_data'],//<= json stringified
+  //     'tmpl_post_name' => ( !empty( $_POST['tmpl_post_name'] ) && is_string( $_POST['tmpl_post_name'] ) ) ? $_POST['tmpl_post_name'] : null,
+  //     'metas' => array(
+  //         'title' => $_POST['tmpl_title'],
+  //         'description' => $_POST['tmpl_description'],
+  //         'skope_id' => $_POST['skope_id'],
+  //         'version' => NIMBLE_VERSION,
+  //         // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
+  //         'active_locations' => is_string( $_POST['active_locations'] ) ? explode( ',', $_POST['active_locations'] ) : array(),
+  //         'date' => date("Y-m-d"),
+  //         'theme' => sanitize_title_with_dashes( get_stylesheet() )
+  //     )
   // );
 // @return WP_Post|WP_Error Post on success, error on failure.
 function sek_update_saved_tmpl_post( $tmpl_data ) {
@@ -162,12 +189,23 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
         return new \WP_Error( __FUNCTION__ . ' => $tmpl_data is not an array');
     }
 
+    if ( !isset( $tmpl_data['data']) || !isset( $tmpl_data['metas']) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid $tmpl_data' );
+        return new \WP_Error( __FUNCTION__ . ' => invalid $tmpl_data');
+    }
+
     $tmpl_data = wp_parse_args( $tmpl_data, array(
-        'title' => '',
-        'description' => '',
         'data' => array(),
         'tmpl_post_name' => null,
-        'nimble_version' => NIMBLE_VERSION
+        'metas' => array(
+            'title' => '',
+            'description' => '',
+            'skope_id' => '',
+            'version' => NIMBLE_VERSION,
+            'active_locations' => array(),
+            'date' => '',
+            'theme' => ''
+        )
     ));
 
     // the template post name is provided only when updating
@@ -177,18 +215,22 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
     if ( !is_null($tmpl_data['tmpl_post_name']) ) {
         $tmpl_post_name = $tmpl_data['tmpl_post_name'];
     } else {
-        $tmpl_post_name = NIMBLE_PREFIX_FOR_SAVED_TMPL .  sanitize_title( $tmpl_data['title'] );//nimble_tmpl_my-template-name
+        $tmpl_post_name = NIMBLE_PREFIX_FOR_SAVED_TMPL .  sanitize_title( $tmpl_data['metas']['title'] );//nimble_tmpl_my-template-name
     }
 
+    sek_error_log('$tmpl_data??', $tmpl_data );
+
     $post_data = array(
-        'post_title' => esc_attr( $tmpl_data['title'] ),
+        'post_title' => esc_attr( $tmpl_data['metas']['title'] ),
         'post_name' => $tmpl_post_name,
         'post_type' => NIMBLE_TEMPLATE_CPT,
         'post_status' => 'publish',
         'post_content' => maybe_serialize( $tmpl_data )
     );
 
+    sek_error_log('serialized $tmpl_data??', maybe_serialize( $tmpl_data ) );
     // Update post if it already exists, otherwise create a new one.
+    $tmpl_post = null;
     if ( $is_update_case ) {
         $tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
     }

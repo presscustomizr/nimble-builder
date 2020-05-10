@@ -36,43 +36,49 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             renderOrRefreshTempGallery : function() {
                   var self = this,
                       _tmpl;
-                  if( $('#nimble-template-gallery').length > 0 )
-                    return;
+                  if( $('#nimble-template-gallery').length < 1 ) {
 
-                  // RENDER
-                  // try {
-                  //       _tmpl =  wp.template( 'nimble-template-gallery' )( {} );
-                  // } catch( er ) {
-                  //       api.errare( 'Error when parsing nimble-template-gallery template', er );
-                  //       return false;
-                  // }
-                  $( '#customize-preview' ).after( $( '<div/>', {
-                        id : 'nimble-template-gallery',
-                        html : '<div class="czr-css-loader czr-mr-loader" style="display:block"><div></div><div></div><div></div></div>',
-                  }));
-                  $('#nimble-template-gallery').append('<div class="sek-tmpl-gallery-inner"></div>');
+                      // RENDER
+                      // try {
+                      //       _tmpl =  wp.template( 'nimble-template-gallery' )( {} );
+                      // } catch( er ) {
+                      //       api.errare( 'Error when parsing nimble-template-gallery template', er );
+                      //       return false;
+                      // }
+                      $( '#customize-preview' ).after( $( '<div/>', {
+                            id : 'nimble-template-gallery',
+                            html : '<div class="czr-css-loader czr-mr-loader" style="display:block"><div></div><div></div><div></div></div>',
+                      }));
+                      $('#nimble-template-gallery')
+                          .append('<div class="sek-tmpl-gallery-inner"></div>')
+                          // Schedule click event with delegation
+                          .on('click', '.sek-tmpl-item', function( evt ) {
+                                evt.preventDefault();
+                                evt.stopPropagation();
+                                var tmpl_id = $(this).data('sek-tmpl-item-id');
+                                console.log('ALORS TEMP ID ?', tmpl_id );
+                                if ( _.isEmpty(tmpl_id) ) {
+                                    api.errare('::renderOrRefreshTempGallery => error => invalid template id');
+                                }
+                                //api.czr_sektions.import_nimble_template( $(this).data('sek-tmpl-item-id') );
+                                //api.czr_sektions.import_nimble_template( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
+                                api.czr_sektions.import_nimble_template( {template_name : tmpl_id, from: 'user'});
 
+                                self.templateGalleryExpanded(false);
+                          });
+                  }
+
+                  // Clean previous html
+                  var $galleryInner = $('#nimble-template-gallery').find('.sek-tmpl-gallery-inner');
+                  $galleryInner.html('');
                   // Wait for the gallery to be fetched and rendered
                   self.getTemplateGalleryHtml().done( function( html ) {
-                        $('#nimble-template-gallery').find('.sek-tmpl-gallery-inner').html( html );
-                  });
-
-                  // Schedule click event with delegation
-                  $('#nimble-template-gallery').on('click', '.sek-tmpl-item', function( evt ) {
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        var tmpl_id = $(this).data('sek-tmpl-item-id');
-                        console.log('ALORS TEMP ID ?', tmpl_id );
-                        if ( _.isEmpty(tmpl_id) ) {
-                            api.errare('::renderOrRefreshTempGallery => error => invalid template id');
-                        }
-                        //api.czr_sektions.import_nimble_template( $(this).data('sek-tmpl-item-id') );
-                        //api.czr_sektions.import_nimble_template( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
-                        api.czr_sektions.import_nimble_template( {template_name : tmpl_id, from: 'user'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
-
-                        self.templateGalleryExpanded(false);
+                        console.log('HTML? ', html );
+                        $galleryInner.html( html );
                   });
             },
+
+
 
             getTemplateGalleryHtml : function() {
                   var self = this,
@@ -127,6 +133,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //     _html += '</div>';
                   // });
                   var _thumbUrl = sektionsLocalizedData.baseUrl + '/assets/admin/img/wire_frame.png';
+                  var _dfd_ = $.Deferred();
+
                   self.getSavedTmplCollection().done( function( tmpl_collection ) {
                         _.each( tmpl_collection, function( _data, _temp_id ) {
                               console.log('SO?', _data );
@@ -140,18 +148,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 _html += '</div>';
                               _html += '</div>';
                         });
+
+                        var $cssLoader = $('#nimble-template-gallery').find('.czr-css-loader');
+                        if ( $cssLoader.length > 0 ) {
+                              $cssLoader.hide({
+                                    duration : 300,
+                                    complete : function() {
+                                          $(this).remove();
+                                          _dfd_.resolve( _html );
+                                    }
+                              });
+                        } else {
+                              _dfd_.resolve( _html );
+                        }
                   });
 
-                  return $.Deferred( function() {
-                      var dfd = this;
-                      _.delay( function() {
-                          $('#nimble-template-gallery').find('.czr-css-loader').hide({
-                              duration : 300,
-                              complete : function() { $(this).remove();}
-                          });
-                          dfd.resolve( _html );
-                      }, 1000);
-                  });
+                  return _dfd_.promise();
             }
       });//$.extend()
 })( wp.customize, jQuery );

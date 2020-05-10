@@ -276,8 +276,8 @@ function sek_ajax_get_manually_imported_file_content() {
 
 
 // fetch the content from a remotely fetched template file
-add_action( 'wp_ajax_sek_process_template_file_content', '\Nimble\sek_ajax_process_template_file_content' );
-function sek_ajax_process_template_file_content() {
+add_action( 'wp_ajax_sek_process_template_json', '\Nimble\sek_ajax_process_template_json' );
+function sek_ajax_process_template_json() {
     // sek_error_log(__FUNCTION__ . ' AJAX $_POST ?', $_POST );
     // sek_error_log(__FUNCTION__ . ' AJAX $_FILES ?', $_FILES );
     // sek_error_log(__FUNCTION__ . ' AJAX $_REQUEST ?', $_REQUEST );
@@ -324,13 +324,13 @@ function sek_ajax_process_template_file_content() {
     // );
     // check import structure
     if ( !is_array( $raw_unserialized_data ) || empty( $raw_unserialized_data['data']) || !is_array( $raw_unserialized_data['data'] ) || empty( $raw_unserialized_data['metas'] ) || !is_array( $raw_unserialized_data['metas'] ) ) {
-        wp_send_json_error(  'invalid_import_content' );
+        wp_send_json_error(  __FUNCTION__ . ' => invalid_import_content' );
         return;
     }
     // check version
     // => current Nimble Version must be at least import version
     if ( !empty( $raw_unserialized_data['metas']['version'] ) && version_compare( NIMBLE_VERSION, $raw_unserialized_data['metas']['version'], '<' ) ) {
-        wp_send_json_error( 'nimble_builder_needs_update' );
+        wp_send_json_error( __FUNCTION__ . ' => nimble_builder_needs_update' );
         return;
     }
 
