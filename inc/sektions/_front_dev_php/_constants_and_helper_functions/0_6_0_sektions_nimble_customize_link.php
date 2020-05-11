@@ -1,6 +1,8 @@
 <?php
 add_action( 'admin_bar_menu', '\Nimble\sek_add_customize_link', 1000 );
 function sek_add_customize_link() {
+    if ( !sek_current_user_can_access_nb_ui() )
+      return;
     global $wp_admin_bar;
     // Don't show for users who can't access the customizer
     if ( !current_user_can( 'customize' ) )

@@ -2,7 +2,10 @@
 namespace Nimble;
 // Exit if accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;
-
+// /* ------------------------------------------------------------------------- *
+// *  OPTION PAGE
+// /* ------------------------------------------------------------------------- */
+require_once( NIMBLE_BASE_PATH . '/inc/admin/nb-options.php' );
 
 // /* ------------------------------------------------------------------------- *
 // *  VERSIONNING
@@ -34,7 +37,7 @@ function sek_versionning() {
 // /* ------------------------------------------------------------------------- */
 add_action('admin_menu', '\Nimble\sek_plugin_menu');
 function sek_plugin_menu() {
-    if ( !current_user_can( 'update_plugins' ) )
+    if ( !current_user_can( 'update_plugins' ) || !sek_current_user_can_access_nb_ui() )
       return;
     // system infos should be displayed to users with admin capabilities only
     add_plugins_page(__( 'System info', 'text_domain' ), __( 'System info', 'text_domain' ), 'read', 'nimble-builder', '\Nimble\sek_plugin_page');
@@ -273,7 +276,7 @@ function sek_get_write_permissions_status() {
 // /* ------------------------------------------------------------------------- */
 add_action( 'admin_init' , '\Nimble\sek_admin_style' );
 function sek_admin_style() {
-    if ( skp_is_customizing() )
+    if ( skp_is_customizing() || !sek_current_user_can_access_nb_ui() )
       return;
     wp_enqueue_style(
         'nimble-admin-css',
@@ -310,8 +313,12 @@ foreach ( array( 'wptexturize', 'convert_smilies', 'wpautop') as $callback ) {
 * @hook : admin_notices
 */
 function sek_may_be_display_update_notice() {
+
     // bail here if the current version has no update notice
     if ( defined('NIMBLE_SHOW_UPDATE_NOTICE_FOR_VERSION') && NIMBLE_SHOW_UPDATE_NOTICE_FOR_VERSION !== NIMBLE_VERSION )
+      return;
+
+    if ( !sek_current_user_can_access_nb_ui() )
       return;
 
     // always wait for the welcome note to be dismissed before displaying the update notice
@@ -475,7 +482,8 @@ add_action( 'admin_notices', '\Nimble\sek_render_welcome_notice' );
 function sek_render_welcome_notice() {
     if ( !current_user_can( 'customize' ) )
       return;
-
+    if ( !sek_current_user_can_access_nb_ui() )
+      return;
     if ( sek_welcome_notice_is_dismissed() )
       return;
 
@@ -588,6 +596,8 @@ function sek_render_welcome_notice() {
 // Register Dashboard Widgets on top of the widgets
 add_action( 'wp_dashboard_setup', '\Nimble\sek_register_dashboard_widgets' );
 function sek_register_dashboard_widgets() {
+    if ( !sek_current_user_can_access_nb_ui() )
+      return;
     $theme_name = sek_get_parent_theme_slug();
     $title = __( 'Nimble Builder Overview', 'text_doma' );
     wp_add_dashboard_widget(
@@ -710,6 +720,8 @@ function sek_is_forbidden_post_type_for_nimble_edit_button( $post_type = '' ) {
 add_action( 'edit_form_after_title', '\Nimble\sek_print_edit_with_nimble_btn_for_classic_editor' );
 // @hook 'edit_form_after_title'
 function sek_print_edit_with_nimble_btn_for_classic_editor( $post ) {
+  if ( !sek_current_user_can_access_nb_ui() )
+    return;
   // introduced to fix https://github.com/presscustomizr/nimble-builder/issues/528
   if ( is_object($post) && sek_is_forbidden_post_type_for_nimble_edit_button( $post->post_type ) )
     return;
@@ -733,6 +745,8 @@ function sek_print_edit_with_nimble_btn_for_classic_editor( $post ) {
 // When using gutenberg editor
 add_action( 'enqueue_block_editor_assets', '\Nimble\sek_enqueue_js_asset_for_gutenberg_edit_button');
 function sek_enqueue_js_asset_for_gutenberg_edit_button() {
+    if ( !sek_current_user_can_access_nb_ui() )
+      return;
     // Void if ( 'post' != $current_screen->base ) <= only printed when editing posts, CPTs, and pages
     $current_screen = get_current_screen();
     if ( 'post' !== $current_screen->base )
@@ -764,6 +778,8 @@ add_action( 'admin_footer', '\Nimble\sek_print_js_for_nimble_edit_btn' );
 // If Classic editor, print the javascript listener to open the customizer url
 // @see assets/admin/js/nimble-gutenberg.js
 function sek_print_js_for_nimble_edit_btn() {
+  if ( !sek_current_user_can_access_nb_ui() )
+    return;
   // Void if ( 'post' != $current_screen->base ) <= only printed when editing posts, CPTs, and pages
   $current_screen = get_current_screen();
   if ( 'post' !== $current_screen->base )
@@ -837,6 +853,8 @@ function sek_print_js_for_nimble_edit_btn() {
 // => when using the classical editor, the html is printed with add_action( 'edit_form_after_title', ... )
 // => when using gutenberg, we render the button with a js template @see assets/admin/js/nimble-gutenberg.js
 function sek_print_nb_btn_edit_with_nimble( $editor_type ) {
+    if ( !sek_current_user_can_access_nb_ui() )
+      return;
     $post = get_post();
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
     $customize_url = sek_get_customize_url_when_is_admin( $post );
@@ -891,6 +909,8 @@ function sek_current_user_can_edit( $post_id = 0 ) {
 // introduced in sept 2019 for https://github.com/presscustomizr/nimble-builder/issues/436
 add_filter( 'display_post_states', '\Nimble\sek_add_nimble_post_state', 10, 2 );
 function sek_add_nimble_post_state( $post_states, $post ) {
+    if ( !sek_current_user_can_access_nb_ui() )
+      return $post_states;
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
     if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_nimble_sections( $manually_built_skope_id ) ) {
         $post_states['nimble'] = __( 'Nimble Builder', 'text-doma' );
@@ -904,6 +924,8 @@ function sek_add_nimble_post_state( $post_states, $post ) {
 add_filter( 'post_row_actions', '\Nimble\sek_filter_post_row_actions', 11, 2 );
 add_filter( 'page_row_actions', '\Nimble\sek_filter_post_row_actions', 11, 2 );
 function sek_filter_post_row_actions( $actions, $post ) {
+    if ( !sek_current_user_can_access_nb_ui() )
+      return $actions;
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
     if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_nimble_sections( $manually_built_skope_id ) ) {
         $actions['edit_with_nimble_builder'] = sprintf( '<a href="%1$s" title="%2$s">%2$s</a>',

@@ -9,6 +9,8 @@ if ( !defined( 'ABSPATH' ) ) {
 // implemented for https://github.com/presscustomizr/nimble-builder/issues/418
 add_action('customize_save_after', '\Nimble\sek_update_most_used_gfonts');
 function sek_update_most_used_gfonts( $manager ) {
+    if ( !sek_current_user_can_access_nb_ui() )
+      return;
     $skope_id = skp_get_skope_id();
     $all_gfonts = sek_get_all_gfonts( $skope_id );
     if ( is_array($all_gfonts) && !empty($all_gfonts) ) {
@@ -19,6 +21,8 @@ function sek_update_most_used_gfonts( $manager ) {
 
 add_action('customize_save_after', '\Nimble\sek_maybe_write_global_stylesheet');
 function sek_maybe_write_global_stylesheet( $manager ) {
+    if ( !sek_current_user_can_access_nb_ui() )
+      return;
     // Try to write the CSS
     new Sek_Dyn_CSS_Handler( array(
         'id'             => NIMBLE_GLOBAL_SKOPE_ID,
@@ -80,6 +84,8 @@ function sek_get_all_gfonts() {
 // ENQUEUE CUSTOMIZER JAVASCRIPT + PRINT LOCALIZED DATA
 add_action ( 'customize_controls_enqueue_scripts', '\Nimble\sek_enqueue_controls_js_css', 20 );
 function sek_enqueue_controls_js_css() {
+    if ( !sek_current_user_can_access_nb_ui() )
+      return;
     wp_enqueue_style(
         'sek-control',
         sprintf(
