@@ -12,12 +12,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this;
                   self.templateGalleryExpanded = new api.Value(false);
 
-                  if ( !sektionsLocalizedData.isTemplateGalleryEnabled )
-                    return;
+                  // if ( !sektionsLocalizedData.isTemplateGalleryEnabled )
+                  //   return;
 
                   self.templateGalleryExpanded.bind( function( expanded ) {
+
+
                         self.cachedElements.$body.toggleClass( 'sek-template-gallery-expanded', expanded );
                         if ( expanded ) {
+                              // close template saver
+                              // close level tree
+                              self.tmplDialogVisible(false);
+                              self.levelTreeExpanded(false);
                               $('#customize-preview iframe').css('z-index', 1);
                               self.renderOrRefreshTempGallery();
                         } else {
@@ -31,45 +37,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
             },
 
-            //@params { scope : 'local' or 'global' }
-            // print the tree
+            renderTmplGalleryUI : function() {
+                  if ( $('#nimble-tmpl-gallery').length > 0 )
+                    return $('#nimble-tmpl-gallery');
+
+                  var self = this;
+
+                  try {
+                        _tmpl =  wp.template( 'nimble-top-tmpl-gallery' )( {} );
+                  } catch( er ) {
+                        api.errare( 'Error when parsing nimble-top-tmpl-gallery template', er );
+                        return false;
+                  }
+                  $('#customize-preview').after( $( _tmpl ) );
+                  return $('#nimble-tmpl-gallery');
+            },
+
+            // print and schedule dom events
             renderOrRefreshTempGallery : function() {
                   var self = this,
                       _tmpl;
-                  if( $('#nimble-template-gallery').length < 1 ) {
-
-                      // RENDER
-                      // try {
-                      //       _tmpl =  wp.template( 'nimble-template-gallery' )( {} );
-                      // } catch( er ) {
-                      //       api.errare( 'Error when parsing nimble-template-gallery template', er );
-                      //       return false;
-                      // }
-                      $( '#customize-preview' ).after( $( '<div/>', {
-                            id : 'nimble-template-gallery',
-                            html : '<div class="czr-css-loader czr-mr-loader" style="display:block"><div></div><div></div><div></div></div>',
-                      }));
-                      $('#nimble-template-gallery')
-                          .append('<div class="sek-tmpl-gallery-inner"></div>')
-                          // Schedule click event with delegation
-                          .on('click', '.sek-tmpl-item', function( evt ) {
-                                evt.preventDefault();
-                                evt.stopPropagation();
-                                var tmpl_id = $(this).data('sek-tmpl-item-id');
-                                console.log('ALORS TEMP ID ?', tmpl_id );
-                                if ( _.isEmpty(tmpl_id) ) {
-                                    api.errare('::renderOrRefreshTempGallery => error => invalid template id');
-                                }
-                                //api.czr_sektions.import_nimble_template( $(this).data('sek-tmpl-item-id') );
-                                //api.czr_sektions.import_nimble_template( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
-                                api.czr_sektions.import_nimble_template( {template_name : tmpl_id, from: 'user'});
-
-                                self.templateGalleryExpanded(false);
-                          });
+                  if( $('#nimble-tmpl-gallery').length < 1 ) {
+                        $.when( self.renderTmplGalleryUI({}) ).done( function() {
+                              self.setupTmplGalleryDOMEvents();
+                        });
                   }
 
                   // Clean previous html
-                  var $galleryInner = $('#nimble-template-gallery').find('.sek-tmpl-gallery-inner');
+                  var $galleryInner = $('#nimble-tmpl-gallery').find('.sek-tmpl-gallery-inner');
                   $galleryInner.html('');
                   // Wait for the gallery to be fetched and rendered
                   self.getTemplateGalleryHtml().done( function( html ) {
@@ -77,8 +72,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
             },
 
+            // @return void()
+            setupTmplGalleryDOMEvents : function() {
+                $('#nimble-tmpl-gallery')
+                    // Schedule click event with delegation
+                    .on('click', '.sek-tmpl-item', function( evt ) {
+                          evt.preventDefault();
+                          evt.stopPropagation();
+                          var tmpl_id = $(this).data('sek-tmpl-item-id');
+                          console.log('ALORS TEMP ID ?', tmpl_id );
+                          if ( _.isEmpty(tmpl_id) ) {
+                              api.errare('::renderOrRefreshTempGallery => error => invalid template id');
+                          }
+                          //api.czr_sektions.import_nimble_template( $(this).data('sek-tmpl-item-id') );
+                          //api.czr_sektions.import_nimble_template( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
+                          api.czr_sektions.import_nimble_template( {template_name : tmpl_id, from: 'user'});
 
+                          self.templateGalleryExpanded(false);
+                    });
+            },
 
+            // @return html
             getTemplateGalleryHtml : function() {
                   var self = this,
                       _html = '';
@@ -147,7 +161,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _html += '</div>';
                         });
 
-                        var $cssLoader = $('#nimble-template-gallery').find('.czr-css-loader');
+                        var $cssLoader = $('#nimble-tmpl-gallery').find('.czr-css-loader');
                         if ( $cssLoader.length > 0 ) {
                               $cssLoader.hide({
                                     duration : 300,

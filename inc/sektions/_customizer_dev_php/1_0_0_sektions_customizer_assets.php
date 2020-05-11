@@ -844,6 +844,24 @@ function sek_print_nimble_customizer_tmpl() {
     </script>
 
 
+    <?php // TEMPLATE GALLERY ?>
+    <script type="text/html" id="tmpl-nimble-top-tmpl-gallery">
+      <div id="nimble-tmpl-gallery" class="czr-preview-notification" data-sek-tmpl-dialog-mode="hidden">
+        <div class="czr-css-loader czr-mr-loader" style="display:block"><div></div><div></div><div></div></div>
+        <div id="sek-gal-top-bar">
+          <input type="text" class="sek-filter-tmpl" placeholder="<?php _e('Search templates', 'text_domain'); ?>">
+          <div class="sek-ui-button-group" role="group">
+            <button class="sek-ui-button sek-close-dialog" type="button" title="<?php _e('Close', 'text_domain'); ?>">
+                <i class="far fa-times-circle"></i>&nbsp;<?php _e('Close', 'text_domain'); ?>
+            </button>
+          </div>
+          <div class="sek-tmpl-gallery-inner"></div>
+        </div>
+      </div>
+    </script>
+
+
+    <?php // LEVEL TREE  ?>
     <script type="text/html" id="tmpl-nimble-level-tree">
       <div id="nimble-level-tree">
           <div class="sek-tree-wrap"></div>
@@ -853,6 +871,8 @@ function sek_print_nimble_customizer_tmpl() {
       </div>
     </script>
 
+
+    <?php // NIMBLE FEEDBACK  ?>
     <script type="text/html" id="tmpl-nimble-feedback-ui">
       <div id="nimble-feedback" data-sek-dismiss-pointer="<?php echo NIMBLE_FEEDBACK_NOTICE_ID; ?>">
           <div class="sek-feedback-step-one">
