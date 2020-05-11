@@ -7,11 +7,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // fired in ::initialize()
             setupSaveTmplUI : function() {
                   var self = this;
+
+                  // if ( sektionsLocalizedData.isTemplateSaveEnabled ) {
+                  //    return;
+                  // }
+
+
                   // Declare api values and schedule reactions
 
                   self.tmplDialogVisible = new api.Value( false );// Hidden by default
-                  self.tmplDialogVisible.bind( function( to ){
-                        self.toggleSaveTmplUI(to);
+                  self.tmplDialogVisible.bind( function( visible ){
+                        if ( visible ) {
+                              // close template gallery
+                              // close level tree
+                              self.templateGalleryExpanded(false);
+                              self.levelTreeExpanded(false);
+                        }
+                        self.toggleSaveTmplUI(visible);
                   });
 
                   // Will store the collection of saved templates

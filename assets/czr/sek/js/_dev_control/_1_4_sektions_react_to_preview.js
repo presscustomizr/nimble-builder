@@ -787,6 +787,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                    return;
                               }
 
+                              // Close template gallery, template saver
+                              console.log('REACT TO PREVIEW : ', msgId );
+                              self.templateGalleryExpanded(false);
+                              self.tmplDialogVisible(false);
+
                               try { _cb_( params )
                                     // the cloneId is passed when resolving the ::updateAPISetting() promise()
                                     // they are needed on level duplication to get the newly generated level id.
