@@ -41,12 +41,12 @@ if ( !empty( $quote_content_settings['quote_text'] ) ) {
     $cite_text = '';
     if ( !empty( $cite_content_settings['cite_text'] ) ) {
         // filter added since text editor implementation https://github.com/presscustomizr/nimble-builder/issues/403
-        $cite_text = apply_filters( 'the_nimble_tinymce_module_content', $cite_content_settings['cite_text'] );
+        $cite_text = apply_filters( 'the_nimble_tinymce_module_content', sek_strip_script_tags( $cite_content_settings['cite_text'] ) );
     }
 
     sek_print_quote_content(
         sprintf( '<blockquote class="sek-quote%3$s" data-sek-quote-design="%4$s"><div class="sek-quote-inner"><div class="sek-quote-content">%1$s</div>%2$s</div></blockquote>',
-            $quote_content_settings['quote_text'],
+            sek_strip_script_tags( $quote_content_settings['quote_text'] ),
             !empty( $cite_text ) ? sprintf( '<footer class="sek-quote-footer"><cite class="sek-cite">%1$s</cite></footer>', $cite_text ) : '',
             empty( $design_settings['quote_design'] ) || 'none' == $design_settings['quote_design'] ? '' : " sek-quote-design sek-{$design_settings['quote_design']}",
             $design_settings['quote_design']

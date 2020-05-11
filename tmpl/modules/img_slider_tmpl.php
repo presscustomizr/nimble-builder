@@ -217,6 +217,7 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
                   $is_text_enabled = true === sek_booleanize_checkbox_val( $item['enable_text'] );
                   $text_content = $is_text_enabled ? $item['text_content'] : '';
                   $has_text_content = !empty( $text_content );
+                  $text_content = sek_strip_script_tags( $text_content );
                   $text_html = sprintf('<div class="sek-slider-text-wrapper"><div class="sek-slider-text-content">%1$s</div></div>', $text_content );
                   if ( !skp_is_customizing() ) {
                       $text_html = !$has_text_content ? '' : $text_html;
@@ -226,7 +227,7 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
 
                   // Put them together
                   printf( '<div class="swiper-slide" title="%1$s" data-sek-item-id="%4$s" data-sek-has-overlay="%5$s"><figure class="sek-carousel-img">%2$s</figure>%3$s</div>',
-                      sek_slider_parse_template_tags( esc_html( esc_attr( $item['title_attr'] ) ), $item ),
+                      sek_slider_parse_template_tags( strip_tags( esc_attr( $item['title_attr'] ) ), $item ),
                       sek_get_img_slider_module_img_html( $item, "true" === $lazy_load_on, $index ),
                       sek_slider_parse_template_tags( $text_html, $item ),
                       $item['id'],

@@ -52,7 +52,7 @@ if ( !isset( $content_settings['link-to'] ) || isset( $content_settings['link-to
     printf('<button %5$s class="sek-btn%3$s"><span class="sek-btn-inner">%1$s<span class="sek-btn-text">%2$s</span>%4$s</span></button>',
         'left' === $icon_side ? $icon_html : '',
         // allow user to use smileys in buttons
-        strip_tags( convert_smilies( $content_settings[ 'button_text' ] ) ),
+        sek_strip_script_tags( convert_smilies( $content_settings[ 'button_text' ] ) ),
         $visual_effect_class,
         'right' === $icon_side ? $icon_html : '',
         !empty($content_settings['btn_text_on_hover']) ? 'title="' . esc_html( $content_settings['btn_text_on_hover'] ) . '"' : ''
@@ -65,7 +65,7 @@ if ( !isset( $content_settings['link-to'] ) || isset( $content_settings['link-to
         true === sek_booleanize_checkbox_val( $content_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
         'left' === $icon_side ? $icon_html : '',
         // allow user to use smileys in buttons
-        strip_tags( convert_smilies( $content_settings['button_text'] ) ),
+        sek_strip_script_tags( convert_smilies( $content_settings['button_text'] ) ),
         $visual_effect_class,
         'right' === $icon_side ? $icon_html : '',
         !empty($content_settings['btn_text_on_hover']) ? 'title="' . esc_html( $content_settings['btn_text_on_hover'] ) . '"' : ''

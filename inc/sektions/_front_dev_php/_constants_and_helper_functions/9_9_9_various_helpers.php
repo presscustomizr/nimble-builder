@@ -261,4 +261,23 @@ function sek_get_th_start_ver( $theme_name ) {
   return $start_ver;
 }
 
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  STRIP SCRIPT TAG WHEN CUSTOMIZING
+ *  to prevent customizer breakages. See https://github.com/presscustomizr/nimble-builder/issues/688
+/* ------------------------------------------------------------------------- */
+function sek_strip_script_tags_when_customizing( $html = '' ) {
+      if ( !skp_is_customizing() || !is_string( $html ) ) {
+          return $html;
+      }
+      return preg_replace('#<script(.*?)>(.*?)</script>#is', '', $html);
+}
+function sek_strip_script_tags( $html = '' ) {
+      if (!is_string( $html ) ) {
+          return $html;
+      }
+      return preg_replace('#<script(.*?)>(.*?)</script>#is', '', $html);
+}
 ?>

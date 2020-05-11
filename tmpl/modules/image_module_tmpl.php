@@ -59,7 +59,7 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
                 $description = $img_post->post_content;
                 $img_title = $img_post->post_title;
                 if ( false !== sek_booleanize_checkbox_val( $value['use_custom_title_attr']) ) {
-                    $title = esc_html( $value['heading_title'] );
+                    $title = strip_tags( $value['heading_title'] );
                 } elseif ( !empty( $caption ) ) {
                     $title = $caption;
                 } else if ( !empty( $description ) ) {

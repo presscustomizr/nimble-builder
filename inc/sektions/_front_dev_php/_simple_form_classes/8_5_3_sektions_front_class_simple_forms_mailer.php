@@ -172,7 +172,7 @@ class Sek_Mailer {
         $after_message  = '';
 
         if ( array_key_exists( 'email_footer', $submission_options ) ) {
-            $email_footer = $submission_options['email_footer'];
+            $email_footer = sek_strip_script_tags( $submission_options['email_footer'] );
         } else {
             $email_footer = sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_doma' ),
                 get_bloginfo( 'name' ),

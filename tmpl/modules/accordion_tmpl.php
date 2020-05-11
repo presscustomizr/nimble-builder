@@ -38,6 +38,8 @@ if ( !function_exists( 'Nimble\sek_print_accordion' ) ) {
 
                   // added Oct. 2019 when revamping presscustomizr.com
                   $item_html_content = sek_parse_template_tags( $item_html_content );
+                  // added may 2020 related to https://github.com/presscustomizr/nimble-builder/issues/688
+                  $item_html_content = sek_strip_script_tags( $item_html_content );
 
                   // Put them together
                   $title_attr = esc_html( esc_attr( $item['title_attr'] ) );
