@@ -12,8 +12,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this;
                   self.templateGalleryExpanded = new api.Value(false);
 
-                  // if ( !sektionsLocalizedData.isTemplateGalleryEnabled )
-                  //   return;
+                  if ( !sektionsLocalizedData.isTemplateGalleryEnabled )
+                    return;
 
                   self.templateGalleryExpanded.bind( function( expanded ) {
 

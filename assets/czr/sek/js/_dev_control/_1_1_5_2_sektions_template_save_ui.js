@@ -8,14 +8,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             setupSaveTmplUI : function() {
                   var self = this;
 
-                  // if ( sektionsLocalizedData.isTemplateSaveEnabled ) {
-                  //    return;
-                  // }
+
 
 
                   // Declare api values and schedule reactions
 
                   self.tmplDialogVisible = new api.Value( false );// Hidden by default
+
+                  if ( sektionsLocalizedData.isTemplateSaveEnabled ) {
+                     return;
+                  }
                   self.tmplDialogVisible.bind( function( visible ){
                         if ( visible ) {
                               // close template gallery
