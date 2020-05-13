@@ -5,7 +5,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
 // /* ------------------------------------------------------------------------- *
 // *  OPTION PAGE
 // /* ------------------------------------------------------------------------- */
-require_once( NIMBLE_BASE_PATH . '/inc/admin/nb-options.php' );
+//require_once( NIMBLE_BASE_PATH . '/inc/admin/nb-options.php' );
 
 // /* ------------------------------------------------------------------------- *
 // *  VERSIONNING
