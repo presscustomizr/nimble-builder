@@ -284,16 +284,6 @@ function sek_strip_script_tags( $html = '' ) {
 // @return bool
 // Introduced May 2020
 function sek_current_user_can_access_nb_ui() {
-    $current_user_id = get_current_user_id();
-    $allowed_user_ids = get_option('nb-authorized-user');
-    $disallowed_user_ids = get_option('nb-unauthorized-user');
-
-    if ( $allowed_user_ids && is_array( $allowed_user_ids ) && !empty($allowed_user_ids) ) {
-        return in_array( $current_user_id, $allowed_user_ids );
-    }
-    if ( $disallowed_user_ids && is_array( $disallowed_user_ids ) && !empty($disallowed_user_ids) ) {
-        return !in_array( $current_user_id, $disallowed_user_ids );
-    }
-    return true;
+    return apply_filters('nimble-user-have-access', true );
 }
 ?>
