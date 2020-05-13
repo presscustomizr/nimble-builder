@@ -74,13 +74,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // @return void()
             setupTmplGalleryDOMEvents : function() {
-                $('#nimble-tmpl-gallery')
+                var $galWrapper = $('#nimble-tmpl-gallery');
+                var self = this;
+                $galWrapper
                     // Schedule click event with delegation
-                    .on('click', '.sek-tmpl-item', function( evt ) {
+                    .on('click', '.sek-tmpl-item .use-tmpl', function( evt ) {
                           evt.preventDefault();
                           evt.stopPropagation();
-                          var tmpl_id = $(this).data('sek-tmpl-item-id');
-                          console.log('ALORS TEMP ID ?', tmpl_id );
+                          var tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id');
                           if ( _.isEmpty(tmpl_id) ) {
                               api.errare('::renderOrRefreshTempGallery => error => invalid template id');
                           }
@@ -89,6 +90,52 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           api.czr_sektions.import_nimble_template( {template_name : tmpl_id, from: 'user'});
 
                           self.templateGalleryExpanded(false);
+                    })
+                    .on('propertychange change click keyup input paste', '.sek-filter-tmpl', _.debounce( function(evt) {
+                          evt.preventDefault();
+                          var _s = $(this).val();
+                          console.log('searched string ??', _s );
+                          var _reset = function() {
+                                $galWrapper.removeClass('search-active');
+                                $galWrapper.find('.sek-tmpl-item').each( function() {
+                                      $(this).removeClass('search-match');
+                                });
+                          };
+                          if ( !_.isString(_s) ) {
+                                _reset();
+                                return;
+                          }
+                          _s = _s.trim().toLowerCase();
+                          if ( _.isEmpty( _s.replace(/\s/g, '') ) ) {
+                                _reset();
+                          } else {
+                                $galWrapper.addClass('search-active');
+                                var title,desc,date,titleMatch, descMatch,dateMatch;
+                                $galWrapper.find('.sek-tmpl-item').each( function() {
+                                      title = ( $(this).find('.tmpl-title').html() + '' ).toLowerCase();
+                                      desc = ( $(this).find('.tmpl-desc').html() + '' ).toLowerCase();
+                                      date = ( $(this).find('.tmpl-date').html() + '' ).toLowerCase();
+                                      titleMatch = -1 != title.indexOf(_s);
+                                      descMatch = -1 != desc.indexOf(_s);
+                                      dateMatch = -1 != date.indexOf(_s);
+                                      $(this).toggleClass( 'search-match', titleMatch || descMatch || dateMatch );
+                                });
+                          }
+
+                    }, 100 ) )
+                    .on( 'click', '.sek-tmpl-info .remove-tmpl', function(evt) {
+                          evt.preventDefault();
+                          var _focusOnRemoveCandidate = function( mode ) {
+                                self.tmplDialogMode( 'remove' );
+                                // self unbind
+                                self.tmplDialogMode.unbind( _focusOnRemoveCandidate );
+                          };
+                          self.tmplDialogMode.bind( _focusOnRemoveCandidate );
+                          self.tmplDialogVisible(true);
+                    })
+                    .on( 'click', '.sek-close-dialog', function(evt) {
+                          evt.preventDefault();
+                          self.templateGalleryExpanded( false );
                     });
             },
 
@@ -145,18 +192,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //       _html += '<div class="sek-tmpl-thumb"><img src="'+ _data.thumb_url +'"/></div>';
                   //     _html += '</div>';
                   // });
-                  var _thumbUrl = sektionsLocalizedData.baseUrl + '/assets/admin/img/wire_frame.png';
-                  var _dfd_ = $.Deferred();
+                  var _thumbUrl = sektionsLocalizedData.baseUrl + '/assets/admin/img/wire_frame.png',
+                      _dfd_ = $.Deferred(),
+                      _titleAttr;
 
                   self.getSavedTmplCollection().done( function( tmpl_collection ) {
                         _.each( tmpl_collection, function( _data, _temp_id ) {
+                              if( !_.isEmpty( _data.description ) ) {
+                                  _titleAttr = [ _data.title, _data.last_modified_date, _data.description ].join(' | ');
+                              } else {
+                                  _titleAttr = [ _data.title, _data.last_modified_date ].join(' | ');
+                              }
+
                               _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '">';
                                 _html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
-                                _html += '<div class="sek-tmpl-info">';
-                                  _html += '<h3>' + _data.title + '</h3>';
-                                  _html += '<p><i>' + '@missi18n Last modified : ' + _data.last_modified_date + '</i></p>';
-                                  _html += '<p>' + _data.description + '</p>';
-                                  _html += '<i class="material-icons" title="@missi18n use this template">add_circle_outline</i>';
+                                _html += '<div class="sek-tmpl-info" title="'+ _titleAttr +'">';
+                                  _html += '<h3 class="tmpl-title">' + _data.title + '</h3>';
+                                  _html += '<p class="tmpl-date"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', _data.last_modified_date ].join(' ') + '</i></p>';
+                                  _html += '<p class="tmpl-desc">' + _data.description + '</p>';
+                                  _html += '<i class="material-icons use-tmpl" title="'+ sektionsLocalizedData.i18n['Use this template'] +'">add_circle_outline</i>';
+                                  _html += '<i class="material-icons remove-tmpl" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>';
                                 _html += '</div>';
                               _html += '</div>';
                         });

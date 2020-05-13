@@ -642,8 +642,17 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.' => __('This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.', 'text_doma'),
 
             // Accordion module
-            'Accordion title' => __('Accordion title', 'text_dom')
-            //'Remove this element' => __('Remove this element', 'text_dom'),
+            'Accordion title' => __('Accordion title', 'text_dom'),
+
+            // Template gallery and save
+            'Last modified' => __('Last modified', 'text_dom'),
+            'Use this template' => __('Use this template', 'text_dom'),
+            'Remove this template' => __('Remove this template', 'text_dom'),
+            'A title is required' => __('A title is required', 'text_dom'),
+            'Template saved' => __('Template saved', 'text_dom'),
+            'Template removed' => __('Template removed', 'text_dom'),
+            'Error when processing templates' => __('Error when processing templates', 'text_dom'),
+            'Last modified' => __('Last modified', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
@@ -855,7 +864,7 @@ function sek_print_nimble_customizer_tmpl() {
       <div id="nimble-tmpl-gallery" class="czr-preview-notification" data-sek-tmpl-dialog-mode="hidden">
         <div class="czr-css-loader czr-mr-loader" style="display:block"><div></div><div></div><div></div></div>
         <div id="sek-gal-top-bar">
-          <input type="text" class="sek-filter-tmpl" placeholder="<?php _e('Search templates', 'text_domain'); ?>">
+          <input type="text" class="sek-filter-tmpl" placeholder="<?php _e('Filter templates', 'text_domain'); ?>">
           <div class="sek-ui-button-group" role="group">
             <button class="sek-ui-button sek-close-dialog" type="button" title="<?php _e('Close', 'text_domain'); ?>">
                 <i class="far fa-times-circle"></i>&nbsp;<?php _e('Close', 'text_domain'); ?>
