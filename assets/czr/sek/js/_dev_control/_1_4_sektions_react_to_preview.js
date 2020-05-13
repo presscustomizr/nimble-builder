@@ -788,9 +788,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
 
                               // Close template gallery, template saver
-                              console.log('REACT TO PREVIEW : ', msgId );
-                              self.templateGalleryExpanded(false);
-                              self.tmplDialogVisible(false);
+                              // do nothing when we notify
+                              if ( 'sek-notify' !== msgId ) {
+                                  self.templateGalleryExpanded(false);
+                                  self.tmplDialogVisible(false);
+                              }
 
                               try { _cb_( params )
                                     // the cloneId is passed when resolving the ::updateAPISetting() promise()

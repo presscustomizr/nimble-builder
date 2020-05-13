@@ -116,7 +116,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           return;
                         _last_modified_date = _tmpl_data.last_modified_date ? _tmpl_data.last_modified_date : '';
                         _title = _tmpl_data.title ? _tmpl_data.title : _default_title;
-                        _html +='<option value="' + _tmpl_post_name + '">' + [ _title, '@missi18n Last modified : ' + _last_modified_date ].join(' | ') + '</option>';
+                        _html +='<option value="' + _tmpl_post_name + '">' + [ _title, sektionsLocalizedData.i18n['Last modified'] + ' : ' + _last_modified_date ].join(' | ') + '</option>';
                   });
 
                   $selectEl.append(_html);
@@ -171,6 +171,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.saveOrUpdateTemplate(evt).done( function( response ) {
                               $tmplDialogWrapper.removeClass('nimble-tmpl-processing-ajax');
                               if ( response.success ) {
+                                    self.tmplDialogVisible( false );
                                     self.setSavedTmplCollection( { refresh : true } );// <= true for refresh
                               }
                         });
@@ -188,6 +189,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.saveOrUpdateTemplate(evt, tmplPostNameCandidateForUpdate).done( function(response) {
                               $tmplDialogWrapper.removeClass('nimble-tmpl-processing-ajax');
                               if ( response.success ) {
+                                    self.tmplDialogVisible( false );
                                     self.setSavedTmplCollection( { refresh : true } )// <= true for refresh
                                           .done( function( tmpl_collection ) {
                                                 // refresh tmpl picker in case the user updated without changing anything
@@ -289,18 +291,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       currentLocalSettingValue = self.preProcessTmpl( api( collectionSettingId )() );
 
                   if ( _.isEmpty( tmpl_title ) ) {
-                      $_title.addClass('error');
-                      api.previewer.trigger('sek-notify', {
-                            type : 'error',
-                            duration : 10000,
-                            message : [
-                                  '<span style="font-size:0.95em">',
-                                    '<strong>@missi18n You need to set a title</strong>',
-                                  '</span>'
-                            ].join('')
+                        $_title.addClass('error');
+                        api.previewer.trigger('sek-notify', {
+                              type : 'error',
+                              duration : 10000,
+                              message : [
+                                    '<span style="font-size:0.95em">',
+                                      '<strong>' + sektionsLocalizedData.i18n['A title is required'] + '</strong>',
+                                    '</span>'
+                              ].join('')
 
-                      });
-                      return;
+                        });
+                        return _dfd_.resolve( {success:false});
                   }
 
                   $('#sek-saved-tmpl-title').removeClass('error');
@@ -319,13 +321,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //console.log('SAVED POST ID', response );
                         _dfd_.resolve( {success:true});
                         // response is {tmpl_post_id: 436}
-                        //self.tmplDialogVisible( false );
                         api.previewer.trigger('sek-notify', {
                             type : 'success',
                             duration : 10000,
                             message : [
                                   '<span style="font-size:0.95em">',
-                                    '<strong>@missi18n Your template has been saved.</strong>',
+                                    '<strong>' + sektionsLocalizedData.i18n['Template saved'] + '</strong>',
                                   '</span>'
                             ].join('')
                         });
@@ -338,7 +339,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             duration : 10000,
                             message : [
                                   '<span style="font-size:0.95em">',
-                                    '<strong>@missi18n error when saving template</strong>',
+                                    '<strong>' + sektionsLocalizedData.i18n['Error when processing template'] + '</strong>',
                                   '</span>'
                             ].join('')
                         });
@@ -360,13 +361,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   .done( function( response ) {
                         _dfd_.resolve( {success:true});
                         // response is {tmpl_post_id: 436}
-                        //self.tmplDialogVisible( false );
                         api.previewer.trigger('sek-notify', {
                             type : 'success',
                             duration : 10000,
                             message : [
                                   '<span style="font-size:0.95em">',
-                                    '<strong>@missi18n Your template has been removed.</strong>',
+                                    '<strong>' + sektionsLocalizedData.i18n['Template removed'] + '</strong>',
                                   '</span>'
                             ].join('')
                         });
@@ -379,7 +379,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             duration : 10000,
                             message : [
                                   '<span style="font-size:0.95em">',
-                                    '<strong>@missi18n error when removing template</strong>',
+                                    '<strong>' + sektionsLocalizedData.i18n['Error when processing templates'] + '</strong>',
                                   '</span>'
                             ].join('')
                         });
@@ -510,7 +510,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             duration : 10000,
                             message : [
                                   '<span style="font-size:0.95em">',
-                                    '<strong>@missi18n error when fetching the saved templates</strong>',
+                                    '<strong>' + sektionsLocalizedData.i18n['Error when processing templates'] + '</strong>',
                                   '</span>'
                             ].join('')
                         });

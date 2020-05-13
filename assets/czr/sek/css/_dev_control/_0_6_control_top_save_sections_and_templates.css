@@ -67,6 +67,7 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
 .sek-tmpl-description textarea, input#sek-saved-tmpl-title, select.sek-saved-tmpl-picker {
   width: 97%;
   max-width: none;
+  margin-bottom: 10px;
 }
 .sek-tmpl-description textarea {
   min-height: 100px;

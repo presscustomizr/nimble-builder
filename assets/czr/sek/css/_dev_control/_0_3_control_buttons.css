@@ -96,12 +96,14 @@
 }
 .sek-content-type-wrapper .sek-ui-button-group,
 .sek-save-tmpl-mode-switcher .sek-ui-button-group,
-.sek-save-tmpl-action .sek-ui-button-group {
+.sek-save-tmpl-action .sek-ui-button-group,
+#nimble-tmpl-gallery .sek-ui-button-group {
   display: block;
 }
 .sek-content-type-wrapper .sek-ui-button,
 .sek-save-tmpl-mode-switcher .sek-ui-button,
-.sek-save-tmpl-action .sek-ui-button {
+.sek-save-tmpl-action .sek-ui-button,
+#nimble-tmpl-gallery .sek-ui-button {
     text-align: center;
     display: inline-block;
     padding: 3px 10px;
