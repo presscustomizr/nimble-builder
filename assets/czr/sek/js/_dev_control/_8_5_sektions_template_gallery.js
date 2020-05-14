@@ -11,7 +11,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   var self = this;
                   self.templateGalleryExpanded = new api.Value(false);
-
                   if ( !sektionsLocalizedData.isTemplateGalleryEnabled )
                     return;
 
@@ -83,7 +82,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           evt.stopPropagation();
                           var tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id');
                           if ( _.isEmpty(tmpl_id) ) {
-                              api.errare('::renderOrRefreshTempGallery => error => invalid template id');
+                              api.errare('::setupTmplGalleryDOMEvents => error => invalid template id');
                           }
                           //api.czr_sektions.import_nimble_template( $(this).data('sek-tmpl-item-id') );
                           //api.czr_sektions.import_nimble_template( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
