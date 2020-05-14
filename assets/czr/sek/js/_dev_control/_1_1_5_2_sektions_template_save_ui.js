@@ -15,7 +15,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   self.tmplDialogVisible = new api.Value( false );// Hidden by default
 
-                  if ( sektionsLocalizedData.isTemplateSaveEnabled ) {
+                  if ( !sektionsLocalizedData.isTemplateSaveEnabled ) {
                      return;
                   }
                   self.tmplDialogVisible.bind( function( visible ){
