@@ -713,7 +713,7 @@ function sek_is_forbidden_post_type_for_nimble_edit_button( $post_type = '' ) {
     // not post types like ACF, contact forms, etc,
     // @see https://github.com/presscustomizr/nimble-builder/issues/573
     $post_type_obj = get_post_type_object( $post_type );
-    $authorized_post_types = apply_filters( 'nimble-authorized-post-types' , array( 'post', 'product', 'attachment' ) );
+    $authorized_post_types = apply_filters( 'nimble-authorized-post-types' , array( 'post', 'page', 'product', 'attachment' ) );
     if ( is_string($post_type) && !in_array($post_type, $authorized_post_types) )
       return true;
 
