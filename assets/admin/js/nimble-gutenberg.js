@@ -6,7 +6,9 @@
               return;
             if ( $('#editor').find('.edit-post-header-toolbar').length > 0 ) {
                 var html = $($('#sek-edit-with-nb').html());
-                $('#editor').find('.edit-post-header-toolbar').append( html );
+                setTimeout( function() {
+                    $('#editor').find('.edit-post-header-toolbar').append( html );
+                }, 500 );// <= May 2020 : introduce a delay to make sure NB edit btn is printed after all gutenberg menu items. @todo find the relevant event to do that instead.
                 button_printed = true;
                 // unsubscribe the listener
                 // documented here : https://developer.wordpress.org/block-editor/packages/packages-data/#subscribe
