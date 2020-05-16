@@ -312,7 +312,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     ].join('')
                               });
                         });
-            },//import_template_from_file
+            },//import_template_from_user_collection_or_remote_api
 
 
 
@@ -570,7 +570,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               api.infoLog('sek-pre-import => imported locations missing in current page.', importedActiveLocationsNotAvailableInCurrentActiveLocations );
                         } else {
-                              api.czr_sektions.import_template( params );
+                              api.czr_sektions.import_template_from_file( params );
                         }
                   } else {
                         // if current and imported location are not arrays, there's a problem.
