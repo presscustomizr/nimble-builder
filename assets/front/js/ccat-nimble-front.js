@@ -611,7 +611,7 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
                         threshold : 100,
                         fadeIn_options : { duration : 400 },
                         delaySmartLoadEvent : 0,
-                        candidateSelectors : '[data-sek-src*="http"], [data-sek-iframe-src]'
+                        candidateSelectors : '[data-sek-src], [data-sek-iframe-src]'
                   },
                   //- to avoid multi processing in general
                   _skipLoadClass = 'sek-lazy-loaded';

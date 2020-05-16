@@ -9,6 +9,8 @@ if ( !defined( 'ABSPATH' ) ) {
 // implemented for https://github.com/presscustomizr/nimble-builder/issues/418
 add_action('customize_save_after', '\Nimble\sek_update_most_used_gfonts');
 function sek_update_most_used_gfonts( $manager ) {
+    if ( !sek_current_user_can_access_nb_ui() )
+      return;
     $skope_id = skp_get_skope_id();
     $all_gfonts = sek_get_all_gfonts( $skope_id );
     if ( is_array($all_gfonts) && !empty($all_gfonts) ) {
@@ -19,6 +21,8 @@ function sek_update_most_used_gfonts( $manager ) {
 
 add_action('customize_save_after', '\Nimble\sek_maybe_write_global_stylesheet');
 function sek_maybe_write_global_stylesheet( $manager ) {
+    if ( !sek_current_user_can_access_nb_ui() )
+      return;
     // Try to write the CSS
     new Sek_Dyn_CSS_Handler( array(
         'id'             => NIMBLE_GLOBAL_SKOPE_ID,
@@ -80,6 +84,8 @@ function sek_get_all_gfonts() {
 // ENQUEUE CUSTOMIZER JAVASCRIPT + PRINT LOCALIZED DATA
 add_action ( 'customize_controls_enqueue_scripts', '\Nimble\sek_enqueue_controls_js_css', 20 );
 function sek_enqueue_controls_js_css() {
+    if ( !sek_current_user_can_access_nb_ui() )
+      return;
     wp_enqueue_style(
         'sek-control',
         sprintf(
@@ -636,8 +642,17 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.' => __('This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.', 'text_doma'),
 
             // Accordion module
-            'Accordion title' => __('Accordion title', 'text_dom')
-            //'Remove this element' => __('Remove this element', 'text_dom'),
+            'Accordion title' => __('Accordion title', 'text_dom'),
+
+            // Template gallery and save
+            'Last modified' => __('Last modified', 'text_dom'),
+            'Use this template' => __('Use this template', 'text_dom'),
+            'Remove this template' => __('Remove this template', 'text_dom'),
+            'A title is required' => __('A title is required', 'text_dom'),
+            'Template saved' => __('Template saved', 'text_dom'),
+            'Template removed' => __('Template removed', 'text_dom'),
+            'Error when processing templates' => __('Error when processing templates', 'text_dom'),
+            'Last modified' => __('Last modified', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
@@ -803,6 +818,7 @@ function sek_print_nimble_customizer_tmpl() {
               </button>
             </div>
           </div>
+          <?php // the select input is printed with a default 'none' option, other options will be populated dynamically with ajax fetching results ?>
           <select class="sek-saved-tmpl-picker"><option selected="selected" value="none"><?php _e('Select a template', 'text_doma'); ?></option></select>
           <div class="sek-tmpl-title">
               <label for="sek-saved-tmpl-title" class="customize-control-title"><?php _e('Template title', 'text_doma'); ?></label>
@@ -812,30 +828,55 @@ function sek_print_nimble_customizer_tmpl() {
               <label for="sek-saved-tmpl-description" class="customize-control-title"><?php _e('Template description', 'text_doma'); ?></label>
               <textarea id="sek-saved-tmpl-description" type="text" value=""></textarea>
           </div>
-          <div class="sek-tmpl-remove-dialog">
-            <p><?php _e('Removing a template cannot be undone. Are you sure you want to continue?', 'text_doma'); ?>
-          </div>
           <div class="sek-save-tmpl-action">
             <div class="sek-ui-button-group" role="group">
               <button class="sek-ui-button sek-do-save-tmpl" type="button" title="<?php _e('Save template', 'text_domain'); ?>">
-                <i class="far fa-save"></i>&nbsp;<?php _e('Save template', 'text_domain'); ?>
+                <i class="far fa-save"></i>&nbsp;<?php _e('Save template', 'text_domain'); ?><span class="spinner"></span>
               </button>
               <button class="sek-ui-button sek-do-update-tmpl" type="button" title="<?php _e('Update template', 'text_domain'); ?>">
-                <i class="far fa-save"></i>&nbsp;<?php _e('Update template', 'text_domain'); ?>
+                <i class="far fa-save"></i>&nbsp;<?php _e('Update template', 'text_domain'); ?><span class="spinner"></span>
               </button>
-              <button class="sek-ui-button sek-do-remove-tmpl" type="button" title="<?php _e('Remove template', 'text_domain'); ?>">
-                <i class="fas fa-trash"></i>&nbsp;<?php _e('Remove template', 'text_domain'); ?>
+              <button class="sek-ui-button sek-open-remove-confirmation" type="button" title="<?php _e('Remove template', 'text_domain'); ?>">
+                <i class="fas fa-trash"></i>&nbsp;<?php _e('Remove template', 'text_domain'); ?><span class="spinner"></span>
               </button>
               <button class="sek-ui-button sek-close-dialog" type="button" title="<?php _e('Close', 'text_domain'); ?>">
                   <i class="far fa-times-circle"></i>&nbsp;<?php _e('Close', 'text_domain'); ?>
               </button>
             </div>
           </div>
-
+          <div class="sek-tmpl-remove-dialog">
+            <p><?php _e('Removing a template cannot be undone. Are you sure you want to continue?', 'text_doma'); ?>
+            <div class="sek-ui-button-group" role="group">
+              <button class="sek-ui-button sek-do-remove-tmpl" type="button" title="<?php _e('Remove template', 'text_domain'); ?>">
+                <?php _e('Remove template', 'text_domain'); ?><span class="spinner"></span>
+              </button>
+              <button class="sek-ui-button sek-cancel-remove-tmpl" type="button" title="<?php _e('Cancel', 'text_domain'); ?>">
+                <?php _e('Cancel', 'text_domain'); ?>
+              </button>
+            </div>
+          </div>
       </div>
     </script>
 
 
+    <?php // TEMPLATE GALLERY ?>
+    <script type="text/html" id="tmpl-nimble-top-tmpl-gallery">
+      <div id="nimble-tmpl-gallery" class="czr-preview-notification" data-sek-tmpl-dialog-mode="hidden">
+        <div class="czr-css-loader czr-mr-loader" style="display:block"><div></div><div></div><div></div></div>
+        <div id="sek-gal-top-bar">
+          <input type="text" class="sek-filter-tmpl" placeholder="<?php _e('Filter templates', 'text_domain'); ?>">
+          <div class="sek-ui-button-group" role="group">
+            <button class="sek-ui-button sek-close-dialog" type="button" title="<?php _e('Close', 'text_domain'); ?>">
+                <i class="far fa-times-circle"></i>&nbsp;<?php _e('Close', 'text_domain'); ?>
+            </button>
+          </div>
+          <div class="sek-tmpl-gallery-inner"></div>
+        </div>
+      </div>
+    </script>
+
+
+    <?php // LEVEL TREE  ?>
     <script type="text/html" id="tmpl-nimble-level-tree">
       <div id="nimble-level-tree">
           <div class="sek-tree-wrap"></div>
@@ -845,6 +886,8 @@ function sek_print_nimble_customizer_tmpl() {
       </div>
     </script>
 
+
+    <?php // NIMBLE FEEDBACK  ?>
     <script type="text/html" id="tmpl-nimble-feedback-ui">
       <div id="nimble-feedback" data-sek-dismiss-pointer="<?php echo NIMBLE_FEEDBACK_NOTICE_ID; ?>">
           <div class="sek-feedback-step-one">
@@ -4393,8 +4436,8 @@ function sek_ajax_get_manually_imported_file_content() {
 
 
 // fetch the content from a remotely fetched template file
-add_action( 'wp_ajax_sek_process_template_file_content', '\Nimble\sek_ajax_process_template_file_content' );
-function sek_ajax_process_template_file_content() {
+add_action( 'wp_ajax_sek_process_template_json', '\Nimble\sek_ajax_process_template_json' );
+function sek_ajax_process_template_json() {
     // sek_error_log(__FUNCTION__ . ' AJAX $_POST ?', $_POST );
     // sek_error_log(__FUNCTION__ . ' AJAX $_FILES ?', $_FILES );
     // sek_error_log(__FUNCTION__ . ' AJAX $_REQUEST ?', $_REQUEST );
@@ -4441,13 +4484,13 @@ function sek_ajax_process_template_file_content() {
     // );
     // check import structure
     if ( !is_array( $raw_unserialized_data ) || empty( $raw_unserialized_data['data']) || !is_array( $raw_unserialized_data['data'] ) || empty( $raw_unserialized_data['metas'] ) || !is_array( $raw_unserialized_data['metas'] ) ) {
-        wp_send_json_error(  'invalid_import_content' );
+        wp_send_json_error(  __FUNCTION__ . ' => invalid_import_content' );
         return;
     }
     // check version
     // => current Nimble Version must be at least import version
     if ( !empty( $raw_unserialized_data['metas']['version'] ) && version_compare( NIMBLE_VERSION, $raw_unserialized_data['metas']['version'], '<' ) ) {
-        wp_send_json_error( 'nimble_builder_needs_update' );
+        wp_send_json_error( __FUNCTION__ . ' => nimble_builder_needs_update' );
         return;
     }
 
@@ -4519,39 +4562,117 @@ function sek_is_img_url( $url = '' ) {
 
 ?><?php
 ////////////////////////////////////////////////////////////////
+// Fetches the user saved templates
+add_action( 'wp_ajax_sek_get_all_saved_tmpl', '\Nimble\sek_ajax_get_all_saved_templates' );
+// @hook wp_ajax_sek_get_user_saved_templates
+function sek_ajax_get_all_saved_templates() {
+    sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+
+    $decoded_templates = sek_get_all_saved_templates();
+
+    if ( is_array($decoded_templates) ) {
+        wp_send_json_success( $decoded_templates );
+    } else {
+        if ( !empty( $decoded_templates ) ) {
+            sek_error_log(  __FUNCTION__ . ' error => invalid templates returned', $decoded_templates );
+            wp_send_json_error(  __FUNCTION__ . ' error => invalid templates returned' );
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////
+// TEMPLATE GET CONTENT + METAS
+// Fetches the json of a given user template
+add_action( 'wp_ajax_sek_get_user_tmpl_json', '\Nimble\sek_ajax_sek_get_user_tmpl_json' );
+// @hook wp_ajax_sek_get_user_saved_templates
+function sek_ajax_sek_get_user_tmpl_json() {
+    sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+
+    // We must have a tmpl_post_name
+    if ( empty( $_POST['tmpl_post_name']) || !is_string( $_POST['tmpl_post_name'] ) ) {
+        wp_send_json_error( __FUNCTION__ . '_missing_tmpl_post_name' );
+    }
+    // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+    //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
+    // }
+    $tmpl_post = sek_get_saved_tmpl_post( $_POST['tmpl_post_name'] );
+    if ( !is_wp_error( $tmpl_post ) && $tmpl_post && is_object( $tmpl_post ) ) {
+        $tmpl_decoded = maybe_unserialize( $tmpl_post->post_content );
+        // Structure of $content :
+        // array(
+        //     'data' => $_POST['tmpl_data'],//<= json stringified
+        //     'tmpl_post_name' => ( !empty( $_POST['tmpl_post_name'] ) && is_string( $_POST['tmpl_post_name'] ) ) ? $_POST['tmpl_post_name'] : null,
+        //     'metas' => array(
+        //         'title' => $_POST['tmpl_title'],
+        //         'description' => $_POST['tmpl_description'],
+        //         'skope_id' => $_POST['skope_id'],
+        //         'version' => NIMBLE_VERSION,
+        //         // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
+        //         'active_locations' => is_string( $_POST['active_locations'] ) ? explode( ',', $_POST['active_locations'] ) : array(),
+        //         'date' => date("Y-m-d"),
+        //         'theme' => sanitize_title_with_dashes( get_stylesheet() )
+        //     )
+        // );
+        if ( is_array( $tmpl_decoded ) && !empty( $tmpl_decoded['data'] ) && is_string( $tmpl_decoded['data'] ) ) {
+            $tmpl_decoded['data'] = json_decode( wp_unslash( $tmpl_decoded['data'], true ) );
+        }
+        wp_send_json_success( $tmpl_decoded );
+    } else {
+        wp_send_json_error( __FUNCTION__ . '_tmpl_post_not_found' );
+    }
+}
+
+////////////////////////////////////////////////////////////////
 // TEMPLATE SAVE
 // introduced in april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
 // ENABLED WHEN CONSTANT NIMBLE_TEMPLATE_SAVE_ENABLED === true
 add_action( 'wp_ajax_sek_save_user_template', '\Nimble\sek_ajax_save_user_template' );
 /////////////////////////////////////////////////////////////////
-// hook : wp_ajax_sek_save_section
+// hook : wp_ajax_sek_save_user_template
 function sek_ajax_save_user_template() {
-    sek_error_log( __FUNCTION__ . ' ALORS YEAH ? ?', $_POST );
+    //sek_error_log( __FUNCTION__ . ' ALORS YEAH ? ?', $_POST );
 
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
-
-    // We must have a title and a section_id and sektion data
-    if ( empty( $_POST['tmpl_title']) ) {
-        wp_send_json_error( __FUNCTION__ . '_missing_template_title' );
-    }
-    // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
-    //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
-    // }
+    // TMPL DATA => the nimble content
     if ( empty( $_POST['tmpl_data']) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_template_data' );
     }
     if ( !is_string( $_POST['tmpl_data'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_template_data_must_be_a_json_stringified' );
     }
+
+    // TMPL METAS
+    // We must have a title
+    if ( empty( $_POST['tmpl_title']) ) {
+        wp_send_json_error( __FUNCTION__ . '_missing_template_title' );
+    }
     if ( !is_string( $_POST['tmpl_description'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_template_description_must_be_a_string' );
     }
-    // sek_error_log('SEKS DATA ?', $_POST['sek_data'] );
+    if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+        wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
+    }
+    if ( !isset( $_POST['active_locations'] ) || empty( $_POST['active_locations'] ) ) {
+        wp_send_json_error( __FUNCTION__ . '_missing_active_locations' );
+    }
+
+
+    //sek_error_log(__FUNCTION__ .  '$_POST?', $_POST );
+
     // sek_error_log('json decode ?', json_decode( wp_unslash( $_POST['sek_data'] ), true ) );
     $template_to_save = array(
-        'title' => $_POST['tmpl_title'],
-        'description' => $_POST['tmpl_description'],
-        'data' => $_POST['tmpl_data']//<= json stringified
+        'data' => $_POST['tmpl_data'],//<= json stringified
+        'tmpl_post_name' => ( !empty( $_POST['tmpl_post_name'] ) && is_string( $_POST['tmpl_post_name'] ) ) ? $_POST['tmpl_post_name'] : null,
+        'metas' => array(
+            'title' => $_POST['tmpl_title'],
+            'description' => $_POST['tmpl_description'],
+            'skope_id' => $_POST['skope_id'],
+            'version' => NIMBLE_VERSION,
+            // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
+            'active_locations' => is_array( $_POST['active_locations'] ) ? $_POST['active_locations'] : array(),
+            'date' => date("Y-m-d"),
+            'theme' => sanitize_title_with_dashes( get_stylesheet() )
+        )
     );
 
     $saved_template_post = sek_update_saved_tmpl_post( $template_to_save );
@@ -4564,23 +4685,47 @@ function sek_ajax_save_user_template() {
     //sek_error_log( __FUNCTION__ . '$_POST' ,  $_POST);
 }
 
-// Fetches the user saved templates
-add_action( 'wp_ajax_sek_get_all_saved_tmpl', '\Nimble\sek_ajax_get_all_saved_templates' );
-// @hook wp_ajax_sek_get_user_saved_templates
-function sek_ajax_get_all_saved_templates() {
+////////////////////////////////////////////////////////////////
+// TEMPLATE REMOVE
+// introduced in may 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
+// ENABLED WHEN CONSTANT NIMBLE_TEMPLATE_SAVE_ENABLED === true
+add_action( 'wp_ajax_sek_remove_user_template', '\Nimble\sek_ajax_remove_user_template' );
+/////////////////////////////////////////////////////////////////
+// hook : wp_ajax_sek_remove_user_template
+function sek_ajax_remove_user_template() {
+    //sek_error_log( __FUNCTION__ . ' ALORS YEAH IN REMOVAL ? ?', $_POST );
+
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 
-    $decoded_templates = sek_get_all_saved_templates();
-
-    if ( !empty( $decoded_templates ) && is_array($decoded_templates) ) {
-        wp_send_json_success( $decoded_templates );
-    } else {
-        if ( !empty( $decoded_templates ) ) {
-            sek_error_log(  __FUNCTION__ . ' error => invalid templates returned', $decoded_templates );
-            wp_send_json_error(  __FUNCTION__ . ' error => invalid templates returned' );
-        }
+    // We must have a tmpl_post_name
+    if ( empty( $_POST['tmpl_post_name']) || !is_string( $_POST['tmpl_post_name'] ) ) {
+        wp_send_json_error( __FUNCTION__ . '_missing_tmpl_post_name' );
     }
+    // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+    //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
+    // }
+    $tmpl_post_to_remove = sek_get_saved_tmpl_post( $_POST['tmpl_post_name'] );
+
+    sek_error_log( __FUNCTION__ . ' => so $tmpl_post_to_remove ' . $_POST['tmpl_post_name'], $tmpl_post_to_remove );
+
+    if ( $tmpl_post_to_remove && is_object( $tmpl_post_to_remove ) ) {
+        $r = wp_delete_post( $tmpl_post_to_remove->ID, true );
+        if ( is_wp_error( $r ) ) {
+            wp_send_json_error( __FUNCTION__ . '_removal_error' );
+        }
+    } else {
+        wp_send_json_error( __FUNCTION__ . '_tmpl_post_not_found' );
+    }
+
+    if ( is_wp_error( $tmpl_post_to_remove ) || is_null($tmpl_post_to_remove) || empty($tmpl_post_to_remove) ) {
+        wp_send_json_error( __FUNCTION__ . '_removal_error' );
+    } else {
+        // sek_error_log( 'ALORS CE POST?', $saved_template_post );
+        wp_send_json_success( [ 'tmpl_post_removed' => $_POST['tmpl_post_name'] ] );
+    }
+    //sek_error_log( __FUNCTION__ . '$_POST' ,  $_POST);
 }
+
 
 
 

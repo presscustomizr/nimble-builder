@@ -13978,6 +13978,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
         // @'wp_footer'
         function sek_customizr_js_stuff() {
+            if ( !sek_current_user_can_access_nb_ui() )
+              return;
             if( !skp_is_customizing() )
               return;
             ?>
@@ -14024,6 +14026,9 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // enqueue / print customize preview assets
         // hook : 'customize_preview_init'
         function sek_schedule_customize_preview_assets() {
+            if ( !sek_current_user_can_access_nb_ui() )
+              return;
+
             // we don't need those assets when previewing a customize changeset
             // added when fixing https://github.com/presscustomizr/nimble-builder/issues/351
             if ( sek_is_customize_previewing_a_changeset_post() )
@@ -17066,7 +17071,7 @@ class Sek_Mailer {
         $after_message  = '';
 
         if ( array_key_exists( 'email_footer', $submission_options ) ) {
-            $email_footer = $submission_options['email_footer'];
+            $email_footer = sek_strip_script_tags( $submission_options['email_footer'] );
         } else {
             $email_footer = sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_doma' ),
                 get_bloginfo( 'name' ),
