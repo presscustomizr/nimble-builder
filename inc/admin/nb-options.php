@@ -17,7 +17,7 @@ function nb_register_options_page() {
     __('Nimble Builder', 'text-domain'),
     __('Nimble Builder', 'text-domain'),
     'manage_options',
-    'nb-options',
+    NIMBLE_OPTIONS_PAGE,
     '\Nimble\nb_options_page'
   );
 }

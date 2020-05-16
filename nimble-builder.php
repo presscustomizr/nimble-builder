@@ -3,7 +3,7 @@
 * Plugin Name: Nimble Page Builder
 * Plugin URI: https://nimblebuilder.com
 * Description: Powerful drag and drop page builder using the native WordPress customizer.
-* Version: 2.0.13
+* Version: 2.0.14
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://nimblebuilder.com/?utm_source=wp-plugins&utm_medium=wp-dashboard&utm_campaign=author-uri
@@ -16,7 +16,7 @@ if ( !defined( 'ABSPATH' ) ) {
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
-$current_version = "2.0.13";
+$current_version = "2.0.14";
 
 if ( !defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version ); }
 if ( !defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
@@ -35,6 +35,10 @@ if ( !defined( 'NIMBLE_RELEASE_NOTE_URL' ) ) { define( 'NIMBLE_RELEASE_NOTE_URL'
 
 // when NIMBLE_IS_PREVIEW_UI_DEBUG_MODE or $_GET['preview_ui_debug'] is true, the levels UI in the preview are not being auto removed, so we can inspect the markup and CSS
 if ( !defined( 'NIMBLE_IS_PREVIEW_UI_DEBUG_MODE' ) ) { define ( 'NIMBLE_IS_PREVIEW_UI_DEBUG_MODE', false ); }
+
+// Admin page
+if ( !defined( 'NIMBLE_OPTIONS_PAGE' ) ) { define ( 'NIMBLE_OPTIONS_PAGE', 'nb-options' ); }
+if ( !defined( 'NIMBLE_OPTIONS_PAGE_URL' ) ) { define ( 'NIMBLE_OPTIONS_PAGE_URL', 'options-general.php?page=' . NIMBLE_OPTIONS_PAGE ); }
 
 /* ------------------------------------------------------------------------- *
  *  CHECK PHP AND WP REQUIREMENTS
