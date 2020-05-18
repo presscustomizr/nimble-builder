@@ -160,5 +160,6 @@ if ( nimble_pass_requirements() ) {
     // Load admin
     if ( is_admin() ) {
         require_once( NIMBLE_BASE_PATH . '/inc/admin/nimble-admin.php' );
+        do_action('nimble_admin_loaded');
     }
 }//if ( nimble_pass_requirements() )
