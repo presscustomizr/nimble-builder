@@ -156,23 +156,6 @@ function print_welcome_page() {
     <?php
 }
 
-/* ------------------------------------------------------------------------- *
-*  SYSTEM INFO
-/* ------------------------------------------------------------------------- */
-nb_register_option_tab([
-    'id' => 'system-info',
-    'title' => __('System info', 'text-doma'),
-    'page_title' => __('System info', 'nimble' ),
-    'content' => '\Nimble\print_system_info',
-]);
-function print_system_info() {
-    require_once( NIMBLE_BASE_PATH . '/inc/admin/system-info.php' );
-    ?>
-     <h3><?php _e( 'System Informations', 'text_domain_to_be_chg' ); ?></h3>
-      <h4><?php _e( 'Please include your system informations when posting support requests.' , 'text_domain_to_be_chg' ) ?></h4>
-      <textarea readonly="readonly" onclick="this.focus();this.select()" id="system-info-textarea" name="tc-sysinfo" title="<?php _e( 'To copy the system info, click below then press Ctrl + C (PC) or Cmd + C (Mac).', 'text_domain_to_be_chg' ); ?>" style="width: 800px;min-height: 800px;font-family: Menlo,Monaco,monospace;background: 0 0;white-space: pre;overflow: auto;display:block;"><?php echo sek_config_infos(); ?></textarea>
-    <?php
-}
 
 /* ------------------------------------------------------------------------- *
 *  DOCUMENTATION
@@ -208,6 +191,24 @@ function print_doc_page() {
         <a href="https://docs.presscustomizr.com" target="_blank" class="button button-primary button-hero" rel="noopener noreferrer"><span class="dashicons dashicons-search"></span>&nbsp;<?php _e('Explore Nimble Builder knowledge base', 'text-doma'); ?></a>
       </div>
 
+    <?php
+}
+
+/* ------------------------------------------------------------------------- *
+*  SYSTEM INFO
+/* ------------------------------------------------------------------------- */
+nb_register_option_tab([
+    'id' => 'system-info',
+    'title' => __('System info', 'text-doma'),
+    'page_title' => __('System info', 'nimble' ),
+    'content' => '\Nimble\print_system_info',
+]);
+function print_system_info() {
+    require_once( NIMBLE_BASE_PATH . '/inc/admin/system-info.php' );
+    ?>
+     <h3><?php _e( 'System Informations', 'text_domain_to_be_chg' ); ?></h3>
+      <h4><?php _e( 'Please include your system informations when posting support requests.' , 'text_domain_to_be_chg' ) ?></h4>
+      <textarea readonly="readonly" onclick="this.focus();this.select()" id="system-info-textarea" name="tc-sysinfo" title="<?php _e( 'To copy the system info, click below then press Ctrl + C (PC) or Cmd + C (Mac).', 'text_domain_to_be_chg' ); ?>" style="width: 800px;min-height: 800px;font-family: Menlo,Monaco,monospace;background: 0 0;white-space: pre;overflow: auto;display:block;"><?php echo sek_config_infos(); ?></textarea>
     <?php
 }
 ?>
