@@ -15722,6 +15722,8 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'nimble_is_content_restricted', array( $this, 'sek_is_content_restricted_by_wp_members_plugin') );
             // Compatibility with Simple Membership plugin
             add_filter( 'nimble_is_content_restricted', array( $this, 'sek_is_content_restricted_by_simple_membership_plugin') );
+            // Compatibility with premium Memberpress plugin http://www.memberpress.com/
+            add_filter( 'nimble_is_content_restricted', array( $this, 'sek_is_content_restricted_by_memberpress_plugin') );
         }
 
         // hook : 'wp'
@@ -15823,6 +15825,14 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 return $bool;
             }
             return !is_user_logged_in() && wpmem_is_blocked( get_the_ID() );
+        }
+
+        // hook : 'nimble_is_content_restricted'
+        // following #685
+        function sek_is_content_restricted_by_memberpress_plugin( $bool ) {
+            if ( !defined('MEPR_VERSION') )
+              return $bool;
+            return !current_user_can('mepr-auth');
         }
 
         // hook : 'nimble_content_restriction_for_location'

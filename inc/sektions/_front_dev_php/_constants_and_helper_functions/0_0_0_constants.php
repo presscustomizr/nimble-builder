@@ -3,10 +3,11 @@ namespace Nimble;
 if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
+// @return bool
 function sek_is_debug_mode() {
   return isset( $_GET['nimble_debug'] );
 }
-// @return array
+// @return bool
 function sek_is_dev_mode() {
   return ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) || ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || sek_is_debug_mode();
 }

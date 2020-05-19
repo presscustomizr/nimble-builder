@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.15
+Stable tag: 2.0.16
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,16 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 2.0.15 =
-[NB edit button] prevent printing Nimble edit button on post types that are not post, attachment and WooCommerce product. [template import] fixes a critical bug when importing a template.
+= 2.0.16 =
+[plugins compatibility] added support for Memberpress plugin. [accordion module] fixed default title background color value. [admin] introduction of a new option page located in WP admin > Settings > Nimble Builder
 
 == Changelog ==
+= 2.0.16 May 19th 2020 =
+* fixed : [accordion module] default title background color is not consistent with default customizer value (#ffffff)
+* added : [plugins compatibility] added support for Memberpress plugin
+* added : [admin] introduction of a new option page located in WP admin > Settings > Nimble Builder
+* improved : [admin] moved system info in the new Nimble Builder option page
+
 = 2.0.15 May 16th 2020 =
 * fixed : [NB edit button] prevent printing Nimble edit button on post types that are not post, attachment and WooCommerce product
 * fixed : [template import] critical bug when importing a template

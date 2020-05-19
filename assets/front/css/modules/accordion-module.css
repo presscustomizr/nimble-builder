@@ -14,6 +14,7 @@
 .sek-accord-wrapper .sek-accord-item .sek-accord-title {
   cursor: pointer;
   color: #565656;
+  background: #ffffff;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: center;
