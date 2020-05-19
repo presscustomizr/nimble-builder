@@ -150,9 +150,13 @@ function print_welcome_page() {
     <div class="nimble-welcome-content">
       <?php echo sek_get_welcome_block(); ?>
     </div>
+    <div class="clear"></div>
     <hr/>
-    <h2><?php _e('Watch the video below for a brief overview of Nimble Builder features', 'text-doma'); ?></h2>
-    <iframe src="https://player.vimeo.com/video/328473405?loop=1&title=0&byline=0&portrait=0" width="640" height="424" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    <div>
+      <h2><?php _e('Watch the video below for a brief overview of Nimble Builder features', 'text-doma'); ?></h2>
+      <iframe src="https://player.vimeo.com/video/328473405?loop=1&title=0&byline=0&portrait=0" width="640" height="424" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+
     <?php
 }
 
