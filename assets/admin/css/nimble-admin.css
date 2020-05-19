@@ -48,42 +48,6 @@ a.czr-rating-link:hover {
 }
 
 
-/* WELCOME NOTICE */
-.nimble-welcome-notice {
-  padding: 38px;
-}
-.nimble-welcome-notice .dashicons {
-  line-height: 44px;
-}
-.nimble-welcome-icon-holder {
-  width: 550px;
-  height: 200px;
-  float: left;
-  margin: 0 38px 38px 0;
-}
-.nimble-welcome-icon {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-.nimble-welcome-notice h1 {
-  font-weight: bold;
-}
-.nimble-welcome-notice h3 {
-  font-size: 16px;
-  font-weight: 500;
-}
-.nimble-link-to-doc {
-  position: relative;
-  display: inline-block;
-  width: 200px;
-  height: 46px;
-}
-.nimble-link-to-doc .nimble-doc-link-wrap {
-  position: absolute;
-  bottom: 0;
-}
-
 /* Nimble btn in admin top bar */
 #wpadminbar .sek-nimble-icon {
   /*padding-left: 15px;*/
@@ -344,4 +308,93 @@ body .block-editor .sek-nimble-mobile-admin-bar-title { display: none; }
 }
 #sek-edit-with-nimble.sek-loading-customizer .sek-nimble-icon img {
   display: none;
+}
+
+
+
+/* WELCOME NOTICE */
+.wrap .nimble-welcome-notice {
+  padding: 10px 20px;
+}
+.nimble-welcome-notice p, .nimble-welcome-content p {
+  font-weight: bold;
+}
+.nimble-welcome-notice .dashicons, .nimble-welcome-content .dashicons {
+  line-height: 44px;
+}
+.nimble-welcome-icon-holder {
+  width: 500px;
+  height: 200px;
+  float: left;
+  margin: 0 38px 38px 0;
+}
+.nimble-welcome-icon {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.nimble-welcome-notice h1 {
+  font-weight: bold;
+}
+.nimble-welcome-notice h3 {
+  font-size: 16px;
+  font-weight: 500;
+}
+.nimble-link-to-doc {
+  position: relative;
+  display: inline-block;
+  width: 200px;
+  height: 46px;
+}
+.nimble-link-to-doc .nimble-doc-link-wrap {
+  position: absolute;
+  bottom: 0;
+}
+
+
+/* OPTIONS PAGE */
+#nimble-options .nb-option-page-title {
+  padding-left: 40px;
+  position: relative;
+}
+[dir="rtl"] .nb-option-page-title {
+  padding-right: 40px;
+  padding-left:0;
+}
+.sek-nimble-title-icon {
+    width: 35px;
+    height: 35px;
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    top: 6px;
+}
+[dir="rtl"] .sek-nimble-title-icon {
+  right:0;
+  left:initial;
+}
+.tab-content-wrapper {
+    margin: 10px 0;
+}
+
+
+/* DOC PAGE */
+.nimble-doc-img {
+  max-width: 60%;
+}
+.nimle-doc-img img {
+  max-width: 100%;
+}
+.nimble-doc ul {
+  padding: 10px 20px;
+}
+.nimble-doc ul li {
+  font-size: 16px;
+  line-height: 1.5em;
+}
+.nimble-doc .dashicons {
+  line-height: 44px;
+}
+#nimble-options .nimble-doc .button-hero {
+  margin: 20px;
 }
