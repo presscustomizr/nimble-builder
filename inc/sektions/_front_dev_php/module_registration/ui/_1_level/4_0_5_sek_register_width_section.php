@@ -26,7 +26,7 @@ function sek_get_module_params_for_sek_level_width_section() {
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Outer section width', 'text_doma'),
                     'min' => 0,
-                    'max' => 500,
+                    'max' => 1500,
                     'default'     => array( 'desktop' => '100%' ),
                     'width-100'   => true,
                     'title_width' => 'width-100'
@@ -44,7 +44,7 @@ function sek_get_module_params_for_sek_level_width_section() {
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Inner section width', 'text_doma'),
                     'min' => 0,
-                    'max' => 500,
+                    'max' => 1500,
                     'default'     => array( 'desktop' => '100%' ),
                     'width-100'   => true,
                     'title_width' => 'width-100'
