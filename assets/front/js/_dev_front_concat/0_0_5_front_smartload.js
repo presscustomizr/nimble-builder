@@ -10,7 +10,9 @@
  * Example of regex to pre-process img server side with php :
  * preg_replace_callback('#<img([^>]+?)src=[\'"]?([^\'"\s>]+)[\'"]?([^>]*)>#', 'regex_callback' , $_html)
  *
- * (c) 2018 Nicolas Guillaume, Nice, France
+ * Note May 2020 : lazyload can be skipped by adding data-skip-lazyload="true" to the img src when generating the HTML markup
+ *
+ * (c) 2020 Nicolas Guillaume, Nice, France
  *
  * Example of gif 1px x 1px placeholder :
  * 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'

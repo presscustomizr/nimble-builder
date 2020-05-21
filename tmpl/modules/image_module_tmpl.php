@@ -37,7 +37,7 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
             // the default img is excluded from the smart loading parsing @see nimble_regex_callback()
             // => this is needed because this image has no specific dimensions set. And therefore can create false javascript computations of other element's distance to top on page load.
             // in particular when calculting if is_visible() to decide if we smart load.
-            $html = sprintf( '<img alt="default img" data-sek-smartload="false" src="%1$s"/>', esc_url(  $value['img'] )  );
+            $html = sprintf( '<img alt="default img" data-skip-lazyload="true" src="%1$s"/>', esc_url(  $value['img'] )  );
         } else {
             //falls back on an icon if previewing
             if ( skp_is_customizing() ) {

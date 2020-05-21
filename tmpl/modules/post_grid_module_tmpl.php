@@ -142,7 +142,7 @@ if ( !function_exists( 'Nimble\sek_render_post') ) {
                       }
                       echo $img_html;
                   } else if ( $use_post_thumb_placeholder ) {
-                      printf( '<img alt="default img" data-sek-smartload="false" src="%1$s"/>', NIMBLE_BASE_URL . '/assets/img/default-img.png'  );
+                      printf( '<img alt="default img" data-skip-lazyload="true" src="%1$s"/>', NIMBLE_BASE_URL . '/assets/img/default-img.png'  );
                   }
               ?>
             </a>
