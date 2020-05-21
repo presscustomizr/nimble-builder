@@ -90,14 +90,13 @@ window.nb_ = {};
         wasEmitted : function( evt ) {
             return ('string' === typeof evt) && nb_.inArray( nb_.eventsEmitted, evt );
         },
-        isInScreen : function(el, threshold) {
-            var wt = window.pageYOffset || document.documentElement.scrollTop,
-                wb = wt + window.innerHeight,
-                it  = el.offsetTop,
-                ib  = it + el.clientHeight,
-                th = threshold || 0;
-
-            return ib >= wt - th && it <= wb + th;
+        // https://stackoverflow.com/questions/5353934/check-if-element-is-visible-on-screen
+        isInScreen : function(el) {
+            if ( !nb_.isObject( el ) )
+              return false;
+            var rect = el.getBoundingClientRect(),
+                viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+            return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
         },
         isCustomizing : function() {
             return true == '<?php echo skp_is_customizing(); ?>';
