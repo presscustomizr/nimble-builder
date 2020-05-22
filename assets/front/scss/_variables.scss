@@ -108,4 +108,19 @@ $black         : #313131;//#202020;
 // Typography
 $serviceFont : sans-serif;
 $monotypeFont : monospace;
+// font family as of Bootstrap https://getbootstrap.com/docs/4.0/content/reboot/
+// also used on github.com
+$font-family-sans-serif:
+  // Safari for OS X and iOS (San Francisco)
+  -apple-system,
+  // Chrome < 56 for OS X (San Francisco)
+  BlinkMacSystemFont,
+  // Windows
+  "Segoe UI",
+  // Android
+  "Roboto",
+  // Basic web fallback
+  "Helvetica Neue", Arial, sans-serif,
+  // Emoji fonts
+  "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $base-line-height: 1em * 1.25;
