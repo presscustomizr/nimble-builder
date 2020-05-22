@@ -136,19 +136,37 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             scheduleHighlightActiveLevel : function() {
                   var self = this;
                   // Stores the currently edited level
+                  // aka the one on which the user clicked to edit it
                   this.activeLevelUI = new api.Value('');
+                  this.activeLevelEl = new api.Value(null);
                   this.activeUIChangedRecently = new api.Value( false );
 
                   this.activeLevelUI.bind( function( to, from ) {
                         var $activeLevel = $('[data-sek-id="' + to +'"]'),
                             $previousActiveLevel = $('[data-sek-id="' + from +'"]');
+
                         if ( $activeLevel.length > 0 ) {
                               $activeLevel.addClass('sek-active-ui sek-highlight-active-ui');
+                              // cache $activeLevel
+                              self.activeLevelEl( $activeLevel );
                         }
                         if ( $previousActiveLevel.length > 0 ) {
                               $previousActiveLevel.removeClass('sek-active-ui sek-highlight-active-ui');
                         }
                         self.activeUIChangedRecently( Date.now() );
+                  });
+
+                  // MAY 2020 : added to focus on the edited element
+                  // updated in self.activeLevelUI() and self.schedulePanelMsgReactions()
+                  self.activeLevelEl.bind( function($el) {
+                        // scroll to focus on the active element
+                        // but only if element is offscreen, otherwise clicking on a section edit UI for example, will make it move to the top, which is annoying
+                        if ( _.isObject($el) && $el.length > 0 && !nb_.isInScreen( $el[0]) ) {
+                              // https://caniuse.com/#search=scrollIntoView
+                              try{ $el[0].scrollIntoView(); } catch(er) {
+                                    self.errare('activeLevelEl error', er );
+                              }
+                        }
                   });
 
                   // apiParams : {
