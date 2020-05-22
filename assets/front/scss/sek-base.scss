@@ -1,14 +1,14 @@
-@import "base";
-@import "functions";
-@import "variables";
-@import "mixins";
-@import "reboot";
-@import "typography";
-@import "grid";
-@import "transitions";
-@import "utilities";
-@import "formatting";
-@import "buttons";
-@import "wpspecifics";
+@import "1_1_functions";
+@import "1_2_variables";
+@import "1_3_mixins";
+@import "1_4_reboot";
+@import "1_5_base";
+@import "1_6_typography";
+@import "1_7_grid";
+@import "1_8_transitions";
+@import "1_9_utilities";
+@import "2_1_formatting";
+@import "2_2_buttons";
+@import "2_3_wpspecifics";
 
-@import "modules";
+@import "3_1_modules";
