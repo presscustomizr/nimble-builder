@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.16
+Stable tag: 2.0.17
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,10 +120,17 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-= 2.0.16 =
-[plugins compatibility] added support for Memberpress plugin. [accordion module] fixed default title background color value. [admin] introduction of a new option page located in WP admin > Settings > Nimble Builder
+2.0.17 : [performance] a column image background could be loaded even when off window and lazyload enabled. [accordion module] accordion content now supports WordPress shortcodes. [customize preview] if an edited element is offscreen, automatically scroll until it becomes visible
 
 == Changelog ==
+= 2.0.17 May 25th 2020 =
+* fixed : [column background][performance] a column image background could be loaded even when off window
+* fixed : [social icons module] default color could be overriden by the theme links color
+* added : [accordion module] accordion content now supports WordPress shortcodes
+* improved : [customize preview] if an edited element is offscreen, automatically scroll until it becomes visible
+* improved : [html module][performance] add lazyload support for images embedded in HTML code
+* improved : [CSS] implemented a better CSS reset
+
 = 2.0.16 May 19th 2020 =
 * fixed : [accordion module] default title background color is not consistent with default customizer value (#ffffff)
 * added : [plugins compatibility] added support for Memberpress plugin

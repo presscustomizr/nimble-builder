@@ -1,3 +1,114 @@
+/* -------------------------------------------------------------------------- */
+/* <GLOBAL RESET>
+/* -------------------------------------------------------------------------- */
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -ms-overflow-style: scrollbar;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+@-ms-viewport {
+  width: device-width;
+}
+
+body {
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5;
+  text-rendering: optimizeSpeed;
+  direction: rtl;
+}
+
+html, body, div {
+  border: none;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  padding: 0;
+  text-align: inherit;
+}
+
+article, aside, dialog, figcaption, figure, footer, header, hgroup, main, nav, section {
+  display: block;
+}
+
+/* -------------------------------------------------------------------------- */
+/* </GLOBAL RESET>
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/* <SCOPED RESET>
+/* -------------------------------------------------------------------------- */
+.sektion-wrapper *,
+.sektion-wrapper *::before,
+.sektion-wrapper *::after {
+  box-sizing: border-box;
+}
+
+.sektion-wrapper span, .sektion-wrapper applet, .sektion-wrapper object, .sektion-wrapper iframe,
+.sektion-wrapper h1, .sektion-wrapper h2, .sektion-wrapper h3, .sektion-wrapper h4, .sektion-wrapper h5, .sektion-wrapper h6, .sektion-wrapper p, .sektion-wrapper blockquote, .sektion-wrapper pre,
+.sektion-wrapper a, .sektion-wrapper abbr, .sektion-wrapper acronym, .sektion-wrapper address, .sektion-wrapper big, .sektion-wrapper cite, .sektion-wrapper code,
+.sektion-wrapper del, .sektion-wrapper dfn, .sektion-wrapper em, .sektion-wrapper img, .sektion-wrapper ins, .sektion-wrapper kbd, .sektion-wrapper q, .sektion-wrapper s, .sektion-wrapper samp,
+.sektion-wrapper small, .sektion-wrapper strike, .sektion-wrapper strong, .sektion-wrapper sub, .sektion-wrapper sup, .sektion-wrapper tt, .sektion-wrapper var,
+.sektion-wrapper b, .sektion-wrapper u, .sektion-wrapper i, .sektion-wrapper center,
+.sektion-wrapper dl, .sektion-wrapper dt, .sektion-wrapper dd, .sektion-wrapper ol, .sektion-wrapper ul, .sektion-wrapper li,
+.sektion-wrapper fieldset, .sektion-wrapper form, .sektion-wrapper label, .sektion-wrapper legend,
+.sektion-wrapper table, .sektion-wrapper caption, .sektion-wrapper tbody, .sektion-wrapper tfoot, .sektion-wrapper thead, .sektion-wrapper tr, .sektion-wrapper th, .sektion-wrapper td,
+.sektion-wrapper article, .sektion-wrapper aside, .sektion-wrapper canvas, .sektion-wrapper details, .sektion-wrapper embed,
+.sektion-wrapper figure, .sektion-wrapper figcaption, .sektion-wrapper footer, .sektion-wrapper header, .sektion-wrapper hgroup,
+.sektion-wrapper menu, .sektion-wrapper nav, .sektion-wrapper output, .sektion-wrapper ruby, .sektion-wrapper section, .sektion-wrapper summary,
+.sektion-wrapper time, .sektion-wrapper mark, .sektion-wrapper audio, .sektion-wrapper video {
+  border: none;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  padding: 0;
+  text-align: inherit;
+}
+
+.sektion-wrapper blockquote::before,
+.sektion-wrapper blockquote::after, .sektion-wrapper q:before, .sektion-wrapper q:after {
+  content: "";
+}
+
+.sektion-wrapper ol, .sektion-wrapper ul {
+  list-style: none;
+}
+
+.sektion-wrapper img {
+  max-width: 100%;
+  vertical-align: middle;
+  border-style: none;
+  display: inline;
+}
+
+.sektion-wrapper svg:not(:root) {
+  overflow: hidden;
+}
+
+.sektion-wrapper figure {
+  margin: 0;
+}
+
+.sektion-wrapper embed, .sektion-wrapper iframe, .sektion-wrapper object {
+  max-width: 100%;
+}
+
+/* -------------------------------------------------------------------------- */
+/* </SCOPED RESET>
+/* -------------------------------------------------------------------------- */
 /* make sure that the location level occupies 100% of the width */
 [data-sek-level="location"] {
   clear: both;
@@ -228,31 +339,6 @@
   .customizer-preview [data-sek-video-bg-on-mobile="false"] .sek-bg-video-wrapper {
     display: none;
   }
-}
-
-.sektion-wrapper *,
-.sektion-wrapper *::before,
-.sektion-wrapper *::after {
-  box-sizing: border-box;
-}
-
-.sektion-wrapper img {
-  max-width: 100%;
-  vertical-align: middle;
-  border-style: none;
-  display: inline;
-}
-
-.sektion-wrapper svg:not(:root) {
-  overflow: hidden;
-}
-
-.sektion-wrapper figure {
-  margin: 0;
-}
-
-.sektion-wrapper embed, .sektion-wrapper iframe, .sektion-wrapper object {
-  max-width: 100%;
 }
 
 .sek-service-font, .sek-module-inner .sek-btn {
@@ -591,46 +677,6 @@
   height: 100%;
   top: 0;
   left: 0;
-}
-
-.sek-module-inner h1,
-.sek-module-inner h2,
-.sek-module-inner h3,
-.sek-module-inner h4,
-.sek-module-inner h5,
-.sek-module-inner h6,
-.sek-module-inner p,
-.sek-module-inner blockquote,
-.sek-module-inner address,
-.sek-module-inner big,
-.sek-module-inner cite,
-.sek-module-inner code,
-.sek-module-inner em,
-.sek-module-inner font,
-.sek-module-inner img,
-.sek-module-inner small,
-.sek-module-inner strike,
-.sek-module-inner sub,
-.sek-module-inner sup,
-.sek-module-inner li,
-.sek-module-inner ol,
-.sek-module-inner ul,
-.sek-module-inner fieldset,
-.sek-module-inner form,
-.sek-module-inner label,
-.sek-module-inner legend,
-.sek-module-inner button,
-.sek-module-inner table,
-.sek-module-inner caption,
-.sek-module-inner tr,
-.sek-module-inner th,
-.sek-module-inner td {
-  border: none;
-  font-size: inherit;
-  line-height: inherit;
-  margin: 0;
-  padding: 0;
-  text-align: inherit;
 }
 
 .sektion-wrapper {
@@ -2220,6 +2266,10 @@ button.sek-btn,
 
 .sek-module-inner .sek-social-icons-wrapper > li {
   display: inline-block;
+}
+
+.sek-module-inner .sek-social-icons-wrapper > li a {
+  color: #707070;
 }
 
 .sek-module-inner .sek-social-icons-wrapper > li .sek-social-icon {

@@ -136,19 +136,37 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             scheduleHighlightActiveLevel : function() {
                   var self = this;
                   // Stores the currently edited level
+                  // aka the one on which the user clicked to edit it
                   this.activeLevelUI = new api.Value('');
+                  this.activeLevelEl = new api.Value(null);
                   this.activeUIChangedRecently = new api.Value( false );
 
                   this.activeLevelUI.bind( function( to, from ) {
                         var $activeLevel = $('[data-sek-id="' + to +'"]'),
                             $previousActiveLevel = $('[data-sek-id="' + from +'"]');
+
                         if ( $activeLevel.length > 0 ) {
                               $activeLevel.addClass('sek-active-ui sek-highlight-active-ui');
+                              // cache $activeLevel
+                              self.activeLevelEl( $activeLevel );
                         }
                         if ( $previousActiveLevel.length > 0 ) {
                               $previousActiveLevel.removeClass('sek-active-ui sek-highlight-active-ui');
                         }
                         self.activeUIChangedRecently( Date.now() );
+                  });
+
+                  // MAY 2020 : added to focus on the edited element
+                  // updated in self.activeLevelUI() and self.schedulePanelMsgReactions()
+                  self.activeLevelEl.bind( function($el) {
+                        // scroll to focus on the active element
+                        // but only if element is offscreen, otherwise clicking on a section edit UI for example, will make it move to the top, which is annoying
+                        if ( _.isObject($el) && $el.length > 0 && !nb_.isInScreen( $el[0]) ) {
+                              // https://caniuse.com/#search=scrollIntoView
+                              try{ $el[0].scrollIntoView(); } catch(er) {
+                                    self.errare('activeLevelEl error', er );
+                              }
+                        }
                   });
 
                   // apiParams : {
@@ -2029,9 +2047,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                             // FOCUS
                             // Sent from the panel when duplicating a section level for example
+                            // focus on a level
                             'sek-animate-to-level' : function( params ) {
                                   var $elToFocusOn = $('[data-sek-id="' + params.id + '"]' );
                                   if ( $elToFocusOn.length > 0 ) {
+                                        //$elToFocusOn[0].scrollIntoView();
                                         $('html, body').animate({
                                               scrollTop : $elToFocusOn.offset().top - 100
                                         }, 200 );
@@ -2132,6 +2152,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             }
                       };//msgCollection
 
+                  var $_activeElement;// <= will be used to cache self.activeLevelEl()
                   _.each( msgCollection, function( callbackFn, msgId ) {
                         api.preview.bind( msgId, function( params ) {
                               params = _.extend( {
@@ -2189,9 +2210,23 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
                                     self.cachedElements.$body.removeClass( msgId );
                               }
+
+                              // MAY 2020 : focus on the edited element
+                              if ( params.apiParams.id ) {
+                                    $_activeElement = self.activeLevelEl();
+                                    // set the activeElement if needed
+                                    if ( !$_activeElement || !_.isObject($_activeElement) || $_activeElement.length < 1 || self.activeLevelUI() !== params.apiParams.id ) {
+                                          self.activeLevelEl( $('[data-sek-id="' + params.apiParams.id + '"]' ) );
+                                          $_activeElement = self.activeLevelEl();
+                                    }
+                                    // if user scrolled while editing an element, let's focus again
+                                    if ( !nb_.isInScreen( $_activeElement[0]) ) {
+                                          $_activeElement[0].scrollIntoView();
+                                    }
+                              }
                         });
                   });
-            },//schedulePanelMsgReactions()
+            }//schedulePanelMsgReactions()
       });//$.extend()
 })( wp.customize, jQuery, _ );
 //global sekPreviewLocalized

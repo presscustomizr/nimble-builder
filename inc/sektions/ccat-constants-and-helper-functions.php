@@ -448,7 +448,7 @@ function nimble_regex_callback( $matches ) {
     if ( false !== strpos( $matches[0], 'data-srcset' ) || false !== strpos( $matches[0], 'data-src' ) ) {
       return $matches[0];
     // bail if already parsed by this regex or if smartload is disabled
-    } else if ( false !== strpos( $matches[0], 'data-sek-src' ) || preg_match('/ data-sek-smartload *= *"false" */', $matches[0]) ) {
+    } else if ( false !== strpos( $matches[0], 'data-sek-src' ) || preg_match('/ data-skip-lazyload *= *"true" */', $matches[0]) ) {
       return $matches[0];
     // otherwise go ahead and parse
     } else {
