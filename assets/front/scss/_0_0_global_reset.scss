@@ -1,0 +1,70 @@
+/* -------------------------------------------------------------------------- */
+/* <GLOBAL RESET>
+/* -------------------------------------------------------------------------- */
+// SHOULD BE PRINTED WHEN NIMBLE BUILDER HEADER AND FOOTER IS USED ONLY
+// May 2020 : the global reset is added
+// It is normally implemented in a well designed theme
+// Nimble Builder will propose options to dequeue theme stylesheet in the future, which makes it crucial to have our own reset embedded.
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -ms-overflow-style: scrollbar;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+// https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/
+// https://css-tricks.com/box-sizing/#article-header-id-3
+*,
+*::before,
+*::after {
+  box-sizing: inherit; //<= because defined as 'border-box' for html element
+}
+// Note: The use of <meta name="viewport"> tag overrides @viewport
+// https://developer.mozilla.org/en-US/docs/Web/CSS/@viewport
+@-ms-viewport {
+  width: device-width;
+}
+
+body {
+  min-height: 100vh;//fill the viewport, even when empty
+  scroll-behavior: smooth;
+  // System Fonts as used by GitHub
+  font-family: $font-family-sans-serif;
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5;
+  //Using optimizeLegibility makes your text look nicer, but can have serious performance issues
+  //https://dev.to/hankchizljaw/a-modern-css-reset-6p3
+  text-rendering: optimizeSpeed;
+  // Direction : https://developer.mozilla.org/en-US/docs/Web/CSS/direction
+  @if ( true == $is_rtl ) {
+    direction: rtl;
+  }
+  @else {
+    direction: ltr;
+  }
+}
+
+// https://gist.github.com/DavidWells/18e73022e723037a50d6
+// ensures we don't inherit the browser style for html, boy and div
+// for example, if not set, there can be a default margin of a few pixels applied to the body element.
+html, body, div {
+  border: none;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  padding: 0;
+  text-align: inherit;
+}
+
+
+// HTML5 display-role reset for older browsers
+// https://meyerweb.com/eric/tools/css/reset/
+article, aside, dialog, figcaption, figure, footer, header, hgroup, main, nav, section {
+  display: block;
+}
+/* -------------------------------------------------------------------------- */
+/* </GLOBAL RESET>
+/* -------------------------------------------------------------------------- */
