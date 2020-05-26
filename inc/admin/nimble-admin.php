@@ -704,20 +704,12 @@ function sek_filter_post_row_actions( $actions, $post ) {
 }
 
 
-// APRIL 2020 : implement compatibility with Yoast content analyzer
-// for https://github.com/presscustomizr/nimble-builder/issues/657
-// documented here : https://github.com/Yoast/javascript/blob/master/packages/yoastseo/docs/Customization.md
-add_action( 'wp_ajax_sek_get_nimble_content_for_yoast', '\Nimble\sek_ajax_get_nimble_content_for_yoast' );
-function sek_ajax_get_nimble_content_for_yoast() {
-    if ( !is_user_logged_in() ) {
-        wp_send_json_error( __FUNCTION__ . ' error => unauthenticated' );
-    }
-    if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
-        wp_send_json_error( __FUNCTION__ . ' error => missing skope_id' );
-    }
-
-    $skope_id = $_POST['skope_id'];
-
+// May 2020 : introduced this helper for SEO plugin compat
+// @return html string
+function sek_get_raw_html_from_skope_id( $skope_id = '' ) {
+    $html = '';
+    if ( empty( $skope_id ) )
+      return $html;
     // Register contextually active modules
     // ( because normally not registered when in admin )
     sek_register_modules_when_not_customizing_and_not_ajaxing( $skope_id );
@@ -740,7 +732,21 @@ function sek_ajax_get_nimble_content_for_yoast() {
     $html = apply_filters( 'the_content', $html );
     // Minify html
     $html = preg_replace('/>\s*</', '><', $html);//https://stackoverflow.com/questions/466437/minifying-html
+    return $html;
+}
 
+// APRIL 2020 : implement compatibility with Yoast content analyzer
+// for https://github.com/presscustomizr/nimble-builder/issues/657
+// documented here : https://github.com/Yoast/javascript/blob/master/packages/yoastseo/docs/Customization.md
+add_action( 'wp_ajax_sek_get_nimble_content_for_yoast', '\Nimble\sek_ajax_get_nimble_content_for_yoast' );
+function sek_ajax_get_nimble_content_for_yoast() {
+    if ( !is_user_logged_in() ) {
+        wp_send_json_error( __FUNCTION__ . ' error => unauthenticated' );
+    }
+    if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
+        wp_send_json_error( __FUNCTION__ . ' error => missing skope_id' );
+    }
+    $html = sek_get_raw_html_from_skope_id( $_POST['skope_id'] );
     wp_send_json_success($html);
 }
 
@@ -774,4 +780,20 @@ function sek_print_js_for_yoast_analysis() {
         });
     </script>
     <?php
+}
+
+
+// MAY 2020 : implement compatibility with SEOPress content analyzer
+// see https://www.seopress.org/support/hooks/filter-the-analyzed-content/
+add_filter('seopress_content_analysis_content', '\Nimble\sek_add_content_to_seopress_analyser', 10, 2);
+function sek_add_content_to_seopress_analyser($content, $id) {
+    //$content = default WP editor
+    //$id = current post ID
+    $post = get_post($id);
+    if ( is_wp_error($post) || !$post || !is_object($post) )
+      return $content;
+
+    $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
+    $nb_content = sek_get_raw_html_from_skope_id( $manually_built_skope_id );
+    return is_string($nb_content) ? $content.$nb_content : $content;
 }
