@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.17
+Stable tag: 2.0.18
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,12 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.0.17 : [performance] a column image background could be loaded even when off window and lazyload enabled. [accordion module] accordion content now supports WordPress shortcodes. [customize preview] if an edited element is offscreen, automatically scroll until it becomes visible
+2.0.18 : [performance] a column image background could be loaded even when off window and lazyload enabled. [accordion module] accordion content now supports WordPress shortcodes. [customize preview] if an edited element is offscreen, automatically scroll until it becomes visible
 
 == Changelog ==
+= 2.0.18 May 26th 2020 =
+* fixed : [CSS] Nimble Builder CSS reset can create inconsistencies with theme style
+
 = 2.0.17 May 25th 2020 =
 * fixed : [column background][performance] a column image background could be loaded even when off window
 * fixed : [social icons module] default color could be overriden by the theme links color
