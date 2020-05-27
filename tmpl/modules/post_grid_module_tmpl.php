@@ -65,7 +65,7 @@ if ( !function_exists( 'Nimble\sek_render_post_navigation') ) {
               // April 2020 : fixes pagination not working on a static page used as front page
               // see https://github.com/presscustomizr/nimble-builder/issues/664
               // https://developer.wordpress.org/reference/classes/wp_query/#pagination-parameters
-              $pagination_query_var = is_front_page() ? 'page' :'paged';
+              $pagination_query_var = Nimble_Manager()->is_viewing_static_front_page ? 'page' :'paged';
               $paged = get_query_var($pagination_query_var);
               $paged = $paged ? $paged : 1;
 
@@ -278,19 +278,24 @@ $query_params = $default_query_params = [
   'category_name'          => $category_names,
   'category__in'           => $categories_in,
   'order'                  => $order,
-  'orderby'                => $orderby
+  'orderby'                => $orderby,
+  // may 2020 : querying ids is enough and much more performant on large queries
+  // @see : https://pluginrepublic.com/how-to-handle-large-queries-in-wordpress/
+  'fields'                 => 'ids'
 ];
 
 
 $post_collection = null;
-
+// may 2020 => is_front_page() was wrong to check if home was a static front page.
+// fixes https://github.com/presscustomizr/nimble-builder/issues/664
+Nimble_Manager()->is_viewing_static_front_page = is_front_page() && 'page' == get_option( 'show_on_front' );
 if ( true === sek_booleanize_checkbox_val($main_settings['display_pagination']) ) {
   $posts_per_page = (int)$main_settings['posts_per_page'];
   $posts_per_page = $posts_per_page <= 0 ? 1 : $posts_per_page;
   // April 2020 : fixes pagination not working on a static page used as front page
   // see https://github.com/presscustomizr/nimble-builder/issues/664
   // https://developer.wordpress.org/reference/classes/wp_query/#pagination-parameters
-  $pagination_query_var = is_front_page() ? 'page' :'paged';
+  $pagination_query_var = Nimble_Manager()->is_viewing_static_front_page ? 'page' :'paged';
   $paged = get_query_var($pagination_query_var);
   $paged = $paged ? $paged : 1;
   $query_params = wp_parse_args( [
