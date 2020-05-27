@@ -413,8 +413,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 'isDevMode' => sek_is_dev_mode(),
                 //'ajaxUrl' => admin_url( 'admin-ajax.php' ),
                 'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
-                'localSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks() ) : '',
-                'globalSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID ) ) : '',
+                // 'localSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks() ) : '',
+                // 'globalSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID ) ) : '',
                 'skope_id' => skp_get_skope_id(), //added for debugging purposes
                 'recaptcha_public_key' => !empty( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : '',
 
