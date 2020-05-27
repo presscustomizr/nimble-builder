@@ -84,18 +84,24 @@ add_filter("plugin_action_links_".plugin_basename(NIMBLE_PLUGIN_FILE), '\Nimble\
 /* ------------------------------------------------------------------------- */
 // fired @'admin_post'
 function nb_save_options() {
-  do_action('nb_admin_post');
-  //wp_safe_redirect( urldecode( admin_url( NIMBLE_OPTIONS_PAGE_URL ) ) );
-  nb_admin_redirect();
+    do_action('nb_admin_post');
+    //wp_safe_redirect( urldecode( admin_url( NIMBLE_OPTIONS_PAGE_URL ) ) );
+    nb_admin_redirect();
 }
 add_action( 'admin_post', '\Nimble\nb_save_options' );
 
 
 // fired @'admin_post'
 function nb_admin_redirect() {
+    $url = sanitize_text_field(
+            wp_unslash( $_POST['_wp_http_referer'] ) // Input var okay.
+    );
+    // Default option url : urldecode( admin_url( NIMBLE_OPTIONS_PAGE_URL ) )
+    $url = urldecode( $url );
+    $url = empty($url) ? urldecode( admin_url( NIMBLE_OPTIONS_PAGE_URL ) ) : $url;
     // Finally, redirect back to the admin page.
     // Note : filter 'nimble_admin_redirect_url' is used in NB pro to add query params used to display warning/error messages
-    wp_safe_redirect( apply_filters('nimble_admin_redirect_url', urldecode( admin_url( NIMBLE_OPTIONS_PAGE_URL ) ) ) );
+    wp_safe_redirect( apply_filters('nimble_admin_redirect_url', $url ) );
     exit;
 }
 
@@ -142,7 +148,7 @@ function nb_get_active_option_tab() {
 nb_register_option_tab([
     'id' => 'welcome',
     'title' => __('Welcome', 'text-doma'),
-    'page_title' => __('Nimble Page Builder', 'nimble' ),
+    'page_title' => __('Nimble Builder', 'nimble' ),
     'content' => '\Nimble\print_welcome_page',
 ]);
 function print_welcome_page() {
@@ -159,6 +165,87 @@ function print_welcome_page() {
 
     <?php
 }
+
+/* ------------------------------------------------------------------------- *
+*  OPTIONS PAGE
+/* ------------------------------------------------------------------------- */
+nb_register_option_tab([
+    'id' => 'options',
+    'title' => __('Options', 'text-doma'),
+    'page_title' => __('Nimble Builder Options', 'nimble' ),
+    'content' => '\Nimble\print_options_page',
+]);
+function print_options_page() {
+    ?>
+    <form method="post" action="<?php echo esc_html( admin_url( 'admin-post.php' ) ); ?>">
+    <table class="form-table" role="presentation">
+      <tbody>
+        <tr>
+          <th scope="row"><?php _e('Shortcodes', 'text_doma'); ?></th>
+          <td>
+            <fieldset><legend class="screen-reader-text"><span><?php _e('Shortcodes', 'text_doma'); ?></span></legend>
+              <?php
+                $shortcode_opt_val = get_option( 'nb_shortcodes_parsed_in_czr' );
+              ?>
+              <label for="nb_shortcodes_parsed_in_czr"><input name="nb_shortcodes_parsed_in_czr" type="checkbox" id="nb_shortcodes_parsed_in_czr" value="on" <?php checked( $shortcode_opt_val, 'on' ); ?>>
+              <?php _e('Parse shortcodes when building your pages in the customizer', 'text_doma'); ?></label>
+              <p class="description"><?php _e('Shortcodes are disabled by default when customizing to prevent any conflicts with Nimble Builder interface.', 'text_doma'); ?></p>
+            </fieldset>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row"><?php _e('Debug Mode', 'text_doma'); ?></th>
+          <td>
+            <fieldset><legend class="screen-reader-text"><span><?php _e('Debug Mode', 'text_doma'); ?></span></legend>
+              <?php
+                $nb_debug_mode_opt_val = get_option( 'nb_debug_mode_active' );
+              ?>
+              <label for="nb_debug_mode_active"><input name="nb_debug_mode_active" type="checkbox" id="nb_debug_mode_active" value="on" <?php checked( $nb_debug_mode_opt_val, 'on' ); ?>>
+              <?php _e('Activate the debug mode when customizing', 'text_doma'); ?></label>
+              <p class="description"><?php _e('In debug mode, during customization Nimble Builder deactivates all modules content and prints only the structure of your sections. This lets you troubleshoot, remove or edit your modules safely.', 'text_doma'); ?></p>
+            </fieldset>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+    <?php
+      wp_nonce_field( 'nb-base-options', 'nb-base-options-nonce' );
+      submit_button();
+    ?>
+    </form>
+    <?php
+}
+add_action( 'nb_admin_post', '\Nimble\nb_save_base_options' );
+// hook : nb_admin_post
+function nb_save_base_options() {
+    // First, validate the nonce and verify the user as permission to save.
+    if ( !nb_has_valid_nonce( 'nb-base-options', 'nb-base-options-nonce' ) || !current_user_can( 'manage_options' ) )
+        return;
+
+    // Shortcode parsing when customizing
+    nb_maybe_update_checkbox_option( 'nb_shortcodes_parsed_in_czr', 'off' );
+
+    // Debug mode
+    nb_maybe_update_checkbox_option( 'nb_debug_mode_active', 'off' );
+}
+
+// helper to update a checkbox option
+// the option is updated only if different than the default val or if the option exists already
+function nb_maybe_update_checkbox_option( $opt_name, $unchecked_value ) {
+    $opt_value = get_option( $opt_name );
+    $posted_value = array_key_exists( $opt_name, $_POST ) ? $_POST[$opt_name] : $unchecked_value;
+    if ( $unchecked_value !== $posted_value ) {
+        update_option( $opt_name, esc_attr( $posted_value ) );
+    } else {
+        // if the option was never set before, then leave it not set
+        // otherwise update it to 'off'
+        if ( false !== $opt_value ) {
+            update_option( $opt_name, $unchecked_value );
+        }
+    }
+}
+
 
 
 /* ------------------------------------------------------------------------- *
