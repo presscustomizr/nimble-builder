@@ -152,7 +152,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // NOTIFICATION WHEN USING CUSTOM TEMPLATE
                   // implemented for https://github.com/presscustomizr/nimble-builder/issues/304
                   var maybePrintNotificationForUsageOfNimbleTemplate = function( templateSettingValue ) {
-                        if ( $(self.topBarId).length < 1 )
+                        if ( $(self.topBarId).length < 1 || sektionsLocalizedData.isDebugMode )
                           return;
                         if ( _.isObject( templateSettingValue ) && templateSettingValue.local_template && 'default' !== templateSettingValue.local_template ) {
                               $(self.topBarId).find('.sek-notifications').html([

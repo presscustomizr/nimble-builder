@@ -144,6 +144,6 @@ body.nimble-top-bar-visible #nimble-top-bar {
   filter: none;
 }
 #nimble-top-bar .sek-notifications {
-  max-width: 300px;
+  max-width: 400px;
   overflow: hidden;
 }
