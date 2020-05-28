@@ -13746,8 +13746,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 'isDevMode' => sek_is_dev_mode(),
                 //'ajaxUrl' => admin_url( 'admin-ajax.php' ),
                 'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
-                'localSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks() ) : '',
-                'globalSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID ) ) : '',
+                // 'localSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks() ) : '',
+                // 'globalSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID ) ) : '',
                 'skope_id' => skp_get_skope_id(), //added for debugging purposes
                 'recaptcha_public_key' => !empty( $global_recaptcha_opts['public_key'] ) ? $global_recaptcha_opts['public_key'] : '',
 
@@ -15412,7 +15412,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'the_nimble_tinymce_module_content', 'shortcode_unautop' );
             add_filter( 'the_nimble_tinymce_module_content', 'prepend_attachment' );
             add_filter( 'the_nimble_tinymce_module_content', 'wp_make_content_images_responsive' );
-            add_filter( 'the_nimble_tinymce_module_content', 'do_shortcode', 11 ); // AFTER wpautop()
+            add_filter( 'the_nimble_tinymce_module_content', array( $this, 'sek_do_shortcode' ), 11 ); // AFTER wpautop()
             add_filter( 'the_nimble_tinymce_module_content', 'capital_P_dangit', 9 );
             add_filter( 'the_nimble_tinymce_module_content', '\Nimble\sek_parse_template_tags', 21 );
 
@@ -15426,8 +15426,40 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'the_nimble_tinymce_module_content', array( $this, 'sek_parse_content_for_video_embed') , 8 );
         }
 
-         // fired @filter the_nimble_tinymce_module_content
+        // fired @filter the_nimble_tinymce_module_content
+        // updated May 2020 : prevent doing shortcode when customizing
+        // fixes https://github.com/presscustomizr/nimble-builder/issues/704
+        function sek_do_shortcode( $content ) {
+            $allow_shortcode_parsing_when_customizing = sek_booleanize_checkbox_val( get_option( 'nb_shortcodes_parsed_in_czr' ) );
+            if ( $allow_shortcode_parsing_when_customizing ) {
+                $content = do_shortcode( $content );
+            } else {
+                if ( !skp_is_customizing() ) {
+                    $content = do_shortcode( $content );
+                } else {
+                    global $shortcode_tags;
+                    // Find all registered tag names in $content.
+                    preg_match_all( '@\[([^<>&/\[\]\x00-\x20=]++)@', $content, $matches );
+                    $tagnames = array_intersect( array_keys( $shortcode_tags ), $matches[1] );
+
+                    if ( !empty( $tagnames ) ) {
+                      $content = sprintf('<div class="nimble-shortcode-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>%2$s',
+                          __('Shortcodes are not parsed by default when customizing. You can change this setting in your WP admin > Settings > Nimble Builder options.', 'text-doma'),
+                          $content
+                      );
+                    }
+                }
+            }
+            return $content;
+        }
+
+        // fired @filter the_nimble_tinymce_module_content
+        // updated May 2020 : prevent doing shortcode when customizing
+        // fixes https://github.com/presscustomizr/nimble-builder/issues/704
         function sek_run_shortcode( $content ) {
+            $allow_shortcode_parsing_when_customizing = sek_booleanize_checkbox_val( get_option( 'nb_shortcodes_parsed_in_czr' ) );
+            if ( skp_is_customizing() && !$allow_shortcode_parsing_when_customizing )
+              return $content;
             if ( array_key_exists( 'wp_embed', $GLOBALS ) && $GLOBALS['wp_embed'] instanceof \WP_Embed ) {
                 $content = $GLOBALS['wp_embed']->run_shortcode( $content );
             }

@@ -5,11 +5,11 @@ if ( !defined( 'ABSPATH' ) ) {
 }
 // @return bool
 function sek_is_debug_mode() {
-  return isset( $_GET['nimble_debug'] );
+  return isset( $_GET['nimble_debug'] ) || sek_booleanize_checkbox_val( get_option( 'nb_debug_mode_active' ) );
 }
 // @return bool
 function sek_is_dev_mode() {
-  return ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) || ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || sek_is_debug_mode();
+  return ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) || ( defined( 'WP_DEBUG' ) && WP_DEBUG );
 }
 
 if ( !defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'nimble_post_type' ); }

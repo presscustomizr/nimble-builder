@@ -120,6 +120,7 @@ function sek_enqueue_controls_js_css() {
             array(
                 'nimbleVersion' => NIMBLE_VERSION,
                 'isDevMode' => sek_is_dev_mode(),
+                'isDebugMode' => sek_is_debug_mode(),
                 'baseUrl' => NIMBLE_BASE_URL,
                 //ajaxURL is not mandatory because is normally available in the customizer window.ajaxurl
                 'ajaxUrl' => admin_url( 'admin-ajax.php' ),
@@ -762,7 +763,11 @@ function sek_print_nimble_customizer_tmpl() {
             </button>
           </div>
           <?php endif; ?>
-          <div class="sek-notifications"></div>
+          <div class="sek-notifications">
+            <?php if ( sek_is_debug_mode() ) : ?>
+                <span style="color:#ff0000;line-height:2em;padding:3px;background:#ffffff;"><span class="fas fa-info-circle">&nbsp;<?php _e('Debug mode active ( WP admin > Settings > Nimble Builder options )', 'text_domain'); ?></span></span>
+            <?php endif; ?>
+          </div>
           <div class="sek-nimble-doc" data-doc-href="https://docs.presscustomizr.com/collection/334-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-customizer-topbar">
             <div class="sek-nimble-icon"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php _e('Nimble Builder','text_domain_to_replace'); ?>" title="<?php _e('Nimble online documentation', 'text_domain'); ?>"/></div>
             <span class="sek-pointer" title="<?php _e('Nimble online documentation', 'text_domain'); ?>"><?php _e('Nimble online documentation', 'text_domain'); ?></span>

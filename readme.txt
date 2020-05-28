@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.18
+Stable tag: 2.0.19
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,17 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.0.18 : [performance] a column image background could be loaded even when off window and lazyload enabled. [accordion module] accordion content now supports WordPress shortcodes. [customize preview] if an edited element is offscreen, automatically scroll until it becomes visible
+2.0.19 : [Grid module] fixed pagination broken on home page + performance improvements for large blog sites. [Customizer] fixed a bug when inserting a new module that requested a page refresh. [SEO] implement support for SEOPress plugin content analyzer. [Shortcodes] parsing deactivated when customizing + new admin option allowing users to activate shortcode parsing when customizing. [troubleshooting] introduction of a "Debug mode" option
 
 == Changelog ==
+= 2.0.19 May 28th 2020 =
+* fixed : [Grid module] pagination breaks when using a grid on home when set as a static page
+* fixed : [Grid module] improve performances of post queries on large blog sites
+* fixed : [customizer] a module just dropped in was not ready for .scrollIntoView() and it broke javascript.
+* added : [SEO] compatibility with SEOPress plugin
+* added : [shortcodes] shortcode with broken javascript can prevent users opening the customizer. Introduction of a new option allowing users to deactivate shortcode parsing when customizing
+* added : [troubleshooting] new "Debug mode" option in WP admin > Settings > Nimble Builder
+
 = 2.0.18 May 26th 2020 =
 * fixed : [CSS] Nimble Builder CSS reset can create inconsistencies with theme style
 

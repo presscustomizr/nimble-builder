@@ -2220,7 +2220,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           $_activeElement = self.activeLevelEl();
                                     }
                                     // if user scrolled while editing an element, let's focus again
-                                    if ( !nb_.isInScreen( $_activeElement[0]) ) {
+                                    if ( 0 < $_activeElement.length && !nb_.isInScreen( $_activeElement[0]) ) {
                                           $_activeElement[0].scrollIntoView();
                                     }
                               }
