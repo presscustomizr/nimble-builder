@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.19
+Stable tag: 2.0.20
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,15 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.0.19 : [Grid module] fixed pagination broken on home page + performance improvements for large blog sites. [Customizer] fixed a bug when inserting a new module that requested a page refresh. [SEO] implement support for SEOPress plugin content analyzer. [Shortcodes] parsing deactivated when customizing + new admin option allowing users to activate shortcode parsing when customizing. [troubleshooting] introduction of a "Debug mode" option. [performances][lazyload] prevent lazyloading images when in header section
+2.0.20 : [Grid module] fixed pagination broken on home page + performance improvements for large blog sites. [Customizer] fixed a bug when inserting a new module that requested a page refresh. [SEO] implement support for SEOPress plugin content analyzer. [Shortcodes] parsing deactivated when customizing + new admin option allowing users to activate shortcode parsing when customizing. [troubleshooting] introduction of a "Debug mode" option. [performances][lazyload] prevent lazyloading images when in header section. [CSS] fixed specificity too low for divider and spacer modules.
 
 == Changelog ==
+= 2.0.20 May 28th 2020 =
+* fixed : [CSS] specificity too low for divider and spacer modules
+* fixed : [CSS] improved style for NB debug notice
+* improved : [Section width] increased the range of input for inner and outer section widths, so that it's easier to set a width in pixels
+* added : [Options page] display a NB icon next to NB settings menu item in admin
+
 = 2.0.19 May 28th 2020 =
 * fixed : [Grid module] pagination breaks when using a grid on home when set as a static page
 * fixed : [Grid module] improve performances of post queries on large blog sites

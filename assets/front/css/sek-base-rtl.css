@@ -1454,7 +1454,7 @@ button.sek-btn,
   line-height: 0;
 }
 
-.sek-divider {
+.sek-module-inner .sek-divider {
   border-top: 1px solid #5a5a5a;
   display: inline-block;
   width: 100%;
@@ -1463,7 +1463,7 @@ button.sek-btn,
   font-size: 1rem;
 }
 
-.sek-spacer {
+.sek-module-inner .sek-spacer {
   height: 20px;
 }
 
