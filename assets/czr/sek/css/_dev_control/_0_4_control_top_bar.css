@@ -140,10 +140,18 @@ body.nimble-top-bar-visible #nimble-top-bar {
 #nimble-top-bar .sek-nimble-doc:hover img {
   -webkit-filter: none;
   filter: none;
-  -webkit-filter: none;
-  filter: none;
 }
 #nimble-top-bar .sek-notifications {
-  max-width: 400px;
+  max-width: 410px;
+  overflow: hidden;
+}
+
+/* May 2020 : debug mode notification */
+#nimble-top-bar .sek-notifications .debug-mode-notif {
+  color:#ff0000;
+  line-height:1.5em;
+  padding:3px;
+  background:#ffffff;
+  display: inline-block;
   overflow: hidden;
 }

@@ -765,7 +765,7 @@ function sek_print_nimble_customizer_tmpl() {
           <?php endif; ?>
           <div class="sek-notifications">
             <?php if ( sek_is_debug_mode() ) : ?>
-                <span style="color:#ff0000;line-height:2em;padding:3px;background:#ffffff;"><span class="fas fa-info-circle">&nbsp;<?php _e('Debug mode active ( WP admin > Settings > Nimble Builder options )', 'text_domain'); ?></span></span>
+                <span class="debug-mode-notif"><span class="fas fa-info-circle">&nbsp;<?php _e('Debug mode active ( WP admin > Settings > Nimble Builder options )', 'text_domain'); ?></span></span>
             <?php endif; ?>
           </div>
           <div class="sek-nimble-doc" data-doc-href="https://docs.presscustomizr.com/collection/334-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-customizer-topbar">
