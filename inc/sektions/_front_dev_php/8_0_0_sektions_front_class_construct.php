@@ -190,6 +190,12 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // April 2020 for https://github.com/presscustomizr/nimble-builder/issues/679
         public $is_content_restricted = false; //<= set at 'wp'
 
+        // May 2020
+        // those location properties are set when walking Nimble content on rendering
+        // @see #705 prevent lazyloading images when in header section.
+        public $current_location_is_header = false;
+        public $current_location_is_footer = false;
+
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
         function __construct( $params = array() ) {
