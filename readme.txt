@@ -120,13 +120,14 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.0.19 : [Grid module] fixed pagination broken on home page + performance improvements for large blog sites. [Customizer] fixed a bug when inserting a new module that requested a page refresh. [SEO] implement support for SEOPress plugin content analyzer. [Shortcodes] parsing deactivated when customizing + new admin option allowing users to activate shortcode parsing when customizing. [troubleshooting] introduction of a "Debug mode" option
+2.0.19 : [Grid module] fixed pagination broken on home page + performance improvements for large blog sites. [Customizer] fixed a bug when inserting a new module that requested a page refresh. [SEO] implement support for SEOPress plugin content analyzer. [Shortcodes] parsing deactivated when customizing + new admin option allowing users to activate shortcode parsing when customizing. [troubleshooting] introduction of a "Debug mode" option. [performances][lazyload] prevent lazyloading images when in header section
 
 == Changelog ==
 = 2.0.19 May 28th 2020 =
 * fixed : [Grid module] pagination breaks when using a grid on home when set as a static page
 * fixed : [Grid module] improve performances of post queries on large blog sites
 * fixed : [customizer] a module just dropped in was not ready for .scrollIntoView() and it broke javascript.
+* improved : [performances][lazyload] prevent lazyloading images when in header section
 * added : [SEO] compatibility with SEOPress plugin
 * added : [shortcodes] shortcode with broken javascript can prevent users opening the customizer. Introduction of a new option allowing users to deactivate shortcode parsing when customizing
 * added : [troubleshooting] new "Debug mode" option in WP admin > Settings > Nimble Builder
@@ -210,14 +211,3 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 * fixed : [HTML][CSS] custom css class name broken in the module markup
 * fixed : [Grid module] pagination could be broken in some cases.
 * added : [SEO] Nimble Builder content is now included to Yoast SEO analyser's tool when editing a page or post
-
-= 2.0.4 March 28th 2020 =
-* improved : [performances][Google fonts] added param "display=swap" to ensure text remains visible during webfont load
-* improved :  [Performance] make sure no enqueued script / inline script / preload stylesheet is printed when no Nimble Sections to print
-
-= 2.0.3 March 24th 2020 =
-* fixed : [form module] add specificity to CSS selectors of the button
-* fixed : [carousel module] when inserting a carousel for the first time, js not instantiated
-* added : [carousel module] a css loader until initialization of the slider
-* improved : [lazyload] lazyload js should not be ran when disabled in options
-* improved : [CSS] always re-generate front dynamic stylesheet when user is logged in and has "customize" capabilities

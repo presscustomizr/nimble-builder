@@ -12788,6 +12788,12 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // April 2020 for https://github.com/presscustomizr/nimble-builder/issues/679
         public $is_content_restricted = false; //<= set at 'wp'
 
+        // May 2020
+        // those location properties are set when walking Nimble content on rendering
+        // @see #705 prevent lazyloading images when in header section.
+        public $current_location_is_header = false;
+        public $current_location_is_footer = false;
+
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
         function __construct( $params = array() ) {
@@ -14696,6 +14702,11 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
 
                     //sek_error_log( __FUNCTION__ . ' WHAT ARE WE RENDERING? ' . $id , $collection );
 
+                    // Store the header-footer location boolean in the manager
+                    // Used to determine if we are allowed to lazyload
+                    // @see https://github.com/presscustomizr/nimble-builder/issues/705
+                    Nimble_Manager()->current_location_is_header = $is_header_location;
+                    Nimble_Manager()->current_location_is_footer = $is_footer_location;
 
                     // PASSWORD PROTECTION see #673 and #679
                     // If the page/post is password protect, and this is not a header or footer location,
@@ -15363,6 +15374,12 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         function sek_maybe_process_img_for_js_smart_load( $html ) {
             // if ( skp_is_customizing() || !sek_is_img_smartload_enabled() )
             //   return $html;
+
+            // prevent lazyloading images when in header section
+            // @see https://github.com/presscustomizr/nimble-builder/issues/705
+            if ( Nimble_Manager()->current_location_is_header )
+              return $html;
+
             if ( !sek_is_img_smartload_enabled() )
               return $html;
             if ( !is_string( $html ) ) {
