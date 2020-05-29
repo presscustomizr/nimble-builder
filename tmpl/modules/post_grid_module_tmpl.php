@@ -105,6 +105,13 @@ if ( !function_exists( 'Nimble\sek_render_post_navigation') ) {
 
 if ( !function_exists( 'Nimble\sek_render_post') ) {
   function sek_render_post( $main_settings, $metas_settings, $thumb_settings ) {
+    global $post;
+
+    if ( is_object($post) && isset($post->ID) ) {
+        $post_id = $post->ID;
+    } else {
+        $post_id = $post;
+    }
     // thumb, title, excerpt visibility
     foreach ( ['thumb'] as $element ) {
         ${'show_' . $element} = sek_booleanize_checkbox_val( $thumb_settings["show_{$element}"] );
@@ -155,7 +162,7 @@ if ( !function_exists( 'Nimble\sek_render_post') ) {
             <?php endif; ?>
             <?php if ( $show_title ) : ?>
               <h2 class="sek-pg-title">
-                <a href="<?php the_permalink(); ?>" rel="bookmark"><?php the_title(); ?></a>
+                <a href="<?php the_permalink(); ?>" rel="bookmark"><?php echo get_the_title($post_id); ?></a>
               </h2><!--/.pg-title-->
             <?php endif; ?>
             <?php if ( $show_author || $show_date || $show_comments ) : ?>
