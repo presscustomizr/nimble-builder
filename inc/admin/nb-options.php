@@ -50,17 +50,36 @@ function nb_options_page() {
       </div>
       <div class="tab-content-wrapper">
         <?php
-          $content_cb = $option_tabs[$active_tab_id]['content'];
-          if( is_string( $content_cb ) && !empty( $content_cb ) ) {
-            if ( function_exists( $content_cb ) ) {
-              call_user_func( $content_cb );
+          $_cb = $option_tabs[$active_tab_id]['content'];
+          if( is_string( $_cb ) && !empty( $_cb ) ) {
+            if ( function_exists( $_cb ) ) {
+              call_user_func( $_cb );
             } else {
-              echo $content_cb;
+              echo $_cb;
+            }
+          } else if ( is_array($_cb) && 2 == count($_cb) ) {
+            if ( is_object($_cb[0]) ) {
+              $to_return = call_user_func( array( $_cb[0] ,  $_cb[1] ) );
+            }
+            //instantiated with an instance property holding the object ?
+            else if ( class_exists($_cb[0]) ) {
+
+              /* PHP 5.3- compliant*/
+              $class_vars = get_class_vars( $_cb[0] );
+
+              if ( isset( $class_vars[ 'instance' ] ) && method_exists( $class_vars[ 'instance' ], $_cb[1]) ) {
+                $to_return = call_user_func( array( $class_vars[ 'instance' ] ,  $_cb[1] ) );
+              }
+
+              else {
+                $_class_obj = new $_cb[0]();
+                if ( method_exists($_class_obj, $_cb[1]) )
+                  $to_return = call_user_func( array( $_class_obj, $_cb[1] ) );
+              }
             }
           }
         ?>
       <div>
-      <?php //do_action('nimble-option-content'); ?>
   </div><!-- .wrap -->
   <?php
 }
@@ -246,7 +265,7 @@ function nb_maybe_update_checkbox_option( $opt_name, $unchecked_value ) {
     }
 }
 
-
+do_action('nb_base_admin_options_registered');
 
 /* ------------------------------------------------------------------------- *
 *  DOCUMENTATION
@@ -302,4 +321,6 @@ function print_system_info() {
       <textarea readonly="readonly" onclick="this.focus();this.select()" id="system-info-textarea" name="tc-sysinfo" title="<?php _e( 'To copy the system info, click below then press Ctrl + C (PC) or Cmd + C (Mac).', 'text_domain_to_be_chg' ); ?>" style="width: 800px;min-height: 800px;font-family: Menlo,Monaco,monospace;background: 0 0;white-space: pre;overflow: auto;display:block;"><?php echo sek_config_infos(); ?></textarea>
     <?php
 }
+
+
 ?>
