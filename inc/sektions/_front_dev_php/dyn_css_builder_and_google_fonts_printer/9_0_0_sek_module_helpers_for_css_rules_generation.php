@@ -1,5 +1,9 @@
 <?php
 namespace Nimble;
+if ( !defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 // @return array() for css rules
 // $rules[]     = array(
 //     'selector' => '[data-sek-id="'.$level['id'].'"]',

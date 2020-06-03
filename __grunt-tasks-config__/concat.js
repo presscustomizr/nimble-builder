@@ -421,11 +421,10 @@ module.exports = {
   },
 
 
-
   //
-  //------------------------- SEKTIONS BASE AND FRONT PHP
+  //------------------------- SEKTIONS UI MODULES PHP
   //
-  czr_sektions_base_front_php : {
+  czr_sektions_ui_modules_php : {
     src: [
       '<%= paths.sektions %>_front_dev_php/dyn_css_builder_and_google_fonts_printer/9_0_0_sek_module_helpers_for_css_rules_generation.php',
 
@@ -467,8 +466,17 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_7_sek_register_global_imp_exp.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_8_sek_register_global_revisions.php',
-      '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_9_sek_register_beta_features.php',
+      '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_9_sek_register_beta_features.php'
+    ],
+    dest: '<%= paths.sektions %>ccat-sektions-ui-modules.php',
+  },
 
+
+  //
+  //------------------------- SEKTIONS FRONT MODULES PHP
+  //
+  czr_sektions_front_modules_php : {
+    src: [
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_0_7_sek_register_image.php',
@@ -494,13 +502,21 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php',
 
-      '<%= paths.sektions %>_front_dev_php/module_registration/front/4_3_3_sek_register_shortcode.php',
-
-
+      '<%= paths.sektions %>_front_dev_php/module_registration/front/4_3_3_sek_register_shortcode.php'
 
       // PRO MODULES
       //'<%= paths.sektions %>_front_dev_php/module_registration/front/4_3_0_sek_register_nimble_special_image.php',
 
+    ],
+    dest: '<%= paths.sektions %>ccat-sektions-front-modules.php',
+  },
+
+
+  //
+  //------------------------- SEKTIONS BASE AND FRONT PHP
+  //
+  czr_sektions_base_front_php : {
+    src: [
       // DYN CSS
       '<%= paths.sektions %>_front_dev_php/dyn_css_builder_and_google_fonts_printer/5_0_1_class-sek-dyn-css-builder.php',
       '<%= paths.sektions %>_front_dev_php/dyn_css_builder_and_google_fonts_printer/5_0_2_class-sek-dyn-css-handler.php',
