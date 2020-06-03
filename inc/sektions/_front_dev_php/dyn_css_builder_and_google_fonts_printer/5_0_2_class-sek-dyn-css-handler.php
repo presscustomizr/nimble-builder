@@ -1,8 +1,4 @@
 <?php
-if ( !defined( 'ABSPATH' ) ) {
-    exit;
-}
-
 /**
  *  Sek Dyn CSS Handler: class responsible for enqueuing/writing CSS file or enqueuing/printing inline CSS
  */

@@ -1,5 +1,5 @@
 <?php
-if ( !class_exists( 'SEK_Front_Assets' ) ) :
+if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
     class SEK_Front_Assets_Customizer_Preview extends SEK_Front_Assets {
         // Fired in __construct()
         function _schedule_preview_assets_printing() {

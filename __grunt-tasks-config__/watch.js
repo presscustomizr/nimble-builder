@@ -143,6 +143,8 @@ module.exports = {
     ],
     tasks : [
       'concat:czr_sektions_constants_helper_functions_php',
+      'concat:czr_sektions_ui_modules_php',
+      'concat:czr_sektions_front_modules_php',
       'concat:czr_sektions_base_front_php'
       //'comments:sektions_front_php'
     ],

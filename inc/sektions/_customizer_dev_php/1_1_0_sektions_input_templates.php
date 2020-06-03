@@ -1,9 +1,4 @@
 <?php
-namespace Nimble;
-if ( !defined( 'ABSPATH' ) ) {
-    exit;
-}
-
 add_action( 'customize_controls_print_footer_scripts', '\Nimble\sek_print_nimble_input_templates' );
 function sek_print_nimble_input_templates() {
 
