@@ -1514,6 +1514,11 @@ transition: background 200ms linear, color 200ms linear;
     line-height: 1.5em;
 }
 
+#nimble-top-tmpl-save-ui .nb-tmpl-save-inner {
+  max-width: 800px;
+  margin: auto;
+}
+
 /*#nimble-top-tmpl-save-ui > div {
   width: 100%;
 }*/

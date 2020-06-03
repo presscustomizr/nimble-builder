@@ -810,6 +810,7 @@ function sek_print_nimble_customizer_tmpl() {
     ?>
     <script type="text/html" id="tmpl-nimble-top-tmpl-save-ui">
       <div id="nimble-top-tmpl-save-ui" class="czr-preview-notification" data-sek-tmpl-dialog-mode="hidden">
+        <div class="nb-tmpl-save-inner">
           <div class="sek-save-tmpl-mode-switcher">
             <div class="sek-ui-button-group" role="group">
               <button aria-pressed="false" data-tmpl-mode-switcher="save" class="sek-ui-button" type="button" title="<?php _e('Save as new template', 'text_domain'); ?>">
@@ -860,6 +861,7 @@ function sek_print_nimble_customizer_tmpl() {
               </button>
             </div>
           </div>
+        </div><?php //nb-tmpl-save-inner ?>
       </div>
     </script>
 
@@ -1045,11 +1047,6 @@ function sek_is_plugin_active_for_network( $plugin ) {
 
 
 ?><?php
-namespace Nimble;
-if ( !defined( 'ABSPATH' ) ) {
-    exit;
-}
-
 add_action( 'customize_controls_print_footer_scripts', '\Nimble\sek_print_nimble_input_templates' );
 function sek_print_nimble_input_templates() {
 
