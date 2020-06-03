@@ -98,23 +98,24 @@ function sek_enqueue_controls_js_css() {
         'all'
     );
 
-
-    wp_enqueue_script(
-        'czr-sektions',
-        //dev / debug mode mode?
-        sprintf(
-            '%1$s/assets/czr/sek/js/%2$s' ,
-            NIMBLE_BASE_URL,
-            sek_is_dev_mode() ? 'ccat-sek-control.js' : 'ccat-sek-control.min.js'
-        ),
-        array( 'czr-skope-base' , 'jquery', 'underscore' ),
-        NIMBLE_ASSETS_VERSION,
-        $in_footer = true
-    );
+    // June 2020 : commented for https://github.com/presscustomizr/nimble-builder/issues/708
+    // now injected on api "ready"
+    // wp_enqueue_script(
+    //     'czr-sektions',
+    //     //dev / debug mode mode?
+    //     sprintf(
+    //         '%1$s/assets/czr/sek/js/%2$s' ,
+    //         NIMBLE_BASE_URL,
+    //         sek_is_dev_mode() ? 'ccat-sek-control.js' : 'ccat-sek-control.min.js'
+    //     ),
+    //     array( 'czr-skope-base' , 'jquery', 'underscore' ),
+    //     NIMBLE_ASSETS_VERSION,
+    //     $in_footer = true
+    // );
 
 
     wp_localize_script(
-        'czr-sektions',
+        'customize-controls',//czr-sektions',
         'sektionsLocalizedData',
         apply_filters( 'nimble-sek-localized-customizer-control-params',
             array(
@@ -716,7 +717,55 @@ function add_sektion_values_to_skope_export( $skopes ) {
     return $new_skopes;
 }
 
+// June 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/708
+// print a script in the head of the customizer
+// inject control js script on api "ready" event
+add_action( 'customize_controls_print_footer_scripts', '\Nimble\sek_print_nimble_czr_control_js', 100 );
+//add_action( 'customize_controls_print_scripts', '\Nimble\sek_print_nimble_czr_control_js', 100 );
+function sek_print_nimble_czr_control_js() {
+    $script_url = sprintf(
+        '%1$s/assets/czr/sek/js/%2$s?ver=%3$s' ,
+        NIMBLE_BASE_URL,
+        sek_is_dev_mode() ? 'ccat-sek-control.js' : 'ccat-sek-control.min.js',
+        NIMBLE_ASSETS_VERSION
+    );
+    ?>
+    <script id="nb-schedule-control-js-load">
+      (function() {
+        var _loadScript = function() {
+          wp.customize.bind( 'ready', function() {
+              wp.customize.apiIsReady = true; //<= used in CZRSeksPrototype::initialize()
+              var _script = document.createElement("script"),
+                  customizePreviewTag = document.getElementById('customize-preview');
+              _script.setAttribute('src', '<?php echo $script_url; ?>'  );
+              _script.setAttribute('id', 'nb-control-js' );
+              //_script.setAttribute('defer', 'defer');
 
+              // Insert after #customize-preview
+              customizePreviewTag.parentNode.insertBefore(_script, customizePreviewTag.nextSibling);
+          });
+        },
+        // recursively try to load jquery every 100ms during 5s ( max 50 times )
+        _loadWhenWpCustomizeLoaded = function( attempts ) {
+            attempts = attempts || 0;
+            if ( wp && wp.customize ) {
+                _loadScript();
+            } else if ( attempts < 50 ) {
+              setTimeout( function() {
+                  attempts++;
+                  _loadWhenWpCustomizeLoaded( attempts );
+              }, 100 );
+            } else {
+              if ( window.console ) {
+                  console.log('Nimble Builder => Error missing wp or wp.customize in global scope' );
+              }
+            }
+        };
+        _loadWhenWpCustomizeLoaded();
+      })();
+    </script>
+    <?php
+};
 
 add_action( 'customize_controls_print_footer_scripts', '\Nimble\sek_print_nimble_customizer_tmpl' );
 function sek_print_nimble_customizer_tmpl() {
@@ -780,10 +829,27 @@ function sek_print_nimble_customizer_tmpl() {
 
 
 
-    <?php // SECTION SAVING ?>
+<?php // SECTION SAVING
+    // June 2020, for https://github.com/presscustomizr/nimble-builder/issues/520
+    ?>
     <script type="text/html" id="tmpl-nimble-top-section-save-ui">
-      <div id="nimble-top-section-save-ui" class="czr-preview-notification">
-          <input id="sek-saved-section-id" type="hidden" value="">
+      <div id="nimble-top-section-save-ui" class="czr-preview-notification" data-sek-section-dialog-mode="hidden">
+        <div class="nb-section-save-inner">
+          <div class="sek-save-section-mode-switcher">
+            <div class="sek-ui-button-group" role="group">
+              <button aria-pressed="false" data-section-mode-switcher="save" class="sek-ui-button" type="button" title="<?php _e('Save as new section', 'text_domain'); ?>">
+                  <i class="far fa-save"></i>&nbsp;<?php _e('Save as new section', 'text_domain'); ?>
+              </button>
+              <button aria-pressed="false" data-section-mode-switcher="update" class="sek-ui-button" type="button" title="<?php _e('Update a section', 'text_domain'); ?>">
+                  <i class="far fa-edit"></i>&nbsp;<?php _e('Update a section', 'text_domain'); ?>
+              </button>
+              <button aria-pressed="false" data-section-mode-switcher="remove" class="sek-ui-button" type="button" title="<?php _e('Remove section(s)', 'text_domain'); ?>">
+                  <i class="fas fa-trash"></i>&nbsp;<?php _e('Remove section(s)', 'text_domain'); ?>
+              </button>
+            </div>
+          </div>
+          <?php // the select input is printed with a default 'none' option, other options will be populated dynamically with ajax fetching results ?>
+          <select class="sek-saved-section-picker"><option selected="selected" value="none"><?php _e('Select a section', 'text_doma'); ?></option></select>
           <div class="sek-section-title">
               <label for="sek-saved-section-title" class="customize-control-title"><?php _e('Section title', 'text_doma'); ?></label>
               <input id="sek-saved-section-title" type="text" value="">
@@ -792,14 +858,34 @@ function sek_print_nimble_customizer_tmpl() {
               <label for="sek-saved-section-description" class="customize-control-title"><?php _e('Section description', 'text_doma'); ?></label>
               <textarea id="sek-saved-section-description" type="text" value=""></textarea>
           </div>
-          <div class="sek-section-save">
-              <button class="button sek-do-save-section far fa-save" type="button" title="<?php _e('Save', 'text_domain'); ?>">
-                <?php _e('Save', 'text_domain'); ?>
+          <div class="sek-save-section-action">
+            <div class="sek-ui-button-group" role="group">
+              <button class="sek-ui-button sek-do-save-tmpl" type="button" title="<?php _e('Save section', 'text_domain'); ?>">
+                <i class="far fa-save"></i>&nbsp;<?php _e('Save section', 'text_domain'); ?><span class="spinner"></span>
               </button>
+              <button class="sek-ui-button sek-do-update-tmpl" type="button" title="<?php _e('Update section', 'text_domain'); ?>">
+                <i class="far fa-save"></i>&nbsp;<?php _e('Update section', 'text_domain'); ?><span class="spinner"></span>
+              </button>
+              <button class="sek-ui-button sek-open-remove-confirmation" type="button" title="<?php _e('Remove section', 'text_domain'); ?>">
+                <i class="fas fa-trash"></i>&nbsp;<?php _e('Remove section', 'text_domain'); ?><span class="spinner"></span>
+              </button>
+              <button class="sek-ui-button sek-close-dialog" type="button" title="<?php _e('Close', 'text_domain'); ?>">
+                  <i class="far fa-times-circle"></i>&nbsp;<?php _e('Close', 'text_domain'); ?>
+              </button>
+            </div>
           </div>
-          <button class="button sek-close-dialog far fa-times-circle" type="button" title="<?php _e('Close', 'text_domain'); ?>">
-              <?php _e('Close', 'text_domain'); ?>
-          </button>
+          <div class="sek-section-remove-dialog">
+            <p><?php _e('Removing a section cannot be undone. Are you sure you want to continue?', 'text_doma'); ?>
+            <div class="sek-ui-button-group" role="group">
+              <button class="sek-ui-button sek-do-remove-tmpl" type="button" title="<?php _e('Remove section', 'text_domain'); ?>">
+                <?php _e('Remove section', 'text_domain'); ?><span class="spinner"></span>
+              </button>
+              <button class="sek-ui-button sek-cancel-remove-tmpl" type="button" title="<?php _e('Cancel', 'text_domain'); ?>">
+                <?php _e('Cancel', 'text_domain'); ?>
+              </button>
+            </div>
+          </div>
+        </div><?php //nb-section-save-inner ?>
       </div>
     </script>
 

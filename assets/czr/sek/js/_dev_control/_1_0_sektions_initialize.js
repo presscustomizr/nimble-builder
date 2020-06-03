@@ -57,10 +57,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // this is used to know what ui elements are currently being displayed
                   self.registered = new api.Value([]);
 
-
-                  api.bind( 'ready', function() {
+                  // June 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/708
+                  if ( wp.customize.apiIsReady ) {
                         self.doSektionThinksOnApiReady();
-                  });//api.bind( 'ready' )
+                  } else {
+                        api.bind( 'ready', function() {
+                              self.doSektionThinksOnApiReady();
+                        });
+                  }
+
 
                   // Add the skope id on save
                   // Uses a WP core hook to filter the query on a customize_save action
@@ -293,7 +298,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // SAVE SECTION UI
                   if ( sektionsLocalizedData.isSavedSectionEnabled ) {
-                        self.setupSaveSectionUI();
+                        //self.setupSaveSectionUI();
                   }
 
                   // SAVE TEMPLATE UI
