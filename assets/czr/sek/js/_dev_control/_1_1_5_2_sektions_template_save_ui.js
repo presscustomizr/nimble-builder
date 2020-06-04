@@ -8,11 +8,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             setupSaveTmplUI : function() {
                   var self = this;
 
-
-
-
                   // Declare api values and schedule reactions
-
                   self.tmplDialogVisible = new api.Value( false );// Hidden by default
 
                   if ( !sektionsLocalizedData.isTemplateSaveEnabled ) {
@@ -24,6 +20,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // close level tree
                               self.templateGalleryExpanded(false);
                               self.levelTreeExpanded(false);
+                              if ( self.saveSectionDialogVisible ) {
+                                    self.saveSectionDialogVisible(false);
+                              }
                         }
                         self.toggleSaveTmplUI(visible);
                   });
@@ -35,7 +34,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // - set the select value to default 'none'
                   self.allSavedTemplates.bind( function( tmpl_collection ) {
                         if ( !_.isObject(tmpl_collection) ) {
-                              api.errare('error => tmpl collection should be an object');
+                              api.errare('error setupSaveTmplUI => tmpl collection should be an object');
                               return;
                         }
                         tmpl_collection = _.isEmpty(tmpl_collection) ? {} : tmpl_collection;
@@ -151,7 +150,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             ///////////////////////////////////////////////
             ///// DOM EVENTS
             // Fired once, on first rendering
-            scheduleDOMEvents : function() {
+            scheduleTmplSaveDOMEvents : function() {
                   var self = this, $tmplDialogWrapper = $('#nimble-top-tmpl-save-ui');
                   if ( $tmplDialogWrapper.data('nimble-tmpl-dom-events-scheduled') )
                     return;
@@ -405,7 +404,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this,
                       _renderAndSetup = function() {
                             $.when( self.renderTmplUI({}) ).done( function( $_el ) {
-                                  self.scheduleDOMEvents();
+                                  self.scheduleTmplSaveDOMEvents();
                                   self.saveUIContainer = $_el;
                                   //display
                                   _.delay( function() {

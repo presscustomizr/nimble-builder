@@ -15,7 +15,7 @@ register_post_type( NIMBLE_TEMPLATE_CPT , array(
     'query_var'        => false,
     'delete_with_user' => false,
     'can_export'       => true,
-    '_builtin'         => true, /* internal use only. don't use this when registering your own post type. */
+    //'_builtin'         => true, /* internal use only. don't use this when registering your own post type. */
     'supports'         => array( 'title', 'revisions' ),
     'capabilities'     => array(
         'delete_posts'           => 'edit_theme_options',
