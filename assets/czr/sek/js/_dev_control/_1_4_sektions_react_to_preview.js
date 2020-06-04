@@ -726,9 +726,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   });
                             },
 
+                            // Updated June 2020 for https://github.com/presscustomizr/nimble-builder/issues/520
                             'sek-toggle-save-section-ui' : function( params ) {
                                   sendToPreview = false;
-                                  self.saveSectionUIVisible( true, params );
+                                  console.log('ALORS SECTION TO SAVE ?', params );
+                                  self.idOfSectionToSave = params.id;
+                                  self.saveSectionDialogVisible( true );
                                   return $.Deferred(function(_dfd_) {
                                         apiParams = {
                                               // action : 'sek-refresh-level',

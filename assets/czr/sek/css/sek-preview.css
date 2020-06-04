@@ -180,7 +180,7 @@
     width: 1.6em!important;
     border-left: 1px dotted white;
 }
-.sek-dyn-ui-icons [data-sek-click-on="pick-content"] {
+.sek-dyn-ui-icons [data-sek-click-on="toggle-save-section-ui"] {
     /*padding-left: 9px;*/
     padding-left: 0.42em;
     margin-left: 0px;

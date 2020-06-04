@@ -297,9 +297,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.setupTopBar();//@see specific dev file
 
                   // SAVE SECTION UI
-                  if ( sektionsLocalizedData.isSavedSectionEnabled ) {
-                        //self.setupSaveSectionUI();
-                  }
+                  // June 2020 : for https://github.com/presscustomizr/nimble-builder/issues/520
+                  self.setupSaveSectionUI();
 
                   // SAVE TEMPLATE UI
                   // April 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/655

@@ -143,7 +143,7 @@ function sek_enqueue_controls_js_css() {
                 'settingIdForGlobalSections' => sek_get_seks_setting_id( NIMBLE_GLOBAL_SKOPE_ID ),
                 'globalSkopeId' => NIMBLE_GLOBAL_SKOPE_ID,
 
-                //'userSavedSektions' => get_option(NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS),
+                //'userSavedSektions' => sek_get_all_saved_sections(),
 
                 //'presetSections' => sek_get_preset_sections_api_data(), <= fetched on demand in ajax
 
@@ -860,10 +860,10 @@ function sek_print_nimble_customizer_tmpl() {
           </div>
           <div class="sek-save-section-action">
             <div class="sek-ui-button-group" role="group">
-              <button class="sek-ui-button sek-do-save-tmpl" type="button" title="<?php _e('Save section', 'text_domain'); ?>">
+              <button class="sek-ui-button sek-do-save-section" type="button" title="<?php _e('Save section', 'text_domain'); ?>">
                 <i class="far fa-save"></i>&nbsp;<?php _e('Save section', 'text_domain'); ?><span class="spinner"></span>
               </button>
-              <button class="sek-ui-button sek-do-update-tmpl" type="button" title="<?php _e('Update section', 'text_domain'); ?>">
+              <button class="sek-ui-button sek-do-update-section" type="button" title="<?php _e('Update section', 'text_domain'); ?>">
                 <i class="far fa-save"></i>&nbsp;<?php _e('Update section', 'text_domain'); ?><span class="spinner"></span>
               </button>
               <button class="sek-ui-button sek-open-remove-confirmation" type="button" title="<?php _e('Remove section', 'text_domain'); ?>">
@@ -877,10 +877,10 @@ function sek_print_nimble_customizer_tmpl() {
           <div class="sek-section-remove-dialog">
             <p><?php _e('Removing a section cannot be undone. Are you sure you want to continue?', 'text_doma'); ?>
             <div class="sek-ui-button-group" role="group">
-              <button class="sek-ui-button sek-do-remove-tmpl" type="button" title="<?php _e('Remove section', 'text_domain'); ?>">
+              <button class="sek-ui-button sek-do-remove-section" type="button" title="<?php _e('Remove section', 'text_domain'); ?>">
                 <?php _e('Remove section', 'text_domain'); ?><span class="spinner"></span>
               </button>
-              <button class="sek-ui-button sek-cancel-remove-tmpl" type="button" title="<?php _e('Cancel', 'text_domain'); ?>">
+              <button class="sek-ui-button sek-cancel-remove-section" type="button" title="<?php _e('Cancel', 'text_domain'); ?>">
                 <?php _e('Cancel', 'text_domain'); ?>
               </button>
             </div>

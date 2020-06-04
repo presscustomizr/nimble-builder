@@ -1,8 +1,11 @@
 
 /* TOP SAVE TMPL UI
 * introduced april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
+* and TOP SAVE SECTION UI
+* introduced June 2020 for for https://github.com/presscustomizr/nimble-builder/issues/520
 */
-#nimble-top-tmpl-save-ui {
+#nimble-top-tmpl-save-ui,
+#nimble-top-section-save-ui {
   height: auto;
   min-height: 300px;
   padding: 20px;
@@ -35,7 +38,8 @@
     line-height: 1.5em;
 }
 
-#nimble-top-tmpl-save-ui .nb-tmpl-save-inner {
+#nimble-top-tmpl-save-ui .nb-tmpl-save-inner,
+#nimble-top-section-save-ui .nb-section-save-inner {
   max-width: 800px;
   margin: auto;
 }
@@ -44,37 +48,51 @@
   width: 100%;
 }*/
 
-body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
+body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui,
+body.sek-save-section-ui-visible #nimble-top-section-save-ui {
   /*visibility: inherit;*/
   opacity: 1;
   top:36px;
 }
 
-#nimble-top-tmpl-save-ui .sek-close-dialog {
+#nimble-top-tmpl-save-ui .sek-close-dialog,
+#nimble-top-section-save-ui .sek-close-dialog {
   position: absolute;
   bottom: 10px;
   right: 10px;
 }
 
-#nimble-top-tmpl-save-ui #sek-saved-tmpl-title.error {
+#nimble-top-tmpl-save-ui #sek-saved-tmpl-title.error,
+#nimble-top-section-save-ui #sek-saved-section-title.error {
   border: 1px solid #ff0000;
 }
 
 
 /* INPUT STYLE */
-.sek-tmpl-title, .sek-tmpl-description, select.sek-saved-tmpl-picker {
+.sek-tmpl-title,
+.sek-tmpl-description,
+select.sek-saved-tmpl-picker,
+.sek-section-title,
+.sek-section-description,
+select.sek-saved-section-picker {
   margin-top: 10px;
   float: left;
   clear: both;
   width: 100%;
 }
 
-.sek-tmpl-description textarea, input#sek-saved-tmpl-title, select.sek-saved-tmpl-picker {
+.sek-tmpl-description textarea,
+input#sek-saved-tmpl-title,
+select.sek-saved-tmpl-picker,
+.sek-section-description textarea,
+input#sek-saved-section-title,
+select.sek-saved-section-picker {
   width: 97%;
   max-width: none;
   margin-bottom: 10px;
 }
-.sek-tmpl-description textarea {
+.sek-tmpl-description textarea,
+.sek-section-description textarea {
   min-height: 100px;
 }
 .sek-saved-tmpl-picker,
@@ -82,12 +100,24 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
 .sek-tmpl-description,
 .sek-save-tmpl-action .sek-do-save-tmpl,
 .sek-save-tmpl-action .sek-do-update-tmpl,
-.sek-save-tmpl-action .sek-open-remove-confirmation { display: none;}
+.sek-save-tmpl-action .sek-open-remove-confirmation,
+.sek-saved-section-picker,
+.sek-section-title,
+.sek-section-description,
+.sek-save-section-action .sek-do-save-section,
+.sek-save-section-action .sek-do-update-section,
+.sek-save-section-action .sek-open-remove-confirmation {
+  display: none;
+}
 
 /* the template picker is visible when template collection has been ajaxily fetched */
-.tmpl-collection-populated .sek-saved-tmpl-picker{display:block}
+.tmpl-collection-populated .sek-saved-tmpl-picker,
+.section-collection-populated .sek-saved-section-picker {
+  display:block
+}
 
-.sek-tmpl-remove-dialog {
+.sek-tmpl-remove-dialog,
+.sek-section-remove-dialog {
   display: none;
   color: red;
   background: #ffffff;
@@ -96,11 +126,12 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
   float: left;
   width: 96%;
 }
-.sek-tmpl-remove-dialog .sek-do-remove-tmpl {
+.sek-tmpl-remove-dialog .sek-do-remove-tmpl,
+.sek-section-remove-dialog .sek-do-remove-section {
   color: red;
 }
 
-/* VISIBILITY = f(mode) */
+/* TMPL UI VISIBILITY = f(mode) */
 [data-sek-tmpl-dialog-mode="save"] .sek-saved-tmpl-picker {display: none;}
 [data-sek-tmpl-dialog-mode="save"] .sek-tmpl-title {display: block;}
 [data-sek-tmpl-dialog-mode="save"] .sek-tmpl-description {display: block;}
@@ -114,11 +145,27 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
 [data-sek-tmpl-dialog-mode="remove"].sek-removal-confirmation-opened .sek-open-remove-confirmation {display: none!important;}
 [data-sek-tmpl-dialog-mode="remove"].sek-removal-confirmation-opened .sek-tmpl-remove-dialog { display: block;}
 
-#nimble-top-tmpl-save-ui .spinner {
+/* SECTION UI VISIBILITY = f(mode) */
+[data-sek-section-dialog-mode="save"] .sek-saved-section-picker {display: none;}
+[data-sek-section-dialog-mode="save"] .sek-section-title {display: block;}
+[data-sek-section-dialog-mode="save"] .sek-section-description {display: block;}
+[data-sek-section-dialog-mode="save"] .sek-do-save-section {display: block;}
+
+[data-sek-section-dialog-mode="update"].sek-section-update-selected .sek-section-title {display: block;}
+[data-sek-section-dialog-mode="update"].sek-section-update-selected .sek-section-description {display: block;}
+[data-sek-section-dialog-mode="update"].sek-section-update-selected .sek-do-update-section {display: block;}
+
+[data-sek-section-dialog-mode="remove"].sek-section-remove-selected .sek-open-remove-confirmation {display: block;}
+[data-sek-section-dialog-mode="remove"].sek-removal-confirmation-opened .sek-open-remove-confirmation {display: none!important;}
+[data-sek-section-dialog-mode="remove"].sek-removal-confirmation-opened .sek-section-remove-dialog { display: block;}
+
+#nimble-top-tmpl-save-ui .spinner,
+#nimble-top-section-save-ui .spinner {
   display: none;
 }
 
-#nimble-top-tmpl-save-ui.nimble-tmpl-processing-ajax .spinner {
+#nimble-top-tmpl-save-ui.nimble-tmpl-processing-ajax .spinner,
+#nimble-top-section-save-ui.nimble-section-processing-ajax .spinner {
   display: block;
   visibility: visible;
 }
@@ -128,13 +175,22 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
 
 
 
-/* TOP SAVE SECTION UI */
-#nimble-top-section-save-ui {
+
+
+
+
+
+
+
+
+
+/* OLD TOP SAVE SECTION UI */
+/* #nimble-top-section-save-ui {
   height: 300px;
   padding: 20px;
   position: absolute;
   top: -300px;
-  /*text-align: center;*/
+
   right: 0;
   left: 0;
   z-index: 20;
@@ -145,17 +201,11 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
   -ms-transition: all, 0.3s ease-in-out;
   -o-transition: all, 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
-  /*visibility: hidden;*/
+
   opacity: 0.3;
   background: rgba(0, 0, 0, 0.5);
   z-index: 99999;
-  /*display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-    -ms-flex-align: center;
-        align-items: center;
-  flex: 0 0 100%;*/
+
   max-width: 100%;
 }
 
@@ -164,7 +214,7 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
 }
 
 body.sek-save-section-ui-visible #nimble-top-section-save-ui {
-  /*visibility: inherit;*/
+
   opacity: 1;
   top:36px;
 }
@@ -178,3 +228,4 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
 #nimble-top-section-save-ui #sek-saved-section-title.error {
   border: 1px solid #ff0000;
 }
+*/

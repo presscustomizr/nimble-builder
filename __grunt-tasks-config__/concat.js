@@ -235,7 +235,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_1_sektions_topbar.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_2_sektions_navigate_history.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_3_sektions_level_tree.js',
-      //'<%= paths.czr_assets %>sek/js/_dev_control/_1_1_5_1_sektions_section_save_ui.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_5_1_sektions_section_save_ui.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_5_2_sektions_template_save_ui.js',//<= april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_6_sektions_feedback_ui.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_8_sektions_revision_history.js',
@@ -413,7 +413,7 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_6_0_sektions_nimble_customize_link.php',
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_7_0_sektions_retro_compatibilities.php',
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_0_sektions_functions_seks_post_set_get.php',
-      //'<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_1_sektions_functions_saved_sektions.php', // <= april 2020 : commented because not used yet
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_1_sektions_functions_save_sections.php',
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_2_sektions_functions_save_templates.php',
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_5_sektions_functions_revision_history.php'
     ],
@@ -552,7 +552,8 @@ module.exports = {
         '<%= paths.sektions %>_customizer_dev_php/7_0_0_sektions_detached_tinymce.php',
         '<%= paths.sektions %>_customizer_dev_php/8_1_0_sektions_customizer_ajax_various.php',
         '<%= paths.sektions %>_customizer_dev_php/8_5_0_sektions_customizer_ajax_import_export.php',
-        '<%= paths.sektions %>_customizer_dev_php/8_6_0_sektions_customizer_ajax_save_template_and_section.php',
+        '<%= paths.sektions %>_customizer_dev_php/8_6_0_sektions_customizer_ajax_save_template.php',
+        '<%= paths.sektions %>_customizer_dev_php/8_7_0_sektions_customizer_ajax_save_section.php',
         '<%= paths.sektions %>_customizer_dev_php/9_0_0_sektions_wp_5_0_gutenberg_compat.php',
       ],
       dest: '<%= paths.sektions %>ccat-czr-sektions.php',
