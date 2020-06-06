@@ -1509,3 +1509,8 @@ https://github.com/presscustomizr/nimble-builder/issues/317 */
 .nimble-shortcode-notice-in-preview > i {
   color: #00a0d2;
 }
+@media(max-width:768px) {
+  .nimble-shortcode-notice-in-preview {
+    font-size: 14px;
+  }
+}
