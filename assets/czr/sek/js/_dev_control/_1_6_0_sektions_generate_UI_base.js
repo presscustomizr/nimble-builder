@@ -326,7 +326,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           if ( !_.isString( _html_content ) ) {
                                                 throw new Error( '::updateAPISettingAndExecutePreviewActions => _doUpdateWithRequestedAction => refreshMarkupWhenNeededForInput => html content is not a string.');
                                           }
-                                          if ( !self.htmlIncludesShortcodesOrTmplTags( _html_content ) ) {
+
+                                          // Like shortcode tags, template tags, script tags
+                                          if ( !self.htmlIncludesElementsThatNeedAnAjaxRefresh( _html_content ) ) {
                                                 api.previewer.send( 'sek-update-html-in-selector', {
                                                       selector : inputRegistrationParams.refresh_markup,
                                                       changed_item_id : _changed_item_id,
@@ -613,9 +615,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
              *
              * @param {string} content The content we want to scan for shortcodes.
              */
-            htmlIncludesShortcodesOrTmplTags : function( content ) {
+            htmlIncludesElementsThatNeedAnAjaxRefresh : function( content ) {
                   var shortcodes = content.match( /\[+([\w_-])+/g ),
                       tmpl_tags = content.match( /\{\{+([\w_-])+/g ),
+                      // script detection introduced for https://github.com/presscustomizr/nimble-builder/issues/710
+                      script_tags = content.match( /<script[\s\S]*?>[\s\S]*?<\/script>/gi ),
                       shortcode_result = [],
                       tmpl_tag_result = [];
 
@@ -637,7 +641,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       }
                     }
                   }
-                  return !_.isEmpty( shortcode_result ) || !_.isEmpty( tmpl_tag_result );
+                  return !_.isEmpty( shortcode_result ) || !_.isEmpty( tmpl_tag_result ) || !_.isEmpty( script_tags );
             }
       });//$.extend()
 })( wp.customize, jQuery );

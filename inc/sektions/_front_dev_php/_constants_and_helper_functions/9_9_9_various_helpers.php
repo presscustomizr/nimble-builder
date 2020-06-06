@@ -272,7 +272,11 @@ function sek_strip_script_tags_when_customizing( $html = '' ) {
       if ( !skp_is_customizing() || !is_string( $html ) ) {
           return $html;
       }
-      return preg_replace('#<script(.*?)>(.*?)</script>#is', '', $html);
+      // June 2020 => added a notice for https://github.com/presscustomizr/nimble-builder/issues/710
+      $script_notice = sprintf('<div class="nimble-shortcode-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>',
+          __('Custom javascript code is not executed when customizing.', 'text-doma')
+      );
+      return preg_replace('#<script(.*?)>(.*?)</script>#is', $script_notice, $html);
 }
 function sek_strip_script_tags( $html = '' ) {
       if (!is_string( $html ) ) {
