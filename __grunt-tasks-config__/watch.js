@@ -233,6 +233,16 @@ module.exports = {
     ],
   },
 
+  sektions_preview_css : {
+    options: {
+      spawn : false,
+      // Start a live reload server on the default port 35729
+      livereload : true
+    },
+    files : [ '<%= paths.czr_assets %>sek/css/sek-preview.css' ],
+    tasks : []
+  },
+
   sektions_czr_control_css : {
     options: {
       spawn : false,
@@ -246,6 +256,7 @@ module.exports = {
       'concat:czr_sektions_customizer_control_css',
     ],
   },
+
 
   // sektions_front_main_js : {
   //   options: {
