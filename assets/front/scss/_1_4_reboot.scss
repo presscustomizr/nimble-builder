@@ -53,9 +53,6 @@
   svg:not(:root) {
     overflow: hidden; // Hide the overflow in IE
   }
-  figure {
-    margin: 0;
-  }
 
   // EMBEDS
   // Fixes https://github.com/presscustomizr/nimble-builder/issues/249
