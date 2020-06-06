@@ -114,7 +114,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // 1) mono-items and multi-items module => input change
             // 2) crud multi item => item added or removed => in this case some args are not passed, like params.settingParams.args.inputRegistrationParams
             updateAPISettingAndExecutePreviewActions : function( params ) {
-                  if ( _.isEmpty( params.settingParams ) || ! _.has( params.settingParams, 'to' ) ) {
+                  if ( _.isEmpty( params.settingParams ) || !_.has( params.settingParams, 'to' ) ) {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing params.settingParams.to. The api main setting can not be updated', params );
                         return;
                   }
@@ -128,7 +128,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       parentModuleType = null,
                       isMultiItemModule = false;
 
-                  if ( _.isEmpty( params.settingParams.args ) || ! _.has( params.settingParams.args, 'moduleRegistrationParams' ) ) {
+                  if ( _.isEmpty( params.settingParams.args ) || !_.has( params.settingParams.args, 'moduleRegistrationParams' ) ) {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing params.settingParams.args.moduleRegistrationParams The api main setting can not be updated', params );
                         return;
                   }
@@ -137,7 +137,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       _module_id_ = params.settingParams.args.moduleRegistrationParams.id,
                       parentModuleInstance = _ctrl_.czr_Module( _module_id_ );
 
-                  if ( ! _.isEmpty( parentModuleInstance ) ) {
+                  if ( !_.isEmpty( parentModuleInstance ) ) {
                         parentModuleType = parentModuleInstance.module_type;
                         isMultiItemModule = parentModuleInstance.isMultiItem();
                   } else {
@@ -148,7 +148,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // The new module value can be a single item object if monoitem module, or an array of item objects if multi-item crud
                   // Let's normalize it
-                  if ( ! isMultiItemModule && _.isObject( rawModuleValue ) ) {
+                  if ( !isMultiItemModule && _.isObject( rawModuleValue ) ) {
                         moduleValueCandidate = self.normalizeAndSanitizeSingleItemInputValues( {
                               item_value : rawModuleValue,
                               parent_module_type : parentModuleType,
@@ -189,22 +189,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return inputRegistrationParams && _.isString( inputRegistrationParams.refresh_markup ) && 'true' !== inputRegistrationParams.refresh_markup && 'false' !== inputRegistrationParams.refresh_markup;
                   };
 
-                  if ( ! _.isUndefined( input_id ) ) {
+                  if ( !_.isUndefined( input_id ) ) {
                         inputRegistrationParams = self.getInputRegistrationParams( input_id, parentModuleType );
-                        if ( ! _.isUndefined( inputRegistrationParams.refresh_stylesheet ) ) {
+                        if ( !_.isUndefined( inputRegistrationParams.refresh_stylesheet ) ) {
                               refresh_stylesheet = Boolean( inputRegistrationParams.refresh_stylesheet );
                         }
-                        if ( ! _.isUndefined( inputRegistrationParams.refresh_markup ) ) {
+                        if ( !_.isUndefined( inputRegistrationParams.refresh_markup ) ) {
                               if ( refreshMarkupWhenNeededForInput() ) {
                                     refresh_markup = inputRegistrationParams.refresh_markup;
                               } else {
                                     refresh_markup = Boolean( inputRegistrationParams.refresh_markup );
                               }
                         }
-                        if ( ! _.isUndefined( inputRegistrationParams.refresh_fonts ) ) {
+                        if ( !_.isUndefined( inputRegistrationParams.refresh_fonts ) ) {
                               refresh_fonts = Boolean( inputRegistrationParams.refresh_fonts );
                         }
-                        if ( ! _.isUndefined( inputRegistrationParams.refresh_preview ) ) {
+                        if ( !_.isUndefined( inputRegistrationParams.refresh_preview ) ) {
                               refresh_preview = Boolean( inputRegistrationParams.refresh_preview );
                         }
                   }
@@ -226,7 +226,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _.each( moduleValueCandidate || {}, function( _val_, _key_ ) {
                                     // Note : _.isEmpty( 5 ) returns true when checking an integer,
                                     // that's why we need to cast the _val_ to a string when using _.isEmpty()
-                                    if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
+                                    if ( !_.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
                                       return;
                                     _valueCandidate[ _key_ ] = _val_;
                               });
@@ -245,7 +245,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // So that the .fonts collection is ready server side
                               if ( true === refresh_fonts ) {
                                     var newFontFamily = params.settingParams.args.input_value;
-                                    if ( ! _.isString( newFontFamily ) ) {
+                                    if ( !_.isString( newFontFamily ) ) {
                                           api.errare( 'updateAPISettingAndExecutePreviewActions => font-family must be a string', newFontFamily );
                                           return;
                                     }
@@ -323,10 +323,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( refreshMarkupWhenNeededForInput() ) {
 
                                           var _html_content = params.settingParams.args.input_value;
-                                          if ( ! _.isString( _html_content ) ) {
+                                          if ( !_.isString( _html_content ) ) {
                                                 throw new Error( '::updateAPISettingAndExecutePreviewActions => _doUpdateWithRequestedAction => refreshMarkupWhenNeededForInput => html content is not a string.');
                                           }
-                                          if ( ! self.htmlIncludesShortcodesOrTmplTags( _html_content ) ) {
+                                          if ( !self.htmlIncludesShortcodesOrTmplTags( _html_content ) ) {
                                                 api.previewer.send( 'sek-update-html-in-selector', {
                                                       selector : inputRegistrationParams.refresh_markup,
                                                       changed_item_id : _changed_item_id,
@@ -364,7 +364,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // this way we make sure that the customized value used when ajaxing will be taken into account when writing the google font http request link
                   if ( true === refresh_fonts ) {
                         var newFontFamily = params.settingParams.args.input_value;
-                        if ( ! _.isString( newFontFamily ) ) {
+                        if ( !_.isString( newFontFamily ) ) {
                               api.errare( 'updateAPISettingAndExecutePreviewActions => font-family must be a string', newFontFamily );
                               return;
                         }
@@ -413,8 +413,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var currentGfonts = self.sniffGlobalGFonts( clonedGlobalOptions );
 
                   // add it only if gfont
-                  if ( ! _.isEmpty( newFontFamily ) && _.isString( newFontFamily ) ) {
-                        if ( newFontFamily.indexOf('gfont') > -1 && ! _.contains( currentGfonts, newFontFamily ) ) {
+                  if ( !_.isEmpty( newFontFamily ) && _.isString( newFontFamily ) ) {
+                        if ( newFontFamily.indexOf('gfont') > -1 && !_.contains( currentGfonts, newFontFamily ) ) {
                               currentGfonts.push( newFontFamily );
                         }
                   }
@@ -440,7 +440,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 return;
                               // example of input_id candidate 'font_family_css'
                               if ( _.isString( _key_ ) && _key_.indexOf('font_family') > -1 ) {
-                                    if ( levelData.indexOf('gfont') > -1 && ! _.contains( gfonts, levelData ) ) {
+                                    if ( levelData.indexOf('gfont') > -1 && !_.contains( gfonts, levelData ) ) {
                                           gfonts.push( levelData );
                                     }
                               }
@@ -504,7 +504,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   _.each( params.item_value, function( _val, input_id ) {
                         if ( 'title' === input_id )
                           return;
-                        if ( ! params.is_multi_items && 'id' === input_id )
+                        if ( !params.is_multi_items && 'id' === input_id )
                           return;
 
                         if ( null !== params.parent_module_type ) {
