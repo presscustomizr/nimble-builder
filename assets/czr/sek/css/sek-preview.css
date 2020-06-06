@@ -69,7 +69,7 @@
 /* Make sure tinyMce module is always accessible
   see https://github.com/presscustomizr/nimble-builder/issues/243
 */
-.sek-module [data-sek-input-type="detached_tinymce_editor"] {
+.sek-module [data-sek-input-type="detached_tinymce_editor"], [data-sek-module-type="czr_simple_html_module"] {
   min-height: 30px
 }
 
