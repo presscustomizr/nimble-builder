@@ -582,12 +582,17 @@ function sek_print_nimble_input_templates() {
         <input data-czrtype="{{data.input_id}}" type="hidden"/>
         <div class="sek-content-type-wrapper">
             <#
+            // June 2020 : the section collection is passed only when rendering pre-built sections
+            // @see sek_register_prebuilt_section_modules() and sek_get_sections_registration_params()
+            // For user saved sections, the rendering is done in javascript, not here
+            // @see @see _dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js
             var section_collection = ( data.input_data && data.input_data.section_collection ) ? data.input_data.section_collection : [];
-            if ( _.isEmpty( section_collection ) ) {
-                wp.customize.errare('Error in js template tmpl-nimble-input___section_picker => missing section collection');
-                return;
-            }
+            // if ( _.isEmpty( section_collection ) ) {
+            //     wp.customize.errare('Error in js template tmpl-nimble-input___section_picker => missing section collection');
+            //     return;
+            // }
 
+            // FOR PREBUILT SECTIONS ONLY, user sections are rendered in javascript @see _dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js
             _.each( section_collection, function( rawSecParams ) {
                 //normalizes the params
                 var section_type = 'content',

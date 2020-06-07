@@ -217,6 +217,9 @@ function sek_update_saved_section_post( $section_data ) {
 
     //sek_error_log('$section_data??', $section_data );
 
+    // Update the post name now
+    $section_data['section_post_name'] = $section_post_name;
+
     $post_data = array(
         'post_title' => esc_attr( $section_data['metas']['title'] ),
         'post_name' => $section_post_name,

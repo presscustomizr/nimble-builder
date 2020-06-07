@@ -18,6 +18,10 @@ function sek_schedule_module_registration() {
         sek_register_modules_when_customizing_or_ajaxing();
         // prebuilt sections are registered from a JSON since https://github.com/presscustomizr/nimble-builder/issues/431
         sek_register_prebuilt_section_modules();
+        // June 2020 : for https://github.com/presscustomizr/nimble-builder/issues/520
+        if ( defined('NIMBLE_SAVED_SECTIONS_ENABLED') && NIMBLE_SAVED_SECTIONS_ENABLED ) {
+            sek_register_user_sections_module();
+        }
     } else {
         // Condition !is_admin() added in april 2020
         // fixes https://github.com/presscustomizr/nimble-builder/issues/658
@@ -202,7 +206,29 @@ function sek_register_prebuilt_section_modules() {
 
 }
 
+// @return void();
+// @hook 'after_setup_theme'
+// June 2020 for https://github.com/presscustomizr/nimble-builder/issues/520
+function sek_register_user_sections_module() {
+    $normalized_params = array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_my_sections_sec_picker_module',
+        'name' => __('Your saved sections', 'text-doma'),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'sections' => array(
+                    'input_type'  => 'section_picker',
+                    'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'section_collection' => array()
+                )
+            )
+        )
+    );
 
+    CZR_Fmk_Base()->czr_pre_register_dynamic_module( $normalized_params );
+}
 
 
 

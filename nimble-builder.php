@@ -26,8 +26,6 @@ if ( !defined( 'NIMBLE_MIN_PHP_VERSION' ) ) { define ( 'NIMBLE_MIN_PHP_VERSION',
 if ( !defined( 'NIMBLE_MIN_WP_VERSION' ) ) { define ( 'NIMBLE_MIN_WP_VERSION', '4.7' ); }
 if ( !defined( 'NIMBLE_PLUGIN_FILE' ) ) { define( 'NIMBLE_PLUGIN_FILE', __FILE__ ); }// Plugin Root File used register_activation_hook( NIMBLE_PLUGIN_FILE, 'nimble_install' );
 
-// Note : NIMBLE_SAVED_SECTIONS_ENABLED and NIMBLE_BETA_FEATURES_ENABLED can be defined in wp_config.php !
-if ( !defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) ) { define ( 'NIMBLE_SAVED_SECTIONS_ENABLED', false ); }
 if ( !defined( 'NIMBLE_BETA_FEATURES_ENABLED' ) ) { define ( 'NIMBLE_BETA_FEATURES_ENABLED', false ); }
 
 if ( !defined( 'NIMBLE_SHOW_UPDATE_NOTICE_FOR_VERSION' ) ) { define( 'NIMBLE_SHOW_UPDATE_NOTICE_FOR_VERSION', '1.8.3' ); }

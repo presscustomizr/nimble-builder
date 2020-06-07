@@ -491,7 +491,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             getSavedSectionCollection : function() {
                   var self = this;
                   self.sectionCollectionPromise = $.Deferred();
-
+                  if ( '_not_populated_' !== self.allSavedSections() ) {
+                        self.sectionCollectionPromise.resolve( self.allSavedSections() );
+                        return self.sectionCollectionPromise;
+                  }
                   wp.ajax.post( 'sek_get_all_saved_sections', {
                         nonce: api.settings.nonce.save
                         //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )

@@ -63,7 +63,8 @@ function sek_get_module_params_for_sek_module_picker_module() {
 /* ------------------------------------------------------------------------- *
  *  SEKTION PICKER MODULES
 /* ------------------------------------------------------------------------- */
-// registered from a remote JSON since https://github.com/presscustomizr/nimble-builder/issues/431
+// now registered with sek_register_prebuilt_section_modules() in add_action( 'after_setup_theme', '\Nimble\sek_schedule_module_registration', 50 );
+// and then populated in AJAX from a local JSON since https://github.com/presscustomizr/nimble-builder/issues/431
 
 // FOR SAVED SECTIONS
 // function sek_get_module_params_for_sek_my_sections_sec_picker_module() {

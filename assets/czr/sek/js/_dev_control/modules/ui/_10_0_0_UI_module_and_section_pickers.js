@@ -130,55 +130,74 @@
                               api.CZRInput.prototype.initialize.call( input, name, options );
                               input.isReady.then( function() {
                                     input.renderUserSavedSections();
-                                    api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
                               });
                         },
 
+                        // Ajax fetch the user section collection
+                        // or return the already cached collection
+                        getUserSavedSections : function() {
+                              var _dfd_ = $.Deferred();
+                              if ( !_.isEmpty( api.czr_sektions.userSavedSections ) ) {
+                                    _dfd_.resolve( api.czr_sektions.userSavedSections );
+                              } else {
+                                    api.czr_sektions.getSavedSectionCollection().done( function( sec_collection ) {
+                                           _dfd_.resolve( sec_collection );
+                                    });
+                              }
+                              return _dfd_.promise();
+                        },
 
                         renderUserSavedSections : function() {
                               var input = this,
                                   html = '',
                                   $wrapper = input.container.find('.sek-content-type-wrapper'),
-                                  creation_date = '',
+                                  creation_date = '';
                                   // https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
-                                  formatDate = function(date) {
-                                      var monthNames = [
-                                          "January", "February", "March",
-                                          "April", "May", "June", "July",
-                                          "August", "September", "October",
-                                          "November", "December"
-                                      ];
+                                  // formatDate = function(date) {
+                                  //     var monthNames = [
+                                  //         "January", "February", "March",
+                                  //         "April", "May", "June", "July",
+                                  //         "August", "September", "October",
+                                  //         "November", "December"
+                                  //     ];
 
-                                      var day = date.getDate(),
-                                          monthIndex = date.getMonth(),
-                                          year = date.getFullYear(),
-                                          hours = date.getHours(),
-                                          minutes = date.getMinutes(),
-                                          seconds = date.getSeconds();
+                                  //     var day = date.getDate(),
+                                  //         monthIndex = date.getMonth(),
+                                  //         year = date.getFullYear(),
+                                  //         hours = date.getHours(),
+                                  //         minutes = date.getMinutes(),
+                                  //         seconds = date.getSeconds();
 
-                                      return [
-                                            day,
-                                            monthNames[monthIndex],
-                                            year
-                                            //[hours,minutes,seconds].join(':')
-                                      ].join(' ');
-                                  };
+                                  //     return [
+                                  //           day,
+                                  //           monthNames[monthIndex],
+                                  //           year
+                                  //           //[hours,minutes,seconds].join(':')
+                                  //     ].join(' ');
+                                  // };
+                              input.getUserSavedSections().done( function( sec_collection ) {
 
-                              _.each( sektionsLocalizedData.userSavedSektions, function( secData, secKey ) {
-                                    try { creation_date = formatDate( new Date( secData.creation_date.replace( /-/g, '/' ) ) ); } catch( er ) {
-                                          api.errare( '::renderUserSavedSections => formatDate => error', er );
-                                    }
-                                    html = [
-                                          '<div class="sek-user-section-wrapper">',
-                                            '<div class="sek-saved-section-title"><i class="sek-remove-user-section far fa-trash-alt"></i>' + secData.title + '</div>',
-                                            '<div draggable="true" data-sek-is-user-section="true" data-sek-section-type="' + secData.type +'" data-sek-content-type="preset_section" data-sek-content-id="' + secKey +'" style="" title="' + secData.title + '">',
-                                              '<div class="sek-overlay"></div>',
-                                              '<div class="sek-saved-section-description">' + secData.description + '</div>',
-                                              ! _.isEmpty( creation_date ) ? ( '<div class="sek-saved-section-date"><i class="far fa-calendar-alt"></i> @missi18n Created : ' + creation_date + '</div>' ) : '',
-                                            '</div>',
-                                          '</div>'
-                                    ].join('');
-                                    $wrapper.append( html );
+                                    console.log('ALORS SEC_COLLECTION ?', sec_collection );
+
+                                    _.each( sec_collection, function( secData, secKey ) {
+                                          // try { creation_date = formatDate( new Date( secData.creation_date.replace( /-/g, '/' ) ) ); } catch( er ) {
+                                          //       api.errare( '::renderUserSavedSections => formatDate => error', er );
+                                          // }
+                                          html = [
+                                                '<div class="sek-user-section-wrapper">',
+                                                  '<div class="sek-saved-section-title"><i class="sek-remove-user-section far fa-trash-alt"></i>' + secData.title + '</div>',
+                                                  '<div draggable="true" data-sek-is-user-section="true" data-sek-section-type="content" data-sek-content-type="preset_section" data-sek-content-id="' + secKey +'" style="" title="' + secData.title + '">',
+                                                    '<div class="sek-overlay"></div>',
+                                                    '<div class="sek-saved-section-description">' + secData.description + '</div>',
+                                                    ! _.isEmpty( creation_date ) ? ( '<div class="sek-saved-section-date"><i class="far fa-calendar-alt"></i> @missi18n Created : ' + creation_date + '</div>' ) : '',
+                                                  '</div>',
+                                                '</div>'
+                                          ].join('');
+                                          $wrapper.append( html );
+
+                                          // Make section draggable now
+                                          api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
+                                    });
                               });
                         }
                   });

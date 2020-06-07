@@ -1100,7 +1100,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             });// self.preparePresetSectionForInjection.done()
                                                 };//_doWhenPresetSectionCollectionFetched()
 
-
                                                 // Try to fetch the sections from the server
                                                 // if sucessfull, resolve __presetSectionInjected__.promise()
                                                 self.getPresetSectionCollection({
@@ -1119,6 +1118,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             // OK. time to resolve __presetSectionInjected__.promise()
                                                             _doWhenPresetSectionCollectionFetched( presetColumnOrSectionCollection );
                                                       });//self.getPresetSectionCollection().done()
+
                                           break;//case 'preset_section' :
                                     }//switch( params.content_type)
                               break;
@@ -1517,57 +1517,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @return a promise()
             // caches the sections in api.sek_presetSections when api.section( '__content_picker__') is registered
             // caches the user saved sections on the first drag and drop of a user-saved section
-            // @params {
-            //  is_user_section : sectionParams.is_user_section
-            //  preset_section_id : '' <= used for user_saved section
-            // }
-            _maybeFetchSectionsFromServer : function( params ) {
+            _maybeFetchSectionsFromServer : function() {
                   var dfd = $.Deferred(),
                       _ajaxRequest_;
 
-                  params = params || { is_user_section : false };
-                  if ( true === params.is_user_section ) {
-                        if ( ! _.isEmpty( api.sek_userSavedSections ) && ! _.isEmpty( api.sek_userSavedSections[ params.preset_section_id ] ) ) {
-                              dfd.resolve( api.sek_userSavedSections );
-                        } else {
-                              api.sek_userSavedSections = api.sek_userSavedSections || {};
-                              if ( ! _.isUndefined( api.sek_fetchingUserSavedSections ) && 'pending' == api.sek_fetchingUserSavedSections.state() ) {
-                                    _ajaxRequest_ = api.sek_fetchingUserSavedSections;
-                              } else {
-                                    _ajaxRequest_ = wp.ajax.post( 'sek_get_user_saved_sections', {
-                                          nonce: api.settings.nonce.save,
-                                          preset_section_id : params.preset_section_id
-                                    });
-                                    api.sek_fetchingUserSavedSections = _ajaxRequest_;
-                              }
-                              _ajaxRequest_.done( function( _sectionData_ ) {
-                                    //api.sek_presetSections = JSON.parse( _collection_ );
-                                    api.sek_userSavedSections[ params.preset_section_id ] = _sectionData_;
-                                    dfd.resolve( api.sek_userSavedSections );
-                              }).fail( function( _r_ ) {
-                                    dfd.reject( _r_ );
-                              });
-                        }
+                  if ( ! _.isEmpty( api.sek_presetSections ) ) {
+                        dfd.resolve( api.sek_presetSections );
                   } else {
-                        if ( ! _.isEmpty( api.sek_presetSections ) ) {
-                              dfd.resolve( api.sek_presetSections );
+                        if ( ! _.isUndefined( api.sek_fetchingPresetSections ) && 'pending' == api.sek_fetchingPresetSections.state() ) {
+                              _ajaxRequest_ = api.sek_fetchingPresetSections;
                         } else {
-                              if ( ! _.isUndefined( api.sek_fetchingPresetSections ) && 'pending' == api.sek_fetchingPresetSections.state() ) {
-                                    _ajaxRequest_ = api.sek_fetchingPresetSections;
-                              } else {
-                                    _ajaxRequest_ = wp.ajax.post( 'sek_get_preset_sections', { nonce: api.settings.nonce.save } );
-                                    api.sek_fetchingPresetSections = _ajaxRequest_;
-                              }
-                              _ajaxRequest_.done( function( _collection_ ) {
-                                    //api.sek_presetSections = JSON.parse( _collection_ );
-                                    api.sek_presetSections = _collection_;
-                                    dfd.resolve( api.sek_presetSections );
-                              }).fail( function( _r_ ) {
-                                    dfd.reject( _r_ );
-                              });
+                              _ajaxRequest_ = wp.ajax.post( 'sek_get_preset_sections', { nonce: api.settings.nonce.save } );
+                              api.sek_fetchingPresetSections = _ajaxRequest_;
                         }
+                        _ajaxRequest_.done( function( _collection_ ) {
+                              //api.sek_presetSections = JSON.parse( _collection_ );
+                              api.sek_presetSections = _collection_;
+                              dfd.resolve( api.sek_presetSections );
+                        }).fail( function( _r_ ) {
+                              dfd.reject( _r_ );
+                        });
                   }
-
                   return dfd.promise();
             },
 
@@ -1588,68 +1558,107 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             getPresetSectionCollection : function( sectionParams ) {
                   var self = this,
                       __dfd__ = $.Deferred();
-
-                  self._maybeFetchSectionsFromServer({
-                        is_user_section : sectionParams.is_user_section,
-                        preset_section_id : sectionParams.presetSectionId
-                  })
-                        .fail( function( er ) {
-                              __dfd__.reject( er );
+                  if ( sectionParams.is_user_section ) {
+                        wp.ajax.post( 'sek_get_user_section_json', {
+                              nonce: api.settings.nonce.save,
+                              section_post_name: sectionParams.presetSectionId
+                              //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
                         })
-                        .done( function( _collection_ ) {
-                              //api.infoLog( 'preset_sections fetched', api.sek_presetSections );
-                              var presetSection,
-                                  allPresets = $.extend( true, {}, _.isObject( _collection_ ) ? _collection_ : {} );
-
-                              if ( _.isEmpty( allPresets ) ) {
-                                    throw new Error( 'getPresetSectionCollection => Invalid collection');
-                              }
-                              if ( _.isEmpty( allPresets[ sectionParams.presetSectionId ] ) ) {
-                                    throw new Error( 'getPresetSectionCollection => the preset section : "' + sectionParams.presetSectionId + '" has not been found in the collection');
-                              }
-                              var presetCandidate = allPresets[ sectionParams.presetSectionId ];
-
-                              // Ensure we have a string that's JSON.parse-able
-                              // if ( typeof presetCandidate !== 'string' || presetCandidate[0] !== '{' ) {
-                              //       throw new Error( 'getPresetSectionCollection => ' + sectionParams.presetSectionId + ' is not JSON.parse-able');
+                        .done( function( userSection ) {
+                              // User section looks like
+                              // {
+                              //  data : {}
+                              //  metas : {}
+                              //  section_post_name : ''
                               // }
-                              // presetCandidate = JSON.parse( presetCandidate );
+                              if ( ! _.isObject( userSection ) || _.isEmpty( userSection ) || _.isUndefined( userSection.data ) ) {
+                                    api.errare( 'getPresetSectionCollection => preset section type not found or empty : ' + sectionParams.presetSectionId, userSection );
+                                    throw new Error( 'getPresetSectionCollection => preset section type not found or empty');
+                              }
 
-                              var setIds = function( collection ) {
-                                    _.each( collection, function( levelData ) {
-                                          levelData.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
-                                          if ( _.isArray( levelData.collection ) ) {
-                                                setIds( levelData.collection );
-                                          }
-                                    });
-                                    return collection;
-                              };
-
-                              var setVersion = function( collection ) {
-                                    _.each( collection, function( levelData ) {
-                                          levelData.ver_ini = sektionsLocalizedData.nimbleVersion;
-                                          if ( _.isArray( levelData.collection ) ) {
-                                                setVersion( levelData.collection );
-                                          }
-                                    });
-                                    return collection;
-                              };
+                              var userSectionCandidate = $.extend( {}, true, userSection.data );
 
                               // ID's
                               // the level's id have to be generated
-                              presetCandidate.collection = setIds( presetCandidate.collection );
+                              // 1) root level
+                              userSectionCandidate.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
+                              // 2) children levels
+                              userSectionCandidate.collection = self.setPresetSectionIds( userSectionCandidate.collection );
 
                               // NIMBLE VERSION
                               // set the section version
-                              presetCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
+                              userSectionCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
                               // the other level's version have to be added
-                              presetCandidate.collection = setVersion( presetCandidate.collection );
-                              __dfd__.resolve( presetCandidate );
-                        });//_maybeFetchSectionsFromServer.done()
+                              userSectionCandidate.collection = self.setPresetSectionVersion( userSectionCandidate.collection );
 
+                              // OK. time to resolve __presetSectionInjected__.promise()
+                              __dfd__.resolve( userSectionCandidate );
+                        })
+                        .fail( function( er ) {
+                               __dfd__.reject( er );
+                        });
+                  } else {
+                        self._maybeFetchSectionsFromServer()
+                              .fail( function( er ) {
+                                    __dfd__.reject( er );
+                              })
+                              .done( function( _collection_ ) {
+                                    //api.infoLog( 'preset_sections fetched', api.sek_presetSections );
+                                    var presetSection,
+                                        allPresets = $.extend( true, {}, _.isObject( _collection_ ) ? _collection_ : {} );
+
+                                    if ( _.isEmpty( allPresets ) ) {
+                                          throw new Error( 'getPresetSectionCollection => Invalid collection');
+                                    }
+                                    if ( _.isEmpty( allPresets[ sectionParams.presetSectionId ] ) ) {
+                                          throw new Error( 'getPresetSectionCollection => the preset section : "' + sectionParams.presetSectionId + '" has not been found in the collection');
+                                    }
+                                    var presetCandidate = allPresets[ sectionParams.presetSectionId ];
+
+                                    // Ensure we have a string that's JSON.parse-able
+                                    // if ( typeof presetCandidate !== 'string' || presetCandidate[0] !== '{' ) {
+                                    //       throw new Error( 'getPresetSectionCollection => ' + sectionParams.presetSectionId + ' is not JSON.parse-able');
+                                    // }
+                                    // presetCandidate = JSON.parse( presetCandidate );
+
+                                    // ID's
+                                    // the level's id have to be generated
+                                    presetCandidate.collection = self.setPresetSectionIds( presetCandidate.collection );
+
+                                    // NIMBLE VERSION
+                                    // set the section version
+                                    presetCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
+                                    // the other level's version have to be added
+                                    presetCandidate.collection = self.setPresetSectionVersion( presetCandidate.collection );
+                                    __dfd__.resolve( presetCandidate );
+                              });//_maybeFetchSectionsFromServer.done()
+                  }
                   return __dfd__.promise();
             },
 
+
+            // SECTION HELPERS
+            setPresetSectionIds : function( collection ) {
+                  var self = this;
+                  _.each( collection, function( levelData ) {
+                        levelData.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
+                        if ( _.isArray( levelData.collection ) ) {
+                              self.setPresetSectionIds( levelData.collection );
+                        }
+                  });
+                  return collection;
+            },
+
+            setPresetSectionVersion : function( collection ) {
+                  var self = this;
+                  _.each( collection, function( levelData ) {
+                        levelData.ver_ini = sektionsLocalizedData.nimbleVersion;
+                        if ( _.isArray( levelData.collection ) ) {
+                              self.setPresetSectionVersion( levelData.collection );
+                        }
+                  });
+                  return collection;
+            },
 
 
 

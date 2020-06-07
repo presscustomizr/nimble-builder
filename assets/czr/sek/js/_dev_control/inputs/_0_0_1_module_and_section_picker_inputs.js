@@ -22,6 +22,7 @@
                 //console.log( this.id, input_options );
             },
 
+            // June 2020 : input type used for both prebuilt and user sections
             section_picker : function( input_options ) {
                   var input = this;
                   // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;

@@ -105,6 +105,10 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
           'sek_module_picker_module'
         ];
 
+        // JUNE 2020
+        // PREBUILT AND USER SECTION MODULES ARE REGISTERED IN add_action( 'after_setup_theme', '\Nimble\sek_schedule_module_registration', 50 );
+        // with sek_register_prebuilt_section_modules(); and sek_register_user_sections_module();
+
         public static $ui_level_modules = [
           // UI LEVEL MODULES
           'sek_mod_option_switcher_module',
