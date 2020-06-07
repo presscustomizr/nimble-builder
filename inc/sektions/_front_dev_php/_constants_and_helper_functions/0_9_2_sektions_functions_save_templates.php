@@ -220,6 +220,9 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
 
     //sek_error_log('$tmpl_data??', $tmpl_data );
 
+    // Update the post name now
+    $tmpl_data['tmpl_post_name'] = $tmpl_post_name;
+
     $post_data = array(
         'post_title' => esc_attr( $tmpl_data['metas']['title'] ),
         'post_name' => $tmpl_post_name,
