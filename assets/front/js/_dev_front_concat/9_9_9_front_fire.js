@@ -147,3 +147,18 @@
         });
     });
 }(window, document));
+
+
+/* ------------------------------------------------------------------------- *
+ *  GRID MODULE
+/* ------------------------------------------------------------------------- */
+// June 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/716
+nb_.listenTo('nb-docready', function() {
+    if ( window.nb_ && window.nb_.getQueryVariable ) {
+        var anchorId = window.nb_.getQueryVariable('go_to'),
+            el = document.getElementById(anchorId);
+        if( anchorId && el ) {
+              setTimeout( function() { el.scrollIntoView();}, 200 );
+        }
+    }
+});
