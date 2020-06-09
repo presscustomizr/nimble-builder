@@ -1583,7 +1583,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // 1) root level
                               userSectionCandidate.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
                               // 2) children levels
-                              userSectionCandidate.collection = self.setPresetSectionIds( userSectionCandidate.collection );
+                              userSectionCandidate.collection = self.setPresetOrUserSectionIds( userSectionCandidate.collection );
 
                               // NIMBLE VERSION
                               // set the section version
@@ -1623,7 +1623,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     // ID's
                                     // the level's id have to be generated
-                                    presetCandidate.collection = self.setPresetSectionIds( presetCandidate.collection );
+                                    presetCandidate.collection = self.setPresetOrUserSectionIds( presetCandidate.collection );
 
                                     // NIMBLE VERSION
                                     // set the section version
@@ -1638,14 +1638,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             // SECTION HELPERS
-            setPresetSectionIds : function( collection ) {
+            // Replaces __rep__me__ by an id looking like __nimble__1eda909f0cfe
+            setPresetOrUserSectionIds : function( collection ) {
                   var self = this;
-                  _.each( collection, function( levelData ) {
-                        levelData.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
-                        if ( _.isArray( levelData.collection ) ) {
-                              self.setPresetSectionIds( levelData.collection );
-                        }
-                  });
+                  // Only collection set as arrays hold columns or modules
+                  if ( _.isArray( collection ) ) {
+                        _.each( collection, function( levelData ) {
+                              levelData.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
+                              if ( _.isArray( levelData.collection ) ) {
+                                    self.setPresetOrUserSectionIds( levelData.collection );
+                              }
+                        });
+                  }
                   return collection;
             },
 

@@ -206,7 +206,6 @@ function sek_enqueue_controls_js_css() {
                 //     '[gfont]Covered+By+Your+Grace:regular'
                 // ),
                 'alreadyUsedFonts' => get_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS ),
-                'isSavedSectionEnabled' => defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) && NIMBLE_SAVED_SECTIONS_ENABLED,
                 'isTemplateGalleryEnabled' => defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) && NIMBLE_TEMPLATE_GALLERY_ENABLED, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/651
                 'isTemplateSaveEnabled' => defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) && NIMBLE_TEMPLATE_SAVE_ENABLED //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/655
             )
@@ -655,7 +654,9 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Template removed' => __('Template removed', 'text_dom'),
             'Error when processing templates' => __('Error when processing templates', 'text_dom'),
             'Last modified' => __('Last modified', 'text_dom'),
-            //'Remove this element' => __('Remove this element', 'text_dom'),
+
+            // Section Save
+            'My sections' => __('My sections', 'text_dom')
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),

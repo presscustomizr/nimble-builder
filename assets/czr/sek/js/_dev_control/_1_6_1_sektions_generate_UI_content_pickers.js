@@ -37,6 +37,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
 
+                        // June 2020 for : https://github.com/presscustomizr/nimble-builder/issues/520
+                        // and https://github.com/presscustomizr/nimble-builder/issues/713
+                        sek_my_sections_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_my_sections_sec_picker_module',
+                              controlLabel :  sektionsLocalizedData.i18n['My sections'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : false,
+                              priority : 10,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>',
+                              is_new : true
+                        },
+
+                        // Preset sections
+                        // to understand how those sections are registered server side, see @see https://github.com/presscustomizr/nimble-builder/issues/713
                         sek_intro_sec_picker_module : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                               module_type : 'sek_intro_sec_picker_module',
@@ -102,26 +117,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               priority : 30,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         }
-                  });
+                  });//$.extend( registrationParams, { });
 
                   // Beta features to merge here ?
                   // if ( sektionsLocalizedData.areBetaFeaturesEnabled ) {
                   //       $.extend( registrationParams, {});
                   // }
-
-                  if ( sektionsLocalizedData.isSavedSectionEnabled ) {
-                        $.extend( registrationParams, {
-                              sek_my_sections_sec_picker_module : {
-                                    settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
-                                    module_type : 'sek_my_sections_sec_picker_module',
-                                    controlLabel :  '@missi18n My sections',
-                                    content_type : 'section',
-                                    expandAndFocusOnInit : false,
-                                    priority : 10,
-                                    icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                              }
-                        });
-                  }
 
 
                   // BAIL WITH A SEE-ME ANIMATION IF THIS UI IS CURRENTLY BEING DISPLAYED
@@ -200,16 +201,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                           var $title = _control_.container.find('label > .customize-control-title'),
                                               _titleContent = $title.html();
+
                                           // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
                                           $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
 
+                                          if ( optionData.is_new ) {
+                                                var _titleHtml = $title.html();
+                                                $title.html( _titleHtml + ' <span class="sek-new-label">New!</span>' );
+                                          }
                                           // if this level has an icon, let's prepend it to the title
                                           if ( ! _.isUndefined( optionData.icon ) ) {
                                                 $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
                                           }
 
                                           // ACCORDION
-
                                           // Setup the accordion only for section content type
                                           if ( 'section' === _control_.content_type ) {
                                                 // Hide the item wrapper

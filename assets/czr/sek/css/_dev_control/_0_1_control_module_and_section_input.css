@@ -1,0 +1,230 @@
+/* MODULE AND SECTION PICKER INPUT */
+[data-sek-content-type] {
+    float: left;
+    padding: 0%;
+    margin: 1.8%;
+    text-align: center;
+    cursor: move;
+    /*cursor: -webkit-grab;*/
+    /*background: #eee;*/
+    -webkit-transition: -webkit-box-shadow .2s ease;
+    transition: -webkit-box-shadow .2s ease;
+    -o-transition: box-shadow .2s ease;
+    transition: box-shadow .2s ease;
+    transition: box-shadow .2s ease, -webkit-box-shadow .2s ease;
+    -webkit-box-shadow: 0 2px 5px rgba(0,0,0,.25);
+    box-shadow: 0 2px 5px rgba(0,0,0,.25);
+    border-radius: 4px;
+}
+[data-sek-content-type="module"] {
+  width: 29%;
+  height: 130px;
+}
+
+
+/* When sections are displayed in the module picker. Typically the columns sections */
+li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
+  width: 29%;
+  height: 130px;
+}
+
+.sek-content-type-wrapper [data-sek-content-type="preset_section"] {
+  width: 95%;
+  height: 165px;
+  position: relative
+}
+
+[data-sek-content-type="preset_section"] .sek-overlay {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #000000;
+    opacity: 0;
+    -webkit-transition: opacity .35s ease;
+    transition: opacity .35s ease;
+    -o-transition: opacity .35s ease;
+}
+[data-sek-content-type="preset_section"]:hover .sek-overlay {
+    opacity: 0.15;
+}
+/* don't elevate inactive modules ( introduced but not yet implemented ) */
+[data-sek-content-type][draggable="true"]:hover {
+  -webkit-box-shadow: 0 12px 20px rgba(0,0,0,.2);
+  box-shadow: 0 12px 20px rgba(0,0,0,.2);
+}
+[data-sek-content-type][draggable="false"] {
+  background: #eee;
+  opacity: 0.8;
+}
+
+/* JUNE 2020 style for user sections */
+/* USER SECTIONS */
+.sek-user-section-wrapper {
+  margin-bottom: 15px;
+  float: left;
+  width: 100%
+}
+.sek-user-section-wrapper [data-sek-content-type="preset_section"] .sek-overlay {
+  opacity: 0.40;
+}
+.sek-user-section-wrapper [data-sek-content-type="preset_section"]:hover .sek-overlay {
+    opacity: 0.50;
+}
+.sek-user-section-wrapper [data-sek-is-user-section="true"] {
+  height: 165px;
+  margin: 0;
+  width: 97%;
+}
+
+.sek-user-section-wrapper .sek-sec-thumb {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+}
+.sek-user-section-wrapper .sek-sec-info {
+  position: relative;
+  color: #ffffff;
+  padding: 2%;
+  overflow: hidden;
+  height: 100%;
+  max-height: 138px;
+  padding: 10px;
+}
+
+.sek-sec-info .sec-title {
+  color: #ffffff;
+  margin: 0;
+  line-height: 20px;
+  max-height: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.sek-sec-info .sec-date, .sek-sec-info .sec-desc {
+  margin:0;
+  margin-top: 5px;
+  font-size: 12px;
+}
+.sek-sec-info .sec-date {
+  font-size: italic;
+}
+
+.sek-sec-info > .remove-user-sec {
+  cursor: pointer;
+  font-size: 16px;
+  width: 30px;
+  height: 30px;
+  color: #535353;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 30px;
+  opacity: 0;
+  -webkit-box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  -webkit-transition: all .20s ease;
+  -o-transition: all .20s ease;
+  transition: all .20s ease;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 0px;
+  right: 5px;
+}
+.sek-sec-info:hover > .remove-user-sec {
+    opacity: 0.7;
+}
+.sek-sec-info > .remove-user-sec:hover {
+    opacity: 0.95;
+    color: red;
+}
+
+/* DRAGGING STUFFS */
+.sek-dragging [data-sek-content-type] {
+  -webkit-box-shadow: 0 2px 5px rgba(0,0,0,.25)!important;
+  box-shadow: 0 2px 5px rgba(0,0,0,.25)!important;
+}
+.sek-dragged {
+  background: #33b3db3d;
+  background: rgba(51, 179, 219, 0.24);
+}
+
+[data-sek-content-type] .sek-module-icon {
+  display: block;
+  padding: 0;
+}
+[data-sek-content-type] .sek-module-icon .nimble-module-icons {
+  font-size: 3rem;
+  max-width: 100%;/*60%!important;*/
+  color: #878787;
+  max-height: 86px;
+}
+
+/* when the module icon is a font icon */
+[data-sek-content-type] .sek-module-icon.is-font-icon {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 100%;
+          flex: 0 0 100%;
+  max-width: 100%;
+  min-height: 70%;
+}
+[data-sek-content-type] .sek-module-icon.is-font-icon i {
+  font-size: 35px;
+}
+[data-sek-content-type] .sek-module-title {
+  display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 0 6px 0px;
+  font-size: 0.75rem;
+  height: 45px;
+  justify-content: center;
+  position: relative;
+  top: -18px;
+}
+/*.sek-grabbing {
+  cursor: -webkit-grabbing;
+}
+*/
+.sek-centered-module-title {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.sek-new-label {
+    background: #ffff00;
+    border: 1px solid yellow;
+    padding: 3px 4px;
+    line-height: 12px;
+    border-radius: 8px;
+    font-size: 12px;
+}

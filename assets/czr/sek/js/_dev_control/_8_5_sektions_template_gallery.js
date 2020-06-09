@@ -191,7 +191,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //       _html += '<div class="sek-tmpl-thumb"><img src="'+ _data.thumb_url +'"/></div>';
                   //     _html += '</div>';
                   // });
-                  var _thumbUrl = sektionsLocalizedData.baseUrl + '/assets/admin/img/wire_frame.png',
+                  var _thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/wire_frame.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
                       _dfd_ = $.Deferred(),
                       _titleAttr;
 

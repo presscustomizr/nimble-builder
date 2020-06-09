@@ -19,9 +19,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.levelTreeExpanded.bind( function(expanded) {
                         self.cachedElements.$body.toggleClass( 'sek-level-tree-expanded', expanded );
                         if ( expanded ) {
-                              // Close template gallery, template saver
+                              // Close template gallery, template saver, section saver
                               self.templateGalleryExpanded(false);
                               self.tmplDialogVisible(false);
+                              if ( self.saveSectionDialogVisible ) {
+                                    self.saveSectionDialogVisible(false);
+                              }
 
                               // Set the level tree now
                               self.setLevelTreeValue();

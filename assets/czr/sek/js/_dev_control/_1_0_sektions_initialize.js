@@ -297,7 +297,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.setupTopBar();//@see specific dev file
 
                   // SAVE SECTION UI
-                  // June 2020 : for https://github.com/presscustomizr/nimble-builder/issues/520
+                  // June 2020 : for https://github.com/presscustomizr/nimble-builder/issues/520 and https://github.com/presscustomizr/nimble-builder/issues/713
                   self.setupSaveSectionUI();
 
                   // SAVE TEMPLATE UI

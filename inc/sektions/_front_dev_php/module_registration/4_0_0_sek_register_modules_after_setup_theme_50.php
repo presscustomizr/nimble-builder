@@ -19,9 +19,7 @@ function sek_schedule_module_registration() {
         // prebuilt sections are registered from a JSON since https://github.com/presscustomizr/nimble-builder/issues/431
         sek_register_prebuilt_section_modules();
         // June 2020 : for https://github.com/presscustomizr/nimble-builder/issues/520
-        if ( defined('NIMBLE_SAVED_SECTIONS_ENABLED') && NIMBLE_SAVED_SECTIONS_ENABLED ) {
-            sek_register_user_sections_module();
-        }
+        sek_register_user_sections_module();
     } else {
         // Condition !is_admin() added in april 2020
         // fixes https://github.com/presscustomizr/nimble-builder/issues/658

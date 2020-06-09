@@ -130,6 +130,7 @@
                               api.CZRInput.prototype.initialize.call( input, name, options );
                               input.isReady.then( function() {
                                     input.renderUserSavedSections();
+                                    input.attachDomEvents();
                               });
                         },
 
@@ -175,32 +176,87 @@
                                   //           //[hours,minutes,seconds].join(':')
                                   //     ].join(' ');
                                   // };
+
+                              var _refreshUserSectionView = function( sec_collection ) {
+                                    // clean
+                                    $wrapper.find('.sek-user-section-wrapper').remove();
+
+                                    // Write
+                                    if ( _.isEmpty( sec_collection ) ) {
+                                        var _placeholdImgUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/save_section_notice.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join('');
+                                          doc_url = 'https://docs.presscustomizr.com/article/417-how-to-save-and-reuse-sections-with-nimble-builder';
+                                        html = [
+                                              '<div class="sek-user-section-wrapper">',
+                                                '<img src="'+ _placeholdImgUrl +'" />',
+                                                '<br/><a href="'+ doc_url +'" target="_blank" rel="noreferrer nofollow">'+ doc_url +'</a>',
+                                              '</div>'
+                                        ].join('');
+                                        $wrapper.append( html );
+                                        input.module.container.find('.czr-item-content .customize-control-title').html('You did not save any section yet.');
+                                    } else {
+                                        var _thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/nb_sec_pholder.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
+                                        styleAttr = 'background: url(' + _thumbUrl  + ') 50% 50% / cover no-repeat;';
+                                        _.each( sec_collection, function( secData, secKey ) {
+                                              // try { creation_date = formatDate( new Date( secData.creation_date.replace( /-/g, '/' ) ) ); } catch( er ) {
+                                              //       api.errare( '::renderUserSavedSections => formatDate => error', er );
+                                              // }
+                                              if( !_.isEmpty( secData.description ) ) {
+                                                  _titleAttr = [ secData.title, secData.last_modified_date, secData.description ].join(' | ');
+                                              } else {
+                                                  _titleAttr = [ secData.title, secData.last_modified_date ].join(' | ');
+                                              }
+                                              html = [
+                                                    '<div class="sek-user-section-wrapper">',
+                                                      '<div draggable="true" data-sek-is-user-section="true" data-sek-section-type="content" data-sek-content-type="preset_section" data-sek-content-id="' + secKey +'" style="" title="' + secData.title + '">',
+                                                        '<div class="sek-sec-thumb" style="'+ styleAttr +'"></div>',//<img src="'+ _thumbUrl +'"/>
+                                                        '<div class="sek-overlay"></div>',
+                                                        '<div class="sek-sec-info" title="'+ _titleAttr +'">',
+                                                          '<h3 class="sec-title">' + secData.title + '</h3>',
+                                                          '<p class="sec-date"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', secData.last_modified_date ].join(' ') + '</i></p>',
+                                                          '<p class="sec-desc">' + secData.description + '</p>',
+                                                          '<i class="material-icons remove-user-sec" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>',
+                                                          //'<div class="sek-overlay"></div>',
+                                                          //'<div class="sek-saved-section-description">' + secData.description + '</div>',
+                                                          //! _.isEmpty( creation_date ) ? ( '<div class="sek-saved-section-date"><i class="far fa-calendar-alt"></i> @missi18n Created : ' + creation_date + '</div>' ) : '',
+                                                        '</div>',
+                                                      '</div>',
+                                                    '</div>'
+                                              ].join('');
+                                              $wrapper.append( html );
+                                        });//_.each
+                                    }
+
+                                    // Make section draggable now
+                                    api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
+                              };//_refreshUserSectionView
+
+                              // on input instantiation, render the collection
                               input.getUserSavedSections().done( function( sec_collection ) {
+                                    _refreshUserSectionView( sec_collection );
+                              });
 
-                                    console.log('ALORS SEC_COLLECTION ?', sec_collection );
+                              // when the collection is modified : save, update, remove actions => NB refreshes the collection
+                              api.czr_sektions.allSavedSections.bind( function( sec_collection ) {
+                                    _refreshUserSectionView( sec_collection );
+                              });
+                        },//renderUserSavedSections
 
-                                    _.each( sec_collection, function( secData, secKey ) {
-                                          // try { creation_date = formatDate( new Date( secData.creation_date.replace( /-/g, '/' ) ) ); } catch( er ) {
-                                          //       api.errare( '::renderUserSavedSections => formatDate => error', er );
-                                          // }
-                                          html = [
-                                                '<div class="sek-user-section-wrapper">',
-                                                  '<div class="sek-saved-section-title"><i class="sek-remove-user-section far fa-trash-alt"></i>' + secData.title + '</div>',
-                                                  '<div draggable="true" data-sek-is-user-section="true" data-sek-section-type="content" data-sek-content-type="preset_section" data-sek-content-id="' + secKey +'" style="" title="' + secData.title + '">',
-                                                    '<div class="sek-overlay"></div>',
-                                                    '<div class="sek-saved-section-description">' + secData.description + '</div>',
-                                                    ! _.isEmpty( creation_date ) ? ( '<div class="sek-saved-section-date"><i class="far fa-calendar-alt"></i> @missi18n Created : ' + creation_date + '</div>' ) : '',
-                                                  '</div>',
-                                                '</div>'
-                                          ].join('');
-                                          $wrapper.append( html );
-
-                                          // Make section draggable now
-                                          api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
-                                    });
+                        // with delegation
+                        attachDomEvents : function() {
+                              // Attach events
+                              this.container.on('click', '.sek-sec-info .remove-user-sec', function(evt) {
+                                    evt.preventDefault();
+                                    var self = api.czr_sektions;
+                                    var _focusOnRemoveCandidate = function( mode ) {
+                                          self.saveSectionDialogMode( 'remove' );
+                                          // self unbind
+                                          self.saveSectionDialogMode.unbind( _focusOnRemoveCandidate );
+                                    };
+                                    self.saveSectionDialogMode.bind( _focusOnRemoveCandidate );
+                                    self.saveSectionDialogVisible(true);
                               });
                         }
-                  });
+                  });//module.inputConstructor
 
                   // run the parent initialize
                   // Note : must be always invoked always after the input / item class extension
@@ -208,7 +264,7 @@
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
                   // module.embedded.then( function() {
-                  //       console.log('MODULE READY=> lets dance',  module.container,  module.container.find('.sek-content-type-wrapper') );
+                  //       console.log('MODULE READY=> lets dance',  module.container,  module.container.find('.sek-ctrl-accordion-title') );
                   // });
             },//initialize
       };
@@ -223,17 +279,15 @@
       //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
-      if ( sektionsLocalizedData.isSavedSectionEnabled ) {
-            $.extend( api.czrModuleMap, {
-                  sek_my_sections_sec_picker_module : {
-                        mthds : Constructor,
-                        crud : false,
-                        name : api.czr_sektions.getRegisteredModuleProperty( 'sek_my_sections_sec_picker_module', 'name' ),
-                        has_mod_opt : false,
-                        ready_on_section_expanded : false,
-                        ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
-                        defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_my_sections_sec_picker_module' )
-                  },
-            });
-      }
+      $.extend( api.czrModuleMap, {
+            sek_my_sections_sec_picker_module : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_my_sections_sec_picker_module', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_my_sections_sec_picker_module' )
+            },
+      });
 })( wp.customize , jQuery, _ );

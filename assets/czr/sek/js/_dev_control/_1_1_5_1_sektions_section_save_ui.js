@@ -1,4 +1,6 @@
 //global sektionsLocalizedData
+//
+//Note : idOfSectionToSave is set when user clicks on the save icon, and is reset when saving/updating closing save dialog
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
@@ -10,9 +12,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Declare api values and schedule reactions
                   self.saveSectionDialogVisible = new api.Value( false );// Hidden by default
 
-                  if ( !sektionsLocalizedData.isSavedSectionEnabled ) {
-                     return;
-                  }
+                  // The observer for visibility
+                  // connected to other observers
                   self.saveSectionDialogVisible.bind( function( visible ){
                         if ( visible ) {
                               // close template gallery
@@ -36,7 +37,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.errare('error setupSaveSectionUI => section collection should be an object');
                               return;
                         }
-                        console.log('SOOO ALL SAVED SECTIONS ?', sec_collection );
                         sec_collection = _.isEmpty(sec_collection) ? {} : sec_collection;
                         self.refreshSectionPickerHtml( sec_collection );
                   });
@@ -81,6 +81,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                               break;
                         }//switch
+
+                        // when user clicks on the remove icon of a section in the collection
+                        // => hide save and update buttons
+                        if ( 'remove' === mode && _.isEmpty( self.idOfSectionToSave ) ) {
+                            $secSaveDialogWrap.addClass('sek-is-removal-only');
+                        } else {
+                            $secSaveDialogWrap.removeClass('sek-is-removal-only');
+                        }
                   });//self.saveSectionDialogMode.bind()
 
             },
@@ -155,7 +163,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             ///////////////////////////////////////////////
             ///// DOM EVENTS
             // Fired once, on first rendering
-            scheduleSectionSaveDOMEvents : function() {
+            maybeScheduleSectionSaveDOMEvents : function() {
                   var self = this, $secSaveDialogWrap = $('#nimble-top-section-save-ui');
                   if ( $secSaveDialogWrap.data('nimble-sec-save-dom-events-scheduled') )
                     return;
@@ -287,6 +295,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             ///////////////////////////////////////////////
             ///// AJAX ACTIONS
             // Fired on 'click' on .sek-do-save-section btn
+            // @param sectionPostNameCandidateForUpdate is only provided when saving
             saveOrUpdateSavedSection : function(evt, sectionPostNameCandidateForUpdate ) {
                   var self = this, _dfd_ = $.Deferred();
                   // idOfSectionToSave is set when reacting to click action
@@ -323,6 +332,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   $('#sek-saved-section-title').removeClass('error');
 
+                  // Do some pre-processing before ajaxing
+                  // Note : ids will be replaced server side
+                  sectionModel = self.preProcessSection( sectionModel );
+                  if ( !_.isObject( sectionModel ) ) {
+                        api.errare('::saveOrUpdateSavedSection => error => invalid sectionModel');
+                        _dfd_.resolve( {success:false});
+                  }
+
                   wp.ajax.post( 'sek_save_user_section', {
                         nonce: api.settings.nonce.save,
                         section_data: JSON.stringify( sectionModel ),
@@ -336,6 +353,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   .done( function( response ) {
                         //console.log('SAVED POST ID', response );
                         _dfd_.resolve( {success:true});
+
                         // response is {section_post_id: 436}
                         api.previewer.trigger('sek-notify', {
                             type : 'success',
@@ -359,6 +377,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   '</span>'
                             ].join('')
                         });
+                  })
+                  .always( function() {
+                        // reset the id of section to save
+                        // => because we need to know when we are in 'remove' mode when user clicked on remove icon in the section collection, => which hides save and update buttons
+                        self.idOfSectionToSave = null;
                   });
                   return _dfd_;
             },//saveOrUpdateSavedSection
@@ -399,6 +422,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   '</span>'
                             ].join('')
                         });
+                  })
+                  .always( function() {
+                        // reset the id of section to save
+                        // => because we need to know when we are in 'remove' mode when user clicked on remove icon in the section collection, => which hides save and update buttons
+                        self.idOfSectionToSave = null;
                   });
 
                   return _dfd_;
@@ -418,7 +446,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this,
                       _renderAndSetup = function() {
                             $.when( self.renderSectionSaveUI({}) ).done( function( $_el ) {
-                                  self.scheduleSectionSaveDOMEvents();
+                                  self.maybeScheduleSectionSaveDOMEvents();//<= schedule on the first display only
                                   self.saveUIContainer = $_el;
                                   //display
                                   _.delay( function() {
@@ -440,6 +468,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         self.saveSectionDialogMode = self.saveSectionDialogMode ? self.saveSectionDialogMode : new api.Value();
                                         self.saveSectionDialogMode('hidden');
                                         self.saveUIContainer.remove();
+                                        // reset the id of section to save
+                                        // => because we need to know when we are in 'remove' mode when user clicked on remove icon in the section collection, => which hides save and update buttons
+                                        self.idOfSectionToSave = null;
                                         dfd.resolve();
                                   }, 250 );
                             } else {
@@ -461,6 +492,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             ///////////////////////////////////////////////
             ///// TMPL COLLECTION
             // @return $.promise
+            // @param params = {refresh : false};
             setSavedSectionCollection : function( params ) {
                   var self = this, _dfd_ = $.Deferred();
 
@@ -478,7 +510,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( self.sectionCollectionPromise && 'pending' === self.sectionCollectionPromise.state() ) {
                         _promise = self.sectionCollectionPromise;
                   } else {
-                        _promise = self.getSavedSectionCollection();
+                        _promise = self.getSavedSectionCollection( params );
                   }
                   _promise.done( function( sec_collection ) {
                         self.allSavedSections( sec_collection );
@@ -488,10 +520,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
             // @return a promise
-            getSavedSectionCollection : function() {
+            // @param params = {refresh : false};
+            // also used from the input Constructor of sek_my_sections_sec_picker_module
+            // @param params = {refresh : false};
+            getSavedSectionCollection : function( params ) {
                   var self = this;
+                  // refresh is true on save, update, remove success
+                  params = params || {refresh : false};
+
                   self.sectionCollectionPromise = $.Deferred();
-                  if ( '_not_populated_' !== self.allSavedSections() ) {
+                  if ( !params.refresh && '_not_populated_' !== self.allSavedSections() ) {
                         self.sectionCollectionPromise.resolve( self.allSavedSections() );
                         return self.sectionCollectionPromise;
                   }
@@ -504,7 +542,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.sectionCollectionPromise.resolve( sec_collection );
                         } else {
                               self.sectionCollectionPromise.resolve( {} );
-                              api.errorLog('control::getSavedSectionCollection => error => collection is empty or invalid');
+                              api.errorLog('control::getSavedSectionCollection => collection is empty or invalid');
                         }
 
                         // response is {section_post_id: 436}
@@ -536,19 +574,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return self.sectionCollectionPromise;
             },
 
-            // @return a section model with clean ids
-            // also removes the section properties "id" and "level", which are dynamically set when dragging and dropping
+            // @return a section model
+            // Note : ids are reset server side
             // Example of section model before preprocessing
             // {
             //    collection: [{…}]
-            //    id: "" //<= to remove
-            //    level: "section" // <= to remove
+            //    id: "" //<= reset server side
+            //    level: "section"
+            //    is_nested : false
             //    options: {bg: {…}}
             //    ver_ini: "1.1.8"
             // }
-            preProcessSection : function( section_data ) {
-                  console.log('TO DO => make sure section is ok to be saved');
-                  return section_data;
+            preProcessSection : function( sectionModel ) {
+                  if ( !_.isObject( sectionModel ) ) {
+                        return null;
+                  }
+                  var preprocessedModel = $.extend( {}, true, sectionModel );
+                  // Make sure a nested section is saved as normal
+                  if ( _.has( preprocessedModel, 'is_nested') ) {
+                        preprocessedModel = _.omit( preprocessedModel, 'is_nested' );
+                  }
+                  return preprocessedModel;
             }
       });//$.extend()
 })( wp.customize, jQuery );

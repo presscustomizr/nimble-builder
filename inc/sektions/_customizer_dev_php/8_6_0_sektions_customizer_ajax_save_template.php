@@ -94,6 +94,9 @@ function sek_ajax_save_user_template() {
         wp_send_json_error( __FUNCTION__ . '_missing_active_locations' );
     }
 
+    // make sure description and title are clean before DB
+    $tmpl_title = wp_strip_all_tags( $_POST['tmpl_title'] );
+    $tmpl_description = wp_strip_all_tags( $_POST['tmpl_description'] );
 
     //sek_error_log(__FUNCTION__ .  '$_POST?', $_POST );
 
@@ -102,8 +105,8 @@ function sek_ajax_save_user_template() {
         'data' => $_POST['tmpl_data'],//<= json stringified
         'tmpl_post_name' => ( !empty( $_POST['tmpl_post_name'] ) && is_string( $_POST['tmpl_post_name'] ) ) ? $_POST['tmpl_post_name'] : null,
         'metas' => array(
-            'title' => $_POST['tmpl_title'],
-            'description' => $_POST['tmpl_description'],
+            'title' => $tmpl_title,
+            'description' => $tmpl_description,
             'skope_id' => $_POST['skope_id'],
             'version' => NIMBLE_VERSION,
             // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"

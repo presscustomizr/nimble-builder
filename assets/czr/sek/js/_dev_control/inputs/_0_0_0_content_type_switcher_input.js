@@ -9,7 +9,8 @@
             content_type_switcher : function( input_options ) {
                   var input = this,
                       _section_,
-                      initial_content_type;
+                      initial_content_type,
+                      nbApiInstance = api.czr_sektions;
 
                   if ( ! api.section.has( input.module.control.section() ) ) {
                         throw new Error( 'api.czrInputMap.content_type_switcher => section not registered' );
@@ -22,6 +23,16 @@
                         var _contentType = $(this).data( 'sek-content-type');
                         // handle the aria-pressed state
                         input.container.find('[data-sek-content-type]').attr( 'aria-pressed', false );
+
+                        // close other dialog
+                        nbApiInstance.templateGalleryExpanded(false);
+                        nbApiInstance.levelTreeExpanded(false);
+                        if ( nbApiInstance.tmplDialogVisible ) {
+                              nbApiInstance.tmplDialogVisible(false);
+                        }
+                        if ( nbApiInstance.saveSectionDialogVisible ) {
+                              nbApiInstance.saveSectionDialogVisible(false);
+                        }
 
                         // April 2020 : template case added for https://github.com/presscustomizr/nimble-builder/issues/651
                         if ( 'template' === _contentType ) {
@@ -64,6 +75,9 @@
                   api.czr_sektions.currentContentPickerType.bind( function( contentType ) {
                         _do_( contentType );
                   });
+
+                  // initialize with module picker
+                  input.container.find( '[data-sek-content-type="' + ( input() || 'module' ) + '"]').trigger('click');
             }
       });
 })( wp.customize, jQuery, _ );

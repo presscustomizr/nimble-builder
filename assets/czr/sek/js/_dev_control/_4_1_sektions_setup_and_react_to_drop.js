@@ -176,12 +176,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     before_section : $dropTarget.data('drop-zone-before-section'),
                                     after_section : $dropTarget.data('drop-zone-after-section'),
 
-                                    content_type : $(this).data('sek-content-type'),
-                                    content_id : $(this).data('sek-content-id'),
+                                    content_type : $(this).attr('data-sek-content-type'),
+                                    content_id : $(this).attr('data-sek-content-id'),
 
-                                    section_type : $(this).data('sek-section-type'),
+                                    section_type : $(this).attr('data-sek-section-type'),
                                     // Saved sections
-                                    is_user_section : "true" === $(this).data('sek-is-user-section')
+                                    is_user_section : "true" === $(this).attr('data-sek-is-user-section')
                               });
                               // And reset the preview target
                               self.lastClickedTargetInPreview({});
@@ -501,10 +501,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( ! $dropTarget.hasClass('sek-drop-zone') ) {
                         return false;
                   }
-                  if ( ( isHeaderLocation || isFooterLocation ) && isContentSectionCandidate ) {
-                        msg = isHeaderLocation ? sektionsLocalizedData.i18n['Header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['Footer location only accepts modules and pre-built footer sections'];
-                        maybePrintErrorMessage( msg );
-                        return false;
+                  // June 2020 : always allow user sections to be dropped in header and footer location
+                  // while preset section must explicitely be 'content' section_type to be allowed
+                  if ( !self.dndData.is_user_section ) {
+                        if ( ( isHeaderLocation || isFooterLocation ) && isContentSectionCandidate ) {
+                              msg = isHeaderLocation ? sektionsLocalizedData.i18n['Header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['Footer location only accepts modules and pre-built footer sections'];
+                              maybePrintErrorMessage( msg );
+                              return false;
+                        }
                   }
                   if ( isFooterLocation && 'preset_section' === self.dndData.content_type && 'header' === self.dndData.section_type ) {
                         msg = sektionsLocalizedData.i18n['You can\'t drop a header section in the footer location'];

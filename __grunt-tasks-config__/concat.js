@@ -212,13 +212,13 @@ module.exports = {
   czr_sektions_customizer_control_css : {
     src: [
       '<%= paths.czr_assets %>sek/css/_dev_control/_0_0_control_font_and_core_overrides.css',
-      '<%= paths.czr_assets %>sek/css/_dev_control/_0_1_control_user_sections.css',
+      '<%= paths.czr_assets %>sek/css/_dev_control/_0_1_control_module_and_section_input.css',
       '<%= paths.czr_assets %>sek/css/_dev_control/_0_2_control_inputs.css',
       '<%= paths.czr_assets %>sek/css/_dev_control/_0_3_control_buttons.css',
       '<%= paths.czr_assets %>sek/css/_dev_control/_0_4_control_top_bar.css',
       '<%= paths.czr_assets %>sek/css/_dev_control/_0_5_control_feedback_ui.css',
       '<%= paths.czr_assets %>sek/css/_dev_control/_0_6_control_top_save_sections_and_templates.css',
-      '<%= paths.czr_assets %>sek/css/_dev_control/_0_7_control_template_gallery.css',
+      '<%= paths.czr_assets %>sek/css/_dev_control/_0_7_control_tmpl_gallery.css',
       '<%= paths.czr_assets %>sek/css/_dev_control/_0_8_control_level_tree.css'
     ],
     dest: '<%= paths.czr_assets %>sek/css/sek-control.css',

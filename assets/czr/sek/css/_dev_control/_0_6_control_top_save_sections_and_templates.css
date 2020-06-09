@@ -60,6 +60,7 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
   position: absolute;
   bottom: 10px;
   right: 10px;
+  border-radius: 3px!important;
 }
 
 #nimble-top-tmpl-save-ui #sek-saved-tmpl-title.error,
@@ -135,7 +136,7 @@ select.sek-saved-section-picker {
 [data-sek-tmpl-dialog-mode="save"] .sek-saved-tmpl-picker {display: none;}
 [data-sek-tmpl-dialog-mode="save"] .sek-tmpl-title {display: block;}
 [data-sek-tmpl-dialog-mode="save"] .sek-tmpl-description {display: block;}
-[data-sek-tmpl-dialog-mode="save"] .sek-do-save-tmpl {display: block;}
+[data-sek-tmpl-dialog-mode="save"] .sek-do-save-tmpl {display: block;border-color: #ffff00;background: #f9f9b6f7;border-radius: 3px!important;}
 
 [data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-tmpl-title {display: block;}
 [data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-tmpl-description {display: block;}
@@ -149,7 +150,7 @@ select.sek-saved-section-picker {
 [data-sek-section-dialog-mode="save"] .sek-saved-section-picker {display: none;}
 [data-sek-section-dialog-mode="save"] .sek-section-title {display: block;}
 [data-sek-section-dialog-mode="save"] .sek-section-description {display: block;}
-[data-sek-section-dialog-mode="save"] .sek-do-save-section {display: block;}
+[data-sek-section-dialog-mode="save"] .sek-do-save-section {display: block;border-color: #ffff00;background: #f9f9b6f7;border-radius: 3px!important;}
 
 [data-sek-section-dialog-mode="update"].sek-section-update-selected .sek-section-title {display: block;}
 [data-sek-section-dialog-mode="update"].sek-section-update-selected .sek-section-description {display: block;}
@@ -158,6 +159,8 @@ select.sek-saved-section-picker {
 [data-sek-section-dialog-mode="remove"].sek-section-remove-selected .sek-open-remove-confirmation {display: block;}
 [data-sek-section-dialog-mode="remove"].sek-removal-confirmation-opened .sek-open-remove-confirmation {display: none!important;}
 [data-sek-section-dialog-mode="remove"].sek-removal-confirmation-opened .sek-section-remove-dialog { display: block;}
+[data-sek-section-dialog-mode="remove"].sek-is-removal-only [data-section-mode-switcher="save"], [data-sek-section-dialog-mode="remove"].sek-is-removal-only [data-section-mode-switcher="update"] { display: none;}
+
 
 #nimble-top-tmpl-save-ui .spinner,
 #nimble-top-section-save-ui .spinner {

@@ -215,7 +215,7 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
     if ( !is_null($tmpl_data['tmpl_post_name']) ) {
         $tmpl_post_name = $tmpl_data['tmpl_post_name'];
     } else {
-        $tmpl_post_name = NIMBLE_PREFIX_FOR_SAVED_TMPL .  sanitize_title( $tmpl_data['metas']['title'] );//nimble_tmpl_my-template-name
+        $tmpl_post_name = NIMBLE_PREFIX_FOR_SAVED_TMPL .  sanitize_title( $tmpl_data['metas']['title'] );//nb_tmpl_my-template-name
     }
 
     //sek_error_log('$tmpl_data??', $tmpl_data );
