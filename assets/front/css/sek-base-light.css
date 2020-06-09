@@ -48,10 +48,6 @@
   overflow: hidden;
 }
 
-.sektion-wrapper figure {
-  margin: 0;
-}
-
 .sektion-wrapper embed, .sektion-wrapper iframe, .sektion-wrapper object {
   max-width: 100%;
 }

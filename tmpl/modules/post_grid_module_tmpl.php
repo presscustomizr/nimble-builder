@@ -13,9 +13,14 @@ $thumb_settings = $value['grid_thumb'];
 
 // filter for 'get_pagenum_link' and 'paginate_links'
 // for https://github.com/presscustomizr/nimble-builder/issues/672
+// June 2020 updated for https://github.com/presscustomizr/nimble-builder/issues/716
 if ( !function_exists( 'Nimble\sek_filter_pagination_nav_url') ) {
     function sek_filter_pagination_nav_url( $result ) {
-          return trailingslashit($result) . '#' . Nimble_Manager()->model['id'];
+          $url = add_query_arg(
+            array('go_to' => Nimble_Manager()->model['id'] ),
+            $result
+          );
+          return $url;
     }
 }
 

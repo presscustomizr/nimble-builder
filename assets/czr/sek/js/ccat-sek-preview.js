@@ -1514,6 +1514,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               syncedTinyMceInputId = $moduleWrapper.find('div[data-sek-input-id]').length > 0 ? $moduleWrapper.find('div[data-sek-input-id]').data('sek-input-id') : '';
                         }
                   }
+                  //console.log('SOO?', params );
                   api.preview.send( 'sek-' + params.action, _.extend( {
                         location : params.location,
                         level : params.level,

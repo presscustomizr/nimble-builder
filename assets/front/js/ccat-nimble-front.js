@@ -2,6 +2,21 @@
 if ( window.nb_ === void 0 && window.console && window.console.log ) {
     console.log('Nimble error => window.nb_ global not instantiated');
 }
+
+
+// add an helper to get the query variable
+// used for grid module
+window.nb_.getQueryVariable = function(variable) {
+       var query = window.location.search.substring(1);
+       var vars = query.split("&");
+       for (var i=0;i<vars.length;i++) {
+               var pair = vars[i].split("=");
+               if(pair[0] == variable){return pair[1];}
+       }
+       return(false);
+};
+
+// adds jQuery dependant methods to window.nb_
 (function(w, d){
     var callbackFunc = function() {
         jQuery( function($){
@@ -2223,3 +2238,18 @@ if ( window.nb_ === void 0 && window.console && window.console.log ) {
         });
     });
 }(window, document));
+
+
+/* ------------------------------------------------------------------------- *
+ *  GRID MODULE
+/* ------------------------------------------------------------------------- */
+// June 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/716
+nb_.listenTo('nb-docready', function() {
+    if ( window.nb_ && window.nb_.getQueryVariable ) {
+        var anchorId = window.nb_.getQueryVariable('go_to'),
+            el = document.getElementById(anchorId);
+        if( anchorId && el ) {
+              setTimeout( function() { el.scrollIntoView();}, 200 );
+        }
+    }
+});

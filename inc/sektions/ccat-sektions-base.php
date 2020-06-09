@@ -2004,6 +2004,10 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
           'sek_module_picker_module'
         ];
 
+        // JUNE 2020
+        // PREBUILT AND USER SECTION MODULES ARE REGISTERED IN add_action( 'after_setup_theme', '\Nimble\sek_schedule_module_registration', 50 );
+        // with sek_register_prebuilt_section_modules(); and sek_register_user_sections_module();
+
         public static $ui_level_modules = [
           // UI LEVEL MODULES
           'sek_mod_option_switcher_module',
@@ -3491,10 +3495,7 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                           <i data-sek-click-on="add-column" class="material-icons sek-click-on" title="<?php _e( 'Add a column', 'text_domain' ); ?>">view_column</i>
                         <# } #>
                         <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate section', 'text_domain' ); ?>">filter_none</i>
-                        <?php if ( defined( 'NIMBLE_SAVED_SECTIONS_ENABLED' ) && NIMBLE_SAVED_SECTIONS_ENABLED ) : ?>
-                          <i data-sek-click-on="toggle-save-section-ui" class="sek-save far fa-save" title="<?php _e( 'Save this section', 'text_domain' ); ?>"></i>
-                        <?php endif; ?>
-                        <i data-sek-click-on="pick-content" data-sek-content-type="module" class="material-icons sek-click-on" title="<?php _e( 'Add a module', 'text_domain' ); ?>">add_circle_outline</i>
+                        <i data-sek-click-on="toggle-save-section-ui" class="sek-save far fa-save" title="<?php _e( 'Save this section', 'text_domain' ); ?>"></i>
                         <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'text_domain' ); ?>">delete_forever</i>
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>

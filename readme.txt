@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.0.21-beta
+Stable tag: 2.1.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,16 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.0.20 : [Grid module] fixed pagination broken on home page + performance improvements for large blog sites. [Customizer] fixed a bug when inserting a new module that requested a page refresh. [SEO] implement support for SEOPress plugin content analyzer. [Shortcodes] parsing deactivated when customizing + new admin option allowing users to activate shortcode parsing when customizing. [troubleshooting] introduction of a "Debug mode" option. [performances][lazyload] prevent lazyloading images when in header section. [CSS] fixed specificity too low for divider and spacer modules.
+2.1.0 : Introduction of a new user interface to save and reuse sections in any pages.
 
 == Changelog ==
+= 2.1.0 June 9th 2020 =
+* fixed [Grid module][Pagination] anchor link can prevent navigating posts pages
+* fixed : [modules][customizer] when customizing introduce a script tag detection, similar to the shortcode one
+* fixed : [HTML module] when customizing, make sure the html module as a minimal height so we can access it
+* improved : [customizer][js][performance] defer loading Nimble ccat-sek-control.js when api is 'ready'
+* added : [sections] save and reuse sections
+
 = 2.0.20 May 28th 2020 =
 * fixed : [CSS] specificity too low for divider and spacer modules
 * fixed : [CSS] improved style for NB debug notice

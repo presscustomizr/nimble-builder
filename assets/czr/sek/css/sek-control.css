@@ -105,30 +105,160 @@ li[id^="accordion-section-__nimble__"] > h3 {
   border-top:1px solid #ddd;
 }
 
+/* MODULE AND SECTION PICKER INPUT */
+[data-sek-content-type] {
+    float: left;
+    padding: 0%;
+    margin: 1.8%;
+    text-align: center;
+    cursor: move;
+    /*cursor: -webkit-grab;*/
+    /*background: #eee;*/
+    -webkit-transition: -webkit-box-shadow .2s ease;
+    transition: -webkit-box-shadow .2s ease;
+    -o-transition: box-shadow .2s ease;
+    transition: box-shadow .2s ease;
+    transition: box-shadow .2s ease, -webkit-box-shadow .2s ease;
+    -webkit-box-shadow: 0 2px 5px rgba(0,0,0,.25);
+    box-shadow: 0 2px 5px rgba(0,0,0,.25);
+    border-radius: 4px;
+}
+[data-sek-content-type="module"] {
+  width: 29%;
+  height: 130px;
+}
 
+
+/* When sections are displayed in the module picker. Typically the columns sections */
+li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
+  width: 29%;
+  height: 130px;
+}
+
+.sek-content-type-wrapper [data-sek-content-type="preset_section"] {
+  width: 95%;
+  height: 165px;
+  position: relative
+}
+
+[data-sek-content-type="preset_section"] .sek-overlay {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #000000;
+    opacity: 0;
+    -webkit-transition: opacity .35s ease;
+    transition: opacity .35s ease;
+    -o-transition: opacity .35s ease;
+}
+[data-sek-content-type="preset_section"]:hover .sek-overlay {
+    opacity: 0.15;
+}
+/* don't elevate inactive modules ( introduced but not yet implemented ) */
+[data-sek-content-type][draggable="true"]:hover {
+  -webkit-box-shadow: 0 12px 20px rgba(0,0,0,.2);
+  box-shadow: 0 12px 20px rgba(0,0,0,.2);
+}
+[data-sek-content-type][draggable="false"] {
+  background: #eee;
+  opacity: 0.8;
+}
+
+/* JUNE 2020 style for user sections */
 /* USER SECTIONS */
 .sek-user-section-wrapper {
   margin-bottom: 15px;
   float: left;
-}
-.sek-user-section-wrapper {
   width: 100%
 }
+.sek-user-section-wrapper [data-sek-content-type="preset_section"] .sek-overlay {
+  opacity: 0.40;
+}
+.sek-user-section-wrapper [data-sek-content-type="preset_section"]:hover .sek-overlay {
+    opacity: 0.50;
+}
 .sek-user-section-wrapper [data-sek-is-user-section="true"] {
-  height: auto;
-  padding: 2%;
-  width: 89%;
-}
-.sek-saved-section-date {
-  font-size: 11px;
-  text-align: left;
-}
-.sek-saved-section-description {
-  font-size: 13px;
-  font-style: italic;
-  text-align: left;
+  height: 165px;
+  margin: 0;
+  width: 97%;
 }
 
+.sek-user-section-wrapper .sek-sec-thumb {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+}
+.sek-user-section-wrapper .sek-sec-info {
+  position: relative;
+  color: #ffffff;
+  padding: 2%;
+  overflow: hidden;
+  height: 100%;
+  max-height: 138px;
+  padding: 10px;
+}
+
+.sek-sec-info .sec-title {
+  color: #ffffff;
+  margin: 0;
+  line-height: 20px;
+  max-height: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.sek-sec-info .sec-date, .sek-sec-info .sec-desc {
+  margin:0;
+  margin-top: 5px;
+  font-size: 12px;
+}
+.sek-sec-info .sec-date {
+  font-size: italic;
+}
+
+.sek-sec-info > .remove-user-sec {
+  cursor: pointer;
+  font-size: 16px;
+  width: 30px;
+  height: 30px;
+  color: #535353;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 30px;
+  opacity: 0;
+  -webkit-box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  -webkit-transition: all .20s ease;
+  -o-transition: all .20s ease;
+  transition: all .20s ease;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 0px;
+  right: 5px;
+}
+.sek-sec-info:hover > .remove-user-sec {
+    opacity: 0.7;
+}
+.sek-sec-info > .remove-user-sec:hover {
+    opacity: 0.95;
+    color: red;
+}
+
+/* DRAGGING STUFFS */
 .sek-dragging [data-sek-content-type] {
   -webkit-box-shadow: 0 2px 5px rgba(0,0,0,.25)!important;
   box-shadow: 0 2px 5px rgba(0,0,0,.25)!important;
@@ -196,67 +326,15 @@ li[id^="accordion-section-__nimble__"] > h3 {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
-/* MODULE AND SECTION PICKER INPUT */
-[data-sek-content-type] {
-    float: left;
-    padding: 0%;
-    margin: 1.8%;
-    text-align: center;
-    cursor: move;
-    /*cursor: -webkit-grab;*/
-    /*background: #eee;*/
-    -webkit-transition: -webkit-box-shadow .2s ease;
-    transition: -webkit-box-shadow .2s ease;
-    -o-transition: box-shadow .2s ease;
-    transition: box-shadow .2s ease;
-    transition: box-shadow .2s ease, -webkit-box-shadow .2s ease;
-    -webkit-box-shadow: 0 2px 5px rgba(0,0,0,.25);
-    box-shadow: 0 2px 5px rgba(0,0,0,.25);
-    border-radius: 4px;
-}
-[data-sek-content-type="module"] {
-  width: 29%;
-  height: 130px;
-}
-/* When sections are displayed in the module picker. Typically the columns sections */
-li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
-  width: 29%;
-  height: 130px;
-}
 
-[data-sek-content-type="preset_section"] {
-  width: 95%;
-  height: 165px;
-  position: relative
-}
-
-[data-sek-content-type="preset_section"] .sek-overlay {
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #000000;
-    opacity: 0;
-    -webkit-transition: opacity .35s ease;
-    transition: opacity .35s ease;
-    -o-transition: opacity .35s ease;
-}
-[data-sek-content-type="preset_section"]:hover .sek-overlay {
-    opacity: 0.15;
-}
-/* don't elevate inactive modules ( introduced but not yet implemented ) */
-[data-sek-content-type][draggable="true"]:hover {
-  -webkit-box-shadow: 0 12px 20px rgba(0,0,0,.2);
-  box-shadow: 0 12px 20px rgba(0,0,0,.2);
-}
-[data-sek-content-type][draggable="false"] {
-  background: #eee;
-  opacity: 0.8;
-}
-
-/* ACCORDION MODULE */
+.sek-new-label {
+    background: #ffff00;
+    border: 1px solid yellow;
+    padding: 3px 4px;
+    line-height: 12px;
+    border-radius: 8px;
+    font-size: 12px;
+}/* ACCORDION MODULE */
 .sek-accord-title {
   color: #4b4a4a;
   overflow: hidden;
@@ -1039,7 +1117,9 @@ credits : Gutenberg team @wordpress */
 /* Button style for the content type switcher and template dialog */
 .sek-content-type-wrapper,
 .sek-save-tmpl-mode-switcher,
-.sek-save-tmpl-action {
+.sek-save-tmpl-action,
+.sek-save-section-mode-switcher,
+.sek-save-section-action {
   margin-bottom: 8px;
   width: 100%;
   float: left;
@@ -1047,12 +1127,16 @@ credits : Gutenberg team @wordpress */
 .sek-content-type-wrapper .sek-ui-button-group,
 .sek-save-tmpl-mode-switcher .sek-ui-button-group,
 .sek-save-tmpl-action .sek-ui-button-group,
+.sek-save-section-mode-switcher .sek-ui-button-group,
+.sek-save-section-action .sek-ui-button-group,
 #nimble-tmpl-gallery .sek-ui-button-group {
   display: block;
 }
 .sek-content-type-wrapper .sek-ui-button,
 .sek-save-tmpl-mode-switcher .sek-ui-button,
 .sek-save-tmpl-action .sek-ui-button,
+.sek-save-section-mode-switcher .sek-ui-button,
+.sek-save-section-action .sek-ui-button,
 #nimble-tmpl-gallery .sek-ui-button {
     text-align: center;
     display: inline-block;
@@ -1061,7 +1145,10 @@ credits : Gutenberg team @wordpress */
     text-transform: uppercase;
 }
 .sek-content-type-wrapper .sek-ui-button { width: 49%; }
-.sek-save-tmpl-mode-switcher .sek-ui-button { width: 32%; }
+.sek-save-tmpl-mode-switcher .sek-ui-button,
+.sek-save-section-mode-switcher .sek-ui-button {
+  width: 32%;
+}
 
 /* APRIL 2020 added for https://github.com/presscustomizr/nimble-builder/issues/651 */
 .sek-content-type-wrapper [data-sek-content-type="template"] {
@@ -1480,8 +1567,11 @@ transition: background 200ms linear, color 200ms linear;
 .sek-feedback-step-two-enjoying, .sek-feedback-step-two-not-enjoying, .sek-feedback-step-three-thanks { display: none;}
 /* TOP SAVE TMPL UI
 * introduced april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
+* and TOP SAVE SECTION UI
+* introduced June 2020 for for https://github.com/presscustomizr/nimble-builder/issues/520
 */
-#nimble-top-tmpl-save-ui {
+#nimble-top-tmpl-save-ui,
+#nimble-top-section-save-ui {
   height: auto;
   min-height: 300px;
   padding: 20px;
@@ -1514,7 +1604,8 @@ transition: background 200ms linear, color 200ms linear;
     line-height: 1.5em;
 }
 
-#nimble-top-tmpl-save-ui .nb-tmpl-save-inner {
+#nimble-top-tmpl-save-ui .nb-tmpl-save-inner,
+#nimble-top-section-save-ui .nb-section-save-inner {
   max-width: 800px;
   margin: auto;
 }
@@ -1523,37 +1614,52 @@ transition: background 200ms linear, color 200ms linear;
   width: 100%;
 }*/
 
-body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
+body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui,
+body.sek-save-section-ui-visible #nimble-top-section-save-ui {
   /*visibility: inherit;*/
   opacity: 1;
   top:36px;
 }
 
-#nimble-top-tmpl-save-ui .sek-close-dialog {
+#nimble-top-tmpl-save-ui .sek-close-dialog,
+#nimble-top-section-save-ui .sek-close-dialog {
   position: absolute;
   bottom: 10px;
   right: 10px;
+  border-radius: 3px!important;
 }
 
-#nimble-top-tmpl-save-ui #sek-saved-tmpl-title.error {
+#nimble-top-tmpl-save-ui #sek-saved-tmpl-title.error,
+#nimble-top-section-save-ui #sek-saved-section-title.error {
   border: 1px solid #ff0000;
 }
 
 
 /* INPUT STYLE */
-.sek-tmpl-title, .sek-tmpl-description, select.sek-saved-tmpl-picker {
+.sek-tmpl-title,
+.sek-tmpl-description,
+select.sek-saved-tmpl-picker,
+.sek-section-title,
+.sek-section-description,
+select.sek-saved-section-picker {
   margin-top: 10px;
   float: left;
   clear: both;
   width: 100%;
 }
 
-.sek-tmpl-description textarea, input#sek-saved-tmpl-title, select.sek-saved-tmpl-picker {
+.sek-tmpl-description textarea,
+input#sek-saved-tmpl-title,
+select.sek-saved-tmpl-picker,
+.sek-section-description textarea,
+input#sek-saved-section-title,
+select.sek-saved-section-picker {
   width: 97%;
   max-width: none;
   margin-bottom: 10px;
 }
-.sek-tmpl-description textarea {
+.sek-tmpl-description textarea,
+.sek-section-description textarea {
   min-height: 100px;
 }
 .sek-saved-tmpl-picker,
@@ -1561,12 +1667,24 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
 .sek-tmpl-description,
 .sek-save-tmpl-action .sek-do-save-tmpl,
 .sek-save-tmpl-action .sek-do-update-tmpl,
-.sek-save-tmpl-action .sek-open-remove-confirmation { display: none;}
+.sek-save-tmpl-action .sek-open-remove-confirmation,
+.sek-saved-section-picker,
+.sek-section-title,
+.sek-section-description,
+.sek-save-section-action .sek-do-save-section,
+.sek-save-section-action .sek-do-update-section,
+.sek-save-section-action .sek-open-remove-confirmation {
+  display: none;
+}
 
 /* the template picker is visible when template collection has been ajaxily fetched */
-.tmpl-collection-populated .sek-saved-tmpl-picker{display:block}
+.tmpl-collection-populated .sek-saved-tmpl-picker,
+.section-collection-populated .sek-saved-section-picker {
+  display:block
+}
 
-.sek-tmpl-remove-dialog {
+.sek-tmpl-remove-dialog,
+.sek-section-remove-dialog {
   display: none;
   color: red;
   background: #ffffff;
@@ -1575,15 +1693,16 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
   float: left;
   width: 96%;
 }
-.sek-tmpl-remove-dialog .sek-do-remove-tmpl {
+.sek-tmpl-remove-dialog .sek-do-remove-tmpl,
+.sek-section-remove-dialog .sek-do-remove-section {
   color: red;
 }
 
-/* VISIBILITY = f(mode) */
+/* TMPL UI VISIBILITY = f(mode) */
 [data-sek-tmpl-dialog-mode="save"] .sek-saved-tmpl-picker {display: none;}
 [data-sek-tmpl-dialog-mode="save"] .sek-tmpl-title {display: block;}
 [data-sek-tmpl-dialog-mode="save"] .sek-tmpl-description {display: block;}
-[data-sek-tmpl-dialog-mode="save"] .sek-do-save-tmpl {display: block;}
+[data-sek-tmpl-dialog-mode="save"] .sek-do-save-tmpl {display: block;border-color: #ffff00;background: #f9f9b6f7;border-radius: 3px!important;}
 
 [data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-tmpl-title {display: block;}
 [data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-tmpl-description {display: block;}
@@ -1593,11 +1712,29 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
 [data-sek-tmpl-dialog-mode="remove"].sek-removal-confirmation-opened .sek-open-remove-confirmation {display: none!important;}
 [data-sek-tmpl-dialog-mode="remove"].sek-removal-confirmation-opened .sek-tmpl-remove-dialog { display: block;}
 
-#nimble-top-tmpl-save-ui .spinner {
+/* SECTION UI VISIBILITY = f(mode) */
+[data-sek-section-dialog-mode="save"] .sek-saved-section-picker {display: none;}
+[data-sek-section-dialog-mode="save"] .sek-section-title {display: block;}
+[data-sek-section-dialog-mode="save"] .sek-section-description {display: block;}
+[data-sek-section-dialog-mode="save"] .sek-do-save-section {display: block;border-color: #ffff00;background: #f9f9b6f7;border-radius: 3px!important;}
+
+[data-sek-section-dialog-mode="update"].sek-section-update-selected .sek-section-title {display: block;}
+[data-sek-section-dialog-mode="update"].sek-section-update-selected .sek-section-description {display: block;}
+[data-sek-section-dialog-mode="update"].sek-section-update-selected .sek-do-update-section {display: block;}
+
+[data-sek-section-dialog-mode="remove"].sek-section-remove-selected .sek-open-remove-confirmation {display: block;}
+[data-sek-section-dialog-mode="remove"].sek-removal-confirmation-opened .sek-open-remove-confirmation {display: none!important;}
+[data-sek-section-dialog-mode="remove"].sek-removal-confirmation-opened .sek-section-remove-dialog { display: block;}
+[data-sek-section-dialog-mode="remove"].sek-is-removal-only [data-section-mode-switcher="save"], [data-sek-section-dialog-mode="remove"].sek-is-removal-only [data-section-mode-switcher="update"] { display: none;}
+
+
+#nimble-top-tmpl-save-ui .spinner,
+#nimble-top-section-save-ui .spinner {
   display: none;
 }
 
-#nimble-top-tmpl-save-ui.nimble-tmpl-processing-ajax .spinner {
+#nimble-top-tmpl-save-ui.nimble-tmpl-processing-ajax .spinner,
+#nimble-top-section-save-ui.nimble-section-processing-ajax .spinner {
   display: block;
   visibility: visible;
 }
@@ -1607,13 +1744,22 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
 
 
 
-/* TOP SAVE SECTION UI */
-#nimble-top-section-save-ui {
+
+
+
+
+
+
+
+
+
+/* OLD TOP SAVE SECTION UI */
+/* #nimble-top-section-save-ui {
   height: 300px;
   padding: 20px;
   position: absolute;
   top: -300px;
-  /*text-align: center;*/
+
   right: 0;
   left: 0;
   z-index: 20;
@@ -1624,17 +1770,11 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
   -ms-transition: all, 0.3s ease-in-out;
   -o-transition: all, 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
-  /*visibility: hidden;*/
+
   opacity: 0.3;
   background: rgba(0, 0, 0, 0.5);
   z-index: 99999;
-  /*display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-    -ms-flex-align: center;
-        align-items: center;
-  flex: 0 0 100%;*/
+
   max-width: 100%;
 }
 
@@ -1643,7 +1783,7 @@ body.sek-save-tmpl-ui-visible #nimble-top-tmpl-save-ui {
 }
 
 body.sek-save-section-ui-visible #nimble-top-section-save-ui {
-  /*visibility: inherit;*/
+
   opacity: 1;
   top:36px;
 }
@@ -1657,6 +1797,7 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
 #nimble-top-section-save-ui #sek-saved-section-title.error {
   border: 1px solid #ff0000;
 }
+*/
 /* TEMPLATE GALLERY */
 #nimble-tmpl-gallery {
   -webkit-transition: top 0.3s ease-in-out;

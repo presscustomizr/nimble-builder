@@ -283,10 +283,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // this is used to know what ui elements are currently being displayed
                   self.registered = new api.Value([]);
 
-
-                  api.bind( 'ready', function() {
+                  // June 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/708
+                  if ( wp.customize.apiIsReady ) {
                         self.doSektionThinksOnApiReady();
-                  });//api.bind( 'ready' )
+                  } else {
+                        api.bind( 'ready', function() {
+                              self.doSektionThinksOnApiReady();
+                        });
+                  }
+
 
                   // Add the skope id on save
                   // Uses a WP core hook to filter the query on a customize_save action
@@ -518,9 +523,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.setupTopBar();//@see specific dev file
 
                   // SAVE SECTION UI
-                  if ( sektionsLocalizedData.isSavedSectionEnabled ) {
-                        self.setupSaveSectionUI();
-                  }
+                  // June 2020 : for https://github.com/presscustomizr/nimble-builder/issues/520 and https://github.com/presscustomizr/nimble-builder/issues/713
+                  self.setupSaveSectionUI();
 
                   // SAVE TEMPLATE UI
                   // April 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/655
@@ -1304,9 +1308,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.levelTreeExpanded.bind( function(expanded) {
                         self.cachedElements.$body.toggleClass( 'sek-level-tree-expanded', expanded );
                         if ( expanded ) {
-                              // Close template gallery, template saver
+                              // Close template gallery, template saver, section saver
                               self.templateGalleryExpanded(false);
                               self.tmplDialogVisible(false);
+                              if ( self.saveSectionDialogVisible ) {
+                                    self.saveSectionDialogVisible(false);
+                              }
 
                               // Set the level tree now
                               self.setLevelTreeValue();
@@ -1660,6 +1667,606 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       });//$.extend()
 })( wp.customize, jQuery );
 //global sektionsLocalizedData
+//
+//Note : idOfSectionToSave is set when user clicks on the save icon, and is reset when saving/updating closing save dialog
+var CZRSeksPrototype = CZRSeksPrototype || {};
+(function ( api, $ ) {
+      $.extend( CZRSeksPrototype, {
+            // SAVE SECTION DIALOG BLOCK
+            // fired in ::initialize()
+            setupSaveSectionUI : function() {
+                  var self = this;
+
+                  // Declare api values and schedule reactions
+                  self.saveSectionDialogVisible = new api.Value( false );// Hidden by default
+
+                  // The observer for visibility
+                  // connected to other observers
+                  self.saveSectionDialogVisible.bind( function( visible ){
+                        if ( visible ) {
+                              // close template gallery
+                              // close level tree
+                              self.templateGalleryExpanded(false);
+                              self.levelTreeExpanded(false);
+                              if ( self.tmplDialogVisible ) {
+                                    self.tmplDialogVisible(false);
+                              }
+                        }
+                        self.toggleSaveSectionUI(visible);
+                  });
+
+                  // Will store the collection of saved sections
+                  self.allSavedSections = new api.Value('_not_populated_');
+                  // When the collection is refreshed
+                  // - populate select options
+                  // - set the select value to default 'none'
+                  self.allSavedSections.bind( function( sec_collection ) {
+                        if ( !_.isObject(sec_collection) ) {
+                              api.errare('error setupSaveSectionUI => section collection should be an object');
+                              return;
+                        }
+                        sec_collection = _.isEmpty(sec_collection) ? {} : sec_collection;
+                        self.refreshSectionPickerHtml( sec_collection );
+                  });
+
+                  self.saveSectionDialogMode = new api.Value('hidden');// 'save' default mode is set when dialog html is rendered
+                  self.saveSectionDialogMode.bind( function(mode){
+                        if ( !_.contains(['hidden', 'save', 'update', 'remove' ], mode ) ) {
+                              api.errare('error setupSaveSectionUI => unknown section dialog mode', mode );
+                              mode = 'save';
+                        }
+
+                        // Set the button pressed state
+                        var $secSaveDialogWrap = $('#nimble-top-section-save-ui'),
+                            $titleInput = $secSaveDialogWrap.find('#sek-saved-section-title'),
+                            $descInput = $secSaveDialogWrap.find('#sek-saved-section-description');
+
+                        $secSaveDialogWrap.find('[data-section-mode-switcher]').attr('aria-pressed', false );
+                        $secSaveDialogWrap.find('[data-section-mode-switcher="' + mode +'"]').attr('aria-pressed', true );
+
+                        // update the current mode
+                        $('#nimble-top-section-save-ui').attr('data-sek-section-dialog-mode', mode );
+
+                        // make sure the remove dialog is hidden
+                        $secSaveDialogWrap.removeClass('sek-removal-confirmation-opened');
+
+                        // execute actions depending on the selected mode
+                        switch( mode ) {
+                              case 'save' :
+                                    // When selecting 'save', make sure the title and description input are cleaned
+                                    $titleInput.val('');
+                                    $descInput.val('');
+                              break;
+                              case 'update' :
+                              case 'remove' :
+                                    var $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker');
+                                        // Make sure the select value is always reset when switching mode
+                                        $selectEl.val('none').trigger('change');
+
+                                    self.setSavedSectionCollection().done( function( sec_collection ) {
+                                          // refresh section picker in case the user updated without changing anything
+                                          self.refreshSectionPickerHtml();
+                                    });
+                              break;
+                        }//switch
+
+                        // when user clicks on the remove icon of a section in the collection
+                        // => hide save and update buttons
+                        if ( 'remove' === mode && _.isEmpty( self.idOfSectionToSave ) ) {
+                            $secSaveDialogWrap.addClass('sek-is-removal-only');
+                        } else {
+                            $secSaveDialogWrap.removeClass('sek-is-removal-only');
+                        }
+                  });//self.saveSectionDialogMode.bind()
+
+            },
+
+
+
+
+
+
+
+
+            ///////////////////////////////////////////////
+            ///// RENDER DIALOG BOX AND SCHEDULE CLICK ACTIONS
+            refreshSectionPickerHtml : function( sec_collection ) {
+                  sec_collection = sec_collection || this.allSavedSections();
+
+                  var $secSaveDialogWrap = $('#nimble-top-section-save-ui'),
+                      $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker');
+                  // Make sure the select value is always reset when switching mode
+                  $selectEl.val('none').trigger('change');
+
+                  // empty all options but the default 'none' one
+                  $selectEl.find('option').each( function() {
+                        if ( 'none' !== $(this).attr('value') ) {
+                              $(this).remove();
+                        }
+                  });
+
+                  // Make sure we don't populate the collection twice ( if user clicks two times fast )
+                  // if ( $secSaveDialogWrap.hasClass('sec-collection-populated') )
+                  //   return;
+
+                  var _default_title = 'section title not set',
+                      _title,
+                      _last_modified_date,
+                      _html = '';
+                  _.each( sec_collection, function( _sec_data, _sec_post_name ) {
+                        if ( !_.isObject(_sec_data) )
+                          return;
+                        _last_modified_date = _sec_data.last_modified_date ? _sec_data.last_modified_date : '';
+                        _title = _sec_data.title ? _sec_data.title : _default_title;
+                        _html +='<option value="' + _sec_post_name + '">' + [ _title, sektionsLocalizedData.i18n['Last modified'] + ' : ' + _last_modified_date ].join(' | ') + '</option>';
+                  });
+
+                  $selectEl.append(_html);
+
+                  // flag so we know it's done
+                  // => controls the CSS visibility of the select element
+                  $secSaveDialogWrap.addClass('section-collection-populated');
+            },
+
+
+            //@param = { }
+            renderSectionSaveUI : function( params ) {
+                  if ( $('#nimble-top-section-save-ui').length > 0 )
+                    return $('#nimble-top-section-save-ui');
+
+                  var self = this;
+
+                  try {
+                        _tmpl =  wp.template( 'nimble-top-section-save-ui' )( {} );
+                  } catch( er ) {
+                        api.errare( 'Error when parsing nimble-top-section-save-ui template', er );
+                        return false;
+                  }
+                  $('#customize-preview').after( $( _tmpl ) );
+                  return $('#nimble-top-section-save-ui');
+            },
+
+
+
+            ///////////////////////////////////////////////
+            ///// DOM EVENTS
+            // Fired once, on first rendering
+            maybeScheduleSectionSaveDOMEvents : function() {
+                  var self = this, $secSaveDialogWrap = $('#nimble-top-section-save-ui');
+                  if ( $secSaveDialogWrap.data('nimble-sec-save-dom-events-scheduled') )
+                    return;
+
+                  // ATTACH DOM EVENTS
+                  // Dialog Mode Switcher
+                  $secSaveDialogWrap.on( 'click', '[data-section-mode-switcher]', function(evt) {
+                        evt.preventDefault();
+                        self.saveSectionDialogMode($(this).data('section-mode-switcher'));
+                  });
+
+                  // React to section select
+                  // update title and description fields on section selection
+                  $secSaveDialogWrap.on( 'change', '.sek-saved-section-picker', function(evt){ self.reactOnSectionSelection(evt, $(this) ); });
+
+                  // SAVE
+                  $secSaveDialogWrap.on( 'click', '.sek-do-save-section', function(evt){
+                        $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
+                        self.saveOrUpdateSavedSection(evt).done( function( response ) {
+                              $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
+                              if ( response.success ) {
+                                    self.saveSectionDialogVisible( false );
+                                    self.setSavedSectionCollection( { refresh : true } );// <= true for refresh
+                              }
+                        });
+                  });
+
+                  // UPDATE
+                  $secSaveDialogWrap.on( 'click', '.sek-do-update-section', function(evt){
+                        var $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker'),
+                            sectionPostNameCandidateForUpdate = $selectEl.val();
+                        // make sure we don't try to remove the default option
+                        if ( 'none' === sectionPostNameCandidateForUpdate || _.isEmpty(sectionPostNameCandidateForUpdate) )
+                          return;
+
+                        $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
+                        self.saveOrUpdateSavedSection(evt, sectionPostNameCandidateForUpdate).done( function(response) {
+                              $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
+                              if ( response.success ) {
+                                    self.saveSectionDialogVisible( false );
+                                    self.setSavedSectionCollection( { refresh : true } )// <= true for refresh
+                                          .done( function( sec_collection ) {
+                                                // refresh section picker in case the user updated without changing anything
+                                                self.refreshSectionPickerHtml();
+                                          });
+                              }
+                        });
+                  });
+
+                  // REMOVE
+                  // Reveal remove dialog
+                  $secSaveDialogWrap.on( 'click', '.sek-open-remove-confirmation', function(evt){
+                        $secSaveDialogWrap.addClass('sek-removal-confirmation-opened');
+                  });
+
+                  // Do Remove
+                  $secSaveDialogWrap.on( 'click', '.sek-do-remove-section', function(evt){
+                        var $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker'),
+                            sectionPostNameCandidateForRemoval = $selectEl.val();
+                        // make sure we don't try to remove the default option
+                        if ( 'none' === sectionPostNameCandidateForRemoval || _.isEmpty(sectionPostNameCandidateForRemoval) )
+                          return;
+
+                        $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
+                        self.removeSavedSection(evt, sectionPostNameCandidateForRemoval).done( function(response) {
+                              $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
+                              $secSaveDialogWrap.removeClass('sek-removal-confirmation-opened');
+                              if ( response.success ) {
+                                    self.setSavedSectionCollection( { refresh : true } );// <= true for refresh
+                              }
+                        });
+                  });
+
+                  // Cancel Remove
+                  $secSaveDialogWrap.on( 'click', '.sek-cancel-remove-section', function(evt){
+                        $secSaveDialogWrap.removeClass('sek-removal-confirmation-opened');
+                  });
+
+
+                  // Switch to update mode
+                  //$secSaveDialogWrap.on( 'click', '[data-section-mode-switcher="update"]', function(evt){  });
+
+                  $('.sek-close-dialog', $secSaveDialogWrap ).on( 'click', function(evt) {
+                        evt.preventDefault();
+                        self.saveSectionDialogVisible(false);
+                  });
+
+                  // Say we're done with DOM event scheduling
+                  $secSaveDialogWrap.data('nimble-sec-save-dom-events-scheduled', true );
+            },
+
+
+
+            // Is used in update and remove modes
+            reactOnSectionSelection : function(evt, $selectEl ){
+                  var self = this,
+                      $secSaveDialogWrap = $('#nimble-top-section-save-ui'),
+                      _sectionPostName = $selectEl.val(),
+                      $titleInput = $secSaveDialogWrap.find('#sek-saved-section-title'),
+                      $descInput = $secSaveDialogWrap.find('#sek-saved-section-description'),
+                      // The informative class control the visibility of the title and the description in CSS
+                      _informativeClass = 'update' === self.saveSectionDialogMode() ? 'sek-section-update-selected' : 'sek-section-remove-selected';
+
+                  if ( 'none' === _sectionPostName ) {
+                        $titleInput.val('');
+                        $descInput.val('');
+                        $secSaveDialogWrap.removeClass(_informativeClass);
+                  } else {
+                        var _allSavedSections = self.allSavedSections();
+                        var _selectedSection = _sectionPostName;
+
+                        // normalize
+                        _allSavedSections = ( _.isObject(_allSavedSections) && !_.isArray(_allSavedSections) ) ? _allSavedSections : {};
+                        _allSavedSections[_sectionPostName] = $.extend( {
+                            title : '',
+                            description : '',
+                            last_modified_date : ''
+                        }, _allSavedSections[_sectionPostName] || {} );
+
+                        $titleInput.val( _allSavedSections[_sectionPostName].title );
+                        $descInput.val( _allSavedSections[_sectionPostName].description );
+                        $secSaveDialogWrap.addClass(_informativeClass);
+                  }
+            },
+
+
+
+
+            ///////////////////////////////////////////////
+            ///// AJAX ACTIONS
+            // Fired on 'click' on .sek-do-save-section btn
+            // @param sectionPostNameCandidateForUpdate is only provided when saving
+            saveOrUpdateSavedSection : function(evt, sectionPostNameCandidateForUpdate ) {
+                  var self = this, _dfd_ = $.Deferred();
+                  // idOfSectionToSave is set when reacting to click action
+                  // @see react to preview 'sek-toggle-save-section-ui'
+                  if ( !self.idOfSectionToSave || _.isEmpty( self.idOfSectionToSave ) ) {
+                        api.errare('saveOrUpdateSavedSection => error => missing section id');
+                        return _dfd_.resolve( {success:false});
+                  }
+                  evt.preventDefault();
+                  var $_title = $('#sek-saved-section-title'),
+                      section_title = $_title.val(),
+                      section_description = $('#sek-saved-section-description').val(),
+                      sectionModel = $.extend( true, {}, self.getLevelModel( self.idOfSectionToSave ) );
+
+                  if ( 'no_match' == sectionModel ) {
+                        api.errare('saveOrUpdateSavedSection => error => no section model with id ' + self.idOfSectionToSave );
+                        return _dfd_.resolve( {success:false});
+                  }
+
+                  if ( _.isEmpty( section_title ) ) {
+                        $_title.addClass('error');
+                        api.previewer.trigger('sek-notify', {
+                              type : 'error',
+                              duration : 10000,
+                              message : [
+                                    '<span style="font-size:0.95em">',
+                                      '<strong>' + sektionsLocalizedData.i18n['A title is required'] + '</strong>',
+                                    '</span>'
+                              ].join('')
+
+                        });
+                        return _dfd_.resolve( {success:false});
+                  }
+
+                  $('#sek-saved-section-title').removeClass('error');
+
+                  // Do some pre-processing before ajaxing
+                  // Note : ids will be replaced server side
+                  sectionModel = self.preProcessSection( sectionModel );
+                  if ( !_.isObject( sectionModel ) ) {
+                        api.errare('::saveOrUpdateSavedSection => error => invalid sectionModel');
+                        _dfd_.resolve( {success:false});
+                  }
+
+                  wp.ajax.post( 'sek_save_user_section', {
+                        nonce: api.settings.nonce.save,
+                        section_data: JSON.stringify( sectionModel ),
+                        // the following will be saved in 'metas'
+                        section_title: section_title,
+                        section_description: section_description,
+                        section_post_name: sectionPostNameCandidateForUpdate || '',// <= provided when updating a section
+                        skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                        //active_locations : api.czr_sektions.activeLocations()
+                  })
+                  .done( function( response ) {
+                        //console.log('SAVED POST ID', response );
+                        _dfd_.resolve( {success:true});
+
+                        // response is {section_post_id: 436}
+                        api.previewer.trigger('sek-notify', {
+                            type : 'success',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>' + sektionsLocalizedData.i18n['Template saved'] + '</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                  })
+                  .fail( function( er ) {
+                        _dfd_.resolve( {success:false});
+                        api.errorLog( 'ajax sek_save_section => error', er );
+                        api.previewer.trigger('sek-notify', {
+                            type : 'error',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>' + sektionsLocalizedData.i18n['Error when processing template'] + '</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                  })
+                  .always( function() {
+                        // reset the id of section to save
+                        // => because we need to know when we are in 'remove' mode when user clicked on remove icon in the section collection, => which hides save and update buttons
+                        self.idOfSectionToSave = null;
+                  });
+                  return _dfd_;
+            },//saveOrUpdateSavedSection
+
+
+
+            // Fired on 'click on .sek-do-remove-section btn
+            removeSavedSection : function(evt, sectionPostNameCandidateForRemoval ) {
+                  var self = this, _dfd_ = $.Deferred();
+                  evt.preventDefault();
+                  wp.ajax.post( 'sek_remove_user_section', {
+                        nonce: api.settings.nonce.save,
+                        section_post_name: sectionPostNameCandidateForRemoval
+                        //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                  })
+                  .done( function( response ) {
+                        _dfd_.resolve( {success:true});
+                        // response is {section_post_id: 436}
+                        api.previewer.trigger('sek-notify', {
+                            type : 'success',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>' + sektionsLocalizedData.i18n['Template removed'] + '</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                  })
+                  .fail( function( er ) {
+                        _dfd_.resolve( {success:false});
+                        api.errorLog( 'ajax sek_remove_section => error', er );
+                        api.previewer.trigger('sek-notify', {
+                            type : 'error',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>' + sektionsLocalizedData.i18n['Error when processing templates'] + '</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                  })
+                  .always( function() {
+                        // reset the id of section to save
+                        // => because we need to know when we are in 'remove' mode when user clicked on remove icon in the section collection, => which hides save and update buttons
+                        self.idOfSectionToSave = null;
+                  });
+
+                  return _dfd_;
+            },
+
+
+
+            ///////////////////////////////////////////////
+            ///// REVEAL / HIDE DIALOG BOX
+            /// react on self.saveSectionDialogVisible.bind(...)
+            // @return void()
+            // self.saveSectionDialogVisible.bind( function( visible ){
+            //       self.toggleSaveSectionUI( visible );
+            // });
+            toggleSaveSectionUI : function( visible ) {
+                  visible = _.isUndefined( visible ) ? true : visible;
+                  var self = this,
+                      _renderAndSetup = function() {
+                            $.when( self.renderSectionSaveUI({}) ).done( function( $_el ) {
+                                  self.maybeScheduleSectionSaveDOMEvents();//<= schedule on the first display only
+                                  self.saveUIContainer = $_el;
+                                  //display
+                                  _.delay( function() {
+                                        // set dialog mode now so we display the relevant fields on init
+                                        self.saveSectionDialogMode('save');// Default mode is save
+                                        self.cachedElements.$body.addClass('sek-save-section-ui-visible');
+                                  }, 200 );
+                                  // set section id input value
+                                  //$('#sek-saved-section-id').val( sectionId );
+                            });
+                      },
+                      _hide = function() {
+                            var dfd = $.Deferred();
+                            self.cachedElements.$body.removeClass('sek-save-section-ui-visible');
+                            if ( $( '#nimble-top-section-save-ui' ).length > 0 ) {
+                                  //remove Dom element after slide up
+                                  _.delay( function() {
+                                        // set dialog mode back to 'hidden' mode
+                                        self.saveSectionDialogMode = self.saveSectionDialogMode ? self.saveSectionDialogMode : new api.Value();
+                                        self.saveSectionDialogMode('hidden');
+                                        self.saveUIContainer.remove();
+                                        // reset the id of section to save
+                                        // => because we need to know when we are in 'remove' mode when user clicked on remove icon in the section collection, => which hides save and update buttons
+                                        self.idOfSectionToSave = null;
+                                        dfd.resolve();
+                                  }, 250 );
+                            } else {
+                                dfd.resolve();
+                            }
+                            return dfd.promise();
+                      };
+
+                  if ( visible ) {
+                        _renderAndSetup();
+                  } else {
+                        _hide().done( function() {
+                              self.saveSectionDialogVisible( false );//should be already false
+                        });
+                  }
+            },
+
+
+            ///////////////////////////////////////////////
+            ///// TMPL COLLECTION
+            // @return $.promise
+            // @param params = {refresh : false};
+            setSavedSectionCollection : function( params ) {
+                  var self = this, _dfd_ = $.Deferred();
+
+                  // refresh is true on save, update, remove success
+                  params = params || {refresh : false};
+
+                  // If the collection is already set, return it.
+                  // unless this is a "refresh" case
+                  if ( !params.refresh && '_not_populated_' !== self.allSavedSections() ) {
+                        return _dfd_.resolve( self.allSavedSections() );
+                  }
+
+                  var _promise;
+                  // Prevent a double request while ajax request is being processed
+                  if ( self.sectionCollectionPromise && 'pending' === self.sectionCollectionPromise.state() ) {
+                        _promise = self.sectionCollectionPromise;
+                  } else {
+                        _promise = self.getSavedSectionCollection( params );
+                  }
+                  _promise.done( function( sec_collection ) {
+                        self.allSavedSections( sec_collection );
+                        _dfd_.resolve( sec_collection );
+                  });
+                  return _dfd_.promise();
+            },
+
+            // @return a promise
+            // @param params = {refresh : false};
+            // also used from the input Constructor of sek_my_sections_sec_picker_module
+            // @param params = {refresh : false};
+            getSavedSectionCollection : function( params ) {
+                  var self = this;
+                  // refresh is true on save, update, remove success
+                  params = params || {refresh : false};
+
+                  self.sectionCollectionPromise = $.Deferred();
+                  if ( !params.refresh && '_not_populated_' !== self.allSavedSections() ) {
+                        self.sectionCollectionPromise.resolve( self.allSavedSections() );
+                        return self.sectionCollectionPromise;
+                  }
+                  wp.ajax.post( 'sek_get_all_saved_sections', {
+                        nonce: api.settings.nonce.save
+                        //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                  })
+                  .done( function( sec_collection ) {
+                        if ( _.isObject(sec_collection) && !_.isArray( sec_collection ) ) {
+                              self.sectionCollectionPromise.resolve( sec_collection );
+                        } else {
+                              self.sectionCollectionPromise.resolve( {} );
+                              api.errorLog('control::getSavedSectionCollection => collection is empty or invalid');
+                        }
+
+                        // response is {section_post_id: 436}
+                        //self.saveSectionDialogVisible( false );
+                        // api.previewer.trigger('sek-notify', {
+                        //     type : 'success',
+                        //     duration : 10000,
+                        //     message : [
+                        //           '<span style="font-size:0.95em">',
+                        //             '<strong>@missi18n Your section has been saved.</strong>',
+                        //           '</span>'
+                        //     ].join('')
+                        // });
+                  })
+                  .fail( function( er ) {
+                        api.errorLog( 'ajax sek_get_all_saved_section => error', er );
+                        api.previewer.trigger('sek-notify', {
+                            type : 'error',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>' + sektionsLocalizedData.i18n['Error when processing templates'] + '</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                        self.sectionCollectionPromise.resolve({});
+                  });
+
+                  return self.sectionCollectionPromise;
+            },
+
+            // @return a section model
+            // Note : ids are reset server side
+            // Example of section model before preprocessing
+            // {
+            //    collection: [{…}]
+            //    id: "" //<= reset server side
+            //    level: "section"
+            //    is_nested : false
+            //    options: {bg: {…}}
+            //    ver_ini: "1.1.8"
+            // }
+            preProcessSection : function( sectionModel ) {
+                  if ( !_.isObject( sectionModel ) ) {
+                        return null;
+                  }
+                  var preprocessedModel = $.extend( {}, true, sectionModel );
+                  // Make sure a nested section is saved as normal
+                  if ( _.has( preprocessedModel, 'is_nested') ) {
+                        preprocessedModel = _.omit( preprocessedModel, 'is_nested' );
+                  }
+                  return preprocessedModel;
+            }
+      });//$.extend()
+})( wp.customize, jQuery );
+//global sektionsLocalizedData
 // introduced in april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
@@ -1669,11 +2276,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             setupSaveTmplUI : function() {
                   var self = this;
 
-
-
-
                   // Declare api values and schedule reactions
-
                   self.tmplDialogVisible = new api.Value( false );// Hidden by default
 
                   if ( !sektionsLocalizedData.isTemplateSaveEnabled ) {
@@ -1685,6 +2288,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // close level tree
                               self.templateGalleryExpanded(false);
                               self.levelTreeExpanded(false);
+                              if ( self.saveSectionDialogVisible ) {
+                                    self.saveSectionDialogVisible(false);
+                              }
                         }
                         self.toggleSaveTmplUI(visible);
                   });
@@ -1696,7 +2302,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // - set the select value to default 'none'
                   self.allSavedTemplates.bind( function( tmpl_collection ) {
                         if ( !_.isObject(tmpl_collection) ) {
-                              api.errare('error => tmpl collection should be an object');
+                              api.errare('error setupSaveTmplUI => tmpl collection should be an object');
                               return;
                         }
                         tmpl_collection = _.isEmpty(tmpl_collection) ? {} : tmpl_collection;
@@ -1812,7 +2418,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             ///////////////////////////////////////////////
             ///// DOM EVENTS
             // Fired once, on first rendering
-            scheduleDOMEvents : function() {
+            scheduleTmplSaveDOMEvents : function() {
                   var self = this, $tmplDialogWrapper = $('#nimble-top-tmpl-save-ui');
                   if ( $tmplDialogWrapper.data('nimble-tmpl-dom-events-scheduled') )
                     return;
@@ -2066,7 +2672,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this,
                       _renderAndSetup = function() {
                             $.when( self.renderTmplUI({}) ).done( function( $_el ) {
-                                  self.scheduleDOMEvents();
+                                  self.scheduleTmplSaveDOMEvents();
                                   self.saveUIContainer = $_el;
                                   //display
                                   _.delay( function() {
@@ -3501,9 +4107,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   });
                             },
 
+                            // Updated June 2020 for https://github.com/presscustomizr/nimble-builder/issues/520
                             'sek-toggle-save-section-ui' : function( params ) {
                                   sendToPreview = false;
-                                  self.saveSectionUIVisible( true, params );
+                                  self.idOfSectionToSave = params.id;
+                                  self.saveSectionDialogVisible( true );
                                   return $.Deferred(function(_dfd_) {
                                         apiParams = {
                                               // action : 'sek-refresh-level',
@@ -3804,7 +4412,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // 1) mono-items and multi-items module => input change
             // 2) crud multi item => item added or removed => in this case some args are not passed, like params.settingParams.args.inputRegistrationParams
             updateAPISettingAndExecutePreviewActions : function( params ) {
-                  if ( _.isEmpty( params.settingParams ) || ! _.has( params.settingParams, 'to' ) ) {
+                  if ( _.isEmpty( params.settingParams ) || !_.has( params.settingParams, 'to' ) ) {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing params.settingParams.to. The api main setting can not be updated', params );
                         return;
                   }
@@ -3818,7 +4426,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       parentModuleType = null,
                       isMultiItemModule = false;
 
-                  if ( _.isEmpty( params.settingParams.args ) || ! _.has( params.settingParams.args, 'moduleRegistrationParams' ) ) {
+                  if ( _.isEmpty( params.settingParams.args ) || !_.has( params.settingParams.args, 'moduleRegistrationParams' ) ) {
                         api.errare( 'updateAPISettingAndExecutePreviewActions => missing params.settingParams.args.moduleRegistrationParams The api main setting can not be updated', params );
                         return;
                   }
@@ -3827,7 +4435,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       _module_id_ = params.settingParams.args.moduleRegistrationParams.id,
                       parentModuleInstance = _ctrl_.czr_Module( _module_id_ );
 
-                  if ( ! _.isEmpty( parentModuleInstance ) ) {
+                  if ( !_.isEmpty( parentModuleInstance ) ) {
                         parentModuleType = parentModuleInstance.module_type;
                         isMultiItemModule = parentModuleInstance.isMultiItem();
                   } else {
@@ -3838,7 +4446,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // The new module value can be a single item object if monoitem module, or an array of item objects if multi-item crud
                   // Let's normalize it
-                  if ( ! isMultiItemModule && _.isObject( rawModuleValue ) ) {
+                  if ( !isMultiItemModule && _.isObject( rawModuleValue ) ) {
                         moduleValueCandidate = self.normalizeAndSanitizeSingleItemInputValues( {
                               item_value : rawModuleValue,
                               parent_module_type : parentModuleType,
@@ -3879,22 +4487,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return inputRegistrationParams && _.isString( inputRegistrationParams.refresh_markup ) && 'true' !== inputRegistrationParams.refresh_markup && 'false' !== inputRegistrationParams.refresh_markup;
                   };
 
-                  if ( ! _.isUndefined( input_id ) ) {
+                  if ( !_.isUndefined( input_id ) ) {
                         inputRegistrationParams = self.getInputRegistrationParams( input_id, parentModuleType );
-                        if ( ! _.isUndefined( inputRegistrationParams.refresh_stylesheet ) ) {
+                        if ( !_.isUndefined( inputRegistrationParams.refresh_stylesheet ) ) {
                               refresh_stylesheet = Boolean( inputRegistrationParams.refresh_stylesheet );
                         }
-                        if ( ! _.isUndefined( inputRegistrationParams.refresh_markup ) ) {
+                        if ( !_.isUndefined( inputRegistrationParams.refresh_markup ) ) {
                               if ( refreshMarkupWhenNeededForInput() ) {
                                     refresh_markup = inputRegistrationParams.refresh_markup;
                               } else {
                                     refresh_markup = Boolean( inputRegistrationParams.refresh_markup );
                               }
                         }
-                        if ( ! _.isUndefined( inputRegistrationParams.refresh_fonts ) ) {
+                        if ( !_.isUndefined( inputRegistrationParams.refresh_fonts ) ) {
                               refresh_fonts = Boolean( inputRegistrationParams.refresh_fonts );
                         }
-                        if ( ! _.isUndefined( inputRegistrationParams.refresh_preview ) ) {
+                        if ( !_.isUndefined( inputRegistrationParams.refresh_preview ) ) {
                               refresh_preview = Boolean( inputRegistrationParams.refresh_preview );
                         }
                   }
@@ -3916,7 +4524,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _.each( moduleValueCandidate || {}, function( _val_, _key_ ) {
                                     // Note : _.isEmpty( 5 ) returns true when checking an integer,
                                     // that's why we need to cast the _val_ to a string when using _.isEmpty()
-                                    if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
+                                    if ( !_.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
                                       return;
                                     _valueCandidate[ _key_ ] = _val_;
                               });
@@ -3935,7 +4543,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // So that the .fonts collection is ready server side
                               if ( true === refresh_fonts ) {
                                     var newFontFamily = params.settingParams.args.input_value;
-                                    if ( ! _.isString( newFontFamily ) ) {
+                                    if ( !_.isString( newFontFamily ) ) {
                                           api.errare( 'updateAPISettingAndExecutePreviewActions => font-family must be a string', newFontFamily );
                                           return;
                                     }
@@ -4013,10 +4621,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     if ( refreshMarkupWhenNeededForInput() ) {
 
                                           var _html_content = params.settingParams.args.input_value;
-                                          if ( ! _.isString( _html_content ) ) {
+                                          if ( !_.isString( _html_content ) ) {
                                                 throw new Error( '::updateAPISettingAndExecutePreviewActions => _doUpdateWithRequestedAction => refreshMarkupWhenNeededForInput => html content is not a string.');
                                           }
-                                          if ( ! self.htmlIncludesShortcodesOrTmplTags( _html_content ) ) {
+
+                                          // Like shortcode tags, template tags, script tags
+                                          if ( !self.htmlIncludesElementsThatNeedAnAjaxRefresh( _html_content ) ) {
                                                 api.previewer.send( 'sek-update-html-in-selector', {
                                                       selector : inputRegistrationParams.refresh_markup,
                                                       changed_item_id : _changed_item_id,
@@ -4054,7 +4664,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // this way we make sure that the customized value used when ajaxing will be taken into account when writing the google font http request link
                   if ( true === refresh_fonts ) {
                         var newFontFamily = params.settingParams.args.input_value;
-                        if ( ! _.isString( newFontFamily ) ) {
+                        if ( !_.isString( newFontFamily ) ) {
                               api.errare( 'updateAPISettingAndExecutePreviewActions => font-family must be a string', newFontFamily );
                               return;
                         }
@@ -4103,8 +4713,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var currentGfonts = self.sniffGlobalGFonts( clonedGlobalOptions );
 
                   // add it only if gfont
-                  if ( ! _.isEmpty( newFontFamily ) && _.isString( newFontFamily ) ) {
-                        if ( newFontFamily.indexOf('gfont') > -1 && ! _.contains( currentGfonts, newFontFamily ) ) {
+                  if ( !_.isEmpty( newFontFamily ) && _.isString( newFontFamily ) ) {
+                        if ( newFontFamily.indexOf('gfont') > -1 && !_.contains( currentGfonts, newFontFamily ) ) {
                               currentGfonts.push( newFontFamily );
                         }
                   }
@@ -4130,7 +4740,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 return;
                               // example of input_id candidate 'font_family_css'
                               if ( _.isString( _key_ ) && _key_.indexOf('font_family') > -1 ) {
-                                    if ( levelData.indexOf('gfont') > -1 && ! _.contains( gfonts, levelData ) ) {
+                                    if ( levelData.indexOf('gfont') > -1 && !_.contains( gfonts, levelData ) ) {
                                           gfonts.push( levelData );
                                     }
                               }
@@ -4194,7 +4804,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   _.each( params.item_value, function( _val, input_id ) {
                         if ( 'title' === input_id )
                           return;
-                        if ( ! params.is_multi_items && 'id' === input_id )
+                        if ( !params.is_multi_items && 'id' === input_id )
                           return;
 
                         if ( null !== params.parent_module_type ) {
@@ -4303,9 +4913,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
              *
              * @param {string} content The content we want to scan for shortcodes.
              */
-            htmlIncludesShortcodesOrTmplTags : function( content ) {
+            htmlIncludesElementsThatNeedAnAjaxRefresh : function( content ) {
                   var shortcodes = content.match( /\[+([\w_-])+/g ),
                       tmpl_tags = content.match( /\{\{+([\w_-])+/g ),
+                      // script detection introduced for https://github.com/presscustomizr/nimble-builder/issues/710
+                      script_tags = content.match( /<script[\s\S]*?>[\s\S]*?<\/script>/gi ),
                       shortcode_result = [],
                       tmpl_tag_result = [];
 
@@ -4327,7 +4939,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       }
                     }
                   }
-                  return !_.isEmpty( shortcode_result ) || !_.isEmpty( tmpl_tag_result );
+                  return !_.isEmpty( shortcode_result ) || !_.isEmpty( tmpl_tag_result ) || !_.isEmpty( script_tags );
             }
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
@@ -4369,6 +4981,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
 
+                        // June 2020 for : https://github.com/presscustomizr/nimble-builder/issues/520
+                        // and https://github.com/presscustomizr/nimble-builder/issues/713
+                        sek_my_sections_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_my_sections_sec_picker_module',
+                              controlLabel :  sektionsLocalizedData.i18n['My sections'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : false,
+                              priority : 10,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>',
+                              is_new : true
+                        },
+
+                        // Preset sections
+                        // to understand how those sections are registered server side, see @see https://github.com/presscustomizr/nimble-builder/issues/713
                         sek_intro_sec_picker_module : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                               module_type : 'sek_intro_sec_picker_module',
@@ -4434,26 +5061,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               priority : 30,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         }
-                  });
+                  });//$.extend( registrationParams, { });
 
                   // Beta features to merge here ?
                   // if ( sektionsLocalizedData.areBetaFeaturesEnabled ) {
                   //       $.extend( registrationParams, {});
                   // }
-
-                  if ( sektionsLocalizedData.isSavedSectionEnabled ) {
-                        $.extend( registrationParams, {
-                              sek_my_sections_sec_picker_module : {
-                                    settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
-                                    module_type : 'sek_my_sections_sec_picker_module',
-                                    controlLabel :  '@missi18n My sections',
-                                    content_type : 'section',
-                                    expandAndFocusOnInit : false,
-                                    priority : 10,
-                                    icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
-                              }
-                        });
-                  }
 
 
                   // BAIL WITH A SEE-ME ANIMATION IF THIS UI IS CURRENTLY BEING DISPLAYED
@@ -4532,16 +5145,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                           var $title = _control_.container.find('label > .customize-control-title'),
                                               _titleContent = $title.html();
+
                                           // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
                                           $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
 
+                                          if ( optionData.is_new ) {
+                                                var _titleHtml = $title.html();
+                                                $title.html( _titleHtml + ' <span class="sek-new-label">New!</span>' );
+                                          }
                                           // if this level has an icon, let's prepend it to the title
                                           if ( ! _.isUndefined( optionData.icon ) ) {
                                                 $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
                                           }
 
                                           // ACCORDION
-
                                           // Setup the accordion only for section content type
                                           if ( 'section' === _control_.content_type ) {
                                                 // Hide the item wrapper
@@ -6730,7 +7347,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             });// self.preparePresetSectionForInjection.done()
                                                 };//_doWhenPresetSectionCollectionFetched()
 
-
                                                 // Try to fetch the sections from the server
                                                 // if sucessfull, resolve __presetSectionInjected__.promise()
                                                 self.getPresetSectionCollection({
@@ -6749,6 +7365,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             // OK. time to resolve __presetSectionInjected__.promise()
                                                             _doWhenPresetSectionCollectionFetched( presetColumnOrSectionCollection );
                                                       });//self.getPresetSectionCollection().done()
+
                                           break;//case 'preset_section' :
                                     }//switch( params.content_type)
                               break;
@@ -7147,57 +7764,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @return a promise()
             // caches the sections in api.sek_presetSections when api.section( '__content_picker__') is registered
             // caches the user saved sections on the first drag and drop of a user-saved section
-            // @params {
-            //  is_user_section : sectionParams.is_user_section
-            //  preset_section_id : '' <= used for user_saved section
-            // }
-            _maybeFetchSectionsFromServer : function( params ) {
+            _maybeFetchSectionsFromServer : function() {
                   var dfd = $.Deferred(),
                       _ajaxRequest_;
 
-                  params = params || { is_user_section : false };
-                  if ( true === params.is_user_section ) {
-                        if ( ! _.isEmpty( api.sek_userSavedSections ) && ! _.isEmpty( api.sek_userSavedSections[ params.preset_section_id ] ) ) {
-                              dfd.resolve( api.sek_userSavedSections );
-                        } else {
-                              api.sek_userSavedSections = api.sek_userSavedSections || {};
-                              if ( ! _.isUndefined( api.sek_fetchingUserSavedSections ) && 'pending' == api.sek_fetchingUserSavedSections.state() ) {
-                                    _ajaxRequest_ = api.sek_fetchingUserSavedSections;
-                              } else {
-                                    _ajaxRequest_ = wp.ajax.post( 'sek_get_user_saved_sections', {
-                                          nonce: api.settings.nonce.save,
-                                          preset_section_id : params.preset_section_id
-                                    });
-                                    api.sek_fetchingUserSavedSections = _ajaxRequest_;
-                              }
-                              _ajaxRequest_.done( function( _sectionData_ ) {
-                                    //api.sek_presetSections = JSON.parse( _collection_ );
-                                    api.sek_userSavedSections[ params.preset_section_id ] = _sectionData_;
-                                    dfd.resolve( api.sek_userSavedSections );
-                              }).fail( function( _r_ ) {
-                                    dfd.reject( _r_ );
-                              });
-                        }
+                  if ( ! _.isEmpty( api.sek_presetSections ) ) {
+                        dfd.resolve( api.sek_presetSections );
                   } else {
-                        if ( ! _.isEmpty( api.sek_presetSections ) ) {
-                              dfd.resolve( api.sek_presetSections );
+                        if ( ! _.isUndefined( api.sek_fetchingPresetSections ) && 'pending' == api.sek_fetchingPresetSections.state() ) {
+                              _ajaxRequest_ = api.sek_fetchingPresetSections;
                         } else {
-                              if ( ! _.isUndefined( api.sek_fetchingPresetSections ) && 'pending' == api.sek_fetchingPresetSections.state() ) {
-                                    _ajaxRequest_ = api.sek_fetchingPresetSections;
-                              } else {
-                                    _ajaxRequest_ = wp.ajax.post( 'sek_get_preset_sections', { nonce: api.settings.nonce.save } );
-                                    api.sek_fetchingPresetSections = _ajaxRequest_;
-                              }
-                              _ajaxRequest_.done( function( _collection_ ) {
-                                    //api.sek_presetSections = JSON.parse( _collection_ );
-                                    api.sek_presetSections = _collection_;
-                                    dfd.resolve( api.sek_presetSections );
-                              }).fail( function( _r_ ) {
-                                    dfd.reject( _r_ );
-                              });
+                              _ajaxRequest_ = wp.ajax.post( 'sek_get_preset_sections', { nonce: api.settings.nonce.save } );
+                              api.sek_fetchingPresetSections = _ajaxRequest_;
                         }
+                        _ajaxRequest_.done( function( _collection_ ) {
+                              //api.sek_presetSections = JSON.parse( _collection_ );
+                              api.sek_presetSections = _collection_;
+                              dfd.resolve( api.sek_presetSections );
+                        }).fail( function( _r_ ) {
+                              dfd.reject( _r_ );
+                        });
                   }
-
                   return dfd.promise();
             },
 
@@ -7218,68 +7805,111 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             getPresetSectionCollection : function( sectionParams ) {
                   var self = this,
                       __dfd__ = $.Deferred();
-
-                  self._maybeFetchSectionsFromServer({
-                        is_user_section : sectionParams.is_user_section,
-                        preset_section_id : sectionParams.presetSectionId
-                  })
-                        .fail( function( er ) {
-                              __dfd__.reject( er );
+                  if ( sectionParams.is_user_section ) {
+                        wp.ajax.post( 'sek_get_user_section_json', {
+                              nonce: api.settings.nonce.save,
+                              section_post_name: sectionParams.presetSectionId
+                              //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
                         })
-                        .done( function( _collection_ ) {
-                              //api.infoLog( 'preset_sections fetched', api.sek_presetSections );
-                              var presetSection,
-                                  allPresets = $.extend( true, {}, _.isObject( _collection_ ) ? _collection_ : {} );
-
-                              if ( _.isEmpty( allPresets ) ) {
-                                    throw new Error( 'getPresetSectionCollection => Invalid collection');
-                              }
-                              if ( _.isEmpty( allPresets[ sectionParams.presetSectionId ] ) ) {
-                                    throw new Error( 'getPresetSectionCollection => the preset section : "' + sectionParams.presetSectionId + '" has not been found in the collection');
-                              }
-                              var presetCandidate = allPresets[ sectionParams.presetSectionId ];
-
-                              // Ensure we have a string that's JSON.parse-able
-                              // if ( typeof presetCandidate !== 'string' || presetCandidate[0] !== '{' ) {
-                              //       throw new Error( 'getPresetSectionCollection => ' + sectionParams.presetSectionId + ' is not JSON.parse-able');
+                        .done( function( userSection ) {
+                              // User section looks like
+                              // {
+                              //  data : {}
+                              //  metas : {}
+                              //  section_post_name : ''
                               // }
-                              // presetCandidate = JSON.parse( presetCandidate );
+                              if ( ! _.isObject( userSection ) || _.isEmpty( userSection ) || _.isUndefined( userSection.data ) ) {
+                                    api.errare( 'getPresetSectionCollection => preset section type not found or empty : ' + sectionParams.presetSectionId, userSection );
+                                    throw new Error( 'getPresetSectionCollection => preset section type not found or empty');
+                              }
 
-                              var setIds = function( collection ) {
-                                    _.each( collection, function( levelData ) {
-                                          levelData.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
-                                          if ( _.isArray( levelData.collection ) ) {
-                                                setIds( levelData.collection );
-                                          }
-                                    });
-                                    return collection;
-                              };
-
-                              var setVersion = function( collection ) {
-                                    _.each( collection, function( levelData ) {
-                                          levelData.ver_ini = sektionsLocalizedData.nimbleVersion;
-                                          if ( _.isArray( levelData.collection ) ) {
-                                                setVersion( levelData.collection );
-                                          }
-                                    });
-                                    return collection;
-                              };
+                              var userSectionCandidate = $.extend( {}, true, userSection.data );
 
                               // ID's
                               // the level's id have to be generated
-                              presetCandidate.collection = setIds( presetCandidate.collection );
+                              // 1) root level
+                              userSectionCandidate.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
+                              // 2) children levels
+                              userSectionCandidate.collection = self.setPresetOrUserSectionIds( userSectionCandidate.collection );
 
                               // NIMBLE VERSION
                               // set the section version
-                              presetCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
+                              userSectionCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
                               // the other level's version have to be added
-                              presetCandidate.collection = setVersion( presetCandidate.collection );
-                              __dfd__.resolve( presetCandidate );
-                        });//_maybeFetchSectionsFromServer.done()
+                              userSectionCandidate.collection = self.setPresetSectionVersion( userSectionCandidate.collection );
 
+                              // OK. time to resolve __presetSectionInjected__.promise()
+                              __dfd__.resolve( userSectionCandidate );
+                        })
+                        .fail( function( er ) {
+                               __dfd__.reject( er );
+                        });
+                  } else {
+                        self._maybeFetchSectionsFromServer()
+                              .fail( function( er ) {
+                                    __dfd__.reject( er );
+                              })
+                              .done( function( _collection_ ) {
+                                    //api.infoLog( 'preset_sections fetched', api.sek_presetSections );
+                                    var presetSection,
+                                        allPresets = $.extend( true, {}, _.isObject( _collection_ ) ? _collection_ : {} );
+
+                                    if ( _.isEmpty( allPresets ) ) {
+                                          throw new Error( 'getPresetSectionCollection => Invalid collection');
+                                    }
+                                    if ( _.isEmpty( allPresets[ sectionParams.presetSectionId ] ) ) {
+                                          throw new Error( 'getPresetSectionCollection => the preset section : "' + sectionParams.presetSectionId + '" has not been found in the collection');
+                                    }
+                                    var presetCandidate = allPresets[ sectionParams.presetSectionId ];
+
+                                    // Ensure we have a string that's JSON.parse-able
+                                    // if ( typeof presetCandidate !== 'string' || presetCandidate[0] !== '{' ) {
+                                    //       throw new Error( 'getPresetSectionCollection => ' + sectionParams.presetSectionId + ' is not JSON.parse-able');
+                                    // }
+                                    // presetCandidate = JSON.parse( presetCandidate );
+
+                                    // ID's
+                                    // the level's id have to be generated
+                                    presetCandidate.collection = self.setPresetOrUserSectionIds( presetCandidate.collection );
+
+                                    // NIMBLE VERSION
+                                    // set the section version
+                                    presetCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
+                                    // the other level's version have to be added
+                                    presetCandidate.collection = self.setPresetSectionVersion( presetCandidate.collection );
+                                    __dfd__.resolve( presetCandidate );
+                              });//_maybeFetchSectionsFromServer.done()
+                  }
                   return __dfd__.promise();
             },
 
+
+            // SECTION HELPERS
+            // Replaces __rep__me__ by an id looking like __nimble__1eda909f0cfe
+            setPresetOrUserSectionIds : function( collection ) {
+                  var self = this;
+                  // Only collection set as arrays hold columns or modules
+                  if ( _.isArray( collection ) ) {
+                        _.each( collection, function( levelData ) {
+                              levelData.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
+                              if ( _.isArray( levelData.collection ) ) {
+                                    self.setPresetOrUserSectionIds( levelData.collection );
+                              }
+                        });
+                  }
+                  return collection;
+            },
+
+            setPresetSectionVersion : function( collection ) {
+                  var self = this;
+                  _.each( collection, function( levelData ) {
+                        levelData.ver_ini = sektionsLocalizedData.nimbleVersion;
+                        if ( _.isArray( levelData.collection ) ) {
+                              self.setPresetSectionVersion( levelData.collection );
+                        }
+                  });
+                  return collection;
+            },
 
 
 
@@ -8753,12 +9383,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     before_section : $dropTarget.data('drop-zone-before-section'),
                                     after_section : $dropTarget.data('drop-zone-after-section'),
 
-                                    content_type : $(this).data('sek-content-type'),
-                                    content_id : $(this).data('sek-content-id'),
+                                    content_type : $(this).attr('data-sek-content-type'),
+                                    content_id : $(this).attr('data-sek-content-id'),
 
-                                    section_type : $(this).data('sek-section-type'),
+                                    section_type : $(this).attr('data-sek-section-type'),
                                     // Saved sections
-                                    is_user_section : "true" === $(this).data('sek-is-user-section')
+                                    is_user_section : "true" === $(this).attr('data-sek-is-user-section')
                               });
                               // And reset the preview target
                               self.lastClickedTargetInPreview({});
@@ -9078,10 +9708,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( ! $dropTarget.hasClass('sek-drop-zone') ) {
                         return false;
                   }
-                  if ( ( isHeaderLocation || isFooterLocation ) && isContentSectionCandidate ) {
-                        msg = isHeaderLocation ? sektionsLocalizedData.i18n['Header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['Footer location only accepts modules and pre-built footer sections'];
-                        maybePrintErrorMessage( msg );
-                        return false;
+                  // June 2020 : always allow user sections to be dropped in header and footer location
+                  // while preset section must explicitely be 'content' section_type to be allowed
+                  if ( !self.dndData.is_user_section ) {
+                        if ( ( isHeaderLocation || isFooterLocation ) && isContentSectionCandidate ) {
+                              msg = isHeaderLocation ? sektionsLocalizedData.i18n['Header location only accepts modules and pre-built header sections'] : sektionsLocalizedData.i18n['Footer location only accepts modules and pre-built footer sections'];
+                              maybePrintErrorMessage( msg );
+                              return false;
+                        }
                   }
                   if ( isFooterLocation && 'preset_section' === self.dndData.content_type && 'header' === self.dndData.section_type ) {
                         msg = sektionsLocalizedData.i18n['You can\'t drop a header section in the footer location'];
@@ -10727,7 +11361,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //       _html += '<div class="sek-tmpl-thumb"><img src="'+ _data.thumb_url +'"/></div>';
                   //     _html += '</div>';
                   // });
-                  var _thumbUrl = sektionsLocalizedData.baseUrl + '/assets/admin/img/wire_frame.png',
+                  var _thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/wire_frame.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
                       _dfd_ = $.Deferred(),
                       _titleAttr;
 
@@ -10793,7 +11427,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             content_type_switcher : function( input_options ) {
                   var input = this,
                       _section_,
-                      initial_content_type;
+                      initial_content_type,
+                      nbApiInstance = api.czr_sektions;
 
                   if ( ! api.section.has( input.module.control.section() ) ) {
                         throw new Error( 'api.czrInputMap.content_type_switcher => section not registered' );
@@ -10806,6 +11441,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var _contentType = $(this).data( 'sek-content-type');
                         // handle the aria-pressed state
                         input.container.find('[data-sek-content-type]').attr( 'aria-pressed', false );
+
+                        // close other dialog
+                        nbApiInstance.templateGalleryExpanded(false);
+                        nbApiInstance.levelTreeExpanded(false);
+                        if ( nbApiInstance.tmplDialogVisible ) {
+                              nbApiInstance.tmplDialogVisible(false);
+                        }
+                        if ( nbApiInstance.saveSectionDialogVisible ) {
+                              nbApiInstance.saveSectionDialogVisible(false);
+                        }
 
                         // April 2020 : template case added for https://github.com/presscustomizr/nimble-builder/issues/651
                         if ( 'template' === _contentType ) {
@@ -10848,6 +11493,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.czr_sektions.currentContentPickerType.bind( function( contentType ) {
                         _do_( contentType );
                   });
+
+                  // initialize with module picker
+                  input.container.find( '[data-sek-content-type="' + ( input() || 'module' ) + '"]').trigger('click');
             }
       });
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
@@ -10874,6 +11522,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                 //console.log( this.id, input_options );
             },
 
+            // June 2020 : input type used for both prebuilt and user sections
             section_picker : function( input_options ) {
                   var input = this;
                   // Mouse effect with cursor: -webkit-grab; -webkit-grabbing;
@@ -14144,58 +14793,133 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.CZRInput.prototype.initialize.call( input, name, options );
                               input.isReady.then( function() {
                                     input.renderUserSavedSections();
-                                    api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
+                                    input.attachDomEvents();
                               });
                         },
 
+                        // Ajax fetch the user section collection
+                        // or return the already cached collection
+                        getUserSavedSections : function() {
+                              var _dfd_ = $.Deferred();
+                              if ( !_.isEmpty( api.czr_sektions.userSavedSections ) ) {
+                                    _dfd_.resolve( api.czr_sektions.userSavedSections );
+                              } else {
+                                    api.czr_sektions.getSavedSectionCollection().done( function( sec_collection ) {
+                                           _dfd_.resolve( sec_collection );
+                                    });
+                              }
+                              return _dfd_.promise();
+                        },
 
                         renderUserSavedSections : function() {
                               var input = this,
                                   html = '',
                                   $wrapper = input.container.find('.sek-content-type-wrapper'),
-                                  creation_date = '',
+                                  creation_date = '';
                                   // https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
-                                  formatDate = function(date) {
-                                      var monthNames = [
-                                          "January", "February", "March",
-                                          "April", "May", "June", "July",
-                                          "August", "September", "October",
-                                          "November", "December"
-                                      ];
+                                  // formatDate = function(date) {
+                                  //     var monthNames = [
+                                  //         "January", "February", "March",
+                                  //         "April", "May", "June", "July",
+                                  //         "August", "September", "October",
+                                  //         "November", "December"
+                                  //     ];
 
-                                      var day = date.getDate(),
-                                          monthIndex = date.getMonth(),
-                                          year = date.getFullYear(),
-                                          hours = date.getHours(),
-                                          minutes = date.getMinutes(),
-                                          seconds = date.getSeconds();
+                                  //     var day = date.getDate(),
+                                  //         monthIndex = date.getMonth(),
+                                  //         year = date.getFullYear(),
+                                  //         hours = date.getHours(),
+                                  //         minutes = date.getMinutes(),
+                                  //         seconds = date.getSeconds();
 
-                                      return [
-                                            day,
-                                            monthNames[monthIndex],
-                                            year
-                                            //[hours,minutes,seconds].join(':')
-                                      ].join(' ');
-                                  };
+                                  //     return [
+                                  //           day,
+                                  //           monthNames[monthIndex],
+                                  //           year
+                                  //           //[hours,minutes,seconds].join(':')
+                                  //     ].join(' ');
+                                  // };
 
-                              _.each( sektionsLocalizedData.userSavedSektions, function( secData, secKey ) {
-                                    try { creation_date = formatDate( new Date( secData.creation_date.replace( /-/g, '/' ) ) ); } catch( er ) {
-                                          api.errare( '::renderUserSavedSections => formatDate => error', er );
+                              var _refreshUserSectionView = function( sec_collection ) {
+                                    // clean
+                                    $wrapper.find('.sek-user-section-wrapper').remove();
+
+                                    // Write
+                                    if ( _.isEmpty( sec_collection ) ) {
+                                        var _placeholdImgUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/save_section_notice.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join('');
+                                          doc_url = 'https://docs.presscustomizr.com/article/417-how-to-save-and-reuse-sections-with-nimble-builder';
+                                        html = [
+                                              '<div class="sek-user-section-wrapper">',
+                                                '<img src="'+ _placeholdImgUrl +'" />',
+                                                '<br/><a href="'+ doc_url +'" target="_blank" rel="noreferrer nofollow">'+ doc_url +'</a>',
+                                              '</div>'
+                                        ].join('');
+                                        $wrapper.append( html );
+                                        input.module.container.find('.czr-item-content .customize-control-title').html('You did not save any section yet.');
+                                    } else {
+                                        var _thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/nb_sec_pholder.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
+                                        styleAttr = 'background: url(' + _thumbUrl  + ') 50% 50% / cover no-repeat;';
+                                        _.each( sec_collection, function( secData, secKey ) {
+                                              // try { creation_date = formatDate( new Date( secData.creation_date.replace( /-/g, '/' ) ) ); } catch( er ) {
+                                              //       api.errare( '::renderUserSavedSections => formatDate => error', er );
+                                              // }
+                                              if( !_.isEmpty( secData.description ) ) {
+                                                  _titleAttr = [ secData.title, secData.last_modified_date, secData.description ].join(' | ');
+                                              } else {
+                                                  _titleAttr = [ secData.title, secData.last_modified_date ].join(' | ');
+                                              }
+                                              html = [
+                                                    '<div class="sek-user-section-wrapper">',
+                                                      '<div draggable="true" data-sek-is-user-section="true" data-sek-section-type="content" data-sek-content-type="preset_section" data-sek-content-id="' + secKey +'" style="" title="' + secData.title + '">',
+                                                        '<div class="sek-sec-thumb" style="'+ styleAttr +'"></div>',//<img src="'+ _thumbUrl +'"/>
+                                                        '<div class="sek-overlay"></div>',
+                                                        '<div class="sek-sec-info" title="'+ _titleAttr +'">',
+                                                          '<h3 class="sec-title">' + secData.title + '</h3>',
+                                                          '<p class="sec-date"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', secData.last_modified_date ].join(' ') + '</i></p>',
+                                                          '<p class="sec-desc">' + secData.description + '</p>',
+                                                          '<i class="material-icons remove-user-sec" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>',
+                                                          //'<div class="sek-overlay"></div>',
+                                                          //'<div class="sek-saved-section-description">' + secData.description + '</div>',
+                                                          //! _.isEmpty( creation_date ) ? ( '<div class="sek-saved-section-date"><i class="far fa-calendar-alt"></i> @missi18n Created : ' + creation_date + '</div>' ) : '',
+                                                        '</div>',
+                                                      '</div>',
+                                                    '</div>'
+                                              ].join('');
+                                              $wrapper.append( html );
+                                        });//_.each
                                     }
-                                    html = [
-                                          '<div class="sek-user-section-wrapper">',
-                                            '<div class="sek-saved-section-title"><i class="sek-remove-user-section far fa-trash-alt"></i>' + secData.title + '</div>',
-                                            '<div draggable="true" data-sek-is-user-section="true" data-sek-section-type="' + secData.type +'" data-sek-content-type="preset_section" data-sek-content-id="' + secKey +'" style="" title="' + secData.title + '">',
-                                              '<div class="sek-overlay"></div>',
-                                              '<div class="sek-saved-section-description">' + secData.description + '</div>',
-                                              ! _.isEmpty( creation_date ) ? ( '<div class="sek-saved-section-date"><i class="far fa-calendar-alt"></i> @missi18n Created : ' + creation_date + '</div>' ) : '',
-                                            '</div>',
-                                          '</div>'
-                                    ].join('');
-                                    $wrapper.append( html );
+
+                                    // Make section draggable now
+                                    api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
+                              };//_refreshUserSectionView
+
+                              // on input instantiation, render the collection
+                              input.getUserSavedSections().done( function( sec_collection ) {
+                                    _refreshUserSectionView( sec_collection );
+                              });
+
+                              // when the collection is modified : save, update, remove actions => NB refreshes the collection
+                              api.czr_sektions.allSavedSections.bind( function( sec_collection ) {
+                                    _refreshUserSectionView( sec_collection );
+                              });
+                        },//renderUserSavedSections
+
+                        // with delegation
+                        attachDomEvents : function() {
+                              // Attach events
+                              this.container.on('click', '.sek-sec-info .remove-user-sec', function(evt) {
+                                    evt.preventDefault();
+                                    var self = api.czr_sektions;
+                                    var _focusOnRemoveCandidate = function( mode ) {
+                                          self.saveSectionDialogMode( 'remove' );
+                                          // self unbind
+                                          self.saveSectionDialogMode.unbind( _focusOnRemoveCandidate );
+                                    };
+                                    self.saveSectionDialogMode.bind( _focusOnRemoveCandidate );
+                                    self.saveSectionDialogVisible(true);
                               });
                         }
-                  });
+                  });//module.inputConstructor
 
                   // run the parent initialize
                   // Note : must be always invoked always after the input / item class extension
@@ -14203,7 +14927,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
 
                   // module.embedded.then( function() {
-                  //       console.log('MODULE READY=> lets dance',  module.container,  module.container.find('.sek-content-type-wrapper') );
+                  //       console.log('MODULE READY=> lets dance',  module.container,  module.container.find('.sek-ctrl-accordion-title') );
                   // });
             },//initialize
       };
@@ -14218,19 +14942,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
-      if ( sektionsLocalizedData.isSavedSectionEnabled ) {
-            $.extend( api.czrModuleMap, {
-                  sek_my_sections_sec_picker_module : {
-                        mthds : Constructor,
-                        crud : false,
-                        name : api.czr_sektions.getRegisteredModuleProperty( 'sek_my_sections_sec_picker_module', 'name' ),
-                        has_mod_opt : false,
-                        ready_on_section_expanded : false,
-                        ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
-                        defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_my_sections_sec_picker_module' )
-                  },
-            });
-      }
+      $.extend( api.czrModuleMap, {
+            sek_my_sections_sec_picker_module : {
+                  mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_my_sections_sec_picker_module', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : false,
+                  ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_my_sections_sec_picker_module' )
+            },
+      });
 })( wp.customize , jQuery, _ );
 //global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
