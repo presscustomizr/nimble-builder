@@ -32,56 +32,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return sektionsLocalizedData.settingIdForGlobalSections;
             },
 
-            // @params = { id : '', level : '' }
-            // Recursively walk the level tree until a match is found
-            // @return the level model object
-            getLevelModel : function( id, collection ) {
-                  var self = this, _data_ = 'no_match',
-                      // @param id mandatory
-                      // @param collection mandatory
-                      // @param collectionSettingId optional
-                      // @param localOrGlobal optional
-                      _walk_ = function( id, collection, collectionSettingId, localOrGlobal ) {
-                            // do we have a collection ?
-                            // if not, let's use the root one
-                            if ( _.isUndefined( collection ) ) {
-                                  var currentSektionSettingValue = api( collectionSettingId )();
-                                  var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
-                                  collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
-                            }
-                            _.each( collection, function( levelData ) {
-                                  // did we found a match recursively ?
-                                  if ( 'no_match' != _data_ )
-                                    return;
-                                  if ( id === levelData.id ) {
-                                        _data_ = levelData;
-                                  } else {
-                                        if ( _.isArray( levelData.collection ) ) {
-                                              _walk_( id, levelData.collection, collectionSettingId, localOrGlobal );
-                                        }
-                                  }
-                            });
-                            return _data_;
-                      };
-
-                  // if a collection has been provided in the signature, let's walk it.
-                  // Otherwise, let's walk the local and global ones until a match is found.
-                  if ( ! _.isEmpty( collection ) ) {
-                        _walk_( id, collection );
-                  } else {
-                        _.each( {
-                              local : self.localSectionsSettingId(),
-                              global : self.getGlobalSectionsSettingId()
-                        }, function( collectionSettingId, localOrGlobal ) {
-                              if ( 'no_match' === _data_ ) {
-                                    _walk_( id, collection, collectionSettingId, localOrGlobal );
-                              }
-                        });
-                  }
-
-                  return _data_;
-            },
-
 
             // @params = { id : '', level : '' }
             // Recursively walk the level tree until a match is found
@@ -140,6 +90,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
+
+
+
+
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            //-- LOCATION HELPERS
+            //-------------------------------------------------------------------------------------------------
             // used in react to preview or update api settings
             // @params is an object {
             //
@@ -192,6 +152,76 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return walkCollection( id ) !== 'no_match';
             },
 
+            // @return bool
+            // June 2020 : introduced for https://github.com/presscustomizr/nimble-builder-pro/issues/6
+            isHeaderLocation : function( id ) {
+                  var _locCollection = this.activeLocationsInfo(),
+                      _currentLocInfo = !_.isArray( _locCollection ) ? {} : _.findWhere( _locCollection, { id : id } );
+                  return _.isObject( _currentLocInfo ) && _currentLocInfo.is_header;
+            },
+
+            // @return bool
+            // June 2020 : introduced for https://github.com/presscustomizr/nimble-builder-pro/issues/6
+            isFooterLocation : function( id ) {
+                  var _locCollection = self.activeLocationsInfo(),
+                      _currentLocInfo = !_.isArray( _locCollection ) ? {} : _.findWhere( _locCollection, { id : id } );
+                  return _.isObject( _currentLocInfo ) && _currentLocInfo.is_footer;
+            },
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            //-- LEVEL HELPERS
+            //-------------------------------------------------------------------------------------------------
+            // @params = { id : '', level : '' }
+            // Recursively walk the level tree until a match is found
+            // @return the level model object
+            getLevelModel : function( id, collection ) {
+                  var self = this, _data_ = 'no_match',
+                      // @param id mandatory
+                      // @param collection mandatory
+                      // @param collectionSettingId optional
+                      // @param localOrGlobal optional
+                      _walk_ = function( id, collection, collectionSettingId, localOrGlobal ) {
+                            // do we have a collection ?
+                            // if not, let's use the root one
+                            if ( _.isUndefined( collection ) ) {
+                                  var currentSektionSettingValue = api( collectionSettingId )();
+                                  var sektionSettingValue = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
+                                  collection = _.isArray( sektionSettingValue.collection ) ? sektionSettingValue.collection : [];
+                            }
+                            _.each( collection, function( levelData ) {
+                                  // did we found a match recursively ?
+                                  if ( 'no_match' != _data_ )
+                                    return;
+                                  if ( id === levelData.id ) {
+                                        _data_ = levelData;
+                                  } else {
+                                        if ( _.isArray( levelData.collection ) ) {
+                                              _walk_( id, levelData.collection, collectionSettingId, localOrGlobal );
+                                        }
+                                  }
+                            });
+                            return _data_;
+                      };
+
+                  // if a collection has been provided in the signature, let's walk it.
+                  // Otherwise, let's walk the local and global ones until a match is found.
+                  if ( ! _.isEmpty( collection ) ) {
+                        _walk_( id, collection );
+                  } else {
+                        _.each( {
+                              local : self.localSectionsSettingId(),
+                              global : self.getGlobalSectionsSettingId()
+                        }, function( collectionSettingId, localOrGlobal ) {
+                              if ( 'no_match' === _data_ ) {
+                                    _walk_( id, collection, collectionSettingId, localOrGlobal );
+                              }
+                        });
+                  }
+
+                  return _data_;
+            },
 
             getLevelPositionInCollection : function( id, collection ) {
                   var self = this, _position_ = 'no_match',
@@ -237,7 +267,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   return _position_;
             },
-
 
             // @params = { property : 'options', id :  }
             // @return mixed type
@@ -294,6 +323,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return newIdWalker( deepClonedLevel );
             },
 
+
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            //-- REGISTRATION HELPERS
+            //-------------------------------------------------------------------------------------------------
             // Extract the default model values from the server localized registered module
             // Invoked when registrating a module in api.czrModuleMap
             // For example :

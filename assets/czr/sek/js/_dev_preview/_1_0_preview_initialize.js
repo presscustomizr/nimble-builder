@@ -69,7 +69,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               active_locs_info.push({
                                     id : $(this).data('sek-id'),
                                     is_global : true === $(this).data('sek-is-global-location'),
-                                    is_header_footer : true === $(this).data('sek-is-header-location') || true === $(this).data('sek-is-footer-location')
+                                    is_header_footer : true === $(this).data('sek-is-header-location') || true === $(this).data('sek-is-footer-location'),
+                                    // added for https://github.com/presscustomizr/nimble-builder-pro/issues/6
+                                    is_header : true === $(this).data('sek-is-header-location'),
+                                    is_footer : true === $(this).data('sek-is-footer-location')
                               });
                         });
                         api.preview.send('sek-active-locations-in-preview', { active_locations : active_locs, active_locs_info : active_locs_info } );

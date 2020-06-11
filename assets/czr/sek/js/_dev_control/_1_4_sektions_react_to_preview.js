@@ -630,6 +630,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   }
                                   uiParams = {
                                         action : 'sek-generate-level-options-ui',
+                                        location : params.location,//<= added June 2020 for https://github.com/presscustomizr/nimble-builder-pro/issues/6
                                         level : params.level,
                                         id : params.id,
                                         in_sektion : params.in_sektion,

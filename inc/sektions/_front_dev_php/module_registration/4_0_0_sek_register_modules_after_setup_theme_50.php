@@ -34,7 +34,8 @@ function sek_schedule_module_registration() {
 function sek_register_modules_when_customizing_or_ajaxing() {
     $modules = array_merge(
         SEK_Front_Construct::$ui_picker_modules,
-        SEK_Front_Construct::$ui_level_modules,
+        // June 2020 filter added for https://github.com/presscustomizr/nimble-builder-pro/issues/6
+        apply_filters( 'nb_level_module_collection', SEK_Front_Construct::$ui_level_modules ),
         SEK_Front_Construct::$ui_local_global_options_modules,
         SEK_Front_Construct::sek_get_front_module_collection()
     );
