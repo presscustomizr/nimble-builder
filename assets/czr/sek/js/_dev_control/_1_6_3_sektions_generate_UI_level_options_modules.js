@@ -25,6 +25,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Prepare the module map to register
                   var modulesRegistrationParams = {};
 
+                  // June 2020 : introduced for https://github.com/presscustomizr/nimble-builder-pro/issues/6
+                  // so we can remotely register modules
+                  api.trigger('nb_setup_level_ui_registration_params', {
+                        params : params,
+                        modulesRegistrationParams : modulesRegistrationParams
+                  });
+
                   $.extend( modulesRegistrationParams, {
                         bg : {
                               settingControlId : params.id + '__bg_options',
