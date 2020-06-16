@@ -110,10 +110,12 @@ if ( nimble_pass_requirements() ) {
     require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-sektions-ui-modules.php' );
     require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-sektions-front-modules.php' );
     require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-sektions-base.php' );
+    do_action('nimble_base_main_loaded');
 
     // $_POST['ac_get_template'] <= scenario of an input template getting ajaxily fetched
     if ( \Nimble\skp_is_customizing() || isset( $_POST['ac_get_template']) || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
         require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-czr-sektions.php' );
+        do_action('nimble_base_czr_loaded');
     }
 
     add_action( 'after_setup_theme', 'nimble_setup_dyn_register', 20 );
