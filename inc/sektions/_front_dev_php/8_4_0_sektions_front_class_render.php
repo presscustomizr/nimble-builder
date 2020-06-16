@@ -384,6 +384,8 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             if ( !empty( $model[ 'options' ] ) && !empty( $model[ 'options' ][ 'anchor' ] ) && !empty( $model[ 'options' ][ 'anchor' ]['custom_css_classes'] ) ) {
                 if ( is_string( $model[ 'options' ][ 'anchor' ]['custom_css_classes'] ) ) {
                     $custom_css_classes = esc_attr( $model[ 'options' ][ 'anchor' ]['custom_css_classes'] );
+                    //clean commas
+                    $custom_css_classes = preg_replace("/(?<!\d)(\,|\.)(?!\d)/", "", $custom_css_classes);
                     //$custom_css_classes = preg_replace("/[^0-9a-zA-Z]/","", $custom_css_classes);
                 }
             }
@@ -488,13 +490,18 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
                         $has_bg_img = true;
                     }
+
+                    // June 2020 : introduced for https://github.com/presscustomizr/nimble-builder-pro/issues/6
+                    $section_classes = apply_filters( 'nimble_section_level_css_classes', array(), $model );
+                    array_push( $section_classes, $custom_css_classes );
+
                     printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s %6$s" %7$s %8$s %9$s>%10$s',
                         $id,
                         $is_nested ? 'data-sek-is-nested="true"' : '',
                         $has_at_least_one_module ? 'sek-has-modules' : '',
                         $this->get_level_visibility_css_class( $model ),
                         $has_bg_img ? 'sek-has-bg' : '',
-                        is_null( $custom_css_classes ) ? '' : $custom_css_classes,
+                        implode(' ', $section_classes),
 
                         is_null( $custom_anchor ) ? '' : 'id="' . ltrim( $custom_anchor , '#' ) . '"',// make sure we clean the hash if user left it
                         // add smartload + parallax attributes
@@ -1227,7 +1234,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 $apply_local_option = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data ) && 'inherit' !== $local_header_footer_data['header-footer'];
 
                 $this->has_global_header_footer = !is_null( $global_header_footer_data ) && is_array( $global_header_footer_data ) && !empty( $global_header_footer_data['header-footer'] ) && 'nimble_global' === $global_header_footer_data['header-footer'];
-
+                $this->has_local_header_footer = false;
                 if ( $apply_local_option ) {
                     $this->has_local_header_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_local' === $local_header_footer_data['header-footer'];
                     $this->has_global_header_footer = !is_null( $local_header_footer_data ) && is_array( $local_header_footer_data ) && !empty( $local_header_footer_data['header-footer'] ) && 'nimble_global' === $local_header_footer_data['header-footer'];
