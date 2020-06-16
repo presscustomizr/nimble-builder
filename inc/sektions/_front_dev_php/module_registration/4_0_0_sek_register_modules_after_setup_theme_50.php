@@ -120,7 +120,7 @@ function sek_do_register_module_collection( $modules ) {
         // bug report detailed here https://github.com/presscustomizr/nimble-builder/issues/234
         $fn = "Nimble\sek_get_module_params_for_{$module_name}";
         if ( function_exists( $fn ) ) {
-            $params = $fn();
+            $params = apply_filters( "nimble_module_params_for_{$module_name}", $fn() );
             if ( is_array( $params ) ) {
                 CZR_Fmk_Base()->czr_pre_register_dynamic_module( $params );
             } else {
