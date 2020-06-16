@@ -284,7 +284,9 @@ function sek_render_welcome_notice() {
     if ( sek_site_has_nimble_sections_created() && !( defined('NIMBLE_DEV') && NIMBLE_DEV ) ) {
         $dismissed = get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true );
         $dismissed_array = array_filter( explode( ',', (string) $dismissed ) );
-        $dismissed_array[] = NIMBLE_WELCOME_NOTICE_ID;
+        if ( !in_array(NIMBLE_WELCOME_NOTICE_ID, $dismissed_array) ) {
+            $dismissed_array[] = NIMBLE_WELCOME_NOTICE_ID;
+        }
         $dismissed = implode( ',', $dismissed_array );
         update_user_meta( get_current_user_id(), 'dismissed_wp_pointers', $dismissed );
         return;
@@ -454,7 +456,7 @@ function sek_nimble_dashboard_callback_fn() {
               <?php if ( !empty( $link_data['html'] ) ) : ?>
                 <?php echo $link_data['html']; ?>
               <?php else : ?>
-              <a href="<?php echo esc_attr( $link_data['link'] ); ?>" target="_blank"><?php echo esc_html( $link_data['title'] ); ?> <span class="screen-reader-text"><?php echo __( '(opens in a new window)', 'text_doma' ); ?></span><span aria-hidden="true" class="dashicons dashicons-external"></span></a>
+              <a href="<?php echo esc_attr( $link_data['link'] ); ?>" target="_blank"><?php echo esc_html( $link_data['title'] ); ?> <span class="screen-reader-text"><?php echo __( '(opens in a new window)', 'text_doma' ); ?></span></a><span aria-hidden="true" class="dashicons dashicons-external"></span>
               <?php endif; ?>
             </div>
           <?php endforeach; ?>
