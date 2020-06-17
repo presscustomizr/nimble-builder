@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -123,6 +123,13 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 2.1.0 : Introduction of a new user interface to save and reuse sections in any pages.
 
 == Changelog ==
+= 2.1.1 June 17th 2020 =
+* fixed : [options] prevent duplicated dismissed pointer in user_meta
+* fixed : [admin] wrong url for NB icon in options title
+* improved : [developers] allow filtering module params from a plugin
+* improved : [developers] allow filtering of NB header CSS classes
+* improved : [developers] the way section CSS classes are printed + add a way to filter from a plugin
+
 = 2.1.0 June 9th 2020 =
 * fixed [Grid module][Pagination] anchor link can prevent navigating posts pages
 * fixed : [modules][customizer] when customizing introduce a script tag detection, similar to the shortcode one

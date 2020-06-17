@@ -6,6 +6,7 @@
 // It is normally implemented in a well designed theme
 // Nimble Builder will propose options to dequeue theme stylesheet in the future, which makes it crucial to have our own reset embedded.
 html {
+  min-height: 100vh;//<= shall we include this ?
   font-size: 100%;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
