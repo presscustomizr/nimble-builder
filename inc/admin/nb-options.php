@@ -36,7 +36,7 @@ function nb_options_page() {
   ?>
 
   <div id="nimble-options" class="wrap">
-      <h1 class="nb-option-page-title"><span class="sek-nimble-title-icon"><img src="http://customizr-dev.test/wp-content/plugins/nimble-builder/assets/img/nimble/nimble_icon.svg?ver=' . <?php echo NIMBLE_VERSION; ?>" alt="Build with Nimble Builder"></span><?php echo apply_filters( 'nimble_parse_admin_text', $page_title ); ?></h1>
+      <h1 class="nb-option-page-title"><span class="sek-nimble-title-icon"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="Build with Nimble Builder"></span><?php echo apply_filters( 'nimble_parse_admin_text', $page_title ); ?></h1>
       <div class="nav-tab-wrapper">
           <?php
             foreach ($option_tabs as $tab_id => $tab_data ) {
