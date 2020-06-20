@@ -75,7 +75,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Example of use of $_POST['local_skope_id'] => @see sek_get_parent_level_model()
                   // Helps fixing : https://github.com/presscustomizr/nimble-builder/issues/242, for which sek_add_css_rules_for_spacing() couldn't be set for columns margins
                   api.bind( 'save-request-params', function( query ) {
-                        $.extend( query, { local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ) } );
+                        $.extend( query, {
+                          local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                          active_locations : api.czr_sektions.activeLocations()
+                        });
                   });
 
 

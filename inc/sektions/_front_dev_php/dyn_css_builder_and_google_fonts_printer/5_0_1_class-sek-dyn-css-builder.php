@@ -37,8 +37,17 @@ class Sek_Dyn_CSS_Builder {
     private $is_global_stylesheet;
     private $parent_level_model = array();
 
+    public $customizer_active_locations = '_not_set_';//June 2020 => added to prevent printing css for not active locations
+    public $current_sniffed_location = '_not_set_';//June 2020 => added to prevent printing css for not active locations
+
     public function __construct( $sek_model = array(), $is_global_stylesheet = false ) {
         $this->sek_model  = $sek_model;
+
+        // June 2020 : this property is set when saving the customizer
+        // and used to determine if we need to generate css for a given location
+        // typically useful when a local header is populated with sections but not used on the page. While still present in the collection of location, we don't want to generate css for it.
+        $this->customizer_active_locations = ( isset($_POST['active_locations']) && is_array($_POST['active_locations']) ) ? $_POST['active_locations'] : '_not_set_';
+
         $this->is_global_stylesheet = $is_global_stylesheet;
         // set the css rules for columns
         /* ------------------------------------------------------------------------- *
@@ -79,6 +88,17 @@ class Sek_Dyn_CSS_Builder {
         }
 
         foreach ( $level as $key => $entry ) {
+            // Let's cache the currently sniffed location
+            if ( is_array($entry) && isset($entry['level']) && 'location' === $entry['level'] ) {
+                $this->current_sniffed_location = $entry['id'];
+            }
+
+            // When saving in the customizer, the active locations are passed in $_POST
+            // so we can determine if a location is currently active or not, and if not, we don't need to generate CSS for it.
+            if ( '_not_set_' !== $this->customizer_active_locations && '_not_set_' !== $this->current_sniffed_location && !in_array($this->current_sniffed_location, $this->customizer_active_locations ) ) {
+                continue;
+            }
+
             $rules = array();
 
             // INPUT CSS RULES <= used in front modules only
@@ -259,6 +279,7 @@ class Sek_Dyn_CSS_Builder {
                         sek_error_log(  __CLASS__ . '::' . __FUNCTION__ . '=> a css rule is missing the selector param', $rule );
                         continue;
                     }
+
                     $this->sek_populate(
                         $rule[ 'selector' ],
                         $rule[ 'css_rules' ],
