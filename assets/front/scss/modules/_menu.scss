@@ -424,3 +424,9 @@
      }
      // end fade effect
 }
+
+// June 2020 for https://github.com/presscustomizr/nimble-builder/issues/721
+[data-sek-is-mobile-menu="yes"] > .show {
+  overflow: auto;
+  max-height: 80vh;
+}
