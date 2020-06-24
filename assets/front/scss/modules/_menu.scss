@@ -31,8 +31,7 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    justify-content: center;
+    justify-content: flex-end;
     padding: .5rem 0;
 
     // https://github.com/presscustomizr/nimble-builder/issues/368
@@ -426,7 +425,46 @@
 }
 
 // June 2020 for https://github.com/presscustomizr/nimble-builder/issues/721
-[data-sek-is-mobile-menu="yes"] > .show {
-  overflow: auto;
-  max-height: 80vh;
+[data-sek-is-mobile-menu="yes"] {
+  > .show {
+    overflow: auto;
+    max-height: 80vh;
+  }
+  li .sub-menu li > a {
+    font-size: 0.8em;
+    padding: .6em 15px;
+  }
+}
+
+
+// June 2020 search icon + form in menu module for https://github.com/presscustomizr/nimble-builder-pro/issues/12
+.nb-module-menu-search {
+  position: relative;
+}
+.nb-svg-search-icon {
+  cursor: pointer;
+}
+.nb-module-menu-search .nb-search-expand {
+  display:none;
+  background: #fff;
+  position: absolute;
+  z-index: 100;
+  top: 49px;
+    right: 0;
+    left: 0;
+  width: 340px;
+  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.1);
+  box-shadow: 0 1px 0 rgba(255,255,255,.1);
+}
+.nb-search-expand .nb-search-expand-inner {
+border: 1px solid #eee;
+box-shadow: 0 0 5px rgba(0,0,0,.2),0 1px 0 rgba(255,255,255,.15);
+transition: -webkit-transform .35s ease-in-out,height .25s ease-in-out,background-color .45s ease-in-out;
+transition: transform .35s ease-in-out,height .25s ease-in-out,background-color .45s ease-in-out;
+padding: 15px;
+}
+
+[data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner [role=search].search-form {
+  display: flex;
+  float: none;
 }
