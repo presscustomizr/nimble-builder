@@ -64,7 +64,7 @@ function nimble_regex_callback( $matches ) {
     // otherwise go ahead and parse
     } else {
       return apply_filters( 'nimble_img_smartloaded',
-        str_replace( array('srcset=', 'sizes='), array('data-sek-srcset=', 'data-sek-sizes='),
+        str_replace( array(' srcset=', ' sizes='), array(' data-sek-srcset=', ' data-sek-sizes='),
             sprintf('<img %1$s src="%2$s" data-sek-src="%3$s" %4$s>',
                 $matches[1],
                 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
