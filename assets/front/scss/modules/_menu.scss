@@ -75,6 +75,8 @@
 
     li {
         a {
+            font-size: 16px;// consistent with defaults
+            line-height: 1.5em;// consistent with default registration params
             padding: .6em .8em;
             display: flex;
             align-items: center;
@@ -437,9 +439,13 @@
 }
 
 
+// PRO SEARCH ICON IN DESKTOP + SEARCH FIELD DESKTOP AND MOBILE
 // June 2020 search icon + form in menu module for https://github.com/presscustomizr/nimble-builder-pro/issues/12
 .nb-module-menu-search {
   position: relative;
+}
+[data-sek-is-mobile-menu="yes"] .nb-module-menu-search {
+  display: none;
 }
 .nb-svg-search-icon {
   cursor: pointer;
@@ -450,21 +456,42 @@
   position: absolute;
   z-index: 100;
   top: 49px;
-    right: 0;
-    left: 0;
+  right: 0;
+  left: 0;
   width: 340px;
   -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.1);
   box-shadow: 0 1px 0 rgba(255,255,255,.1);
 }
 .nb-search-expand .nb-search-expand-inner {
-border: 1px solid #eee;
-box-shadow: 0 0 5px rgba(0,0,0,.2),0 1px 0 rgba(255,255,255,.15);
-transition: -webkit-transform .35s ease-in-out,height .25s ease-in-out,background-color .45s ease-in-out;
-transition: transform .35s ease-in-out,height .25s ease-in-out,background-color .45s ease-in-out;
-padding: 15px;
+  border: 1px solid #eee;
+  box-shadow: 0 0 5px rgba(0,0,0,.2),0 1px 0 rgba(255,255,255,.15);
+  transition: -webkit-transform .35s ease-in-out,height .25s ease-in-out,background-color .45s ease-in-out;
+  transition: transform .35s ease-in-out,height .25s ease-in-out,background-color .45s ease-in-out;
+  padding: 15px;
 }
 
 [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner [role=search].search-form {
   display: flex;
   float: none;
+}
+[data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner label input[type=search] {
+  max-width: 100%;
+}
+[data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=submit], [data-sek-is-mobile-menu="yes"] .nb-mobile-search form input[type=submit] {
+  margin: 0;
+  background: #808080;
+    color: #fff;
+}
+[data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=search], [data-sek-is-mobile-menu="yes"] .nb-mobile-search input[type=search] {
+  text-transform: none!important;
+}
+.nb-mobile-search {
+  display: none;
+}
+[data-sek-is-mobile-menu="yes"] .nb-mobile-search {
+  display: block;
+  padding: 6px 14px 15px;
+}
+[data-sek-is-mobile-menu="yes"] .nb-mobile-search input {
+  font-size: 16px;
 }

@@ -3,7 +3,7 @@
 * Plugin Name: Nimble Page Builder
 * Plugin URI: https://nimblebuilder.com
 * Description: Powerful drag and drop page builder using the native WordPress customizer.
-* Version: 2.1.1
+* Version: 2.1.2-betaaaa
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://nimblebuilder.com/?utm_source=wp-plugins&utm_medium=wp-dashboard&utm_campaign=author-uri
@@ -16,7 +16,7 @@ if ( !defined( 'ABSPATH' ) ) {
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
-$current_version = "2.1.1";
+$current_version = "2.1.2-betaaaa";
 
 if ( !defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version ); }
 if ( !defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
@@ -106,11 +106,13 @@ if ( nimble_pass_requirements() ) {
         }
     }
 
+    do_action('nimble_before_loading');
     require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-constants-and-helper-functions.php' );
+    do_action('nimble_base_loaded');
     require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-sektions-ui-modules.php' );
     require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-sektions-front-modules.php' );
     require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-sektions-base.php' );
-    do_action('nimble_base_main_loaded');
+    do_action('nimble_front_loaded');
 
     // $_POST['ac_get_template'] <= scenario of an input template getting ajaxily fetched
     if ( \Nimble\skp_is_customizing() || isset( $_POST['ac_get_template']) || ( defined('DOING_AJAX') && DOING_AJAX ) ) {

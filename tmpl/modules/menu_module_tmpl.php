@@ -40,7 +40,9 @@ $nav_classes = is_string($nav_classes) ? $nav_classes : 'sek-nav-wrap';
     }
     $menu_classes = is_string($menu_classes) ? $menu_classes : 'sek-menu-module sek-nav';
 
-     //error_log( print_r( get_terms( 'nav_menu', array( 'hide_empty' => true ) ), true) );
+    do_action('nb_menu_module_before_wp_menu', $model );
+
+    //error_log( print_r( get_terms( 'nav_menu', array( 'hide_empty' => true ) ), true) );
     wp_nav_menu(
         array(
           'theme_location'  => '__nimble__',//<= if no theme location is specified, WP assigns the first non empty one available (see wp-includes/nav-menu-template.php:106, the comment reads: // get the first menu that has items if we still can't find a menu ) which we don't want.
