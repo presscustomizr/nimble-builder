@@ -482,7 +482,8 @@
   background: #808080;
     color: #fff;
 }
-[data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=search], [data-sek-is-mobile-menu="yes"] .nb-mobile-search input[type=search] {
+[data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=search], [data-sek-is-mobile-menu="yes"] .nb-mobile-search input[type=search],
+[data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=submit], [data-sek-is-mobile-menu="yes"] .nb-mobile-search form input[type=submit] {
   text-transform: none!important;
 }
 .nb-mobile-search {
