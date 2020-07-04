@@ -346,15 +346,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // an svg file like Nimble__divider_icon.svg => in this case we build and return the full url
             // or a font_icon like '<i class="fab fa-wordpress-simple"></i>'
             getTreeModuleIcon : function( modType ) {
-                  var _icon = {};
+                  var _icon = {}, icon_img_src;
                   _.each( sektionsLocalizedData.moduleCollection, function( modData ) {
                         if ( !_.isEmpty( _icon ) )
                           return;
                         if ( modType === modData['content-id'] ) {
-                              _icon = {
-                                    svg : modData.icon ? sektionsLocalizedData.moduleIconPath + modData.icon : '',
-                                    font : modData.font_icon ? modData.font_icon : ''
-                              };
+                              if ( !_.isEmpty( modData.icon ) ) {
+                                    if ( 'http' === modData.icon.substring(0, 4) ) {
+                                          icon_img_src = modData.icon;
+                                    } else {
+                                          icon_img_src = sektionsLocalizedData.moduleIconPath + modData.icon;
+                                    }
+                                    _icon = {
+                                          svg : modData.icon ? icon_img_src : '',
+                                          font : modData.font_icon ? modData.font_icon : ''
+                                    };
+                              }
                         }
                   });
                   if ( !_.isEmpty( _icon.svg ) ) {

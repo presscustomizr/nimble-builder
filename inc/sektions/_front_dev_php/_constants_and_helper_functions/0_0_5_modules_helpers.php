@@ -139,13 +139,6 @@ function sek_get_module_collection() {
         )
         // array(
         //   'content-type' => 'module',
-        //   'content-id' => 'czr_special_img_module',
-        //   'title' => __( 'Nimble Image', 'text_doma' ),
-        //   'font_icon' => '<i class="material-icons">all_out</i>',
-        //   'active' => sek_is_pro()
-        // )
-        // array(
-        //   'content-type' => 'module',
         //   'content-id' => 'czr_featured_pages_module',
         //   'title' => __( 'Featured pages',  'text_doma' ),
         //   'icon' => 'Nimble__featured_icon.svg'

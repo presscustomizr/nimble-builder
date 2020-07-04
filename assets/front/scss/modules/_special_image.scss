@@ -1,4 +1,4 @@
-.#{$project-prefix}nimble-image-wrapper {
+.sek-nimble-image-wrapper {
     max-width: 100%;
     overflow: hidden;
     width: 100%;
@@ -18,7 +18,7 @@
     transform-style: preserve-3d;
 }
 
-.#{$project-prefix}nimble-image-mask {
+.sek-nimble-image-mask {
     position: absolute;
     border-color: #fff;
     left: 0;
@@ -42,22 +42,24 @@
         transition: all .3s ease;
         -webkit-backface-visibility: hidden;
         backface-visibility: hidden;
-        .#{$project-prefix}nimble-image-wrapper.expanded &,
-        .#{$project-prefix}nimble-image-wrapper.hover &,
-        .#{$project-prefix}nimble-image-wrapper:hover & {
+        .sek-nimble-image-wrapper.expanded &,
+        .sek-nimble-image-wrapper.hover &,
+        .sek-nimble-image-wrapper:hover & {
             transform: scale(1.4);
         }
     }
-    .#{$project-prefix}nimble-image-wrapper.round &::before {
+    .sek-nimble-image-wrapper.round &::before {
         border-radius: 50%;
     }
 }
 
-.#{$project-prefix}nimble-image {
+.sek-nimble-image {
     position: absolute;
     width: 100%;
     height: 100%;
     background-position: center center;
     background-size: cover;
+    background-repeat: no-repeat;
     z-index: 0;
+    top: 0;
 }
