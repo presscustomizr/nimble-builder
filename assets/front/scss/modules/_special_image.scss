@@ -16,6 +16,12 @@
     justify-content: center;
     backface-visibility: hidden;
     transform-style: preserve-3d;
+    a {
+      color: #ffffff;
+      &:hover {
+        color: #ffffff;
+      }
+    }
 }
 
 .sek-nimble-image-mask {
@@ -32,8 +38,6 @@
     justify-content: center;
     &::before {
         position: absolute;
-        width: 63%;
-        padding-bottom: 63%;
         content: '';
         z-index: 1;
         border: 150vw solid;
@@ -42,16 +46,40 @@
         transition: all .3s ease;
         -webkit-backface-visibility: hidden;
         backface-visibility: hidden;
-        .sek-nimble-image-wrapper.expanded &,
-        .sek-nimble-image-wrapper.hover &,
-        .sek-nimble-image-wrapper:hover & {
-            transform: scale(1.4);
+        // .sek-nimble-image-wrapper.nb-mask-expand &,
+        // .sek-nimble-image-wrapper.nb-mask-always-shrinked & {
+        //     width: 63%;
+        //     padding-bottom: 63%;
+        // }
+        // .sek-nimble-image-wrapper.nb-mask-expand.hover &,
+        // .sek-nimble-image-wrapper.nb-mask-expand:hover & {
+        //     width: 88%;
+        //     padding-bottom: 88%;
+        // }
+        .sek-nimble-image-wrapper.nb-mask-expand:hover &,
+        .sek-nimble-image-wrapper.nb-mask-shrink &,
+        .sek-nimble-image-wrapper.nb-mask-always-expanded & {
+            width: 88%;
+            padding-bottom: 88%;
         }
+        .sek-nimble-image-wrapper.nb-mask-shrink:hover &,
+        .sek-nimble-image-wrapper.nb-mask-expand &,
+        .sek-nimble-image-wrapper.nb-mask-always-shrinked & {
+            width: 63%;
+            padding-bottom: 63%;
+        }
+        // .sek-nimble-image-wrapper.expanded &,
+        // .sek-nimble-image-wrapper.nb-mask-expand.hover &,
+        // .sek-nimble-image-wrapper.nb-mask-expand:hover & {
+        //     transform: scale(1.4);
+        // }
     }
-    .sek-nimble-image-wrapper.round &::before {
+
+    .sek-nimble-image-wrapper.nb-circle-mask &::before {
         border-radius: 50%;
     }
 }
+
 
 .sek-nimble-image {
     position: absolute;
