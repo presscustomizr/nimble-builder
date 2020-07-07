@@ -17,6 +17,35 @@
                   }
                   _section_ = api.section( input.module.control.section() );
 
+                  var _do_ = function( contentType ) {
+                        input.container.find( '[data-sek-content-type="' + ( contentType || 'module' ) + '"]').trigger('click');
+                        _.each( _section_.controls(), function( _control_ ) {
+                              if ( ! _.isUndefined( _control_.content_type ) ) {
+                                    _control_.active( contentType === _control_.content_type );
+                              }
+                        });
+                  };
+
+                  // Initialize
+                  // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
+                  api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value();
+                  // This event is emitted by ::generateUIforDraggableContent()
+                  // this way we are sure that all controls for modules and sections are instantiated
+                  // and we can use _section_.controls() to set the visibility of module / section controls when switching
+                  api.bind('nimble-modules-and-sections-controls-registered', function() {
+                        _do_( api.czr_sektions.currentContentPickerType() );
+                  });
+
+
+
+                  // Schedule a reaction to changes
+                  api.czr_sektions.currentContentPickerType.bind( function( contentType ) {
+                        _do_( contentType );
+                  });
+
+                  // initialize the content picker observer
+                  api.czr_sektions.currentContentPickerType( input() );
+
                   // attach click event on data-sek-content-type buttons
                   input.container.on('click', '[data-sek-content-type]', function( evt ) {
                         evt.preventDefault();
@@ -45,39 +74,16 @@
                               api.czr_sektions.templateGalleryExpanded(false);
 
                               $(this).attr( 'aria-pressed', true );
+
                               // case for section and module content type
                               api.czr_sektions.currentContentPickerType( _contentType );
                         }
                   });
 
-
-                  var _do_ = function( contentType ) {
-                        input.container.find( '[data-sek-content-type="' + ( contentType || 'module' ) + '"]').trigger('click');
-                        _.each( _section_.controls(), function( _control_ ) {
-                              if ( ! _.isUndefined( _control_.content_type ) ) {
-                                    _control_.active( contentType === _control_.content_type );
-                              }
-                        });
-                  };
-
-                  // Initialize
-                  // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
-                  api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value( input() );
-                  // This event is emitted by ::generateUIforDraggableContent()
-                  // this way we are sure that all controls for modules and sections are instantiated
-                  // and we can use _section_.controls() to set the visibility of module / section controls when switching
-                  api.bind('nimble-modules-and-sections-controls-registered', function() {
-                        _do_( api.czr_sektions.currentContentPickerType() );
-                  });
-
-
-                  // Schedule a reaction to changes
-                  api.czr_sektions.currentContentPickerType.bind( function( contentType ) {
-                        _do_( contentType );
-                  });
-
-                  // initialize with module picker
-                  input.container.find( '[data-sek-content-type="' + ( input() || 'module' ) + '"]').trigger('click');
+                  // initialize with module or section picker depending on the scenario :
+                  // 1) new section created => section picker
+                  // 2) all other cases => module picker
+                  _do_( api.czr_sektions.currentContentPickerType() );
             }
       });
 })( wp.customize, jQuery, _ );

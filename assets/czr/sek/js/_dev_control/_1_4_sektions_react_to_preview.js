@@ -589,13 +589,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                             // GENERATE UI ELEMENTS
+                            // June 2020 :
+                            // When a user creates a new section, the content type switcher is set to section
+                            // For all other cases, when user clicks on the + icon, the content type switcher is set to module
                             'sek-pick-content' : function( params ) {
                                   params = _.isObject(params) ? params : {};
                                   // Set the active content type here
                                   // This is used in api.czrInputMap.content_type_switcher()
                                   // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
                                   api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value();
-                                  api.czr_sektions.currentContentPickerType( params.content_type || 'module' );
 
                                   // Set the last clicked target element id now => will be used for double click insertion of module / section
                                   if ( _.isObject( params ) && params.id ) {

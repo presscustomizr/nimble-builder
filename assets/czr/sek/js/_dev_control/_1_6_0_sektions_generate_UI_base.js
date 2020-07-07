@@ -48,6 +48,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errare( '::generateUI() => error', er );
                                     dfd = $.Deferred();
                               }
+                              // June 2020 Make sure the content picker is set to "section" when user creates a new section
+                              api.czr_sektions.currentContentPickerType( params.content_type || 'module' );
                         break;
 
                         // Fired in ::initialize()
