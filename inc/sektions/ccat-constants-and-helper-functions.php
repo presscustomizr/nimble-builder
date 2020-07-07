@@ -457,7 +457,10 @@ function nimble_regex_callback( $matches ) {
     // otherwise go ahead and parse
     } else {
       return apply_filters( 'nimble_img_smartloaded',
-        str_replace( array('srcset=', 'sizes='), array('data-sek-srcset=', 'data-sek-sizes='),
+        // june 2020 : the spaces before strings to replace ensure we don't replace attributes that include "srcset" or "sizes"
+        // which can happen if another plugin has already added lazy load attributes
+        // see https://github.com/presscustomizr/nimble-builder/issues/723
+        str_replace( array(' srcset=', ' sizes='), array(' data-sek-srcset=', ' data-sek-sizes='),
             sprintf('<img %1$s src="%2$s" data-sek-src="%3$s" %4$s>',
                 $matches[1],
                 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
@@ -918,13 +921,6 @@ function sek_get_module_collection() {
           'font_icon' => '<i class="material-icons">menu</i>'
           //'active' => sek_are_beta_features_enabled()
         )
-        // array(
-        //   'content-type' => 'module',
-        //   'content-id' => 'czr_special_img_module',
-        //   'title' => __( 'Nimble Image', 'text_doma' ),
-        //   'font_icon' => '<i class="material-icons">all_out</i>',
-        //   'active' => sek_is_pro()
-        // )
         // array(
         //   'content-type' => 'module',
         //   'content-id' => 'czr_featured_pages_module',

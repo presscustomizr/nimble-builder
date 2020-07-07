@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.4
-Stable tag: 2.1.1
+Stable tag: 2.1.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,17 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.0 : Introduction of a new user interface to save and reuse sections in any pages.
+2.1.2 : [performance][css] don't generate CSS for inactive locations on a page
+. [menu module] submenu items won't inherit user defined text styles. [menu module][mobile menu] make sure users can scroll down mobile menu items if menu wrapper is higher than vh. [lazy load][performances] fixed : image parsing can break srcset and sizes attributes. [UI][Content Picker] Fix all content type displayed in some cases + make sure the content picker is set to "section" when user creates a new section
 
 == Changelog ==
+= 2.1.2 July 7th 2020 =
+* fixed : [performance][css] don't generate CSS for inactive locations on a page
+* fixed : [menu module] submenu items won't inherit user defined text styles
+* fixed : [menu module][mobile menu] make sure users can scroll down mobile menu items if menu wrapper is higher than vh
+* fixed : [lazy load][performances] image parsing can break srcset and sizes attributes
+* fixed : [UI][Content Picker] Fix all content type displayed in some cases + make sure the content picker is set to "section" when user creates a new section
+
 = 2.1.1 June 17th 2020 =
 * fixed : [options] prevent duplicated dismissed pointer in user_meta
 * fixed : [admin] wrong url for NB icon in options title

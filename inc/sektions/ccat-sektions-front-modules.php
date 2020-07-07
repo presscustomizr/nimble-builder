@@ -4574,7 +4574,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
 }
 ?><?php
 /* ------------------------------------------------------------------------- *
- *  LOAD AND REGISTER BUTTON MODULE
+ *  LOAD AND REGISTER MENU MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 
@@ -4611,7 +4611,7 @@ function sek_get_module_params_for_czr_menu_module() {
             //     'color_css'  => '#ffffff',
             // )
         ),
-        'css_selectors' => array( '.sek-menu-module > li > a' ),//<=@see tmpl/modules/menu_module_tmpl.php
+        'css_selectors' => array( '.sek-menu-module li > a', '.nb-search-expand-inner input', '[data-sek-is-mobile-menu="yes"] .nb-mobile-search input' ),//<=@see tmpl/modules/menu_module_tmpl.php
         'render_tmpl_path' => "menu_module_tmpl.php"
     );
 }

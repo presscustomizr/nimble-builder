@@ -1687,7 +1687,11 @@ function sek_print_nimble_input_templates() {
                 modData = jQuery.extend( defaultModParams, modData );
 
                 if ( !_.isEmpty( modData['icon'] ) ) {
-                    icon_img_src = sektionsLocalizedData.moduleIconPath + modData['icon'];
+                    if ( 'http' === modData['icon'].substring(0, 4) ) {
+                      icon_img_src = modData['icon'];
+                    } else {
+                      icon_img_src = sektionsLocalizedData.moduleIconPath + modData['icon'];
+                    }
                     icon_img_html = '<img draggable="false" title="' + modData['title'] + '" alt="' +  modData['title'] + '" class="nimble-module-icons" src="' + icon_img_src + '"/>';
                 } else if ( !_.isEmpty( modData['font_icon'] ) ) {
                     icon_img_html = modData['font_icon'];

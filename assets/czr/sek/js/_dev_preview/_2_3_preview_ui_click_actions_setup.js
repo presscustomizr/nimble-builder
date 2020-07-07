@@ -49,6 +49,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             self.errare( '::scheduleUiClickReactions => error location id can not be empty' );
                         }
 
+                        //console.log('ALORS CLICKED ?', clickedOn );
+
                         switch( clickedOn ) {
                               case 'addContentButton' :
                                     var is_first_section = true === $el.closest('[data-sek-is-first-section]').data('sek-is-first-section');
@@ -139,7 +141,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               break;
                         }
 
-                        //console.log('CLICKED ?', clickedOn );
                   });//$('body').on('click', function( evt ) {}
 
             },//scheduleUserReactions()
@@ -157,7 +158,6 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               syncedTinyMceInputId = $moduleWrapper.find('div[data-sek-input-id]').length > 0 ? $moduleWrapper.find('div[data-sek-input-id]').data('sek-input-id') : '';
                         }
                   }
-                  //console.log('SOO?', params );
                   api.preview.send( 'sek-' + params.action, _.extend( {
                         location : params.location,
                         level : params.level,

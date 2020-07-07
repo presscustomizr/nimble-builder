@@ -3,7 +3,7 @@
 * Plugin Name: Nimble Page Builder
 * Plugin URI: https://nimblebuilder.com
 * Description: Powerful drag and drop page builder using the native WordPress customizer.
-* Version: 2.1.2-betaaaa
+* Version: 2.1.2
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://nimblebuilder.com/?utm_source=wp-plugins&utm_medium=wp-dashboard&utm_campaign=author-uri
@@ -16,7 +16,7 @@ if ( !defined( 'ABSPATH' ) ) {
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
-$current_version = "2.1.2-betaaaa";
+$current_version = "2.1.2";
 
 if ( !defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version ); }
 if ( !defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
@@ -51,7 +51,7 @@ if ( version_compare( $wp_version, NIMBLE_MIN_WP_VERSION, '<' ) ) {
     return;
 }
 
-function nimble_pass_requirements(){
+function nimble_passes_requirements(){
   global $wp_version;
   return !version_compare( phpversion(), NIMBLE_MIN_PHP_VERSION, '<' ) && !version_compare( $wp_version, NIMBLE_MIN_WP_VERSION, '<' );
 }
@@ -77,7 +77,7 @@ function nimble_display_min_requirement_notice( $requires_what, $requires_what_v
 /* ------------------------------------------------------------------------- */
 add_action( 'after_setup_theme', 'nimble_load_czr_base_fmk', 10 );
 function nimble_load_czr_base_fmk() {
-    if ( !nimble_pass_requirements() )
+    if ( !nimble_passes_requirements() )
       return;
     if ( did_action( 'nimble_base_fmk_loaded' ) ) {
         if ( ( defined( 'CZR_DEV' ) && CZR_DEV ) || ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) ) {
@@ -95,7 +95,7 @@ function nimble_load_czr_base_fmk() {
     }
 }
 
-if ( nimble_pass_requirements() ) {
+if ( nimble_passes_requirements() ) {
     require_once( NIMBLE_BASE_PATH . '/inc/czr-skope/index.php' );
     add_action( 'after_setup_theme', 'nimble_load_skope_php');
     function nimble_load_skope_php() {
@@ -112,7 +112,7 @@ if ( nimble_pass_requirements() ) {
     require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-sektions-ui-modules.php' );
     require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-sektions-front-modules.php' );
     require_once( NIMBLE_BASE_PATH . '/inc/sektions/ccat-sektions-base.php' );
-    do_action('nimble_front_loaded');
+    do_action('nimble_after_loading');
 
     // $_POST['ac_get_template'] <= scenario of an input template getting ajaxily fetched
     if ( \Nimble\skp_is_customizing() || isset( $_POST['ac_get_template']) || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
@@ -166,4 +166,4 @@ if ( nimble_pass_requirements() ) {
         require_once( NIMBLE_BASE_PATH . '/inc/admin/nimble-admin.php' );
         do_action('nimble_admin_loaded');
     }
-}//if ( nimble_pass_requirements() )
+}//if ( nimble_passes_requirements() )

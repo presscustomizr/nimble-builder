@@ -1248,6 +1248,7 @@ window.nb_.getQueryVariable = function(variable) {
                       $('.sek-mobile-menu-expanded-below').remove();
                       _doMobileMenuSetup();
               });
+
           });//jQuery( function($){})
 
       };/////////////// callbackFunc

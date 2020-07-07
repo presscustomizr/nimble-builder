@@ -64,6 +64,9 @@ function nimble_regex_callback( $matches ) {
     // otherwise go ahead and parse
     } else {
       return apply_filters( 'nimble_img_smartloaded',
+        // june 2020 : the spaces before strings to replace ensure we don't replace attributes that include "srcset" or "sizes"
+        // which can happen if another plugin has already added lazy load attributes
+        // see https://github.com/presscustomizr/nimble-builder/issues/723
         str_replace( array(' srcset=', ' sizes='), array(' data-sek-srcset=', ' data-sek-sizes='),
             sprintf('<img %1$s src="%2$s" data-sek-src="%3$s" %4$s>',
                 $matches[1],

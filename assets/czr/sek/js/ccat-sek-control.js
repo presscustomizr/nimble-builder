@@ -301,7 +301,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Example of use of $_POST['local_skope_id'] => @see sek_get_parent_level_model()
                   // Helps fixing : https://github.com/presscustomizr/nimble-builder/issues/242, for which sek_add_css_rules_for_spacing() couldn't be set for columns margins
                   api.bind( 'save-request-params', function( query ) {
-                        $.extend( query, { local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ) } );
+                        $.extend( query, {
+                          local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                          active_locations : api.czr_sektions.activeLocations()
+                        });
                   });
 
 
@@ -392,9 +395,37 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.generateUI({ action : 'sek-generate-global-options-ui'});
                               _section_.nimbleGlobalOptionGenerated = true;
                         });
+                        ////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        // June 2020 property introduced for https://github.com/presscustomizr/nimble-builder-pro/issues/12
+                        self.nb_is_ready = true;
 
                         // This event has been introduced when implementing https://github.com/presscustomizr/nimble-builder/issues/304
                         api.trigger('nimble-ready-for-current-skope');
+                         ////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////
                   };//doSkopeDependantActions()
 
                   // populate the setting ids now if skopes are set
@@ -1635,15 +1666,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // an svg file like Nimble__divider_icon.svg => in this case we build and return the full url
             // or a font_icon like '<i class="fab fa-wordpress-simple"></i>'
             getTreeModuleIcon : function( modType ) {
-                  var _icon = {};
+                  var _icon = {}, icon_img_src;
                   _.each( sektionsLocalizedData.moduleCollection, function( modData ) {
                         if ( !_.isEmpty( _icon ) )
                           return;
                         if ( modType === modData['content-id'] ) {
-                              _icon = {
-                                    svg : modData.icon ? sektionsLocalizedData.moduleIconPath + modData.icon : '',
-                                    font : modData.font_icon ? modData.font_icon : ''
-                              };
+                              if ( !_.isEmpty( modData.icon ) ) {
+                                    if ( 'http' === modData.icon.substring(0, 4) ) {
+                                          icon_img_src = modData.icon;
+                                    } else {
+                                          icon_img_src = sektionsLocalizedData.moduleIconPath + modData.icon;
+                                    }
+                                    _icon = {
+                                          svg : modData.icon ? icon_img_src : '',
+                                          font : modData.font_icon ? modData.font_icon : ''
+                                    };
+                              }
                         }
                   });
                   if ( !_.isEmpty( _icon.svg ) ) {
@@ -3970,13 +4008,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                             // GENERATE UI ELEMENTS
+                            // June 2020 :
+                            // When a user creates a new section, the content type switcher is set to section
+                            // For all other cases, when user clicks on the + icon, the content type switcher is set to module
                             'sek-pick-content' : function( params ) {
                                   params = _.isObject(params) ? params : {};
                                   // Set the active content type here
                                   // This is used in api.czrInputMap.content_type_switcher()
                                   // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
                                   api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value();
-                                  api.czr_sektions.currentContentPickerType( params.content_type || 'module' );
 
                                   // Set the last clicked target element id now => will be used for double click insertion of module / section
                                   if ( _.isObject( params ) && params.id ) {
@@ -4347,6 +4387,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errare( '::generateUI() => error', er );
                                     dfd = $.Deferred();
                               }
+                              // June 2020 Make sure the content picker is set to "section" when user creates a new section
+                              api.czr_sektions.currentContentPickerType( params.content_type || 'module' );
                         break;
 
                         // Fired in ::initialize()
@@ -11479,6 +11521,35 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   _section_ = api.section( input.module.control.section() );
 
+                  var _do_ = function( contentType ) {
+                        input.container.find( '[data-sek-content-type="' + ( contentType || 'module' ) + '"]').trigger('click');
+                        _.each( _section_.controls(), function( _control_ ) {
+                              if ( ! _.isUndefined( _control_.content_type ) ) {
+                                    _control_.active( contentType === _control_.content_type );
+                              }
+                        });
+                  };
+
+                  // Initialize
+                  // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
+                  api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value();
+                  // This event is emitted by ::generateUIforDraggableContent()
+                  // this way we are sure that all controls for modules and sections are instantiated
+                  // and we can use _section_.controls() to set the visibility of module / section controls when switching
+                  api.bind('nimble-modules-and-sections-controls-registered', function() {
+                        _do_( api.czr_sektions.currentContentPickerType() );
+                  });
+
+
+
+                  // Schedule a reaction to changes
+                  api.czr_sektions.currentContentPickerType.bind( function( contentType ) {
+                        _do_( contentType );
+                  });
+
+                  // initialize the content picker observer
+                  api.czr_sektions.currentContentPickerType( input() );
+
                   // attach click event on data-sek-content-type buttons
                   input.container.on('click', '[data-sek-content-type]', function( evt ) {
                         evt.preventDefault();
@@ -11507,39 +11578,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.czr_sektions.templateGalleryExpanded(false);
 
                               $(this).attr( 'aria-pressed', true );
+
                               // case for section and module content type
                               api.czr_sektions.currentContentPickerType( _contentType );
                         }
                   });
 
-
-                  var _do_ = function( contentType ) {
-                        input.container.find( '[data-sek-content-type="' + ( contentType || 'module' ) + '"]').trigger('click');
-                        _.each( _section_.controls(), function( _control_ ) {
-                              if ( ! _.isUndefined( _control_.content_type ) ) {
-                                    _control_.active( contentType === _control_.content_type );
-                              }
-                        });
-                  };
-
-                  // Initialize
-                  // Fixes issue https://github.com/presscustomizr/nimble-builder/issues/248
-                  api.czr_sektions.currentContentPickerType = api.czr_sektions.currentContentPickerType || new api.Value( input() );
-                  // This event is emitted by ::generateUIforDraggableContent()
-                  // this way we are sure that all controls for modules and sections are instantiated
-                  // and we can use _section_.controls() to set the visibility of module / section controls when switching
-                  api.bind('nimble-modules-and-sections-controls-registered', function() {
-                        _do_( api.czr_sektions.currentContentPickerType() );
-                  });
-
-
-                  // Schedule a reaction to changes
-                  api.czr_sektions.currentContentPickerType.bind( function( contentType ) {
-                        _do_( contentType );
-                  });
-
-                  // initialize with module picker
-                  input.container.find( '[data-sek-content-type="' + ( input() || 'module' ) + '"]').trigger('click');
+                  // initialize with module or section picker depending on the scenario :
+                  // 1) new section created => section picker
+                  // 2) all other cases => module picker
+                  _do_( api.czr_sektions.currentContentPickerType() );
             }
       });
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData
