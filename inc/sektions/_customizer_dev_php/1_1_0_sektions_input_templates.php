@@ -547,7 +547,8 @@ function sek_print_nimble_input_templates() {
                   'title' : '',
                   'icon' : '',
                   'font_icon' : '',
-                  'active' : true
+                  'active' : true,
+                  'is_pro' : false
                 },
                 modData = jQuery.extend( defaultModParams, modData );
 
@@ -565,11 +566,22 @@ function sek_print_nimble_input_templates() {
                     font_icon_class = !_.isEmpty( modData['font_icon'] ) ? 'is-font-icon' : '',
                     is_draggable = true !== modData['active'] ? 'false' : 'true';
                 if ( true !== modData['active'] ) {
-                    title_attr = "<?php _e('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_doma'); ?>";
+                    if ( modData['is_pro'] ) {
+                        title_attr = "<?php _e('Pro feature', 'text_doma'); ?>";
+                    } else {
+                        title_attr = "<?php _e('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_doma'); ?>";
+                    }
                 }
                 // "data-sek-eligible-for-module-dropzones" was introduced for https://github.com/presscustomizr/nimble-builder/issues/540
                 #>
-                <div draggable="{{is_draggable}}" data-sek-eligible-for-module-dropzones="true" data-sek-content-type="{{modData['content-type']}}" data-sek-content-id="{{modData['content-id']}}" title="{{title_attr}}"><div class="sek-module-icon {{font_icon_class}}"><# print(icon_img_html); #></div><div class="sek-module-title"><div class="sek-centered-module-title">{{modData['title']}}</div></div></div>
+                <div draggable="{{is_draggable}}" data-sek-eligible-for-module-dropzones="true" data-sek-content-type="{{modData['content-type']}}" data-sek-content-id="{{modData['content-id']}}" title="{{title_attr}}"><div class="sek-module-icon {{font_icon_class}}"><# print(icon_img_html); #></div><div class="sek-module-title"><div class="sek-centered-module-title">{{modData['title']}}</div></div>
+                  <#
+                  if ( modData['is_pro'] ) {
+                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + '/sek/img/pro_white.svg" alt="Pro feature"/></div>';
+                    print(pro_img_html);
+                  }
+                  #>
+                </div>
                 <#
             });//_.each
             #>

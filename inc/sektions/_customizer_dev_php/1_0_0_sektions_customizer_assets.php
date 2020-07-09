@@ -176,6 +176,7 @@ function sek_enqueue_controls_js_css() {
                 // added for the module tree #359
                 'moduleCollection' => sek_get_module_collection(),
                 'moduleIconPath' => NIMBLE_MODULE_ICON_PATH,
+                'czrAssetsPath' => NIMBLE_BASE_URL . '/assets/czr/',
 
                 'hasActiveCachePlugin' => sek_has_active_cache_plugin(),
 

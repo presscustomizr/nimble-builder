@@ -51,6 +51,14 @@ function sek_get_module_collection() {
         ),
         array(
           'content-type' => 'module',
+          'content-id' => 'czr_special_img_module',
+          'title' => __( 'Nimble Image', 'text_doma' ),
+          'icon' => 'Nimble_img_icon.svg',
+          'is_pro' => !sek_is_pro(),
+          'active' => sek_is_pro()
+        ),
+        array(
+          'content-type' => 'module',
           'content-id' => 'czr_button_module',
           'title' => __( 'Button', 'text_doma' ),
           'icon' => 'Nimble_button_icon.svg'
