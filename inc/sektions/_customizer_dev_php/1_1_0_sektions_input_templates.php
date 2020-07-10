@@ -577,7 +577,7 @@ function sek_print_nimble_input_templates() {
                 <div draggable="{{is_draggable}}" data-sek-eligible-for-module-dropzones="true" data-sek-content-type="{{modData['content-type']}}" data-sek-content-id="{{modData['content-id']}}" title="{{title_attr}}"><div class="sek-module-icon {{font_icon_class}}"><# print(icon_img_html); #></div><div class="sek-module-title"><div class="sek-centered-module-title">{{modData['title']}}</div></div>
                   <#
                   if ( modData['is_pro'] ) {
-                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + '/sek/img/pro_white.svg" alt="Pro feature"/></div>';
+                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_white.svg" alt="Pro feature"/></div>';
                     print(pro_img_html);
                   }
                   #>
