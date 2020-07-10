@@ -1,6 +1,10 @@
 <?php
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 function sek_get_module_params_for_sek_local_header_footer() {
+    $pro_text = '';
+    if ( !sek_is_pro() ) {
+        $pro_text = sek_get_pro_notice_for_czr_input( __('sticky header, header over content, sticky footer, search icon, WooCommerce Cart, hamburger color, ...', 'text-doma') );
+    }
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_header_footer',
@@ -31,6 +35,7 @@ function sek_get_module_params_for_sek_local_header_footer() {
                             __('site wide options', 'text_doma')
                         )
                     ),
+                    'html_after' => $pro_text
                 )
             )
         )//tmpl
