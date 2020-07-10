@@ -36,6 +36,13 @@ function sek_get_raw_registration_params() {
                     'content-id' => 'intro_two',
                     'title' => __('2 columns, call to action, full-width background', 'text-domain' ),
                     'thumb' => 'intro_two.jpg'
+                ),
+                array(
+                    'content-id' => 'pro_intro_one',
+                    'title' => __('3 call to action boxes, full-width background', 'text-domain' ),
+                    'thumb' => 'intro_two.jpg',
+                    'active' => sek_is_pro(),
+                    'is_pro' => !sek_is_pro()
                 )
             )
         ],

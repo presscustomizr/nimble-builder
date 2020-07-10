@@ -618,7 +618,9 @@ function sek_print_nimble_input_templates() {
                   'thumb' : '',
                   'title' : '',
                   'section_type' : '',
-                  'height': ''
+                  'height': '',
+                  'active' : true,
+                  'is_pro' : false
                 },
                 modData = jQuery.extend( defaultParams, secParams );
 
@@ -627,14 +629,22 @@ function sek_print_nimble_input_templates() {
                 }
 
                 var thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/img/section_assets/thumbs/', secParams['thumb'] ,  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
-                styleAttr = 'background: url(' + thumbUrl  + ') 50% 50% / cover no-repeat;';
+                    styleAttr = 'background: url(' + thumbUrl  + ') 50% 50% / cover no-repeat;';
+                    is_draggable = true !== modData['active'] ? 'false' : 'true';
 
                 if ( !_.isEmpty(secParams['height']) ) {
                     styleAttr = styleAttr + 'height:' + secParams['height'] + ';';
                 }
 
                 #>
-                <div draggable="true" data-sek-content-type="preset_section" data-sek-content-id="{{secParams['content-id']}}" style="<# print(styleAttr); #>" title="{{secParams['title']}}" data-sek-section-type="{{section_type}}"><div class="sek-overlay"></div></div>
+                <div draggable="{{is_draggable}}" data-sek-content-type="preset_section" data-sek-content-id="{{secParams['content-id']}}" style="<# print(styleAttr); #>" title="{{secParams['title']}}" data-sek-section-type="{{section_type}}"><div class="sek-overlay"></div>
+                  <#
+                  if ( modData['is_pro'] ) {
+                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_white.svg" alt="Pro feature"/></div>';
+                    print(pro_img_html);
+                  }
+                  #>
+                </div>
                 <#
             });//_.each
             #>
