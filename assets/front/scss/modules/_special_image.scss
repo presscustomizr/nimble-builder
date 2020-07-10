@@ -22,6 +22,23 @@
         color: #ffffff;
       }
     }
+    .nb-icon-wrapper {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      top: 0;
+      display: -webkit-box;
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 80px;
+      color: #707070;
+      background-color: rgba(206,206,206,0.5);
+    }
 }
 
 .sek-nimble-image-mask {
