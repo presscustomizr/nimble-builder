@@ -319,14 +319,14 @@ class Sek_Dyn_CSS_Handler {
             if ( !empty($this->css_string_to_enqueue_or_print) ) {
                 $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
             } else {
-                $this->sek_dyn_css_maybe_delete_file_test();
+                $this->sek_dyn_css_maybe_delete_file();
             }
         } else {
             //sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' ?? => $this->css_string_to_enqueue_or_print => ', $this->css_string_to_enqueue_or_print );
             if ( !empty($this->css_string_to_enqueue_or_print) ) {
                 $this->sek_dyn_css_maybe_write_css_file();
             } else {
-                $this->sek_dyn_css_maybe_delete_file_test();
+                $this->sek_dyn_css_maybe_delete_file();
             }
         }
     }//__construct
@@ -364,6 +364,18 @@ class Sek_Dyn_CSS_Handler {
             if ( !$this->_sek_dyn_css_write_file_is_possible() ) {
                 $this->mode = self::MODE_INLINE;
             }
+        }
+
+        // July 2020 remove previous folder
+        if ( 'done' != get_transient( 'nimble_update_css_folder_name_0720' ) ) {
+            $upload_dir = wp_get_upload_dir();
+            $prev_folder_path = $this->_sek_dyn_css_build_relative_base_path( NIMBLE_PREV_CSS_FOLDER_NAME );
+            $previous_folder_one = wp_normalize_path( trailingslashit( $upload_dir['basedir'] ) . $prev_folder_path );
+            global $wp_filesystem;
+            if ( $wp_filesystem->exists( $previous_folder_one ) ) {
+                $wp_filesystem->rmdir( $previous_folder_one, true );
+            }
+            set_transient( 'nimble_update_css_folder_name_0720', 'done', 30 * YEAR_IN_SECONDS );
         }
     }
 
@@ -665,13 +677,14 @@ class Sek_Dyn_CSS_Handler {
     /**
      *
      * Retrieve the relative path (to the 'uploads' dir ) of the CSS base directory
+     * July 2020 => added a $base_dir param for #727
      *
      * @access private
      *
      * @return string The relative path (to the 'uploads' dir) of the CSS base directory
      */
-    private function _sek_dyn_css_build_relative_base_path() {
-        $css_base_dir     = self::CSS_BASE_DIR;
+    private function _sek_dyn_css_build_relative_base_path( $base_dir = null ) {
+        $css_base_dir     = is_null($base_dir) ? self::CSS_BASE_DIR : $base_dir;
 
         if ( is_multisite() ) {
             $site        = get_site();
