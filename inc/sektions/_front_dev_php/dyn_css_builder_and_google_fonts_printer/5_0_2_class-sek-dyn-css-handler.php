@@ -316,17 +316,22 @@ class Sek_Dyn_CSS_Handler {
         //hook setup for printing or enqueuing
         //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Customizer_Setting::update()
         if ( !$this->customizer_save ) {
-            if ( !empty($this->css_string_to_enqueue_or_print) ) {
+            // when not customizing, we write and enqueue :
+            // - if the file already exists,
+            // - or if we just have generated the CSS because the file had been deleted
+            if ( !empty($this->css_string_to_enqueue_or_print) || $this->_sek_dyn_css_file_exists_is_readable_and_has_content() ) {
                 $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
             } else {
-                $this->sek_dyn_css_maybe_delete_file();
+                $this->sek_dyn_css_delete_file_if_empty();
             }
         } else {
             //sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' ?? => $this->css_string_to_enqueue_or_print => ', $this->css_string_to_enqueue_or_print );
             if ( !empty($this->css_string_to_enqueue_or_print) ) {
                 $this->sek_dyn_css_maybe_write_css_file();
             } else {
-                $this->sek_dyn_css_maybe_delete_file();
+                // When customizing, the stylesheet is always generated.
+                // So if it is empty, it means we have to delete it
+                $this->sek_dyn_css_delete_file();
             }
         }
     }//__construct
@@ -552,14 +557,31 @@ class Sek_Dyn_CSS_Handler {
 
     /**
      *
-     * Remove the CSS file from the disk, if it exists
+     * Maybe remove the CSS file from the disk, if it exists and if empty
      * Note : July 2020 => function updated for https://github.com/presscustomizr/nimble-builder/issues/727
      *
      * @return bool TRUE if the CSS file has been deleted (or didn't exist already), FALSE otherwise
      */
-    public function sek_dyn_css_maybe_delete_file() {
+    public function sek_dyn_css_delete_file_if_empty() {
         global $wp_filesystem;
-        if ( $wp_filesystem->exists( $this->uri ) ) {
+        if ( $this->_sek_dyn_css_file_exists_and_is_empty() ) {
+            $this->file_exists != $wp_filesystem->delete( $this->uri );
+            return !$this->file_exists;
+        }
+        return !$this->file_exists;
+    }
+
+
+    /**
+     *
+     * Remove the CSS file from the disk, if it exists, and even if not empty
+     * Note : July 2020 => function updated for https://github.com/presscustomizr/nimble-builder/issues/727
+     *
+     * @return bool TRUE if the CSS file has been deleted (or didn't exist already), FALSE otherwise
+     */
+    public function sek_dyn_css_delete_file() {
+        global $wp_filesystem;
+        if ( $this->file_exists ) {
             $this->file_exists != $wp_filesystem->delete( $this->uri );
             return !$this->file_exists;
         }
