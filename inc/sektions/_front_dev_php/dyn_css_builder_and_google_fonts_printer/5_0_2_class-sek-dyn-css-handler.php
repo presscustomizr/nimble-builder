@@ -367,15 +367,16 @@ class Sek_Dyn_CSS_Handler {
         }
 
         // July 2020 remove previous folder
-        if ( 'done' != get_transient( 'nimble_update_css_folder_name_0720' ) ) {
-            $upload_dir = wp_get_upload_dir();
-            $prev_folder_path = $this->_sek_dyn_css_build_relative_base_path( NIMBLE_PREV_CSS_FOLDER_NAME );
-            $previous_folder_one = wp_normalize_path( trailingslashit( $upload_dir['basedir'] ) . $prev_folder_path );
-            global $wp_filesystem;
-            if ( $wp_filesystem->exists( $previous_folder_one ) ) {
-                $wp_filesystem->rmdir( $previous_folder_one, true );
-            }
-            set_transient( 'nimble_update_css_folder_name_0720', 'done', 30 * YEAR_IN_SECONDS );
+        // see https://github.com/presscustomizr/nimble-builder/issues/727
+        // if ( 'done' != get_transient( 'nimble_update_css_folder_name_0720' ) ) {
+        //     set_transient( 'nimble_update_css_folder_name_0720', 'done', 30 * YEAR_IN_SECONDS );
+        // }
+        $upload_dir = wp_get_upload_dir();
+        $prev_folder_path = $this->_sek_dyn_css_build_relative_base_path( NIMBLE_PREV_CSS_FOLDER_NAME );
+        $previous_folder_one = wp_normalize_path( trailingslashit( $upload_dir['basedir'] ) . $prev_folder_path );
+        global $wp_filesystem;
+        if ( $wp_filesystem->exists( $previous_folder_one ) ) {
+            $wp_filesystem->rmdir( $previous_folder_one, true );
         }
     }
 
