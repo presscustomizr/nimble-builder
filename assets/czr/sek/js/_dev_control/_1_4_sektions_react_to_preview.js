@@ -24,6 +24,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             // Note : if the target location is empty ( is_first_section is true ), nothing is send to the preview when updating the api setting, and we refresh the location level. => this makes sure that we removes the placeholder printed in the previously empty location
                             'sek-add-section' : {
                                   callback : function( params ) {
+                                        // July 2020 => for #728
+                                        api.previewedDevice( 'desktop' );
+
                                         sendToPreview = ! _.isUndefined( params.send_to_preview ) ? params.send_to_preview : true;//<= when the level is refreshed when complete, we don't need to send to preview.
                                         uiParams = {};
                                         apiParams = {

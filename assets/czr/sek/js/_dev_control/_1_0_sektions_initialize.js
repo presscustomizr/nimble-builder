@@ -232,9 +232,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Always set the previewed device back to desktop on ui change
                   // event 'sek-ui-removed' id triggered when cleaning the registered ui controls
                   // @see ::cleanRegistered()
-                  self.bind( 'sek-ui-removed', function() {
-                        api.previewedDevice( 'desktop' );
-                  });
+                  // July 2020 commented to fix https://github.com/presscustomizr/nimble-builder/issues/728
+                  // self.bind( 'sek-ui-removed', function() {
+                  //       api.previewedDevice( 'desktop' );
+                  // });
 
                   // Synchronize api.previewedDevice with the currently rendered ui
                   // ensure that the selected device tab of the spacing module is the one being previewed
