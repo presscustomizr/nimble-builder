@@ -458,9 +458,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Always set the previewed device back to desktop on ui change
                   // event 'sek-ui-removed' id triggered when cleaning the registered ui controls
                   // @see ::cleanRegistered()
-                  self.bind( 'sek-ui-removed', function() {
-                        api.previewedDevice( 'desktop' );
-                  });
+                  // July 2020 commented to fix https://github.com/presscustomizr/nimble-builder/issues/728
+                  // self.bind( 'sek-ui-removed', function() {
+                  //       api.previewedDevice( 'desktop' );
+                  // });
 
                   // Synchronize api.previewedDevice with the currently rendered ui
                   // ensure that the selected device tab of the spacing module is the one being previewed
@@ -3443,6 +3444,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             // Note : if the target location is empty ( is_first_section is true ), nothing is send to the preview when updating the api setting, and we refresh the location level. => this makes sure that we removes the placeholder printed in the previously empty location
                             'sek-add-section' : {
                                   callback : function( params ) {
+                                        // July 2020 => for #728
+                                        api.previewedDevice( 'desktop' );
+
                                         sendToPreview = ! _.isUndefined( params.send_to_preview ) ? params.send_to_preview : true;//<= when the level is refreshed when complete, we don't need to send to preview.
                                         uiParams = {};
                                         apiParams = {
