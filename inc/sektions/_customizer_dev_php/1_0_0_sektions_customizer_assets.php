@@ -213,6 +213,23 @@ function sek_enqueue_controls_js_css() {
     );//wp_localize_script()
 
     nimble_enqueue_code_editor();
+
+    // July 2020 : compatibility with WP5.5
+    global $wp_version;
+    if ( version_compare( $wp_version, '5.4.2' , '>=' ) ) {
+        wp_localize_script(
+          'wp-color-picker',
+          'wpColorPickerL10n',
+          array(
+            'clear'            => __( 'Clear' ),
+            'clearAriaLabel'   => __( 'Clear color' ),
+            'defaultString'    => __( 'Default' ),
+            'defaultAriaLabel' => __( 'Select default color' ),
+            'pick'             => __( 'Select Color' ),
+            'defaultLabel'     => __( 'Color value' ),
+          )
+        );
+    }
 }//sek_enqueue_controls_js_css()
 
 
