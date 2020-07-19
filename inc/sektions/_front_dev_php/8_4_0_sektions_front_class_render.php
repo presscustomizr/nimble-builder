@@ -1131,7 +1131,12 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'the_nimble_tinymce_module_content', 'wpautop' );
             add_filter( 'the_nimble_tinymce_module_content', 'shortcode_unautop' );
             add_filter( 'the_nimble_tinymce_module_content', 'prepend_attachment' );
-            add_filter( 'the_nimble_tinymce_module_content', 'wp_make_content_images_responsive' );
+            // July 2020 : compatibility with WP 5.5
+            if ( function_exists('wp_filter_content_tags') ) {
+                add_filter( 'the_nimble_tinymce_module_content', 'wp_filter_content_tags' );
+            } else {
+                add_filter( 'the_nimble_tinymce_module_content', 'wp_make_content_images_responsive' );
+            }
             add_filter( 'the_nimble_tinymce_module_content', array( $this, 'sek_do_shortcode' ), 11 ); // AFTER wpautop()
             add_filter( 'the_nimble_tinymce_module_content', 'capital_P_dangit', 9 );
             add_filter( 'the_nimble_tinymce_module_content', '\Nimble\sek_parse_template_tags', 21 );
