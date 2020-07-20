@@ -34,7 +34,7 @@ function sek_get_nimble_api_data( $force_update = false ) {
     $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
     $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
     if ( !array_key_exists('api_data_transient_0720', $bw_fixes_options ) || 'done' != $bw_fixes_options['api_data_transient_0720'] ) {
-        sek_clean_past_transients( 'nimble_api_data');
+        sek_clean_transients_like( 'nimble_api_data');
         $bw_fixes_options['api_data_transient_0720'] = 'done';
         // flag as done
         update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );

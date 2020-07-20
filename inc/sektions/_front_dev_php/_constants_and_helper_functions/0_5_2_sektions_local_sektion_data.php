@@ -4,16 +4,30 @@
 
 /////////////////////////////////////////////////////////////
 // REGISTRATION PARAMS FOR PRESET SECTIONS
-// Store the params in transient, refreshed every hour
+// Store the params in an option, refreshed every 30 days, on plugin update, on theme switch
 // @return array()
 function sek_get_sections_registration_params( $force_update = false ) {
-    $section_params_transient_name = 'section_params_transient_' . NIMBLE_VERSION;
-    $registration_params = get_transient( $section_params_transient_name );
-    // Refresh every 30 days, unless force_update set to true
-    if ( $force_update || false === $registration_params ) {
-        $registration_params = sek_get_raw_registration_params();
-        set_transient( $section_params_transient_name, $registration_params, 30 * DAY_IN_SECONDS );
+
+    // JULY 2020 => not stored in a transient anymore. For https://github.com/presscustomizr/nimble-builder/issues/730
+    // + clean previously created transients
+    $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
+    $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
+    if ( !array_key_exists('clean_section_params_transient_0720', $bw_fixes_options ) || 'done' != $bw_fixes_options['clean_section_params_transient_0720'] ) {
+        sek_clean_transients_like( 'section_params_transient' );
+        $bw_fixes_options['clean_section_params_transient_0720'] = 'done';
+        // flag as done
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
     }
+
+    // $section_params_transient_name = 'section_params_transient_' . NIMBLE_VERSION;
+    // $registration_params = get_transient( $section_params_transient_name );
+    // // Refresh every 30 days, unless force_update set to true
+    // if ( $force_update || false === $registration_params ) {
+    //     $registration_params = sek_get_raw_registration_params();
+    //     set_transient( $section_params_transient_name, $registration_params, 30 * DAY_IN_SECONDS );
+    // }
+
+    $registration_params = sek_get_raw_registration_params();
     return $registration_params;
 }
 
@@ -141,9 +155,21 @@ function sek_get_raw_registration_params() {
 /////////////////////////////////////////////////////////////
 // JSON FOR PRESET SECTIONS
 function sek_get_preset_section_collection_from_json( $force_update = false ) {
-    $section_json_transient_name = 'section_json_transient_' . NIMBLE_VERSION;
-    $json_collection = get_transient( $section_json_transient_name );
+    // JULY 2020 => not stored in a transient anymore. For https://github.com/presscustomizr/nimble-builder/issues/730
+    // + clean previously created transients
+    $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
+    $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
+    if ( !array_key_exists('clean_section_json_transient_0720', $bw_fixes_options ) || 'done' != $bw_fixes_options['clean_section_json_transient_0720'] ) {
+        sek_clean_transients_like( 'section_json_transient' );
+        $bw_fixes_options['clean_section_json_transient_0720'] = 'done';
+        // flag as done
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
+    }
+
+    $json_collection = get_option( NIMBLE_OPT_NAME_FOR_SECTION_JSON );
+
     // Refresh every 30 days, unless force_update set to true
+    // force update is activated on plugin update, theme_switch
     if ( $force_update || false === $json_collection ) {
         $json_raw = @file_get_contents( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
         if ( $json_raw === false ) {
@@ -151,7 +177,8 @@ function sek_get_preset_section_collection_from_json( $force_update = false ) {
         }
 
         $json_collection = json_decode( $json_raw, true );
-        set_transient( $section_json_transient_name, $json_collection, 30 * DAY_IN_SECONDS );
+        // Save now as option for faster access next time
+        update_option( NIMBLE_OPT_NAME_FOR_SECTION_JSON, $json_collection );
     }
     return $json_collection;
 }

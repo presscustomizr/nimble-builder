@@ -297,9 +297,8 @@ function sek_current_user_can_access_nb_ui() {
 /* ------------------------------------------------------------------------- *
  *  TRANSIENTS
 /* ------------------------------------------------------------------------- */
-// July 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/730
-function sek_clean_past_transients( $transient_string ) {
-    // sek_error_log('CLEAN PAST TRANSIENTS', $transient_string );
+// July 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/730
+function sek_clean_transients_like( $transient_string ) {
     global $wpdb;
     $where_like = '%'.$transient_string.'%';
     $sql = "SELECT `option_name` AS `name`, `option_value` AS `value`
@@ -320,13 +319,16 @@ function sek_clean_past_transients( $transient_string ) {
         }
     }
 
+    //sek_error_log('CLEAN PAST TRANSIENTS ' . $transient_string, $transients );
+
     // Clean the transients found
     // transient name looks like _transient_section_json_transient_2.1.5
     // when deleted, it also removes the associated _transient_timeout_... option
     foreach ($transients as $group => $list) {
         if ( 'transient' === $group && is_array($list) ) {
             foreach ($list as $name => $val) {
-              $trans_name = str_replace('_transient_', '', $name);
+              // the transient name does not include the "_transient_" prefix
+              $trans_name = substr($name, strlen('_transient_') );
               delete_transient( $trans_name );
             }
         }
