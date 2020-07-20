@@ -1,29 +1,30 @@
 <?php
+// JULY 2020 => NOT FIRED ANYMORE ( because introduced in oct 2018 ) => DEACTIVATED IN nimble-builder.php
 // fired @wp_loaded
 // Note : if fired @plugins_loaded, invoking wp_update_post() generates php notices
 function sek_maybe_do_version_mapping() {
-    if ( !is_user_logged_in() || !current_user_can( 'edit_theme_options' ) )
-      return;
-    //delete_option(NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS);
-    $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-    $global_options = is_array( $global_options ) ? $global_options : array();
-    $global_options['retro_compat_mappings'] = isset( $global_options['retro_compat_mappings'] ) ? $global_options['retro_compat_mappings'] : array();
+    // if ( !is_user_logged_in() || !current_user_can( 'edit_theme_options' ) )
+    //   return;
+    // //delete_option(NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS);
+    // $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+    // $global_options = is_array( $global_options ) ? $global_options : array();
+    // $global_options['retro_compat_mappings'] = isset( $global_options['retro_compat_mappings'] ) ? $global_options['retro_compat_mappings'] : array();
 
-    // To 1_0_4 was introduced in december 2018
-    // It's related to a modification of the skope_id when home is a static page
-    if ( !array_key_exists( 'to_1_4_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['to_1_4_0'] ) {
-        $status_to_1_4_0 = sek_do_compat_to_1_4_0();
-        //sek_error_log('$status_1_0_4_to_1_1_0 ' . $status_1_0_4_to_1_1_0, $global_options );
-        $global_options['retro_compat_mappings']['to_1_4_0'] = 'done';
-    }
+    // // To 1_0_4 was introduced in december 2018
+    // // It's related to a modification of the skope_id when home is a static page
+    // if ( !array_key_exists( 'to_1_4_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['to_1_4_0'] ) {
+    //     $status_to_1_4_0 = sek_do_compat_to_1_4_0();
+    //     //sek_error_log('$status_1_0_4_to_1_1_0 ' . $status_1_0_4_to_1_1_0, $global_options );
+    //     $global_options['retro_compat_mappings']['to_1_4_0'] = 'done';
+    // }
 
-    // 1_0_4_to_1_1_0 introduced in October 2018
-    if ( !array_key_exists( '1_0_4_to_1_1_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] ) {
-        $status_1_0_4_to_1_1_0 = sek_do_compat_1_0_4_to_1_1_0();
-        //sek_error_log('$status_1_0_4_to_1_1_0 ' . $status_1_0_4_to_1_1_0, $global_options );
-        $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] = 'done';
-    }
-    update_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS, $global_options );
+    // // 1_0_4_to_1_1_0 introduced in October 2018
+    // if ( !array_key_exists( '1_0_4_to_1_1_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] ) {
+    //     $status_1_0_4_to_1_1_0 = sek_do_compat_1_0_4_to_1_1_0();
+    //     //sek_error_log('$status_1_0_4_to_1_1_0 ' . $status_1_0_4_to_1_1_0, $global_options );
+    //     $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] = 'done';
+    // }
+    // update_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS, $global_options );
 }
 
 ////////////////////////////////////////////////////////////////
