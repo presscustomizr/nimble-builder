@@ -170,7 +170,7 @@ function sek_get_preset_section_collection_from_json( $force_update = false ) {
 
     // Refresh every 30 days, unless force_update set to true
     // force update is activated on plugin update, theme_switch
-    if ( $force_update || false === $json_collection ) {
+    if ( $force_update || false == $json_collection ) {
         $json_raw = @file_get_contents( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
         if ( $json_raw === false ) {
             $json_raw = wp_remote_fopen( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
@@ -184,7 +184,7 @@ function sek_get_preset_section_collection_from_json( $force_update = false ) {
 }
 
 
-// Maybe refresh data on
+// Maybe set / refresh section data
 // - theme switch
 // - nimble upgrade
 // - nimble is loaded ( only when is_admin() ) <= This makes the loading of the customizer faster on the first load, because the transient is ready.
@@ -192,14 +192,8 @@ add_action( 'nimble_front_classes_ready', '\Nimble\sek_refresh_preset_sections_d
 add_action( 'after_switch_theme', '\Nimble\sek_refresh_preset_sections_data');
 add_action( 'upgrader_process_complete', '\Nimble\sek_refresh_preset_sections_data');
 function sek_refresh_preset_sections_data() {
-    if ( 'nimble_front_classes_ready' === current_filter() && !is_admin() )
-      return;
-    if ( 'nimble_front_classes_ready' === current_filter() && defined( 'DOING_AJAX') && DOING_AJAX )
-      return;
-
-    // => so the posts and message are up to date
-    sek_get_preset_section_collection_from_json(true);
-    sek_get_sections_registration_params(true);
+    // force refresh only on after_switch_theme and upgrader_process_complete actions
+    sek_get_preset_section_collection_from_json( 'nimble_front_classes_ready' != current_filter() );
 }
 
 ?>
