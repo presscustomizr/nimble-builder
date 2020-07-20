@@ -28,6 +28,9 @@ if ( !defined( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NA
 //if ( !defined( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' , 'nimble_saved_sektions' ); } //<= June 2020 to be removed
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS' , 'nimble_most_used_fonts' ); }
 
+if ( !defined( 'NIMBLE_OPT_NAME_FOR_SECTION_JSON' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SECTION_JSON' , 'nb_prebuild_section_json' ); }
+
+if ( !defined( 'NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES' ) ) { define( 'NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES' , 'nb_backward_fixes' ); }
 
 if ( !defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
 if ( !defined( 'NIMBLE_WIDGET_PREFIX' ) ) { define( 'NIMBLE_WIDGET_PREFIX' , 'nimble-widget-area-' ); }
@@ -2715,6 +2718,50 @@ function sek_strip_script_tags( $html = '' ) {
 function sek_current_user_can_access_nb_ui() {
     return apply_filters('nimble-user-have-access', true );
 }
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  TRANSIENTS
+/* ------------------------------------------------------------------------- */
+// July 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/730
+function sek_clean_transients_like( $transient_string ) {
+    global $wpdb;
+    $where_like = '%'.$transient_string.'%';
+    $sql = "SELECT `option_name` AS `name`, `option_value` AS `value`
+            FROM  $wpdb->options
+            WHERE `option_name` LIKE '$where_like'
+            ORDER BY `option_name`";
+
+    $results = $wpdb->get_results( $sql );
+    $transients = array();
+
+    foreach ( $results as $result ) {
+        if ( 0 === strpos( $result->name, '_transient' ) ) {
+            if ( 0 === strpos( $result->name, '_transient_timeout_') ) {
+                $transients['transient_timeout'][ $result->name ] = $result->value;
+            } else {
+                $transients['transient'][ $result->name ] = maybe_unserialize( $result->value );
+            }
+        }
+    }
+
+    //sek_error_log('CLEAN PAST TRANSIENTS ' . $transient_string, $transients );
+
+    // Clean the transients found
+    // transient name looks like _transient_section_json_transient_2.1.5
+    // when deleted, it also removes the associated _transient_timeout_... option
+    foreach ($transients as $group => $list) {
+        if ( 'transient' === $group && is_array($list) ) {
+            foreach ($list as $name => $val) {
+              // the transient name does not include the "_transient_" prefix
+              $trans_name = substr($name, strlen('_transient_') );
+              delete_transient( $trans_name );
+            }
+        }
+    }
+}
 ?><?php
 // /* ------------------------------------------------------------------------- *
 // *  NIMBLE API
@@ -2726,6 +2773,7 @@ if ( !defined( "NIMBLE_NEWS_OPT_NAME" ) ) { define( "NIMBLE_NEWS_OPT_NAME", 'nim
 // DOES NOT RETURN THE DATA FOR PRESET SECTIONS
 // if ( !defined( "NIMBLE_DATA_API_URL" ) ) { define( "NIMBLE_DATA_API_URL", 'https://api.nimblebuilder.com/wp-json/nimble/v1/cravan' ); }
 if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2", 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan' ); }
+
 
 // Nimble api returns a set of value structured as follow
 // return array(
@@ -2744,8 +2792,20 @@ if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2", 
 //     // 'testreferer' => $_SERVER => to get the
 // );
 // @return array|false Info data, or false.
+// api data is refreshed on plugin update and theme switch
 function sek_get_nimble_api_data( $force_update = false ) {
-    $api_data_transient_name = 'nimble_api_data_' . NIMBLE_VERSION;
+    // July 2020 for https://github.com/presscustomizr/nimble-builder/issues/730
+    $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
+    $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
+    if ( !array_key_exists('api_data_transient_0720', $bw_fixes_options ) || 'done' != $bw_fixes_options['api_data_transient_0720'] ) {
+        sek_clean_transients_like( 'nimble_api_data');
+        $bw_fixes_options['api_data_transient_0720'] = 'done';
+        // flag as done
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
+    }
+
+    // July 2020 => new static transient name, not updated on each NB version
+    $api_data_transient_name = 'nimble_data_api';
     $info_data = get_transient( $api_data_transient_name );
     $theme_slug = sek_get_parent_theme_slug();
     $pc_theme_name = sek_maybe_get_presscustomizr_theme_name( $theme_slug );
@@ -2884,16 +2944,30 @@ function sek_refresh_nimble_api_data() {
 
 /////////////////////////////////////////////////////////////
 // REGISTRATION PARAMS FOR PRESET SECTIONS
-// Store the params in transient, refreshed every hour
+// Store the params in an option, refreshed every 30 days, on plugin update, on theme switch
 // @return array()
 function sek_get_sections_registration_params( $force_update = false ) {
-    $section_params_transient_name = 'section_params_transient_' . NIMBLE_VERSION;
-    $registration_params = get_transient( $section_params_transient_name );
-    // Refresh every 30 days, unless force_update set to true
-    if ( $force_update || false === $registration_params ) {
-        $registration_params = sek_get_raw_registration_params();
-        set_transient( $section_params_transient_name, $registration_params, 30 * DAY_IN_SECONDS );
+
+    // JULY 2020 => not stored in a transient anymore. For https://github.com/presscustomizr/nimble-builder/issues/730
+    // + clean previously created transients
+    $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
+    $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
+    if ( !array_key_exists('clean_section_params_transient_0720', $bw_fixes_options ) || 'done' != $bw_fixes_options['clean_section_params_transient_0720'] ) {
+        sek_clean_transients_like( 'section_params_transient' );
+        $bw_fixes_options['clean_section_params_transient_0720'] = 'done';
+        // flag as done
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
     }
+
+    // $section_params_transient_name = 'section_params_transient_' . NIMBLE_VERSION;
+    // $registration_params = get_transient( $section_params_transient_name );
+    // // Refresh every 30 days, unless force_update set to true
+    // if ( $force_update || false === $registration_params ) {
+    //     $registration_params = sek_get_raw_registration_params();
+    //     set_transient( $section_params_transient_name, $registration_params, 30 * DAY_IN_SECONDS );
+    // }
+
+    $registration_params = sek_get_raw_registration_params();
     return $registration_params;
 }
 
@@ -3021,23 +3095,36 @@ function sek_get_raw_registration_params() {
 /////////////////////////////////////////////////////////////
 // JSON FOR PRESET SECTIONS
 function sek_get_preset_section_collection_from_json( $force_update = false ) {
-    $section_json_transient_name = 'section_json_transient_' . NIMBLE_VERSION;
-    $json_collection = get_transient( $section_json_transient_name );
+    // JULY 2020 => not stored in a transient anymore. For https://github.com/presscustomizr/nimble-builder/issues/730
+    // + clean previously created transients
+    $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
+    $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
+    if ( !array_key_exists('clean_section_json_transient_0720', $bw_fixes_options ) || 'done' != $bw_fixes_options['clean_section_json_transient_0720'] ) {
+        sek_clean_transients_like( 'section_json_transient' );
+        $bw_fixes_options['clean_section_json_transient_0720'] = 'done';
+        // flag as done
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
+    }
+
+    $json_collection = get_option( NIMBLE_OPT_NAME_FOR_SECTION_JSON );
+
     // Refresh every 30 days, unless force_update set to true
-    if ( $force_update || false === $json_collection ) {
+    // force update is activated on plugin update, theme_switch
+    if ( $force_update || false == $json_collection ) {
         $json_raw = @file_get_contents( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
         if ( $json_raw === false ) {
             $json_raw = wp_remote_fopen( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
         }
 
         $json_collection = json_decode( $json_raw, true );
-        set_transient( $section_json_transient_name, $json_collection, 30 * DAY_IN_SECONDS );
+        // Save now as option for faster access next time
+        update_option( NIMBLE_OPT_NAME_FOR_SECTION_JSON, $json_collection );
     }
     return $json_collection;
 }
 
 
-// Maybe refresh data on
+// Maybe set / refresh section data
 // - theme switch
 // - nimble upgrade
 // - nimble is loaded ( only when is_admin() ) <= This makes the loading of the customizer faster on the first load, because the transient is ready.
@@ -3045,14 +3132,8 @@ add_action( 'nimble_front_classes_ready', '\Nimble\sek_refresh_preset_sections_d
 add_action( 'after_switch_theme', '\Nimble\sek_refresh_preset_sections_data');
 add_action( 'upgrader_process_complete', '\Nimble\sek_refresh_preset_sections_data');
 function sek_refresh_preset_sections_data() {
-    if ( 'nimble_front_classes_ready' === current_filter() && !is_admin() )
-      return;
-    if ( 'nimble_front_classes_ready' === current_filter() && defined( 'DOING_AJAX') && DOING_AJAX )
-      return;
-
-    // => so the posts and message are up to date
-    sek_get_preset_section_collection_from_json(true);
-    sek_get_sections_registration_params(true);
+    // force refresh only on after_switch_theme and upgrader_process_complete actions
+    sek_get_preset_section_collection_from_json( 'nimble_front_classes_ready' != current_filter() );
 }
 
 ?><?php
@@ -3190,31 +3271,32 @@ function sek_get_customize_url_for_post_id( $post_id, $return_url = '' ) {
 }
 
 ?><?php
+// JULY 2020 => NOT FIRED ANYMORE ( because introduced in oct 2018 ) => DEACTIVATED IN nimble-builder.php
 // fired @wp_loaded
 // Note : if fired @plugins_loaded, invoking wp_update_post() generates php notices
 function sek_maybe_do_version_mapping() {
-    if ( !is_user_logged_in() || !current_user_can( 'edit_theme_options' ) )
-      return;
-    //delete_option(NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS);
-    $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
-    $global_options = is_array( $global_options ) ? $global_options : array();
-    $global_options['retro_compat_mappings'] = isset( $global_options['retro_compat_mappings'] ) ? $global_options['retro_compat_mappings'] : array();
+    // if ( !is_user_logged_in() || !current_user_can( 'edit_theme_options' ) )
+    //   return;
+    // //delete_option(NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS);
+    // $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+    // $global_options = is_array( $global_options ) ? $global_options : array();
+    // $global_options['retro_compat_mappings'] = isset( $global_options['retro_compat_mappings'] ) ? $global_options['retro_compat_mappings'] : array();
 
-    // To 1_0_4 was introduced in december 2018
-    // It's related to a modification of the skope_id when home is a static page
-    if ( !array_key_exists( 'to_1_4_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['to_1_4_0'] ) {
-        $status_to_1_4_0 = sek_do_compat_to_1_4_0();
-        //sek_error_log('$status_1_0_4_to_1_1_0 ' . $status_1_0_4_to_1_1_0, $global_options );
-        $global_options['retro_compat_mappings']['to_1_4_0'] = 'done';
-    }
+    // // To 1_0_4 was introduced in december 2018
+    // // It's related to a modification of the skope_id when home is a static page
+    // if ( !array_key_exists( 'to_1_4_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['to_1_4_0'] ) {
+    //     $status_to_1_4_0 = sek_do_compat_to_1_4_0();
+    //     //sek_error_log('$status_1_0_4_to_1_1_0 ' . $status_1_0_4_to_1_1_0, $global_options );
+    //     $global_options['retro_compat_mappings']['to_1_4_0'] = 'done';
+    // }
 
-    // 1_0_4_to_1_1_0 introduced in October 2018
-    if ( !array_key_exists( '1_0_4_to_1_1_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] ) {
-        $status_1_0_4_to_1_1_0 = sek_do_compat_1_0_4_to_1_1_0();
-        //sek_error_log('$status_1_0_4_to_1_1_0 ' . $status_1_0_4_to_1_1_0, $global_options );
-        $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] = 'done';
-    }
-    update_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS, $global_options );
+    // // 1_0_4_to_1_1_0 introduced in October 2018
+    // if ( !array_key_exists( '1_0_4_to_1_1_0', $global_options['retro_compat_mappings'] ) || 'done' != $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] ) {
+    //     $status_1_0_4_to_1_1_0 = sek_do_compat_1_0_4_to_1_1_0();
+    //     //sek_error_log('$status_1_0_4_to_1_1_0 ' . $status_1_0_4_to_1_1_0, $global_options );
+    //     $global_options['retro_compat_mappings']['1_0_4_to_1_1_0'] = 'done';
+    // }
+    // update_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS, $global_options );
 }
 
 ////////////////////////////////////////////////////////////////

@@ -42,4 +42,5 @@
 
 [data-sek-module-type="czr_icon_module"] .sek-icon-wrapper {
   display: inline-block;
+  line-height: 1em;
 }
