@@ -10,6 +10,7 @@ if ( !defined( "NIMBLE_NEWS_OPT_NAME" ) ) { define( "NIMBLE_NEWS_OPT_NAME", 'nim
 // if ( !defined( "NIMBLE_DATA_API_URL" ) ) { define( "NIMBLE_DATA_API_URL", 'https://api.nimblebuilder.com/wp-json/nimble/v1/cravan' ); }
 if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2", 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan' ); }
 
+
 // Nimble api returns a set of value structured as follow
 // return array(
 //     'timestamp' => time(),
@@ -27,8 +28,20 @@ if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2", 
 //     // 'testreferer' => $_SERVER => to get the
 // );
 // @return array|false Info data, or false.
+// api data is refreshed on plugin update and theme switch
 function sek_get_nimble_api_data( $force_update = false ) {
-    $api_data_transient_name = 'nimble_api_data_' . NIMBLE_VERSION;
+    // July 2020 for https://github.com/presscustomizr/nimble-builder/issues/730
+    $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
+    $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
+    if ( !array_key_exists('api_data_transient_0720', $bw_fixes_options ) || 'done' != $bw_fixes_options['api_data_transient_0720'] ) {
+        sek_clean_past_transients( 'nimble_api_data');
+        $bw_fixes_options['api_data_transient_0720'] = 'done';
+        // flag as done
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
+    }
+
+    // July 2020 => new static transient name, not updated on each NB version
+    $api_data_transient_name = 'nimble_data_api';
     $info_data = get_transient( $api_data_transient_name );
     $theme_slug = sek_get_parent_theme_slug();
     $pc_theme_name = sek_maybe_get_presscustomizr_theme_name( $theme_slug );

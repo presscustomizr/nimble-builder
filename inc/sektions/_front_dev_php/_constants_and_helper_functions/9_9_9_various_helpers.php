@@ -290,4 +290,46 @@ function sek_strip_script_tags( $html = '' ) {
 function sek_current_user_can_access_nb_ui() {
     return apply_filters('nimble-user-have-access', true );
 }
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  TRANSIENTS
+/* ------------------------------------------------------------------------- */
+// July 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/730
+function sek_clean_past_transients( $transient_string ) {
+    // sek_error_log('CLEAN PAST TRANSIENTS', $transient_string );
+    global $wpdb;
+    $where_like = '%'.$transient_string.'%';
+    $sql = "SELECT `option_name` AS `name`, `option_value` AS `value`
+            FROM  $wpdb->options
+            WHERE `option_name` LIKE '$where_like'
+            ORDER BY `option_name`";
+
+    $results = $wpdb->get_results( $sql );
+    $transients = array();
+
+    foreach ( $results as $result ) {
+        if ( 0 === strpos( $result->name, '_transient' ) ) {
+            if ( 0 === strpos( $result->name, '_transient_timeout_') ) {
+                $transients['transient_timeout'][ $result->name ] = $result->value;
+            } else {
+                $transients['transient'][ $result->name ] = maybe_unserialize( $result->value );
+            }
+        }
+    }
+
+    // Clean the transients found
+    // transient name looks like _transient_section_json_transient_2.1.5
+    // when deleted, it also removes the associated _transient_timeout_... option
+    foreach ($transients as $group => $list) {
+        if ( 'transient' === $group && is_array($list) ) {
+            foreach ($list as $name => $val) {
+              $trans_name = str_replace('_transient_', '', $name);
+              delete_transient( $trans_name );
+            }
+        }
+    }
+}
 ?>
