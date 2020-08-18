@@ -176,6 +176,7 @@ function sek_enqueue_controls_js_css() {
                 // added for the module tree #359
                 'moduleCollection' => sek_get_module_collection(),
                 'moduleIconPath' => NIMBLE_MODULE_ICON_PATH,
+                'czrAssetsPath' => NIMBLE_BASE_URL . '/assets/czr/',
 
                 'hasActiveCachePlugin' => sek_has_active_cache_plugin(),
 
@@ -1131,6 +1132,19 @@ function sek_is_plugin_active_for_network( $plugin ) {
   return false;
 }
 
+// July 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/720
+function sek_get_pro_notice_for_czr_input( $features = '' ) {
+  return sprintf( '<hr/><p class="sek-pro-notice"><img class="sek-pro-icon" src="%1$s"/><span class="sek-pro-notice-icon-bef-text"><img src="%2$s"/></span><span class="sek-pro-notice-text">%3$s : %4$s<br/><br/>%5$s</span><p>',
+      NIMBLE_BASE_URL.'/assets/czr/sek/img/pro_white.svg?ver='.NIMBLE_VERSION,
+      NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
+      __('Unlock more features with Nimble Builder Pro', 'text-doma'),
+      $features,
+      sprintf('<a href="%1$s" rel="noopener noreferrer" title="%2$s" target="_blank">%2$s <i class="fas fa-external-link-alt"></i></a>',
+          'https://presscustomizr.com/nimble-builder-pro/',
+          __('Go Pro', 'text-doma')
+      )
+  );
+}
 
 
 ?>

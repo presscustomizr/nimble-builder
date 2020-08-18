@@ -126,7 +126,17 @@ li[id^="accordion-section-__nimble__"] > h3 {
 [data-sek-content-type="module"] {
   width: 29%;
   height: 130px;
+  position: relative;
 }
+.sek-is-pro {
+  position: absolute;
+  top: -3px;
+  z-index: 10;
+  right: 2px;
+  height: 20px;
+  width: 31px;
+}
+
 
 
 /* When sections are displayed in the module picker. Typically the columns sections */

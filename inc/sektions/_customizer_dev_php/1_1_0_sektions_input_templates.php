@@ -547,7 +547,8 @@ function sek_print_nimble_input_templates() {
                   'title' : '',
                   'icon' : '',
                   'font_icon' : '',
-                  'active' : true
+                  'active' : true,
+                  'is_pro' : false
                 },
                 modData = jQuery.extend( defaultModParams, modData );
 
@@ -565,11 +566,22 @@ function sek_print_nimble_input_templates() {
                     font_icon_class = !_.isEmpty( modData['font_icon'] ) ? 'is-font-icon' : '',
                     is_draggable = true !== modData['active'] ? 'false' : 'true';
                 if ( true !== modData['active'] ) {
-                    title_attr = "<?php _e('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_doma'); ?>";
+                    if ( modData['is_pro'] ) {
+                        title_attr = "<?php _e('Pro feature', 'text_doma'); ?>";
+                    } else {
+                        title_attr = "<?php _e('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_doma'); ?>";
+                    }
                 }
                 // "data-sek-eligible-for-module-dropzones" was introduced for https://github.com/presscustomizr/nimble-builder/issues/540
                 #>
-                <div draggable="{{is_draggable}}" data-sek-eligible-for-module-dropzones="true" data-sek-content-type="{{modData['content-type']}}" data-sek-content-id="{{modData['content-id']}}" title="{{title_attr}}"><div class="sek-module-icon {{font_icon_class}}"><# print(icon_img_html); #></div><div class="sek-module-title"><div class="sek-centered-module-title">{{modData['title']}}</div></div></div>
+                <div draggable="{{is_draggable}}" data-sek-eligible-for-module-dropzones="true" data-sek-content-type="{{modData['content-type']}}" data-sek-content-id="{{modData['content-id']}}" title="{{title_attr}}"><div class="sek-module-icon {{font_icon_class}}"><# print(icon_img_html); #></div><div class="sek-module-title"><div class="sek-centered-module-title">{{modData['title']}}</div></div>
+                  <#
+                  if ( modData['is_pro'] ) {
+                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_white.svg" alt="Pro feature"/></div>';
+                    print(pro_img_html);
+                  }
+                  #>
+                </div>
                 <#
             });//_.each
             #>
@@ -606,7 +618,9 @@ function sek_print_nimble_input_templates() {
                   'thumb' : '',
                   'title' : '',
                   'section_type' : '',
-                  'height': ''
+                  'height': '',
+                  'active' : true,
+                  'is_pro' : false
                 },
                 modData = jQuery.extend( defaultParams, secParams );
 
@@ -615,14 +629,22 @@ function sek_print_nimble_input_templates() {
                 }
 
                 var thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/img/section_assets/thumbs/', secParams['thumb'] ,  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
-                styleAttr = 'background: url(' + thumbUrl  + ') 50% 50% / cover no-repeat;';
+                    styleAttr = 'background: url(' + thumbUrl  + ') 50% 50% / cover no-repeat;';
+                    is_draggable = true !== modData['active'] ? 'false' : 'true';
 
                 if ( !_.isEmpty(secParams['height']) ) {
                     styleAttr = styleAttr + 'height:' + secParams['height'] + ';';
                 }
 
                 #>
-                <div draggable="true" data-sek-content-type="preset_section" data-sek-content-id="{{secParams['content-id']}}" style="<# print(styleAttr); #>" title="{{secParams['title']}}" data-sek-section-type="{{section_type}}"><div class="sek-overlay"></div></div>
+                <div draggable="{{is_draggable}}" data-sek-content-type="preset_section" data-sek-content-id="{{secParams['content-id']}}" style="<# print(styleAttr); #>" title="{{secParams['title']}}" data-sek-section-type="{{section_type}}"><div class="sek-overlay"></div>
+                  <#
+                  if ( modData['is_pro'] ) {
+                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_white.svg" alt="Pro feature"/></div>';
+                    print(pro_img_html);
+                  }
+                  #>
+                </div>
                 <#
             });//_.each
             #>
