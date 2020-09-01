@@ -8586,7 +8586,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             sniffAllFonts : function() {
                   var self = this,
                       Allfonts = [],
-                      _snifff_ = function( collectionSettingId, level ) {
+                      _snifff_ = function( collectionSettingId, localOrGlobal, level ) {
                             if ( _.isUndefined( level ) ) {
                                   var currentSektionSettingValue = api( collectionSettingId )();
                                   level = _.isObject( currentSektionSettingValue ) ? $.extend( true, {}, currentSektionSettingValue ) : $.extend( true, {}, self.getDefaultSektionSettingValue( localOrGlobal ) );
@@ -8600,13 +8600,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         Allfonts.push( levelData );
                                   }
                                   if ( _.isArray( levelData ) || _.isObject( levelData ) ) {
-                                        _snifff_( collectionSettingId, levelData );
+                                        _snifff_( collectionSettingId, localOrGlobal, levelData );
                                   }
                             });
                       };
 
-                  _.each( [ self.localSectionsSettingId(), self.getGlobalSectionsSettingId(), sektionsLocalizedData.optNameForGlobalOptions ], function( setId ) {
-                        _snifff_( setId );
+                  // Loop and sniff local sections, global sections, global options
+                  _.each( [
+                        { id : self.localSectionsSettingId(), scope : 'local' },
+                        { id : self.getGlobalSectionsSettingId(), scope : 'global' },
+                        { id : sektionsLocalizedData.optNameForGlobalOptions, scope : 'global' }
+                  ], function( args ) {
+                        _snifff_( args.id, args.scope );
                   });
                   return Allfonts;
             },

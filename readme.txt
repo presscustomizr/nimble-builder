@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.5
-Stable tag: 2.1.5
+Stable tag: 2.1.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -123,6 +123,10 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 2.1.5 : Implements patches for a better compatibility with upcoming WP 5.5. Limits the number of transients created by Nimble Builder.
 
 == Changelog ==
+= 2.1.6 September 1st 2020 =
+* fixed : [customizer] fixed possible javascript error when setting a font family
+* improved : [admin] Welcome notice doesn't need to be displayed on all screens
+
 = 2.1.5 July 20th 2020 =
 * fixed : [compatibility with WP 5.5] wp_make_content_images_responsive is deprecated, replaced by wp_filter_content_tags
 * fixed : [compatibility with WP 5.5] adapt customizer color-picker script with latest version of WP 5.5
