@@ -278,6 +278,29 @@ function sek_render_welcome_notice() {
       return;
     if ( isset($_GET['page']) && NIMBLE_OPTIONS_PAGE === $_GET['page'] )
       return;
+    // Prevent diplay on some admin pages
+    // for https://github.com/presscustomizr/nimble-builder/issues/737
+    $current_screen = get_current_screen();
+    if( in_array( $current_screen->base, array(
+        // Tools menu items
+        'site-health',
+        'tools',
+        'import',
+        'export',
+        'export-personal-data',
+        'erase-personal-data',
+
+        // Settings menu items
+        'options-general',
+        'options-writing',
+        'options-reading',
+        'options-discussion',
+        'options-media',
+        'options-permalinks',
+        'options-privacy',
+      ) ) )
+      return;
+
     // If the notice has not been dismissed, make sure it is still relevant to display it.
     // If user has started created sections, we should not display it anymore => update the dismissed pointers array
     // @see https://developer.wordpress.org/reference/functions/wp_ajax_dismiss_wp_pointer/
