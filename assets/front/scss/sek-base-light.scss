@@ -1,4 +1,8 @@
 // sek_base and sek_base-light must import the same files !
+
+// @import "0_0_global_reset.scss"; <= not concatenated for the moment. Well coded themes should have their own reset.
+// But could be used in the future if an option to dequeue the theme stylesheet is added
+// see https://github.com/presscustomizr/nimble-builder/issues/702
 @import "1_1_functions";
 @import "1_2_variables";
 @import "1_3_mixins";
