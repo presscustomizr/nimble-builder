@@ -1133,7 +1133,10 @@ function sek_is_plugin_active_for_network( $plugin ) {
 }
 
 // July 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/720
+// @param $features (string) list of features
 function sek_get_pro_notice_for_czr_input( $features = '' ) {
+  if ( !defined('NIMBLE_PRO_UPSELL_ON') || !NIMBLE_PRO_UPSELL_ON )
+    return '';
   return sprintf( '<hr/><p class="sek-pro-notice"><img class="sek-pro-icon" src="%1$s"/><span class="sek-pro-notice-icon-bef-text"><img src="%2$s"/></span><span class="sek-pro-notice-text">%3$s : %4$s<br/><br/>%5$s</span><p>',
       NIMBLE_BASE_URL.'/assets/czr/sek/img/pro_white.svg?ver='.NIMBLE_VERSION,
       NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
@@ -1146,5 +1149,40 @@ function sek_get_pro_notice_for_czr_input( $features = '' ) {
   );
 }
 
+
+// September 2020 : filter the collection of modules
+// Removes pro upsell modules if NIMBLE_PRO_UPSELL_ON is false
+// filter declared in inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php
+add_filter('sek_get_module_collection', function( $collection ) {
+    if ( NIMBLE_PRO_UPSELL_ON )
+      return $collection;
+
+    $filtered = [];
+    foreach ($collection as $mod => $mod_data) {
+        if ( array_key_exists('is_pro', $mod_data) && $mod_data['is_pro'] )
+          continue;
+        $filtered[] = $mod_data;
+    }
+    return $filtered;
+});
+
+// September 2020 : filter the collection of pre-built sections
+// Removes pro upsell modules if NIMBLE_PRO_UPSELL_ON is false
+// filter declared in _front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php
+add_filter('sek_get_raw_section_registration_params', function( $collection ) {
+    if ( NIMBLE_PRO_UPSELL_ON )
+      return $collection;
+
+    $filtered = [];
+    foreach ($collection as $section_group_name => $group_data) {
+        $filtered[$section_group_name] = $group_data;
+        foreach ( $group_data['section_collection'] as $sec_key => $sec_data) {
+            if ( array_key_exists('is_pro', $sec_data) && $sec_data['is_pro'] ) {
+                unset($filtered[$section_group_name]['section_collection'][$sec_key]);
+            }
+        }
+    }
+    return $filtered;
+});
 
 ?>
