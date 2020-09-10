@@ -690,3 +690,33 @@ credits : Gutenberg team @wordpress */
   float: left;
   padding-left: 10px;
 }
+
+.sek-pro-notice {
+  position: relative;
+  padding-left: 36px;
+  font-size: 13px;
+}
+.sek-pro-notice a, .sek-pro-notice a:hover, .sek-pro-notice a:focus {
+  color: #f07829;
+  font-weight: bold;
+  text-decoration: none;
+}
+.sek-pro-notice a:hover {
+  text-decoration: underline;
+}
+.sek-pro-icon {
+  position: absolute;
+  width: 32px;
+  left: 0;
+  top: -2px;
+}
+.sek-pro-notice .sek-pro-notice-icon-bef-text {
+  display: inline-block;
+  width: 23px;
+  height: 15px;
+  position: relative;
+}
+.sek-pro-notice .sek-pro-notice-icon-bef-text  img {
+  position: absolute;
+  top: 0;
+}

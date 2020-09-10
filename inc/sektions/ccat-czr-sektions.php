@@ -176,6 +176,7 @@ function sek_enqueue_controls_js_css() {
                 // added for the module tree #359
                 'moduleCollection' => sek_get_module_collection(),
                 'moduleIconPath' => NIMBLE_MODULE_ICON_PATH,
+                'czrAssetsPath' => NIMBLE_BASE_URL . '/assets/czr/',
 
                 'hasActiveCachePlugin' => sek_has_active_cache_plugin(),
 
@@ -1131,7 +1132,58 @@ function sek_is_plugin_active_for_network( $plugin ) {
   return false;
 }
 
+// July 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/720
+// @param $features (string) list of features
+function sek_get_pro_notice_for_czr_input( $features = '' ) {
+  if ( !defined('NIMBLE_PRO_UPSELL_ON') || !NIMBLE_PRO_UPSELL_ON )
+    return '';
+  return sprintf( '<hr/><p class="sek-pro-notice"><img class="sek-pro-icon" src="%1$s"/><span class="sek-pro-notice-icon-bef-text"><img src="%2$s"/></span><span class="sek-pro-notice-text">%3$s : %4$s<br/><br/>%5$s</span><p>',
+      NIMBLE_BASE_URL.'/assets/czr/sek/img/pro_white.svg?ver='.NIMBLE_VERSION,
+      NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
+      __('Unlock more features with Nimble Builder Pro', 'text-doma'),
+      $features,
+      sprintf('<a href="%1$s" rel="noopener noreferrer" title="%2$s" target="_blank">%2$s <i class="fas fa-external-link-alt"></i></a>',
+          'https://presscustomizr.com/nimble-builder-pro/',
+          __('Go Pro', 'text-doma')
+      )
+  );
+}
 
+
+// September 2020 : filter the collection of modules
+// Removes pro upsell modules if NIMBLE_PRO_UPSELL_ON is false
+// filter declared in inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php
+add_filter('sek_get_module_collection', function( $collection ) {
+    if ( NIMBLE_PRO_UPSELL_ON )
+      return $collection;
+
+    $filtered = [];
+    foreach ($collection as $mod => $mod_data) {
+        if ( array_key_exists('is_pro', $mod_data) && $mod_data['is_pro'] )
+          continue;
+        $filtered[] = $mod_data;
+    }
+    return $filtered;
+});
+
+// September 2020 : filter the collection of pre-built sections
+// Removes pro upsell modules if NIMBLE_PRO_UPSELL_ON is false
+// filter declared in _front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php
+add_filter('sek_get_raw_section_registration_params', function( $collection ) {
+    if ( NIMBLE_PRO_UPSELL_ON )
+      return $collection;
+
+    $filtered = [];
+    foreach ($collection as $section_group_name => $group_data) {
+        $filtered[$section_group_name] = $group_data;
+        foreach ( $group_data['section_collection'] as $sec_key => $sec_data) {
+            if ( array_key_exists('is_pro', $sec_data) && $sec_data['is_pro'] ) {
+                unset($filtered[$section_group_name]['section_collection'][$sec_key]);
+            }
+        }
+    }
+    return $filtered;
+});
 
 ?><?php
 add_action( 'customize_controls_print_footer_scripts', '\Nimble\sek_print_nimble_input_templates' );
@@ -1682,7 +1734,8 @@ function sek_print_nimble_input_templates() {
                   'title' : '',
                   'icon' : '',
                   'font_icon' : '',
-                  'active' : true
+                  'active' : true,
+                  'is_pro' : false
                 },
                 modData = jQuery.extend( defaultModParams, modData );
 
@@ -1700,11 +1753,22 @@ function sek_print_nimble_input_templates() {
                     font_icon_class = !_.isEmpty( modData['font_icon'] ) ? 'is-font-icon' : '',
                     is_draggable = true !== modData['active'] ? 'false' : 'true';
                 if ( true !== modData['active'] ) {
-                    title_attr = "<?php _e('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_doma'); ?>";
+                    if ( modData['is_pro'] ) {
+                        title_attr = "<?php _e('Pro feature', 'text_doma'); ?>";
+                    } else {
+                        title_attr = "<?php _e('Available soon ! This module is currently in beta, you can activate it in Site Wide Options > Beta features', 'text_doma'); ?>";
+                    }
                 }
                 // "data-sek-eligible-for-module-dropzones" was introduced for https://github.com/presscustomizr/nimble-builder/issues/540
                 #>
-                <div draggable="{{is_draggable}}" data-sek-eligible-for-module-dropzones="true" data-sek-content-type="{{modData['content-type']}}" data-sek-content-id="{{modData['content-id']}}" title="{{title_attr}}"><div class="sek-module-icon {{font_icon_class}}"><# print(icon_img_html); #></div><div class="sek-module-title"><div class="sek-centered-module-title">{{modData['title']}}</div></div></div>
+                <div draggable="{{is_draggable}}" data-sek-eligible-for-module-dropzones="true" data-sek-content-type="{{modData['content-type']}}" data-sek-content-id="{{modData['content-id']}}" title="{{title_attr}}"><div class="sek-module-icon {{font_icon_class}}"><# print(icon_img_html); #></div><div class="sek-module-title"><div class="sek-centered-module-title">{{modData['title']}}</div></div>
+                  <#
+                  if ( modData['is_pro'] ) {
+                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_white.svg" alt="Pro feature"/></div>';
+                    print(pro_img_html);
+                  }
+                  #>
+                </div>
                 <#
             });//_.each
             #>
@@ -1741,7 +1805,9 @@ function sek_print_nimble_input_templates() {
                   'thumb' : '',
                   'title' : '',
                   'section_type' : '',
-                  'height': ''
+                  'height': '',
+                  'active' : true,
+                  'is_pro' : false
                 },
                 modData = jQuery.extend( defaultParams, secParams );
 
@@ -1750,14 +1816,22 @@ function sek_print_nimble_input_templates() {
                 }
 
                 var thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/img/section_assets/thumbs/', secParams['thumb'] ,  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
-                styleAttr = 'background: url(' + thumbUrl  + ') 50% 50% / cover no-repeat;';
+                    styleAttr = 'background: url(' + thumbUrl  + ') 50% 50% / cover no-repeat;';
+                    is_draggable = true !== modData['active'] ? 'false' : 'true';
 
                 if ( !_.isEmpty(secParams['height']) ) {
                     styleAttr = styleAttr + 'height:' + secParams['height'] + ';';
                 }
 
                 #>
-                <div draggable="true" data-sek-content-type="preset_section" data-sek-content-id="{{secParams['content-id']}}" style="<# print(styleAttr); #>" title="{{secParams['title']}}" data-sek-section-type="{{section_type}}"><div class="sek-overlay"></div></div>
+                <div draggable="{{is_draggable}}" data-sek-content-type="preset_section" data-sek-content-id="{{secParams['content-id']}}" style="<# print(styleAttr); #>" title="{{secParams['title']}}" data-sek-section-type="{{section_type}}"><div class="sek-overlay"></div>
+                  <#
+                  if ( modData['is_pro'] ) {
+                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_white.svg" alt="Pro feature"/></div>';
+                    print(pro_img_html);
+                  }
+                  #>
+                </div>
                 <#
             });//_.each
             #>

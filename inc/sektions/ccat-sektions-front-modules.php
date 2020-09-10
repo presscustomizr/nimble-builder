@@ -4620,6 +4620,10 @@ function sek_get_module_params_for_czr_menu_module() {
  *  MENU CONTENT
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_menu_content_child() {
+    $pro_text = '';
+    if ( !sek_is_pro() ) {
+        $pro_text = sek_get_pro_notice_for_czr_input( __('search icon and WooCommerce cart in menu, sticky header, hamburger color, ...', 'text-doma') );
+    }
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_menu_content_child',
@@ -4661,6 +4665,7 @@ function sek_get_module_params_for_czr_menu_content_child() {
                     'css_selectors' => array( '.sek-nav-wrap' ),
                     'title_width' => 'width-100',
                     'width-100'   => true,
+                    'html_after' => $pro_text
                 ),
             ),
         ),
