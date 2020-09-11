@@ -18436,6 +18436,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                   }
                                             });
                                       break;
+                                      case 'show_privacy_field' :
+                                            _.each( [ 'privacy_field_label', 'privacy_field_required' ] , function( _inputId_ ) {
+                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                        return input();
+                                                  }); } catch( er ) {
+                                                        api.errare( input.module.module_type + ' => error in setInputVisibilityDeps', er );
+                                                  }
+                                            });
+                                      break;
                                       case 'link-pick-url' :
                                             try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'link-custom-url', function() {
                                                   return input();

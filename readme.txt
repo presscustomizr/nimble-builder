@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.5
-Stable tag: 2.1.7
+Stable tag: 2.1.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,12 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.7 : Successfully tested with WP 5.5.1. Maintenance release, minor admin code improvement.
+2.1.8 : [contact form module] introduction of a privacy checkbox for a better GDPR compliancy
 
 == Changelog ==
+= 2.1.8 September 11th 2020 =
+* added : [contact form module] introduction of a privacy checkbox for a better GDPR compliancy
+
 = 2.1.7 September 7 2020 =
 * improved : Maintenance release, minor admin code improvement.
 
@@ -155,105 +158,3 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 * improved : [developers] allow filtering module params from a plugin
 * improved : [developers] allow filtering of NB header CSS classes
 * improved : [developers] the way section CSS classes are printed + add a way to filter from a plugin
-
-= 2.1.0 June 9th 2020 =
-* fixed [Grid module][Pagination] anchor link can prevent navigating posts pages
-* fixed : [modules][customizer] when customizing introduce a script tag detection, similar to the shortcode one
-* fixed : [HTML module] when customizing, make sure the html module as a minimal height so we can access it
-* improved : [customizer][js][performance] defer loading Nimble ccat-sek-control.js when api is 'ready'
-* added : [sections] save and reuse sections
-
-= 2.0.20 May 28th 2020 =
-* fixed : [CSS] specificity too low for divider and spacer modules
-* fixed : [CSS] improved style for NB debug notice
-* improved : [Section width] increased the range of input for inner and outer section widths, so that it's easier to set a width in pixels
-* added : [Options page] display a NB icon next to NB settings menu item in admin
-
-= 2.0.19 May 28th 2020 =
-* fixed : [Grid module] pagination breaks when using a grid on home when set as a static page
-* fixed : [Grid module] improve performances of post queries on large blog sites
-* fixed : [customizer] a module just dropped in was not ready for .scrollIntoView() and it broke javascript.
-* improved : [performances][lazyload] prevent lazyloading images when in header section
-* added : [SEO] compatibility with SEOPress plugin
-* added : [shortcodes] shortcode with broken javascript can prevent users opening the customizer. Introduction of a new option allowing users to deactivate shortcode parsing when customizing
-* added : [troubleshooting] new "Debug mode" option in WP admin > Settings > Nimble Builder
-
-= 2.0.18 May 26th 2020 =
-* fixed : [CSS] Nimble Builder CSS reset can create inconsistencies with theme style
-
-= 2.0.17 May 25th 2020 =
-* fixed : [column background][performance] a column image background could be loaded even when off window
-* fixed : [social icons module] default color could be overriden by the theme links color
-* added : [accordion module] accordion content now supports WordPress shortcodes
-* improved : [customize preview] if an edited element is offscreen, automatically scroll until it becomes visible
-* improved : [html module][performance] add lazyload support for images embedded in HTML code
-* improved : [CSS] implemented a better CSS reset
-
-= 2.0.16 May 19th 2020 =
-* fixed : [accordion module] default title background color is not consistent with default customizer value (#ffffff)
-* added : [plugins compatibility] added support for Memberpress plugin
-* added : [admin] introduction of a new option page located in WP admin > Settings > Nimble Builder
-* improved : [admin] moved system info in the new Nimble Builder option page
-
-= 2.0.15 May 16th 2020 =
-* fixed : [NB edit button] prevent printing Nimble edit button on post types that are not post, attachment and WooCommerce product
-* fixed : [template import] critical bug when importing a template
-
-= 2.0.14 May 13th 2020 =
-* fixed : strip script tags when relevant to prevent customizer breakage
-* fixed : [performances][lazy load] images with using relative path for src attribute are not lazy loaded
-
-= 2.0.13 May 6th 2020 =
-* fixed : [section width] zeroing inner width of a section could generate a php notice
-* fixed : [column width] column width can be broken when a custom margin is set and a custom breakpoint is used 
-
-= 2.0.12 May 5th 2020 =
-* fixed : [Form module][reCaptcha] possible error on submission
-* fixed : [Lazy Loading][IE11 browser] lazy load is broken on IE11
-* added : introduction of a debug mode, enabled with url param ?nimble_debug=1, in order to prevent javascript breakage when troubleshooting
-
-= 2.0.11 May 1st 2020 =
-* fixed : [password protection] prevent printing multiple password protection forms in a single page / post
-* fixed : [customize ui][column width] Fix possible error when trying to set a column width
-* added : implemented compatibility with "Members" plugins
-* added : implemented compatibility with "Paid Membership Pro" plugin
-* added : implemented compatibility with "WP Members" plugin
-* added : implemented compatibility with "Simple WP Membership Protection" plugin
-* added : a default filtrable message when content is restricted for membership plugins
-
-= 2.0.10 April 24th 2020 =
-* fixed : [Password protected pages/posts] Nimble Builder content ( excluding header and footer ) should not be revealed before password submission
-* fixed : [RTL][customizer][nimble top menu] broken in RTL mode => all items are in the same place
-* improved : [grid module] updated pagination urls to ensure user focus on grid module when navigating post pages
-* added : [shortcode module][performance] lazy loading can break shortcodes
-
-= 2.0.9 April 24th 2020 =
-* fixed : [slider module] lazy loading broken, leading to extra space on top and bottom of the slider
-* fixed : [PHP compatibility] PHP notice with PHP 7.4.2 ( Array and string offset access syntax with curly braces is deprecated )
-* fixed : [import/export] Site wide import/export doesn’t work
-* fixed : [Lazy load][Performance] make sure images are lazy loaded when dynamic content is inserted in the DOM ( via ajax )
-* fixed : [Lazy load][Performance] when images are set to display:none; lazyload is fired even when an image is off the viewport
-* fixed : [search] the found_posts number updated with Nimble Builder results is not correct when search results are paginated
-* updated : name of the WP editor module to Rich Text Editor
-* added : [performance][shortcode module] support for image lazy loading
-
-= 2.0.8 April 17th 2020 =
-* fixed : [column][responsive] custom margins on columns not considered when calculating responsive width for mobile devices
-* fixed : [column][responsive] custom margins should be inherited if not set for a device, when calculating responsive width for mobile devices
-* fixed : [customizer][spacing input] when switching device, the unit of the input value is inconsistent with the one actually active
-* fixed : [customizer] make sure the font-size of "Insert a new section here" is set by Nimble Builder
-
-= 2.0.7 April 15th 2020 =
-* fixed : [grid module] pagination broken when used on home when home is a static page
-* fixed : [grid module] lazy loading images might break when customizing grids. Disabled when customizing.
-* improved : [grid module] better pagination CSS design
-
-= 2.0.6 April 14th 2020 =
-* fixed : [customizer] modules visibility settings should gray out hidden modules instead of removing them during customization
-* added : [Import/Export] new option to skip image import
-
-= 2.0.5 April 12th 2020 =
-* fixed : [performance] prevent trying to register modules when is_admin()
-* fixed : [HTML][CSS] custom css class name broken in the module markup
-* fixed : [Grid module] pagination could be broken in some cases.
-* added : [SEO] Nimble Builder content is now included to Yoast SEO analyser's tool when editing a page or post

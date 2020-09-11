@@ -1248,7 +1248,7 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
     } else {
         $registered_modules = CZR_Fmk_Base()->registered_modules;
         // sek_error_log( __FUNCTION__ . ' => registered_modules', $registered_modules );
-        if ( !array( $registered_modules ) || !array_key_exists( $module_type, $registered_modules ) ) {
+        if ( sek_is_dev_mode() && !array( $registered_modules ) || !array_key_exists( $module_type, $registered_modules ) ) {
             sek_error_log( __FUNCTION__ . ' => ' . $module_type . ' is not registered in the $CZR_Fmk_Base_fn()->registered_modules;' );
             return $input_list;
         }

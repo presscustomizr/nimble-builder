@@ -1154,7 +1154,7 @@ function sek_get_pro_notice_for_czr_input( $features = '' ) {
 // Removes pro upsell modules if NIMBLE_PRO_UPSELL_ON is false
 // filter declared in inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php
 add_filter('sek_get_module_collection', function( $collection ) {
-    if ( NIMBLE_PRO_UPSELL_ON )
+    if ( defined('NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON )
       return $collection;
 
     $filtered = [];
@@ -1170,7 +1170,7 @@ add_filter('sek_get_module_collection', function( $collection ) {
 // Removes pro upsell modules if NIMBLE_PRO_UPSELL_ON is false
 // filter declared in _front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php
 add_filter('sek_get_raw_section_registration_params', function( $collection ) {
-    if ( NIMBLE_PRO_UPSELL_ON )
+    if ( defined('NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON )
       return $collection;
 
     $filtered = [];

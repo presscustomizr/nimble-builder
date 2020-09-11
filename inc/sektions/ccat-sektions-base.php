@@ -5533,6 +5533,15 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 'type'             => 'textarea',
                 'wrapper_tag'      => 'div'
             ),
+            'nimble_privacy' => array(
+                'label'            => __( 'I have read and agree to the privacy policy.', 'text_doma' ),
+                'type'             => 'checkbox',
+                'required'         => true,
+                'value'            => false,
+                //'additional_attrs' => array( 'class' => 'sek-btn' ),
+                'wrapper_tag'      => 'div',
+                'wrapper_class'    => array( 'sek-form-field', 'sek-privacy-wrapper' )
+            ),
             'nimble_submit' => array(
                 'type'             => 'submit',
                 'value'            => __( 'Submit', 'text_doma' ),
@@ -5791,6 +5800,14 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                     $user_form_composition[$field_id] = $field_data;
                     $user_form_composition[$field_id]['label'] = esc_attr( $form_fields_options['email_field_label'] );
                 break;
+                case 'nimble_privacy':
+                    if ( !empty( $form_fields_options['show_privacy_field'] ) && sek_is_checked( $form_fields_options['show_privacy_field'] ) ) {
+                        $user_form_composition[$field_id] = $field_data;
+                        $user_form_composition[$field_id]['required'] = sek_is_checked( $form_fields_options['privacy_field_required'] );
+                        $user_form_composition[$field_id]['label'] = esc_attr( $form_fields_options['privacy_field_label'] );
+                    }
+                break;
+
                 //'additional_attrs' => array( 'class' => 'sek-btn' ),
                 case 'nimble_submit':
                     $user_form_composition[$field_id] = $field_data;
@@ -6027,18 +6044,27 @@ class Sek_Field {
             $label = sprintf( '%1$s<label for="%2$s">%3$s</label>%4$s',
                 $this->data[ 'before_label' ],
                 esc_attr( $this->input->get_data( 'id' ) ),
-                esc_html($label),
+                wp_specialchars_decode($label),
                 $this->data[ 'after_label' ]
             );
         }
 
         //the input
-        $html = sprintf( '%s%s%s%s',
-            $label,
-            $this->data[ 'before_input' ],
-            $this->input,
-            $this->data[ 'after_input' ]
-        );
+        if ( !empty($this->data['type']) && 'checkbox' === $this->data['type'] ) {
+            $html = sprintf( '%s%s%s%s',
+                $this->data[ 'before_input' ],
+                $this->input,
+                $this->data[ 'after_input' ],
+                $label
+            );
+        } else {
+            $html = sprintf( '%s%s%s%s',
+                $label,
+                $this->data[ 'before_input' ],
+                $this->input,
+                $this->data[ 'after_input' ]
+            );
+        }
 
         //any wrapper?
         if ( $this->data[ 'wrapper_tag' ] ) {
@@ -6222,6 +6248,16 @@ class Sek_Input_Hidden extends Sek_Input_Basic {
     }
 }
 endif;
+
+if ( !class_exists( '\Nimble\Sek_Input_Checkbox' ) ) :
+class Sek_Input_Checkbox extends Sek_Input_Basic {
+    public function __construct( $args ) {
+        $args[ 'type' ]     = 'checkbox';
+        parent::__construct( $args );
+    }
+}
+endif;
+
 
 if ( !class_exists( '\Nimble\Sek_Input_Text' ) ) :
 class Sek_Input_Text extends Sek_Input_Basic {
