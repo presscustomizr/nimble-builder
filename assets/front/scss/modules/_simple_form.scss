@@ -42,6 +42,11 @@
     #sek-form-respond {
       padding: 20px 0;
     }
+    input[type="checkbox"] + label {
+        display: inline;
+        font-weight: bold;
+        margin-left: 0.5rem;
+    }
 }
 
 // Submission message
