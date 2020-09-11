@@ -2924,7 +2924,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
  *  FONTS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_simple_form_fonts_child() {
-    $fl_font_selectors = array( 'form label', '.sek-form-message' ); //<= .sek-form-message is the wrapper of the form status message : Thanks, etc...
+    $fl_font_selectors = array( '.sek-simple-form-wrapper form label', '.sek-form-message' ); //<= .sek-form-message is the wrapper of the form status message : Thanks, etc...
     $ft_font_selectors = array( 'form input[type="text"]', 'form input[type="text"]:focus', 'form textarea', 'form textarea:focus' );
     $btn_font_selectors = array( 'form input[type="submit"]' );
     return array(

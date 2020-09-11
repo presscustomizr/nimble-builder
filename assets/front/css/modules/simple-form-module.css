@@ -44,6 +44,12 @@
   padding: 20px 0;
 }
 
+.sek-simple-form-wrapper input[type="checkbox"] + label {
+  display: inline;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
 .sek-form-message {
   padding: 10px;
   margin: 10px 0;
