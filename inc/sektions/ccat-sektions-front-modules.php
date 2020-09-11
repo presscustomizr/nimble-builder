@@ -2647,7 +2647,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 'show_privacy_field' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Display a checkbox for privacy policy consent', 'text_doma'),
-                    'default'     => true,
+                    'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
@@ -4647,7 +4647,7 @@ function sek_get_module_params_for_czr_menu_module() {
 function sek_get_module_params_for_czr_menu_content_child() {
     $pro_text = '';
     if ( !sek_is_pro() ) {
-        $pro_text = sek_get_pro_notice_for_czr_input( __('search icon and WooCommerce cart in menu, sticky header, hamburger color, ...', 'text-doma') );
+        $pro_text = '';//sek_get_pro_notice_for_czr_input( __('search icon and WooCommerce cart in menu, sticky header, hamburger color, ...', 'text-doma') );
     }
     return array(
         'dynamic_registration' => true,
