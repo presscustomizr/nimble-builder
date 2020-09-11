@@ -161,7 +161,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 'show_privacy_field' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Display a checkbox for privacy policy consent', 'text_doma'),
-                    'default'     => true,
+                    'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
