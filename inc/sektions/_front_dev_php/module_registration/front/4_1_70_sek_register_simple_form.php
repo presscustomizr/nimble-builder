@@ -106,8 +106,14 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
+                    'html_after' => '<hr/>'
                 ),
-
+                'email_field_label' => array(
+                    'input_type'  => 'text',
+                    'width-100'         => true,
+                    'title'       => __('Email field label', 'text_doma'),
+                    'default'     => __('Email', 'translate')
+                ),
                 'show_subject_field' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Display subject field', 'text_doma'),
@@ -127,6 +133,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
+                    'html_after' => '<hr/>'
                 ),
 
                 'show_message_field' => array(
@@ -148,13 +155,31 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
+                    'html_after' => '<hr/>'
                 ),
 
-                'email_field_label' => array(
-                    'input_type'  => 'text',
+                'show_privacy_field' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Display privacy policy consent field.', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                ),
+                'privacy_field_label' => array(
+                    'input_type'        => 'nimble_tinymce_editor',
+                    'title'       => __( 'Consent message' , 'text_doma' ),
+                    'default'     => __( 'I have read and agree to the privacy policy.', 'text_doma' ),
                     'width-100'         => true,
-                    'title'       => __('Email field label', 'text_doma'),
-                    'default'     => __('Email', 'translate')
+                    'refresh_markup' => '.sek-privacy-wrapper label',
+                    'notice_before' => __('Html code is allowed', 'text-domain')
+                ),
+                'privacy_field_required' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Privacy policy consent is required', 'text_doma'),
+                    'default'     => true,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'html_after' => '<hr/>'
                 ),
 
                 'button_text' => array(

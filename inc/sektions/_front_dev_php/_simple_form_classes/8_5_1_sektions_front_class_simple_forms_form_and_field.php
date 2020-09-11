@@ -152,18 +152,27 @@ class Sek_Field {
             $label = sprintf( '%1$s<label for="%2$s">%3$s</label>%4$s',
                 $this->data[ 'before_label' ],
                 esc_attr( $this->input->get_data( 'id' ) ),
-                esc_html($label),
+                wp_specialchars_decode($label),
                 $this->data[ 'after_label' ]
             );
         }
 
         //the input
-        $html = sprintf( '%s%s%s%s',
-            $label,
-            $this->data[ 'before_input' ],
-            $this->input,
-            $this->data[ 'after_input' ]
-        );
+        if ( !empty($this->data['type']) && 'checkbox' === $this->data['type'] ) {
+            $html = sprintf( '%s%s%s%s',
+                $this->data[ 'before_input' ],
+                $this->input,
+                $this->data[ 'after_input' ],
+                $label
+            );
+        } else {
+            $html = sprintf( '%s%s%s%s',
+                $label,
+                $this->data[ 'before_input' ],
+                $this->input,
+                $this->data[ 'after_input' ]
+            );
+        }
 
         //any wrapper?
         if ( $this->data[ 'wrapper_tag' ] ) {

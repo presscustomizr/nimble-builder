@@ -164,6 +164,16 @@ class Sek_Input_Hidden extends Sek_Input_Basic {
 }
 endif;
 
+if ( !class_exists( '\Nimble\Sek_Input_Checkbox' ) ) :
+class Sek_Input_Checkbox extends Sek_Input_Basic {
+    public function __construct( $args ) {
+        $args[ 'type' ]     = 'checkbox';
+        parent::__construct( $args );
+    }
+}
+endif;
+
+
 if ( !class_exists( '\Nimble\Sek_Input_Text' ) ) :
 class Sek_Input_Text extends Sek_Input_Basic {
     public function __construct( $args ) {
