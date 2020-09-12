@@ -305,6 +305,38 @@ function print_doc_page() {
 }
 
 /* ------------------------------------------------------------------------- *
+*  RESTRICT USERS
+/* ------------------------------------------------------------------------- */
+//register option tab and print the form
+if ( sek_is_pro() || ( defined( 'NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON ) ) {
+    $restrict_users_title = __('Restrict users', 'text-doma');
+    if ( !sek_is_pro() ) {
+        $restrict_users_title = sprintf( '<span class="sek-pro-icon"><img src="%1$s" alt="Pro feature"></span><span class="sek-title-after-icon">%2$s</span>',
+            NIMBLE_BASE_URL.'/assets/czr/sek/img/pro_orange.svg?ver='.NIMBLE_VERSION,
+            __('Restrict users', 'nimble' )
+        );
+    }
+    nb_register_option_tab([
+        'id' => 'restrict_users',
+        'title' => $restrict_users_title,
+        'page_title' => __('Restrict users', 'nimble' ),
+        'content' => '\Nimble\print_restrict_users_options_content',
+    ]);
+
+    function print_restrict_users_options_content() {
+        if ( !sek_is_pro() ) {
+          ?>
+            <h4><?php _e('Nimble Builder can be used by default by all users with an administrator role. With Nimble Builder Pro you can decide which administrators are allowed to use the plugin.', 'text_domain'); ?></h4>
+            <h4><?php _e('Unauthorized users will not see any reference to Nimble Builder when editing a page, in the customizer and in the WordPress admin screens.', 'text_domain') ?></h4>
+            <a class="sek-pro-link" href="https://presscustomizr.com/nimble-builder-pro/" rel="noopener noreferrer" title="Go Pro" target="_blank"><?php _e('Go Pro', 'text_domain'); ?> <span class="dashicons dashicons-external"></span></a>
+          <?php
+        }
+        do_action( 'nb_restrict_user_content' );
+    }
+}
+
+
+/* ------------------------------------------------------------------------- *
 *  SYSTEM INFO
 /* ------------------------------------------------------------------------- */
 nb_register_option_tab([

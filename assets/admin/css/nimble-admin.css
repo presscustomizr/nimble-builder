@@ -351,7 +351,10 @@ body .block-editor .sek-nimble-mobile-admin-bar-title { display: none; }
   bottom: 0;
 }
 
-
+/* WP OVERRIDE FOR ADMIN TABS */
+#nimble-options .nav-tab {
+  position: relative;
+}
 /* OPTIONS PAGE */
 #nimble-options .nb-option-page-title {
   padding-left: 40px;
@@ -362,22 +365,47 @@ body .block-editor .sek-nimble-mobile-admin-bar-title { display: none; }
   padding-left:0;
 }
 .sek-nimble-title-icon {
-    width: 35px;
-    height: 35px;
-    display: inline-block;
-    position: absolute;
-    left: 0;
-    top: 6px;
+  width: 35px;
+  height: 35px;
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  top: 6px;
 }
 [dir="rtl"] .sek-nimble-title-icon {
   right:0;
   left:initial;
 }
+.sek-pro-icon {
+  width: 23px;
+  height: 27px;
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  top: 6px;
+  margin: 0 6px;
+}
+span.sek-title-after-icon {
+    padding-left: 24px;
+}
 .tab-content-wrapper {
     margin: 10px 0;
 }
-
-
+.sek-pro-link {
+  color: #f07829;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 19px;
+}
+.sek-pro-link:hover {
+  text-decoration: underline;
+  color: #f07829;
+}
+.sek-pro-link .dashicons {
+  font-size: 24px;
+  position: relative;
+  bottom: 3px;
+}
 /* DOC PAGE */
 .nimble-doc-img {
   max-width: 60%;

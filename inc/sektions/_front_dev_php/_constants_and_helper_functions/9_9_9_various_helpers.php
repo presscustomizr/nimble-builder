@@ -288,7 +288,7 @@ function sek_strip_script_tags( $html = '' ) {
 // @return bool
 // Introduced May 2020
 function sek_current_user_can_access_nb_ui() {
-    return apply_filters('nimble-user-have-access', true );
+    return apply_filters('nb_user_has_access', true );
 }
 
 
