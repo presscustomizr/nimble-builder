@@ -225,7 +225,7 @@ function sek_is_forbidden_post_type_for_nimble_edit_button( $post_type = '' ) {
 add_action( 'edit_form_after_title', '\Nimble\sek_print_edit_with_nimble_btn_for_classic_editor' );
 // @hook 'edit_form_after_title'
 function sek_print_edit_with_nimble_btn_for_classic_editor( $post ) {
-  if ( !sek_current_user_can_access_nb_ui() )
+  if ( !sek_current_user_can_access_nb_ui() || !apply_filters('nb_post_edit_btn_enabled', true ) )
     return;
   // introduced to fix https://github.com/presscustomizr/nimble-builder/issues/528
   if ( is_object($post) && sek_is_forbidden_post_type_for_nimble_edit_button( $post->post_type ) )
@@ -250,7 +250,7 @@ function sek_print_edit_with_nimble_btn_for_classic_editor( $post ) {
 // When using gutenberg editor
 add_action( 'enqueue_block_editor_assets', '\Nimble\sek_enqueue_js_asset_for_gutenberg_edit_button');
 function sek_enqueue_js_asset_for_gutenberg_edit_button() {
-    if ( !sek_current_user_can_access_nb_ui() )
+    if ( !sek_current_user_can_access_nb_ui() || !apply_filters('nb_post_edit_btn_enabled', true ) )
       return;
     // Void if ( 'post' != $current_screen->base ) <= only printed when editing posts, CPTs, and pages
     $current_screen = get_current_screen();
@@ -283,7 +283,7 @@ add_action( 'admin_footer', '\Nimble\sek_print_js_for_nimble_edit_btn' );
 // If Classic editor, print the javascript listener to open the customizer url
 // @see assets/admin/js/nimble-gutenberg.js
 function sek_print_js_for_nimble_edit_btn() {
-  if ( !sek_current_user_can_access_nb_ui() )
+  if ( !sek_current_user_can_access_nb_ui() || !apply_filters('nb_post_edit_btn_enabled', true ) )
     return;
   // Void if ( 'post' != $current_screen->base ) <= only printed when editing posts, CPTs, and pages
   $current_screen = get_current_screen();
@@ -358,7 +358,7 @@ function sek_print_js_for_nimble_edit_btn() {
 // => when using the classical editor, the html is printed with add_action( 'edit_form_after_title', ... )
 // => when using gutenberg, we render the button with a js template @see assets/admin/js/nimble-gutenberg.js
 function sek_print_nb_btn_edit_with_nimble( $editor_type ) {
-    if ( !sek_current_user_can_access_nb_ui() )
+    if ( !sek_current_user_can_access_nb_ui() || !apply_filters('nb_post_edit_btn_enabled', true ) )
       return;
     $post = get_post();
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );

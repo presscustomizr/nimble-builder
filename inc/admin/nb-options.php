@@ -225,10 +225,10 @@ function print_options_page() {
             </fieldset>
           </td>
         </tr>
-
       </tbody>
     </table>
     <?php
+      do_action('nb_admin_options_tab_after_content');
       wp_nonce_field( 'nb-base-options', 'nb-base-options-nonce' );
       submit_button();
     ?>
@@ -244,7 +244,6 @@ function nb_save_base_options() {
 
     // Shortcode parsing when customizing
     nb_maybe_update_checkbox_option( 'nb_shortcodes_parsed_in_czr', 'off' );
-
     // Debug mode
     nb_maybe_update_checkbox_option( 'nb_debug_mode_active', 'off' );
 }
