@@ -16,8 +16,8 @@ function nb_register_options_page() {
   if ( !sek_current_user_can_access_nb_ui() )
     return;
   add_options_page(
-    __('Nimble Builder', 'text-domain'),
-    __('Nimble Builder', 'text-domain'),
+    apply_filters( 'nb_admin_settings_title', __('Nimble Builder', 'text-domain') ),
+    apply_filters( 'nb_admin_settings_title', __('Nimble Builder', 'text-domain') ),
     'manage_options',
     NIMBLE_OPTIONS_PAGE,
     '\Nimble\nb_options_page'

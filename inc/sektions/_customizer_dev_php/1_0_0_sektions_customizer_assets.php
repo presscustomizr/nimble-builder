@@ -122,6 +122,7 @@ function sek_enqueue_controls_js_css() {
                 'nimbleVersion' => NIMBLE_VERSION,
                 'isDevMode' => sek_is_dev_mode(),
                 'isDebugMode' => sek_is_debug_mode(),
+                'isPro' => sek_is_pro(),
                 'baseUrl' => NIMBLE_BASE_URL,
                 //ajaxURL is not mandatory because is normally available in the customizer window.ajaxurl
                 'ajaxUrl' => admin_url( 'admin-ajax.php' ),

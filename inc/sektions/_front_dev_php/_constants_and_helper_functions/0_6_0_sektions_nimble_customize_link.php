@@ -46,7 +46,7 @@ function sek_add_customize_link() {
           NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
           __('Nimble Builder','text_domain_to_replace'),
           __('Add sections in live preview with Nimble Builder', 'text_domain'),
-          __( 'Build with Nimble Builder', 'text_domain' )
+          apply_filters( 'nb_admin_bar_title', __( 'Build with Nimble Builder', 'text_domain' ) )
       ),
       'href'   => $customize_url,
       'meta'   => array(

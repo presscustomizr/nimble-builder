@@ -375,7 +375,7 @@ function sek_print_nb_btn_edit_with_nimble( $editor_type ) {
       <?php //_e( 'Edit with Nimble Builder', 'text_doma' ); ?>
       <?php printf( '<span class="sek-spinner"></span><span class="sek-nimble-icon" title="%3$s"><img src="%1$s" alt="%2$s"/><span class="sek-nimble-admin-bar-title">%2$s</span><span class="sek-nimble-mobile-admin-bar-title">%3$s</span></span>',
           NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
-          sek_local_skope_has_nimble_sections( $manually_built_skope_id ) ? __('Continue building with Nimble','text_domain') : __('Build with Nimble Builder','text_domain'),
+          apply_filters( 'nb_admin_nb_button_edit_title', sek_local_skope_has_nimble_sections( $manually_built_skope_id ) ? __('Continue building with Nimble','text_domain') : __('Build with Nimble Builder','text_domain'), $manually_built_skope_id ),
           __('Build','text_domain'),
           __('Build sections in live preview with Nimble Builder', 'text_domain')
       ); ?>
