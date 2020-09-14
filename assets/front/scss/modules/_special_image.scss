@@ -56,6 +56,10 @@
         padding: 0;
       }
     }
+    //hover color consistent with default value
+    &.nb-icon-has-hover-color:hover .nb-pro-img-icon {
+      color: #969696;
+    }
 }
 
 .sek-nimble-image-mask {
