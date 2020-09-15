@@ -72,6 +72,9 @@ function sek_config_infos() {
     $return .= 'Upgraded From:            ' . get_option( 'nimble_version_upgraded_from', 'None' ) . "\n";
     $return .= 'Started With:             ' . get_option( 'nimble_started_with_version', 'None' ) . "\n";
 
+    // sept 2020 : filter added to allow printing NB Pro versions info
+    $return = apply_filters('nb_admin_syst_info_after_nb_config', $return);
+
     // Get plugins that have an update
     $updates = get_plugin_updates();
 
