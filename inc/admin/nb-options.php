@@ -89,11 +89,14 @@ function nb_options_page() {
 *  ADD SETTINGS LINKS
 /* ------------------------------------------------------------------------- */
 function nb_settings_link($links) {
-  $doc_link = sprintf('<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>', 'https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin', __('Docs', 'text-doma') );
-  array_unshift($links, $doc_link );
-  $settings_link = sprintf('<a href="%1$s">%2$s</a>', admin_url( NIMBLE_OPTIONS_PAGE_URL ), __('Settings', 'text-doma') );
-  array_unshift($links, $settings_link );
-  return $links;
+    $doc_link = sprintf('<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>', 'https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin', __('Docs', 'text-doma') );
+    array_unshift($links, $doc_link );
+    $settings_link = sprintf('<a href="%1$s">%2$s</a>',
+        add_query_arg( array( 'tab' => 'options' ), admin_url( NIMBLE_OPTIONS_PAGE_URL ) ),
+        __('Settings', 'text-doma')
+    );
+    array_unshift($links, $settings_link );
+    return $links;
 }
 add_filter("plugin_action_links_".plugin_basename(NIMBLE_PLUGIN_FILE), '\Nimble\nb_settings_link' );
 
