@@ -126,6 +126,12 @@
                                     break;
                               }
                         });
+
+                        // Sept 2020 for https://github.com/presscustomizr/nimble-builder-pro/issues/23
+                        api.trigger('nb_setup_visibility_deps_for_img_module', {
+                              item : item,
+                              module : module
+                        });
                   }
             },//CZRItemConstructor
 
