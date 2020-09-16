@@ -20,7 +20,10 @@ $main_settings = $value['main_settings'];
 //$borders_corners_settings = $value['borders_corners'];
 
 if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
-    function sek_get_img_module_img_html( $value ) {
+    function sek_get_img_module_img_html( $value, $for_mobile = false, $img = null, $img_size = null ) {
+        $img = !is_null($img) ? $img : $value['img'];
+        $img_size = !is_null($img_size) ? $img_size : $value['img-size'];
+
         $visual_effect_class = '';
         //visual effect classes
         if ( true === sek_booleanize_checkbox_val( $value['use_box_shadow'] ) ) {
@@ -30,14 +33,16 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
             $visual_effect_class .= " sek-hover-effect-" . $value['img_hover_effect'];
         }
 
+        $visual_effect_class .= $for_mobile ? " sek-is-mobile-logo" : " sek-img";
+
         $html = '';
-        if ( is_int( $value['img'] ) ) {
-            $html = wp_get_attachment_image( $value['img'], empty( $value['img-size'] ) ? 'large' : $value['img-size']);
-        } else if ( !empty( $value['img'] ) && is_string( $value['img'] ) ) {
+        if ( is_int( $img ) ) {
+            $html = wp_get_attachment_image( $img, empty( $img_size ) ? 'large' : $img_size);
+        } else if ( !empty( $img ) && is_string( $img ) ) {
             // the default img is excluded from the smart loading parsing @see nimble_regex_callback()
             // => this is needed because this image has no specific dimensions set. And therefore can create false javascript computations of other element's distance to top on page load.
             // in particular when calculting if is_visible() to decide if we smart load.
-            $html = sprintf( '<img alt="default img" data-skip-lazyload="true" src="%1$s"/>', esc_url(  $value['img'] )  );
+            $html = sprintf( '<img alt="default img" data-skip-lazyload="true" src="%1$s"/>', esc_url(  $img )  );
         } else {
             //falls back on an icon if previewing
             if ( skp_is_customizing() ) {
@@ -52,8 +57,8 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
         //   'href' => get_permalink( $attachment->ID ),
         //   'src' => $attachment->guid,
         //   'title' => $attachment->post_title
-        if ( is_int( $value['img'] ) ) {
-            $img_post = get_post( $value['img'] );
+        if ( is_int( $img ) ) {
+            $img_post = get_post( $img );
             if ( !is_wp_error( $img_post ) && is_object( $img_post ) && 'attachment' === $img_post->post_type ) {
                 $caption = $img_post->post_excerpt;
                 $description = $img_post->post_content;
@@ -112,12 +117,12 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
 
 // Print
 if ( 'no-link' === $main_settings['link-to'] ) {
-    echo sek_get_img_module_img_html( $main_settings );
+    echo apply_filters('nb_img_module_html', sek_get_img_module_img_html( $main_settings ), $main_settings );
 } else {
     printf('<a class="%4$s" href="%1$s" %2$s>%3$s</a>',
         sek_get_img_module_img_link( $main_settings ),
         true === sek_booleanize_checkbox_val( $main_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
-        sek_get_img_module_img_html( $main_settings ),
+        apply_filters('nb_img_module_html', sek_get_img_module_img_html( $main_settings ), $main_settings ),
         'sek-link-to-'.$main_settings['link-to'] // sek-link-to-img-lightbox
     );
 }

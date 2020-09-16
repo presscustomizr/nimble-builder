@@ -34,6 +34,10 @@ function sek_get_module_params_for_czr_image_module() {
  *  MAIN SETTINGS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_image_main_settings_child() {
+    $pro_text = '';
+    if ( !sek_is_pro() ) {
+        $pro_text = sek_get_pro_notice_for_czr_input( __('set a specific header logo on mobiles, shrink header logo when scrolling down the page, ...', 'text-doma') );
+    }
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_image_main_settings_child',
@@ -151,7 +155,8 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'input_type'  => 'simpleselect',
                     'title'       => __('Mouse over effect', 'text_doma'),
                     'default'     => 'none',
-                    'choices'     => sek_get_select_options_for_input_id( 'img_hover_effect' )
+                    'choices'     => sek_get_select_options_for_input_id( 'img_hover_effect' ),
+                    'html_after' => $pro_text
                 )
             )
         ),
