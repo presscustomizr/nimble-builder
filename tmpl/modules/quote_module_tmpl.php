@@ -16,6 +16,9 @@ $design_settings = $value['design'];
 //  => so we can listen to user click actions and open the editor on for each separate tiny_mce_editor input
 if ( !function_exists( __NAMESPACE__ . '\sek_print_quote_content' ) ) {
     function sek_print_quote_content( $quote_content, $input_id, $module_model, $echo = false ) {
+        // added september 2020 related to https://github.com/presscustomizr/nimble-builder/issues/688
+        $quote_content = sek_strip_script_tags( $quote_content );
+
         // filter added since text editor implementation https://github.com/presscustomizr/nimble-builder/issues/403
         // Use our own content filter instead of $content = apply_filters( 'the_content', $tiny_mce_content );
         // because of potential third party plugins corrupting 'the_content' filter. https://github.com/presscustomizr/nimble-builder/issues/233
