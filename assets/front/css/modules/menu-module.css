@@ -407,6 +407,7 @@
 
 .nb-svg-search-icon {
   cursor: pointer;
+  padding: 0;
 }
 
 .nb-module-menu-search .nb-search-expand {

@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.5
-Stable tag: 2.1.9
+Stable tag: 2.1.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,13 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.8 : [contact form module] introduction of a privacy checkbox for a better GDPR compliancy
+2.1.10 : [accordion module] Fixed Tiktok video embeds not working when used in accordion content.
 
 == Changelog ==
+= 2.1.10 September 17, 2020 =
+* improved : [admin] settings links should point to "Options" tab
+* fixed : [accordion module] striping script tags should be moved before parsing video embed, leading to tiktok videos embeds not working
+
 = 2.1.9 September 11th 2020 =
 * fixed : php fatal error on front end
 

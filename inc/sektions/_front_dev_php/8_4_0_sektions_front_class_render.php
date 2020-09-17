@@ -1148,7 +1148,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'the_nimble_tinymce_module_content', array( $this, 'sek_run_shortcode' ), 8 );
 
             // @see filters in wp-includes/class-wp-embed.php
-            add_filter( 'the_nimble_tinymce_module_content', array( $this, 'sek_parse_content_for_video_embed') , 8 );
+            add_filter( 'the_nimble_tinymce_module_content', array( $this, 'sek_parse_content_for_video_embed'), 8 );
         }
 
         // fired @filter the_nimble_tinymce_module_content

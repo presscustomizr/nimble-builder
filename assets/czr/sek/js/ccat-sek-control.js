@@ -680,7 +680,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _mainPanel_.deferred.embedded.done( function() {
                               var $sidePanelTitleEl = _mainPanel_.container.find('h3.accordion-section-title'),
                                   $topPanelTitleEl = _mainPanel_.container.find('.panel-meta .accordion-section-title'),
-                                  logoHtml = [ '<img class="sek-nimble-logo" alt="'+ _mainPanel_.params.title +'" src="', sektionsLocalizedData.baseUrl, '/assets/img/nimble/nimble_horizontal.svg?ver=' + sektionsLocalizedData.nimbleVersion , '"/>' ].join('');
+                                  logoHtml = [
+                                      '<img class="sek-nimble-logo" alt="'+ _mainPanel_.params.title +'" src="',
+                                      sektionsLocalizedData.baseUrl,
+                                      '/assets/img/nimble/nimble_horizontal.svg?ver=' + sektionsLocalizedData.nimbleVersion,
+                                      '"/>',
+                                  ].join('');
+                              // Add Pro
+                              if ( sektionsLocalizedData.isPro ) {
+                                  logoHtml += [
+                                      '<img class="sek-nimble-logo" src="',
+                                      sektionsLocalizedData.baseUrl,
+                                      '/assets/czr/sek/img/pro_white.svg?ver=' + sektionsLocalizedData.nimbleVersion,
+                                      '"/>',
+                                  ].join('');
+                              }
 
                               if ( 0 < $sidePanelTitleEl.length ) {
                                     // The default title looks like this : Nimble Builder <span class="screen-reader-text">Press return or enter to open this section</span>
@@ -16854,6 +16868,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     break;
                               }
+                        });
+
+                        // Sept 2020 for https://github.com/presscustomizr/nimble-builder-pro/issues/23
+                        api.trigger('nb_setup_visibility_deps_for_img_module', {
+                              item : item,
+                              module : module
                         });
                   }
             },//CZRItemConstructor
