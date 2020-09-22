@@ -36,7 +36,15 @@ function nb_options_page() {
   ?>
 
   <div id="nimble-options" class="wrap">
-      <h1 class="nb-option-page-title"><span class="sek-nimble-title-icon"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="Build with Nimble Builder"></span><?php echo apply_filters( 'nimble_parse_admin_text', $page_title ); ?></h1>
+      <h1 class="nb-option-page-title">
+        <?php
+        printf('<span class="sek-nimble-title-icon"><img src="%1$s" alt="Build with Nimble Builder">%2$s</span>',
+            NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
+            apply_filters( 'nimble_option_title_icon_after', '' )
+        );
+        echo apply_filters( 'nimble_parse_admin_text', $page_title );
+        ?>
+      </h1>
       <div class="nav-tab-wrapper">
           <?php
             foreach ($option_tabs as $tab_id => $tab_data ) {
@@ -269,42 +277,7 @@ function nb_maybe_update_checkbox_option( $opt_name, $unchecked_value ) {
 
 do_action('nb_base_admin_options_registered');
 
-/* ------------------------------------------------------------------------- *
-*  DOCUMENTATION
-/* ------------------------------------------------------------------------- */
-nb_register_option_tab([
-    'id' => 'doc',
-    'title' => __('Documentation', 'text-doma'),
-    'page_title' => __('Nimble Builder knowledge base', 'nimble' ),
-    'content' => '\Nimble\print_doc_page',
-]);
-function print_doc_page() {
-    ?>
-      <div class="nimble-doc">
-          <ul>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin"><span>Getting started with Nimble Page Builder for WordPress</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/386-how-to-access-the-live-customization-interface-of-the-nimble-builder"><span>How to access the live customization interface of Nimble Builder ?</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/371-how-to-start-building-from-a-blank-page-with-the-wordpress-nimble-builder"><span>How to start building from a blank ( full width ) page with WordPress Nimble Builder?</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/358-building-your-header-and-footer-with-the-nimble-builder"><span>How to build your WordPress header and footer with Nimble Builder ?</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/350-how-to-use-shortcodes-from-other-plugins-with-the-nimble-builder-plugin"><span>How to embed WordPress shortcodes in your pages with Nimble Builder ?</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/366-how-to-add-an-anchor-to-a-section-and-integrate-it-into-the-menu-with-the-nimble-page-builder"><span>How to add an anchor to a section and integrate it into the menu with Nimble Page Builder ?</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder"><span>How to set a parallax background for a section in WordPress with Nimble Builder ?</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder"><span>Designing for mobile devices with the WordPress Nimble Builder</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/414-nimble-builder-and-website-performances"><span>Nimble Builder and website performance 🚀</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/393-how-to-add-post-grids-to-any-wordpress-page-with-nimble-builder"><span>How to add post grids to any WordPress page with Nimble Builder ?</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder"><span>How to design your 404 error page with Nimble Builder</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/391-how-to-export-and-import-templates-with-nimble-builder"><span>How to reuse sections and templates with the export / import feature of Nimble Builder ?</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/401-how-to-create-a-video-background-with-nimble-builder-wordpress-plugin"><span>How to create a video background with Nimble Builder WordPress plugin ?</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/408-how-to-insert-a-responsive-carousel-in-your-wordpress-pages-with-nimble-builder"><span>How to insert a responsive carousel in your WordPress pages with Nimble Builder ?</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/389-how-to-visualize-the-structure-of-the-content-created-with-nimble-builder"><span>How to visualize the structure of the content created with Nimble Builder ?</span></a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/383-how-to-customize-the-height-of-your-sections-and-columns-with-the-nimble-builder"><span>How to customize the height of your sections and columns with Nimble Builder ?</span></a></li>
 
-          </ul>
-        <a href="https://docs.presscustomizr.com" target="_blank" class="button button-primary button-hero" rel="noopener noreferrer"><span class="dashicons dashicons-search"></span>&nbsp;<?php _e('Explore Nimble Builder knowledge base', 'text-doma'); ?></a>
-      </div>
-
-    <?php
-}
 
 /* ------------------------------------------------------------------------- *
 *  RESTRICT USERS
@@ -356,5 +329,41 @@ function print_system_info() {
     <?php
 }
 
+/* ------------------------------------------------------------------------- *
+*  DOCUMENTATION
+/* ------------------------------------------------------------------------- */
+nb_register_option_tab([
+    'id' => 'doc',
+    'title' => __('Documentation', 'text-doma'),
+    'page_title' => __('Nimble Builder knowledge base', 'nimble' ),
+    'content' => '\Nimble\print_doc_page',
+]);
+function print_doc_page() {
+    ?>
+      <div class="nimble-doc">
+          <ul>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin"><span>Getting started with Nimble Page Builder for WordPress</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/386-how-to-access-the-live-customization-interface-of-the-nimble-builder"><span>How to access the live customization interface of Nimble Builder ?</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/371-how-to-start-building-from-a-blank-page-with-the-wordpress-nimble-builder"><span>How to start building from a blank ( full width ) page with WordPress Nimble Builder?</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/358-building-your-header-and-footer-with-the-nimble-builder"><span>How to build your WordPress header and footer with Nimble Builder ?</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/350-how-to-use-shortcodes-from-other-plugins-with-the-nimble-builder-plugin"><span>How to embed WordPress shortcodes in your pages with Nimble Builder ?</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/366-how-to-add-an-anchor-to-a-section-and-integrate-it-into-the-menu-with-the-nimble-page-builder"><span>How to add an anchor to a section and integrate it into the menu with Nimble Page Builder ?</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder"><span>How to set a parallax background for a section in WordPress with Nimble Builder ?</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder"><span>Designing for mobile devices with the WordPress Nimble Builder</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/414-nimble-builder-and-website-performances"><span>Nimble Builder and website performance 🚀</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/393-how-to-add-post-grids-to-any-wordpress-page-with-nimble-builder"><span>How to add post grids to any WordPress page with Nimble Builder ?</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder"><span>How to design your 404 error page with Nimble Builder</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/391-how-to-export-and-import-templates-with-nimble-builder"><span>How to reuse sections and templates with the export / import feature of Nimble Builder ?</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/401-how-to-create-a-video-background-with-nimble-builder-wordpress-plugin"><span>How to create a video background with Nimble Builder WordPress plugin ?</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/408-how-to-insert-a-responsive-carousel-in-your-wordpress-pages-with-nimble-builder"><span>How to insert a responsive carousel in your WordPress pages with Nimble Builder ?</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/389-how-to-visualize-the-structure-of-the-content-created-with-nimble-builder"><span>How to visualize the structure of the content created with Nimble Builder ?</span></a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/383-how-to-customize-the-height-of-your-sections-and-columns-with-the-nimble-builder"><span>How to customize the height of your sections and columns with Nimble Builder ?</span></a></li>
+
+          </ul>
+        <a href="https://docs.presscustomizr.com" target="_blank" class="button button-primary button-hero" rel="noopener noreferrer"><span class="dashicons dashicons-search"></span>&nbsp;<?php _e('Explore Nimble Builder knowledge base', 'text-doma'); ?></a>
+      </div>
+
+    <?php
+}
 
 ?>
