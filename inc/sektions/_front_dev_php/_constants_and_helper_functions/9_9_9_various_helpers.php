@@ -112,7 +112,7 @@ function sek_are_beta_features_enabled() {
  *  PRO
 /* ------------------------------------------------------------------------- */
 function sek_is_pro() {
-    return defined('NIMBLE_PRO_VERSION');
+    return defined('NB_PRO_VERSION');
 }
 
 
