@@ -717,6 +717,8 @@ function sek_welcome_notice_is_dismissed() {
 
 add_action( 'admin_notices', '\Nimble\sek_render_welcome_notice' );
 function sek_render_welcome_notice() {
+    if ( sek_is_pro() )
+      return;
     if ( !current_user_can( 'customize' ) )
       return;
     if ( !sek_current_user_can_access_nb_ui() )
