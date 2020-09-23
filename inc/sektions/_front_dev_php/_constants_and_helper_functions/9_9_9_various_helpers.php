@@ -374,6 +374,8 @@ add_filter('sek_get_module_collection', function( $collection ) {
 // Removes pro upsell modules if NIMBLE_PRO_UPSELL_ON is false
 // filter declared in _front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php
 add_filter('sek_get_raw_section_registration_params', function( $collection ) {
+    if ( sek_is_pro() )
+      return $collection;
     if ( defined('NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON )
       return $collection;
 
