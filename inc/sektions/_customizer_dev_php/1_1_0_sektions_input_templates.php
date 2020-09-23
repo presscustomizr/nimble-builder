@@ -577,7 +577,7 @@ function sek_print_nimble_input_templates() {
                 <div draggable="{{is_draggable}}" data-sek-eligible-for-module-dropzones="true" data-sek-content-type="{{modData['content-type']}}" data-sek-content-id="{{modData['content-id']}}" title="{{title_attr}}"><div class="sek-module-icon {{font_icon_class}}"><# print(icon_img_html); #></div><div class="sek-module-title"><div class="sek-centered-module-title">{{modData['title']}}</div></div>
                   <#
                   if ( modData['is_pro'] ) {
-                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_white.svg" alt="Pro feature"/></div>';
+                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
                     print(pro_img_html);
                   }
                   #>
@@ -640,7 +640,7 @@ function sek_print_nimble_input_templates() {
                 <div draggable="{{is_draggable}}" data-sek-content-type="preset_section" data-sek-content-id="{{secParams['content-id']}}" style="<# print(styleAttr); #>" title="{{secParams['title']}}" data-sek-section-type="{{section_type}}"><div class="sek-overlay"></div>
                   <#
                   if ( modData['is_pro'] ) {
-                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_white.svg" alt="Pro feature"/></div>';
+                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
                     print(pro_img_html);
                   }
                   #>
@@ -882,6 +882,19 @@ function sek_print_nimble_input_templates() {
 
         </div>
         <input data-czrtype="{{data.input_id}}" type="hidden" value="{{data.value}}"/>
+      </script>
+      <?php
+
+      /* ------------------------------------------------------------------------- *
+       *  INACTIVE
+       * Sept 2020 introduced an "inactive" input type in order to display pro info for Nimble
+       * this input should be "hidden" type, and should not trigger an API change.
+       * when working on https://github.com/presscustomizr/nimble-builder-pro/issues/67
+
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___inactive">
+        <input data-czrtype="{{data.input_id}}" type="hidden"/>
       </script>
       <?php
 }//sek_print_nimble_input_templates() @hook 'customize_controls_print_footer_scripts'
