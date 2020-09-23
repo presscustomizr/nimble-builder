@@ -339,7 +339,15 @@ function sek_get_preset_sektions() {
     // May 21st => back to the local data
     // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
     //$preset_sections = sek_get_preset_sections_api_data();
-    $preset_sections = sek_get_preset_section_collection_from_json();
+
+    // September 2020 => force update every 24 hours so users won't miss a new pre-build section
+    // Note that the refresh should have take place on 'upgrader_process_complete'
+    $force_update = false;
+    if ( false == get_transient('nimble_preset_sections_refreshed') ) {
+        $force_update = true;
+        set_transient( 'nimble_preset_sections_refreshed', 'yes', 2 * DAY_IN_SECONDS );
+    }
+    $preset_sections = sek_get_preset_section_collection_from_json( $force_update );
     if ( empty( $preset_sections ) ) {
         wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => no preset_sections when running sek_get_preset_sections_api_data()' );
     }
