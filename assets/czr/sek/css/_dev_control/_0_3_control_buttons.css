@@ -236,6 +236,13 @@
   top: 6px;
 }
 
+/* STYLE FOR THE PRO ICON NEXT TO THE CONTROL TITLE */
+.sek-pro-icon-next-title {
+  padding: 5px;
+  min-width: 22px;
+}
+
+
 /* HIDE ADD NEW BUTTON IN MULTI-ITEM MODULES WHEN ACCORDION COLLAPSED */
 [data-sek-expanded="false"] > .czr-open-pre-add-new { display: none;}
 [data-sek-expanded="false"] > .czr-items-wrapper { display: none;}
