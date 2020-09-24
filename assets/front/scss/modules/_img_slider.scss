@@ -45,10 +45,14 @@
           height: 100%;
           width: auto;
           overflow: hidden;
+          display: flex;
+          justify-content: center;
+          align-items: center;
           img {
             height: 100%;
             width: auto;
             max-width: none;
+            object-fit: cover;
           }
         }
       }
