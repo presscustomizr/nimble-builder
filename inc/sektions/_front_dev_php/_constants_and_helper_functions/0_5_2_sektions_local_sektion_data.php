@@ -52,8 +52,8 @@ function sek_get_raw_section_registration_params() {
                 ),
                 array(
                     'content-id' => 'pro_intro_one',
-                    'title' => __('3 call to action boxes, full-width background', 'text-domain' ),
-                    'thumb' => 'intro_two.jpg',
+                    'title' => __('2 columns, call to actions, image carousel', 'text-domain' ),
+                    'thumb' => 'pro_intro_one.jpg',
                     'active' => sek_is_pro(),
                     'is_pro' => true
                 )
