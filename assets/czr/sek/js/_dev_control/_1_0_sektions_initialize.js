@@ -251,6 +251,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                               });
                         });
+
+                        // Send the previewed device to the preview
+                        //api.previewer.send( 'sek-preview-device-changed', { device : device });
                   });
 
                   // Schedule a reset
