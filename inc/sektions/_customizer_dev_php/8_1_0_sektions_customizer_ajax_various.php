@@ -231,6 +231,7 @@ function sek_get_font_list_tmpl( $html, $requested_tmpl = '', $posted_params = a
 function sek_get_cfonts() {
     $cfonts = array();
     $raw_cfonts = array(
+        '-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue, Arial, sans-serif',
         'Arial Black,Arial Black,Gadget,sans-serif',
         'Century Gothic',
         'Comic Sans MS,Comic Sans MS,cursive',
@@ -342,8 +343,9 @@ function sek_get_preset_sektions() {
 
     // September 2020 => force update every 24 hours so users won't miss a new pre-build section
     // Note that the refresh should have take place on 'upgrader_process_complete'
+    // always force refresh when developing
     $force_update = false;
-    if ( false == get_transient('nimble_preset_sections_refreshed') ) {
+    if ( false == get_transient('nimble_preset_sections_refreshed') || sek_is_dev_mode() ) {
         $force_update = true;
         set_transient( 'nimble_preset_sections_refreshed', 'yes', 2 * DAY_IN_SECONDS );
     }
