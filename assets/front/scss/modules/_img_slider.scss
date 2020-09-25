@@ -43,14 +43,14 @@
       &[data-sek-image-layout="height-100"] {
         .sek-carousel-img {
           height: 100%;
-          width: auto;
+          width: 100%;
           overflow: hidden;
           display: flex;
           justify-content: center;
           align-items: center;
           img {
+            width: 100%;
             height: 100%;
-            width: auto;
             max-width: none;
             object-fit: cover;
           }
