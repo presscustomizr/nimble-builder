@@ -104,6 +104,22 @@ function sek_get_raw_section_registration_params() {
                 )
             )
         ],
+        'sek_team_sec_picker_module' => [
+            'module_title' => __('Sections for teams', 'text_doma'),
+            'section_collection' => array(
+                array(
+                    'content-id' => 'team_one',
+                    'title' => __('4 column', 'text-domain' ),
+                    'thumb' => 'team_one.jpg'
+                ),
+                array(
+                    'content-id' => 'team_two',
+                    'title' => __('3 columns', 'text-domain' ),
+                    'thumb' => 'team_two.jpg',
+                    'height' => '180px'
+                )
+            )
+        ],
         'sek_column_layouts_sec_picker_module' => [
             'module_title' => __('Empty sections with columns layout', 'text_doma'),
             'section_collection' => array(

@@ -515,6 +515,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Sections for services and features' => __('Sections for services and features', 'text_doma'),
             'About us sections' => __('About us sections', 'text_doma'),
             'Contact-us sections' => __('Contact-us sections', 'text_doma'),
+            'Sections for teams' => __('Sections for teams', 'text_doma'),
             'Empty sections with columns layout' => __('Empty sections with columns layout', 'text_doma'),
             'Header sections' => __('Header sections', 'text_doma'),
             'Footer sections' => __('Footer sections', 'text_doma'),

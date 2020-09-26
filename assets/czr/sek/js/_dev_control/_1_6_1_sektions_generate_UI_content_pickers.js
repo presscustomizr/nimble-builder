@@ -88,6 +88,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               priority : 30,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
+                        sek_team_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_team_sec_picker_module',
+                              controlLabel :  sektionsLocalizedData.i18n['Sections for teams'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : false,
+                              priority : 30,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                        },
                         sek_column_layouts_sec_picker_module : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                               module_type : 'sek_column_layouts_sec_picker_module',
