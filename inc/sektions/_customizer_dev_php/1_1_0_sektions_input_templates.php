@@ -608,6 +608,7 @@ function sek_print_nimble_input_templates() {
             //     return;
             // }
 
+            var img_version = sektionsLocalizedData.isDevMode ? Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1) : sektionsLocalizedData.nimbleVersion;
             // FOR PREBUILT SECTIONS ONLY, user sections are rendered in javascript @see _dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js
             _.each( section_collection, function( rawSecParams ) {
                 //normalizes the params
@@ -628,7 +629,7 @@ function sek_print_nimble_input_templates() {
                     section_type = secParams['section_type'];
                 }
 
-                var thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/img/section_assets/thumbs/', secParams['thumb'] ,  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
+                var thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/img/section_assets/thumbs/', secParams['thumb'] ,  '?ver=' , img_version ].join(''),
                     styleAttr = 'background: url(' + thumbUrl  + ') 50% 50% / cover no-repeat;';
                     is_draggable = true !== modData['active'] ? 'false' : 'true';
 
