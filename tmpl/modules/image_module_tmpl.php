@@ -46,8 +46,13 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
         } else {
             //falls back on an icon if previewing
             if ( skp_is_customizing() ) {
-                $html = Nimble_Manager()->sek_get_input_placeholder_content( 'upload' );
+                $html = sprintf('<div style="min-height:50px">%1$s</div>', Nimble_Manager()->sek_get_input_placeholder_content( 'upload' ));
             }
+        }
+
+        // Do we have something ? If not print the placeholder
+        if ( empty($html) && skp_is_customizing() ) {
+            $html = sprintf('<div style="min-height:50px">%1$s</div>', Nimble_Manager()->sek_get_input_placeholder_content( 'upload' ));
         }
 
         $title = '';
