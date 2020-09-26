@@ -120,7 +120,7 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.10 : [accordion module] Fixed Tiktok video embeds not working when used in accordion content.
+2.1.11 : [image module] Added a new custom height option. [carousel module] fixed minor css issue. [prebuilt sections] added new "Team" group of sections. Various improvement for the dynamic CSS generation.
 
 == Changelog ==
 = 2.1.11 September 26, 2020 =

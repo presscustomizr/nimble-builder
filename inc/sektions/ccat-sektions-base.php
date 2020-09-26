@@ -2088,8 +2088,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
           'sek_level_width_section',
           'sek_level_anchor_module',
           'sek_level_visibility_module',
-          'sek_level_breakpoint_module',
-          'sek_level_cust_css_section'
+          'sek_level_breakpoint_module'
         ];
 
         public static $ui_local_global_options_modules = [
@@ -2193,6 +2192,14 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             // REGISTER NIMBLE WIDGET ZONES
             add_action( 'widgets_init', array( $this, 'sek_nimble_widgets_init' ) );
             do_action('nimble_manager_ready');
+
+            // MAYBE REGISTER PRO UPSELL MODUMES
+            add_filter('nb_level_module_collection', function( $module_collection ) {
+                if ( is_array($module_collection) && defined('NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON ) {
+                    array_push($module_collection, 'sek_level_cust_css_section' );
+                }
+                return $module_collection;
+            });
         }//__construct
 
         // @fired @hook 'widgets_init'

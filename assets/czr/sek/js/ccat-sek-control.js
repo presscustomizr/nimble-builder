@@ -5675,15 +5675,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     module_type : 'sek_level_breakpoint_module',
                                     controlLabel : sektionsLocalizedData.i18n['Responsive settings : breakpoint, column direction'],
                                     icon : '<i class="material-icons sek-level-option-icon">devices</i>'
-                              },
-                              sec_custom_css : {
-                                    settingControlId : params.id + '__sec_custom_css',
-                                    module_type : 'sek_level_cust_css_section',
-                                    controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
-                                    icon : '<i class="material-icons sek-level-option-icon">code</i>',
-                                    isPro : true
                               }
                         });
+                        if ( sektionsLocalizedData.isUpsellEnabled || sektionsLocalizedData.isPro ) {
+                              $.extend( modulesRegistrationParams, {
+                                    sec_custom_css : {
+                                          settingControlId : params.id + '__sec_custom_css',
+                                          module_type : 'sek_level_cust_css_section',
+                                          controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
+                                          icon : '<i class="material-icons sek-level-option-icon">code</i>',
+                                          isPro : true
+                                    }
+                              });
+                        }
                   }
                   if ( 'column' === params.level ) {
                         $.extend( modulesRegistrationParams, {

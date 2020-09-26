@@ -1075,7 +1075,7 @@ function sek_register_modules_when_not_customizing_and_not_ajaxing( $skope_id = 
 
     $modules = array_merge(
         $contextually_actives_candidates,
-        SEK_Front_Construct::$ui_level_modules,
+        apply_filters( 'nb_level_module_collection', SEK_Front_Construct::$ui_level_modules ),
         SEK_Front_Construct::$ui_local_global_options_modules
     );
     sek_do_register_module_collection( $modules );
