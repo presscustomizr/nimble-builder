@@ -380,13 +380,20 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     $custom_anchor = esc_attr( $model[ 'options' ][ 'anchor' ]['custom_anchor'] );
                 }
             }
-            $custom_css_classes = null;
+            $level_css_classes = '';
             if ( !empty( $model[ 'options' ] ) && !empty( $model[ 'options' ][ 'anchor' ] ) && !empty( $model[ 'options' ][ 'anchor' ]['custom_css_classes'] ) ) {
                 if ( is_string( $model[ 'options' ][ 'anchor' ]['custom_css_classes'] ) ) {
-                    $custom_css_classes = esc_attr( $model[ 'options' ][ 'anchor' ]['custom_css_classes'] );
+                    $level_css_classes = esc_attr( $model[ 'options' ][ 'anchor' ]['custom_css_classes'] );
                     //clean commas
-                    $custom_css_classes = preg_replace("/(?<!\d)(\,|\.)(?!\d)/", "", $custom_css_classes);
-                    //$custom_css_classes = preg_replace("/[^0-9a-zA-Z]/","", $custom_css_classes);
+                    $level_css_classes = preg_replace("/(?<!\d)(\,|\.)(?!\d)/", "", $level_css_classes);
+                    //$level_css_classes = preg_replace("/[^0-9a-zA-Z]/","", $level_css_classes);
+                }
+            }
+
+            // sept 2020 => Box shadow CSS class
+            if ( !empty( $model[ 'options' ] ) && !empty( $model[ 'options' ][ 'border' ] ) && !empty( $model[ 'options' ][ 'border' ]['shadow'] ) ) {
+                if ( sek_is_checked( $model[ 'options' ][ 'border' ]['shadow'] ) ) {
+                    $level_css_classes .= 'sek-level-has-shadow';
                 }
             }
 
@@ -493,7 +500,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
 
                     // June 2020 : introduced for https://github.com/presscustomizr/nimble-builder-pro/issues/6
                     $section_classes = apply_filters( 'nimble_section_level_css_classes', array(), $model );
-                    array_push( $section_classes, $custom_css_classes );
+                    array_push( $section_classes, $level_css_classes );
 
                     printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s %6$s" %7$s %8$s %9$s>%10$s',
                         $id,
@@ -587,7 +594,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         $grid_column_class,
                         $this->get_level_visibility_css_class( $model ),
                         $has_bg_img ? 'sek-has-bg' : '',
-                        is_null( $custom_css_classes ) ? '' : $custom_css_classes,
+                        $level_css_classes,
 
                         empty( $collection ) ? 'data-sek-no-modules="true"' : '',
                         // add smartload + parallax attributes
@@ -721,7 +728,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         $module_type,
                         $this->get_level_visibility_css_class( $model ),
                         $has_bg_img ? 'sek-has-bg' : '',
-                        is_null( $custom_css_classes ) ? '' : $custom_css_classes,
+                        $level_css_classes,
 
                         $title_attribute,
                         // add smartload + parallax attributes
