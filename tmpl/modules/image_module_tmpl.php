@@ -24,16 +24,20 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
         $img = !is_null($img) ? $img : $value['img'];
         $img_size = !is_null($img_size) ? $img_size : $value['img-size'];
 
-        $visual_effect_class = '';
+        $img_figure_classes = '';
         //visual effect classes
         if ( true === sek_booleanize_checkbox_val( $value['use_box_shadow'] ) ) {
-            $visual_effect_class = ' box-shadow';
+            $img_figure_classes = ' box-shadow';
         }
         if ( 'none' !== $value['img_hover_effect']) {
-            $visual_effect_class .= " sek-hover-effect-" . $value['img_hover_effect'];
+            $img_figure_classes .= " sek-hover-effect-" . $value['img_hover_effect'];
         }
 
-        $visual_effect_class .= $for_mobile ? " sek-is-mobile-logo" : " sek-img";
+        $img_figure_classes .= $for_mobile ? " sek-is-mobile-logo" : " sek-img";
+
+        if ( true === sek_booleanize_checkbox_val( $value['use_custom_height'] ) ) {
+            $img_figure_classes .= " has-custom-height";
+        }
 
         $html = '';
         if ( is_int( $img ) ) {
@@ -83,7 +87,7 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
         if ( !skp_is_customizing() && false !== strpos($html, 'data-sek-src="http') ) {
             $html = $html.Nimble_Manager()->css_loader_html;
         }
-        return sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', $visual_effect_class, $html, esc_html( $title ) );
+        return sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', $img_figure_classes, $html, esc_html( $title ) );
     }
 }
 

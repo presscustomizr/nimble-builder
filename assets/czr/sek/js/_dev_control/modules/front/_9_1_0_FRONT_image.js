@@ -115,6 +115,15 @@
                                                 }
                                           });
                                     break;
+                                    case 'use_custom_height' :
+                                          _.each( [ 'custom_height' ] , function( _inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input();
+                                                }); } catch( er ) {
+                                                      api.errare( 'Image module => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
                                     case 'use_custom_title_attr' :
                                           _.each( [ 'heading_title' ] , function( _inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {

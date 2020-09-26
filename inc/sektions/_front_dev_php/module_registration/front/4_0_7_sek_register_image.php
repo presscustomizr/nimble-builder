@@ -131,7 +131,8 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'input_type'  => 'nimblecheck',
                     'title'       => __( 'Custom image width', 'text_doma' ),
                     'default'     => 0,
-                    'refresh_stylesheet' => true
+                    'refresh_stylesheet' => true,
+                    'html_before' => '<hr/>'
                 ),
                 'custom_width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -146,10 +147,30 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true
                 ),
+                'use_custom_height' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __( 'Custom image height', 'text_doma' ),
+                    'default'     => 0,
+                    'refresh_stylesheet' => true
+                ),
+                'custom_height' => array(
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
+                    'title'       => __('Height', 'text_doma'),
+                    'min' => 1,
+                    'max' => 100,
+                    //'unit' => '%',
+                    'default'     => array( 'desktop' => '100%' ),
+                    'max'     => 500,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
+                ),
                 'use_box_shadow' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __( 'Apply a shadow', 'text_doma' ),
                     'default'     => 0,
+                    'html_before' => '<hr/>'
                 ),
                 'img_hover_effect' => array(
                     'input_type'  => 'simpleselect',
@@ -307,7 +328,62 @@ function sek_add_css_rules_for_czr_image_module( $rules, $complete_modul_model )
                 'mq' =>null
             );
         }
-    }
+    }// Width
+
+
+    // HEIGHT
+    if ( sek_booleanize_checkbox_val( $main_settings['use_custom_height'] ) ) {
+        $height = $main_settings[ 'custom_height' ];
+        $css_rules = '';
+        if ( isset( $height ) && FALSE !== $height ) {
+            $numeric = sek_extract_numeric_value( $height );
+            if ( !empty( $numeric ) ) {
+                $unit = sek_extract_unit( $height );
+                $css_rules .= 'max-height:' . $numeric . $unit . ';';
+            }
+            // same treatment as in sek_add_css_rules_for_css_sniffed_input_id() => 'width'
+            if ( is_string( $height ) ) {
+                  $numeric = sek_extract_numeric_value($height);
+                  if ( !empty( $numeric ) ) {
+                      $unit = sek_extract_unit( $height );
+                      $css_rules .= 'max-height:' . $numeric . $unit . ';';
+                  }
+            } else if ( is_array( $height ) ) {
+                  $height = wp_parse_args( $height, array(
+                      'desktop' => '100%',
+                      'tablet' => '',
+                      'mobile' => ''
+                  ));
+                  // replace % by vh when needed
+                  $ready_value = $height;
+                  foreach ($height as $device => $num_unit ) {
+                      $numeric = sek_extract_numeric_value( $num_unit );
+                      if ( !empty( $numeric ) ) {
+                          $unit = sek_extract_unit( $num_unit );
+                          $ready_value[$device] = $numeric . $unit;
+                      }
+                  }
+
+                  $rules = sek_set_mq_css_rules(array(
+                      'value' => $ready_value,
+                      'css_property' => 'max-height',
+                      'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner figure',
+                      'is_important' => false,
+                      'level_id' => $complete_modul_model['id']
+                  ), $rules );
+            }
+        }//if
+
+
+        if ( !empty( $css_rules ) ) {
+            $rules[] = array(
+                'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner img',
+                'css_rules' => $css_rules,
+                'mq' =>null
+            );
+        }
+    }// height
+
 
     // BORDERS
     $border_settings = $borders_corners_settings[ 'borders' ];
