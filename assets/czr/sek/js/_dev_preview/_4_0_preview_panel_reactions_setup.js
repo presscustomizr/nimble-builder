@@ -595,6 +595,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               // https://github.com/presscustomizr/nimble-builder/issues/742
                               api.preview.bind( msgId, _.debounce( function( params ) {
                                     _apiPreviewCallback( params, callbackFn, msgId );
+                                    if ( params && params.apiParams && params.apiParams.id ) {
+                                          api.preview.trigger('sek-animate-to-level', { id : params.apiParams.id });
+                                    }
                               }, 1000 ));// api.preview.bind( msgId, function( params ) {
                         } else {
                               api.preview.bind( msgId, function( params ) {
