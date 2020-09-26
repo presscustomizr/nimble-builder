@@ -130,11 +130,11 @@ li[id^="accordion-section-__nimble__"] > h3 {
 }
 .sek-is-pro {
   position: absolute;
-  top: -3px;
+  top: 0px;
   z-index: 10;
   right: 2px;
   height: 20px;
-  width: 31px;
+  width: 28px;
 }
 
 
@@ -1302,6 +1302,13 @@ credits : Gutenberg team @wordpress */
   position: relative;
   top: 6px;
 }
+
+/* STYLE FOR THE PRO ICON NEXT TO THE CONTROL TITLE */
+.sek-pro-icon-next-title {
+  padding: 5px;
+  min-width: 22px;
+}
+
 
 /* HIDE ADD NEW BUTTON IN MULTI-ITEM MODULES WHEN ACCORDION COLLAPSED */
 [data-sek-expanded="false"] > .czr-open-pre-add-new { display: none;}

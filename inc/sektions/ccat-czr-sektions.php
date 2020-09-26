@@ -515,6 +515,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Sections for services and features' => __('Sections for services and features', 'text_doma'),
             'About us sections' => __('About us sections', 'text_doma'),
             'Contact-us sections' => __('Contact-us sections', 'text_doma'),
+            'Sections for teams' => __('Sections for teams', 'text_doma'),
             'Empty sections with columns layout' => __('Empty sections with columns layout', 'text_doma'),
             'Header sections' => __('Header sections', 'text_doma'),
             'Footer sections' => __('Footer sections', 'text_doma'),
@@ -1711,7 +1712,7 @@ function sek_print_nimble_input_templates() {
                 <div draggable="{{is_draggable}}" data-sek-eligible-for-module-dropzones="true" data-sek-content-type="{{modData['content-type']}}" data-sek-content-id="{{modData['content-id']}}" title="{{title_attr}}"><div class="sek-module-icon {{font_icon_class}}"><# print(icon_img_html); #></div><div class="sek-module-title"><div class="sek-centered-module-title">{{modData['title']}}</div></div>
                   <#
                   if ( modData['is_pro'] ) {
-                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_white.svg" alt="Pro feature"/></div>';
+                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
                     print(pro_img_html);
                   }
                   #>
@@ -1742,6 +1743,7 @@ function sek_print_nimble_input_templates() {
             //     return;
             // }
 
+            var img_version = sektionsLocalizedData.isDevMode ? Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1) : sektionsLocalizedData.nimbleVersion;
             // FOR PREBUILT SECTIONS ONLY, user sections are rendered in javascript @see _dev_control/modules/ui/_10_0_0_UI_module_and_section_pickers.js
             _.each( section_collection, function( rawSecParams ) {
                 //normalizes the params
@@ -1762,7 +1764,7 @@ function sek_print_nimble_input_templates() {
                     section_type = secParams['section_type'];
                 }
 
-                var thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/img/section_assets/thumbs/', secParams['thumb'] ,  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
+                var thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/img/section_assets/thumbs/', secParams['thumb'] ,  '?ver=' , img_version ].join(''),
                     styleAttr = 'background: url(' + thumbUrl  + ') 50% 50% / cover no-repeat;';
                     is_draggable = true !== modData['active'] ? 'false' : 'true';
 
@@ -1774,7 +1776,7 @@ function sek_print_nimble_input_templates() {
                 <div draggable="{{is_draggable}}" data-sek-content-type="preset_section" data-sek-content-id="{{secParams['content-id']}}" style="<# print(styleAttr); #>" title="{{secParams['title']}}" data-sek-section-type="{{section_type}}"><div class="sek-overlay"></div>
                   <#
                   if ( modData['is_pro'] ) {
-                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_white.svg" alt="Pro feature"/></div>';
+                    var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
                     print(pro_img_html);
                   }
                   #>
@@ -2016,6 +2018,19 @@ function sek_print_nimble_input_templates() {
 
         </div>
         <input data-czrtype="{{data.input_id}}" type="hidden" value="{{data.value}}"/>
+      </script>
+      <?php
+
+      /* ------------------------------------------------------------------------- *
+       *  INACTIVE
+       * Sept 2020 introduced an "inactive" input type in order to display pro info for Nimble
+       * this input should be "hidden" type, and should not trigger an API change.
+       * when working on https://github.com/presscustomizr/nimble-builder-pro/issues/67
+
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___inactive">
+        <input data-czrtype="{{data.input_id}}" type="hidden"/>
       </script>
       <?php
 }//sek_print_nimble_input_templates() @hook 'customize_controls_print_footer_scripts'
@@ -4161,6 +4176,7 @@ function sek_get_font_list_tmpl( $html, $requested_tmpl = '', $posted_params = a
 function sek_get_cfonts() {
     $cfonts = array();
     $raw_cfonts = array(
+        '-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue, Arial, sans-serif',
         'Arial Black,Arial Black,Gadget,sans-serif',
         'Century Gothic',
         'Comic Sans MS,Comic Sans MS,cursive',
@@ -4269,7 +4285,16 @@ function sek_get_preset_sektions() {
     // May 21st => back to the local data
     // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
     //$preset_sections = sek_get_preset_sections_api_data();
-    $preset_sections = sek_get_preset_section_collection_from_json();
+
+    // September 2020 => force update every 24 hours so users won't miss a new pre-build section
+    // Note that the refresh should have take place on 'upgrader_process_complete'
+    // always force refresh when developing
+    $force_update = false;
+    if ( false == get_transient('nimble_preset_sections_refreshed') || sek_is_dev_mode() ) {
+        $force_update = true;
+        set_transient( 'nimble_preset_sections_refreshed', 'yes', 2 * DAY_IN_SECONDS );
+    }
+    $preset_sections = sek_get_preset_section_collection_from_json( $force_update );
     if ( empty( $preset_sections ) ) {
         wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => no preset_sections when running sek_get_preset_sections_api_data()' );
     }

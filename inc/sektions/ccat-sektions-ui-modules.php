@@ -2090,9 +2090,6 @@ function sek_get_module_params_for_sek_level_border_module() {
  *  SCHEDULE CSS RULES FILTERING
 /* ------------------------------------------------------------------------- */
 add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_border', 10, 3 );
-add_filter( 'sek_add_css_rules_for_level_options', '\Nimble\sek_add_css_rules_for_boxshadow', 10, 3 );
-
-
 function sek_add_css_rules_for_border( $rules, $level ) {
     $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
     // $default_value_model = Array
@@ -2149,48 +2146,6 @@ function sek_add_css_rules_for_border( $rules, $level ) {
         $rules = sek_generate_css_rules_for_border_radius_options( $rules, $normalized_border_options['border-radius'], '[data-sek-id="'.$level['id'].'"]' );
     }
 
-    return $rules;
-}
-
-
-
-function sek_add_css_rules_for_boxshadow( $rules, $level ) {
-    $options = empty( $level[ 'options' ] ) ? array() : $level['options'];
-    // $default_value_model = Array
-    // (
-    //     [bg-color] =>
-    //     [bg-image] =>
-    //     [bg-position] => center
-    //     [bg-attachment] => 0
-    //     [bg-scale] => default
-    //     [bg-apply-overlay] => 0
-    //     [bg-color-overlay] =>
-    //     [bg-opacity-overlay] => 50
-    //     [border-width] => 1
-    //     [border-type] => none
-    //     [border-color] =>
-    //     [shadow] => 0
-    // )
-    $default_value_model  = sek_get_default_module_model( 'sek_level_border_module' );
-    $normalized_border_options = ( !empty( $options[ 'border' ] ) && is_array( $options[ 'border' ] ) ) ? $options[ 'border' ] : array();
-    $normalized_border_options = wp_parse_args( $normalized_border_options , is_array( $default_value_model ) ? $default_value_model : array() );
-
-    if ( empty( $normalized_border_options) )
-      return $rules;
-
-    if ( !empty( $normalized_border_options[ 'shadow' ] ) &&  sek_is_checked( $normalized_border_options[ 'shadow'] ) ) {
-        // when customizing set to !important, to override the sek-highlight-active-ui effect
-        $rules[]     = array(
-                'selector' => '.customizer-preview [data-sek-id="'.$level['id'].'"]',
-                'css_rules' => '-webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;-moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px!important;',
-                'mq' =>null
-        );
-        $rules[]     = array(
-                'selector' => '[data-sek-id="'.$level['id'].'"]',
-                'css_rules' => '-webkit-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;-moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;',
-                'mq' =>null
-        );
-    }
     return $rules;
 }
 ?><?php
@@ -3304,6 +3259,37 @@ function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
 
 
     return $rules;
+}
+
+?><?php
+//Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
+function sek_get_module_params_for_sek_level_cust_css_section() {
+    $pro_text = '';
+    if ( !sek_is_pro() ) {
+        $pro_text = sek_get_pro_notice_for_czr_input( __('custom CSS on a per section basis.', 'text-doma') );
+    }
+    return array(
+        'dynamic_registration' => true,
+        'module_type' => 'sek_level_cust_css_section',
+        'name' => __('Width options', 'text_doma'),
+        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
+        // 'starting_value' => array(
+        //     'outer-section-width' => '100%',
+        //     'inner-section-width' => '100%'
+        // ),
+        'tmpl' => array(
+            'item-inputs' => array(
+                'custom_css' => array(
+                    'input_type'  => 'inactive',
+                    'default'     => '',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => false,
+                    'html_before' => $pro_text . '<hr/>'
+                )
+            )
+        )//tmpl
+    );
 }
 
 ?><?php

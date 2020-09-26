@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.5
-Stable tag: 2.1.10
+Stable tag: 2.1.11
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -123,6 +123,18 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 2.1.10 : [accordion module] Fixed Tiktok video embeds not working when used in accordion content.
 
 == Changelog ==
+= 2.1.11 September 26, 2020 =
+* fixed : [dynamic css] css value may not be taken into account when typed fast, for example when setting an height in pixels
+* fixed : [slider module] horizontal centering broken when slider fills 100% of height
+* fixed : [slider module] improved slider image style when chosen option is to adapt image on height
+* fixed : [prebuilt sections][performances] removed the get sections action at 'nimble_front_classes_ready'
+* fixed : [img module] make sure the html has a minimum height when no image was found
+* improved : [dynamic stylesheet] always animate to level when stylesheet is generated
+* improved : [dynamic stylesheet][performance] improved the CSS rule generation for level box shadow
+* added : [fonts] new web safe font
+* added : [image module] introduction of a custom height option
+* added: [prebuilt sections] new group of sections "Team" with 2 new prebuilt sections included
+
 = 2.1.10 September 17, 2020 =
 * improved : [admin] settings links should point to "Options" tab
 * fixed : [accordion module] striping script tags should be moved before parsing video embed, leading to tiktok videos embeds not working

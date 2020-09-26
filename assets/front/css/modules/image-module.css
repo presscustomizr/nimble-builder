@@ -19,6 +19,20 @@
   transition: all 0.2s ease-out;
 }
 
+[data-sek-module-type="czr_image_module"] figure.has-custom-height {
+  overflow: hidden;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+[data-sek-module-type="czr_image_module"] figure.has-custom-height img {
+  object-fit: cover;
+}
+
 .sek-hover-effect-opacity img:hover {
   opacity: .7;
 }

@@ -1522,6 +1522,11 @@ window.nb_.getQueryVariable = function(variable) {
                           //mySwiper.slideTo(index, speed, runCallbacks);
                           activeSwiperInstance.slideTo( slideIndex, 100 );
                     });
+
+                    // Trigger a window resize when control send a 'sek-preview-device-changed'
+                    // wp.customize.preview.bind('sek-preview-device-changed', nb_.debounce( function( params ) {
+                    //       nb_.cachedElements.$window.trigger('resize');
+                    // }, 1000 ));
               }
           });
 

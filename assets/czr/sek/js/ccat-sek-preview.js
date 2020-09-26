@@ -2156,79 +2156,104 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             }
                       };//msgCollection
 
+
+
+
                   var $_activeElement;// <= will be used to cache self.activeLevelEl()
-                  _.each( msgCollection, function( callbackFn, msgId ) {
-                        api.preview.bind( msgId, function( params ) {
-                              params = _.extend( {
-                                  location_skope_id : '',
-                                  apiParams : {},
-                                  uiParams : {}
-                              }, params || {} );
+                  var _apiPreviewCallback = function( params, callbackFn, msgId ) {
+                        params = _.extend( {
+                            location_skope_id : '',
+                            apiParams : {},
+                            uiParams : {}
+                        }, params || {} );
 
-                              // If the ajax response is an array formed this way ( @see sek-refresh-level case ) :
-                              // @see SEK_Front_Ajax::sek_get_level_content_for_injection
-                              // _ajaxResponse_ = array(
-                              //     'contents' => $html,
-                              //     'setting_validities' => $exported_setting_validities
-                              // );
-                              // Then we send an additional setting-validity message to the control panel
-                              // This is the same mechanism used by WP to handle the setting validity of the partial refresh
+                        // If the ajax response is an array formed this way ( @see sek-refresh-level case ) :
+                        // @see SEK_Front_Ajax::sek_get_level_content_for_injection
+                        // _ajaxResponse_ = array(
+                        //     'contents' => $html,
+                        //     'setting_validities' => $exported_setting_validities
+                        // );
+                        // Then we send an additional setting-validity message to the control panel
+                        // This is the same mechanism used by WP to handle the setting validity of the partial refresh
 
-                              var sendSuccessDataToPanel = function( _ajaxResponse_ ) {
-                                    // always send back the {msgId}_done message, so the control panel can fire the "complete" callback.
-                                    // @see api.czr_sektions::reactToPreviewMsg
-                                    api.preview.send( [ msgId, 'done'].join('_'), params );
+                        var sendSuccessDataToPanel = function( _ajaxResponse_ ) {
+                              // always send back the {msgId}_done message, so the control panel can fire the "complete" callback.
+                              // @see api.czr_sektions::reactToPreviewMsg
+                              api.preview.send( [ msgId, 'done'].join('_'), params );
 
-                                    // For multi-items module, when the level is refreshed, we want to focus on the changed_item
-                                    // @see CZRSeksPrototype::doSektionThinksOnApiReady
-                                    if ( params.apiParams.is_multi_items && params.apiParams.action === 'sek-refresh-level' ) {
-                                          api.preview.send( 'multi-items-module-refreshed', params );
-                                    }
-
-                                    if ( _.isUndefined( _ajaxResponse_ ) )
-                                      return;
-
-                                    if ( _ajaxResponse_.data && _ajaxResponse_.data.setting_validities ) {
-                                          api.preview.send( 'selective-refresh-setting-validities', _ajaxResponse_.data.setting_validities );
-                                    }
-                              };
-                              // the action being processed is added as a css class to the body of the preview
-                              // it's used to enable/disable specific css properties during the action
-                              // for example, we don't want css transitions while duplicating or removing a column
-                              self.cachedElements.$body.addClass( msgId );
-                              try {
-                                    $.when( _.isFunction( callbackFn ) ? callbackFn( params ) : self[callbackFn].call( self, params ) )
-                                          .done( function( _ajaxResponse_ ) {
-                                                sendSuccessDataToPanel( _ajaxResponse_ );
-                                          })
-                                          .fail( function() {
-                                                api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
-                                          })
-                                          .always( function( _ajaxResponse_ ) {
-                                                self.cachedElements.$body.removeClass( msgId );
-                                          })
-                                          .then( function() {
-                                                api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
-                                          });
-                              } catch( _er_ ) {
-                                    self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
-                                    self.cachedElements.$body.removeClass( msgId );
+                              // For multi-items module, when the level is refreshed, we want to focus on the changed_item
+                              // @see CZRSeksPrototype::doSektionThinksOnApiReady
+                              if ( params.apiParams.is_multi_items && params.apiParams.action === 'sek-refresh-level' ) {
+                                    api.preview.send( 'multi-items-module-refreshed', params );
                               }
 
-                              // MAY 2020 : focus on the edited element
-                              if ( params.apiParams.id ) {
+                              if ( _.isUndefined( _ajaxResponse_ ) )
+                                return;
+
+                              if ( _ajaxResponse_.data && _ajaxResponse_.data.setting_validities ) {
+                                    api.preview.send( 'selective-refresh-setting-validities', _ajaxResponse_.data.setting_validities );
+                              }
+                        };
+                        // the action being processed is added as a css class to the body of the preview
+                        // it's used to enable/disable specific css properties during the action
+                        // for example, we don't want css transitions while duplicating or removing a column
+                        self.cachedElements.$body.addClass( msgId );
+                        try {
+                              $.when( _.isFunction( callbackFn ) ? callbackFn( params ) : self[callbackFn].call( self, params ) )
+                                    .done( function( _ajaxResponse_ ) {
+                                          sendSuccessDataToPanel( _ajaxResponse_ );
+                                    })
+                                    .fail( function() {
+                                          api.preview.send( 'sek-notify', { type : 'error', duration : 10000, message : sekPreviewLocalized.i18n['Something went wrong, please refresh this page.'] });
+                                    })
+                                    .always( function( _ajaxResponse_ ) {
+                                          self.cachedElements.$body.removeClass( msgId );
+                                    })
+                                    .then( function() {
+                                          api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
+                                    });
+                        } catch( _er_ ) {
+                              self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
+                              self.cachedElements.$body.removeClass( msgId );
+                        }
+
+                        // MAY 2020 : focus on the edited element
+                        if ( params.apiParams.id ) {
+                              $_activeElement = self.activeLevelEl();
+                              // set the activeElement if needed
+                              if ( !$_activeElement || !_.isObject($_activeElement) || $_activeElement.length < 1 || self.activeLevelUI() !== params.apiParams.id ) {
+                                    self.activeLevelEl( $('[data-sek-id="' + params.apiParams.id + '"]' ) );
                                     $_activeElement = self.activeLevelEl();
-                                    // set the activeElement if needed
-                                    if ( !$_activeElement || !_.isObject($_activeElement) || $_activeElement.length < 1 || self.activeLevelUI() !== params.apiParams.id ) {
-                                          self.activeLevelEl( $('[data-sek-id="' + params.apiParams.id + '"]' ) );
-                                          $_activeElement = self.activeLevelEl();
-                                    }
-                                    // if user scrolled while editing an element, let's focus again
-                                    if ( 0 < $_activeElement.length && !nb_.isInScreen( $_activeElement[0]) ) {
-                                          $_activeElement[0].scrollIntoView();
-                                    }
                               }
-                        });
+                              // if user scrolled while editing an element, let's focus again
+                              if ( 0 < $_activeElement.length && !nb_.isInScreen( $_activeElement[0]) ) {
+                                    $_activeElement[0].scrollIntoView();
+                              }
+                        }
+                  };//_apiPreviewCallback
+
+
+                  // Bind api preview
+                  _.each( msgCollection, function( callbackFn, msgId ) {
+                        if ( 'sek-refresh-stylesheet' === msgId ) {
+                              api.preview.bind( msgId, function( params ) {
+                                    _apiPreviewCallback( params, callbackFn, msgId );
+                              });// api.preview.bind( msgId, function( params ) {
+                              // September 2020 : added a debounced callback when generating stylesheet in order to prevent
+                              // css value may not be taken into account when typed fast, for example an height in pixels
+                              // https://github.com/presscustomizr/nimble-builder/issues/742
+                              api.preview.bind( msgId, _.debounce( function( params ) {
+                                    _apiPreviewCallback( params, callbackFn, msgId );
+                                    if ( params && params.apiParams && params.apiParams.id ) {
+                                          api.preview.trigger('sek-animate-to-level', { id : params.apiParams.id });
+                                    }
+                              }, 1000 ));// api.preview.bind( msgId, function( params ) {
+                        } else {
+                              api.preview.bind( msgId, function( params ) {
+                                    _apiPreviewCallback( params, callbackFn, msgId );
+                              });// api.preview.bind( msgId, function( params ) {
+                        }
+
                   });
             }//schedulePanelMsgReactions()
       });//$.extend()

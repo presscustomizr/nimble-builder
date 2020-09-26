@@ -477,6 +477,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                               });
                         });
+
+                        // Send the previewed device to the preview
+                        //api.previewer.send( 'sek-preview-device-changed', { device : device });
                   });
 
                   // Schedule a reset
@@ -5093,6 +5096,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               priority : 30,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
                         },
+                        sek_team_sec_picker_module : {
+                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              module_type : 'sek_team_sec_picker_module',
+                              controlLabel :  sektionsLocalizedData.i18n['Sections for teams'],
+                              content_type : 'section',
+                              expandAndFocusOnInit : false,
+                              priority : 30,
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                        },
                         sek_column_layouts_sec_picker_module : {
                               settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                               module_type : 'sek_column_layouts_sec_picker_module',
@@ -5656,12 +5668,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //             icon : '<i class="material-icons sek-level-option-icon">crop_din</i>'
                         //       }
                         // });
+                        // Pro icon
                         $.extend( modulesRegistrationParams, {
                               breakpoint : {
                                     settingControlId : params.id + '__breakpoint_options',
                                     module_type : 'sek_level_breakpoint_module',
                                     controlLabel : sektionsLocalizedData.i18n['Responsive settings : breakpoint, column direction'],
                                     icon : '<i class="material-icons sek-level-option-icon">devices</i>'
+                              },
+                              sec_custom_css : {
+                                    settingControlId : params.id + '__sec_custom_css',
+                                    module_type : 'sek_level_cust_css_section',
+                                    controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
+                                    icon : '<i class="material-icons sek-level-option-icon">code</i>',
+                                    isPro : true
                               }
                         });
                   }
@@ -5798,12 +5818,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         _titleContent = $title.html();
                                     // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
                                     $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
+
                                     // if this level has an icon, let's prepend it to the title
-                                    if ( ! _.isUndefined( optionData.icon ) ) {
+                                    if ( !_.isUndefined( optionData.icon ) ) {
                                           $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
                                     }
                                     // prepend the animated arrow
                                     $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
+
+                                    // if this section is pro, and we're not running NB PRo => add the icon
+                                    if ( optionData.isPro && !sektionsLocalizedData.isPro ) {
+                                        $title.append( [
+                                            '<img class="sek-pro-icon-next-title" src="',
+                                            sektionsLocalizedData.baseUrl,
+                                            '/assets/czr/sek/img/pro_orange.svg?ver=' + sektionsLocalizedData.nimbleVersion,
+                                            '"/>',
+                                        ].join('') );
+                                    }
+
                                     // setup the initial state + initial click
                                     _control_.container.attr('data-sek-expanded', "false" );
                                     if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
@@ -16012,6 +16044,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 //global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
 ( function ( api, $, _ ) {
+
+      //provides a description of each module
+      //=> will determine :
+      //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
+      //2) which js template(s) to use : if crud, the module template shall include the add new and pre-item elements.
+      //   , if crud, the item shall be removable
+      //3) how to render : if multi item, the item content is rendered when user click on edit button.
+      //    If not multi item, the single item content is rendered as soon as the item wrapper is rendered.
+      //4) some DOM behaviour. For example, a multi item shall be sortable.
+      api.czrModuleMap = api.czrModuleMap || {};
+      $.extend( api.czrModuleMap, {
+            sek_level_cust_css_section : {
+                  //mthds : Constructor,
+                  crud : false,
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_cust_css_section', 'name' ),
+                  has_mod_opt : false,
+                  ready_on_section_expanded : true,
+                  defaultItemModel : _.extend(
+                        { id : '', title : '' },
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_cust_css_section' )
+                  )
+            },
+      });
+})( wp.customize , jQuery, _ );//global sektionsLocalizedData, serverControlParams
+//extends api.CZRDynModule
+( function ( api, $, _ ) {
       //provides a description of each module
       //=> will determine :
       //1) how to initialize the module model. If not crud, then the initial item(s) model shall be provided
@@ -16851,6 +16909,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     break;
                                     case 'use_custom_width' :
                                           _.each( [ 'custom_width' ] , function( _inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input();
+                                                }); } catch( er ) {
+                                                      api.errare( 'Image module => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                                    case 'use_custom_height' :
+                                          _.each( [ 'custom_height' ] , function( _inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       return input();
                                                 }); } catch( er ) {
