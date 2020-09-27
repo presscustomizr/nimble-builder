@@ -49,7 +49,8 @@ function sek_get_module_params_for_sek_level_border_module() {
                     'title'       => __('Apply a shadow', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'default' => 0
+                    'default' => 0,
+                    'refresh_markup' => true
                 )
             )//item-inputs
         )//tmpl
