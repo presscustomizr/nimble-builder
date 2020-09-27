@@ -230,7 +230,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
 
             // MAYBE REGISTER PRO UPSELL MODUMES
             add_filter('nb_level_module_collection', function( $module_collection ) {
-                if ( is_array($module_collection) && defined('NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON ) {
+                if ( is_array($module_collection) && ( sek_is_pro() || defined('NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON ) ) {
                     array_push($module_collection, 'sek_level_cust_css_section' );
                 }
                 return $module_collection;
