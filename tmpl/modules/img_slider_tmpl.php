@@ -60,9 +60,10 @@ if ( !function_exists('Nimble\sek_maybe_parse_slider_img_html_for_lazyload') ) {
     // @return html string
     function sek_maybe_parse_slider_img_html_for_lazyload( $attachment_id, $size = 'thumbnail', $is_first_img, $lazy_load_on ) {
         // Skip when :
-        // 1) slider lazy loading is not active
-        // 2) global Nimble lazy load is active, and this is the first image ( in this case we want to lazy load the first image of the slider if offscreen )
-        if ( !$lazy_load_on || ( sek_is_img_smartload_enabled() && $is_first_img ) ) {
+        // - is customizing
+        // - slider lazy loading is not active
+        // - global Nimble lazy load is active, and this is the first image ( in this case we want to lazy load the first image of the slider if offscreen )
+        if ( skp_is_customizing() || !$lazy_load_on || ( sek_is_img_smartload_enabled() && $is_first_img ) ) {
             return wp_get_attachment_image( $attachment_id, $size );
         }
 
@@ -179,8 +180,7 @@ if ( !function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
             // in particular when calculting if is_visible() to decide if we smart load.
             $html = sprintf( '<img alt="default img" data-skip-lazyload="true" src="%1$s"/>', esc_url(  $item['img'] )  );
         }
-        //return $html;
-        return apply_filters( 'nimble_parse_for_smart_load', $html );
+        return skp_is_customizing() ? $html : apply_filters( 'nimble_parse_for_smart_load', $html );
     }
 }
 
