@@ -197,6 +197,8 @@ window.nb_ = {};
     }
     // maybe reveal bg images on dom ready
     // if lazyload is not loaded yet, and container is visible
+    // Sept 2020 : if lazyload disabled, make sure all background get revealed
+    // because background are always printed as data-sek-src attribute for a level, lazyload or not, and therefore need to be inlined styled with javascript
     nb_.listenTo('nb-docready', function() {
         var matches = document.querySelectorAll('div.sek-has-bg');
         if ( !nb_.isObject( matches ) || matches.length < 1 )
@@ -205,7 +207,11 @@ window.nb_ = {};
         matches.forEach( function(el) {
             if ( !nb_.isObject(el) )
               return;
-            if ( nb_.isInScreen(el) ) {
+            if ( window.sekFrontLocalized && window.sekFrontLocalized.lazyload_enabled ) {
+                if ( nb_.isInScreen(el) ) {
+                    nb_.mayBeRevealBG.call(el);
+                }
+            } else {
                 nb_.mayBeRevealBG.call(el);
             }
         });
