@@ -48,7 +48,26 @@
                     return;
 
                   evt.preventDefault();
-                  $root.animate({ scrollTop : $nimbleTargetCandidate.offset().top - 150 }, 400 );
+                  // Sept 2020 => if lazy load is enabled and there are still images to load, make sure all images are loaded before scrolling to an anchor
+                  // => lazyload all images + add a tiny delay before scrolling
+                  // otherwise, the scroll might no land to the right place, due to image dimensions not OK ( occurs on chrome and edge at least )
+                  // see https://github.com/presscustomizr/nimble-builder/issues/744
+                  var _scrollDelay = 0;
+                  if ( sekFrontLocalized.lazyload_enabled && true !== nb_.cachedElements.allImgLoadedBeforeScrollToAnchor ) {
+                        nb_.cachedElements.$body.find('img').trigger('sek_load_img');
+                        nb_.cachedElements.allImgLoadedBeforeScrollToAnchor = true;
+                        _scrollDelay = 100;//<= needed on browsers like chrome and edge, not on FF
+                  }
+                  nb_.delay( function() {
+                        // Check is scrollIntoView is fully supported, in particular the options for smooth behavior
+                        // https://stackoverflow.com/questions/46919627/is-it-possible-to-test-for-scrollintoview-browser-compatibility
+                        // if not, fallback on jQuery animate()
+                        if( 'scrollBehavior' in document.documentElement.style ) {
+                              $nimbleTargetCandidate[0].scrollIntoView( { behavior: "smooth" } );
+                        } else {
+                              $root.animate({ scrollTop : $nimbleTargetCandidate.offset().top - 150 }, 400 );
+                        }
+                  }, _scrollDelay );
             };
 
             // animate menu item to Nimble anchors
