@@ -43,6 +43,19 @@
       &[data-sek-image-layout="height-100"] {
         .sek-carousel-img {
           height: 100%;
+          width: auto;
+          overflow: hidden;
+          img {
+            width: auto;
+            height: 100%;
+            max-width: none;
+          }
+        }
+      }
+      // Sept 2020, for https://github.com/presscustomizr/nimble-builder/issues/743
+      &[data-sek-image-layout="cover"] {
+        .sek-carousel-img {
+          height: 100%;
           width: 100%;
           overflow: hidden;
           display: flex;
