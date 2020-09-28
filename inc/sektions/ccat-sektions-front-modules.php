@@ -5269,6 +5269,7 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                                 'default'     => 'width-100',
                                 'choices'     => array(
                                     'nimble-wizard' => __('Nimble wizard', 'text_doma' ),
+                                    'cover' => __('Images fill space and are centered without being stretched', 'text_doma'),
                                     'width-100' => __('Adapt images to carousel\'s width', 'text_doma' ),
                                     'height-100' => __('Adapt images to carousel\'s height', 'text_doma' ),
                                 ),

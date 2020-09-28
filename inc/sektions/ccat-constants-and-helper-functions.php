@@ -3122,6 +3122,14 @@ function sek_get_raw_section_registration_params() {
                     'title' => __('3 columns', 'text-domain' ),
                     'thumb' => 'team_two.jpg',
                     'height' => '180px'
+                ),
+                array(
+                    'content-id' => 'pro_team_one',
+                    'title' => __('3 columns, call to action', 'text-domain' ),
+                    'thumb' => 'pro_team_one.jpg',
+                    'active' => sek_is_pro(),
+                    'height' => '180px',
+                    'is_pro' => true
                 )
             )
         ],

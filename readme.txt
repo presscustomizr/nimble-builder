@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.5
-Stable tag: 2.1.11
+Stable tag: 2.1.12
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,19 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.11 : [image module] Added a new custom height option. [carousel module] fixed minor css issue. [prebuilt sections] added new "Team" group of sections. Various improvement for the dynamic CSS generation.
+2.1.12 : [lazy load] background images off screen were not loaded when lazy load was disabled. [scroll to anchor] fixes an issues when lazy loading is on, the scroll coulg not land to the right anchor. [carousel module] introduction of a new image layout option so that images fill space and are centered without being stretched
 
 == Changelog ==
+= 2.1.12 September 28, 2020 =
+* fixed : [lazy load] background images off screen are not loaded when lazy load is disabled
+* fixed : [image module] an image with an invalid url should not be rendered
+* fixed : [shadow on levels] not refreshed when customizing
+* fixed : [scroll to anchor] when lazy loading is on, the scroll might not land to the right anchor
+* fixed : [carousel module] first image not displayed when customizing with global lazyload disabled BUT slider lazyload enabled
+* fixed : [carousel module] adapt image to carousel height broken
+* added : [carousel module] new image layout option so that images fill space and are centered without being stretched
+* improved : [scroll to anchor] implement scrollIntoView
+
 = 2.1.11 September 26, 2020 =
 * fixed : [dynamic css] css value may not be taken into account when typed fast, for example when setting an height in pixels
 * fixed : [slider module] horizontal centering broken when slider fills 100% of height
