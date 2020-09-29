@@ -47,7 +47,7 @@
 /* ------------------------------------------------------------------------- *
  *  SMARTLOAD
 /* ------------------------------------------------------------------------- */
-// nimble-lazyload-loaded is fired in lazyload plugin, only when sekFrontLocalized.lazyload_enabled
+// nimble-lazyload-parsed is fired in lazyload plugin, only when sekFrontLocalized.lazyload_enabled OR when nb_.isCustomizing()
 (function(w, d){
     nb_.listenTo('nb-lazyload-parsed', function() {
         jQuery(function($){
@@ -56,7 +56,7 @@
                           var _maybeDoLazyLoad = function() {
                                 // if the element already has an instance of nimbleLazyLoad, simply trigger an event
                                 if ( !$(this).data('nimbleLazyLoadDone') ) {
-                                    $(this).nimbleLazyLoad();
+                                    $(this).nimbleLazyLoad({force : nb_.isCustomizing()});
                                 } else {
                                     $(this).trigger('nb-trigger-lazyload');
                                 }
