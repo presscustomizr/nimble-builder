@@ -201,7 +201,10 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         public $current_location_is_footer = false;
 
         // September 2020 for https://github.com/presscustomizr/nimble-builder-pro/issues/67
-        public $section_custom_css = '';
+        public $local_sections_custom_css = '';
+        public $global_sections_custom_css = '';
+        public $building_global_stylesheet = false;
+
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
