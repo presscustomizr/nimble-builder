@@ -38,7 +38,8 @@ function sek_get_raw_section_registration_params() {
                 array(
                     'content-id' => 'intro_three',
                     'title' => __('1 columns, call to action, full-width background', 'text-domain' ),
-                    'thumb' => 'intro_three.jpg'
+                    'thumb' => 'intro_three.jpg',
+                    'demo_url' => 'https://nimblebuilder.com/landing-page-one/#contact'
                 ),
                 array(
                     'content-id' => 'intro_one',

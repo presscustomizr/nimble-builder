@@ -148,7 +148,34 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
 .sek-content-type-wrapper [data-sek-content-type="preset_section"] {
   width: 95%;
   height: 165px;
-  position: relative
+  position: relative;
+  overflow: hidden;
+}
+
+/* SEPT 2020 : LINK TO DEMO SECTION */
+.sek-demo-link {
+    position: absolute;
+    bottom: -22px;
+    z-index: 20;
+    height: 18px;
+    width: 100%;
+    padding: 2px 0;
+    background: #000000;
+    background-color: rgba(0,0,0,.5);
+    color: #ffffff;
+    font-size: 13px;
+    cursor: pointer;
+    -webkit-transition: bottom 0.2s ease-in-out;
+    -moz-transition: bottom, 0.2s ease-in-out;
+    -ms-transition: bottom, 0.2s ease-in-out;
+    -o-transition: bottom, 0.2s ease-in-out;
+    transition: bottom 0.2s ease-in-out;
+}
+.sek-demo-link i, .sek-demo-link a {color:#ffffff;}
+.sek-demo-link a {text-decoration: none;text-transform: uppercase;}
+.sek-demo-link a:hover {color:#ffffff;text-decoration: underline;}
+[data-sek-content-type="preset_section"]:hover .sek-demo-link {
+  bottom: 0px;
 }
 
 [data-sek-content-type="preset_section"] .sek-overlay {
@@ -176,6 +203,8 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
   background: #eee;
   opacity: 0.8;
 }
+
+
 
 /* JUNE 2020 style for user sections */
 /* USER SECTIONS */

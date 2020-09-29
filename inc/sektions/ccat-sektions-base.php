@@ -2166,7 +2166,10 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         public $current_location_is_footer = false;
 
         // September 2020 for https://github.com/presscustomizr/nimble-builder-pro/issues/67
-        public $section_custom_css = '';
+        public $local_sections_custom_css = '';
+        public $global_sections_custom_css = '';
+        public $building_global_stylesheet = false;
+
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
@@ -5474,6 +5477,11 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
             else if ( !defined( 'DOING_AJAX' ) && !is_customize_preview() && sek_inline_dynamic_stylesheets_on_front() ) {
               $fire_at_hook = 'wp_head';
             }
+
+            // Say that we're building the global stylesheet
+            // introduced for the custom CSS, to know if we're building CSS for a local or a global section
+            // @see https://github.com/presscustomizr/nimble-builder-pro/issues/67
+            Nimble_Manager()->building_global_stylesheet = $params['is_global_stylesheet'];
 
             $css_handler_instance = new Sek_Dyn_CSS_Handler( array(
                 'id'             => $params['skope_id'],

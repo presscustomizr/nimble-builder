@@ -124,7 +124,7 @@ function sek_get_registered_location_property( $location_id, $property_name = ''
     }
 
     $location_params = wp_parse_args( $all_locations[$location_id], Nimble_Manager()->default_registered_location_model );
-    return !empty( $location_params[$property_name] ) ? $location_params[$property_name] : $default_property_val;
+    return array_key_exists($property_name, $location_params) ? $location_params[$property_name] : $default_property_val;
 }
 
 // @return bool
@@ -3043,7 +3043,8 @@ function sek_get_raw_section_registration_params() {
                 array(
                     'content-id' => 'intro_three',
                     'title' => __('1 columns, call to action, full-width background', 'text-domain' ),
-                    'thumb' => 'intro_three.jpg'
+                    'thumb' => 'intro_three.jpg',
+                    'demo_url' => 'https://nimblebuilder.com/landing-page-one/#contact'
                 ),
                 array(
                     'content-id' => 'intro_one',

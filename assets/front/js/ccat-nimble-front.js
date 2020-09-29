@@ -647,24 +647,28 @@ window.nb_.getQueryVariable = function(variable) {
                         threshold : 100,
                         fadeIn_options : { duration : 400 },
                         delaySmartLoadEvent : 0,
-                        candidateSelectors : '[data-sek-src], [data-sek-iframe-src]'
+                        candidateSelectors : '[data-sek-src], [data-sek-iframe-src]',
+                        force:false//<= can be useful when nb_.isCustomizing()
                   },
                   //- to avoid multi processing in general
                   _skipLoadClass = 'sek-lazy-loaded';
 
 
               function Plugin( element, options ) {
-                    if ( !sekFrontLocalized.lazyload_enabled )
+                    this.element = element;
+                    this.options = $.extend( {}, defaults, options);
+                    var allowLazyLoad = sekFrontLocalized.lazyload_enabled;
+                    if ( this.options.force ) {
+                        allowLazyLoad = true;
+                    }
+
+                    if ( !allowLazyLoad )
                       return;
                     // Do we already have an instance for this element ?
                     if ( $(this.element).data('nimbleLazyLoadDone') ) {
                         $(this.element).trigger('nb-trigger-lazyload' );
                         return;
                     }
-
-                    this.element = element;
-                    this.options = $.extend( {}, defaults, options);
-
 
                     this._defaults = defaults;
                     this._name = pluginName;
@@ -886,7 +890,8 @@ window.nb_.getQueryVariable = function(variable) {
       // on 'nb-app-ready', jQuery is loaded
       nb_.listenTo('nb-app-ready', function(){
           callbackFunc();
-          if ( sekFrontLocalized.lazyload_enabled ) { nb_.emit('nb-lazyload-parsed'); }
+          // Sept 2020 => always emit lazyload parsed event when customizing
+          if ( sekFrontLocalized.lazyload_enabled || nb_.isCustomizing() ) { nb_.emit('nb-lazyload-parsed'); }
       });
 }(window, document));// global sekFrontLocalized, nimbleListenTo
 /* ------------------------------------------------------------------------- *
@@ -2163,7 +2168,7 @@ window.nb_.getQueryVariable = function(variable) {
 /* ------------------------------------------------------------------------- *
  *  SMARTLOAD
 /* ------------------------------------------------------------------------- */
-// nimble-lazyload-loaded is fired in lazyload plugin, only when sekFrontLocalized.lazyload_enabled
+// nimble-lazyload-parsed is fired in lazyload plugin, only when sekFrontLocalized.lazyload_enabled OR when nb_.isCustomizing()
 (function(w, d){
     nb_.listenTo('nb-lazyload-parsed', function() {
         jQuery(function($){
@@ -2172,7 +2177,7 @@ window.nb_.getQueryVariable = function(variable) {
                           var _maybeDoLazyLoad = function() {
                                 // if the element already has an instance of nimbleLazyLoad, simply trigger an event
                                 if ( !$(this).data('nimbleLazyLoadDone') ) {
-                                    $(this).nimbleLazyLoad();
+                                    $(this).nimbleLazyLoad({force : nb_.isCustomizing()});
                                 } else {
                                     $(this).trigger('nb-trigger-lazyload');
                                 }

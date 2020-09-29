@@ -149,6 +149,7 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
           'skope_id' => $this->skope_id
       ) );
 
+      // Write the local stylesheet
       if ( NIMBLE_GLOBAL_SKOPE_ID !== $this->skope_id ) {
           // Try to write the CSS
           new Sek_Dyn_CSS_Handler( array(

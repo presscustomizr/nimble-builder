@@ -621,9 +621,10 @@ function sek_print_nimble_input_templates() {
                   'section_type' : '',
                   'height': '',
                   'active' : true,
-                  'is_pro' : false
+                  'is_pro' : false,
+                  'demo_url' : false
                 },
-                modData = jQuery.extend( defaultParams, secParams );
+                secParams = jQuery.extend( defaultParams, secParams );
 
                 if ( !_.isEmpty( secParams['section_type'] ) ) {
                     section_type = secParams['section_type'];
@@ -631,7 +632,7 @@ function sek_print_nimble_input_templates() {
 
                 var thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/img/section_assets/thumbs/', secParams['thumb'] ,  '?ver=' , img_version ].join(''),
                     styleAttr = 'background: url(' + thumbUrl  + ') 50% 50% / cover no-repeat;';
-                    is_draggable = true !== modData['active'] ? 'false' : 'true';
+                    is_draggable = true !== secParams['active'] ? 'false' : 'true';
 
                 if ( !_.isEmpty(secParams['height']) ) {
                     styleAttr = styleAttr + 'height:' + secParams['height'] + ';';
@@ -640,11 +641,14 @@ function sek_print_nimble_input_templates() {
                 #>
                 <div draggable="{{is_draggable}}" data-sek-content-type="preset_section" data-sek-content-id="{{secParams['content-id']}}" style="<# print(styleAttr); #>" title="{{secParams['title']}}" data-sek-section-type="{{section_type}}"><div class="sek-overlay"></div>
                   <#
-                  if ( modData['is_pro'] ) {
+                  if ( secParams['is_pro'] ) {
                     var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
                     print(pro_img_html);
                   }
-                  #>
+                  var demo_title = "<?php _e('View in live demo', 'text_doma'); ?>";
+                  if ( secParams['demo_url'] ) { #>
+                    <div class="sek-demo-link"><a href="{{secParams['demo_url']}}" target="_blank" rel="noopener noreferrer">{{demo_title}} <i class="fas fa-external-link-alt"></i></a></div>
+                  <# } #>
                 </div>
                 <#
             });//_.each
