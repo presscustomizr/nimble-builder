@@ -76,7 +76,7 @@ function sek_get_registered_location_property( $location_id, $property_name = ''
     }
 
     $location_params = wp_parse_args( $all_locations[$location_id], Nimble_Manager()->default_registered_location_model );
-    return !empty( $location_params[$property_name] ) ? $location_params[$property_name] : $default_property_val;
+    return array_key_exists($property_name, $location_params) ? $location_params[$property_name] : $default_property_val;
 }
 
 // @return bool
