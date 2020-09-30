@@ -718,6 +718,8 @@ function add_sektion_values_to_skope_export( $skopes ) {
 add_action( 'customize_controls_print_footer_scripts', '\Nimble\sek_print_nimble_czr_control_js', 100 );
 //add_action( 'customize_controls_print_scripts', '\Nimble\sek_print_nimble_czr_control_js', 100 );
 function sek_print_nimble_czr_control_js() {
+    if ( !sek_current_user_can_access_nb_ui() )
+      return;
     $script_url = sprintf(
         '%1$s/assets/czr/sek/js/%2$s?ver=%3$s' ,
         NIMBLE_BASE_URL,
