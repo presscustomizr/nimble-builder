@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_global_widths() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_widths',
-        'name' => __('Site wide width options', 'text_doma'),
+        //'name' => __('Site wide width options', 'text_doma'),
         // 'starting_value' => array(
 
         // ),

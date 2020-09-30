@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_level_text_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_text_module',
-        'name' => __('Text', 'text_doma'),
+        //'name' => __('Text', 'text_doma'),
         // 'starting_value' => array(
         //     'bg-color-overlay'  => '#000000',
         //     'bg-opacity-overlay' => '40'

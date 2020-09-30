@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_global_recaptcha() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_recaptcha',
-        'name' => __('Protect your contact forms with Google reCAPTCHA', 'text_doma'),
+        //'name' => __('Protect your contact forms with Google reCAPTCHA', 'text_doma'),
         // 'starting_value' => array(
 
         // ),

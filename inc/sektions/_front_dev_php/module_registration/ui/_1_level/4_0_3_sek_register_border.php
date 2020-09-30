@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_level_border_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_border_module',
-        'name' => __('Borders', 'text_doma'),
+        //'name' => __('Borders', 'text_doma'),
         'starting_value' => array(
             'borders' => array(
                 '_all_' => array( 'wght' => '1px', 'col' => '#000000' )

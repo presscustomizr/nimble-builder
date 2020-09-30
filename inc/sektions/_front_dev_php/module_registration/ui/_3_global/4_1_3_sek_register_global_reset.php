@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_global_reset() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_reset',
-        'name' => __('Reset global scope sections', 'text_doma'),
+        //'name' => __('Reset global scope sections', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'reset_global' => array(

@@ -8,7 +8,7 @@ function sek_get_module_params_for_sek_local_header_footer() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_header_footer',
-        'name' => __('Page header', 'text_doma'),
+        //'name' => __('Page header', 'text_doma'),
         // 'starting_value' => array(
         //     'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) )
         // ),

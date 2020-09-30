@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_local_widths() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_widths',
-        'name' => __('Width settings of the sections in the current page', 'text_doma'),
+        //'name' => __('Width settings of the sections in the current page', 'text_doma'),
         // 'starting_value' => array(
         //     'outer-section-width' => '100%',
         //     'inner-section-width' => '100%'

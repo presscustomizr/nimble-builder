@@ -8,7 +8,7 @@ function sek_get_module_params_for_sek_global_header_footer() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_header_footer',
-        'name' => __('Site wide header', 'text_doma'),
+        //'name' => __('Site wide header', 'text_doma'),
         // 'starting_value' => array(
 
         // ),

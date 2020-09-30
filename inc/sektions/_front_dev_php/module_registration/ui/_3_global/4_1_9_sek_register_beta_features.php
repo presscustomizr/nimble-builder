@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_global_beta_features() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_beta_features',
-        'name' => __('Beta features', 'text_doma'),
+        //'name' => __('Beta features', 'text_doma'),
         // 'starting_value' => array(
 
         // ),

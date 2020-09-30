@@ -191,14 +191,14 @@ function sek_register_prebuilt_section_modules() {
 
     foreach ( $registration_params as $module_type => $module_params ) {
         $module_params = wp_parse_args( $module_params, array(
-            'module_title' => '',
+            'name' => '',
             'section_collection' => array()
         ));
 
         // normalize the module params
         $normalized_params = $default_module_params;
         $normalized_params['module_type'] = $module_type;
-        $normalized_params['name'] = $module_params['module_title'];
+        $normalized_params['name'] = $module_params['name'];
         $normalized_params['tmpl']['item-inputs']['sections']['section_collection'] = $module_params['section_collection'];
         CZR_Fmk_Base()->czr_pre_register_dynamic_module( $normalized_params );
     }
@@ -212,7 +212,7 @@ function sek_register_user_sections_module() {
     $normalized_params = array(
         'dynamic_registration' => true,
         'module_type' => 'sek_my_sections_sec_picker_module',
-        'name' => __('Your saved sections', 'text-doma'),
+        'name' => __('My sections', 'text-doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'sections' => array(
