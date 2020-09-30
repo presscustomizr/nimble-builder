@@ -39,24 +39,27 @@ function sek_get_raw_section_registration_params() {
                     'content-id' => 'intro_three',
                     'title' => __('1 columns, call to action, full-width background', 'text-domain' ),
                     'thumb' => 'intro_three.jpg',
-                    //'demo_url' => 'https://nimblebuilder.com/landing-page-one/#contact'
+                    'demo_url' => '#intro-one'
                 ),
                 array(
                     'content-id' => 'intro_one',
                     'title' => __('1 column, full-width background', 'text-domain' ),
-                    'thumb' => 'intro_one.jpg'
+                    'thumb' => 'intro_one.jpg',
+                    'demo_url' => '#intro-two'
                 ),
                 array(
                     'content-id' => 'intro_two',
                     'title' => __('2 columns, call to action, full-width background', 'text-domain' ),
-                    'thumb' => 'intro_two.jpg'
+                    'thumb' => 'intro_two.jpg',
+                    'demo_url' => '#intro-three'
                 ),
                 array(
                     'content-id' => 'pro_intro_one',
                     'title' => __('2 columns, call to actions, image carousel', 'text-domain' ),
                     'thumb' => 'pro_intro_one.jpg',
                     'active' => sek_is_pro(),
-                    'is_pro' => true
+                    'is_pro' => true,
+                    'demo_url' => '#intro-four'
                 )
             )
         ],
@@ -67,12 +70,14 @@ function sek_get_raw_section_registration_params() {
                     'content-id' => 'features_one',
                     'title' => __('3 columns with icon and call to action', 'text-domain' ),
                     'thumb' => 'features_one.jpg',
+                    'demo_url' => '#service-one'
                     //'height' => '188px'
                 ),
                 array(
                     'content-id' => 'features_two',
                     'title' => __('3 columns with icon', 'text-domain' ),
                     'thumb' => 'features_two.jpg',
+                    'demo_url' => '#service-two'
                     //'height' => '188px'
                 )
             )
@@ -84,6 +89,7 @@ function sek_get_raw_section_registration_params() {
                     'content-id' => 'about_one',
                     'title' => __('A simple about us section with 2 columns', 'text-domain' ),
                     'thumb' => 'about_one.jpg',
+                    'demo_url' => '#about-one'
                     //'height' => '188px'
                 )
             )
@@ -95,12 +101,14 @@ function sek_get_raw_section_registration_params() {
                     'content-id' => 'contact_one',
                     'title' => __('A contact form and a Google map', 'text-domain' ),
                     'thumb' => 'contact_one.jpg',
+                    'demo_url' => '#contact-one'
                     //'height' => '188px'
                 ),
                 array(
                     'content-id' => 'contact_two',
                     'title' => __('A contact form with an image background', 'text-domain' ),
                     'thumb' => 'contact_two.jpg',
+                    'demo_url' => '#contact-two'
                     //'height' => '188px'
                 )
             )
@@ -111,13 +119,15 @@ function sek_get_raw_section_registration_params() {
                 array(
                     'content-id' => 'team_one',
                     'title' => __('4 column', 'text-domain' ),
-                    'thumb' => 'team_one.jpg'
+                    'thumb' => 'team_one.jpg',
+                    'demo_url' => '#team-one'
                 ),
                 array(
                     'content-id' => 'team_two',
                     'title' => __('3 columns', 'text-domain' ),
                     'thumb' => 'team_two.jpg',
-                    'height' => '180px'
+                    'height' => '180px',
+                    'demo_url' => '#team-two'
                 ),
                 array(
                     'content-id' => 'pro_team_one',
@@ -125,7 +135,8 @@ function sek_get_raw_section_registration_params() {
                     'thumb' => 'pro_team_one.jpg',
                     'active' => sek_is_pro(),
                     'height' => '180px',
-                    'is_pro' => true
+                    'is_pro' => true,
+                    'demo_url' => '#team-three'
                 )
             )
         ],
