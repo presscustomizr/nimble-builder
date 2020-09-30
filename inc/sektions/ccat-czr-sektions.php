@@ -503,23 +503,12 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             // Generated UI
             'Content Picker' => __('Content Picker', 'text_doma'),
-            'Pick a module' => __('Pick a module', 'text_doma'),
             'Pick a pre-designed section' => __('Pick a pre-designed section', 'text_doma'),
-            'Select a content type' => __('Select a content type', 'text_doma'),
 
             'Header location only accepts modules and pre-built header sections' => __('Header location only accepts modules and pre-built header sections', 'text_doma'),
             'Footer location only accepts modules and pre-built footer sections' => __('Footer location only accepts modules and pre-built footer sections', 'text_doma'),
             'You can\'t drop a header section in the footer location' => __('You can\'t drop a header section in the footer location', 'text_doma'),
             'You can\'t drop a footer section in the header location' => __('You can\'t drop a footer section in the header location', 'text_doma'),
-
-            'Sections for an introduction' => __('Sections for an introduction', 'text_doma'),
-            'Sections for services and features' => __('Sections for services and features', 'text_doma'),
-            'About us sections' => __('About us sections', 'text_doma'),
-            'Contact-us sections' => __('Contact-us sections', 'text_doma'),
-            'Sections for teams' => __('Sections for teams', 'text_doma'),
-            'Empty sections with columns layout' => __('Empty sections with columns layout', 'text_doma'),
-            'Header sections' => __('Header sections', 'text_doma'),
-            'Footer sections' => __('Footer sections', 'text_doma'),
 
             'Module' => __('Module', 'text_doma'),
             'Content for' => __('Content for', 'text_doma'),
@@ -532,6 +521,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_doma'),
             'Height and vertical alignment for the' => __('Height and vertical alignment for the', 'text_doma'),
             'Width settings for the' => __('Width settings for the', 'text_doma'),
+            'Width and horizontal alignment for the' => __('Width and horizontal alignment for the', 'text_doma'),
             'Custom anchor ( CSS ID ) and CSS classes for the' => __('Custom anchor ( CSS ID ) and CSS classes for the', 'text_doma'),
             'Device visibility settings for the' => __('Device visibility settings for the', 'text_doma'),
             'Responsive settings : breakpoint, column direction' => __('Responsive settings : breakpoint, column direction', 'text_doma'),
@@ -660,7 +650,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Last modified' => __('Last modified', 'text_dom'),
 
             // Section Save
-            'My sections' => __('My sections', 'text_dom')
+            //'My sections' => __('My sections', 'text_dom')
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),

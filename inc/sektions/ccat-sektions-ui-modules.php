@@ -1186,14 +1186,14 @@ function sek_register_prebuilt_section_modules() {
 
     foreach ( $registration_params as $module_type => $module_params ) {
         $module_params = wp_parse_args( $module_params, array(
-            'module_title' => '',
+            'name' => '',
             'section_collection' => array()
         ));
 
         // normalize the module params
         $normalized_params = $default_module_params;
         $normalized_params['module_type'] = $module_type;
-        $normalized_params['name'] = $module_params['module_title'];
+        $normalized_params['name'] = $module_params['name'];
         $normalized_params['tmpl']['item-inputs']['sections']['section_collection'] = $module_params['section_collection'];
         CZR_Fmk_Base()->czr_pre_register_dynamic_module( $normalized_params );
     }
@@ -1207,7 +1207,7 @@ function sek_register_user_sections_module() {
     $normalized_params = array(
         'dynamic_registration' => true,
         'module_type' => 'sek_my_sections_sec_picker_module',
-        'name' => __('Your saved sections', 'text-doma'),
+        'name' => __('My sections', 'text-doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'sections' => array(
@@ -1408,7 +1408,7 @@ function sek_get_module_params_for_sek_content_type_switcher_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_content_type_switcher_module',
-        'name' => __('Content type', 'text_doma'),
+        'name' => __('Select a content type', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -1444,7 +1444,7 @@ function sek_get_module_params_for_sek_module_picker_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_module_picker_module',
-        'name' => __('Content Picker', 'text_doma'),
+        'name' => __('Pick a module', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -1491,7 +1491,7 @@ function sek_get_module_params_for_sek_mod_option_switcher_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_mod_option_switcher_module',
-        'name' => __('Option switcher', 'text_doma'),
+        //'name' => __('Option switcher', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -1513,7 +1513,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_bg_module',
-        'name' => __('Background', 'text_doma'),
+        //'name' => __('Background', 'text_doma'),
         // 'starting_value' => array(
         //     'bg-color-overlay'  => '#000000',
         //     'bg-opacity-overlay' => '40'
@@ -1868,7 +1868,7 @@ function sek_get_module_params_for_sek_level_text_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_text_module',
-        'name' => __('Text', 'text_doma'),
+        //'name' => __('Text', 'text_doma'),
         // 'starting_value' => array(
         //     'bg-color-overlay'  => '#000000',
         //     'bg-opacity-overlay' => '40'
@@ -2032,7 +2032,7 @@ function sek_get_module_params_for_sek_level_border_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_border_module',
-        'name' => __('Borders', 'text_doma'),
+        //'name' => __('Borders', 'text_doma'),
         'starting_value' => array(
             'borders' => array(
                 '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
@@ -2155,7 +2155,7 @@ function sek_get_module_params_for_sek_level_height_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_height_module',
-        'name' => __('Height options', 'text_doma'),
+        //'name' => __('Height options', 'text_doma'),
         'starting_value' => array(
             'custom-height'  => array( 'desktop' => '50%' ),
         ),
@@ -2305,7 +2305,7 @@ function sek_get_module_params_for_sek_level_spacing_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_spacing_module',
-        'name' => __('Spacing options', 'text_doma'),
+        //'name' => __('Spacing options', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
 
@@ -2576,7 +2576,7 @@ function sek_get_module_params_for_sek_level_width_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_width_module',
-        'name' => __('Width options', 'text_doma'),
+        //'name' => __('Width options', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -2605,6 +2605,7 @@ function sek_get_module_params_for_sek_level_width_module() {
                     'css_identifier' => 'h_alignment',
                     'title_width' => 'width-100',
                     'width-100'   => true,
+                    'notice_after' => __('Horizontal alignment can only be applied with a custom module width < to the parent column\'s width'),
                 )
             )
         )//tmpl
@@ -2700,7 +2701,7 @@ function sek_get_module_params_for_sek_level_width_column() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_width_column',
-        'name' => __('Column width', 'text_doma'),
+        //'name' => __('Column width', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -2819,7 +2820,7 @@ function sek_get_module_params_for_sek_level_width_section() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_width_section',
-        'name' => __('Width options', 'text_doma'),
+        //'name' => __('Width options', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         // 'starting_value' => array(
@@ -2989,7 +2990,7 @@ function sek_get_module_params_for_sek_level_anchor_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_anchor_module',
-        'name' => __('Set a custom anchor', 'text_doma'),
+        //'name' => __('Set a custom anchor', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -3019,7 +3020,7 @@ function sek_get_module_params_for_sek_level_visibility_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_visibility_module',
-        'name' => __('Set visibility on devices', 'text_doma'),
+        //'name' => __('Set visibility on devices', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -3146,7 +3147,7 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_breakpoint_module',
-        'name' => __('Set a custom breakpoint', 'text_doma'),
+        //'name' => __('Set a custom breakpoint', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -3272,7 +3273,7 @@ function sek_get_module_params_for_sek_level_cust_css_section() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_cust_css_section',
-        'name' => __('Width options', 'text_doma'),
+        //'name' => __('Width options', 'text_doma'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         // 'starting_value' => array(
@@ -3299,7 +3300,7 @@ function sek_get_module_params_for_sek_local_template() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_template',
-        'name' => __('Template for the current page', 'text_doma'),
+        //'name' => __('Template for the current page', 'text_doma'),
         'starting_value' => array(),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -3328,7 +3329,7 @@ function sek_get_module_params_for_sek_local_widths() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_widths',
-        'name' => __('Width settings of the sections in the current page', 'text_doma'),
+        //'name' => __('Width settings of the sections in the current page', 'text_doma'),
         // 'starting_value' => array(
         //     'outer-section-width' => '100%',
         //     'inner-section-width' => '100%'
@@ -3520,7 +3521,7 @@ function sek_get_module_params_for_sek_local_custom_css() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_custom_css',
-        'name' => __('Custom CSS for the sections of the current page', 'text_doma'),
+        //'name' => __('Custom CSS for the sections of the current page', 'text_doma'),
         // 'starting_value' => array(
         //     'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) )
         // ),
@@ -3569,7 +3570,7 @@ function sek_get_module_params_for_sek_local_reset() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_reset',
-        'name' => __('Reset the sections of the current page', 'text_doma'),
+        //'name' => __('Reset the sections of the current page', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'reset_local' => array(
@@ -3590,7 +3591,7 @@ function sek_get_module_params_for_sek_local_performances() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_performances',
-        'name' => __('Performance optimizations', 'text_doma'),
+        //'name' => __('Performance optimizations', 'text_doma'),
         // 'starting_value' => array(
         //     'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) )
         // ),
@@ -3629,7 +3630,7 @@ function sek_get_module_params_for_sek_local_header_footer() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_header_footer',
-        'name' => __('Page header', 'text_doma'),
+        //'name' => __('Page header', 'text_doma'),
         // 'starting_value' => array(
         //     'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) )
         // ),
@@ -3668,7 +3669,7 @@ function sek_get_module_params_for_sek_local_revisions() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_revisions',
-        'name' => __('Revision history', 'text_doma'),
+        //'name' => __('Revision history', 'text_doma'),
         // 'starting_value' => array(
         //     'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) )
         // ),
@@ -3696,7 +3697,7 @@ function sek_get_module_params_for_sek_local_imp_exp() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_imp_exp',
-        'name' => __('Export / Import', 'text_doma'),
+        //'name' => __('Export / Import', 'text_doma'),
         // 'starting_value' => array(
         //     'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) )
         // ),
@@ -3748,7 +3749,7 @@ function sek_get_module_params_for_sek_global_text() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_text',
-        'name' => __('Global text', 'text_doma'),
+        //'name' => __('Global text', 'text_doma'),
         // 'starting_value' => array(
         //     'global_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) )
         // ),
@@ -4051,7 +4052,7 @@ function sek_get_module_params_for_sek_global_breakpoint() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_breakpoint',
-        'name' => __('Site wide breakpoint options', 'text_doma'),
+        //'name' => __('Site wide breakpoint options', 'text_doma'),
         // 'starting_value' => array(
 
         // ),
@@ -4113,7 +4114,7 @@ function sek_get_module_params_for_sek_global_widths() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_widths',
-        'name' => __('Site wide width options', 'text_doma'),
+        //'name' => __('Site wide width options', 'text_doma'),
         // 'starting_value' => array(
 
         // ),
@@ -4292,7 +4293,7 @@ function sek_get_module_params_for_sek_global_reset() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_reset',
-        'name' => __('Reset global scope sections', 'text_doma'),
+        //'name' => __('Reset global scope sections', 'text_doma'),
         'tmpl' => array(
             'item-inputs' => array(
                 'reset_global' => array(
@@ -4314,7 +4315,7 @@ function sek_get_module_params_for_sek_global_performances() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_performances',
-        'name' => __('Site wide performance options', 'text_doma'),
+        //'name' => __('Site wide performance options', 'text_doma'),
         // 'starting_value' => array(
 
         // ),
@@ -4434,7 +4435,7 @@ function sek_get_module_params_for_sek_global_header_footer() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_header_footer',
-        'name' => __('Site wide header', 'text_doma'),
+        //'name' => __('Site wide header', 'text_doma'),
         // 'starting_value' => array(
 
         // ),
@@ -4472,7 +4473,7 @@ function sek_get_module_params_for_sek_global_recaptcha() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_recaptcha',
-        'name' => __('Protect your contact forms with Google reCAPTCHA', 'text_doma'),
+        //'name' => __('Protect your contact forms with Google reCAPTCHA', 'text_doma'),
         // 'starting_value' => array(
 
         // ),
@@ -4554,7 +4555,7 @@ function sek_get_module_params_for_sek_global_imp_exp() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_imp_exp',
-        'name' => __('Export / Import global sections', 'text_doma'),
+        //'name' => __('Export / Import global sections', 'text_doma'),
         // 'starting_value' => array(
         //     'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) )
         // ),
@@ -4607,7 +4608,7 @@ function sek_get_module_params_for_sek_global_revisions() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_revisions',
-        'name' => __('Revision history', 'text_doma'),
+        //'name' => __('Revision history', 'text_doma'),
         // 'starting_value' => array(
         //     'global_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) )
         // ),
@@ -4636,7 +4637,7 @@ function sek_get_module_params_for_sek_global_beta_features() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_beta_features',
-        'name' => __('Beta features', 'text_doma'),
+        //'name' => __('Beta features', 'text_doma'),
         // 'starting_value' => array(
 
         // ),

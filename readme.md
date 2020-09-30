@@ -1,7 +1,7 @@
-# Nimble Builder v2.1.13-alpha [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+# Nimble Builder v2.1.13-beta [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 ![Nimble Builder](/nimble.jpg)
 
-> Powerful drag and drop page builder using the native WordPress customizer.
+> Simple and smart companion that allows you to insert sections into any existing page, create landing pages or entire websites including header and footer.
 
 ## Development Workflows
 - https://github.com/presscustomizr/nimble-builder/issues?utf8=%E2%9C%93&q=label%3AWorkflow+
