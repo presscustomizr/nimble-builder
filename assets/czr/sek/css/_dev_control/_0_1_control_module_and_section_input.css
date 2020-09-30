@@ -64,8 +64,8 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
     -o-transition: bottom, 0.2s ease-in-out;
     transition: bottom 0.2s ease-in-out;
 }
-.sek-demo-link i, .sek-demo-link a {color:#ffffff;}
-.sek-demo-link a {text-decoration: none;text-transform: uppercase;}
+.sek-demo-link i, .sek-demo-link a, .sek-demo-link a:focus, .sek-demo-link a:visited{color:#ffffff;}
+.sek-demo-link a {text-decoration: none;text-transform: uppercase;font-size: 12px;}
 .sek-demo-link a:hover {color:#ffffff;text-decoration: underline;}
 [data-sek-content-type="preset_section"]:hover .sek-demo-link {
   bottom: 0px;
