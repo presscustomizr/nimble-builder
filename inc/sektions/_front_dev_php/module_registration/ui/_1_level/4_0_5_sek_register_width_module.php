@@ -33,6 +33,7 @@ function sek_get_module_params_for_sek_level_width_module() {
                     'css_identifier' => 'h_alignment',
                     'title_width' => 'width-100',
                     'width-100'   => true,
+                    'notice_after' => __('Horizontal alignment can only be applied with a custom module width < to the parent column\'s width'),
                 )
             )
         )//tmpl

@@ -145,7 +145,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               width : {
                                     settingControlId : params.id + '__width_options',
                                     module_type : 'sek_level_width_module',
-                                    controlLabel : sektionsLocalizedData.i18n['Width settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
+                                    controlLabel : sektionsLocalizedData.i18n['Width and horizontal alignment for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
                                     icon : '<i class="fas fa-ruler-horizontal sek-level-option-icon"></i>'
                               }
                         });

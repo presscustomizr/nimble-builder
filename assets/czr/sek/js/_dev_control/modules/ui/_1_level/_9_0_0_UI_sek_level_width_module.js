@@ -43,9 +43,9 @@
                                           api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'custom-width', function() {
                                                 return 'custom' === input();
                                           });
-                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'h_alignment', function() {
-                                                return 'custom' === input();
-                                          });
+                                          // api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'h_alignment', function() {
+                                          //       return 'custom' === input();
+                                          // });
                                     break;
                               }
                         });
