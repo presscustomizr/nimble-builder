@@ -56,8 +56,6 @@ class Sek_Dyn_CSS_Builder {
         // filter fired in sek_css_rules_sniffer_walker()
         add_filter( 'sek_add_css_rules_for_level_options', array( $this, 'sek_add_rules_for_column_width' ), 10, 2 );
 
-        //sek_error_log('FIRING THE CSS BUILDER');
-
         $this->sek_css_rules_sniffer_walker();
     }
 
@@ -251,8 +249,12 @@ class Sek_Dyn_CSS_Builder {
                 if ( !empty( $entry[ 'level' ] ) && 'location' != $entry[ 'level' ] ) {
                     $level_type = $entry[ 'level' ];
                     $rules = apply_filters( "sek_add_css_rules_for__{$level_type}__options", $rules, $entry );
+
                     // build rules for level options => section / column / module
-                    $rules = apply_filters( 'sek_add_css_rules_for_level_options', $rules, $entry );
+                    // param is_global_stylesheet says that we're building the global stylesheet
+                    // introduced for the custom CSS, to know if we're building CSS for a local or a global section
+                    // @see https://github.com/presscustomizr/nimble-builder-pro/issues/67
+                    $rules = apply_filters( 'sek_add_css_rules_for_level_options', $rules, $entry, $this->is_global_stylesheet );
                 }
 
                 // populate rules for modules values

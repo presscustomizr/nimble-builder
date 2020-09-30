@@ -167,11 +167,6 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
               $fire_at_hook = 'wp_head';
             }
 
-            // Say that we're building the global stylesheet
-            // introduced for the custom CSS, to know if we're building CSS for a local or a global section
-            // @see https://github.com/presscustomizr/nimble-builder-pro/issues/67
-            Nimble_Manager()->building_global_stylesheet = $params['is_global_stylesheet'];
-
             $css_handler_instance = new Sek_Dyn_CSS_Handler( array(
                 'id'             => $params['skope_id'],
                 'skope_id'       => $params['skope_id'],
