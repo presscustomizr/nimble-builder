@@ -56,8 +56,6 @@ class Sek_Dyn_CSS_Builder {
         // filter fired in sek_css_rules_sniffer_walker()
         add_filter( 'sek_add_css_rules_for_level_options', array( $this, 'sek_add_rules_for_column_width' ), 10, 2 );
 
-        //sek_error_log('FIRING THE CSS BUILDER');
-
         $this->sek_css_rules_sniffer_walker();
     }
 
@@ -251,8 +249,12 @@ class Sek_Dyn_CSS_Builder {
                 if ( !empty( $entry[ 'level' ] ) && 'location' != $entry[ 'level' ] ) {
                     $level_type = $entry[ 'level' ];
                     $rules = apply_filters( "sek_add_css_rules_for__{$level_type}__options", $rules, $entry );
+
                     // build rules for level options => section / column / module
-                    $rules = apply_filters( 'sek_add_css_rules_for_level_options', $rules, $entry );
+                    // param is_global_stylesheet says that we're building the global stylesheet
+                    // introduced for the custom CSS, to know if we're building CSS for a local or a global section
+                    // @see https://github.com/presscustomizr/nimble-builder-pro/issues/67
+                    $rules = apply_filters( 'sek_add_css_rules_for_level_options', $rules, $entry, $this->is_global_stylesheet );
                 }
 
                 // populate rules for modules values
@@ -905,7 +907,7 @@ class Sek_Dyn_CSS_Handler {
         // 3) front, user logged in + 'customize' capabilities :
         //    the css file is re-written on each page load + enqueued. If writing a css file is not possible, we fallback on inline printing.
         // 4) front, user not logged in :
-        //    the normal behaviour is that the css file is enqueued.
+        //    the default behavior is that the css file is enqueued.
         //    It should have been written when saving in the customizer. If no file available, we try to write it. If writing a css file is not possible, we fallback on inline printing.
         if ( is_customize_preview() || !$this->_sek_dyn_css_file_exists_is_readable_and_has_content() || $this->force_rewrite || $this->customizer_save ) {
             $this->sek_model = sek_get_skoped_seks( $this->skope_id );
@@ -1048,7 +1050,6 @@ class Sek_Dyn_CSS_Handler {
      * @return void()
      */
     public function sek_dyn_css_enqueue_or_print_and_google_fonts_print() {
-        //sek_error_log( __CLASS__ . ' | ' . __FUNCTION__ . ' => ' . $this->id );
         // CSS FILE
         //case enqueue file : front end + user with customize caps not logged in
         if ( self::MODE_FILE == $this->mode ) {
@@ -1081,6 +1082,7 @@ class Sek_Dyn_CSS_Handler {
                 $this->enqueued_or_printed = true;
             }
         }// if ( self::MODE_FILE )
+
         // case when sek_inline_dynamic_stylesheets_on_front()
         // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
         else if ( !is_customize_preview() && self::MODE_INLINE == $this->mode ) {
@@ -2168,7 +2170,6 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // September 2020 for https://github.com/presscustomizr/nimble-builder-pro/issues/67
         public $local_sections_custom_css = '';
         public $global_sections_custom_css = '';
-        public $building_global_stylesheet = false;
 
 
         /////////////////////////////////////////////////////////////////
@@ -5477,11 +5478,6 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
             else if ( !defined( 'DOING_AJAX' ) && !is_customize_preview() && sek_inline_dynamic_stylesheets_on_front() ) {
               $fire_at_hook = 'wp_head';
             }
-
-            // Say that we're building the global stylesheet
-            // introduced for the custom CSS, to know if we're building CSS for a local or a global section
-            // @see https://github.com/presscustomizr/nimble-builder-pro/issues/67
-            Nimble_Manager()->building_global_stylesheet = $params['is_global_stylesheet'];
 
             $css_handler_instance = new Sek_Dyn_CSS_Handler( array(
                 'id'             => $params['skope_id'],

@@ -718,6 +718,8 @@ function add_sektion_values_to_skope_export( $skopes ) {
 add_action( 'customize_controls_print_footer_scripts', '\Nimble\sek_print_nimble_czr_control_js', 100 );
 //add_action( 'customize_controls_print_scripts', '\Nimble\sek_print_nimble_czr_control_js', 100 );
 function sek_print_nimble_czr_control_js() {
+    if ( !sek_current_user_can_access_nb_ui() )
+      return;
     $script_url = sprintf(
         '%1$s/assets/czr/sek/js/%2$s?ver=%3$s' ,
         NIMBLE_BASE_URL,
@@ -1773,7 +1775,7 @@ function sek_print_nimble_input_templates() {
                   }
                   var demo_title = "<?php _e('View in live demo', 'text_doma'); ?>";
                   if ( secParams['demo_url'] ) { #>
-                    <div class="sek-demo-link"><a href="{{secParams['demo_url']}}" target="_blank" rel="noopener noreferrer">{{demo_title}} <i class="fas fa-external-link-alt"></i></a></div>
+                    <div class="sek-demo-link"><a href="https://nimblebuilder.com/nimble-builder-sections?utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=section_demos{{secParams['demo_url']}}" target="_blank" rel="noopener noreferrer">{{demo_title}} <i class="fas fa-external-link-alt"></i></a></div>
                   <# } #>
                 </div>
                 <#
