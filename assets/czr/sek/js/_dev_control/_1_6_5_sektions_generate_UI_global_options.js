@@ -72,7 +72,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           settingControlId : _id_ + '__performances',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Site wide page speed optimizations'],
-                                          icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
+                                          icon : '<i class="material-icons sek-level-option-icon">network_check</i>'
                                     };
                               break;
                               case 'recaptcha' :

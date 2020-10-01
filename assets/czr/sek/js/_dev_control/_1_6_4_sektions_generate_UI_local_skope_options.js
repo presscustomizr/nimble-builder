@@ -85,7 +85,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           settingControlId : _id_ + '__local_performances',
                                           module_type : mod_type,
                                           controlLabel : sektionsLocalizedData.i18n['Page speed optimizations'],
-                                          icon : '<i class="fas fa-fighter-jet sek-level-option-icon"></i>'
+                                          icon : '<i class="material-icons sek-level-option-icon">network_check</i>'
                                     };
                               break;
                               case 'local_reset' :
