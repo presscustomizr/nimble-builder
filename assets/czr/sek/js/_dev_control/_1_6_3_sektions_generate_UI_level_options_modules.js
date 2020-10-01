@@ -90,6 +90,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         },
                   });
 
+                  if ( sektionsLocalizedData.isUpsellEnabled || sektionsLocalizedData.isPro ) {
+                        $.extend( modulesRegistrationParams, {
+                              animation : {
+                                    settingControlId : params.id + '__animate_options',
+                                    module_type : 'sek_level_animation_module',
+                                    controlLabel : sektionsLocalizedData.i18n['Animation settings for the']+ ' ' + sektionsLocalizedData.i18n[params.level],
+                                    icon : '<i class="material-icons sek-level-option-icon">movie_filter</i>',
+                                    isPro : true
+                              }
+                        });
+                  }
+
                   if ( 'section' === params.level ) {
                         $.extend( modulesRegistrationParams, {
                               width : {

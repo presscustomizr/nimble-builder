@@ -526,6 +526,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Device visibility settings for the' => __('Device visibility settings for the', 'text_doma'),
             'Responsive settings : breakpoint, column direction' => __('Responsive settings : breakpoint, column direction', 'text_doma'),
 
+            'Animation settings for the' => __('Animation settings for the', 'text_doma'),
             'Settings for the' => __('Settings for the', 'text_doma'),//section / column / module
 
             'The section cannot be moved higher.' => __('The section cannot be moved higher.', 'text_doma'),

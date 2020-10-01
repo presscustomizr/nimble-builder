@@ -230,10 +230,11 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             add_action( 'widgets_init', array( $this, 'sek_nimble_widgets_init' ) );
             do_action('nimble_manager_ready');
 
-            // MAYBE REGISTER PRO UPSELL MODUMES
+            // MAYBE REGISTER PRO UPSELL MODUlES
             add_filter('nb_level_module_collection', function( $module_collection ) {
                 if ( is_array($module_collection) && ( sek_is_pro() || defined('NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON ) ) {
                     array_push($module_collection, 'sek_level_cust_css_section' );
+                    array_push($module_collection, 'sek_level_animation_module' );
                 }
                 return $module_collection;
             });

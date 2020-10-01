@@ -397,6 +397,10 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 }
             }
 
+            // sept 2020 => allows NB pro to filter $level_css_classes
+            $level_css_classes = apply_filters( 'nimble_level_css_classes', $level_css_classes, $model );
+            $level_custom_data_attributes = apply_filters( 'nimble_level_custom_data_attributes', '', $model );
+
             switch ( $level_type ) {
                 /********************************************************
                  LOCATIONS
@@ -502,7 +506,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     $section_classes = apply_filters( 'nimble_section_level_css_classes', array(), $model );
                     array_push( $section_classes, $level_css_classes );
 
-                    printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s %6$s" %7$s %8$s %9$s>%10$s',
+                    printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s %6$s" %7$s %8$s %9$s %10$s>%11$s',
                         $id,
                         $is_nested ? 'data-sek-is-nested="true"' : '',
                         $has_at_least_one_module ? 'sek-has-modules' : '',
@@ -515,6 +519,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         $bg_attributes,
 
                         $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
+                        $level_custom_data_attributes,
                         ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     );
                     if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
@@ -589,7 +594,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
                         $has_bg_img = true;
                     }
-                    printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s %5$s" %6$s %7$s %8$s %9$s>%10$s',
+                    printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s %5$s" %6$s %7$s %8$s %9$s %10$s>%11$s',
                         $id,
                         $grid_column_class,
                         $this->get_level_visibility_css_class( $model ),
@@ -602,6 +607,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
 
                         $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
+                        $level_custom_data_attributes,
                         ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     );
                     if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
@@ -723,7 +729,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                       ?><script>nb_.emit('nb-needs-parallax');</script><?php
                     }
 
-                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s %5$s" %6$s %7$s %8$s %9$s %10$s>%11$s',
+                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s %5$s" %6$s %7$s %8$s %9$s %10$s %11$s>%12$s',
                         $id,
                         $module_type,
                         $this->get_level_visibility_css_class( $model ),
@@ -737,6 +743,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
 
                         $this->sek_maybe_print_preview_level_guid_html(), //<= added for #494
                         $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': '',// <= added for #532
+                        $level_custom_data_attributes,
                         ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     );
                       ?>
