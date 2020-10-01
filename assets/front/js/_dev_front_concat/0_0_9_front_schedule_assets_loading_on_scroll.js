@@ -21,10 +21,11 @@
                 // populate the collection of scroll handlers looped on ::loopOnScrollHandlers()
                 // + emit
                 nb_.scrollHandlers = nb_.scrollHandlers || {};
-                var handlerParams = { elements : params.elements, func : params.func };
+                var handlerParams = { elements : params.elements, func : params.func, force_loading : params.force_loading };
                 nb_.scrollHandlers[params.id] = handlerParams;
                 nb_.emit('nimble-new-scroll-handler-added', { fire_once : false } );
             };
+            nb_.emit('nimble-ready-to-load-assets-on-scroll');
         });//jQuery(function($){})
     });//'nb-app-ready'
 }(window, document));

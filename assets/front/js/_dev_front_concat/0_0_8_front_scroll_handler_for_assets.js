@@ -33,6 +33,14 @@
                 if ( handlerParams.loaded )
                   return true;//<=> continue see https://api.jquery.com/jquery.each/
 
+                // do nothing if dynamic asset loading is not enabled for js and css AND the assets in not in "force" mode
+                var load_authorized = sekFrontLocalized.load_front_assets_on_scroll;
+                if ( true === handlerParams.force_loading ) {
+                    load_authorized = true;
+                }
+                if ( !load_authorized )
+                  return;
+
                 if ( 1 > handlerParams.elements.length )
                   return true;
 
@@ -61,9 +69,6 @@
 
     nb_.listenTo('nb-app-ready', function() {
         jQuery(function($){
-            // do nothing if dynamic asset loading is not enabled for js and css
-            if ( !sekFrontLocalized.load_front_assets_on_scroll )
-              return;
             // nb_.scrollHandlers = [
             //    { id : 'swiper', elements : $(), func : function(){} }
             //    ...
