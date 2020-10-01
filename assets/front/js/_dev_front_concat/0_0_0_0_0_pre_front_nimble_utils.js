@@ -74,12 +74,12 @@ window.nb_.getQueryVariable = function(variable) {
                     //Simple Utility telling if a given Dom element is currently in the window <=> visible.
                     //Useful to mimic a very basic WayPoint
                     elOrFirstVisibleParentIsInWindow : function( element, threshold ) {
-                          var $_el = ! ( element instanceof $ ) ? $(element) : element;
-                          if ( ! ( $_el instanceof $ ) ) {
+                          var $_el = !( element instanceof $ ) ? $(element) : element;
+                          if ( !( $_el instanceof $ ) ) {
                               nb_.errorLog('invalid element in nb_.elOrFirstVisibleParentIsInWindow', $_el );
                               return;
                           }
-                          if ( threshold && ! nb_.isNumber( threshold ) ) {
+                          if ( threshold && !nb_.isNumber( threshold ) ) {
                               nb_.errorLog('invalid threshold in nb_.elOrFirstVisibleParentIsInWindow');
                               return;
                           }
