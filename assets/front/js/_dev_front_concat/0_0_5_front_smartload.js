@@ -222,7 +222,10 @@
                                 $_el.data('sek-lazy-loaded', true );
                                 self._clean_css_loader( $_el );
 
-                          });//<= create a load() fn
+                          })//<= create a load() fn
+                          .on('error', function( evt, error ) {
+                                $_el.addClass('sek-lazy-load-error');
+                          });// on error
                     //http://stackoverflow.com/questions/1948672/how-to-tell-if-an-image-is-loaded-or-cached-in-jquery
                     if ( $jQueryImgToLoad[0].complete ) {
                           $jQueryImgToLoad.trigger( 'load' );
