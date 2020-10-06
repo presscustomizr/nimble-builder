@@ -305,6 +305,14 @@
   }
 }
 
+.sek-animate-candidate {
+  opacity: 0;
+}
+
+.sek-overflow-hidden-when-animating [data-sek-level] {
+  overflow-x: hidden;
+}
+
 .sek-service-font, .sek-module-inner .sek-btn {
   font-family: sans-serif;
 }

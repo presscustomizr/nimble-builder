@@ -74,12 +74,12 @@ window.nb_.getQueryVariable = function(variable) {
                     //Simple Utility telling if a given Dom element is currently in the window <=> visible.
                     //Useful to mimic a very basic WayPoint
                     elOrFirstVisibleParentIsInWindow : function( element, threshold ) {
-                          var $_el = ! ( element instanceof $ ) ? $(element) : element;
-                          if ( ! ( $_el instanceof $ ) ) {
+                          var $_el = !( element instanceof $ ) ? $(element) : element;
+                          if ( !( $_el instanceof $ ) ) {
                               nb_.errorLog('invalid element in nb_.elOrFirstVisibleParentIsInWindow', $_el );
                               return;
                           }
-                          if ( threshold && ! nb_.isNumber( threshold ) ) {
+                          if ( threshold && !nb_.isNumber( threshold ) ) {
                               nb_.errorLog('invalid threshold in nb_.elOrFirstVisibleParentIsInWindow');
                               return;
                           }
@@ -327,6 +327,44 @@ window.nb_.getQueryVariable = function(variable) {
             };
 
             var $root = $('html, body');
+            window.nb_allImagesLazyLoadedForScrollToAnchor = false;
+            // this = $nimbleTargetCandidate
+            var _doAnimateToTarget = function() {
+                  var $target = $(this);
+                  // Check is scrollIntoView is fully supported, in particular the options for smooth behavior
+                  // https://stackoverflow.com/questions/46919627/is-it-possible-to-test-for-scrollintoview-browser-compatibility
+                  // if not, fallback on jQuery animate()
+                  if( 'scrollBehavior' in document.documentElement.style ) {
+                        $target[0].scrollIntoView( { behavior: "smooth" } );
+                  } else {
+                        $root.animate({ scrollTop : $target.offset().top - 150 }, 400 );
+                  }
+            };
+            var runTime = 0;
+            // this = $nimbleTargetCandidate
+            var _checkThatAllImgAreLoaded = function() {
+                  var $el = $(this);
+                  // If all images (except the ones in error ) are loaded animate
+                  // if not, loop until images are loaded
+                  // do not loop more than 2000 ms
+                  if ( $('img[data-sek-src]').not('.sek-lazy-load-error').length < 1 ) {
+                        window.nb_allImagesLazyLoadedForScrollToAnchor = true;
+                        _doAnimateToTarget.call($el);
+                  } else if ( runTime < 20 ) {
+                        runTime++;
+                        // Loop on myself, maximum 20 times until all images are lazyloaded
+                        nb_.delay( function() {
+                              _checkThatAllImgAreLoaded.call($el);
+                        }, 100 );
+                        // Start animating after 200ms so that user doesn't wait too long
+                        // even if another animation may take over after all remaining images have been loaded
+                        nb_.delay( function() {
+                              _doAnimateToTarget.call($el);
+                        }, 200 );
+                  } else {
+                        _doAnimateToTarget.call($el);
+                  }
+            };
             var maybeScrollToAnchor = function( evt ){
                   // problem to solve : users want to define anchor links that work inside a page, but also from other pages.
                   // @see https://github.com/presscustomizr/nimble-builder/issues/413
@@ -342,31 +380,26 @@ window.nb_.getQueryVariable = function(variable) {
                     return;
                   if( 'string' !== typeof(itemURLObject.hash) || '' === itemURLObject.hash )
                     return;
+
                   var $nimbleTargetCandidate = $('[data-sek-level="location"]' ).find( '[id="' + itemURLObject.hash.replace('#','') + '"]');
                   if ( 1 !== $nimbleTargetCandidate.length )
                     return;
 
                   evt.preventDefault();
-                  // Sept 2020 => if lazy load is enabled and there are still images to load, make sure all images are loaded before scrolling to an anchor
+
+                  // Sept 2020 => LAYOUT SHIFT PROBLEMS
+                  // => if lazy load is enabled and there are still images to load, make sure all images are loaded before scrolling to an anchor
                   // => lazyload all images + add a tiny delay before scrolling
                   // otherwise, the scroll might no land to the right place, due to image dimensions not OK ( occurs on chrome and edge at least )
                   // see https://github.com/presscustomizr/nimble-builder/issues/744
+                  // additional issue : https://github.com/presscustomizr/nimble-builder/issues/748
                   var _scrollDelay = 0;
-                  if ( sekFrontLocalized.lazyload_enabled && true !== nb_.cachedElements.allImgLoadedBeforeScrollToAnchor ) {
-                        nb_.cachedElements.$body.find('img').trigger('sek_load_img');
-                        nb_.cachedElements.allImgLoadedBeforeScrollToAnchor = true;
-                        _scrollDelay = 100;//<= needed on browsers like chrome and edge, not on FF
+                  if ( sekFrontLocalized.lazyload_enabled && false === window.nb_allImagesLazyLoadedForScrollToAnchor && $('img[data-sek-src]').not('.sek-lazy-load-error').length > 0 ) {
+                        $('body').one( 'smartload', 'img', function() { _checkThatAllImgAreLoaded.call( $nimbleTargetCandidate );} );
+                        $('img[data-sek-src]').trigger('sek_load_img');
+                  } else {
+                        _doAnimateToTarget.call( $nimbleTargetCandidate );
                   }
-                  nb_.delay( function() {
-                        // Check is scrollIntoView is fully supported, in particular the options for smooth behavior
-                        // https://stackoverflow.com/questions/46919627/is-it-possible-to-test-for-scrollintoview-browser-compatibility
-                        // if not, fallback on jQuery animate()
-                        if( 'scrollBehavior' in document.documentElement.style ) {
-                              $nimbleTargetCandidate[0].scrollIntoView( { behavior: "smooth" } );
-                        } else {
-                              $root.animate({ scrollTop : $nimbleTargetCandidate.offset().top - 150 }, 400 );
-                        }
-                  }, _scrollDelay );
             };
 
             // animate menu item to Nimble anchors
@@ -832,7 +865,10 @@ window.nb_.getQueryVariable = function(variable) {
                                 $_el.data('sek-lazy-loaded', true );
                                 self._clean_css_loader( $_el );
 
-                          });//<= create a load() fn
+                          })//<= create a load() fn
+                          .on('error', function( evt, error ) {
+                                $_el.addClass('sek-lazy-load-error');
+                          });// on error
                     //http://stackoverflow.com/questions/1948672/how-to-tell-if-an-image-is-loaded-or-cached-in-jquery
                     if ( $jQueryImgToLoad[0].complete ) {
                           $jQueryImgToLoad.trigger( 'load' );
@@ -1842,6 +1878,14 @@ window.nb_.getQueryVariable = function(variable) {
                 if ( handlerParams.loaded )
                   return true;//<=> continue see https://api.jquery.com/jquery.each/
 
+                // do nothing if dynamic asset loading is not enabled for js and css AND the assets in not in "force" mode
+                var load_authorized = sekFrontLocalized.load_front_assets_on_scroll;
+                if ( true === handlerParams.force_loading ) {
+                    load_authorized = true;
+                }
+                if ( !load_authorized )
+                  return;
+
                 if ( 1 > handlerParams.elements.length )
                   return true;
 
@@ -1870,9 +1914,6 @@ window.nb_.getQueryVariable = function(variable) {
 
     nb_.listenTo('nb-app-ready', function() {
         jQuery(function($){
-            // do nothing if dynamic asset loading is not enabled for js and css
-            if ( !sekFrontLocalized.load_front_assets_on_scroll )
-              return;
             // nb_.scrollHandlers = [
             //    { id : 'swiper', elements : $(), func : function(){} }
             //    ...
@@ -1909,10 +1950,11 @@ window.nb_.getQueryVariable = function(variable) {
                 // populate the collection of scroll handlers looped on ::loopOnScrollHandlers()
                 // + emit
                 nb_.scrollHandlers = nb_.scrollHandlers || {};
-                var handlerParams = { elements : params.elements, func : params.func };
+                var handlerParams = { elements : params.elements, func : params.func, force_loading : params.force_loading };
                 nb_.scrollHandlers[params.id] = handlerParams;
                 nb_.emit('nimble-new-scroll-handler-added', { fire_once : false } );
             };
+            nb_.emit('nimble-ready-to-load-assets-on-scroll');
         });//jQuery(function($){})
     });//'nb-app-ready'
 }(window, document));

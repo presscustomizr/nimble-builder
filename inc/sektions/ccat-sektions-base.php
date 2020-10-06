@@ -2171,6 +2171,8 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         public $local_sections_custom_css = '';
         public $global_sections_custom_css = '';
 
+        // October 2020
+        public $rendering = false;//<= set to true when rendering NB content
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
@@ -2197,10 +2199,11 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             add_action( 'widgets_init', array( $this, 'sek_nimble_widgets_init' ) );
             do_action('nimble_manager_ready');
 
-            // MAYBE REGISTER PRO UPSELL MODUMES
+            // MAYBE REGISTER PRO UPSELL MODUlES
             add_filter('nb_level_module_collection', function( $module_collection ) {
                 if ( is_array($module_collection) && ( sek_is_pro() || defined('NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON ) ) {
                     array_push($module_collection, 'sek_level_cust_css_section' );
+                    array_push($module_collection, 'sek_level_animation_module' );
                 }
                 return $module_collection;
             });
@@ -3136,6 +3139,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
             $l10n = array(
                 'isDevMode' => sek_is_dev_mode(),
+                'isCustomizing' => skp_is_customizing(),
                 //'ajaxUrl' => admin_url( 'admin-ajax.php' ),
                 'frontNonce' => array( 'id' => 'SEKFrontNonce', 'handle' => wp_create_nonce( 'sek-front-nonce' ) ),
                 // 'localSeks' => sek_is_debug_mode() ? wp_json_encode( sek_get_skoped_seks() ) : '',
@@ -3912,8 +3916,10 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 // sek_error_log( 'LEVEL MODEL IN ::sek_schedule_sektions_rendering()', $locationSettingValue);
                 remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
                 remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
-
+                // rendering property allows us to determine if we're rendering NB content while filtering WP core functions, like the one of the lazy load attributes
+                Nimble_Manager()->rendering = true;
                 $this->render( $locationSettingValue, $location_id );
+                Nimble_Manager()->rendering = false;
 
                 add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ),NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
                 add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
@@ -4084,6 +4090,10 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 }
             }
 
+            // sept 2020 => allows NB pro to filter $level_css_classes
+            $level_css_classes = apply_filters( 'nimble_level_css_classes', $level_css_classes, $model );
+            $level_custom_data_attributes = apply_filters( 'nimble_level_custom_data_attributes', '', $model );
+
             switch ( $level_type ) {
                 /********************************************************
                  LOCATIONS
@@ -4189,7 +4199,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     $section_classes = apply_filters( 'nimble_section_level_css_classes', array(), $model );
                     array_push( $section_classes, $level_css_classes );
 
-                    printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s %6$s" %7$s %8$s %9$s>%10$s',
+                    printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s %6$s" %7$s %8$s %9$s %10$s>%11$s',
                         $id,
                         $is_nested ? 'data-sek-is-nested="true"' : '',
                         $has_at_least_one_module ? 'sek-has-modules' : '',
@@ -4202,6 +4212,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         $bg_attributes,
 
                         $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
+                        $level_custom_data_attributes,
                         ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     );
                     if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
@@ -4276,7 +4287,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
                         $has_bg_img = true;
                     }
-                    printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s %5$s" %6$s %7$s %8$s %9$s>%10$s',
+                    printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s %5$s" %6$s %7$s %8$s %9$s %10$s>%11$s',
                         $id,
                         $grid_column_class,
                         $this->get_level_visibility_css_class( $model ),
@@ -4289,6 +4300,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
 
                         $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
+                        $level_custom_data_attributes,
                         ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     );
                     if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
@@ -4410,7 +4422,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                       ?><script>nb_.emit('nb-needs-parallax');</script><?php
                     }
 
-                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s %5$s" %6$s %7$s %8$s %9$s %10$s>%11$s',
+                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s %5$s" %6$s %7$s %8$s %9$s %10$s %11$s>%12$s',
                         $id,
                         $module_type,
                         $this->get_level_visibility_css_class( $model ),
@@ -4424,6 +4436,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
 
                         $this->sek_maybe_print_preview_level_guid_html(), //<= added for #494
                         $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': '',// <= added for #532
+                        $level_custom_data_attributes,
                         ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     );
                       ?>

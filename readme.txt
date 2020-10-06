@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.5
-Stable tag: 2.1.13
+Stable tag: 2.1.14-beta
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,13 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.13 : [module settings] horizontal alignment should be customizable without setting a custom width. [prebuilt sections] link to live demo when hovering thumbnail
+2.1.14 : [scroll to anchor] + [lazyload] => avoid layout shifts problems for pages with many images
 
 == Changelog ==
+= 2.1.14 October 6th, 2020 =
+* fixed : [performance][Lazy loading] when rendering NB content, remove attr loading="lazy" added to images by WP
+* fixed : [scroll to anchor] + [lazyload] => avoid layout shifts problems for page with many images
+
 = 2.1.13 September 30, 2020 =
 * fixed : [module settings] horizontal alignment should be customizable without setting a custom width
 * added : [prebuilt sections] link to live demo when hovering thumbnail
