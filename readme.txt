@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.5
-Stable tag: 2.1.14-beta
+Stable tag: 2.1.14
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,7 +120,7 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.14 : [scroll to anchor] + [lazyload] => avoid layout shifts problems for pages with many images
+2.1.14 : [scroll to anchor] + [lazyload] => avoid layout shifts problems visible in particular in pages with many images
 
 == Changelog ==
 = 2.1.14 October 6th, 2020 =
