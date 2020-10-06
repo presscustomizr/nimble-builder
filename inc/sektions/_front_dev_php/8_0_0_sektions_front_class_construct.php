@@ -204,6 +204,8 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         public $local_sections_custom_css = '';
         public $global_sections_custom_css = '';
 
+        // October 2020
+        public $rendering = false;//<= set to true when rendering NB content
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>

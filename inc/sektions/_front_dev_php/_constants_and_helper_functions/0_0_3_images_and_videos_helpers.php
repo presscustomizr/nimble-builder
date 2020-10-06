@@ -146,6 +146,15 @@ function sek_is_video_bg_lazyload_enabled() {
     return Nimble_Manager()->video_bg_lazyload_enabled;
 }
 
+/* ------------------------------------------------------------------------- *
+ *  DISABLE SUPPORT FOR BROWSER NATIVE LAZY LOADING
+/* ------------------------------------------------------------------------- */
+// Disabled when rendering NB content only
+// attribute loading="lazy" was introduced in WP 5.5, Oct 2020
+// => see why NB disable it here :https://github.com/presscustomizr/nimble-builder/issues/747
+add_filter( 'wp_lazy_loading_enabled', function($default) {
+    return Nimble_Manager()->rendering ? false : $default;
+});
 
 
 

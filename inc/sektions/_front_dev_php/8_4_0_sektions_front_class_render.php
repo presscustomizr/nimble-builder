@@ -225,8 +225,10 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 // sek_error_log( 'LEVEL MODEL IN ::sek_schedule_sektions_rendering()', $locationSettingValue);
                 remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ), NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
                 remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
-
+                // rendering property allows us to determine if we're rendering NB content while filtering WP core functions, like the one of the lazy load attributes
+                Nimble_Manager()->rendering = true;
                 $this->render( $locationSettingValue, $location_id );
+                Nimble_Manager()->rendering = false;
 
                 add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ),NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
                 add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
