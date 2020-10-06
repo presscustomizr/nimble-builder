@@ -18,6 +18,7 @@
                   case 'simpleselect' ://<=used in Nimble Builder
                   case 'fa_icon_picker' :
                   case 'font_picker':
+                  case 'animation_picker' ://<= oct 2020 added for https://github.com/presscustomizr/nimble-builder-pro/issues/73
                         template_name = 'simpleselect';
                   break;
 
