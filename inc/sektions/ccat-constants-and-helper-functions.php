@@ -395,6 +395,22 @@ function sek_defer_script($handle) {
     // Adds defer attribute to enqueued / registered scripts.
     wp_script_add_data( $handle, 'defer', true );
 }
+
+// oct 2020 => introduction of a normalized way to emit a js event to NB front api
+// in particular to make sure NB doesn't print a <script> twice to emit the same event
+function sek_emit_js_event( $event = '', $echo = true ) {
+    $emitted = Nimble_Manager()->emitted_js_event;
+    if ( !is_string($event) || in_array($event, $emitted) )
+      return;
+    $emitted[] = $event;
+    Nimble_Manager()->emitted_js_event = $emitted;
+    $html = sprintf('<script>nb_.emit("%1$s");</script>', $event );
+    if ( $echo ) {
+        echo $html;
+    } else {
+        return $html;
+    }
+}
 ?><?php
 
 /* ------------------------------------------------------------------------- *
