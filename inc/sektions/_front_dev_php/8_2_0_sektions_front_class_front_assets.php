@@ -428,6 +428,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 'contextuallyActiveModules' => sek_get_collection_of_contextually_active_modules(),
                 'fontAwesomeAlreadyEnqueued' => wp_style_is('customizr-fa', 'enqueued') || wp_style_is('hueman-font-awesome', 'enqueued')
             );
+            $l10n = apply_filters( 'nimble-localized-js-front', $l10n );
+
             foreach ( (array) $l10n as $key => $value ) {
                 if ( !is_scalar( $value ) ) {
                   continue;
