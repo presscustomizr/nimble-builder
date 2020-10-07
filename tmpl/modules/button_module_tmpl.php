@@ -72,7 +72,5 @@ if ( !isset( $content_settings['link-to'] ) || isset( $content_settings['link-to
     );
 }
 if ( !empty(sek_get_button_module_icon( $content_settings )) ) {
-  ?>
-  <script>nb_.emit('nb-needs-fa');</script>
-  <?php
+    sek_emit_js_event('nb-needs-fa');
 }

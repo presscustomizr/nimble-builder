@@ -92,7 +92,5 @@ else :
     );
 endif;
 if ( !empty($icon_html) ) {
-  ?>
-  <script>nb_.emit('nb-needs-fa');</script>
-  <?php
+  sek_emit_js_event('nb-needs-fa');
 }

@@ -403,6 +403,8 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             $level_css_classes = apply_filters( 'nimble_level_css_classes', $level_css_classes, $model );
             $level_custom_data_attributes = apply_filters( 'nimble_level_custom_data_attributes', '', $model );
 
+            do_action('nimble_before_rendering_level', $model, $level_css_classes, $level_custom_data_attributes );
+
             switch ( $level_type ) {
                 /********************************************************
                  LOCATIONS
@@ -525,10 +527,10 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     );
                     if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
-                      ?><script>nb_.emit('nb-needs-videobg-js');</script><?php
+                        sek_emit_js_event('nb-needs-videobg-js');
                     }
                     if ( false !== strpos($bg_attributes, 'data-sek-bg-parallax="true"') ) {
-                      ?><script>nb_.emit('nb-needs-parallax');</script><?php
+                        sek_emit_js_event('nb-needs-parallax');
                     }
                     ?>
 
@@ -613,10 +615,10 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
                     );
                     if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
-                      ?><script>nb_.emit('nb-needs-videobg-js');</script><?php
+                        sek_emit_js_event('nb-needs-videobg-js');
                     }
                     if ( false !== strpos($bg_attributes, 'data-sek-bg-parallax="true"') ) {
-                      ?><script>nb_.emit('nb-needs-parallax');</script><?php
+                        sek_emit_js_event('nb-needs-parallax');
                     }
                       ?>
                         <?php
@@ -728,7 +730,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         $has_bg_img = true;
                     }
                     if ( false !== strpos($bg_attributes, 'data-sek-bg-parallax="true"') ) {
-                      ?><script>nb_.emit('nb-needs-parallax');</script><?php
+                        sek_emit_js_event('nb-needs-parallax');
                     }
 
                     printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s %5$s" %6$s %7$s %8$s %9$s %10$s %11$s>%12$s',

@@ -18,8 +18,8 @@ if ( is_array( $nav_classes ) ) {
   $nav_classes = implode(' ', $nav_classes );
 }
 $nav_classes = is_string($nav_classes) ? $nav_classes : 'sek-nav-wrap';
+sek_emit_js_event('nb-needs-menu-js');
 ?>
-<script>nb_.emit('nb-needs-menu-js');</script>
 
 <?php do_action('nb_menu_module_before_nav', $model ); ?>
 

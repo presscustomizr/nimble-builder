@@ -138,7 +138,5 @@ if ( 'no-link' === $main_settings['link-to'] ) {
     );
 }
 if ( 'img-lightbox' === $main_settings['link-to'] ) {
-  ?>
-  <script>nb_.emit('nb-needs-magnific-popup');</script>
-  <?php
+    sek_emit_js_event('nb-needs-magnific-popup');
 }

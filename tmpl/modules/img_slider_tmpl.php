@@ -266,9 +266,7 @@ $slider_options = !empty($value['slider_options']) ? $value['slider_options'] : 
 
 if ( !empty( $img_collection ) ) {
     sek_print_img_slider( $img_collection, $slider_options, $model );
-    ?>
-    <script>nb_.emit('nb-needs-swiper');</script>
-    <?php
+    sek_emit_js_event('nb-needs-swiper');
 } else {
     if ( skp_is_customizing() ) {
         printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',

@@ -71,7 +71,7 @@ $accord_opts = !empty($value['accord_opts']) ? $value['accord_opts'] : array();
 
 if ( !empty( $accord_collec ) ) {
     sek_print_accordion( $accord_collec, $accord_opts, $model );
-    ?><script>nb_.emit('nb-needs-accordion');</script><?php
+    sek_emit_js_event('nb-needs-accordion');
 } else {
     if ( skp_is_customizing() ) {
         printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',
