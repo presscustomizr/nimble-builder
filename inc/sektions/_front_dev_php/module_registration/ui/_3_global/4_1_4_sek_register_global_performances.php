@@ -64,13 +64,13 @@ function sek_get_module_params_for_sek_global_performances() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
-                'preload_font_awesome' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Defer loading Font Awesome icons', 'text_doma'),
-                    'default'     => 1,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20'
-                ),
+                // 'preload_font_awesome' => array(
+                //     'input_type'  => 'nimblecheck',
+                //     'title'       => __('Preload Font Awesome icons', 'text_doma'),
+                //     'default'     => 1,
+                //     'title_width' => 'width-80',
+                //     'input_width' => 'width-20'
+                // ),
 
 
 

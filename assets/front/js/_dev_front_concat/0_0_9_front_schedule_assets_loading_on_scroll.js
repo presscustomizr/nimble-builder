@@ -215,6 +215,19 @@
 
                         };
                         document.getElementsByTagName('head')[0].appendChild(link);
+                        var _href;
+                        ['fa-brands-400.woff2?5.12.1', 'fa-regular-400.woff2?5.12.1'].forEach( function( fontName ) {
+                            _href = sekFrontLocalized.frontAssetsPath + 'fonts/webfonts/'+fontName;
+                            link = document.createElement('link');
+                            link.setAttribute('href', _href );
+                            link.setAttribute('rel', 'preload');
+                            link.setAttribute('as', 'font');
+                            link.setAttribute('type', 'font/woff2');
+                            link.setAttribute('crossorigin', 'anonymous');
+                            document.getElementsByTagName('head')[0].appendChild(link);
+                        });
+                        // <link rel="preload" as="font" type="font/woff2" href="<?php echo NIMBLE_BASE_URL .'/assets/front/fonts/webfonts/fa-brands-400.woff2?5.12.1'; ?>" crossorigin="anonymous"/>
+                        // <link rel="preload" as="font" type="font/woff2" href="<?php echo NIMBLE_BASE_URL .'/assets/front/fonts/webfonts/fa-regular-400.woff2?5.12.1'; ?>" crossorigin="anonymous"/>
                   }
             };// doLoad
             // Load js plugin if needed
