@@ -104,7 +104,14 @@ window.nb_ = {};
         isLazyLoadEnabled : function() {
             return !nb_.isCustomizing() && true == '<?php echo sek_is_img_smartload_enabled(); ?>';
         },
-        // params = {id, as, href, onEvent, scriptEl }
+        // params = {
+        // id : 'nb-animate-css',
+        // as : 'style',
+        // href : "",
+        // onEvent : 'nb-docready',
+        // scriptEl : document.currentScript,
+        // eventOnLoad : 'animate-css-loaded'
+        // }
         preloadAsset : function(params) {
             //console.log('PARAMS ?', params, nb_.hasPreloadSupport() );
             params = params || {};
@@ -135,7 +142,10 @@ window.nb_ = {};
                             link.parentNode.removeChild(link);
                         }
                     }
-                  };
+                    if ( params.eventOnLoad ) {
+                        nb_.emit( params.eventOnLoad );
+                    }
+                };
             if ( ! nb_.hasPreloadSupport() && 'script' === params.as ) {
                 if ( params.onEvent ) {
                     nb_.listenTo( params.onEvent, function() { _injectFinalAsset.call(link); });
