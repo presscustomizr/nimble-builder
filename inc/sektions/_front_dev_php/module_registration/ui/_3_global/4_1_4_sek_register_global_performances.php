@@ -77,7 +77,7 @@ function sek_get_module_params_for_sek_global_performances() {
                 'preload_front_scripts' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Defer loading and parsing of javascript files to avoid render blocking issues', 'text_doma'),
-                    'default'     => 0,
+                    'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'html_before' => '<hr/><h3>' . __('SCRIPTS') .'</h3>'
