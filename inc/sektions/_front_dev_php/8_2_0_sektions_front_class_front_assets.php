@@ -570,12 +570,17 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                     // Font awesome is always loaded when customizing
                     // when not customizing, sek_front_needs_font_awesome() sniffs if the collection include a module using an icon
                     // October 2020 Better preload implementation
-                    // As explained here :https://stackoverflow.com/questions/49268352/preload-font-awesome
+                    // As explained here https://stackoverflow.com/questions/49268352/preload-font-awesome
                     // FA fonts can be preloaded. the crossorigin param has to be added
+                    // => this removes Google Speed tests message "preload key requests"
                     // important => the url of the font must be exactly the same as in font awesome stylesheet, including the query param at the end fa-brands-400.woff2?5.12.1
+                    // // note that we could preload all other types available ( eot, woff, ttf, svg )
+                    // but NB focus on preloading woff2 which is the type used by most recent browsers
+                    // see https://css-tricks.com/snippets/css/using-font-face/
                     ?>
                     <link rel="preload" as="font" type="font/woff2" href="<?php echo NIMBLE_BASE_URL .'/assets/front/fonts/webfonts/fa-brands-400.woff2?5.12.1'; ?>" crossorigin="anonymous"/>
                     <link rel="preload" as="font" type="font/woff2" href="<?php echo NIMBLE_BASE_URL .'/assets/front/fonts/webfonts/fa-regular-400.woff2?5.12.1'; ?>" crossorigin="anonymous"/>
+                    <link rel="preload" as="font" type="font/woff2" href="<?php echo NIMBLE_BASE_URL .'/assets/front/fonts/webfonts/fa-solid-900.woff2?5.12.1'; ?>" crossorigin="anonymous"/>
                     <?php $fa_style_url = NIMBLE_BASE_URL .'/assets/front/fonts/css/fontawesome-all.min.css?'.NIMBLE_ASSETS_VERSION; ?>
                     <script id="nb-load-fa-style">
                       nb_.listenTo('nb-needs-fa', function() {

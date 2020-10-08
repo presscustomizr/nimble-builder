@@ -215,8 +215,17 @@
 
                         };
                         document.getElementsByTagName('head')[0].appendChild(link);
+
+                        // October 2020 Better preload implementation
+                        // As explained here https://stackoverflow.com/questions/49268352/preload-font-awesome
+                        // FA fonts can be preloaded. the crossorigin param has to be added
+                        // => this removes Google Speed tests message "preload key requests"
+                        // important => the url of the font must be exactly the same as in font awesome stylesheet, including the query param at the end fa-brands-400.woff2?5.12.1
+                        // // note that we could preload all other types available ( eot, woff, ttf, svg )
+                        // but NB focus on preloading woff2 which is the type used by most recent browsers
+                        // see https://css-tricks.com/snippets/css/using-font-face/
                         var _href;
-                        ['fa-brands-400.woff2?5.12.1', 'fa-regular-400.woff2?5.12.1'].forEach( function( fontName ) {
+                        ['fa-brands-400.woff2?5.12.1', 'fa-regular-400.woff2?5.12.1', 'fa-solid-900.woff2?5.12.1'].forEach( function( fontName ) {
                             _href = sekFrontLocalized.frontAssetsPath + 'fonts/webfonts/'+fontName;
                             link = document.createElement('link');
                             link.setAttribute('href', _href );
