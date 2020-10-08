@@ -198,15 +198,15 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             /* ------------------------------------------------------------------------- *
              *  FONT AWESOME STYLESHEET
             /* ------------------------------------------------------------------------- */
-            // if ( ( sek_front_needs_font_awesome() && !sek_preload_font_awesome() && !sek_load_front_assets_in_ajax() ) || skp_is_customizing() ) {
-            //     wp_enqueue_style(
-            //         'nb-font-awesome',
-            //         NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
-            //         array(),
-            //         NIMBLE_ASSETS_VERSION,
-            //         $media = 'all'
-            //     );
-            // }
+            if ( ( sek_front_needs_font_awesome() && !sek_load_front_assets_in_ajax() ) || skp_is_customizing() ) {
+                wp_enqueue_style(
+                    'nb-font-awesome',
+                    NIMBLE_BASE_URL . '/assets/front/fonts/css/fontawesome-all.min.css',
+                    array(),
+                    NIMBLE_ASSETS_VERSION,
+                    $media = 'all'
+                );
+            }
 
         }//sek_enqueue_front_assets
 
