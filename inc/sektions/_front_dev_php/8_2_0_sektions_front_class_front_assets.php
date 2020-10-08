@@ -543,8 +543,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 'nb-swiper' => sek_is_dev_mode() ? '/assets/front/js/libs/swiper.js' : '/assets/front/js/libs/swiper.min.js',
                 'nb-video-bg-plugin' => sek_is_dev_mode() ? '/assets/front/js/libs/nimble-video-bg.js' : '/assets/front/js/libs/nimble-video-bg.min.js',
 
-                'nb-font-awesome' => '/assets/front/fonts/css/fontawesome-all.min.css',
-                'nb-magnific-popup-style' => '/assets/front/css/libs/magnific-popup.min.css'
+                'nb-magnific-popup-style' => '/assets/front/css/libs/magnific-popup.min.css',
+                'nb-font-awesome' => '/assets/front/fonts/css/fontawesome-all.min.css'
             ];
 
             // add version
@@ -562,11 +562,17 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // if active theme is Hueman or Customizr, Font Awesome may already been enqueued.
             // asset handle for Customizr => 'customizr-fa'
             // asset handle for Hueman => 'hueman-font-awesome'
-            if ( sek_preload_font_awesome() && !wp_style_is('customizr-fa', 'enqueued') && !wp_style_is('hueman-font-awesome', 'enqueued') ) {
+            if ( sek_front_needs_font_awesome() && sek_preload_font_awesome() && !wp_style_is('customizr-fa', 'enqueued') && !wp_style_is('hueman-font-awesome', 'enqueued') ) {
                 // Font awesome is always loaded when customizing
                 // when not customizing, sek_front_needs_font_awesome() sniffs if the collection include a module using an icon
+                // October 2020 Better preload implementation
+                // As explained here :https://stackoverflow.com/questions/49268352/preload-font-awesome
+                // FA fonts can be preloaded. the crossorigin param has to be added
+                // important => the url of the font must be exactly the same as in font awesome stylesheet, including the query param at the end fa-brands-400.woff2?5.12.1
                 ?>
-                <script id="nb-load-fa">
+                <link rel="preload" as="font" type="font/woff2" href="<?php echo NIMBLE_BASE_URL .'/assets/front/fonts/webfonts/fa-brands-400.woff2?5.12.1'; ?>" crossorigin="anonymous"/>
+                <link rel="preload" as="font" type="font/woff2" href="<?php echo NIMBLE_BASE_URL .'/assets/front/fonts/webfonts/fa-regular-400.woff2?5.12.1'; ?>" crossorigin="anonymous"/>
+                <script id="nb-load-fa-style">
                   nb_.listenTo('nb-needs-fa', function() {
                       nb_.preloadAsset( {
                         id : 'nb-font-awesome',
@@ -577,6 +583,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                       });
                   });
                 </script>
+
                 <?php
             }
         }
