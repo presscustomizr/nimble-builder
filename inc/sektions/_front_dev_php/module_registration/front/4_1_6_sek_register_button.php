@@ -309,7 +309,7 @@ function sek_add_css_rules_for_button_front_module( $rules, $complete_modul_mode
             $rules,
             $border_settings,
             $border_type,
-            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-btn'
+            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-btn'
         );
     }
     return $rules;
