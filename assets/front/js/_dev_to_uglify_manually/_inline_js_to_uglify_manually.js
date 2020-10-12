@@ -113,7 +113,6 @@ window.nb_ = {};
         // eventOnLoad : 'animate-css-loaded'
         // }
         preloadAsset : function(params) {
-            //console.log('PARAMS ?', params, nb_.hasPreloadSupport() );
             params = params || {};
 
             // bail if preloaded already ?
@@ -122,13 +121,14 @@ window.nb_ = {};
               return;
 
             var headTag = document.getElementsByTagName('head')[0],
-                link = document.createElement('link'),
-                link_rel = 'style' === params.as ? 'stylesheet' : 'script',
+                link,
                 _injectFinalAsset = function() {
                     var link = this;
                     // this is the link element
                     if ( 'style' === params.as ) {
                        link.setAttribute('rel', 'stylesheet');
+                       link.setAttribute('type', 'text/css');
+                       link.setAttribute('media', 'all');
                     } else {
                         var _script = document.createElement("script");
                         _script.setAttribute('src', params.href );
@@ -146,19 +146,46 @@ window.nb_ = {};
                         nb_.emit( params.eventOnLoad );
                     }
                 };
-            if ( ! nb_.hasPreloadSupport() && 'script' === params.as ) {
+
+            // terminate here in the case of a font preload when preload not supported
+            if ( 'font' === params.as && !nb_.hasPreloadSupport() )
+              return;
+
+
+            link = document.createElement('link');
+
+            // script without preload support
+            if ( !nb_.hasPreloadSupport() && 'script' === params.as ) {
                 if ( params.onEvent ) {
                     nb_.listenTo( params.onEvent, function() { _injectFinalAsset.call(link); });
                 } else {
                     _injectFinalAsset.call(link);
                 }
             } else {
+                // script, font and stylesheet
                 link.setAttribute('href', params.href);
-                link.setAttribute('rel', nb_.hasPreloadSupport() ? 'preload' : 'stylesheet' );
+                if ( 'style' === params.as ) {
+                    link.setAttribute('rel', nb_.hasPreloadSupport() ? 'preload' : 'stylesheet' );
+                } else if ( ( 'script' === params.as || 'font' === params.as ) && nb_.hasPreloadSupport() ) {
+                    link.setAttribute('rel', 'preload' );
+                }
                 link.setAttribute('id', params.id );
                 link.setAttribute('as', params.as);
+
+                // attributes specific to fonts
+                if ( 'font' === params.as ) {
+                    link.setAttribute('type', params.type);
+                    link.setAttribute('crossorigin', 'anonymous');
+                }
+
+                // watch load events
                 link.onload = function() {
+                    //console.log('LOADED ASSET => ' + params.id + ' ON EVENT ' + params.onEvent );
                     this.onload=null;
+                    // nothing left to do if this is a font. It can now be used by the stylesheet
+                    if ( 'font' === params.as )
+                      return;
+
                     if ( params.onEvent ) {
                         nb_.listenTo( params.onEvent, function() { _injectFinalAsset.call(link); });
                     } else {
@@ -169,6 +196,7 @@ window.nb_ = {};
                     nb_.errorLog('Nimble preloadAsset error', er, params );
                 };
             }
+            // append link now
             headTag.appendChild(link);
 
             // store the asset as done
@@ -246,7 +274,10 @@ window.nb_ = {};
         window.addEventListener( "load", _docReady );
     }
 
-}(window, document ));
+}(window, document ));// Your code goes here
+
+
+
 
 
 
