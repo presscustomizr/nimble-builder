@@ -4406,30 +4406,20 @@ function sek_get_module_params_for_sek_global_performances() {
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
-                'preload_font_awesome' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Defer loading Font Awesome icons', 'text_doma'),
-                    'default'     => 1,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20'
-                ),
-
-
-
-                'preload_front_scripts' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Defer loading and parsing of javascript files to avoid render blocking issues', 'text_doma'),
-                    'default'     => 0,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                    'html_before' => '<hr/><h3>' . __('SCRIPTS') .'</h3>'
-                ),
+                // 'preload_font_awesome' => array(
+                //     'input_type'  => 'nimblecheck',
+                //     'title'       => __('Preload Font Awesome icons', 'text_doma'),
+                //     'default'     => 1,
+                //     'title_width' => 'width-80',
+                //     'input_width' => 'width-20'
+                // ),
                 'load_assets_in_ajax' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Inject non priority assets dynamically in the page only when needed.', 'text_doma'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
+                    'html_before' => '<hr/><h3>' . __('SCRIPTS') .'</h3>'
                     //'notice_after' => __('Beta feature'),
                 ),
 

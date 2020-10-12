@@ -1410,7 +1410,6 @@ function sek_get_module_params_for_czr_icon_module() {
         'css_selectors' => array( '.sek-icon-wrapper' ),//array( '.sek-icon i' ),
         'render_tmpl_path' => "icon_module_tmpl.php",
         // Nimble will "sniff" if we need font awesome
-        // see ::sek_front_needs_font_awesome()
         // 'front_assets' => array(
         //       'czr-font-awesome' => array(
         //           'type' => 'css',
@@ -2558,7 +2557,7 @@ function sek_add_css_rules_for_button_front_module( $rules, $complete_modul_mode
             $rules,
             $border_settings,
             $border_type,
-            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-btn'
+            '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-btn'
         );
     }
     return $rules;

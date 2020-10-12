@@ -27,7 +27,6 @@ function sek_get_module_params_for_czr_icon_module() {
         'css_selectors' => array( '.sek-icon-wrapper' ),//array( '.sek-icon i' ),
         'render_tmpl_path' => "icon_module_tmpl.php",
         // Nimble will "sniff" if we need font awesome
-        // see ::sek_front_needs_font_awesome()
         // 'front_assets' => array(
         //       'czr-font-awesome' => array(
         //           'type' => 'css',

@@ -299,11 +299,11 @@
   opacity: 0;
 }
 
-.sek-overflow-hidden-when-animating [data-sek-level] {
-  overflow-x: hidden;
+.sek-overflow-hidden-while-animating {
+  overflow: hidden;
 }
 
-.sek-service-font, .sek-module-inner .sek-btn {
+.sek-service-font, .sek-module .sek-module-inner .sek-btn {
   font-family: sans-serif;
 }
 
@@ -766,7 +766,7 @@
   color: #777;
 }
 
-.sek-module-inner .sek-btn {
+.sek-module .sek-module-inner .sek-btn {
   display: inline-block;
   font-weight: normal;
   line-height: 1.25em;
@@ -791,22 +791,22 @@
   transition: all 0.2s ease-in-out;
 }
 
-.sek-module-inner .sek-btn:focus, .sek-module-inner .sek-btn:hover {
+.sek-module .sek-module-inner .sek-btn:focus, .sek-module .sek-module-inner .sek-btn:hover {
   text-decoration: none;
 }
 
-.sek-module-inner .sek-btn:focus, .sek-module-inner .focus.sek-btn {
+.sek-module .sek-module-inner .sek-btn:focus, .sek-module .sek-module-inner .focus.sek-btn {
   outline: 0;
   box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.25);
 }
 
-.sek-module-inner .disabled.sek-btn, .sek-module-inner .sek-btn:disabled {
+.sek-module .sek-module-inner .disabled.sek-btn, .sek-module .sek-module-inner .sek-btn:disabled {
   cursor: not-allowed;
   opacity: .65;
   box-shadow: none;
 }
 
-.sek-module-inner .sek-btn:active, .sek-module-inner .active.sek-btn {
+.sek-module .sek-module-inner .sek-btn:active, .sek-module .sek-module-inner .active.sek-btn {
   background-image: none;
   box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.25);
 }
@@ -1862,17 +1862,17 @@ button.sek-btn,
   text-align: center;
 }
 
-.sek-module-inner .sek-btn {
+.sek-module .sek-module-inner .sek-btn {
   background: #020202;
   color: #ffffff;
   padding: 0.5em 1em;
 }
 
-.sek-module-inner .sek-btn i {
+.sek-module .sek-module-inner .sek-btn i {
   margin: 0 8px;
 }
 
-.sek-module-inner .sek-btn:hover, .sek-module-inner .sek-btn:focus, .sek-module-inner .sek-btn:active {
+.sek-module .sek-module-inner .sek-btn:hover, .sek-module .sek-module-inner .sek-btn:focus, .sek-module .sek-module-inner .sek-btn:active {
   color: #ffffff;
 }
 

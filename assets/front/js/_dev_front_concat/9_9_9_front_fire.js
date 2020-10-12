@@ -6,7 +6,7 @@
     nb_.listenTo('nb-jmp-parsed', function() {
         jQuery(function($){
             var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
-            // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
+            // Abort if no link candidate
             if ( $linkCandidates.length < 1 )
               return;
 
@@ -16,7 +16,7 @@
                 if ( $linkCandidate.length < 1 || 'string' !== typeof( $linkCandidate[0].protocol ) || -1 !== $linkCandidate[0].protocol.indexOf('javascript') )
                   return;
                 // Abort if candidate already setup
-                if ( true === $linkCandidate.data('nimble-mfp-done') )
+                if ( $linkCandidate.data('nimble-mfp-done') )
                   return;
 
                 try { $linkCandidate.magnificPopup({
