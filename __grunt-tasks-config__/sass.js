@@ -64,5 +64,26 @@ module.exports = {
     files : {
       '<%= paths.front_assets %>css/modules/icon-module.css' : '<%= paths.front_assets %>scss/stand-alone-module-generators/icon-module.scss'
     }
+  },
+  sek_module_social_icons: {
+    files : {
+      '<%= paths.front_assets %>css/modules/social-icons-module.css' : '<%= paths.front_assets %>scss/stand-alone-module-generators/social-icons-module.scss'
+    }
+  },
+  sek_module_button: {
+    files : {
+      '<%= paths.front_assets %>css/modules/button-module.css' : '<%= paths.front_assets %>scss/stand-alone-module-generators/button-module.scss'
+    }
+  },
+  sek_module_heading: {
+    files : {
+      '<%= paths.front_assets %>css/modules/heading-module.css' : '<%= paths.front_assets %>scss/stand-alone-module-generators/heading-module.scss'
+    }
+  },
+  // pro module
+  sek_module_special_image: {
+    files : {
+      '<%= paths.front_assets %>css/modules/special-image-module.css' : '<%= paths.front_assets %>scss/stand-alone-module-generators/special-image-module.scss'
+    }
   }
 };

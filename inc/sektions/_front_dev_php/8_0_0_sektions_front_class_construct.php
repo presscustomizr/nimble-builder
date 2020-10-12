@@ -170,15 +170,21 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // so that we don't fire the heavy requests multiple times in case the function sek_get_feedback_notif_status() is invoked several times
         public $feedback_notif_status = 'not_set';
 
-        // March 2020 : introduction of split stylesheet for some modules
+        // March 2020 : introduction of individual stylesheet for some modules
+        // October 2020 : implementation of dynamic stylesheet concatenation when generating stylesheets
         public $big_module_stylesheet_map = [
             'czr_quote_module' => 'quote-module',
             'czr_icon_module' => 'icon-module',
-            'czr_img_slider_module' => 'img-slider-module-with-swiper',
+            'czr_img_slider_module' => 'img-slider-module',
             'czr_accordion_module' => 'accordion-module',
             'czr_menu_module' => 'menu-module',
             'czr_post_grid_module' => 'post-grid-module',
-            'czr_simple_form_module' => 'simple-form-module'
+            'czr_simple_form_module' => 'simple-form-module',
+            'czr_image_module' => 'image-module',
+            'czr_special_img_module' => 'special-image-module',
+            'czr_social_icons_module' => 'social-icons-module',
+            'czr_button_module' => 'button-module',
+            'czr_heading_module' => 'heading-module'
         ];
 
         // March 2020, for https://github.com/presscustomizr/nimble-builder/issues/629
