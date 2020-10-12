@@ -63,15 +63,6 @@ function sek_inline_dynamic_stylesheets_on_front() {
     return false;
 }
 
-// @return bool
-// march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-function sek_use_split_stylesheets_on_front() {
-    $glob_perf = sek_get_global_option_value( 'performances' );
-    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['use_partial_module_stylesheets'] ) ) {
-        return sek_booleanize_checkbox_val( $glob_perf['use_partial_module_stylesheets'] );
-    }
-    return false;
-}
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/629
@@ -124,6 +115,19 @@ function sek_emit_js_event( $event = '', $echo = true ) {
         return $html;
     }
 }
+
+
+// October 2020 => module stylesheets are concatenated in the dynamic stylesheet
+// @return bool
+// march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
+// function sek_use_split_stylesheets_on_front() {
+//     $glob_perf = sek_get_global_option_value( 'performances' );
+//     if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['use_partial_module_stylesheets'] ) ) {
+//         return sek_booleanize_checkbox_val( $glob_perf['use_partial_module_stylesheets'] );
+//     }
+//     return false;
+// }
+
 
 /* ------------------------------------------------------------------------- *
  *  FRONT ASSET SNIFFERS

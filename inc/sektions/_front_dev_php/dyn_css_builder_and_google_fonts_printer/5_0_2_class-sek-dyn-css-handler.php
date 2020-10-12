@@ -377,11 +377,19 @@ class Sek_Dyn_CSS_Handler {
         //     set_transient( 'nimble_update_css_folder_name_0720', 'done', 30 * YEAR_IN_SECONDS );
         // }
         $upload_dir = wp_get_upload_dir();
-        $prev_folder_path = $this->_sek_dyn_css_build_relative_base_path( NIMBLE_PREV_CSS_FOLDER_NAME );
+        $prev_folder_path = $this->_sek_dyn_css_build_relative_base_path( NIMBLE_DEPREC_ONE_CSS_FOLDER_NAME );
         $previous_folder_one = wp_normalize_path( trailingslashit( $upload_dir['basedir'] ) . $prev_folder_path );
         global $wp_filesystem;
         if ( $wp_filesystem->exists( $previous_folder_one ) ) {
             $wp_filesystem->rmdir( $previous_folder_one, true );
+        }
+
+        // October 2020 remove previous folder when implementing dynamic module stylesheet concatenation
+        $prev_folder_path = $this->_sek_dyn_css_build_relative_base_path( NIMBLE_DEPREC_TWO_CSS_FOLDER_NAME );
+        $previous_folder_two = wp_normalize_path( trailingslashit( $upload_dir['basedir'] ) . $prev_folder_path );
+        global $wp_filesystem;
+        if ( $wp_filesystem->exists( $previous_folder_two ) ) {
+            $wp_filesystem->rmdir( $previous_folder_two, true );
         }
     }
 
