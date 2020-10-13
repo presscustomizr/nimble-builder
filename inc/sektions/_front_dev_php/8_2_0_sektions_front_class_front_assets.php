@@ -21,10 +21,6 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // replace wp_localize because we don't need to indicate a dependency to any scripts for local data
             add_action( 'wp_head', array( $this, 'sek_add_local_script_data' ), 0  );
 
-            // Maybe print split module stylesheet inline
-            // introduced in march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
-            //add_action( 'wp_head', array( $this, 'sek_maybe_print_inline_split_module_stylesheets' ), PHP_INT_MAX  );
-
             // initialize Nimble front js app
             add_action( 'wp_head', array( $this, 'sek_initialize_front_js_app' ), 0  );
 
@@ -575,32 +571,6 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             <script id="nimble-detect-jquery">!function(){var e=function(){var e="nb-jquery-loaded";nb_.wasEmitted(e)||nb_.emit(e)},n=function(t){t=t||0,void 0!==window.jQuery?e():t<30?setTimeout(function(){n(++t)},200):alert("Nimble Builder problem : jQuery.js was not detected on your website")},t=document.getElementById("<?php echo NIMBLE_JQUERY_ID; ?>");t&&t.addEventListener("load",function(){e()}),n()}();</script>
             <?php
         }
-
-
-
-        // // hook : wp_head@PHP_INT_MAX
-        // // introduced in march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
-        // function sek_maybe_print_inline_split_module_stylesheets() {
-        //     $is_stylesheet_split_for_performance = !skp_is_customizing() && sek_use_split_stylesheets_on_front();
-        //     $is_inline_stylesheets_for_performance= !skp_is_customizing() && $is_stylesheet_split_for_performance && sek_inline_module_stylesheets_on_front();
-        //     if ( !$is_inline_stylesheets_for_performance)
-        //       return;
-        //     // css assets are always enqueued when customizing
-        //     global $wp_filesystem;
-        //     $contextually_active_modules = sek_get_collection_of_contextually_active_modules();
-        //     // loop on the map module type (candidates for split) => stylesheet file name
-        //     foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
-        //         if ( !array_key_exists($module_type , $contextually_active_modules) )
-        //           continue;
-        //         $uri = NIMBLE_BASE_PATH . '/assets/front/css/modules/' . $stylesheet_name .'.min.css';
-        //         //sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' SOOO ? => ' . $this->uri . $wp_filesystem->exists( $this->uri ), empty( $file_content ) );
-        //         if ( $wp_filesystem->exists( $uri ) && $wp_filesystem->is_readable( $uri ) ) {
-        //             $file_content = $wp_filesystem->get_contents( $uri );
-        //             printf( '<style id="%1$s-stylesheet" type="text/css" media="all">%2$s</style>', $stylesheet_name, $file_content );
-        //         }
-        //     }
-        // }
-
 
 
         // @'wp_footer'PHP_INT_MAX
