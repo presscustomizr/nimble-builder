@@ -41,6 +41,9 @@ class Sek_Dyn_CSS_Builder {
     public $customizer_active_locations = '_not_set_';//June 2020 => added to prevent printing css for not active locations
     public $current_sniffed_location = '_not_set_';//June 2020 => added to prevent printing css for not active locations
 
+    public $sniffed_locations = [];//oct 2020 => will populate a collection of location sniffed while parsing the sek_model
+    public $sniffed_modules = [];//oct 2020 => will populate a collection of modules sniffed while parsing the sek_model
+
     public function __construct( $sek_model = array(), $is_global_stylesheet = false ) {
         $this->sek_model  = $sek_model;
 
@@ -90,11 +93,16 @@ class Sek_Dyn_CSS_Builder {
             // Let's cache the currently sniffed location
             if ( is_array($entry) && isset($entry['level']) && 'location' === $entry['level'] ) {
                 $this->current_sniffed_location = $entry['id'];
+                $this->sniffed_locations[ $this->current_sniffed_location ] = [];
             }
 
             // When saving in the customizer, the active locations are passed in $_POST
             // so we can determine if a location is currently active or not, and if not, we don't need to generate CSS for it.
-            if ( '_not_set_' !== $this->customizer_active_locations && '_not_set_' !== $this->current_sniffed_location && !in_array($this->current_sniffed_location, $this->customizer_active_locations ) ) {
+            // Oct 2020 : case of the global stylesheet :
+            // The global stylesheet may be inactive on a given customization, which means that the customizer_active_locations won't include any global locations.
+            // But this does not mean that the global stylesheet is inactive on other pages.
+            // That's why we only verify the active location condition when !$this->is_global_stylesheet
+            if ( !$this->is_global_stylesheet && '_not_set_' !== $this->customizer_active_locations && '_not_set_' !== $this->current_sniffed_location && !in_array($this->current_sniffed_location, $this->customizer_active_locations ) ) {
                 continue;
             }
 
@@ -110,12 +118,22 @@ class Sek_Dyn_CSS_Builder {
             if ( is_string( $key ) && 1 < strlen( $key ) ) {
                 // we need to have a level model set
                 if ( !empty( $parent_level ) && is_array( $parent_level ) && !empty( $parent_level['module_type'] ) ) {
-                     // If the current level is a module, check if the module has generic css ( *_css suffixed ) selectors specified on registration
+
+                    // Populates the sniffed module collection for later use
+                    $current_location_modules = $this->sniffed_locations[ $this->current_sniffed_location ];
+                    $current_location_modules = is_array($current_location_modules) ? $current_location_modules : [];
+                    if ( !in_array( $parent_level['module_type'], $current_location_modules ) ) {
+                        $this->sniffed_modules[] = $parent_level['module_type'];
+                        $this->sniffed_locations[ $this->current_sniffed_location ][] = $parent_level['module_type'];
+                    }
+
+                    // If the current level is a module, check if the module has generic css ( *_css suffixed ) selectors specified on registration
                     // $module_level_css_selectors = null;
                     // $registered_input_list = null;
                     $module_level_css_selectors = sek_get_registered_module_type_property( $parent_level['module_type'], 'css_selectors' );
 
                     $registered_input_list = sek_get_registered_module_input_list( $parent_level['module_type'] );
+
                     if ( 'value' === $key && is_array( $entry ) ) {
                           $is_father = sek_get_registered_module_type_property( $parent_level['module_type'], 'is_father' );
                           $father_mod_type = $parent_level['module_type'];
@@ -507,7 +525,12 @@ class Sek_Dyn_CSS_Builder {
         }
 
         // CONCATENATE MODULE CSS + GENERATED CSS
-        return apply_filters( 'nimble_get_dynamic_stylesheet', $modules_css . $css, $this->is_global_stylesheet );
+        return apply_filters( 'nimble_get_dynamic_stylesheet',
+            $modules_css . $css,
+            $this->is_global_stylesheet,
+            $this->sniffed_locations,
+            $this->sniffed_modules
+        );
     }
 
 
