@@ -1357,7 +1357,7 @@ https://github.com/presscustomizr/nimble-builder/issues/317 */
   animation: sek-target-highlight 3s infinite;
   background-color: #eee;
 }
-.sek-injection-instructions {
+.sektion-wrapper .sek-injection-instructions {
   display: none;
   font-size: 13px;
   line-height: 1.5em;
