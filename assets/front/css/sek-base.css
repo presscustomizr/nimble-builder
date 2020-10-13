@@ -958,6 +958,9 @@ button.sek-btn,
   font-size: 1em;
 }
 
+/*************************************
+* HEADING MODULE
+*************************************/
 .sek-module-inner h1, .sek-module-inner h2, .sek-module-inner h3, .sek-module-inner h4, .sek-module-inner h5, .sek-module-inner h6 {
   font-weight: 400;
   line-height: 1.5em;
@@ -998,6 +1001,9 @@ button.sek-btn,
   font-size: inherit;
 }
 
+/*************************************
+* MENU MODULE
+*************************************/
 .sek-nav-wrap {
   position: relative;
   display: -ms-flexbox;
@@ -1466,6 +1472,9 @@ button.sek-btn,
   font-size: 16px;
 }
 
+/*************************************
+* IMAGE MODULE
+*************************************/
 [data-sek-module-type="czr_image_module"] {
   text-align: center;
 }
@@ -1551,6 +1560,9 @@ button.sek-btn,
   filter: grayscale(0%);
 }
 
+/*************************************
+* SPECIAL IMAGE MODULE
+*************************************/
 .sek-nimble-image-wrapper {
   max-width: 100%;
   overflow: hidden;
@@ -1683,6 +1695,9 @@ button.sek-btn,
   top: 0;
 }
 
+/*************************************
+* DIVIDER MODULE
+*************************************/
 [data-sek-module-type="czr_divider_module"] {
   text-align: center;
 }
@@ -1701,10 +1716,16 @@ button.sek-btn,
   font-size: 1rem;
 }
 
+/*************************************
+* SPACER MODULE
+*************************************/
 .sek-module-inner .sek-spacer {
   height: 20px;
 }
 
+/*************************************
+* ICON MODULE
+*************************************/
 [data-sek-module-type="czr_icon_module"] {
   text-align: center;
   color: #5a5a5a;
@@ -1748,6 +1769,9 @@ button.sek-btn,
   line-height: 1em;
 }
 
+/*************************************
+* QUOTE MODULE
+*************************************/
 .sek-quote p {
   margin: 0 0 .5em;
   padding: 0;
@@ -1858,6 +1882,9 @@ button.sek-btn,
   top: 10px;
 }
 
+/*************************************
+* BUTTON MODULE
+*************************************/
 [data-sek-module-type="czr_button_module"] .sek-module-inner {
   text-align: center;
 }
@@ -1896,6 +1923,9 @@ button.sek-btn,
   transform: translateY(2px);
 }
 
+/*************************************
+* POST GRID MODULE
+*************************************/
 .sek-post-grid-wrapper {
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
@@ -2353,6 +2383,9 @@ button.sek-btn,
   font-size: 0.9em;
 }
 
+/*************************************
+* SIMPLE FORM MODULE
+*************************************/
 .sek-simple-form-wrapper input[type=text], .sek-simple-form-wrapper textarea {
   font-size: 16px;
   width: 100% !important;
@@ -2443,10 +2476,16 @@ button.sek-btn,
   display: none;
 }
 
+/*************************************
+* TINY MCE EDITOR MODULE
+*************************************/
 [data-sek-module-type="czr_tiny_mce_editor_module"] a {
   text-decoration: underline;
 }
 
+/*************************************
+* SOCIAL ICONS MODULE
+*************************************/
 [data-sek-module-type="czr_social_icons_module"] .sek-module-inner .sek-social-icons-wrapper {
   margin: 10px 0;
 }
@@ -2476,6 +2515,9 @@ button.sek-btn,
   transition: all 0.2s ease-in-out;
 }
 
+/*************************************
+* IMAGE SLIDER MODULE
+*************************************/
 .sek-column-inner [data-sek-module-type="czr_img_slider_module"] {
   width: calc(100% + 20px);
   max-width: calc(100% + 20px);
@@ -2718,6 +2760,9 @@ button.sek-btn,
   }
 }
 
+/*************************************
+* ACCORDION MODULE
+*************************************/
 .sek-accord-wrapper {
   text-align: left;
 }
@@ -2858,6 +2903,9 @@ button.sek-btn,
   display: none;
 }
 
+/*************************************
+* SHORTCODE MODULE
+*************************************/
 [data-sek-module-type="czr_shortcode_module"] [data-sek-use-flexbox="true"] {
   display: -ms-flexbox;
   display: flex;

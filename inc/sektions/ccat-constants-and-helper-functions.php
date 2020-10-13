@@ -19,8 +19,11 @@ if ( !defined( 'NIMBLE_SECTION_CPT' ) ) { define( 'NIMBLE_SECTION_CPT' , 'nimble
 if ( !defined( 'NIMBLE_PREFIX_FOR_SAVED_TMPL' ) ) { define( 'NIMBLE_PREFIX_FOR_SAVED_TMPL' , 'nb_tmpl_' ); }
 if ( !defined( 'NIMBLE_PREFIX_FOR_SAVED_SECTION' ) ) { define( 'NIMBLE_PREFIX_FOR_SAVED_SECTION' , 'nb_section_' ); }
 
-if ( !defined( 'NIMBLE_PREV_CSS_FOLDER_NAME' ) ) { define( 'NIMBLE_PREV_CSS_FOLDER_NAME' , 'sek_css' ); }
-if ( !defined( 'NIMBLE_CSS_FOLDER_NAME' ) ) { define( 'NIMBLE_CSS_FOLDER_NAME' , 'nb_css' ); }
+if ( !defined( 'NIMBLE_DEPREC_ONE_CSS_FOLDER_NAME' ) ) { define( 'NIMBLE_DEPREC_ONE_CSS_FOLDER_NAME' , 'sek_css' ); }//<= folder name deprecated in july 2020
+if ( !defined( 'NIMBLE_DEPREC_TWO_CSS_FOLDER_NAME' ) ) { define( 'NIMBLE_DEPREC_TWO_CSS_FOLDER_NAME' , 'nb_css' ); }//<= folder name deprecated in october 2020
+if ( !defined( 'NIMBLE_CSS_FOLDER_NAME' ) ) { define( 'NIMBLE_CSS_FOLDER_NAME' , 'nimble_css' ); }
+if ( !defined( 'NIMBLE_MODULE_CSS_READING_STATUS_OPT' ) ) { define( 'NIMBLE_MODULE_CSS_READING_STATUS_OPT' , 'nimble_module_css_read_status' ); }
+
 if ( !defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'nimble___' ); }
 if ( !defined( 'NIMBLE_GLOBAL_SKOPE_ID' ) ) { define( 'NIMBLE_GLOBAL_SKOPE_ID' , 'skp__global' ); }
 
@@ -242,15 +245,6 @@ function sek_inline_dynamic_stylesheets_on_front() {
     return false;
 }
 
-// @return bool
-// march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-function sek_use_split_stylesheets_on_front() {
-    $glob_perf = sek_get_global_option_value( 'performances' );
-    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['use_partial_module_stylesheets'] ) ) {
-        return sek_booleanize_checkbox_val( $glob_perf['use_partial_module_stylesheets'] );
-    }
-    return false;
-}
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/629
@@ -303,6 +297,19 @@ function sek_emit_js_event( $event = '', $echo = true ) {
         return $html;
     }
 }
+
+
+// October 2020 => module stylesheets are concatenated in the dynamic stylesheet
+// @return bool
+// march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
+// function sek_use_split_stylesheets_on_front() {
+//     $glob_perf = sek_get_global_option_value( 'performances' );
+//     if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['use_partial_module_stylesheets'] ) ) {
+//         return sek_booleanize_checkbox_val( $glob_perf['use_partial_module_stylesheets'] );
+//     }
+//     return false;
+// }
+
 
 /* ------------------------------------------------------------------------- *
  *  FRONT ASSET SNIFFERS

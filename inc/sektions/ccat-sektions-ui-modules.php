@@ -4377,14 +4377,14 @@ function sek_get_module_params_for_sek_global_performances() {
                     // )
                 ),
 
-                'use_partial_module_stylesheets' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Use partial CSS stylesheets for modules', 'text_doma'),
-                    'default'     => 0,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                    'html_before' => '<hr/><h3>' . __('STYLESHEETS') .'</h3>'
-                ),
+                // 'use_partial_module_stylesheets' => array(
+                //     'input_type'  => 'nimblecheck',
+                //     'title'       => __('Use partial CSS stylesheets for modules', 'text_doma'),
+                //     'default'     => 0,
+                //     'title_width' => 'width-80',
+                //     'input_width' => 'width-20',
+                //     'html_before' => '<hr/><h3>' . __('STYLESHEETS') .'</h3>'
+                // ),
                 // 'print_partial_module_stylesheets_inline' => array(
                 //     'input_type'  => 'nimblecheck',
                 //     'title'       => __('Print modules stylesheets inline', 'text_doma'),
@@ -4398,6 +4398,7 @@ function sek_get_module_params_for_sek_global_performances() {
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
+                    'html_before' => '<hr/><h3>' . __('STYLESHEETS') .'</h3>'
                 ),
                 'preload_google_fonts' => array(
                     'input_type'  => 'nimblecheck',

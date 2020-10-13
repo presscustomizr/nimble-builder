@@ -32,6 +32,7 @@ class Sek_Dyn_CSS_Builder {
     const COLS_MOBILE_BREAKPOINT  = 'md';
 
     private $collection;//the collection of css rules
+    private $module_types = [];
     private $sek_model;
     // property "is_global_stylesheet" has been added when fixing https://github.com/presscustomizr/nimble-builder/issues/273
     private $is_global_stylesheet;
@@ -261,6 +262,9 @@ class Sek_Dyn_CSS_Builder {
                 if ( !empty( $entry[ 'level' ] ) && 'module' === $entry['level'] ) {
                     if ( !empty( $entry['module_type'] ) ) {
                         $module_type = $entry['module_type'];
+                        // populate module types list so we can add their stylesheet afterward
+                        $this->module_types[] = $module_type;
+
                         // build rules for modules
                         // applying sek_normalize_module_value_with_defaults() allows us to access all the value properties of the module without needing to check their existence
                         $rules = apply_filters( "sek_add_css_rules_for_module_type___{$module_type}", $rules, sek_normalize_module_value_with_defaults( $entry ) );
@@ -438,9 +442,52 @@ class Sek_Dyn_CSS_Builder {
         return $b_int - $a_int;
     }
 
+
+
     //@returns a stringified stylesheet, ready to be printed on the page or in a file
     public function get_stylesheet() {
         $css = '';
+
+        // CONCATENATE MODULE STYLESHEETS
+        // Oct 2020 => https://github.com/presscustomizr/nimble-builder/issues/749
+        $this->module_types = array_unique($this->module_types);
+        //sek_error_log('$this->module_types ?', $this->module_types );
+        $modules_css = '';
+        $base_uri = NIMBLE_BASE_PATH . '/assets/front/css/modules/';
+        global $wp_filesystem;
+        $reading_issue = false;
+        $read_attempt = false;
+        foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
+            if ( $reading_issue )
+                continue;
+            if ( !in_array($module_type , $this->module_types ) )
+              continue;
+            $uri = sprintf( '%1$s%2$s%3$s',
+                $base_uri ,
+                $stylesheet_name,
+                sek_is_dev_mode() ? '.css' : '.min.css'
+            );
+
+            $uri =  wp_normalize_path($uri);
+            $read_attempt = true;
+            //sek_error_log('$uri ??' . $module_type . $stylesheet_name, $uri );
+            if ( $wp_filesystem->exists($uri) && $wp_filesystem->is_readable($uri) ) {
+                $modules_css .= $wp_filesystem->get_contents($uri);
+            } else {
+                $reading_issue = true;
+            }
+        }
+        if ( $read_attempt ) {
+            if ( $reading_issue ) {
+                update_option( NIMBLE_MODULE_CSS_READING_STATUS_OPT, 'failed' );
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => reading issue => impossible to concatenate module stylesheets');
+            } else {
+                update_option( NIMBLE_MODULE_CSS_READING_STATUS_OPT, 'OK' );
+            }
+        }
+        //sek_error_log('$modules_css ??', $modules_css );
+
+        // ORGANIZE CSS RULES BY MEDIA QUERIES
         $collection = apply_filters( 'nimble_css_rules_collection_before_printing_stylesheet', $this->collection );
         if ( is_array( $collection ) && !empty( $collection ) ) {
             // Sort the collection by media queries
@@ -458,7 +505,9 @@ class Sek_Dyn_CSS_Builder {
                 $css .= $_css;
             }
         }
-        return apply_filters( 'nimble_get_dynamic_stylesheet', $css, $this->is_global_stylesheet );
+
+        // CONCATENATE MODULE CSS + GENERATED CSS
+        return apply_filters( 'nimble_get_dynamic_stylesheet', $modules_css . $css, $this->is_global_stylesheet );
     }
 
 
@@ -993,11 +1042,19 @@ class Sek_Dyn_CSS_Handler {
         //     set_transient( 'nimble_update_css_folder_name_0720', 'done', 30 * YEAR_IN_SECONDS );
         // }
         $upload_dir = wp_get_upload_dir();
-        $prev_folder_path = $this->_sek_dyn_css_build_relative_base_path( NIMBLE_PREV_CSS_FOLDER_NAME );
+        $prev_folder_path = $this->_sek_dyn_css_build_relative_base_path( NIMBLE_DEPREC_ONE_CSS_FOLDER_NAME );
         $previous_folder_one = wp_normalize_path( trailingslashit( $upload_dir['basedir'] ) . $prev_folder_path );
         global $wp_filesystem;
         if ( $wp_filesystem->exists( $previous_folder_one ) ) {
             $wp_filesystem->rmdir( $previous_folder_one, true );
+        }
+
+        // October 2020 remove previous folder when implementing dynamic module stylesheet concatenation
+        $prev_folder_path = $this->_sek_dyn_css_build_relative_base_path( NIMBLE_DEPREC_TWO_CSS_FOLDER_NAME );
+        $previous_folder_two = wp_normalize_path( trailingslashit( $upload_dir['basedir'] ) . $prev_folder_path );
+        global $wp_filesystem;
+        if ( $wp_filesystem->exists( $previous_folder_two ) ) {
+            $wp_filesystem->rmdir( $previous_folder_two, true );
         }
     }
 
@@ -2137,15 +2194,21 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // so that we don't fire the heavy requests multiple times in case the function sek_get_feedback_notif_status() is invoked several times
         public $feedback_notif_status = 'not_set';
 
-        // March 2020 : introduction of split stylesheet for some modules
+        // March 2020 : introduction of individual stylesheet for some modules
+        // October 2020 : implementation of dynamic stylesheet concatenation when generating stylesheets
         public $big_module_stylesheet_map = [
             'czr_quote_module' => 'quote-module',
             'czr_icon_module' => 'icon-module',
-            'czr_img_slider_module' => 'img-slider-module-with-swiper',
+            'czr_img_slider_module' => 'img-slider-module',
             'czr_accordion_module' => 'accordion-module',
             'czr_menu_module' => 'menu-module',
             'czr_post_grid_module' => 'post-grid-module',
-            'czr_simple_form_module' => 'simple-form-module'
+            'czr_simple_form_module' => 'simple-form-module',
+            'czr_image_module' => 'image-module',
+            'czr_special_img_module' => 'special-image-module',
+            'czr_social_icons_module' => 'social-icons-module',
+            'czr_button_module' => 'button-module',
+            'czr_heading_module' => 'heading-module'
         ];
 
         // March 2020, for https://github.com/presscustomizr/nimble-builder/issues/629
@@ -2787,10 +2850,15 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             $has_local_sections = sek_local_skope_has_nimble_sections( skp_get_skope_id() );
             $has_global_sections = sek_has_global_sections();
 
-            // the light split stylesheet is never used when customizing
-            $is_stylesheet_split_for_performance = !skp_is_customizing() && sek_use_split_stylesheets_on_front();
+            // Oct 2020 => use sek-base ( which includes all module stylesheets ) if Nimble could not concatenate module stylesheets when generating the dynamic stylesheet
+            // for https://github.com/presscustomizr/nimble-builder/issues/749
+            if ( 'failed' === get_option(NIMBLE_MODULE_CSS_READING_STATUS_OPT) ) {
+                $main_stylesheet_name = 'sek-base';
+            } else {
+                // the light split stylesheet is never used when customizing
+                $main_stylesheet_name = !skp_is_customizing() ? 'sek-base-light' : 'sek-base';
+            }
 
-            $main_stylesheet_name = $is_stylesheet_split_for_performance ? 'sek-base-light' : 'sek-base';
 
             // Always load the base Nimble style when user logged in so we can display properly the button in the top admin bar.
             if ( is_user_logged_in() || $has_local_sections || $has_global_sections ) {
@@ -2861,7 +2929,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // public $big_module_stylesheet_map = [
             //     'czr_quote_module' => 'quote-module',
             //     'czr_icon_module' => 'icon-module',
-            //     'czr_img_slider_module' => 'img-slider-module-with-swiper',
+            //     'czr_img_slider_module' => 'img-slider-module',
             //     'czr_accordion_module' => 'accordion-module',
             //     'czr_menu_module' => 'menu-module',
             //     'czr_post_grid_module' => 'post-grid-module',
@@ -2870,25 +2938,26 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // SPLIT STYLESHEETS
             // introduced march 2020 for https://github.com/presscustomizr/nimble-builder/issues/612
             // if the module stylesheets are inline, see wp_head action
-            if ( !skp_is_customizing() && $is_stylesheet_split_for_performance ) {
-                // loop on the map module type (candidates for split) => stylesheet file name
-                foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
-                    if ( !array_key_exists($module_type , $contextually_active_modules ) )
-                      continue;
+            // October 2020 => modules stylesheets are now concatenated in the dynamically generated stylesheet
+            // if ( !skp_is_customizing() && $is_stylesheet_split_for_performance ) {
+            //     // loop on the map module type (candidates for split) => stylesheet file name
+            //     foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
+            //         if ( !array_key_exists($module_type , $contextually_active_modules ) )
+            //           continue;
 
-                    wp_enqueue_style(
-                        $module_type,
-                        sprintf( '%1$s%2$s%3$s',
-                            NIMBLE_BASE_URL . '/assets/front/css/modules/',
-                            $stylesheet_name,
-                            sek_is_dev_mode() ? '.css' : '.min.css'
-                        ),
-                        array( $main_stylesheet_name ),
-                        NIMBLE_ASSETS_VERSION,
-                        $media = 'all'
-                    );
-                }
-            }
+            //         wp_enqueue_style(
+            //             $module_type,
+            //             sprintf( '%1$s%2$s%3$s',
+            //                 NIMBLE_BASE_URL . '/assets/front/css/modules/',
+            //                 $stylesheet_name,
+            //                 sek_is_dev_mode() ? '.css' : '.min.css'
+            //             ),
+            //             array( $main_stylesheet_name ),
+            //             NIMBLE_ASSETS_VERSION,
+            //             $media = 'all'
+            //         );
+            //     }
+            // }
 
 
             /* ------------------------------------------------------------------------- *
@@ -2909,7 +2978,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
              *  SWIPER FOR SLIDERS
             /* ------------------------------------------------------------------------- */
             if ( array_key_exists('czr_img_slider_module' , $contextually_active_modules) || skp_is_customizing() ) {
-                // march 2020 : when using split stylesheet, swiper css is already included in assets/front/css/modules/img-slider-module-with-swiper.css
+                // march 2020 :
                 // when loading assets in ajax, swiper stylesheet is loaded dynamically
                 // so we don't need to enqueue it
                 // added for https://github.com/presscustomizr/nimble-builder/issues/612
@@ -2986,17 +3055,6 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
             $contextually_active_modules = sek_get_collection_of_contextually_active_modules();
 
-            // public $big_module_stylesheet_map = [
-            //     'czr_quote_module' => 'quote-module',
-            //     'czr_icon_module' => 'icon-module',
-            //     'czr_img_slider_module' => 'img-slider-module-with-swiper',
-            //     'czr_accordion_module' => 'accordion-module',
-            //     'czr_menu_module' => 'menu-module',
-            //     'czr_post_grid_module' => 'post-grid-module',
-            //     'czr_simple_form_module' => 'simple-form-module'
-            // ];
-
-
             // The following js assets are loaded defer
             // 1) when customizing
             // 2) when preload and ajax not enabled
@@ -3056,6 +3114,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         function sek_maybe_preload_front_assets_when_not_customizing() {
             // Check that current page has Nimble content before printing anything
             // For https://github.com/presscustomizr/nimble-builder/issues/649
+            // When customizing, all assets are enqueued the WP way
             if ( !Nimble_Manager()->page_has_nimble_content || sek_load_front_assets_in_ajax() || skp_is_customizing() )
               return;
 
