@@ -448,13 +448,18 @@ class Sek_Dyn_CSS_Builder {
     public function get_stylesheet() {
         $css = '';
 
-        // concatenate module stylesheets
+        // CONCATENATE MODULE STYLESHEETS
+        // Oct 2020 => https://github.com/presscustomizr/nimble-builder/issues/749
         $this->module_types = array_unique($this->module_types);
         //sek_error_log('$this->module_types ?', $this->module_types );
         $modules_css = '';
         $base_uri = NIMBLE_BASE_PATH . '/assets/front/css/modules/';
         global $wp_filesystem;
+        $reading_issue = false;
+        $read_attempt = false;
         foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
+            if ( $reading_issue )
+                continue;
             if ( !in_array($module_type , $this->module_types ) )
               continue;
             $uri = sprintf( '%1$s%2$s%3$s',
@@ -464,14 +469,25 @@ class Sek_Dyn_CSS_Builder {
             );
 
             $uri =  wp_normalize_path($uri);
+            $read_attempt = true;
             //sek_error_log('$uri ??' . $module_type . $stylesheet_name, $uri );
             if ( $wp_filesystem->exists($uri) && $wp_filesystem->is_readable($uri) ) {
                 $modules_css .= $wp_filesystem->get_contents($uri);
-            };
+            } else {
+                $reading_issue = true;
+            }
         }
-        sek_error_log('=> TODO => if a stylesheet is not readable, update an option ( nb_force_load_large_style ), so that we check this option when deciding if we should load the light or the full style');
+        if ( $read_attempt ) {
+            if ( $reading_issue ) {
+                update_option( NIMBLE_MODULE_CSS_READING_STATUS_OPT, 'failed' );
+                sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => reading issue => impossible to concatenate module stylesheets');
+            } else {
+                update_option( NIMBLE_MODULE_CSS_READING_STATUS_OPT, 'OK' );
+            }
+        }
         //sek_error_log('$modules_css ??', $modules_css );
 
+        // ORGANIZE CSS RULES BY MEDIA QUERIES
         $collection = apply_filters( 'nimble_css_rules_collection_before_printing_stylesheet', $this->collection );
         if ( is_array( $collection ) && !empty( $collection ) ) {
             // Sort the collection by media queries
@@ -489,6 +505,8 @@ class Sek_Dyn_CSS_Builder {
                 $css .= $_css;
             }
         }
+
+        // CONCATENATE MODULE CSS + GENERATED CSS
         return apply_filters( 'nimble_get_dynamic_stylesheet', $modules_css . $css, $this->is_global_stylesheet );
     }
 

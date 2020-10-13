@@ -138,7 +138,7 @@ function sek_config_infos() {
     $return .= 'PHP Version:              ' . PHP_VERSION . "\n";
     $return .= 'MySQL Version:            ' . $wpdb->db_version() . "\n";
     $return .= 'Webserver Info:           ' . $_SERVER['SERVER_SOFTWARE'] . "\n";
-    $return .= 'Writing Permissions:      ' . sek_get_write_permissions_status() . "\n";
+    $return .= 'Write/Read permissions:   ' . sek_get_write_permissions_status() . "\n";
 
     // PHP configs
     $return .= "\n\n" . '------------ PHP CONFIG' . "\n";
@@ -190,6 +190,7 @@ function sek_let_to_num( $v ) {
 function sek_get_write_permissions_status() {
     $permission_issues = array();
     $writing_path_candidates = array();
+
     $wp_upload_dir = wp_upload_dir();
     if ( $wp_upload_dir['error'] ) {
         $permission_issues[] = 'WordPress root uploads folder';
@@ -206,6 +207,12 @@ function sek_get_write_permissions_status() {
         if ( !is_writable( $dir ) ) {
             $permission_issues[] = $description;
         }
+    }
+
+    // oct 2020, for https://github.com/presscustomizr/nimble-builder/issues/749
+    $base_module_css_uri = NIMBLE_BASE_PATH . '/assets/front/css/modules/';
+    if ( !is_readable($base_module_css_uri) ) {
+        $permission_issues[] = 'module css folder not readable';
     }
 
     if ( $permission_issues ) {

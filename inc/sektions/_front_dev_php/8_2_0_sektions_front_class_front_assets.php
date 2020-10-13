@@ -59,8 +59,15 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             $has_local_sections = sek_local_skope_has_nimble_sections( skp_get_skope_id() );
             $has_global_sections = sek_has_global_sections();
 
-            // the light split stylesheet is never used when customizing
-            $main_stylesheet_name = !skp_is_customizing() ? 'sek-base-light' : 'sek-base';
+            // Oct 2020 => use sek-base ( which includes all module stylesheets ) if Nimble could not concatenate module stylesheets when generating the dynamic stylesheet
+            // for https://github.com/presscustomizr/nimble-builder/issues/749
+            if ( 'failed' === get_option(NIMBLE_MODULE_CSS_READING_STATUS_OPT) ) {
+                $main_stylesheet_name = 'sek-base';
+            } else {
+                // the light split stylesheet is never used when customizing
+                $main_stylesheet_name = !skp_is_customizing() ? 'sek-base-light' : 'sek-base';
+            }
+
 
             // Always load the base Nimble style when user logged in so we can display properly the button in the top admin bar.
             if ( is_user_logged_in() || $has_local_sections || $has_global_sections ) {
