@@ -80,7 +80,6 @@ module.exports = function(grunt) {
               'uglify:sektions_front_js',
               'uglify:sektions_partial_front_js',
               'uglify:sektions_front_libs_js'
-
           ],
 
           'build_sektion_php_js_css' : [
