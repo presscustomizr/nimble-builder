@@ -53,6 +53,16 @@ module.exports = {
       ext: '.min.js'
     }]
   },
+
+  sektions_partial_front_js : {
+    files: [{
+      expand: true,
+      cwd: '<%= paths.front_assets %>js/partials',
+      src: [ '*.js', '!*.min.js' ],
+      dest: '<%= paths.front_assets %>js/partials',
+      ext: '.min.js'
+    }]
+  },
   // sektions_front_js_stand_alone_module_scripts : {
   //   files: [{
   //     expand: true,
