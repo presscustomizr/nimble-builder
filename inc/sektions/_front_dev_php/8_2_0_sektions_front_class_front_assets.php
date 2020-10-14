@@ -262,14 +262,13 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             /* ------------------------------------------------------------------------- *
              *  FRONT PARTIAL SCRIPTS
             /* ------------------------------------------------------------------------- */
-            $front_scripts = [
-                'slider-module',
-                'menu-module',
-                'front-parallax',
-                'accordion-module'
-            ];
-
-            foreach ($front_scripts as $name) {
+            // public $partial_front_scripts = [
+            //     'slider-module' => 'nb-needs-swiper',
+            //     'menu-module' => 'nb-needs-menu-js',
+            //     'front-parallax' => 'nb-needs-parallax',
+            //     'accordion-module' => 'nb-needs-accordion'
+            // ];
+            foreach (Nimble_Manager()->partial_front_scripts as $name => $event) {
                 $handle = "nb-{$name}";
                 wp_enqueue_script(
                     $handle,
@@ -348,39 +347,58 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             if ( skp_is_customizing() )
               return;
 
-            // Load main script on nb-docready event
-            $script_url = sprintf('%1$s/assets/front/js/ccat-nimble-front.%2$s?v=%3$s', NIMBLE_BASE_URL, sek_is_dev_mode() ? 'js' : 'min.js', NIMBLE_ASSETS_VERSION);
-            ?>
-            <script id='<?php echo "nb-load-main-script"; ?>'>
-              nb_.listenTo('nb-docready', function() {
-                  nb_.preloadOrDeferAsset( {
-                    id : 'nb-main-js',
-                    as : 'script',
-                    href : "<?php echo $script_url; ?>",
-                    scriptEl : document.getElementById('<?php echo "nb-load-main-script"; ?>')
-                  });
-              });
-            </script>
-            <?php
-
-
-            // Schedule loading of partial scripts
-            $front_scripts = [
-                'slider-module' => 'nb-needs-swiper',
-                'menu-module' => 'nb-needs-menu-js',
-                'front-parallax' => 'nb-needs-parallax',
-                'accordion-module' => 'nb-needs-accordion'
-            ];
-            foreach ($front_scripts as $name => $event) {
-                $url = sprintf('%1$s/assets/front/js/partials/%2$s.%3$s?v=%4$s', NIMBLE_BASE_URL, $name, sek_is_dev_mode() ? 'js' : 'min.js', NIMBLE_ASSETS_VERSION);
+            if ( !sek_load_front_assets_in_ajax() ) {
+                // Load main script on nb-docready event
+                $script_url = sprintf('%1$s/assets/front/js/ccat-nimble-front.%2$s?v=%3$s', NIMBLE_BASE_URL, sek_is_dev_mode() ? 'js' : 'min.js', NIMBLE_ASSETS_VERSION);
                 ?>
-                <script id='<?php echo "nb-load-script-{$name}"; ?>'>
-                  nb_.listenTo('<?php echo $event; ?>', function() {
+                <script id='<?php echo "nb-load-main-script"; ?>'>
+                  nb_.listenTo('nb-docready', function() {
                       nb_.preloadOrDeferAsset( {
-                        id : "<?php echo $name; ?>",
+                        id : 'nb-main-js',
                         as : 'script',
-                        href : "<?php echo $url; ?>",
-                        scriptEl : document.getElementById('<?php echo "nb-load-script-{$name}"; ?>')
+                        href : "<?php echo $script_url; ?>",
+                        scriptEl : document.getElementById('<?php echo "nb-load-main-script"; ?>')
+                      });
+                  });
+                </script>
+                <?php
+
+
+                // Schedule loading of partial scripts
+                $partial_front_scripts = Nimble_Manager()->partial_front_scripts;
+                foreach ($partial_front_scripts as $name => $event) {
+                    $url = sprintf('%1$s/assets/front/js/partials/%2$s.%3$s?v=%4$s', NIMBLE_BASE_URL, $name, sek_is_dev_mode() ? 'js' : 'min.js', NIMBLE_ASSETS_VERSION);
+                    ?>
+                    <script id='<?php echo "nb-load-script-{$name}"; ?>'>
+                      nb_.listenTo('<?php echo $event; ?>', function() {
+                          nb_.preloadOrDeferAsset( {
+                            id : "<?php echo $name; ?>",
+                            as : 'script',
+                            href : "<?php echo $url; ?>",
+                            scriptEl : document.getElementById('<?php echo "nb-load-script-{$name}"; ?>')
+                          });
+                      });
+                    </script>
+                    <?php
+                }
+            } else {
+                ?>
+                <script id="nb-load-front-script-and-styles">
+                  nb_.listenTo('nb-jquery-loaded', function() {
+                      jQuery(function($){
+                          if ( !sekFrontLocalized.load_front_assets_on_scroll )
+                              return;
+
+                          // Main script
+                          nb_.ajaxLoadScript({ path : sekFrontLocalized.isDevMode ? 'js/ccat-nimble-front.js' : 'js/ccat-nimble-front.min.js'});
+
+                          // Partial scripts
+                          $.each( sekFrontLocalized.partialFrontScripts, function( _name, _event ){
+                              nb_.listenTo( _event, function() {
+                                  nb_.ajaxLoadScript({ path : sekFrontLocalized.isDevMode ? 'js/partials/' + _name + '.js' : 'js/partials/' + _name + '.min.js'});
+                              });
+                          });
+
                       });
                   });
                 </script>
@@ -582,7 +600,9 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 'assetVersion' => NIMBLE_ASSETS_VERSION,
                 'frontAssetsPath' => NIMBLE_BASE_URL . '/assets/front/',
                 'contextuallyActiveModules' => sek_get_collection_of_contextually_active_modules(),
-                'fontAwesomeAlreadyEnqueued' => wp_style_is('customizr-fa', 'enqueued') || wp_style_is('hueman-font-awesome', 'enqueued')
+                'fontAwesomeAlreadyEnqueued' => wp_style_is('customizr-fa', 'enqueued') || wp_style_is('hueman-font-awesome', 'enqueued'),
+
+                'partialFrontScripts' => Nimble_Manager()->partial_front_scripts
             );
             $l10n = apply_filters( 'nimble-localized-js-front', $l10n );
 

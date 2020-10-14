@@ -213,6 +213,14 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // October 2020
         public $emitted_js_event = [];//<= collection of unique js event emitted with a script like <script>nb_.emit('nb-needs-parallax');</script>
 
+        // October 2020, for https://github.com/presscustomizr/nimble-builder/issues/751
+        public $partial_front_scripts = [
+            'slider-module' => 'nb-needs-swiper',
+            'menu-module' => 'nb-needs-menu-js',
+            'front-parallax' => 'nb-needs-parallax',
+            'accordion-module' => 'nb-needs-accordion'
+        ];
+
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
         function __construct( $params = array() ) {
