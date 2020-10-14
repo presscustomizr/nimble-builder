@@ -57,7 +57,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
             // Oct 2020 => use sek-base ( which includes all module stylesheets ) if Nimble could not concatenate module stylesheets when generating the dynamic stylesheet
             // for https://github.com/presscustomizr/nimble-builder/issues/749
-            if ( 'failed' === get_option(NIMBLE_MODULE_CSS_READING_STATUS_OPT) ) {
+            if ( 'failed' === get_option(NIMBLE_OPT_FOR_MODULE_CSS_READING_STATUS) ) {
                 $main_stylesheet_name = 'sek-base';
             } else {
                 // the light split stylesheet is never used when customizing
