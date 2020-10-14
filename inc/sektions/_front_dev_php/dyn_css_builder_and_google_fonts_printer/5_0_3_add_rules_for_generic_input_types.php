@@ -46,7 +46,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         return $rules;
     }
 
-    $selector = sprintf( '[data-sek-id="%1$s"]', $parent_level['id'] );
+    $selector = sprintf( '.nb-loc [data-sek-id="%1$s"]', $parent_level['id'] );
     // for multi-items module, each item has a unique id allowing us to identify it
     // implemented to allow CSS rules to be generated on a per-item basis
     // for https://github.com/presscustomizr/nimble-builder/issues/78
@@ -86,7 +86,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
             sek_error_log( __FUNCTION__ . ' => missing input id ' . $input_id . ' in input list for module type ' . $parent_level['module_type'] );
         }
         if ( is_array( $registered_input_list ) && !empty( $registered_input_list[ $input_id ] ) && !empty( $registered_input_list[ $input_id ]['css_selectors'] ) ) {
-            // reset the selector to the level id selector, in case it was previously set spcifically at the module level
+            // reset the selector to the level id selector, in case it was previously set specifically at the module level
             $selector = '[data-sek-id="'.$parent_level['id'].'"]';
             if ( $is_multi_items ) {
                 $selector = sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"]', $parent_level['id'], $item_id );

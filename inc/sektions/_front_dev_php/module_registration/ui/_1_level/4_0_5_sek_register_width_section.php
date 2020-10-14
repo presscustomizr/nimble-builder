@@ -96,10 +96,10 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
     $user_defined_widths = array();
 
     if ( !empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
-        $user_defined_widths['outer-section-width'] = 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"]';
+        $user_defined_widths['outer-section-width'] = 'body .nb-loc [data-sek-id="'.$section['id'].'"]';
     }
     if ( !empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
-        $user_defined_widths['inner-section-width'] = 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner';
+        $user_defined_widths['inner-section-width'] = 'body .nb-loc [data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner';
     }
 
     if ( empty( $user_defined_widths ) )
@@ -144,13 +144,13 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-left',
-                'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid',
+                'selector' => 'body .nb-loc [data-sek-id="'.$section['id'].'"] > .sek-container-fluid',
                 'level_id' => $section['id']
             ), $rules );
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-right',
-                'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid',
+                'selector' => 'body .nb-loc [data-sek-id="'.$section['id'].'"] > .sek-container-fluid',
                 'level_id' => $section['id']
             ), $rules );
         }

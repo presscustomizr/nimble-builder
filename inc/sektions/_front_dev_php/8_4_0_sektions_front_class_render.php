@@ -444,7 +444,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                       <?php if ( skp_is_customizing() || ( !skp_is_customizing() && !empty( $collection ) ) ) : ?>
                             <?php
                               Nimble_Manager()->page_has_nimble_content = true;
-                              printf( '<div class="sektion-wrapper %6$s" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s %5$s>',
+                              printf( '<div class="sektion-wrapper nb-loc %6$s" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s %5$s>',
                                   $id,
                                   sprintf('data-sek-is-global-location="%1$s"', sek_is_global_location( $id ) ? 'true' : 'false'),
                                   $is_header_location ? 'data-sek-is-header-location="true"' : '',

@@ -117,10 +117,10 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
     $user_defined_widths = array();
 
     if ( !empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
-        $user_defined_widths['outer-section-width'] = '.sektion-wrapper [data-sek-level="section"]';
+        $user_defined_widths['outer-section-width'] = '.nb-loc [data-sek-level="section"]';
     }
     if ( !empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
-        $user_defined_widths['inner-section-width'] = '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner';
+        $user_defined_widths['inner-section-width'] = '.nb-loc [data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner';
     }
 
     $rules = array();
@@ -165,13 +165,13 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-left',
-                'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid',
+                'selector' => '.nb-loc [data-sek-level="section"] > .sek-container-fluid',
                 'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
             ), $rules );
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-right',
-                'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid',
+                'selector' => '.nb-loc [data-sek-level="section"] > .sek-container-fluid',
                 'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
             ), $rules );
         }
