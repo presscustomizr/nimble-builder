@@ -4,7 +4,7 @@
 [data-sek-module-type="czr_social_icons_module"] .sek-module-inner .sek-social-icons-wrapper {
   margin: 10px 0; //consistent with the 'spacing' default value on module registration
 }
-.sek-module-inner .sek-social-icons-wrapper {
+.nb-loc .sek-module-inner .sek-social-icons-wrapper {
   text-align: center; //consistent with the 'h_alignment_css' default value on module registration
   > *:not(:last-child) { padding-right: 8px; }
   > li {
