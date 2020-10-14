@@ -34,6 +34,9 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // maybe fetch jQuery from a CDN when dequeued
             add_action( 'wp_footer', array( $this, 'sek_preload_jquery_from_dns' ));
 
+            // Scheduling loading of needed js files
+            add_action( 'wp_head', array( $this, 'sek_main_front_js_preloading_when_not_customizing') );
+
             // If supported by the browser, woff2 fonts of Font Awesome will be preloaded
             add_action( 'wp_head', array( $this, 'sek_maybe_preload_fa_fonts') );
             // Maybe preload Font assets when really needed ( sniff first ) + nb_.listenTo('nb-needs-fa')
@@ -223,33 +226,10 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
 
         //@'wp_enqueue_scripts'
+        // ==>>> when not customizing, assets are injected with javascript <<===
         function sek_enqueue_front_js_assets() {
             if ( !sek_local_skope_has_nimble_sections( skp_get_skope_id() ) && !sek_has_global_sections() )
               return;
-            /* ------------------------------------------------------------------------- *
-             *  MAIN SCRIPT
-             /* ------------------------------------------------------------------------- */
-            // wp_register_script(
-            //     'sek-front-fmk-js',
-            //     NIMBLE_BASE_URL . '/assets/front/js/_front_js_fmk.js',
-            //     array( 'jquery', 'underscore'),
-            //     time(),
-            //     true
-            // );
-            if ( !sek_load_front_assets_in_ajax() ) {
-                wp_enqueue_script(
-                    'nb-main-js',
-                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.js' : NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.min.js',
-                    //array( 'jquery', 'underscore'),
-                    // october 2018 => underscore is concatenated in the main front js file.
-                    ( !skp_is_customizing() && sek_is_jquery_replaced() ) ? array() : array( 'jquery'),
-                    NIMBLE_ASSETS_VERSION,
-                    false
-                );
-                // added for https://github.com/presscustomizr/nimble-builder/issues/583
-                sek_defer_script('nb-main-js');
-            }
-
 
             // when front scripts are preloaded or loaded in ajax, jquery is not declared as dependency
             // we need to make sure its enqueued, unless it's replaced by a cdn version
@@ -257,70 +237,172 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 wp_enqueue_script('jquery');
             }
 
+            // When not customizing, the main and partial front scripts are loaded only when needed on front, with nb_.listenTo('{event_name}')
+            // When customizing, we need to enqueue them the regular way
+            if ( !skp_is_customizing() )
+              return;
 
-            $contextually_active_modules = sek_get_collection_of_contextually_active_modules();
 
-            // The following js assets are loaded defer
-            // 1) when customizing
-            // 2) when preload and ajax not enabled
-            if ( skp_is_customizing() ) {
-                /* ------------------------------------------------------------------------- *
-                 *  LIGHT BOX WITH MAGNIFIC POPUP
-                /* ------------------------------------------------------------------------- */
+            /* ------------------------------------------------------------------------- *
+            *  FRONT MAIN SCRIPT
+            /* ------------------------------------------------------------------------- */
+            wp_enqueue_script(
+                'nb-main-js',
+                sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.js' : NIMBLE_BASE_URL . '/assets/front/js/ccat-nimble-front.min.js',
+                //array( 'jquery', 'underscore'),
+                // october 2018 => underscore is concatenated in the main front js file.
+                ( !skp_is_customizing() && sek_is_jquery_replaced() ) ? array() : array( 'jquery'),
+                NIMBLE_ASSETS_VERSION,
+                false
+            );
+            // added for https://github.com/presscustomizr/nimble-builder/issues/583
+            sek_defer_script('nb-main-js');
+
+
+            /* ------------------------------------------------------------------------- *
+             *  FRONT PARTIAL SCRIPTS
+            /* ------------------------------------------------------------------------- */
+            $front_scripts = [
+                'slider-module',
+                'menu-module',
+                'front-parallax',
+                'accordion-module'
+            ];
+
+            foreach ($front_scripts as $name) {
+                $handle = "nb-{$name}";
                 wp_enqueue_script(
-                    'nb-magnific-popups',
-                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.min.js',
+                    $handle,
+                    sprintf('%1$s/assets/front/js/partials/%2$s.%3$s', NIMBLE_BASE_URL, $name, sek_is_dev_mode() ? 'js' : 'min.js'),
                     array(), //( !skp_is_customizing() && sek_is_jquery_replaced() ) ? array() : array( 'jquery'),
                     NIMBLE_ASSETS_VERSION,
                     false
                 );
-                sek_defer_script('nb-magnific-popups');
-
-
-                /* ------------------------------------------------------------------------- *
-                 *  SWIPER FOR SLIDERS
-                 /* ------------------------------------------------------------------------- */
-                // SWIPER JS LIB + MODULE SCRIPT
-                // Swiper js is needed for the czr_img_slider_module
-                // front : Load if js not loaded dynamically + we detect the need for the script
-                // customizing : load if not loaded dynamically
-                wp_enqueue_script(
-                    'nb-swiper',
-                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/swiper.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/swiper.min.js',
-                    array(),
-                    NIMBLE_ASSETS_VERSION,
-                    false
-                );
-                // not added when customizing
-                sek_defer_script('nb-swiper');
-
-
-                /* ------------------------------------------------------------------------- *
-                 *  VIDEO BG
-                 /* ------------------------------------------------------------------------- */
-                // front : Load if js not loaded dynamically + we detect the need for the script
-                // customizing : load if not loaded dynamically
-                wp_enqueue_script(
-                    'nb-video-bg-plugin',
-                    sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/nimble-video-bg.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/nimble-video-bg.min.js',
-                    array(),
-                    NIMBLE_ASSETS_VERSION,
-                    false
-                );
-                // not added when customizing
-                sek_defer_script('nb-video-bg-plugin');
+                sek_defer_script($handle);
             }
+
+
+
+            /* ------------------------------------------------------------------------- *
+             *  LIGHT BOX WITH MAGNIFIC POPUP
+            /* ------------------------------------------------------------------------- */
+            wp_enqueue_script(
+                'nb-magnific-popups',
+                sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.min.js',
+                array(), //( !skp_is_customizing() && sek_is_jquery_replaced() ) ? array() : array( 'jquery'),
+                NIMBLE_ASSETS_VERSION,
+                false
+            );
+            sek_defer_script('nb-magnific-popups');
+
+
+            /* ------------------------------------------------------------------------- *
+             *  SWIPER FOR SLIDERS
+             /* ------------------------------------------------------------------------- */
+            // SWIPER JS LIB + MODULE SCRIPT
+            // Swiper js is needed for the czr_img_slider_module
+            // front : Load if js not loaded dynamically + we detect the need for the script
+            // customizing : load if not loaded dynamically
+            wp_enqueue_script(
+                'nb-swiper',
+                sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/swiper.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/swiper.min.js',
+                array(),
+                NIMBLE_ASSETS_VERSION,
+                false
+            );
+            // not added when customizing
+            sek_defer_script('nb-swiper');
+
+
+            /* ------------------------------------------------------------------------- *
+             *  VIDEO BG
+             /* ------------------------------------------------------------------------- */
+            // front : Load if js not loaded dynamically + we detect the need for the script
+            // customizing : load if not loaded dynamically
+            wp_enqueue_script(
+                'nb-video-bg-plugin',
+                sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/nimble-video-bg.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/nimble-video-bg.min.js',
+                array(),
+                NIMBLE_ASSETS_VERSION,
+                false
+            );
+            // not added when customizing
+            sek_defer_script('nb-video-bg-plugin');
         }//sek_enqueue_front_js_assets
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //@wp_head
+        // ==>>> when customizing, all assets are enqueued the wp way <<===
+        function sek_main_front_js_preloading_when_not_customizing() {
+            if ( skp_is_customizing() )
+              return;
+
+            // Load main script on nb-docready event
+            $script_url = sprintf('%1$s/assets/front/js/ccat-nimble-front.%2$s?v=%3$s', NIMBLE_BASE_URL, sek_is_dev_mode() ? 'js' : 'min.js', NIMBLE_ASSETS_VERSION);
+            ?>
+            <script id='<?php echo "nb-load-main-script"; ?>'>
+              nb_.listenTo('nb-docready', function() {
+                  nb_.preloadOrDeferAsset( {
+                    id : 'nb-main-js',
+                    as : 'script',
+                    href : "<?php echo $script_url; ?>",
+                    scriptEl : document.getElementById('<?php echo "nb-load-main-script"; ?>')
+                  });
+              });
+            </script>
+            <?php
+
+
+            // Schedule loading of partial scripts
+            $front_scripts = [
+                'slider-module' => 'nb-needs-swiper',
+                'menu-module' => 'nb-needs-menu-js',
+                'front-parallax' => 'nb-needs-parallax',
+                'accordion-module' => 'nb-needs-accordion'
+            ];
+            foreach ($front_scripts as $name => $event) {
+                $url = sprintf('%1$s/assets/front/js/partials/%2$s.%3$s?v=%4$s', NIMBLE_BASE_URL, $name, sek_is_dev_mode() ? 'js' : 'min.js', NIMBLE_ASSETS_VERSION);
+                ?>
+                <script id='<?php echo "nb-load-script-{$name}"; ?>'>
+                  nb_.listenTo('<?php echo $event; ?>', function() {
+                      nb_.preloadOrDeferAsset( {
+                        id : "<?php echo $name; ?>",
+                        as : 'script',
+                        href : "<?php echo $url; ?>",
+                        scriptEl : document.getElementById('<?php echo "nb-load-script-{$name}"; ?>')
+                      });
+                  });
+                </script>
+                <?php
+            }
+        }
+
+
 
 
 
         //@wp_footer
         // preload is applied when 'load_assets_in_ajax' is not active
+        // ==>>> when customizing, all assets are enqueued the wp way <<===
         function sek_maybe_preload_front_assets_when_not_customizing() {
+            if ( skp_is_customizing() )
+              return;
+
             // Check that current page has Nimble content before printing anything
             // For https://github.com/presscustomizr/nimble-builder/issues/649
             // When customizing, all assets are enqueued the WP way
-            if ( !Nimble_Manager()->page_has_nimble_content || sek_load_front_assets_in_ajax() || skp_is_customizing() )
+            if ( !Nimble_Manager()->page_has_nimble_content || sek_load_front_assets_in_ajax() )
               return;
 
             /* ------------------------------------------------------------------------- *
@@ -339,7 +421,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 $assets_urls[$k] = NIMBLE_BASE_URL .$path .'?'.NIMBLE_ASSETS_VERSION;
             }
             ?>
-            <script id="nb-load-front-script-and-styles">nb_.listenTo("nb-needs-magnific-popup",function(){nb_.preloadAsset({id:"nb-magnific-popup",as:"script",href:"<?php echo $assets_urls['nb-magnific-popup']; ?>",onEvent:"nb-docready"}),nb_.preloadAsset({id:"nb-magnific-popup-style",as:"style",href:"<?php echo $assets_urls['nb-magnific-popup-style']; ?>",onEvent:"nb-docready"})}),nb_.listenTo("nb-needs-swiper",function(){nb_.preloadAsset({id:"nb-swiper",as:"script",href:"<?php echo $assets_urls['nb-swiper']; ?>",onEvent:"nb-docready"})}),nb_.listenTo("nb-needs-videobg-js",function(){nb_.preloadAsset({id:"nb-video-bg-plugin",as:"script",href:"<?php echo $assets_urls['nb-video-bg-plugin']; ?>",onEvent:"nb-docready"})});</script>
+            <script id="nb-load-front-script-and-styles">nb_.listenTo("nb-needs-magnific-popup",function(){nb_.preloadOrDeferAsset({id:"nb-magnific-popup",as:"script",href:"<?php echo $assets_urls['nb-magnific-popup']; ?>",onEvent:"nb-docready"}),nb_.preloadOrDeferAsset({id:"nb-magnific-popup-style",as:"style",href:"<?php echo $assets_urls['nb-magnific-popup-style']; ?>",onEvent:"nb-docready"})}),nb_.listenTo("nb-needs-swiper",function(){nb_.preloadOrDeferAsset({id:"nb-swiper",as:"script",href:"<?php echo $assets_urls['nb-swiper']; ?>",onEvent:"nb-docready"})}),nb_.listenTo("nb-needs-videobg-js",function(){nb_.preloadOrDeferAsset({id:"nb-video-bg-plugin",as:"script",href:"<?php echo $assets_urls['nb-video-bg-plugin']; ?>",onEvent:"nb-docready"})});</script>
             <?php
 
             /* ------------------------------------------------------------------------- *
@@ -354,7 +436,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 <?php $fa_style_url = NIMBLE_BASE_URL .'/assets/front/fonts/css/fontawesome-all.min.css?'.NIMBLE_ASSETS_VERSION; ?>
                 <script id="nb-load-fa-style">
                   nb_.listenTo('nb-needs-fa', function() {
-                      nb_.preloadAsset( {
+                      nb_.preloadOrDeferAsset( {
                         id : 'nb-font-awesome',
                         as : 'style',
                         href : "<?php echo $fa_style_url; ?>",
@@ -366,8 +448,9 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
                 <?php
             }
-
         }
+
+
 
         // hook : wp_head
         // October 2020 Better preload implementation
@@ -389,7 +472,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 <?php $font_url = NIMBLE_BASE_URL .'/assets/front/fonts/webfonts/'.$name; ?>
                 <script id='<?php echo "nb-load-{$id}"; ?>'>
                   nb_.listenTo('nb-needs-fa', function() {
-                      nb_.preloadAsset( {
+                      nb_.preloadOrDeferAsset( {
                         id : "<?php echo $id; ?>",
                         as : 'font',
                         href : "<?php echo $font_url; ?>",
@@ -402,8 +485,6 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
               <?php endforeach; ?>
             <?php
         }
-
-
 
 
         // @'wp_default_scripts'
@@ -528,7 +609,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             if ( !sek_local_skope_has_nimble_sections( skp_get_skope_id() ) && !sek_has_global_sections() )
               return;
             ?>
-            <script id="nimble-app-init">window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isArray(e)||"[object Array]"===toString.call(e)},inArray:function(e,t){return!(!nb_.isArray(e)||nb_.isUndefined(t))&&e.indexOf(t)>-1},isUndefined:function(e){return void 0===e},isObject:function(e){var t=typeof e;return"function"===t||"object"===t&&!!e},errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},hasPreloadSupport:function(e){var t=document.createElement("link").relList;return!(!t||!t.supports)&&t.supports("preload")},listenTo:function(e,t){var n={"nb-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nb-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nb-jquery-loaded")},"nb-jmp-parsed":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup},"nb-main-swiper-parsed":function(){return void 0!==window.Swiper}},o=function(o){nb_.isUndefined(n[e])||!1!==n[e]()?(t(),nb_.eventsListenedTo.push(e)):nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",e,nb_.eventsListenedTo)};"function"==typeof t?nb_.wasEmitted(e)?o():document.addEventListener(e,o):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",e)},eventsEmitted:[],eventsListenedTo:[],emit:function(e,t){if(!(nb_.isUndefined(t)||t.fire_once)||!nb_.wasEmitted(e)){var n=document.createEvent("Event");n.initEvent(e,!0,!0),document.dispatchEvent(n),nb_.eventsEmitted.push(e)}},wasListenedTo:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsListenedTo,e)},wasEmitted:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsEmitted,e)},isInScreen:function(e){if(!nb_.isObject(e))return!1;var t=e.getBoundingClientRect(),n=Math.max(document.documentElement.clientHeight,window.innerHeight);return!(t.bottom<0||t.top-n>=0)},isCustomizing:function(){return!1},isLazyLoadEnabled:function(){return!nb_.isCustomizing()&&!1},preloadAsset:function(e){if(e=e||{},nb_.preloadedAssets=nb_.preloadedAssets||[],!nb_.inArray(nb_.preloadedAssets,e.id)){var t,n=document.getElementsByTagName("head")[0],o=function(){if("style"===e.as)this.setAttribute("rel","stylesheet"),this.setAttribute("type","text/css"),this.setAttribute("media","all");else{var t=document.createElement("script");t.setAttribute("src",e.href),t.setAttribute("id",e.id),nb_.hasPreloadSupport()||"script"!==e.as||t.setAttribute("defer","defer"),n.appendChild(t),this&&this.parentNode&&this.parentNode.removeChild(this)}e.eventOnLoad&&nb_.emit(e.eventOnLoad)};("font"!==e.as||nb_.hasPreloadSupport())&&(t=document.createElement("link"),nb_.hasPreloadSupport()||"script"!==e.as?(t.setAttribute("href",e.href),"style"===e.as?t.setAttribute("rel",nb_.hasPreloadSupport()?"preload":"stylesheet"):"script"!==e.as&&"font"!==e.as||!nb_.hasPreloadSupport()||t.setAttribute("rel","preload"),t.setAttribute("id",e.id),t.setAttribute("as",e.as),"font"===e.as&&(t.setAttribute("type",e.type),t.setAttribute("crossorigin","anonymous")),t.onload=function(){this.onload=null,"font"!==e.as&&(e.onEvent?nb_.listenTo(e.onEvent,function(){o.call(t)}):o.call(t))},t.onerror=function(t){nb_.errorLog("Nimble preloadAsset error",t,e)}):e.onEvent?nb_.listenTo(e.onEvent,function(){o.call(t)}):o.call(t),n.appendChild(t),nb_.preloadedAssets.push(e.id),e.scriptEl&&e.scriptEl.parentNode&&e.scriptEl.parentNode.removeChild(e.scriptEl))}},mayBeRevealBG:function(){this.getAttribute("data-sek-src")&&(this.setAttribute("style",'background-image:url("'+this.getAttribute("data-sek-src")+'")'),this.className+=" sek-lazy-loaded",this.querySelectorAll(".sek-css-loader").forEach(function(e){nb_.isObject(e)&&e.parentNode.removeChild(e)}))}},window.NodeList&&!NodeList.prototype.forEach&&(NodeList.prototype.forEach=function(e,t){t=t||window;for(var n=0;n<this.length;n++)e.call(t,this[n],n,this)}),nb_.listenTo("nb-docready",function(){var e=document.querySelectorAll("div.sek-has-bg");!nb_.isObject(e)||e.length<1||e.forEach(function(e){nb_.isObject(e)&&(window.sekFrontLocalized&&window.sekFrontLocalized.lazyload_enabled?nb_.isInScreen(e)&&nb_.mayBeRevealBG.call(e):nb_.mayBeRevealBG.call(e))})}),"complete"===document.readyState||"loading"!==document.readyState&&!document.documentElement.doScroll)nb_.emit("nb-docready");else{var n=function(){nb_.wasEmitted("nb-docready")||nb_.emit("nb-docready")};document.addEventListener("DOMContentLoaded",n),window.addEventListener("load",n)}}(window,document);</script>
+            <script id="nimble-app-init">window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isArray(e)||"[object Array]"===toString.call(e)},inArray:function(e,t){return!(!nb_.isArray(e)||nb_.isUndefined(t))&&e.indexOf(t)>-1},isUndefined:function(e){return void 0===e},isObject:function(e){var t=typeof e;return"function"===t||"object"===t&&!!e},errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},hasPreloadSupport:function(e){var t=document.createElement("link").relList;return!(!t||!t.supports)&&t.supports("preload")},listenTo:function(e,t){nb_.eventsListenedTo.push(e);var n={"nb-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nb-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nb-jquery-loaded")},"nb-jmp-parsed":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup},"nb-main-swiper-parsed":function(){return void 0!==window.Swiper}},o=function(o){nb_.isUndefined(n[e])||!1!==n[e]()?t():nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",e,nb_.eventsListenedTo,t)};"function"==typeof t?nb_.wasEmitted(e)?o():document.addEventListener(e,o):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",e)},eventsEmitted:[],eventsListenedTo:[],emit:function(e,t){if(!(nb_.isUndefined(t)||t.fire_once)||!nb_.wasEmitted(e)){var n=document.createEvent("Event");n.initEvent(e,!0,!0),document.dispatchEvent(n),nb_.eventsEmitted.push(e)}},wasListenedTo:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsListenedTo,e)},wasEmitted:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsEmitted,e)},isInScreen:function(e){if(!nb_.isObject(e))return!1;var t=e.getBoundingClientRect(),n=Math.max(document.documentElement.clientHeight,window.innerHeight);return!(t.bottom<0||t.top-n>=0)},isCustomizing:function(){return!1},isLazyLoadEnabled:function(){return!nb_.isCustomizing()&&!1},preloadOrDeferAsset:function(e){if(e=e||{},nb_.preloadedAssets=nb_.preloadedAssets||[],!nb_.inArray(nb_.preloadedAssets,e.id)){var t,n=document.getElementsByTagName("head")[0],o=function(){if("style"===e.as)this.setAttribute("rel","stylesheet"),this.setAttribute("type","text/css"),this.setAttribute("media","all");else{var t=document.createElement("script");t.setAttribute("src",e.href),t.setAttribute("id",e.id),"script"===e.as&&t.setAttribute("defer","defer"),n.appendChild(t),this&&this.parentNode&&this.parentNode.removeChild(this)}e.eventOnLoad&&nb_.emit(e.eventOnLoad)};("font"!==e.as||nb_.hasPreloadSupport())&&(t=document.createElement("link"),"script"===e.as?e.onEvent?nb_.listenTo(e.onEvent,function(){o.call(t)}):o.call(t):(t.setAttribute("href",e.href),"style"===e.as?t.setAttribute("rel",nb_.hasPreloadSupport()?"preload":"stylesheet"):"font"===e.as&&nb_.hasPreloadSupport()&&t.setAttribute("rel","preload"),t.setAttribute("id",e.id),t.setAttribute("as",e.as),"font"===e.as&&(t.setAttribute("type",e.type),t.setAttribute("crossorigin","anonymous")),t.onload=function(){this.onload=null,"font"!==e.as&&(e.onEvent?nb_.listenTo(e.onEvent,function(){o.call(t)}):o.call(t))},t.onerror=function(t){nb_.errorLog("Nimble preloadOrDeferAsset error",t,e)}),n.appendChild(t),nb_.preloadedAssets.push(e.id),e.scriptEl&&e.scriptEl.parentNode&&e.scriptEl.parentNode.removeChild(e.scriptEl))}},mayBeRevealBG:function(){this.getAttribute("data-sek-src")&&(this.setAttribute("style",'background-image:url("'+this.getAttribute("data-sek-src")+'")'),this.className+=" sek-lazy-loaded",this.querySelectorAll(".sek-css-loader").forEach(function(e){nb_.isObject(e)&&e.parentNode.removeChild(e)}))}},window.NodeList&&!NodeList.prototype.forEach&&(NodeList.prototype.forEach=function(e,t){t=t||window;for(var n=0;n<this.length;n++)e.call(t,this[n],n,this)}),nb_.listenTo("nb-docready",function(){var e=document.querySelectorAll("div.sek-has-bg");!nb_.isObject(e)||e.length<1||e.forEach(function(e){nb_.isObject(e)&&(window.sekFrontLocalized&&window.sekFrontLocalized.lazyload_enabled?nb_.isInScreen(e)&&nb_.mayBeRevealBG.call(e):nb_.mayBeRevealBG.call(e))})}),"complete"===document.readyState||"loading"!==document.readyState&&!document.documentElement.doScroll)nb_.emit("nb-docready");else{var n=function(){nb_.wasEmitted("nb-docready")||nb_.emit("nb-docready")};document.addEventListener("DOMContentLoaded",n),window.addEventListener("load",n)}}(window,document);</script>
             <?php
         }
 
@@ -584,7 +665,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             if( sek_is_jquery_replaced() && !skp_is_customizing() ) {
             ?>
             <script id="nb-load-jquery">setTimeout( function() {
-                nb_.preloadAsset( {
+                nb_.preloadOrDeferAsset( {
                     id : '<?php echo NIMBLE_JQUERY_ID; ?>',
                     as : 'script',
                     href : '<?php echo NIMBLE_JQUERY_LATEST_CDN_URL; ?>',
@@ -607,7 +688,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             if ( !sek_load_front_assets_in_ajax() )
               return;
             ?>
-            <script id="nb-load-assets-dynamically">window,document,nb_.listenTo("nb-jquery-loaded",function(){nb_.scriptsLoadingStatus={},nb_.ajaxLoadScript=function(t){jQuery(function(a){t=a.extend({path:"",complete:"",loadcheck:!1},t),nb_.scriptsLoadingStatus[t.path]&&"pending"===nb_.scriptsLoadingStatus[t.path].state()||(nb_.scriptsLoadingStatus[t.path]=nb_.scriptsLoadingStatus[t.path]||a.Deferred(),jQuery.ajax({url:sekFrontLocalized.frontAssetsPath+t.path+"?"+sekFrontLocalized.assetVersion,cache:!0,dataType:"script"}).done(function(){"function"!=typeof t.loadcheck||t.loadcheck()?"function"==typeof t.complete&&t.complete():nb_.errorLog("ajaxLoadScript success but loadcheck failed for => "+t.path)}).fail(function(){nb_.errorLog("ajaxLoadScript failed for => "+t.path)}))})},jQuery(function(t){sekFrontLocalized.load_front_assets_on_scroll&&nb_.ajaxLoadScript({path:sekFrontLocalized.isDevMode?"js/ccat-nimble-front.js":"js/ccat-nimble-front.min.js"})})});</script>
+            <script id="nb-load-assets-dynamically">window,document,nb_.listenTo("nb-jquery-loaded",function(){nb_.scriptsLoadingStatus={},nb_.ajaxLoadScript=function(t){jQuery(function(a){t=a.extend({path:"",complete:"",loadcheck:!1},t),nb_.scriptsLoadingStatus[t.path]&&"pending"===nb_.scriptsLoadingStatus[t.path].state()||(nb_.scriptsLoadingStatus[t.path]=nb_.scriptsLoadingStatus[t.path]||a.Deferred(),jQuery.ajax({url:sekFrontLocalized.frontAssetsPath+t.path+"?"+sekFrontLocalized.assetVersion,cache:!0,dataType:"script"}).done(function(){"function"!=typeof t.loadcheck||t.loadcheck()?"function"==typeof t.complete&&t.complete():nb_.errorLog("ajaxLoadScript success but loadcheck failed for => "+t.path)}).fail(function(){nb_.errorLog("ajaxLoadScript failed for => "+t.path)}))})}});</script>
             <?php
         }
     }//class

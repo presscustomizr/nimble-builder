@@ -104,7 +104,7 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
 
             if ( !empty( $print_candidates ) ) {
                 ?>
-                <script id="nimble-preload-gfonts">nb_.preloadAsset( { id : '<?php echo NIMBLE_GOOGLE_FONTS_STYLESHEET_ID; ?>', as : 'style', href : '//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>&display=swap', scriptEl : document.currentScript } );</script>
+                <script id="nimble-preload-gfonts">nb_.preloadOrDeferAsset( { id : '<?php echo NIMBLE_GOOGLE_FONTS_STYLESHEET_ID; ?>', as : 'style', href : '//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>&display=swap', scriptEl : document.currentScript } );</script>
                 <?php
             }
         }

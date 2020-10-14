@@ -37,6 +37,10 @@ window.nb_ = {};
           return relList.supports('preload');
         },
         listenTo : function( evt, func ) {
+            // console.log('LISTENED TO', evt );
+            // store it, so if the event has been emitted before the listener is fired, we know it's been emitted
+            nb_.eventsListenedTo.push(evt);
+
             var canWeFireCallbackForEvent = {
                 'nb-jquery-loaded' : function() { return typeof undefined !== typeof jQuery; },
                 'nb-app-ready' : function() { return ( typeof undefined !== typeof window.nb_ ) && nb_.wasListenedTo('nb-jquery-loaded'); },
@@ -48,13 +52,13 @@ window.nb_ = {};
             // see : https://stackoverflow.com/questions/18613456/trigger-event-with-parameters
             var _executeAndLog = function(e) {
                 if ( !nb_.isUndefined(canWeFireCallbackForEvent[evt]) && false === canWeFireCallbackForEvent[evt]() ) {
-                    nb_.errorLog('Nimble error => an event callback could not be fired because conditions not met => ', evt, nb_.eventsListenedTo );
+                    nb_.errorLog('Nimble error => an event callback could not be fired because conditions not met => ', evt, nb_.eventsListenedTo, func );
                     return;
                 }
                 func();
-                // console.log('LISTENED TO', evt );
-                // store it, so if the event has been emitted before the listener is fired, we know it's been emitted
-                nb_.eventsListenedTo.push(evt);
+                // // console.log('LISTENED TO', evt );
+                // // store it, so if the event has been emitted before the listener is fired, we know it's been emitted
+                // nb_.eventsListenedTo.push(evt);
             };
             // if the event requires a condition to be executed let's check it
             // if the event has alreay been listened to, let's fire the func, otherwise wait for its emission
@@ -112,9 +116,16 @@ window.nb_ = {};
         // scriptEl : document.currentScript,
         // eventOnLoad : 'animate-css-loaded'
         // }
-        preloadAsset : function(params) {
+        // About preloading : rel="preload" tells the browser to start loading an important assets in priority
+        // example :
+        // - load late-discovered resources early
+        // - early loading of fonts
+        // NB asset strategy :
+        // - use rel="preload" for webfonts like Font Awesome ( stylesheet + fonts )
+        // - use defer attribute for all javascript files( see https://flaviocopes.com/javascript-async-defer/ ) "The best thing to do to speed up your page loading when using scripts is to put them in the head, and add a defer attribute to your script tag:"
+        // see https://www.smashingmagazine.com/2016/02/preload-what-is-it-good-for/
+        preloadOrDeferAsset : function(params) {
             params = params || {};
-
             // bail if preloaded already ?
             nb_.preloadedAssets = nb_.preloadedAssets || [];
             if ( nb_.inArray( nb_.preloadedAssets, params.id ) )
@@ -133,7 +144,7 @@ window.nb_ = {};
                         var _script = document.createElement("script");
                         _script.setAttribute('src', params.href );
                         _script.setAttribute('id', params.id );
-                        if ( !nb_.hasPreloadSupport() && 'script' === params.as ) {
+                        if ( 'script' === params.as ) {
                             _script.setAttribute('defer', 'defer');
                         }
                         headTag.appendChild(_script);
@@ -155,7 +166,7 @@ window.nb_ = {};
             link = document.createElement('link');
 
             // script without preload support
-            if ( !nb_.hasPreloadSupport() && 'script' === params.as ) {
+            if ( 'script' === params.as ) {
                 if ( params.onEvent ) {
                     nb_.listenTo( params.onEvent, function() { _injectFinalAsset.call(link); });
                 } else {
@@ -166,7 +177,7 @@ window.nb_ = {};
                 link.setAttribute('href', params.href);
                 if ( 'style' === params.as ) {
                     link.setAttribute('rel', nb_.hasPreloadSupport() ? 'preload' : 'stylesheet' );
-                } else if ( ( 'script' === params.as || 'font' === params.as ) && nb_.hasPreloadSupport() ) {
+                } else if ( 'font' === params.as && nb_.hasPreloadSupport() ) {
                     link.setAttribute('rel', 'preload' );
                 }
                 link.setAttribute('id', params.id );
@@ -193,7 +204,7 @@ window.nb_ = {};
                     }
                 };
                 link.onerror = function(er) {
-                    nb_.errorLog('Nimble preloadAsset error', er, params );
+                    nb_.errorLog('Nimble preloadOrDeferAsset error', er, params );
                 };
             }
             // append link now
@@ -274,7 +285,7 @@ window.nb_ = {};
         window.addEventListener( "load", _docReady );
     }
 
-}(window, document ));// Your code goes here
+}(window, document ));
 
 
 
@@ -354,14 +365,14 @@ window.nb_ = {};
 
 // printed in sek_maybe_preload_front_scripts_and_styles
 nb_.listenTo('nb-needs-magnific-popup', function() {
-    nb_.preloadAsset( {
+    nb_.preloadOrDeferAsset( {
         id : 'nb-magnific-popup',
         as : 'script',
         href : "<?php echo $assets_urls['nb-magnific-popup']; ?>",
         onEvent : 'nb-docready',
         // scriptEl : document.currentScript
     });
-    nb_.preloadAsset( {
+    nb_.preloadOrDeferAsset( {
       id : 'nb-magnific-popup-style',
       as : 'style',
       href : "<?php echo $assets_urls['nb-magnific-popup-style']; ?>",
@@ -370,7 +381,7 @@ nb_.listenTo('nb-needs-magnific-popup', function() {
     });
 });
 nb_.listenTo('nb-needs-swiper', function() {
-    nb_.preloadAsset( {
+    nb_.preloadOrDeferAsset( {
         id : 'nb-swiper',
         as : 'script',
         href : "<?php echo $assets_urls['nb-swiper']; ?>",
@@ -379,7 +390,7 @@ nb_.listenTo('nb-needs-swiper', function() {
     });
 });
 nb_.listenTo('nb-needs-videobg-js', function() {
-    nb_.preloadAsset( {
+    nb_.preloadOrDeferAsset( {
         id : 'nb-video-bg-plugin',
         as : 'script',
         href : "<?php echo $assets_urls['nb-video-bg-plugin']; ?>",
@@ -395,7 +406,7 @@ nb_.listenTo('nb-needs-videobg-js', function() {
 ( function() {
       // Load jQuery
       setTimeout( function() {
-          nb_.preloadAsset( {
+          nb_.preloadOrDeferAsset( {
               id : '<?php echo NIMBLE_JQUERY_ID; ?>',
               as : 'script',
               href : '<?php echo NIMBLE_JQUERY_LATEST_CDN_URL; ?>',
@@ -491,16 +502,6 @@ nb_.listenTo('nb-needs-videobg-js', function() {
                 });
             });
         };//ajaxLoadScript
-
-
-        jQuery(function($){
-            if ( !sekFrontLocalized.load_front_assets_on_scroll )
-                return;
-
-            nb_.ajaxLoadScript({
-                path : sekFrontLocalized.isDevMode ? 'js/ccat-nimble-front.js' : 'js/ccat-nimble-front.min.js'
-            });
-        });//jQuery(function($){})
     });/////////////// callbackFunc
 }(window, document));
 
