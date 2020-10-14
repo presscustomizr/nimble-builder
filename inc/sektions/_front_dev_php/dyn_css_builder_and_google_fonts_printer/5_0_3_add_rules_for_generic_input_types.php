@@ -46,7 +46,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         return $rules;
     }
 
-    $selector = sprintf( '.nb-loc [data-sek-id="%1$s"]', $parent_level['id'] );
+    $selector = sprintf( '.nb-loc .sek-row [data-sek-id="%1$s"]', $parent_level['id'] );
     // for multi-items module, each item has a unique id allowing us to identify it
     // implemented to allow CSS rules to be generated on a per-item basis
     // for https://github.com/presscustomizr/nimble-builder/issues/78

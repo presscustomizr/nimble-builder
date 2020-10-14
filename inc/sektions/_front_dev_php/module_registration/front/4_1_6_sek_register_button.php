@@ -293,7 +293,7 @@ function sek_add_css_rules_for_button_front_module( $rules, $complete_modul_mode
         }
     }
     $rules[] = array(
-        'selector' => '.nb-loc [data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-btn:hover',
+        'selector' => '.nb-loc .sek-row [data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-btn:hover',
         'css_rules' => 'background-color:' . $bg_color_hover . ';',
         'mq' =>null
     );
