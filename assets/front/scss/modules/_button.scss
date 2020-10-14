@@ -5,7 +5,7 @@
 [data-sek-module-type="czr_button_module"] .#{$project-prefix}module-inner {
   text-align: center;
 }
-.sek-module .#{$project-prefix}module-inner {
+.nb-loc .sek-module .#{$project-prefix}module-inner {
   .sek-btn {
     background:#020202;
     color: #ffffff;
@@ -15,6 +15,7 @@
     }
     &:hover, &:focus, &:active {
       color: #ffffff;
+      text-decoration:none;
     }
   }
 }
