@@ -147,7 +147,11 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                     // an attribute "data-sek-preview-level-guid" is added to each rendered level when customizing or ajaxing
                     // when generating the ui, we check if the localized guid matches the one rendered server side
                     // otherwise the preview UI can be broken
-                    'previewLevelGuid' => $this->sek_get_preview_level_guid()
+                    'previewLevelGuid' => $this->sek_get_preview_level_guid(),
+
+                    // Assets id
+                    'googleFontsStyleId' => NIMBLE_GOOGLE_FONTS_STYLESHEET_ID,
+                    'globalOptionsStyleId' => NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID
                 )
             );
 

@@ -91,8 +91,12 @@ function sek_get_module_params_for_sek_global_widths() {
 //
 // Nimble implements an inheritance for both logic, determined by the css selectors, and the media query rules.
 // For example, an inner width of 85% applied for skope will win against the global one, but can be overriden by a specific inner width set at a section level.
-add_action('wp_head', '\Nimble\sek_write_global_custom_section_widths', 1000 );
-function sek_write_global_custom_section_widths() {
+// October 2020 => it's better to write this global style inline than to hook in filter 'nimble_get_dynamic_stylesheet', as we do for local width for example, implying that we may create a global stylesheet.
+// Because :
+// 1) if user doesn't use any global header / footer, which is the most common case, we save an http request for a global stylesheet
+// 2) the css rules generated for custom section widths are very short and do not justify a new stylesheet
+add_filter('nimble_set_global_inline_style', '\Nimble\sek_write_global_custom_section_widths', 1000 );
+function sek_write_global_custom_section_widths($global_css = '') {
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
 
     if ( !is_array( $global_options ) || empty( $global_options['widths'] ) || !is_array( $global_options['widths'] ) )
@@ -171,10 +175,11 @@ function sek_write_global_custom_section_widths() {
         }
     }//foreach
 
+    $global_css = is_string($global_css) ? $global_css : '';
     $width_options_css = Sek_Dyn_CSS_Builder::sek_generate_css_stylesheet_for_a_set_of_rules( $rules );
-
     if ( is_string( $width_options_css ) && !empty( $width_options_css ) ) {
-        printf('<style type="text/css" id="nimble-global-widths-options">%1$s</style>', $width_options_css );
+        $global_css .= $width_options_css;
     }
+    return $global_css;
 }
 ?>
