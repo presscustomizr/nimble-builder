@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.5
-Stable tag: 2.1.15-RC10
+Stable tag: 2.1.15-RC12
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,26 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.14 : [scroll to anchor] + [lazyload] => avoid layout shifts problems visible in particular in pages with many images
+2.1.15 : Improved compatibility with future WP default theme : Twenty Twenty-One. Significant performance improvement with more efficient CSS and JS assets loading logic on front.
 
 == Changelog ==
+= 2.1.15 October 15th, 2020 =
+* fixed : [CSS][Button module] border and text color should have more specificity to avoid being overridden by future WP default theme twentytwentyone
+* fixed : [customizer preview] some CSS rules for UI buttons are not specific enough when using a theme like twentytwentyone
+* fixed : [CSS] global stylesheet may be erased when generating local stylesheet with no global locations
+* fixed : [CSS] specificity too low for module dynamic styles, in particular for text CSS rules
+* fixed : [CSS][performance]  better performances on front for global options CSS, like text, breakpoint, sections widths
+* fixed : [menu module] added more specificity to button style to avoid inheritance of themes or plugins style ( twentytwentyone overrides buttons style )
+* added : [CSS] new selector .nb-loc to location wrappers
+* added : [CSS][performance] use a new global option to store global style to be rendered inline
+* improved : [JS][Performances] reduce main script file + defer loading of partial ones + load when needed only
+* improved : [CSS][Global options] implement a better way to print global options stylesheets with a filter 'nimble_set_global_inline_style'
+* improved : [performance] preload some front assets like Font Awesome style and fonts
+* improved : [performance][js][css] assets for magn. popup, swiper, video bg are now by default loaded by js on front.  WP enqueueing is only used when customizing for those assets.
+* improved : [CSS][Performance] implement dynamic module stylesheet concatenation + added a new folder name 'nimble_css' for new concatenated stylesheets  + clean the previous one 'nb_css' + removed global performance option 'use_partial_module_stylesheets'. Fallback on full stylesheet if concatenation broken due to permissions problems.
+* removed : [performance] option 'preload_front_scripts', now implemented by default
+* removed : [performance] removed php sniffers to detect if we need to load specific assets in favor of a js detection
+
 = 2.1.14 October 6th, 2020 =
 * fixed : [performance][Lazy loading] when rendering NB content, remove attr loading="lazy" added to images by WP
 * fixed : [scroll to anchor] + [lazyload] => avoid layout shifts problems for page with many images

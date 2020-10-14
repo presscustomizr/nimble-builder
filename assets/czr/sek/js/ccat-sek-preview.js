@@ -2558,7 +2558,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
             appendDynStyleSheet : function( location_skope_id, styleMarkup ) {
                 var _stylesheet_id_ = '#sek-' + location_skope_id,//@see php Sek_Dyn_CSS_Handler
-                    _gfonts_id_ = '#sek-gfonts-local-and-global';//@see php Sek_Dyn_CSS_Handler
+                    _gfonts_id_ = '#' + sekPreviewLocalized.googleFontsStyleId,//@see php Sek_Dyn_CSS_Handler
+                    _global_option_inline_style_id_ = '#' + sekPreviewLocalized.globalOptionsStyleId;
 
                 // Remove a dynamic inline stylesheet if already printed
                 if ( 0 < $('head').find( _stylesheet_id_ ).length ) {
@@ -2567,12 +2568,15 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                 if ( 0 < $('head').find( _gfonts_id_ ).length ) {
                       $('head').find( _gfonts_id_ ).remove();
                 }
+                if ( 0 < $('head').find( _global_option_inline_style_id_ ).length ) {
+                      $('head').find( _global_option_inline_style_id_ ).remove();
+                }
                 if ( !_.isEmpty( styleMarkup ) ) {
                       $('head').append( styleMarkup );
                 }
                 // Has it be printed ?
                 // if we have something to print ( styleMarkup not empty ), there should be a dom element
-                if ( ! _.isEmpty( styleMarkup ) &&  1 > $('head').find( _stylesheet_id_ ).length && 1 > $('head').find( _gfonts_id_ ).length  ) {
+                if ( !_.isEmpty( styleMarkup ) &&  1 > $('head').find( _stylesheet_id_ ).length && 1 > $('head').find( _gfonts_id_ ).length && 1 > $('head').find( _global_option_inline_style_id_ ).length ) {
                       this.errare( 'sek-preview => problem when printing the dynamic inline style for : '+ _stylesheet_id_, styleMarkup );
                 } else {
                       $('head').find( _stylesheet_id_ ).attr('sek-data-origin', 'customizer' );

@@ -2912,10 +2912,10 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
     $user_defined_widths = array();
 
     if ( !empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
-        $user_defined_widths['outer-section-width'] = 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"]';
+        $user_defined_widths['outer-section-width'] = 'body .nb-loc [data-sek-id="'.$section['id'].'"]';
     }
     if ( !empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
-        $user_defined_widths['inner-section-width'] = 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner';
+        $user_defined_widths['inner-section-width'] = 'body .nb-loc [data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner';
     }
 
     if ( empty( $user_defined_widths ) )
@@ -2960,13 +2960,13 @@ function sek_add_css_rules_for_section_width( $rules, $section ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-left',
-                'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid',
+                'selector' => 'body .nb-loc [data-sek-id="'.$section['id'].'"] > .sek-container-fluid',
                 'level_id' => $section['id']
             ), $rules );
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-right',
-                'selector' => 'body .sektion-wrapper [data-sek-id="'.$section['id'].'"] > .sek-container-fluid',
+                'selector' => 'body .nb-loc [data-sek-id="'.$section['id'].'"] > .sek-container-fluid',
                 'level_id' => $section['id']
             ), $rules );
         }
@@ -3473,10 +3473,10 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
     $user_defined_widths = array();
 
     if ( !empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
-        $user_defined_widths['outer-section-width'] = '.sektion-wrapper [data-sek-level="section"]';
+        $user_defined_widths['outer-section-width'] = '.nb-loc [data-sek-level="section"]';
     }
     if ( !empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
-        $user_defined_widths['inner-section-width'] = '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner';
+        $user_defined_widths['inner-section-width'] = '.nb-loc [data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner';
     }
 
     $rules = array();
@@ -3521,13 +3521,13 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-left',
-                'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid',
+                'selector' => '.nb-loc [data-sek-level="section"] > .sek-container-fluid',
                 'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
             ), $rules );
             $rules = sek_set_mq_css_rules(array(
                 'value' => $padding_of_the_parent_container,
                 'css_property' => 'padding-right',
-                'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid',
+                'selector' => '.nb-loc [data-sek-level="section"] > .sek-container-fluid',
                 'level_id' => '_excluded_from_section_custom_breakpoint_' //<= introduced in dec 2019 : https://github.com/presscustomizr/nimble-builder/issues/564
             ), $rules );
         }
@@ -3894,31 +3894,27 @@ function sek_get_module_params_for_sek_global_text() {
 
 // Nimble implements an inheritance for both logic, determined by the css selectors, and the media query rules.
 // For example, an inner width of 85% applied for skope will win against the global one, but can be overriden by a specific inner width set at a section level.
-add_filter( 'nimble_get_dynamic_stylesheet', '\Nimble\sek_add_raw_global_text_css', 10, 2 );
-// @filter 'nimble_get_dynamic_stylesheet'
-// this filter is declared in Sek_Dyn_CSS_Builder::get_stylesheet() with 2 parameters
-// apply_filters( 'nimble_get_dynamic_stylesheet', $css, $this->is_global_stylesheet );
-function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
-    // the global text rules must be restricted to the local stylesheet
-    if ( !$is_global_stylesheet )
-      return $css;
-
-    $css = is_string( $css ) ? $css : '';
-
+// October 2020 => it's better to write this global style inline than to hook in filter 'nimble_get_dynamic_stylesheet', as we do for local width for example, implying that we may create a small useless global stylesheet.
+// Because :
+// 1) if user doesn't use any global header / footer, which is the most common case, we save an http request for a global stylesheet
+// 2) the css rules generated for global text are very short and do not justify a new stylesheet
+add_filter( 'nimble_set_global_inline_style', '\Nimble\sek_add_raw_global_text_css' );
+// @hook 'wp_head'
+function sek_add_raw_global_text_css( $global_css = '') {
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
     if ( !is_array( $global_options ) || empty( $global_options['global_text'] ) || !is_array( $global_options['global_text'] ) )
-      return $css;
+      return;
 
     $text_options = $global_options['global_text'];
     if ( !is_array( $text_options  ) )
-      return $css;
+      return;
 
     $rules = array();
     // SELECTORS
-    $default_text_selector = '.sektion-wrapper [data-sek-level], [data-sek-level] p, [data-sek-level] .sek-btn, [data-sek-level] button, [data-sek-level] input, [data-sek-level] select, [data-sek-level] optgroup, [data-sek-level] textarea';
-    $links_selector = '.sektion-wrapper [data-sek-level] a';
-    $links_hover_selector = '.sektion-wrapper [data-sek-level] a:hover';
-    $headings_selector = '.sektion-wrapper [data-sek-level] h1, .sektion-wrapper [data-sek-level] h2, .sektion-wrapper [data-sek-level] h3, .sektion-wrapper [data-sek-level] h4, .sektion-wrapper [data-sek-level] h5, .sektion-wrapper [data-sek-level] h6';
+    $default_text_selector = '.nb-loc [data-sek-level], [data-sek-level] p, [data-sek-level] .sek-btn, [data-sek-level] button, [data-sek-level] input, [data-sek-level] select, [data-sek-level] optgroup, [data-sek-level] textarea';
+    $links_selector = '.nb-loc [data-sek-level] .sek-module-inner a';
+    $links_hover_selector = '.nb-loc [data-sek-level] .sek-module-inner a:hover';
+    $headings_selector = '.nb-loc [data-sek-level] h1, .nb-loc [data-sek-level] h2, .nb-loc [data-sek-level] h3, .nb-loc [data-sek-level] h4, .nb-loc [data-sek-level] h5, .nb-loc [data-sek-level] h6';
 
     // DEFAULT TEXT OPTIONS
     // Font Family
@@ -4008,73 +4004,12 @@ function sek_add_raw_global_text_css( $css, $is_global_stylesheet ) {
         );
     }
 
-    // sek_error_log('ALORS text_options ?', $text_options);
-
-
+    $global_css = is_string($global_css) ? $global_css : '';
     $global_text_options_css = Sek_Dyn_CSS_Builder::sek_generate_css_stylesheet_for_a_set_of_rules( $rules );
-
-    return is_string( $global_text_options_css ) ? $css . $global_text_options_css : $css;
-
-    // // Note that the option 'outer-section-width' and 'inner-section-width' can be empty when set to a value === default
-    // // @see js czr_setions::normalizeAndSanitizeSingleItemInputValues()
-    // foreach ( $user_defined_widths as $width_opt_name => $selector ) {
-    //     if ( !empty( $width_options[ $width_opt_name ] ) && !is_array( $width_options[ $width_opt_name ] ) ) {
-    //         sek_error_log( __FUNCTION__ . ' => error => the width option should be an array( {device} => {number}{unit} )');
-    //     }
-    //     // $width_options[ $width_opt_name ] should be an array( {device} => {number}{unit} )
-    //     // If not set in the width options , it means that it is equal to default
-    //     $user_custom_width_value = ( empty( $width_options[ $width_opt_name ] ) || !is_array( $width_options[ $width_opt_name ] ) ) ? array('desktop' => '100%') : $width_options[ $width_opt_name ];
-    //     $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
-    //         'desktop' => '100%',
-    //         'tablet' => '',
-    //         'mobile' => ''
-    //     ));
-    //     $max_width_value = $user_custom_width_value;
-    //     $margin_value = array();
-
-    //     foreach ( $user_custom_width_value as $device => $num_unit ) {
-    //         $numeric = sek_extract_numeric_value( $num_unit );
-    //         if ( !empty( $numeric ) ) {
-    //             $unit = sek_extract_unit( $num_unit );
-    //             $max_width_value[$device] = $numeric . $unit;
-    //             $margin_value[$device] = '0 auto';
-    //             $padding_of_the_parent_container[$device] = 'inherit';
-    //         }
-    //     }
-
-    //     $rules = sek_set_mq_css_rules(array(
-    //         'value' => $max_width_value,
-    //         'css_property' => 'max-width',
-    //         'selector' => $selector
-    //     ), $rules );
-
-    //     // when customizing the inner section width, we need to reset the default padding rules for .sek-container-fluid {padding-right:10px; padding-left:10px}
-    //     // @see assets/front/scss/_grid.scss
-    //     if ( 'inner-section-width' === $width_opt_name ) {
-    //         $rules = sek_set_mq_css_rules(array(
-    //             'value' => $padding_of_the_parent_container,
-    //             'css_property' => 'padding-left',
-    //             'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid'
-    //         ), $rules );
-    //         $rules = sek_set_mq_css_rules(array(
-    //             'value' => $padding_of_the_parent_container,
-    //             'css_property' => 'padding-right',
-    //             'selector' => '.sektion-wrapper [data-sek-level="section"] > .sek-container-fluid'
-    //         ), $rules );
-    //     }
-
-    //     if ( !empty( $margin_value ) ) {
-    //         $rules = sek_set_mq_css_rules(array(
-    //             'value' => $margin_value,
-    //             'css_property' => 'margin',
-    //             'selector' => $selector
-    //         ), $rules );
-    //     }
-    // }//foreach
-
-    // $width_options_css = Sek_Dyn_CSS_Builder::sek_generate_css_stylesheet_for_a_set_of_rules( $rules );
-
-    // return is_string( $width_options_css ) ? $css . $width_options_css : $css;
+    if ( is_string( $global_text_options_css ) && !empty( $global_text_options_css ) ) {
+        $global_css .= $global_text_options_css;
+    }
+    return $global_css;
 }
 
 ?><?php
@@ -4129,15 +4064,15 @@ function sek_get_module_params_for_sek_global_breakpoint() {
 }
 
 
-add_action('wp_head', '\Nimble\sek_write_global_custom_breakpoint', 1000 );
-function sek_write_global_custom_breakpoint() {
-    $css = '';
-    // delete_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
+add_filter('nimble_set_global_inline_style', '\Nimble\sek_write_global_custom_breakpoint' );
+function sek_write_global_custom_breakpoint($global_css = '') {
     $custom_breakpoint = sek_get_global_custom_breakpoint();
     if ( $custom_breakpoint >= 1 ) {
-        $css .= '@media (min-width:' . $custom_breakpoint . 'px) {.sek-global-custom-breakpoint-col-8 {-ms-flex: 0 0 8.333%;flex: 0 0 8.333%;max-width: 8.333%;}.sek-global-custom-breakpoint-col-9 {-ms-flex: 0 0 9.090909%;flex: 0 0 9.090909%;max-width: 9.090909%;}.sek-global-custom-breakpoint-col-10 {-ms-flex: 0 0 10%;flex: 0 0 10%;max-width: 10%;}.sek-global-custom-breakpoint-col-11 {-ms-flex: 0 0 11.111%;flex: 0 0 11.111%;max-width: 11.111%;}.sek-global-custom-breakpoint-col-12 {-ms-flex: 0 0 12.5%;flex: 0 0 12.5%;max-width: 12.5%;}.sek-global-custom-breakpoint-col-14 {-ms-flex: 0 0 14.285%;flex: 0 0 14.285%;max-width: 14.285%;}.sek-global-custom-breakpoint-col-16 {-ms-flex: 0 0 16.666%;flex: 0 0 16.666%;max-width: 16.666%;}.sek-global-custom-breakpoint-col-20 {-ms-flex: 0 0 20%;flex: 0 0 20%;max-width: 20%;}.sek-global-custom-breakpoint-col-25 {-ms-flex: 0 0 25%;flex: 0 0 25%;max-width: 25%;}.sek-global-custom-breakpoint-col-30 {-ms-flex: 0 0 30%;flex: 0 0 30%;max-width: 30%;}.sek-global-custom-breakpoint-col-33 {-ms-flex: 0 0 33.333%;flex: 0 0 33.333%;max-width: 33.333%;}.sek-global-custom-breakpoint-col-40 {-ms-flex: 0 0 40%;flex: 0 0 40%;max-width: 40%;}.sek-global-custom-breakpoint-col-50 {-ms-flex: 0 0 50%;flex: 0 0 50%;max-width: 50%;}.sek-global-custom-breakpoint-col-60 {-ms-flex: 0 0 60%;flex: 0 0 60%;max-width: 60%;}.sek-global-custom-breakpoint-col-66 {-ms-flex: 0 0 66.666%;flex: 0 0 66.666%;max-width: 66.666%;}.sek-global-custom-breakpoint-col-70 {-ms-flex: 0 0 70%;flex: 0 0 70%;max-width: 70%;}.sek-global-custom-breakpoint-col-75 {-ms-flex: 0 0 75%;flex: 0 0 75%;max-width: 75%;}.sek-global-custom-breakpoint-col-80 {-ms-flex: 0 0 80%;flex: 0 0 80%;max-width: 80%;}.sek-global-custom-breakpoint-col-83 {-ms-flex: 0 0 83.333%;flex: 0 0 83.333%;max-width: 83.333%;}.sek-global-custom-breakpoint-col-90 {-ms-flex: 0 0 90%;flex: 0 0 90%;max-width: 90%;}.sek-global-custom-breakpoint-col-100 {-ms-flex: 0 0 100%;flex: 0 0 100%;max-width: 100%;}}';
-        printf('<style type="text/css" id="nimble-global-breakpoint-options">%1$s</style>', $css );
+        $global_css = is_string($global_css) ? $global_css : '';
+        $css = '@media (min-width:' . $custom_breakpoint . 'px) {.sek-global-custom-breakpoint-col-8 {-ms-flex: 0 0 8.333%;flex: 0 0 8.333%;max-width: 8.333%;}.sek-global-custom-breakpoint-col-9 {-ms-flex: 0 0 9.090909%;flex: 0 0 9.090909%;max-width: 9.090909%;}.sek-global-custom-breakpoint-col-10 {-ms-flex: 0 0 10%;flex: 0 0 10%;max-width: 10%;}.sek-global-custom-breakpoint-col-11 {-ms-flex: 0 0 11.111%;flex: 0 0 11.111%;max-width: 11.111%;}.sek-global-custom-breakpoint-col-12 {-ms-flex: 0 0 12.5%;flex: 0 0 12.5%;max-width: 12.5%;}.sek-global-custom-breakpoint-col-14 {-ms-flex: 0 0 14.285%;flex: 0 0 14.285%;max-width: 14.285%;}.sek-global-custom-breakpoint-col-16 {-ms-flex: 0 0 16.666%;flex: 0 0 16.666%;max-width: 16.666%;}.sek-global-custom-breakpoint-col-20 {-ms-flex: 0 0 20%;flex: 0 0 20%;max-width: 20%;}.sek-global-custom-breakpoint-col-25 {-ms-flex: 0 0 25%;flex: 0 0 25%;max-width: 25%;}.sek-global-custom-breakpoint-col-30 {-ms-flex: 0 0 30%;flex: 0 0 30%;max-width: 30%;}.sek-global-custom-breakpoint-col-33 {-ms-flex: 0 0 33.333%;flex: 0 0 33.333%;max-width: 33.333%;}.sek-global-custom-breakpoint-col-40 {-ms-flex: 0 0 40%;flex: 0 0 40%;max-width: 40%;}.sek-global-custom-breakpoint-col-50 {-ms-flex: 0 0 50%;flex: 0 0 50%;max-width: 50%;}.sek-global-custom-breakpoint-col-60 {-ms-flex: 0 0 60%;flex: 0 0 60%;max-width: 60%;}.sek-global-custom-breakpoint-col-66 {-ms-flex: 0 0 66.666%;flex: 0 0 66.666%;max-width: 66.666%;}.sek-global-custom-breakpoint-col-70 {-ms-flex: 0 0 70%;flex: 0 0 70%;max-width: 70%;}.sek-global-custom-breakpoint-col-75 {-ms-flex: 0 0 75%;flex: 0 0 75%;max-width: 75%;}.sek-global-custom-breakpoint-col-80 {-ms-flex: 0 0 80%;flex: 0 0 80%;max-width: 80%;}.sek-global-custom-breakpoint-col-83 {-ms-flex: 0 0 83.333%;flex: 0 0 83.333%;max-width: 83.333%;}.sek-global-custom-breakpoint-col-90 {-ms-flex: 0 0 90%;flex: 0 0 90%;max-width: 90%;}.sek-global-custom-breakpoint-col-100 {-ms-flex: 0 0 100%;flex: 0 0 100%;max-width: 100%;}}';
+          $global_css .= $css;
     }
+    return $global_css;
 }
 ?><?php
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
@@ -4232,8 +4167,12 @@ function sek_get_module_params_for_sek_global_widths() {
 //
 // Nimble implements an inheritance for both logic, determined by the css selectors, and the media query rules.
 // For example, an inner width of 85% applied for skope will win against the global one, but can be overriden by a specific inner width set at a section level.
-add_action('wp_head', '\Nimble\sek_write_global_custom_section_widths', 1000 );
-function sek_write_global_custom_section_widths() {
+// October 2020 => it's better to write this global style inline than to hook in filter 'nimble_get_dynamic_stylesheet', as we do for local width for example, implying that we may create a global stylesheet.
+// Because :
+// 1) if user doesn't use any global header / footer, which is the most common case, we save an http request for a global stylesheet
+// 2) the css rules generated for custom section widths are very short and do not justify a new stylesheet
+add_filter('nimble_set_global_inline_style', '\Nimble\sek_write_global_custom_section_widths', 1000 );
+function sek_write_global_custom_section_widths($global_css = '') {
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
 
     if ( !is_array( $global_options ) || empty( $global_options['widths'] ) || !is_array( $global_options['widths'] ) )
@@ -4312,11 +4251,12 @@ function sek_write_global_custom_section_widths() {
         }
     }//foreach
 
+    $global_css = is_string($global_css) ? $global_css : '';
     $width_options_css = Sek_Dyn_CSS_Builder::sek_generate_css_stylesheet_for_a_set_of_rules( $rules );
-
     if ( is_string( $width_options_css ) && !empty( $width_options_css ) ) {
-        printf('<style type="text/css" id="nimble-global-widths-options">%1$s</style>', $width_options_css );
+        $global_css .= $width_options_css;
     }
+    return $global_css;
 }
 ?><?php
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
