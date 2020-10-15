@@ -5,28 +5,28 @@
   margin: 10px 0;
 }
 
-.sek-module-inner .sek-social-icons-wrapper {
+.nb-loc .sek-module-inner .sek-social-icons-wrapper {
   text-align: center;
 }
 
-.sek-module-inner .sek-social-icons-wrapper > *:not(:last-child) {
+.nb-loc .sek-module-inner .sek-social-icons-wrapper > *:not(:last-child) {
   padding-right: 8px;
 }
 
-.sek-module-inner .sek-social-icons-wrapper > li {
+.nb-loc .sek-module-inner .sek-social-icons-wrapper > li {
   display: inline-block;
 }
 
-.sek-module-inner .sek-social-icons-wrapper > li a {
+.nb-loc .sek-module-inner .sek-social-icons-wrapper > li a {
   color: #707070;
 }
 
-.sek-module-inner .sek-social-icons-wrapper > li .sek-social-icon {
+.nb-loc .sek-module-inner .sek-social-icons-wrapper > li .sek-social-icon {
   font-size: 28px;
   line-height: 1.5em;
 }
 
-.sek-module-inner .sek-social-icons-wrapper > li .sek-social-icon {
+.nb-loc .sek-module-inner .sek-social-icons-wrapper > li .sek-social-icon {
   -webkit-transition: all 0.2s ease-in-out;
   -o-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
