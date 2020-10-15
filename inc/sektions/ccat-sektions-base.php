@@ -1567,7 +1567,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         }
         if ( is_array( $registered_input_list ) && !empty( $registered_input_list[ $input_id ] ) && !empty( $registered_input_list[ $input_id ]['css_selectors'] ) ) {
             // reset the selector to the level id selector, in case it was previously set specifically at the module level
-            $selector = '[data-sek-id="'.$parent_level['id'].'"]';
+            $selector = '.nb-loc .sek-row [data-sek-id="'.$parent_level['id'].'"]';
             if ( $is_multi_items ) {
                 $selector = sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"]', $parent_level['id'], $item_id );
             }
@@ -4943,10 +4943,11 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
 
             if ( !empty( $bg_img_url ) ) {
                 $new_attributes[] = sprintf( 'data-sek-src="%1$s"', $bg_img_url );
+                if ( sek_is_img_smartload_enabled() ) {
+                    $new_attributes[] = sprintf( 'data-sek-lazy-bg="true"' );
+                }
             }
-            if ( sek_is_img_smartload_enabled() ) {
-                $new_attributes[] = sprintf( 'data-sek-lazy-bg="true"' );
-            }
+
             // data-sek-bg-fixed attribute has been added for https://github.com/presscustomizr/nimble-builder/issues/414
             // @see css rules related
             // we can't have both fixed and parallax option together
