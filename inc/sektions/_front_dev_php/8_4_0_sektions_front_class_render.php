@@ -1047,10 +1047,11 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
 
             if ( !empty( $bg_img_url ) ) {
                 $new_attributes[] = sprintf( 'data-sek-src="%1$s"', $bg_img_url );
+                if ( sek_is_img_smartload_enabled() ) {
+                    $new_attributes[] = sprintf( 'data-sek-lazy-bg="true"' );
+                }
             }
-            if ( sek_is_img_smartload_enabled() ) {
-                $new_attributes[] = sprintf( 'data-sek-lazy-bg="true"' );
-            }
+
             // data-sek-bg-fixed attribute has been added for https://github.com/presscustomizr/nimble-builder/issues/414
             // @see css rules related
             // we can't have both fixed and parallax option together
