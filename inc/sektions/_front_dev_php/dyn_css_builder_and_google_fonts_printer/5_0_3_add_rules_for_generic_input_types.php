@@ -87,7 +87,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         }
         if ( is_array( $registered_input_list ) && !empty( $registered_input_list[ $input_id ] ) && !empty( $registered_input_list[ $input_id ]['css_selectors'] ) ) {
             // reset the selector to the level id selector, in case it was previously set specifically at the module level
-            $selector = '[data-sek-id="'.$parent_level['id'].'"]';
+            $selector = '.nb-loc .sek-row [data-sek-id="'.$parent_level['id'].'"]';
             if ( $is_multi_items ) {
                 $selector = sprintf( '[data-sek-id="%1$s"]  [data-sek-item-id="%2$s"]', $parent_level['id'], $item_id );
             }
