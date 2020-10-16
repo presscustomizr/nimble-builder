@@ -142,7 +142,7 @@ function sek_add_raw_global_text_css( $global_css = '') {
 
     $rules = array();
     // SELECTORS
-    $default_text_selector = '.nb-loc [data-sek-level], [data-sek-level] p, [data-sek-level] .sek-btn, [data-sek-level] button, [data-sek-level] input, [data-sek-level] select, [data-sek-level] optgroup, [data-sek-level] textarea';
+    $default_text_selector = '.nb-loc [data-sek-level], .nb-loc [data-sek-level] p, .nb-loc [data-sek-level] .sek-btn, .nb-loc [data-sek-level] button, .nb-loc [data-sek-level] input, .nb-loc [data-sek-level] select, .nb-loc [data-sek-level] optgroup, .nb-loc [data-sek-level] textarea';
     $links_selector = '.nb-loc [data-sek-level] .sek-module-inner a';
     $links_hover_selector = '.nb-loc [data-sek-level] .sek-module-inner a:hover';
     $headings_selector = '.nb-loc [data-sek-level] h1, .nb-loc [data-sek-level] h2, .nb-loc [data-sek-level] h3, .nb-loc [data-sek-level] h4, .nb-loc [data-sek-level] h5, .nb-loc [data-sek-level] h6';
