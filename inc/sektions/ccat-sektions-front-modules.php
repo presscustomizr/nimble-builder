@@ -43,7 +43,11 @@ function sek_get_module_params_for_czr_simple_html_module() {
                     'refresh_stylesheet' => true,
                     'refresh_fonts' => true,
                     'css_identifier' => 'font_family',
-                    'html_before' => '<hr/><h3>' . __('TEXT OPTIONS') .'</h3>'
+                    'html_before' => '<hr/><h3>' . __('TEXT OPTIONS') .'</h3>',
+                    'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                        __('Find inspiration'),
+                        'https://fonts.google.com/?sort=popularity'
+                    )
                 ),
                 'font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -1843,6 +1847,10 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                     'refresh_fonts' => true,
                     'css_identifier' => 'font_family',
                     'css_selectors' => $quote_font_selectors,
+                    'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                        __('Find inspiration'),
+                        'https://fonts.google.com/?sort=popularity'
+                    )
                 ),
                 'quote_font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -2013,6 +2021,10 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                     'refresh_fonts' => true,
                     'css_identifier' => 'font_family',
                     'css_selectors' => $cite_font_selectors,
+                    'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                        __('Find inspiration'),
+                        'https://fonts.google.com/?sort=popularity'
+                    )
                 ),
                 'cite_font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -3030,6 +3042,10 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'refresh_fonts' => true,
                                 'css_identifier' => 'font_family',
                                 'css_selectors' => $fl_font_selectors,
+                                'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                                    __('Find inspiration'),
+                                    'https://fonts.google.com/?sort=popularity'
+                                )
                             ),
                             'fl_font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -3169,6 +3185,10 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'refresh_fonts' => true,
                                 'css_identifier' => 'font_family',
                                 'css_selectors' => $ft_font_selectors,
+                                'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                                    __('Find inspiration'),
+                                    'https://fonts.google.com/?sort=popularity'
+                                )
                             ),
                             'ft_font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -3308,6 +3328,10 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'refresh_fonts' => true,
                                 'css_identifier' => 'font_family',
                                 'css_selectors' => $btn_font_selectors,
+                                'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                                    __('Find inspiration'),
+                                    'https://fonts.google.com/?sort=popularity'
+                                )
                             ),
                             'btn_font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -4083,6 +4107,10 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                                 'refresh_fonts' => true,
                                 'css_identifier' => 'font_family',
                                 'css_selectors' => $pt_font_selectors,
+                                'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                                    __('Find inspiration'),
+                                    'https://fonts.google.com/?sort=popularity'
+                                )
                             ),
                             'pt_font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -4175,6 +4203,10 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                                 'refresh_fonts' => true,
                                 'css_identifier' => 'font_family',
                                 'css_selectors' => $pe_font_selectors,
+                                'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                                    __('Find inspiration'),
+                                    'https://fonts.google.com/?sort=popularity'
+                                )
                             ),
                             'pe_font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -4267,6 +4299,10 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                                 'refresh_fonts' => true,
                                 'css_identifier' => 'font_family',
                                 'css_selectors' => $cat_font_selectors,
+                                'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                                    __('Find inspiration'),
+                                    'https://fonts.google.com/?sort=popularity'
+                                )
                             ),
                             'cat_font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -4359,6 +4395,10 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                                 'refresh_fonts' => true,
                                 'css_identifier' => 'font_family',
                                 'css_selectors' => $metas_font_selectors,
+                                'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                                    __('Find inspiration'),
+                                    'https://fonts.google.com/?sort=popularity'
+                                )
                             ),
                             'met_font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -5125,7 +5165,11 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
                                 'refresh_fonts' => true,
                                 'css_identifier' => 'font_family',
                                 'css_selectors' => $text_content_selector,
-                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>'
+                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>',
+                                'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                                    __('Find inspiration'),
+                                    'https://fonts.google.com/?sort=popularity'
+                                )
                             ),
                             'font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -5842,7 +5886,11 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'refresh_fonts' => true,
                                 'css_identifier' => 'font_family',
                                 'css_selectors' => $title_content_selector,
-                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>'
+                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>',
+                                'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                                    __('Find inspiration'),
+                                    'https://fonts.google.com/?sort=popularity'
+                                )
                             ),
                             'font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -5943,7 +5991,11 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'refresh_fonts' => true,
                                 'css_identifier' => 'font_family',
                                 'css_selectors' => $main_content_selector,
-                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>'
+                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>',
+                                'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                                    __('Find inspiration'),
+                                    'https://fonts.google.com/?sort=popularity'
+                                )
                             ),
                             'ct_font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
