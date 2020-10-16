@@ -126,7 +126,7 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
                                 'refresh_fonts' => true,
                                 'css_identifier' => 'font_family',
                                 'css_selectors' => $text_content_selector,
-                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>'
+                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>',
                                 'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
                                     __('Find inspiration'),
                                     'https://fonts.google.com/?sort=popularity'
