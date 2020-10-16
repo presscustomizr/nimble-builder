@@ -100,7 +100,7 @@ function sek_write_global_custom_section_widths($global_css = '') {
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
 
     if ( !is_array( $global_options ) || empty( $global_options['widths'] ) || !is_array( $global_options['widths'] ) )
-      return;
+      return $global_css;
 
     $width_options = $global_options['widths'];
     $user_defined_widths = array();
