@@ -19,7 +19,11 @@ function sek_get_module_params_for_sek_global_text() {
                     'refresh_stylesheet' => true,
                     'refresh_fonts' => true,
                     'refresh_preview' => false,
-                    'html_before' => '<h3>' . __('GLOBAL TEXT STYLE') .'</h3>'
+                    'html_before' => '<h3>' . __('GLOBAL TEXT STYLE') .'</h3>',
+                    'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                        __('Find inspiration'),
+                        'https://fonts.google.com/?sort=popularity'
+                    )
                 ),
                 'default_font_size'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -107,7 +111,11 @@ function sek_get_module_params_for_sek_global_text() {
                     'refresh_stylesheet' => true,
                     'refresh_fonts' => true,
                     'refresh_preview' => false,
-                    'html_before' => '<hr/><h3>' . __('GLOBAL STYLE OPTIONS FOR HEADINGS') .'</h3>'
+                    'html_before' => '<hr/><h3>' . __('GLOBAL STYLE OPTIONS FOR HEADINGS') .'</h3>',
+                    'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                        __('Find inspiration'),
+                        'https://fonts.google.com/?sort=popularity'
+                    )
                 ),
             )
         )//tmpl

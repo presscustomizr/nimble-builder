@@ -240,7 +240,11 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'refresh_fonts' => true,
                                 'css_identifier' => 'font_family',
                                 'css_selectors' => $title_content_selector,
-                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>'
+                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>',
+                                'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                                    __('Find inspiration'),
+                                    'https://fonts.google.com/?sort=popularity'
+                                )
                             ),
                             'font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
@@ -341,7 +345,11 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'refresh_fonts' => true,
                                 'css_identifier' => 'font_family',
                                 'css_selectors' => $main_content_selector,
-                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>'
+                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>',
+                                'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
+                                    __('Find inspiration'),
+                                    'https://fonts.google.com/?sort=popularity'
+                                )
                             ),
                             'ct_font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
