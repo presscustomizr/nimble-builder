@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.5
-Stable tag: 2.1.16
+Stable tag: 2.1.17
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,13 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.16 : Improved compatibility with future WP default theme : Twenty Twenty-One. Significant performance improvement with more efficient CSS and JS assets loading logic on front. Fixed minor CSS and markup issue.
+2.1.17 : Improved compatibility with future WP default theme : Twenty Twenty-One. Significant performance improvement with more efficient CSS and JS assets loading logic on front. Fixed minor CSS and markup issue.
 
 == Changelog ==
+= 2.1.17 October 16th 2020 =
+* fixed : [global CSS] bug : missing global style options after updating Nimble Builder to v2.1.15+
+* added : [customizer][font picker] link to Google fonts showcase
+
 = 2.1.16 October 16th 2020 =
 * fixed : [CSS] specificity too low for rules generated for modules
 * fixed : [html] attribute data-sek-lazy-bg is added to all levels even when there's no lazy backround to load

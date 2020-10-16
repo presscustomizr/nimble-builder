@@ -3903,7 +3903,6 @@ function sek_get_module_params_for_sek_global_text() {
 }
 
 
-
 // Nimble implements an inheritance for both logic, determined by the css selectors, and the media query rules.
 // For example, an inner width of 85% applied for skope will win against the global one, but can be overriden by a specific inner width set at a section level.
 // October 2020 => it's better to write this global style inline than to hook in filter 'nimble_get_dynamic_stylesheet', as we do for local width for example, implying that we may create a small useless global stylesheet.
@@ -3915,15 +3914,15 @@ add_filter( 'nimble_set_global_inline_style', '\Nimble\sek_add_raw_global_text_c
 function sek_add_raw_global_text_css( $global_css = '') {
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
     if ( !is_array( $global_options ) || empty( $global_options['global_text'] ) || !is_array( $global_options['global_text'] ) )
-      return;
+      return $global_css;
 
     $text_options = $global_options['global_text'];
     if ( !is_array( $text_options  ) )
-      return;
+      return $global_css;
 
     $rules = array();
     // SELECTORS
-    $default_text_selector = '.nb-loc [data-sek-level], [data-sek-level] p, [data-sek-level] .sek-btn, [data-sek-level] button, [data-sek-level] input, [data-sek-level] select, [data-sek-level] optgroup, [data-sek-level] textarea';
+    $default_text_selector = '.nb-loc [data-sek-level], .nb-loc [data-sek-level] p, .nb-loc [data-sek-level] .sek-btn, .nb-loc [data-sek-level] button, .nb-loc [data-sek-level] input, .nb-loc [data-sek-level] select, .nb-loc [data-sek-level] optgroup, .nb-loc [data-sek-level] textarea';
     $links_selector = '.nb-loc [data-sek-level] .sek-module-inner a';
     $links_hover_selector = '.nb-loc [data-sek-level] .sek-module-inner a:hover';
     $headings_selector = '.nb-loc [data-sek-level] h1, .nb-loc [data-sek-level] h2, .nb-loc [data-sek-level] h3, .nb-loc [data-sek-level] h4, .nb-loc [data-sek-level] h5, .nb-loc [data-sek-level] h6';
@@ -4188,7 +4187,7 @@ function sek_write_global_custom_section_widths($global_css = '') {
     $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );
 
     if ( !is_array( $global_options ) || empty( $global_options['widths'] ) || !is_array( $global_options['widths'] ) )
-      return;
+      return $global_css;
 
     $width_options = $global_options['widths'];
     $user_defined_widths = array();
