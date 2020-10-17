@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.5
-Stable tag: 2.1.17
+Stable tag: 2.1.18
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,13 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.17 : Improved compatibility with future WP default theme : Twenty Twenty-One. Significant performance improvement with more efficient CSS and JS assets loading logic on front. Fixed minor CSS and markup issue.
+2.1.18 : Improved compatibility with future WP default theme : Twenty Twenty-One. Significant performance improvement with more efficient CSS and JS assets loading logic on front. Fixed minor CSS and markup issue.
 
 == Changelog ==
+= 2.1.18 October 17th 2020 =
+* fixed : [javascript][performance] front javascript can break when user activates the ajax load performance option
+* added : [front assets][performance] introduction of a new property Nimble_Manager()::page_has_local_or_global_sections, set @template_redirect, which let us know if NB asset are needed on a given page. More efficitent that the previous check which was running several times a recursive walker on the section tree.
+
 = 2.1.17 October 16th 2020 =
 * fixed : [global CSS] bug : missing global style options after updating Nimble Builder to v2.1.15+
 * added : [customizer][font picker] link to Google fonts showcase
