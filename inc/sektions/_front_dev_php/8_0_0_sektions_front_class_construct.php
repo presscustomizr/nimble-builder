@@ -193,7 +193,10 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         public $css_loader_html = '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>';
 
         // March 2020, for https://github.com/presscustomizr/nimble-builder/issues/649
-        public $page_has_nimble_content = false;
+        public $nimble_content_is_printed_on_this_page = false;//<= tells if any Nimble Content has been printed. October 2020 => not used, replaced by page_has_local_or_global_sections
+        // October 2020
+        public $page_has_local_or_global_sections = false;//<= set @wp_enqueue_script, used to determine if we should load css, js and fonts assets or not.
+
         // April 2020 for https://github.com/presscustomizr/nimble-builder/issues/679
         public $is_content_restricted = false; //<= set at 'wp'
 

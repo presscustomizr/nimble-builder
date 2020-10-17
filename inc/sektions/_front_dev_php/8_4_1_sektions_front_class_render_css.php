@@ -97,7 +97,7 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
         function sek_gfont_print_with_preload( $print_candidates = '' ) {
             // Check that current page has Nimble content before printing any Google fonts
             // For https://github.com/presscustomizr/nimble-builder/issues/649
-            if ( !Nimble_Manager()->page_has_nimble_content )
+            if ( !Nimble_Manager()->page_has_local_or_global_sections )
               return;
             // print candidates must be fetched when sek_preload_google_fonts_on_front()
             $print_candidates = $this->sek_get_gfont_print_candidates();
