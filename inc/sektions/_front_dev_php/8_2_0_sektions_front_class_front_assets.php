@@ -346,59 +346,40 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         function sek_main_front_js_preloading_when_not_customizing() {
             if ( skp_is_customizing() )
               return;
+            if ( !Nimble_Manager()->page_has_nimble_content )
+              return;
 
-            if ( !sek_load_front_assets_in_ajax() ) {
-                // Load main script on nb-docready event
-                $script_url = sprintf('%1$s/assets/front/js/ccat-nimble-front.%2$s?v=%3$s', NIMBLE_BASE_URL, sek_is_dev_mode() ? 'js' : 'min.js', NIMBLE_ASSETS_VERSION);
-                ?>
-                <script id='<?php echo "nb-load-main-script"; ?>'>
-                  nb_.listenTo('nb-docready', function() {
-                      nb_.preloadOrDeferAsset( {
-                        id : 'nb-main-js',
-                        as : 'script',
-                        href : "<?php echo $script_url; ?>",
-                        scriptEl : document.getElementById('<?php echo "nb-load-main-script"; ?>')
-                      });
+            if ( sek_load_front_assets_in_ajax() )
+              return;
+
+            // Load main script on nb-docready event
+            $script_url = sprintf('%1$s/assets/front/js/ccat-nimble-front.%2$s?v=%3$s', NIMBLE_BASE_URL, sek_is_dev_mode() ? 'js' : 'min.js', NIMBLE_ASSETS_VERSION);
+            ?>
+            <script id='<?php echo "nb-load-main-script"; ?>'>
+              nb_.listenTo('nb-docready', function() {
+                  nb_.preloadOrDeferAsset( {
+                    id : 'nb-main-js',
+                    as : 'script',
+                    href : "<?php echo $script_url; ?>",
+                    scriptEl : document.getElementById('<?php echo "nb-load-main-script"; ?>')
                   });
-                </script>
-                <?php
+              });
+            </script>
+            <?php
 
 
-                // Schedule loading of partial scripts
-                $partial_front_scripts = Nimble_Manager()->partial_front_scripts;
-                foreach ($partial_front_scripts as $name => $event) {
-                    $url = sprintf('%1$s/assets/front/js/partials/%2$s.%3$s?v=%4$s', NIMBLE_BASE_URL, $name, sek_is_dev_mode() ? 'js' : 'min.js', NIMBLE_ASSETS_VERSION);
-                    ?>
-                    <script id='<?php echo "nb-load-script-{$name}"; ?>'>
-                      nb_.listenTo('<?php echo $event; ?>', function() {
-                          nb_.preloadOrDeferAsset( {
-                            id : "<?php echo $name; ?>",
-                            as : 'script',
-                            href : "<?php echo $url; ?>",
-                            scriptEl : document.getElementById('<?php echo "nb-load-script-{$name}"; ?>')
-                          });
-                      });
-                    </script>
-                    <?php
-                }
-            } else {
+            // Schedule loading of partial scripts
+            $partial_front_scripts = Nimble_Manager()->partial_front_scripts;
+            foreach ($partial_front_scripts as $name => $event) {
+                $url = sprintf('%1$s/assets/front/js/partials/%2$s.%3$s?v=%4$s', NIMBLE_BASE_URL, $name, sek_is_dev_mode() ? 'js' : 'min.js', NIMBLE_ASSETS_VERSION);
                 ?>
-                <script id="nb-load-front-script-and-styles">
-                  nb_.listenTo('nb-jquery-loaded', function() {
-                      jQuery(function($){
-                          if ( !sekFrontLocalized.load_front_assets_on_scroll )
-                              return;
-
-                          // Main script
-                          nb_.ajaxLoadScript({ path : sekFrontLocalized.isDevMode ? 'js/ccat-nimble-front.js' : 'js/ccat-nimble-front.min.js'});
-
-                          // Partial scripts
-                          $.each( sekFrontLocalized.partialFrontScripts, function( _name, _event ){
-                              nb_.listenTo( _event, function() {
-                                  nb_.ajaxLoadScript({ path : sekFrontLocalized.isDevMode ? 'js/partials/' + _name + '.js' : 'js/partials/' + _name + '.min.js'});
-                              });
-                          });
-
+                <script id='<?php echo "nb-load-script-{$name}"; ?>'>
+                  nb_.listenTo('<?php echo $event; ?>', function() {
+                      nb_.preloadOrDeferAsset( {
+                        id : "<?php echo $name; ?>",
+                        as : 'script',
+                        href : "<?php echo $url; ?>",
+                        scriptEl : document.getElementById('<?php echo "nb-load-script-{$name}"; ?>')
                       });
                   });
                 </script>
@@ -480,6 +461,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // but NB focus on preloading woff2 which is the type used by most recent browsers
         // see https://css-tricks.com/snippets/css/using-font-face/
         function sek_maybe_preload_fa_fonts() {
+            if ( !Nimble_Manager()->page_has_nimble_content )
+              return;
             $fonts = [
                 'fa-brands' => 'fa-brands-400.woff2?5.12.1',
                 'fa-regular' => 'fa-regular-400.woff2?5.12.1',
@@ -709,6 +692,27 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
               return;
             ?>
             <script id="nb-load-assets-dynamically">window,document,nb_.listenTo("nb-jquery-loaded",function(){nb_.scriptsLoadingStatus={},nb_.ajaxLoadScript=function(t){jQuery(function(a){t=a.extend({path:"",complete:"",loadcheck:!1},t),nb_.scriptsLoadingStatus[t.path]&&"pending"===nb_.scriptsLoadingStatus[t.path].state()||(nb_.scriptsLoadingStatus[t.path]=nb_.scriptsLoadingStatus[t.path]||a.Deferred(),jQuery.ajax({url:sekFrontLocalized.frontAssetsPath+t.path+"?"+sekFrontLocalized.assetVersion,cache:!0,dataType:"script"}).done(function(){"function"!=typeof t.loadcheck||t.loadcheck()?"function"==typeof t.complete&&t.complete():nb_.errorLog("ajaxLoadScript success but loadcheck failed for => "+t.path)}).fail(function(){nb_.errorLog("ajaxLoadScript failed for => "+t.path)}))})}});</script>
+
+
+            <script id="nb-load-front-script-and-styles">
+              nb_.listenTo('nb-jquery-loaded', function() {
+                  jQuery(function($){
+                      if ( !sekFrontLocalized.load_front_assets_on_scroll )
+                          return;
+
+                      // Main script
+                      nb_.ajaxLoadScript({ path : sekFrontLocalized.isDevMode ? 'js/ccat-nimble-front.js' : 'js/ccat-nimble-front.min.js'});
+
+                      // Partial scripts
+                      $.each( sekFrontLocalized.partialFrontScripts, function( _name, _event ){
+                          nb_.listenTo( _event, function() {
+                              nb_.ajaxLoadScript({ path : sekFrontLocalized.isDevMode ? 'js/partials/' + _name + '.js' : 'js/partials/' + _name + '.min.js'});
+                          });
+                      });
+
+                  });
+              });
+            </script>
             <?php
         }
     }//class
