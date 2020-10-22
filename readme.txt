@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.5
-Stable tag: 2.1.19
+Stable tag: 2.1.20
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,12 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.19 : Improved compatibility with future WP default theme : Twenty Twenty-One. Significant performance improvement with more efficient CSS and JS assets loading logic on front. Fixed minor CSS and markup issue.
+2.1.20 : Improved compatibility with future WP default theme : Twenty Twenty-One. Significant performance improvement with more efficient CSS and JS assets loading logic on front. Fixed minor CSS and markup issue.
 
 == Changelog ==
+= 2.1.20 October 22nd 2020 =
+* fixed : [javascript] replaced javascript alert when jQuery not detected by a console log
+
 = 2.1.19 October 17th 2020 =
 * fixed : [CSS] php error when user not logged in when enqueuing CSS stylesheets
 
