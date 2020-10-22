@@ -347,7 +347,9 @@ window.nb_ = {};
                   _emitWhenJqueryIsReady( attempts );
               }, 200 );
           } else {
-              alert('Nimble Builder problem : jQuery.js was not detected on your website');
+              if ( window.console && window.console.log ) {
+                  console.log('Nimble Builder problem : jQuery.js was not detected on your website');
+              }
           }
       };
       // if jQuery has already be printed, let's listen to the load event

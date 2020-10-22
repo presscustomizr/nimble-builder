@@ -654,7 +654,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             if ( !skp_is_customizing() && !Nimble_Manager()->page_has_local_or_global_sections )
               return;
             ?>
-            <script id="nimble-detect-jquery">!function(){var e=function(){var e="nb-jquery-loaded";nb_.wasEmitted(e)||nb_.emit(e)},n=function(t){t=t||0,void 0!==window.jQuery?e():t<30?setTimeout(function(){n(++t)},200):alert("Nimble Builder problem : jQuery.js was not detected on your website")},t=document.getElementById("<?php echo NIMBLE_JQUERY_ID; ?>");t&&t.addEventListener("load",function(){e()}),n()}();</script>
+            <script id="nimble-detect-jquery">!function(){var e=function(){var e="nb-jquery-loaded";nb_.wasEmitted(e)||nb_.emit(e)},o=function(n){n=n||0,void 0!==window.jQuery?e():n<30?setTimeout(function(){o(++n)},200):window.console&&window.console.log&&console.log("Nimble Builder problem : jQuery.js was not detected on your website")},n=document.getElementById("<?php echo NIMBLE_JQUERY_ID; ?>");n&&n.addEventListener("load",function(){e()}),o()}();</script>
             <?php
         }
 
