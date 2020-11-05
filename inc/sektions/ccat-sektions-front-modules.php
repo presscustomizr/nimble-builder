@@ -583,6 +583,15 @@ function sek_add_css_rules_for_czr_image_module( $rules, $complete_modul_model )
                       'is_important' => false,
                       'level_id' => $complete_modul_model['id']
                   ), $rules );
+
+                  // to fix https://github.com/presscustomizr/nimble-builder/issues/754
+                  $rules = sek_set_mq_css_rules(array(
+                      'value' => $ready_value,
+                      'css_property' => 'max-width',
+                      'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner img',
+                      'is_important' => false,
+                      'level_id' => $complete_modul_model['id']
+                  ), $rules );
             }
         }//if
 
