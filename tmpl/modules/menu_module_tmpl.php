@@ -42,6 +42,19 @@ sek_emit_js_event('nb-needs-menu-js');
 
     do_action('nb_menu_module_before_wp_menu', $model );
 
+
+    /* ------------------------------------------------------------------------- *
+     *  PRINT THE MENU + prevent running a filter used in twenty twenty one ( nov 2020 )
+    /* ------------------------------------------------------------------------- */
+    // Twenty Twenty One filters 'walker_nav_menu_start_el' and adds a button
+    // see https://github.com/WordPress/twentytwentyone/blob/trunk/inc/menu-functions.php
+    global $wp_filter;
+    $menu_wp_hook = null;
+    // Remove and cache the filter
+    if ( isset( $wp_filter[ 'walker_nav_menu_start_el' ] ) && is_object($wp_filter[ 'walker_nav_menu_start_el' ] ) ) {
+        $menu_wp_hook = $wp_filter[ 'walker_nav_menu_start_el' ];
+        unset( $wp_filter[ 'walker_nav_menu_start_el' ] );
+    }
     //error_log( print_r( get_terms( 'nav_menu', array( 'hide_empty' => true ) ), true) );
     wp_nav_menu(
         array(
@@ -55,6 +68,11 @@ sek_emit_js_event('nb-needs-menu-js');
           'link_after'      => '</span>'
       )
     );
+
+    // Add back the filter
+    if ( is_object($menu_wp_hook) ) {
+        $wp_filter[ 'walker_nav_menu_start_el' ] = $menu_wp_hook;
+    }
 
   ?>
     </div>
