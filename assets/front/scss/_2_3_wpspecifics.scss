@@ -38,6 +38,7 @@
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
+    max-width: 100%;
     @if ( true == $is_rtl ) {
       float:left;
     } @else {
