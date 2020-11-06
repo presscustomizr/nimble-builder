@@ -39,6 +39,10 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         sek_error_log( __FUNCTION__ . ' => missing input_list', $parent_level);
         return $rules;
     }
+    if ( empty( $registered_input_list[ $input_id ] ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing input_id : ' . $input_id, $parent_level);
+        return $rules;
+    }
     $input_registration_params = $registered_input_list[ $input_id ];
     if ( !is_string( $input_registration_params['css_identifier'] ) || empty( $input_registration_params['css_identifier'] ) ) {
         sek_error_log( __FUNCTION__ . ' => missing css_identifier for parent level', $parent_level );
