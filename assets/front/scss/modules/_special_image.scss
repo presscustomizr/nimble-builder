@@ -19,7 +19,7 @@
     justify-content: center;
     backface-visibility: hidden;
     transform-style: preserve-3d;
-    a {
+    @at-root .nb-loc [data-sek-level] .sek-module-inner .sek-nimble-image-wrapper a {
       color: #ffffff;
       &:hover {
         color: #ffffff;
@@ -121,7 +121,6 @@
     }
 }
 
-
 .sek-nimble-image {
     position: absolute;
     width: 100%;
@@ -132,3 +131,5 @@
     z-index: 0;
     top: 0;
 }
+
+
