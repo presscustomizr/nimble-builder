@@ -54,6 +54,14 @@ function sek_get_raw_section_registration_params() {
                     'demo_url' => '#intro-three'
                 ),
                 array(
+                    'content-id' => 'pro_intro_two',
+                    'title' => __('3 columns, call to actions', 'text-domain' ),
+                    'thumb' => 'pro_intro_two.jpg',
+                    'active' => sek_is_pro(),
+                    'is_pro' => true,
+                    'demo_url' => 'https://nimblebuilder.com/special-image-demo/'
+                ),
+                array(
                     'content-id' => 'pro_intro_one',
                     'title' => __('2 columns, call to actions, image carousel', 'text-domain' ),
                     'thumb' => 'pro_intro_one.jpg',
