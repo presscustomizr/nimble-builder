@@ -48,7 +48,18 @@ function sek_get_module_params_for_sek_level_height_module() {
                     //'css_identifier' => 'v_alignment',
                     'title_width' => 'width-100',
                     'width-100'   => true,
-                )
+                ),
+                'zindex' => array(
+                    'input_type'  => 'range_simple',
+                    'title'       => __('z-index', 'text_doma'),
+                    'orientation' => 'horizontal',
+                    'min' => 0,
+                    'max' => 100,
+                    // 'unit' => '%',
+                    'default'  => '0',
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
+                ),
             )
         )//tmpl
     );
@@ -141,6 +152,18 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
             'mq' =>null
         );
     }
+
+    // Z-INDEX
+    // implemented to fix https://github.com/presscustomizr/nimble-builder/issues/365
+    if ( !empty( $height_options[ 'zindex' ] ) ) {
+        $numeric = sek_extract_numeric_value( $height_options[ 'zindex' ] );
+        $rules[] = array(
+            'selector' => '[data-sek-id="'.$level['id'].'"]',
+            'css_rules' => 'position:relative;z-index:' . $numeric,
+            'mq' =>null
+        );
+    }
+
     //error_log( print_r($rules, true) );
     return $rules;
 }

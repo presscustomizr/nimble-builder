@@ -519,7 +519,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Text settings for the' => __('Text settings for the', 'text_doma'),
             'Borders settings for the' => __('Borders settings for the', 'text_doma'),
             'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_doma'),
-            'Height and vertical alignment for the' => __('Height and vertical alignment for the', 'text_doma'),
+            'Height, vertical alignment, z-index for the' => __('Height, vertical alignment, z-index for the', 'text_doma'),
             'Width settings for the' => __('Width settings for the', 'text_doma'),
             'Width and horizontal alignment for the' => __('Width and horizontal alignment for the', 'text_doma'),
             'Custom anchor ( CSS ID ) and CSS classes for the' => __('Custom anchor ( CSS ID ) and CSS classes for the', 'text_doma'),
