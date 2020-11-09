@@ -59,8 +59,11 @@
   padding: 0 0 0 .9rem;
 }
 
-.sek-nav li a {
+.sek-nav li {
   font-size: 16px;
+}
+
+.sek-nav li a {
   line-height: 1.5em;
   padding: .6em .8em;
   display: -ms-flexbox;

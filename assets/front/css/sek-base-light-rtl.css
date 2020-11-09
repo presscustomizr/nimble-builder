@@ -850,6 +850,7 @@ button.sek-btn,
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  max-width: 100%;
   float: left;
 }
 
@@ -992,6 +993,9 @@ button.sek-btn,
   text-decoration: none;
   -webkit-box-shadow: none;
   box-shadow: none;
+  -webkit-transition: color 0.2s ease-in-out;
+  -o-transition: color 0.2s ease-in-out;
+  transition: color 0.2s ease-in-out;
 }
 
 .sek-module-inner img {

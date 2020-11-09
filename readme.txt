@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.5
-Stable tag: 2.1.21
+Stable tag: 2.1.22-beta
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -123,6 +123,17 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 2.1.20 : Improved compatibility with future WP default theme : Twenty Twenty-One. Significant performance improvement with more efficient CSS and JS assets loading logic on front. Fixed minor CSS and markup issue.
 
 == Changelog ==
+= 2.1.22 November 9th 2020 =
+* fixed : [dynamic CSS] a missing input id can break building css rules
+* fixed : [global style] global font size not taking precedence over default theme rules in menu items, and ul / ol lists
+* fixed : [search form] add max-width rule to search input to reinforce Nimble CSS precedence over active theme/plugins
+* fixed : [menu module] removed buttons added with a filter by upcoming Twenty Twenty One theme to top level menu-items
+* fixed : [level background] print inline css when customizing instead of relying on data-sek-src
+* fixed : [special image][pro] added more specificity to the link CSS rules to prevent override by global link rules
+* added : [module,column,section] new z-index option in "Height" options
+* added : [links] simple default color CSS transition
+* improved : [lazy load] Disable smart load parsing when building in the customizer
+
 = 2.1.21 November 5th 2020 =
 * fixed : [Image module] custom width not taken into account if > 100% of the parent element.
 * fixed : [link picker][customizer] list of links not visible (opacity set to 0) due to "clearfix" class styled by other plugins

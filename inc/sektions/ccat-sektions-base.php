@@ -1519,6 +1519,10 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
         sek_error_log( __FUNCTION__ . ' => missing input_list', $parent_level);
         return $rules;
     }
+    if ( empty( $registered_input_list[ $input_id ] ) ) {
+        sek_error_log( __FUNCTION__ . ' => missing input_id : ' . $input_id, $parent_level);
+        return $rules;
+    }
     $input_registration_params = $registered_input_list[ $input_id ];
     if ( !is_string( $input_registration_params['css_identifier'] ) || empty( $input_registration_params['css_identifier'] ) ) {
         sek_error_log( __FUNCTION__ . ' => missing css_identifier for parent level', $parent_level );
@@ -4914,6 +4918,15 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     // At this point we may not have a valid $bg_img_url
                     // let's check
                     if ( !empty( $bg_img_url ) ) {
+                        if ( defined('DOING_AJAX') && DOING_AJAX ) {
+                            $new_attributes[] = sprintf('style="background-image:url(\'%1$s\');"', $bg_img_url );
+                        } else {
+                            $new_attributes[] = sprintf( 'data-sek-src="%1$s"', $bg_img_url );
+                            if ( sek_is_img_smartload_enabled() ) {
+                                $new_attributes[] = sprintf( 'data-sek-lazy-bg="true"' );
+                            }
+                        }
+
                         // When the fixed background is ckecked, it wins against parallax
                         $fixed_bg_enabled = !empty( $bg_options['bg-attachment'] ) && sek_booleanize_checkbox_val( $bg_options['bg-attachment'] );
                         $parallax_enabled = !$fixed_bg_enabled && !empty( $bg_options['bg-parallax'] ) && sek_booleanize_checkbox_val( $bg_options['bg-parallax'] );
@@ -4925,6 +4938,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         }
                     }
                 }
+
 
                 // Nov 2019, for video background https://github.com/presscustomizr/nimble-builder/issues/287
                 // should be added for sections and columns only
@@ -4956,12 +4970,6 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 }
             }
 
-            if ( !empty( $bg_img_url ) ) {
-                $new_attributes[] = sprintf( 'data-sek-src="%1$s"', $bg_img_url );
-                if ( sek_is_img_smartload_enabled() ) {
-                    $new_attributes[] = sprintf( 'data-sek-lazy-bg="true"' );
-                }
-            }
 
             // data-sek-bg-fixed attribute has been added for https://github.com/presscustomizr/nimble-builder/issues/414
             // @see css rules related
@@ -5007,6 +5015,11 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         function sek_maybe_process_img_for_js_smart_load( $html ) {
             // if ( skp_is_customizing() || !sek_is_img_smartload_enabled() )
             //   return $html;
+
+            // Disable smart load parsing when building in the customizer
+            if ( defined('DOING_AJAX') && DOING_AJAX ) {
+                return $html;
+            }
 
             // prevent lazyloading images when in header section
             // @see https://github.com/presscustomizr/nimble-builder/issues/705
@@ -5350,12 +5363,12 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             if ( is_numeric($nimble_found_posts) ) {
                 $wp_query->found_posts = $wp_query->found_posts + $nimble_found_posts;
             }
-        }// sek_maybe_include_nimble_content_in_search_results
+        }// return
 
 
 
 
-        // @return html string
+        // @sek_maybe_include_nimble_content_in_search_results html string
         // introduced for https://github.com/presscustomizr/nimble-builder/issues/494
         function sek_maybe_print_preview_level_guid_html() {
               if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) ) {

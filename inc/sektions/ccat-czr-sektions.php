@@ -519,7 +519,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Text settings for the' => __('Text settings for the', 'text_doma'),
             'Borders settings for the' => __('Borders settings for the', 'text_doma'),
             'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_doma'),
-            'Height and vertical alignment for the' => __('Height and vertical alignment for the', 'text_doma'),
+            'Height, vertical alignment, z-index for the' => __('Height, vertical alignment, z-index for the', 'text_doma'),
             'Width settings for the' => __('Width settings for the', 'text_doma'),
             'Width and horizontal alignment for the' => __('Width and horizontal alignment for the', 'text_doma'),
             'Custom anchor ( CSS ID ) and CSS classes for the' => __('Custom anchor ( CSS ID ) and CSS classes for the', 'text_doma'),
@@ -1775,8 +1775,10 @@ function sek_print_nimble_input_templates() {
                     print(pro_img_html);
                   }
                   var demo_title = "<?php _e('View in live demo', 'text_doma'); ?>";
-                  if ( secParams['demo_url'] ) { #>
+                  if ( secParams['demo_url'] && -1 === secParams['demo_url'].indexOf('http') ) { #>
                     <div class="sek-demo-link"><a href="https://nimblebuilder.com/nimble-builder-sections?utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=section_demos{{secParams['demo_url']}}" target="_blank" rel="noopener noreferrer">{{demo_title}} <i class="fas fa-external-link-alt"></i></a></div>
+                  <# } else { #>
+                    <div class="sek-demo-link"><a href="{{secParams['demo_url']}}?utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=section_demos" target="_blank" rel="noopener noreferrer">{{demo_title}} <i class="fas fa-external-link-alt"></i></a></div>
                   <# } #>
                 </div>
                 <#

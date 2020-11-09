@@ -2203,7 +2203,18 @@ function sek_get_module_params_for_sek_level_height_module() {
                     //'css_identifier' => 'v_alignment',
                     'title_width' => 'width-100',
                     'width-100'   => true,
-                )
+                ),
+                'zindex' => array(
+                    'input_type'  => 'range_simple',
+                    'title'       => __('z-index', 'text_doma'),
+                    'orientation' => 'horizontal',
+                    'min' => 0,
+                    'max' => 100,
+                    // 'unit' => '%',
+                    'default'  => '0',
+                    'width-100'   => true,
+                    'title_width' => 'width-100'
+                ),
             )
         )//tmpl
     );
@@ -2296,6 +2307,18 @@ function sek_add_css_rules_for_level_height( $rules, $level ) {
             'mq' =>null
         );
     }
+
+    // Z-INDEX
+    // implemented to fix https://github.com/presscustomizr/nimble-builder/issues/365
+    if ( !empty( $height_options[ 'zindex' ] ) ) {
+        $numeric = sek_extract_numeric_value( $height_options[ 'zindex' ] );
+        $rules[] = array(
+            'selector' => '[data-sek-id="'.$level['id'].'"]',
+            'css_rules' => 'position:relative;z-index:' . $numeric,
+            'mq' =>null
+        );
+    }
+
     //error_log( print_r($rules, true) );
     return $rules;
 }
@@ -3922,7 +3945,7 @@ function sek_add_raw_global_text_css( $global_css = '') {
 
     $rules = array();
     // SELECTORS
-    $default_text_selector = '.nb-loc [data-sek-level], .nb-loc [data-sek-level] p, .nb-loc [data-sek-level] .sek-btn, .nb-loc [data-sek-level] button, .nb-loc [data-sek-level] input, .nb-loc [data-sek-level] select, .nb-loc [data-sek-level] optgroup, .nb-loc [data-sek-level] textarea';
+    $default_text_selector = '.nb-loc [data-sek-level], .nb-loc [data-sek-level] p, .nb-loc [data-sek-level] .sek-btn, .nb-loc [data-sek-level] button, .nb-loc [data-sek-level] input, .nb-loc [data-sek-level] select, .nb-loc [data-sek-level] optgroup, .nb-loc [data-sek-level] textarea, .nb-loc [data-sek-level] ul, .nb-loc [data-sek-level] ol, .nb-loc [data-sek-level] li';
     $links_selector = '.nb-loc [data-sek-level] .sek-module-inner a';
     $links_hover_selector = '.nb-loc [data-sek-level] .sek-module-inner a:hover';
     $headings_selector = '.nb-loc [data-sek-level] h1, .nb-loc [data-sek-level] h2, .nb-loc [data-sek-level] h3, .nb-loc [data-sek-level] h4, .nb-loc [data-sek-level] h5, .nb-loc [data-sek-level] h6';

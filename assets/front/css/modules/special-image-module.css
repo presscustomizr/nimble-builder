@@ -22,11 +22,11 @@
   padding-top: 100%;
 }
 
-.sek-nimble-image-wrapper a {
+.nb-loc [data-sek-level] .sek-module-inner .sek-nimble-image-wrapper a {
   color: #ffffff;
 }
 
-.sek-nimble-image-wrapper a:hover {
+.nb-loc [data-sek-level] .sek-module-inner .sek-nimble-image-wrapper a:hover {
   color: #ffffff;
 }
 
