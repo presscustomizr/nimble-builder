@@ -100,11 +100,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                 // remove target="_blank" if enabled by user
                                 // @fixes issue https://github.com/presscustomizr/nimble-builder/issues/542
                                 $(this).removeAttr('target');
-                                $(this).hover( function() {
+                                $(this).on('mouseenter', function() {
                                         $(this).attr( 'title', sekPreviewLocalized.i18n['Shift-click to visit the link']);
-                                }, function() {
+                                });
+                                $(this).on('mouseleave', function() {
                                       $(this).removeAttr( 'title' );
                                 });
+
                                 $(this).on('click', function(evt) {
                                       if ( ! evt.shiftKey ) {
                                         return;

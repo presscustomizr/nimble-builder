@@ -321,7 +321,7 @@
                       this.options    = $.extend( {}, defaults, options) ;
                       this._defaults  = defaults;
                       this._name      = pluginName;
-                      this._customEvt = $.isArray(self.options.oncustom) ? self.options.oncustom : self.options.oncustom.split(' ');
+                      this._customEvt = nb_.isArray(self.options.oncustom) ? self.options.oncustom : self.options.oncustom.split(' ');
                       this.init();
                 }
 
@@ -348,7 +348,7 @@
 
                       //bind the container element with custom events if any
                       //( the images will also be bound )
-                      if ( $.isArray( self._customEvt ) ) {
+                      if ( nb_.isArray( self._customEvt ) ) {
                             self._customEvt.map( function( evt ) {
                                   var $_containerToListen = ( self.options.$containerToListen instanceof $ && 1 < self.options.$containerToListen.length ) ? self.options.$containerToListen : $( self.container );
                                   $_containerToListen.bind( evt, {} , function() {

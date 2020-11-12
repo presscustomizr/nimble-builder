@@ -102,7 +102,6 @@
                     });
                     //debounced resize event
                     nb_.cachedElements.$window.on('resize', nb_.debounce( function( _evt ) {
-                          console.log('ON RESIZE ?');
                           self._maybe_trigger_load( _evt );
                     }, 100 ) );
 
