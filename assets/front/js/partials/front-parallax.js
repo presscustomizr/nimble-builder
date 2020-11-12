@@ -53,9 +53,9 @@
                     }
 
                     //the scroll event gets throttled with the requestAnimationFrame
-                    this.$_window.scroll( function(_evt) { self.maybeParallaxMe(_evt); } );
+                    this.$_window.on( 'scroll', function(_evt) { self.maybeParallaxMe(_evt); } );
                     //debounced resize event
-                    this.$_window.resize( nb_.debounce( function(_evt) {
+                    this.$_window.on( 'resize', nb_.debounce( function(_evt) {
                           self.maybeParallaxMe(_evt);
                     }, 100 ) );
 

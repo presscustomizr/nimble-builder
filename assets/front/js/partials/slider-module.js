@@ -370,7 +370,7 @@
                             // Parse Img can be fired several times, so bind once
                             if ( self.options.onresize && ! $_img.data('resize-react-bound' ) ) {
                                   $_img.data('resize-react-bound', true );
-                                  nb_.cachedElements.$window.resize( nb_.debounce( function() {
+                                  nb_.cachedElements.$window.on('resize', nb_.debounce( function() {
                                         self._pre_img_cent( $_img, 'resize');
                                   }, 100 ) );
                             }

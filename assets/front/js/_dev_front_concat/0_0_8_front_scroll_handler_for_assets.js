@@ -20,7 +20,7 @@
             });
 
             if ( handlerParams.scrollHandler && nb_.scrollHandlers[id].loaded ) {
-                nb_.cachedElements.$window.unbind('scroll', handlerParams.scrollHandler );
+                nb_.cachedElements.$window.off('scroll', handlerParams.scrollHandler );
             }
         });
     };//_loadAssetWhenElementVisible

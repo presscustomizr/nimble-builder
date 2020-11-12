@@ -46,7 +46,7 @@
 
                     if ( this.options.lazyLoad ) {
                           //the scroll event gets throttled with the requestAnimationFrame
-                          nb_.cachedElements.$window.scroll( nb_.throttle( function( _evt ) {
+                          nb_.cachedElements.$window.on('scroll', nb_.throttle( function( _evt ) {
                                 if ( nb_.elOrFirstVisibleParentIsInWindow( self.$element ) && !self.$element.data('sek-player-instantiated') ) {
                                       // Are we already instantiated ?
                                       if ( false === self.videoPlayer ) {
@@ -56,7 +56,7 @@
                           }, 50 ) );
 
                           //debounced resize event
-                          nb_.cachedElements.$window.resize( nb_.debounce( function( _evt ) {
+                          nb_.cachedElements.$window.on('resize', nb_.debounce( function( _evt ) {
                                 if ( nb_.elOrFirstVisibleParentIsInWindow( self.$element ) && !self.$element.data('sek-player-instantiated') ) {
                                       // Are we already instantiated ?
                                       if ( false === self.videoPlayer ) {

@@ -97,11 +97,12 @@
                     });
 
                     //the scroll event gets throttled with the requestAnimationFrame
-                    nb_.cachedElements.$window.scroll( function( _evt ) {
+                    nb_.cachedElements.$window.on('scroll', function( _evt ) {
                           self._better_scroll_event_handler( _evt );
                     });
                     //debounced resize event
-                    nb_.cachedElements.$window.resize( nb_.debounce( function( _evt ) {
+                    nb_.cachedElements.$window.on('resize', nb_.debounce( function( _evt ) {
+                          console.log('ON RESIZE ?');
                           self._maybe_trigger_load( _evt );
                     }, 100 ) );
 
@@ -188,7 +189,7 @@
                         $jQueryImgToLoad = $("<img />", { src : _src } );
 
                     $_el.addClass('lazy-loading');
-                    $_el.unbind('sek_load_img');
+                    $_el.off('sek_load_img');
 
                     $jQueryImgToLoad
                           // .hide()
@@ -252,7 +253,7 @@
                         self = this;
 
                     //$_el.addClass('lazy-loading');
-                    $_el.unbind('sek_load_iframe');
+                    $_el.off('sek_load_iframe');
 
                     $_el.attr( 'src', function() {
                           var src = $(this).attr('data-sek-iframe-src');
