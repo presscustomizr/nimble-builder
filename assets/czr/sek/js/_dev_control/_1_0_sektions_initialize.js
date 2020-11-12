@@ -455,8 +455,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // the panel.expanded() Value is not the right candidate to be observed because it gets changed on too many events, when generating the various UI.
                   api.panel( sektionsLocalizedData.sektionsPanelId, function( _mainPanel_ ) {
                         _mainPanel_.deferred.embedded.done( function() {
-                              var $sidePanelTitleEl = _mainPanel_.container.find('h3.accordion-section-title'),
-                                  $topPanelTitleEl = _mainPanel_.container.find('.panel-meta .accordion-section-title'),
+                              var $sidePanelTitleEl = _mainPanel_.container.first().find('h3.accordion-section-title'),
+                                  $topPanelTitleEl = _mainPanel_.container.first().find('.panel-meta .accordion-section-title'),
                                   logoHtml = [
                                       '<img class="sek-nimble-logo" alt="'+ _mainPanel_.params.title +'" src="',
                                       sektionsLocalizedData.baseUrl,
