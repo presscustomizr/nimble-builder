@@ -301,6 +301,20 @@ module.exports = {
       'concat:sektions_front_js'
     ]
   },
+  sektions_front_js_partials : {
+    options: {
+      spawn : false,
+      // Start a live reload server on the default port 35729
+      livereload : true
+    },
+    files : [
+      '<%= paths.front_assets %>js/partials/**/*.js',
+    ],
+    tasks : [
+      'jshint:front_js',
+      'uglify:sektions_partial_front_js'
+    ],
+  },
   // sektions_front_js_stand_alone_module_scripts : {
   //   options: {
   //     spawn : false,
