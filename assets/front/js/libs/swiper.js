@@ -7331,7 +7331,7 @@
         }
       }
       if (swiper.pagination && $targetEl.is(("." + (swiper.params.pagination.bulletClass)))) {
-        $targetEl[0].click();
+        $targetEl[0].trigger('click');
       }
     },
     notify: function notify(message) {

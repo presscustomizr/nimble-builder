@@ -101,7 +101,7 @@
                                           initPlainTextareaEditor();
                                     }
                                     //focus the editor
-                                   $input_title.click();
+                                   $input_title.trigger('click');
                               }, 10 );
                         };
 

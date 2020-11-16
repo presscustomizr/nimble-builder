@@ -117,9 +117,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                           } else {
                                 $(this).addClass('nimble-unclickable');
                                 $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', 'javascript:void(0)');
-                                $(this).hover( function() {
+                                $(this).on('mouseenter', function() {
                                       $(this).attr( 'title', isJavascriptProtocol ? sekPreviewLocalized.i18n['Link deactivated while previewing'] : sekPreviewLocalized.i18n['External links are disabled when customizing']);
-                                }, function() {
+                                }).on('mouseleave', function() {
                                       $(this).removeAttr( 'title' );
                                 });
                                 $(this).on('click', function(evt) {

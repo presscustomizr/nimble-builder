@@ -677,7 +677,7 @@ function sek_may_be_display_update_notice() {
 
           //on load
           $( function($) {
-            $('.nimble-dismiss-update-notice').click( function( e ) {
+            $('.nimble-dismiss-update-notice').on('click', function( e ) {
               e.preventDefault();
               _ajax_action( $(this) );
             } );
