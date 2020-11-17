@@ -682,8 +682,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // the panel.expanded() Value is not the right candidate to be observed because it gets changed on too many events, when generating the various UI.
                   api.panel( sektionsLocalizedData.sektionsPanelId, function( _mainPanel_ ) {
                         _mainPanel_.deferred.embedded.done( function() {
-                              var $sidePanelTitleEl = _mainPanel_.container.find('h3.accordion-section-title'),
-                                  $topPanelTitleEl = _mainPanel_.container.find('.panel-meta .accordion-section-title'),
+                              var $sidePanelTitleEl = _mainPanel_.container.first().find('h3.accordion-section-title'),
+                                  $topPanelTitleEl = _mainPanel_.container.first().find('.panel-meta .accordion-section-title'),
                                   logoHtml = [
                                       '<img class="sek-nimble-logo" alt="'+ _mainPanel_.params.title +'" src="',
                                       sektionsLocalizedData.baseUrl,
@@ -9150,6 +9150,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               $(this).attr('data-sek-expanded', "false" );
                         });
                         $control.attr('data-sek-expanded', "false" == $control.attr('data-sek-expanded') ? "true" : "false" );
+
                         // this event 'sek-accordion-expanded', is used to defer the instantiation of the code editor
                         // @see api.czrInputMap['code_editor']
                         // @see https://github.com/presscustomizr/nimble-builder/issues/176
@@ -9182,8 +9183,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
 
                                     // remotely request a module.ready()
+                                    // see CZRModuleMths::initialize
                                     // => then once module is ready and all items populated, the event 'items-collection-populated' is triggered on the control, and we can reveal the module content/.
-                                    _ctrl_.container.trigger( 'sek-accordion-expanded' );
+
+                                    // Nov 2020 => make sure the setup has been done on the control so that it reacts on a on custom event ( here 'sek-accordion-expanded' )
+                                    // see fmk CZRModuleMths::initialize
+                                    // event defined on module registration with api.czrModuleMap[ module.module_type ].ready_on_section_expanded
+                                    if ( _ctrl_.module_ready_on_custom_control_event_is_setup ) {
+                                          _ctrl_.container.trigger( 'sek-accordion-expanded' );
+                                    } else {
+                                          _ctrl_.container.one('module_ready_on_custom_control_event_is_setup', function() {
+                                                _ctrl_.container.trigger( 'sek-accordion-expanded' );
+                                          });
+                                    }
                               });
                         }
                   }
@@ -12703,7 +12715,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           initPlainTextareaEditor();
                                     }
                                     //focus the editor
-                                   $input_title.click();
+                                   $input_title.trigger('click');
                               }, 10 );
                         };
 

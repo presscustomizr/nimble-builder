@@ -100,11 +100,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                 // remove target="_blank" if enabled by user
                                 // @fixes issue https://github.com/presscustomizr/nimble-builder/issues/542
                                 $(this).removeAttr('target');
-                                $(this).hover( function() {
+                                $(this).on('mouseenter', function() {
                                         $(this).attr( 'title', sekPreviewLocalized.i18n['Shift-click to visit the link']);
-                                }, function() {
+                                });
+                                $(this).on('mouseleave', function() {
                                       $(this).removeAttr( 'title' );
                                 });
+
                                 $(this).on('click', function(evt) {
                                       if ( ! evt.shiftKey ) {
                                         return;
@@ -115,9 +117,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                           } else {
                                 $(this).addClass('nimble-unclickable');
                                 $(this).data('sek-unlinked', "yes").attr('data-nimble-href', $(this).attr('href') ).attr('href', 'javascript:void(0)');
-                                $(this).hover( function() {
+                                $(this).on('mouseenter', function() {
                                       $(this).attr( 'title', isJavascriptProtocol ? sekPreviewLocalized.i18n['Link deactivated while previewing'] : sekPreviewLocalized.i18n['External links are disabled when customizing']);
-                                }, function() {
+                                }).on('mouseleave', function() {
                                       $(this).removeAttr( 'title' );
                                 });
                                 $(this).on('click', function(evt) {

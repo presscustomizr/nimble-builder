@@ -511,11 +511,11 @@ window.nb_.getQueryVariable = function(variable) {
                     });
 
                     //the scroll event gets throttled with the requestAnimationFrame
-                    nb_.cachedElements.$window.scroll( function( _evt ) {
+                    nb_.cachedElements.$window.on('scroll', function( _evt ) {
                           self._better_scroll_event_handler( _evt );
                     });
                     //debounced resize event
-                    nb_.cachedElements.$window.resize( nb_.debounce( function( _evt ) {
+                    nb_.cachedElements.$window.on('resize', nb_.debounce( function( _evt ) {
                           self._maybe_trigger_load( _evt );
                     }, 100 ) );
 
@@ -602,7 +602,7 @@ window.nb_.getQueryVariable = function(variable) {
                         $jQueryImgToLoad = $("<img />", { src : _src } );
 
                     $_el.addClass('lazy-loading');
-                    $_el.unbind('sek_load_img');
+                    $_el.off('sek_load_img');
 
                     $jQueryImgToLoad
                           // .hide()
@@ -666,7 +666,7 @@ window.nb_.getQueryVariable = function(variable) {
                         self = this;
 
                     //$_el.addClass('lazy-loading');
-                    $_el.unbind('sek_load_iframe');
+                    $_el.off('sek_load_iframe');
 
                     $_el.attr( 'src', function() {
                           var src = $(this).attr('data-sek-iframe-src');
@@ -722,7 +722,7 @@ window.nb_.getQueryVariable = function(variable) {
             });
 
             if ( handlerParams.scrollHandler && nb_.scrollHandlers[id].loaded ) {
-                nb_.cachedElements.$window.unbind('scroll', handlerParams.scrollHandler );
+                nb_.cachedElements.$window.off('scroll', handlerParams.scrollHandler );
             }
         });
     };//_loadAssetWhenElementVisible
