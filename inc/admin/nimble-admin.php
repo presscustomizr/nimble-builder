@@ -442,6 +442,9 @@ function sek_filter_post_row_actions( $actions, $post ) {
 }
 
 
+// /* ------------------------------------------------------------------------- *
+// *  SEO PLUGINS COMPAT
+// /* ------------------------------------------------------------------------- */
 // May 2020 : introduced this helper for SEO plugin compat
 // @return html string
 function sek_get_raw_html_from_skope_id( $skope_id = '' ) {
@@ -473,11 +476,9 @@ function sek_get_raw_html_from_skope_id( $skope_id = '' ) {
     return $html;
 }
 
-// APRIL 2020 : implement compatibility with Yoast content analyzer
-// for https://github.com/presscustomizr/nimble-builder/issues/657
-// documented here : https://github.com/Yoast/javascript/blob/master/packages/yoastseo/docs/Customization.md
-add_action( 'wp_ajax_sek_get_nimble_content_for_yoast', '\Nimble\sek_ajax_get_nimble_content_for_yoast' );
-function sek_ajax_get_nimble_content_for_yoast() {
+
+add_action( 'wp_ajax_sek_get_nimble_content_for_seo_plugins', '\Nimble\sek_ajax_get_nimble_content_for_seo_plugins' );
+function sek_ajax_get_nimble_content_for_seo_plugins() {
     if ( !is_user_logged_in() ) {
         wp_send_json_error( __FUNCTION__ . ' error => unauthenticated' );
     }
@@ -488,6 +489,9 @@ function sek_ajax_get_nimble_content_for_yoast() {
     wp_send_json_success($html);
 }
 
+// APRIL 2020 : implement compatibility with Yoast content analyzer
+// for https://github.com/presscustomizr/nimble-builder/issues/657
+// documented here : https://github.com/Yoast/javascript/blob/master/packages/yoastseo/docs/Customization.md
 add_action( 'admin_footer', '\Nimble\sek_print_js_for_yoast_analysis' );
 function sek_print_js_for_yoast_analysis() {
     if ( !defined( 'WPSEO_VERSION' ) )
@@ -503,7 +507,7 @@ function sek_print_js_for_yoast_analysis() {
         jQuery(function($){
             var NimblePlugin = function() {
                 YoastSEO.app.registerPlugin( 'nimblePlugin', {status: 'loading'} );
-                wp.ajax.post( 'sek_get_nimble_content_for_yoast', {
+                wp.ajax.post( 'sek_get_nimble_content_for_seo_plugins', {
                     skope_id : '<?php echo $manually_built_skope_id; ?>'
                 }).done( function( nimbleContent ) {
                     YoastSEO.app.pluginReady('nimblePlugin');
@@ -536,6 +540,51 @@ function sek_add_content_to_seopress_analyser($content, $id) {
     return is_string($nb_content) ? $content.$nb_content : $content;
 }
 
+
+// NOVEMBER 2020 : implement compatibility with Rank Math content analyzer
+// for https://github.com/presscustomizr/nimble-builder/issues/755
+// documented here : https://rankmath.com/kb/content-analysis-api/
+// 1) Enqueue the script that hooks on RM analyzer
+add_action( 'admin_init' , '\Nimble\sek_enqueue_js_for_rank_math_analyser' );
+function sek_enqueue_js_for_rank_math_analyser() {
+    if ( !defined( 'RANK_MATH_VERSION' ) )
+      return;
+    wp_enqueue_script(
+      'nb-rank-math-integration',
+      sprintf(
+            '%1$s/assets/admin/js/%2$s' ,
+            NIMBLE_BASE_URL,
+            'nimble-rank-seo-analyzer.js'
+      ),
+      [ 'wp-hooks', 'rank-math-analyzer' ],
+      NIMBLE_ASSETS_VERSION,
+      true
+    );
+}
+
+// 2) Provide the current skope_id to the script
+add_action( 'admin_footer', '\Nimble\sek_print_js_for_rank_math_analyser' );
+function sek_print_js_for_rank_math_analyser() {
+    if ( !defined( 'RANK_MATH_VERSION' ) )
+      return;
+
+    // This script is only printed when editing posts and pages
+    $current_screen = get_current_screen();
+    if ( 'post' !== $current_screen->base )
+      return;
+
+    $post = get_post();
+    $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
+    ?>
+    <script id="nimble-add-content-to-rank-math-analyzer">
+        jQuery(function($){
+            // Write skope_id as a global var + trigger an event => solves the problem of nimble-rank-seo-analyzer.js being loaded before
+            window.nb_skope_id_for_rank_math_seo = '<?php echo $manually_built_skope_id; ?>';
+            $(document).trigger('nb-skope-id-ready.rank-math', { skope_id : '<?php echo $manually_built_skope_id; ?>' } );
+        });
+    </script>
+    <?php
+}
 
 
 // /* ------------------------------------------------------------------------- *
