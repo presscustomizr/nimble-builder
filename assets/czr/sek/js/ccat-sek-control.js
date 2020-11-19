@@ -18142,6 +18142,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                   }
                                             });
                                       break;
+                                      case 'width-type' :
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'custom-width', function() {
+                                                return 'custom' === input();
+                                          });
+                                          _.each( [ 'custom-width', 'h_inner_align_css' ] , function( _inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return 'custom' === input();
+                                                }); } catch( er ) {
+                                                      api.errare( 'Button module => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                      break;
+
+                                      case 'height-type' :
+                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'custom-height', function() {
+                                                return 'custom' === input();
+                                          });
+                                      break;
                                 }
                           });
                     }

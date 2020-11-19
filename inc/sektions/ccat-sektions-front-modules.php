@@ -2503,7 +2503,58 @@ function sek_get_module_params_for_czr_btn_design_child() {
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                )
+                ),
+                'width-type' => array(
+                    'input_type'  => 'simpleselect',
+                    'title'       => __('Width : auto or custom', 'text_doma'),
+                    'default'     => 'default',
+                    'choices'     => sek_get_select_options_for_input_id( 'height-type' ),
+                    'html_before' => '<hr/>',
+                    'refresh_markup'     => false,
+                    'refresh_stylesheet' => true,
+                ),
+                'custom-width' => array(
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
+                    'title'       => __('Custom width', 'text_doma'),
+                    'min' => 0,
+                    'max' => 500,
+                    'default'     => array( 'desktop' => '150px' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup'     => false,
+                    'refresh_stylesheet' => true,
+                ),
+                'h_inner_align_css'        => array(
+                    'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
+                    'title'              => __( 'Text alignment', 'text_doma' ),
+                    'default'     => array( 'desktop' => 'center' ),
+                    'refresh_markup'     => false,
+                    'refresh_stylesheet' => true,
+                    'css_identifier'     => 'h_alignment',
+                    'css_selectors'      => '.sek-btn .sek-btn-text',
+                    'title_width' => 'width-100',
+                    'width-100'   => true,
+                ),
+                'height-type' => array(
+                    'input_type'  => 'simpleselect',
+                    'title'       => __('Height : auto or custom', 'text_doma'),
+                    'default'     => 'default',
+                    'choices'     => sek_get_select_options_for_input_id( 'height-type' ),
+                    'html_before' => '<hr/>',
+                    'refresh_markup'     => false,
+                    'refresh_stylesheet' => true,
+                ),
+                'custom-height' => array(
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
+                    'title'       => __('Custom height', 'text_doma'),
+                    'min' => 0,
+                    'max' => 500,
+                    'default'     => array( 'desktop' => '40px' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup'     => false,
+                    'refresh_stylesheet' => true,
+                ),
             )
         ),
         'render_tmpl_path' => '',
@@ -2581,6 +2632,71 @@ function sek_add_css_rules_for_button_front_module( $rules, $complete_modul_mode
             '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-btn'
         );
     }
+
+    // CUSTOM WIDTH BY DEVICE
+    if ( !empty( $design_settings[ 'width-type' ] ) ) {
+        if ( 'custom' == $design_settings[ 'width-type' ] && array_key_exists( 'custom-width', $design_settings ) ) {
+            $user_custom_width_value = $design_settings[ 'custom-width' ];
+            if ( !empty( $user_custom_width_value ) && !is_array( $user_custom_width_value ) ) {
+                sek_error_log( __FUNCTION__ . ' => error => the width option should be an array( {device} => {number}{unit} )');
+            }
+            $user_custom_width_value = is_array( $user_custom_width_value ) ? $user_custom_width_value : array();
+            $user_custom_width_value = wp_parse_args( $user_custom_width_value, array(
+                'desktop' => '100%',
+                'tablet' => '',
+                'mobile' => ''
+            ));
+            $width_value = $user_custom_width_value;
+            foreach ( $user_custom_width_value as $device => $num_unit ) {
+                $numeric = sek_extract_numeric_value( $num_unit );
+                if ( !empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $num_unit );
+                    $width_value[$device] = $numeric . $unit;
+                }
+            }
+
+            $rules = sek_set_mq_css_rules(array(
+                'value' => $width_value,
+                'css_property' => 'width',
+                'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-btn',
+                'level_id' => $complete_modul_model['id']
+            ), $rules );
+        }
+    }
+
+
+    // CUSTOM HEIGHT BY DEVICE
+    if ( !empty( $design_settings[ 'height-type' ] ) ) {
+        if ( 'custom' === $design_settings[ 'height-type' ] ) {
+            $custom_user_height = array_key_exists( 'custom-height', $design_settings ) ? $design_settings[ 'custom-height' ] : array();
+            if ( !is_array( $custom_user_height ) ) {
+                sek_error_log( __FUNCTION__ . ' => error => the height option should be an array( {device} => {number}{unit} )', $custom_user_height);
+            }
+            $custom_user_height = is_array( $custom_user_height ) ? $custom_user_height : array();
+            $custom_user_height = wp_parse_args( $custom_user_height, array(
+                'desktop' => '40px',//<= consistent with default
+                'tablet' => '',
+                'mobile' => ''
+            ));
+            $height_value = $custom_user_height;
+            foreach ( $custom_user_height as $device => $num_unit ) {
+                $numeric = sek_extract_numeric_value( $num_unit );
+                if ( !empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $num_unit );
+                    $unit = '%' === $unit ? 'vh' : $unit;
+                    $height_value[$device] = $numeric . $unit;
+                }
+            }
+
+            $rules = sek_set_mq_css_rules(array(
+                'value' => $height_value,
+                'css_property' => 'height',
+                'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-btn',
+                'level_id' => $complete_modul_model['id']
+            ), $rules );
+        }
+    }
+
     return $rules;
 }
 

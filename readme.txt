@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.6
-Stable tag: 2.1.23
+Stable tag: 2.1.24
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,14 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.20 : Improved compatibility with future WP default theme : Twenty Twenty-One. Significant performance improvement with more efficient CSS and JS assets loading logic on front. Fixed minor CSS and markup issue.
+2.1.24 : [SEO] Implemented compatibility with the content analyzer of Rank Math SEO plugin. [button module] Added new options to customize width and height of the button. [WP 5.6] Fixed compatibility issues with the upcoming version of WP.
 
 == Changelog ==
+= 2.1.24 November 19th 2020 =
+* fixed : [WP 5.6][admin][NB button] updated selector of the header toolbar with new in WP5.6 + implement retro-compat with previous versions
+* added : [compatibility] Implemented compatibility with the content analyzer of Rank Math SEO plugin
+* added : [button module] new options to customize width and height of the button
+
 = 2.1.23 November 17th 2020 =
 * fixed : [jQuery][javascript] prepare code for WordPress 5.6+ and removal of jquery migrate
 * fixed : fixed : [CSS][default style] headings font-sizes should be styled by default when used in another module than the heading one, like in the rich text module for example

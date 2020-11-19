@@ -29,6 +29,11 @@
   align-items: center;
 }
 
+.sek-btn-inner .sek-btn-text {
+  width: 100%;
+  text-align: center;
+}
+
 .sek-btn.box-shadow {
   -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
