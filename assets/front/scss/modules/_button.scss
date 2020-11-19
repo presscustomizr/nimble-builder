@@ -28,6 +28,10 @@
 .#{$project-prefix}btn-inner {
     display: flex;
     align-items: center;
+    .sek-btn-text  {
+        width: 100%;
+        text-align: center;
+    }
 }
 .#{$project-prefix}btn.box-shadow {
     -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
