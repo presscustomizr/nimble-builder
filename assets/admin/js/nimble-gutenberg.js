@@ -1,18 +1,31 @@
 // Introduced for https://github.com/presscustomizr/nimble-builder/issues/449
 (function ($) {
     var button_printed = false,
+        // the callback is ran until unsuscribed when headerToolBar element has been detected and the btn printed
         _callback = function () {
             if ( button_printed )
               return;
-            if ( $('#editor').find('.edit-post-header-toolbar').length > 0 ) {
+
+            var $headerToolBar = $('#editor').find('.edit-post-header__toolbar');
+            var _printBtn = function() {
                 var html = $($('#sek-edit-with-nb').html());
                 setTimeout( function() {
-                    $('#editor').find('.edit-post-header-toolbar').append( html );
+                    $headerToolBar.append( html );
                 }, 300 );// <= May 2020 : introduce a delay to make sure NB edit btn is printed after all gutenberg menu items. @todo find the relevant event to do that instead.
                 button_printed = true;
                 // unsubscribe the listener
                 // documented here : https://developer.wordpress.org/block-editor/packages/packages-data/#subscribe
                 wp.data.subscribe(_callback)();
+            };
+
+            if ( $headerToolBar.length > 0 ) {
+                _printBtn();
+            } else {
+                // Nov 2020 => retro compat with WP version < 5.6
+                $headerToolBar = $('#editor').find('.edit-post-header-toolbar');
+                if ( $headerToolBar.length > 0 ) {
+                    _printBtn();
+                }
             }
         };
 
