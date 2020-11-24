@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.6
-Stable tag: 2.1.24
+Stable tag: 2.1.25
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,14 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.24 : [SEO] Implemented compatibility with the content analyzer of Rank Math SEO plugin. [button module] Added new options to customize width and height of the button. [WP 5.6] Fixed compatibility issues with the upcoming version of WP.
+2.1.25 : Fixes a compatibility issue with WPML translation plugin. [WP 5.6] improves compatibility with new default theme Twenty Twenty One.
 
 == Changelog ==
+= 2.1.25 November 24th 2020 =
+* fixed : [pre-built section] link to demo should not be displayed when not specified
+* fixed : [WP 5.6] images in the image module should not be inline styled by third party themes/plugins (as new default theme Twenty Twenty One does it with a filter for example )
+* fixed : [WPML translation] compatibility issue with WPML preventing NB to build translated page
+
 = 2.1.24 November 19th 2020 =
 * fixed : [WP 5.6][admin][NB button] updated selector of the header toolbar with new in WP5.6 + implement retro-compat with previous versions
 * added : [compatibility] Implemented compatibility with the content analyzer of Rank Math SEO plugin

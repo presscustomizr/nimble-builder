@@ -2674,6 +2674,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
             //encapsulates a WordPress ajax request in a normalize method
             //@param queryParams = {}
+            //
+            //Important : we MUST use $.ajax() because when previewing, the ajax requests params are amended with a preFilter ( see customize-preview.js, $.ajaxPrefilter( prefilterAjax ) )in order to include params
+            //in particular the 'customized' dirty values, that NB absolutely needs to dynamically register settings that have not yet been instantiated by WP_Customize_Manager
+            // see WP Core => class WP_Customize_Manager, add_action( 'customize_register', array( $this, 'register_dynamic_settings' ), 11 );
+            // see NB => class SEK_CZR_Dyn_Register
+            // see NB => Nimble_Customizer_Setting::filter_previewed_sek_get_skoped_seks => this is how we can get the sektions collection while customizing, see sek_get_skoped_seks()
             doAjax : function( queryParams ) {
                   var self = this;
                   //do we have a queryParams ?
@@ -2688,6 +2694,16 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             },
                             queryParams
                       );
+
+                  // Check if the ajax url passes WP core customize-preview test
+                  // Nov 2020 : added when fixing WPML compat https://github.com/presscustomizr/nimble-builder/issues/753
+                  var urlParser = document.createElement( 'a' );
+                      urlParser.href = ajaxUrl;
+                  // Abort if the request is not for this site.
+                  if ( ! api.isLinkPreviewable( urlParser, { allowAdminAjax: true } ) ) {
+                      self.errare( 'self.doAjax => error => !api.isLinkPreviewable for action ' + _query_.action, urlParser );
+                      return dfd.resolve().promise();
+                  }
 
                   // HTTP ajaxurl when site is HTTPS causes Access-Control-Allow-Origin failure in Desktop and iOS Safari
                   if ( "https:" == document.location.protocol ) {
@@ -2720,6 +2736,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   // That's why those static query params are written in the preview frame, and used as ajax params that we can access server side via php $_POST.
                   _query_.czr_query_params = JSON.stringify( _.isObject( _wpCustomizeSettings.czr_query_params ) ? _wpCustomizeSettings.czr_query_params : [] );
 
+                  // note that the $_POST['customized'] param is set by core WP customizer-preview.js with $.ajaxPrefilter
                   $.post( ajaxUrl, _query_ )
                         .done( function( _r ) {
                               // Check if the user is logged out.
