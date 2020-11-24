@@ -149,6 +149,7 @@ function sek_get_code_editor_params() {
 // POSTPONE FEEDBACK NOTIFICATION IN CUSTOMIZER
 // INSPIRED FROM CORE DISMISS POINTER MECHANISM
 // @see wp-admin/includes/ajax-actions.php
+// Nov 2020 => DEPRECATED https://github.com/presscustomizr/nimble-builder/issues/701
 function sek_postpone_feedback_notification() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
 

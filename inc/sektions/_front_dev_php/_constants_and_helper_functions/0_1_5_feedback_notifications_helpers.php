@@ -2,24 +2,27 @@
 // /* ------------------------------------------------------------------------- *
 // *  FEEDBACK NOTIF
 // /* ------------------------------------------------------------------------- */
-// Invoked when generating the customizer localized js params 'sektionsLocalizedData'
+// Invoked when printing the review note in the plugin table, in the 'plugin_row_meta'
+// Since this is a quite heavy check, NB stores it in a 7 days long transient
 function sek_get_feedback_notif_status() {
-    if ( sek_feedback_notice_is_dismissed() )
-      return;
-    if ( sek_feedback_notice_is_postponed() )
-      return;
+    // if ( sek_feedback_notice_is_dismissed() )
+    //   return;
+    // if ( sek_feedback_notice_is_postponed() )
+    //   return;
 
-    // Did we set the status already ?
-    if ( 'not_set' !== Nimble_Manager()->feedback_notif_status )
-      return Nimble_Manager()->feedback_notif_status;
+    // Check if we already stored the status in a transient first
 
-    // If not let's set it
+    $transient_name = 'nimble_feedback_status';
+    $transient_value = get_transient( $transient_name );
+    if ( false != $transient_value ) {
+        return 'eligible' === $transient_value;
+    }
 
+    // If transient not set or expired, let's set it and return the feedback status
     $start_version = get_option( 'nimble_started_with_version', NIMBLE_VERSION );
-    //sek_error_log('START VERSION ?' . $start_version, version_compare( $start_version, '1.6.0', '<=' ) );
 
-    // Bail if user started after v2.1.14, October 6th, 2020 ( set on November 23th 2020 )
-    if ( !version_compare( $start_version, '2.1.14', '<=' ) )
+    // Bail if user started after v2.1.20, October 22nd 2020 ( set on November 23th 2020 )
+    if ( !version_compare( $start_version, '2.1.20', '<=' ) )
       return;
 
     $sek_post_query_vars = array(
@@ -56,12 +59,16 @@ function sek_get_feedback_notif_status() {
 
     $modules_used = array_unique($modules_used);
 
+    $transient_value = 'not_eligible';
     // sek_error_log('$section_created ??', $nb_section_created );
     // sek_error_log('$modules_used ?? ' . count($modules_used), $modules_used );
     // sek_error_log('$customized_pages ??', $customized_pages );
     //version_compare( $this->wp_version, '4.1', '>=' )
-    Nimble_Manager()->feedback_notif_status = $customized_pages > 2 && $nb_section_created > 4 && count($modules_used) > 3;
-    return Nimble_Manager()->feedback_notif_status;
+    if ( $customized_pages > 2 && $nb_section_created > 4 && count($modules_used) > 3 ) {
+        $transient_value = 'eligible';
+    }
+    set_transient( $transient_name, $transient_value, 7 * DAY_IN_SECONDS );
+    return $transient_value;
 }
 
 
@@ -84,7 +91,7 @@ function sek_populate_list_of_modules_used( $seks_data ) {
     }
 }
 
-
+// Nov 2020 =
 function sek_feedback_notice_is_dismissed() {
     $dismissed = get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true );
     $dismissed_array = array_filter( explode( ',', (string) $dismissed ) );

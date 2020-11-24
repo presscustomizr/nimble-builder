@@ -918,7 +918,9 @@ add_filter( 'plugin_row_meta', function($plugin_meta, $plugin_file, $plugin_data
         $pro_slug = 'nimble-builder-pro/nimble-builder-pro.php';
         $installed_plugins = get_plugins();
         $is_pro_installed = array_key_exists( $pro_slug, $installed_plugins ) || in_array( $pro_slug, $installed_plugins, true );
+
         if ( sek_is_dev_mode() || !$is_pro_installed ) {
+            $plugin_meta = is_array($plugin_meta) ? $plugin_meta : [];
             $plugin_meta[] = sprintf(
               '<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s %3$s</a>',
               'https://wordpress.org/support/plugin/nimble-builder/reviews/?filter=5/#new-post',
