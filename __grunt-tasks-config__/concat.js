@@ -216,7 +216,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/css/_dev_control/_0_2_control_inputs.css',
       '<%= paths.czr_assets %>sek/css/_dev_control/_0_3_control_buttons.css',
       '<%= paths.czr_assets %>sek/css/_dev_control/_0_4_control_top_bar.css',
-      '<%= paths.czr_assets %>sek/css/_dev_control/_0_5_control_feedback_ui.css',
+      //'<%= paths.czr_assets %>sek/css/_dev_control/_0_5_control_feedback_ui.css',
       '<%= paths.czr_assets %>sek/css/_dev_control/_0_6_control_top_save_sections_and_templates.css',
       '<%= paths.czr_assets %>sek/css/_dev_control/_0_7_control_tmpl_gallery.css',
       '<%= paths.czr_assets %>sek/css/_dev_control/_0_8_control_level_tree.css'
@@ -237,7 +237,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_3_sektions_level_tree.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_5_1_sektions_section_save_ui.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_5_2_sektions_template_save_ui.js',//<= april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
-      '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_6_sektions_feedback_ui.js',
+      //'<%= paths.czr_assets %>sek/js/_dev_control/_1_1_6_sektions_feedback_ui.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_1_8_sektions_revision_history.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_2_sektions_setup_collection_setting.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_4_sektions_react_to_preview.js',

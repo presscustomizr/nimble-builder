@@ -490,20 +490,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //       $topPanelTitleElInner.html( logoHtml );
                               // }
 
-                              if ( sektionsLocalizedData.eligibleForFeedbackNotification ) {
-                                    _mainPanel_.expanded.bind( function( expanded ) {
-                                          if ( expanded && _.isUndefined( self.feedbackUIVisible ) ) {
-                                                // FEEDBACK UI
-                                                self.setupFeedBackUI();
+                              // NOV FEEDBACK UI DISABLED in favor of an admin notice
+                              // if ( sektionsLocalizedData.eligibleForFeedbackNotification ) {
+                              //       _mainPanel_.expanded.bind( function( expanded ) {
+                              //             if ( expanded && _.isUndefined( self.feedbackUIVisible ) ) {
+                              //                   // FEEDBACK UI
+                              //                   self.setupFeedBackUI();
 
-                                                // march 2020 : print confettis
-                                                // confettis script is enqueued in the preview
-                                                setTimeout( function() {
-                                                    api.previewer.send('sek-print-confettis', { duration : Date.now() + (1 * 2000) } );
-                                                }, 1000 );
-                                          }
-                                    });
-                              }//if ( sektionsLocalizedData.eligibleForFeedbackNotification )
+                              //                   // march 2020 : print confettis
+                              //                   // confettis script is enqueued in the preview
+                              //                   setTimeout( function() {
+                              //                       api.previewer.send('sek-print-confettis', { duration : Date.now() + (1 * 2000) } );
+                              //                   }, 1000 );
+                              //             }
+                              //       });
+                              // }//if ( sektionsLocalizedData.eligibleForFeedbackNotification )
                         });
                   });
 
