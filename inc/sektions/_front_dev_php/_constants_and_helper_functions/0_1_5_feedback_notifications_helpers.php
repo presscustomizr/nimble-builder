@@ -18,8 +18,8 @@ function sek_get_feedback_notif_status() {
     $start_version = get_option( 'nimble_started_with_version', NIMBLE_VERSION );
     //sek_error_log('START VERSION ?' . $start_version, version_compare( $start_version, '1.6.0', '<=' ) );
 
-    // Bail if user did not start before v1.10.10, February 15th 2020 ( set on March 3rd 2020 )
-    if ( !version_compare( $start_version, '1.10.10', '<=' ) )
+    // Bail if user started after v2.1.14, October 6th, 2020 ( set on November 23th 2020 )
+    if ( !version_compare( $start_version, '2.1.14', '<=' ) )
       return;
 
     $sek_post_query_vars = array(
@@ -60,7 +60,7 @@ function sek_get_feedback_notif_status() {
     // sek_error_log('$modules_used ?? ' . count($modules_used), $modules_used );
     // sek_error_log('$customized_pages ??', $customized_pages );
     //version_compare( $this->wp_version, '4.1', '>=' )
-    Nimble_Manager()->feedback_notif_status = $customized_pages > 0 && $nb_section_created > 2 && count($modules_used) > 2;
+    Nimble_Manager()->feedback_notif_status = $customized_pages > 2 && $nb_section_created > 4 && count($modules_used) > 3;
     return Nimble_Manager()->feedback_notif_status;
 }
 

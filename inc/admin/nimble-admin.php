@@ -896,3 +896,36 @@ function sek_write_update_notice_after_for_pc_themes() {
     }
     return '';
 }
+
+/* ------------------------------------------------------------------------- *
+*  Review link in plugin list table
+*  Nov 2020 for https://github.com/presscustomizr/nimble-builder/issues/701
+/* ------------------------------------------------------------------------- */
+/**
+ * Filters the array of row meta for each plugin in the Plugins list table.
+ * @param string[] $plugin_meta An array of the plugin's metadata, including
+ *                              the version, author, author URI, and plugin URI.
+ * @param string   $plugin_file Path to the plugin file relative to the plugins directory.
+ * @param array    $plugin_data An array of plugin data.
+ * @param string   $status      Status filter currently applied to the plugin list. Possible
+ *                              values are: 'all', 'active', 'inactive', 'recently_activated',
+ *                              'upgrade', 'mustuse', 'dropins', 'search', 'paused',
+ *                              'auto-update-enabled', 'auto-update-disabled'.
+ */
+add_filter( 'plugin_row_meta', function($plugin_meta, $plugin_file, $plugin_data, $status) {
+    if ( false !== strpos($plugin_file, 'nimble-builder.php') && sek_get_feedback_notif_status() ) {
+        $is_pro_installed = false;
+        $pro_slug = 'nimble-builder-pro/nimble-builder-pro.php';
+        $installed_plugins = get_plugins();
+        $is_pro_installed = array_key_exists( $pro_slug, $installed_plugins ) || in_array( $pro_slug, $installed_plugins, true );
+        if ( sek_is_dev_mode() || !$is_pro_installed ) {
+            $plugin_meta[] = sprintf(
+              '<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s %3$s</a>',
+              'https://wordpress.org/support/plugin/nimble-builder/reviews/?filter=5/#new-post',
+              __( 'Enjoying Nimble Builder ? Share a review' ),
+              '<span style="color:#ffb900;font-size: 12px;">&#9733;&#9733;&#9733;&#9733;&#9733;</span>'
+            );
+        }
+    }
+    return $plugin_meta;
+},100,4);
