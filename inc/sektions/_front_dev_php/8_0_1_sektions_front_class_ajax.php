@@ -189,10 +189,17 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
         // @param $sek_action is $_POST['sek_action']
         // @param $maybe_preset_section_id is used when injecting a collection of preset sections
         private function sek_ajax_fetch_content( $sek_action = '', $maybe_preset_section_id = '' ) {
-            //sek_error_log( __CLASS__ . '::' . __FUNCTION__ , $_POST );
-            // the $_POST['customized'] has already been updated
+            //sek_error_log( __CLASS__ . '::' . __FUNCTION__  . ' POST ?', $_POST );
+            // Important Notes :
+            // 1) at this stage => the $_POST['customized'] has already been updated
             // so invoking sek_get_skoped_seks() will ensure that we get the latest data
-            // since wp has not been fired yet, we need to use the posted skope_id param.
+            // How $_POST['customized'] is getting populated without a full refresh of the preview ?
+            // a) Each time the main collection setting id is updated ( @see CZRSeksPrototype::mayBeUpdateSektionsSetting() ), api.Setting.prototype.preview sends a 'setting' event to the preview
+            // ( note that api.Setting.prototype.preview is overriden by NB to send other events )
+            // b) when the core customize-preview receives the event, it updates the customized dirties
+            // c) then when ajaxing, the $_POST['customized'] param is added by WP core with $.ajaxPrefilter() in customize-preview.js
+            //
+            // 2) since 'wp' hook has not been fired yet, we need to use the posted skope_id param.
             $sektionSettingValue = sek_get_skoped_seks( $_POST['location_skope_id'] );
             if ( !is_array( $sektionSettingValue ) ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => invalid sektionSettingValue => it should be an array().' );

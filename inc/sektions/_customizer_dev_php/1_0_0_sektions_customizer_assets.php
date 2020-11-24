@@ -1127,4 +1127,27 @@ function sek_is_plugin_active_for_network( $plugin ) {
 
   return false;
 }
+
+// Nov 2020 => compatibility with WPML
+// When running ajax requests in the preview, WP verifies if the request is for the current site to prevent cross site injections ( XSS ) attacks
+// This is done in customize-preview.js during the $.ajax preFiltering with the method api.isLinkPreviewable()
+// see customize-preview.js, $.ajaxPrefilter( prefilterAjax );
+// WPML filters the home_url() by adding the language to it, like mysite.com/fr/
+// but the admin ajax url doesn't include the language and is mysite.com/wp-admin/admin-ajax.php, which won't pass the api.isLinkPreviewable() test
+// The following filter makes sure that the base home url is always added to the list of allowed urls
+//
+// this filter is declared in class-wp-customize-manager.php, get_allowed_urls()
+add_filter('customize_allowed_urls', function( $allowed_urls ) {
+  $allowed_urls = is_array($allowed_urls) ? $allowed_urls : [];
+  // @see https://developer.wordpress.org/reference/functions/get_home_url/
+  if ( is_multisite() ) {
+      switch_to_blog( $blog_id );
+      $url_to_add = get_option( 'home' );
+      restore_current_blog();
+  } else {
+      $url_to_add = get_option( 'home' );
+  }
+  $allowed_urls[] = $url_to_add;
+  return $allowed_urls;
+});
 ?>

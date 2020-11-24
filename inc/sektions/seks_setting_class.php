@@ -72,6 +72,8 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
 
   /**
    * Filter `sek_get_skoped_seks` for applying the customized value.
+   * Note that the $_POST['customized'] param is set by core WP customizer-preview.js with $.ajaxPrefilter
+   * This is how NB can access the customized dirty values while ajaxing during customization
    *
    * This is used in the preview when `sek_get_skoped_seks()` is called for rendering the styles.
    *
