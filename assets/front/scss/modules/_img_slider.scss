@@ -15,6 +15,10 @@
     .sek-swiper-loading .sek-carousel-img img {
       display: none;//<= sek-swiper-loading is removed on swiper init event
     }
+    // nov 2020 => hide swiper built-in preloader when customizing because won't be auto-hidden
+    @at-root .customizer-preview .swiper-wrapper .swiper-lazy-preloader {
+        display: none;
+    }
     .swiper-container {
       width: 100%;
       height: 100%;
