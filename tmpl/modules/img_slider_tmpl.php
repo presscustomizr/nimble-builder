@@ -64,7 +64,11 @@ if ( !function_exists('Nimble\sek_maybe_parse_slider_img_html_for_lazyload') ) {
         // - slider lazy loading is not active
         // - global Nimble lazy load is active, and this is the first image ( in this case we want to lazy load the first image of the slider if offscreen )
         if ( skp_is_customizing() || !$lazy_load_on || ( sek_is_img_smartload_enabled() && $is_first_img ) ) {
-            return wp_get_attachment_image( $attachment_id, $size );
+            // Nov 2020 : removes any additional styles added by a theme ( Twenty Twenty one ) or a plugin to the image
+            add_filter( 'wp_get_attachment_image_attributes', '\Nimble\sek_remove_image_style_attr', 999 );
+            $img_html = wp_get_attachment_image( $attachment_id, $size );
+            remove_filter( 'wp_get_attachment_image_attributes', '\Nimble\sek_remove_image_style_attr', 999 );
+            return $img_html;
         }
 
         // If lazy loaded, preprocess the image like wp_get_attachment_image()
@@ -116,7 +120,10 @@ if ( !function_exists('Nimble\sek_maybe_parse_slider_img_html_for_lazyload') ) {
              * @param string|array $size       Requested size. Image size or array of width and height values
              *                                 (in that order). Default 'thumbnail'.
              */
+            // Nov 2020 : removes any additional styles added by a theme ( Twenty Twenty one ) or a plugin to the image
+            add_filter( 'wp_get_attachment_image_attributes', '\Nimble\sek_remove_image_style_attr', 999 );
             $attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $attachment, $size );
+            remove_filter( 'wp_get_attachment_image_attributes', '\Nimble\sek_remove_image_style_attr', 999 );
 
             // add swiper data-* stuffs for lazyloading now, after all filters
             // @see https://swiperjs.com/api/#lazy

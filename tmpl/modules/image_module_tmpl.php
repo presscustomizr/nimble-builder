@@ -19,9 +19,7 @@ $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 $main_settings = $value['main_settings'];
 //$borders_corners_settings = $value['borders_corners'];
 
-// Nov 2020 : removes any additional styles added by a theme ( Twenty Twenty one ) or a plugin to the image
-// because otherwise it overrides NB builder custom width, height, and custom width when scrolling ( NB Pro )
-// hook : 'wp_get_attachment_image_attributes'
+
 if ( !function_exists( 'Nimble\remove_attachment_image_style_attr' ) ) {
     function remove_attachment_image_style_attr( $attr ) {
         if ( is_array($attr) && isset($attr['style']) ) {
@@ -53,9 +51,10 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
 
         $html = '';
         if ( is_int( $img ) ) {
-            add_filter( 'wp_get_attachment_image_attributes', '\Nimble\remove_attachment_image_style_attr', 999 );
+            // Nov 2020 : removes any additional styles added by a theme ( Twenty Twenty one ) or a plugin to the image
+            add_filter( 'wp_get_attachment_image_attributes', '\Nimble\sek_remove_image_style_attr', 999 );
             $html = wp_get_attachment_image( $img, empty( $img_size ) ? 'large' : $img_size);
-            remove_filter( 'wp_get_attachment_image_attributes', '\Nimble\remove_attachment_image_style_attr', 999 );
+            remove_filter( 'wp_get_attachment_image_attributes', '\Nimble\sek_remove_image_style_attr', 999 );
         } else if ( !empty( $img ) && is_string( $img ) ) {
             // the default img is excluded from the smart loading parsing @see nimble_regex_callback()
             // => this is needed because this image has no specific dimensions set. And therefore can create false javascript computations of other element's distance to top on page load.

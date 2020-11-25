@@ -143,7 +143,10 @@ if ( !function_exists( 'Nimble\sek_render_post') ) {
             <?php endif; ?>
               <?php
                   if( $has_post_thumbnail ) {
+                      // Nov 2020 : removes any additional styles added by a theme ( Twenty Twenty one ) or a plugin to the image
+                      add_filter( 'wp_get_attachment_image_attributes', '\Nimble\sek_remove_image_style_attr', 999 );
                       $img_html = wp_get_attachment_image( get_post_thumbnail_id(), empty( $thumb_settings['img_size'] ) ? 'medium' : $thumb_settings['img_size']);
+                      remove_filter( 'wp_get_attachment_image_attributes', '\Nimble\sek_remove_image_style_attr', 999 );
                       if ( !skp_is_customizing() ) {
                         // april 2020 : when customizing, smart load randomly breaks when refreshing the grids
                         // so let's apply smart load only on front for now
