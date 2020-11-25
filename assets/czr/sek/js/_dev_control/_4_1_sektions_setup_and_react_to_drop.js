@@ -209,7 +209,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               .on( 'dragend', function( evt ) { _onEnd.call( $(this), evt ); })
                               // double click insertion
                               // implemented for https://github.com/presscustomizr/nimble-builder/issues/317
-                              .dblclick( function( evt ) { _onDoubleClick.call( $(this), evt ); });
+                              .on( 'dblclick', function( evt ) { _onDoubleClick.call( $(this), evt ); });
                   });
             },//setupNimbleZones()
 
