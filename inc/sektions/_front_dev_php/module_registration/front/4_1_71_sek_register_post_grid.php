@@ -111,7 +111,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'title'       => __( 'Number of columns', 'text_doma' ),
                     'default'     => array( 'desktop' => '2', 'tablet' => '2', 'mobile' => '1' ),
                     'min'         => 1,
-                    'max'         => 4,
+                    'max'         => 12,
                     'step'        => 1,
                     'width-100'   => true,
                     'title_width' => 'width-100'
@@ -1047,6 +1047,235 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
               'level_id' => $complete_modul_model['id']
           ), $rules );
     }
+
+
+    // TABLET AND MOBILE BREAKPOINT SETUP
+    $mobile_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['sm'];// 576
+    $tablet_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['md'];// 768
+
+    $custom_tablet_breakpoint = $tablet_breakpoint;
+
+    // Is there a global custom breakpoint set ?
+    $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
+    $has_global_custom_breakpoint = $global_custom_breakpoint >= 1;
+    // Does the parent section have a custom breakpoint set ?
+    $section_custom_breakpoint = intval( sek_get_closest_section_custom_breakpoint( array( 'searched_level_id' => $complete_modul_model['id'] ) ) );
+    $has_section_custom_breakpoint = $section_custom_breakpoint >= 1;
+
+    // Use section breakpoint in priority, then global one
+    if ( $has_section_custom_breakpoint ) {
+        $custom_tablet_breakpoint = $section_custom_breakpoint;
+    } else if ( $has_global_custom_breakpoint ) {
+        $custom_tablet_breakpoint = $global_custom_breakpoint;
+    }
+
+    sek_error_log('global custom breakpoint => '. $global_custom_breakpoint);
+    sek_error_log('section custom breakpoint => '. $section_custom_breakpoint);
+
+
+    $tablet_breakpoint = $custom_tablet_breakpoint;
+    // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
+    $mobile_breakpoint = $mobile_breakpoint >= $tablet_breakpoint ? $tablet_breakpoint : $mobile_breakpoint;
+
+    $tab_bp_val = $tablet_breakpoint - 1;// -1 to avoid "blind" spots @see https://github.com/presscustomizr/nimble-builder/issues/551
+    $mob_bp_val = $mobile_breakpoint - 1;// -1 to avoid "blind" spots @see https://github.com/presscustomizr/nimble-builder/issues/551
+
+
+    // GRID LAYOUT
+    // NUMBER OF COLUMNS BY DEVICE IN CASE OF A CUSTOM BREAKPOINT, GLOBAL OR FOR THE SECTION
+    // Get the default breakpoint values
+    if ( 'grid' === $main_settings['layout'] ) {
+        // BASE CSS RULES
+        // .sek-grid-layout.sek-all-col-1 {
+        //   -ms-grid-columns: minmax(0,1fr);
+        //   grid-template-columns: minmax(0,1fr);
+        // }
+        // .sek-grid-layout.sek-all-col-2 {
+        //   -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr);
+        //   grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+        //   grid-column-gap: 20px;
+        //   grid-row-gap: 20px;
+        // }
+        $col_nb_gap_map = [
+            'col-1' => null,
+            'col-2' => '20px',
+            'col-3' => '15px',
+            'col-4' => '15px',
+            'col-5' => '15px',
+            'col-6' => '10px',
+            'col-7' => '10px',
+            'col-8' => '10px',
+            'col-9' => '10px',
+            'col-10' => '5px',
+            'col-11' => '5px',
+            'col-12' => '5px'
+        ];
+
+        foreach ($col_nb_gap_map as $col_nb_index => $col_gap) {
+            $col_nb = intval( str_replace('col-', '', $col_nb_index ) );
+            $ms_grid_columns = [];
+            $grid_template_columns = [];
+            // Up to 12 columns
+            for ($j=1; $j <= $col_nb; $j++) {
+                if ( $j > 1 ) {
+                    $ms_grid_columns[] = $col_gap;
+                }
+                $ms_grid_columns[] = 'minmax(0,1fr)';
+                $grid_template_columns[] = 'minmax(0,1fr)';
+            }
+            $ms_grid_columns = implode(' ', $ms_grid_columns);
+            $grid_template_columns = implode(' ', $grid_template_columns);
+
+            $col_css_rules = [
+                '-ms-grid-columns:' . $ms_grid_columns,
+                'grid-template-columns:' . $grid_template_columns
+            ];
+            if ( $col_nb > 1 ) {
+                $col_css_rules[] = 'grid-column-gap:'.$col_gap;
+                $col_css_rules[] = 'grid-row-gap:'.$col_gap;
+            }
+            $rules[] = array(
+                'selector' => '.sek-post-grid-wrapper .sek-grid-layout.sek-all-col-'.$col_nb,
+                'css_rules' => implode(';', $col_css_rules),
+                'mq' =>null
+            );
+        }
+
+
+        // MEDIA QUERIES
+        $main_settings['columns'] = is_array($main_settings['columns']) ? $main_settings['columns'] : [];
+        $cols_by_device = wp_parse_args(
+            $main_settings['columns'],
+            [ 'desktop' => '2', 'tablet' => '2', 'mobile' => '1' ]
+        );
+
+        sek_error_log('ALORS COLUMNS BY DEVICE ?', $cols_by_device );
+
+        $col_css_rules = '';
+        foreach ( $cols_by_device as $device => $col_nb ) {
+            $col_nb = intval($col_nb);
+            // First define the media queries using custom user breakpoints
+            switch( $device ) {
+                case 'desktop' :
+                    $media_qu = "(min-width:{$tablet_breakpoint}px)";
+                break;
+                case 'tablet' :
+                    if ( $mobile_breakpoint >= ( $tab_bp_val ) ) {
+                        $media_qu = "(max-width:{$tab_bp_val}px)";
+                    } else {
+                        $media_qu = "(min-width:{$mob_bp_val}px) and (max-width:{$tab_bp_val}px)";
+                    }
+                break;
+                case 'mobile' :
+                    $media_qu = "(max-width:{$mob_bp_val}px)";
+                break;
+            }
+
+
+            // Then define the selector + css rules by device
+            // SELECTOR
+            $selector = sprintf('[data-sek-id="%1$s"] .sek-post-grid-wrapper .sek-grid-layout.sek-%2$s-col-%3$s',
+                $complete_modul_model['id'],
+                $device,
+                $col_nb
+            );
+
+            // CSS RULES
+            //     .sek-grid-layout.sek-desktop-col-1 {
+            //       -ms-grid-columns: minmax(0,1fr);
+            //       grid-template-columns: minmax(0,1fr);
+            //     }
+            //     .sek-grid-layout.sek-desktop-col-2 {
+            //       -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr);
+            //       grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+            //       grid-column-gap: 20px;
+            //       grid-row-gap: 20px;
+            //     }
+            $ms_grid_columns = [];
+            $grid_template_columns = [];
+            // Up to 12 columns
+            for ($i=1; $i <= $col_nb; $i++) {
+                if ( $i > 1 ) {
+                    $col_gap = array_key_exists('col-'.$col_nb, $col_nb_gap_map ) ? $col_nb_gap_map['col-'.$col_nb] : '5px';
+                    $ms_grid_columns[] = $col_gap;
+                }
+                $ms_grid_columns[] = 'minmax(0,1fr)';
+                $grid_template_columns[] = 'minmax(0,1fr)';
+            }
+
+            $ms_grid_columns = implode(' ', $ms_grid_columns);
+            $grid_template_columns = implode(' ', $grid_template_columns);
+
+            $col_css_rules = [
+                '-ms-grid-columns:' . $ms_grid_columns,
+                'grid-template-columns:' . $grid_template_columns
+            ];
+
+            if ( $col_nb > 1 ) {
+                $col_gap = array_key_exists('col-'.$col_nb, $col_nb_gap_map ) ? $col_nb_gap_map['col-'.$col_nb] : '5px';
+                $col_css_rules[] = 'grid-column-gap:'.$col_gap;
+                $col_css_rules[] = 'grid-row-gap:'.$col_gap;
+            }
+
+            $col_css_rules_ready = [];
+            if ( 'desktop' != $device ) {
+                foreach ($col_css_rules as $col_rule) {
+                    $col_css_rules_ready[] = $col_rule .= '!important';
+                }
+            } else {
+                $col_css_rules_ready = $col_css_rules;
+            }
+            $col_css_rules_ready = implode(';', $col_css_rules_ready);
+
+            $rules[] = array(
+                'selector' => $selector,
+                'css_rules' => $col_css_rules_ready,
+                'mq' => $media_qu
+            );
+        }// end foreach
+    }// END OF GRID LAYOUT RULES
+
+
+    // LIST LAYOUT RULES
+    if ( 'list' === $main_settings['layout'] ) {
+        $css_rules = [
+            '-ms-grid-columns: minmax(0,1fr)!important;',
+            'grid-template-columns: minmax(0,1fr)!important;',//<= important because this property can be customized by users for desktop
+            'grid-gap: 0;',
+        ];
+        // TABLET RULES
+        if ( $mobile_breakpoint >= ( $tab_bp_val ) ) {
+            $media_qu = "(max-width:{$tab_bp_val}px)";
+        } else {
+            $media_qu = "(min-width:{$mob_bp_val}px) and (max-width:{$tab_bp_val}px)";
+        }
+        $rules[] = array(
+            'selector' => '.sek-post-grid-wrapper.sek-has-tablet-breakpoint .sek-list-layout article',
+            'css_rules' => implode('', $css_rules),
+            'mq' => $media_qu
+        );
+        $rules[] = array(
+            'selector' => '.sek-post-grid-wrapper.sek-has-tablet-breakpoint .sek-list-layout article .sek-pg-thumbnail',
+            'css_rules' => 'margin-bottom:15px;',
+            'mq' => $media_qu
+        );
+
+        // MOBILE RULES
+        $media_qu = "(max-width:{$mob_bp_val}px)";
+        $rules[] = array(
+            'selector' => '.sek-post-grid-wrapper.sek-has-mobile-breakpoint .sek-list-layout article',
+            'css_rules' => implode('', $css_rules),
+            'mq' => $media_qu
+        );
+        $rules[] = array(
+            'selector' => '.sek-post-grid-wrapper.sek-has-mobile-breakpoint .sek-list-layout article .sek-pg-thumbnail',
+            'css_rules' => 'margin-bottom:15px;',
+            'mq' => $media_qu
+        );
+    }
+
+    sek_error_log('$rules ??', $rules );
+
     return $rules;
 }
 ?>

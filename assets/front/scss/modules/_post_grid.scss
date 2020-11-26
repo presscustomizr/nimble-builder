@@ -269,157 +269,8 @@
     -ms-grid-row: 1;
     -ms-grid-column: 3;
   }
-
-  .sek-grid-layout.sek-all-col-1 {
-    -ms-grid-columns: minmax(0,1fr);
-    grid-template-columns: minmax(0,1fr);
-  }
-  .sek-grid-layout.sek-all-col-2 {
-    -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr);
-    grid-template-columns: minmax(0,1fr) minmax(0,1fr);
-    grid-column-gap: 20px;
-    grid-row-gap: 20px;
-  }
-  .sek-grid-layout.sek-all-col-3 {
-    -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr);
-    grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
-    grid-column-gap: 15px;
-    grid-row-gap: 15px;
-  }
-  .sek-grid-layout.sek-all-col-4 {
-    -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr);
-    grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
-    grid-column-gap: 15px;
-    grid-row-gap: 15px;
-  }
 }//.sek-post-grid-wrapper COLUMN LAYOUT
 
-
-@include media-breakpoint-up(md) {
-  .sek-post-grid-wrapper {
-    .sek-grid-layout.sek-desktop-col-1 {
-      -ms-grid-columns: minmax(0,1fr);
-      grid-template-columns: minmax(0,1fr);
-    }
-    .sek-grid-layout.sek-desktop-col-2 {
-      -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr);
-      grid-template-columns: minmax(0,1fr) minmax(0,1fr);
-      grid-column-gap: 20px;
-      grid-row-gap: 20px;
-    }
-    .sek-grid-layout.sek-desktop-col-3 {
-      -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr);
-      grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
-      grid-column-gap: 15px;
-      grid-row-gap: 15px;
-    }
-    .sek-grid-layout.sek-desktop-col-4 {
-      -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr);
-      grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
-      grid-column-gap: 15px;
-      grid-row-gap: 15px;
-    }
-  }
-}
-
-@include media-breakpoint-between(sm, sm) {
-  .sek-post-grid-wrapper {
-    .sek-grid-layout.sek-tablet-col-1 {
-      -ms-grid-columns: minmax(0,1fr)!important;
-      grid-template-columns: minmax(0,1fr)!important;
-    }
-    .sek-grid-layout.sek-tablet-col-2 {
-      -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr)!important;
-      grid-template-columns: minmax(0,1fr) minmax(0,1fr)!important;
-      grid-column-gap: 20px;
-      grid-row-gap: 20px;
-    }
-    .sek-grid-layout.sek-tablet-col-3 {
-      -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr)!important;
-      grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
-      grid-column-gap: 15px;
-      grid-row-gap: 15px;
-    }
-    .sek-grid-layout.sek-tablet-col-4 {
-      -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr)!important;
-      grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
-      grid-column-gap: 15px;
-      grid-row-gap: 15px;
-    }
-  }
-}
-@include media-breakpoint-only(xs) {
-  .sek-post-grid-wrapper {
-    .sek-grid-layout.sek-mobile-col-1 {
-      -ms-grid-columns: minmax(0,1fr)!important;
-      grid-template-columns: minmax(0,1fr)!important;
-    }
-    .sek-grid-layout.sek-mobile-col-2 {
-      -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr)!important;
-      grid-template-columns: minmax(0,1fr) minmax(0,1fr)!important;
-      grid-column-gap: 20px;
-      grid-row-gap: 20px;
-    }
-    .sek-grid-layout.sek-mobile-col-3 {
-      -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr)!important;
-      grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
-      grid-column-gap: 15px;
-      grid-row-gap: 15px;
-    }
-    .sek-grid-layout.sek-mobile-col-4 {
-      -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr)!important;
-      grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
-      grid-column-gap: 15px;
-      grid-row-gap: 15px;
-    }
-  }
-}
-
-
-
-// $grid-breakpoints: (
-//   xs: 0,
-//   sm: 576px,
-//   md: 768px,
-//   lg: 992px,
-//   xl: 1200px
-// ) !default;
-
-@include media-breakpoint-between(sm, sm) {
-  .sek-post-grid-wrapper.sek-has-tablet-breakpoint {
-    .sek-list-layout article {
-      -ms-grid-columns: minmax(0,1fr)!important;
-      grid-template-columns: minmax(0,1fr)!important;//<= important because this property can be customized by users for desktop
-      grid-gap: 0;
-      .sek-pg-thumbnail {
-        margin-bottom: 15px;
-      }
-    }
-    // .sek-grid-layout {
-    //   &[class*="sek-desktop-col-"] {
-    //     grid-template-columns: minmax(0,1fr);
-    //   }
-    // }
-  }
-}
-
-@include media-breakpoint-only(xs) {
-  .sek-post-grid-wrapper.sek-has-mobile-breakpoint {
-    .sek-list-layout article {
-      -ms-grid-columns: minmax(0,1fr)!important;
-      grid-template-columns: minmax(0,1fr)!important;//<= important because this property can be customized by users for desktop
-      grid-gap: 0;
-      .sek-pg-thumbnail {
-        margin-bottom: 15px;
-      }
-    }
-    // .sek-grid-layout {
-    //   &[class*="sek-desktop-col-"] {
-    //     grid-template-columns: minmax(0,1fr);
-    //   }
-    // }
-  }
-}
 
 
 // PAGINATION LINKS
@@ -529,3 +380,173 @@
     font-size: 0.9em;
   }
 }
+
+
+// NOV 2020 : max column number grows from 4 to 12
+// Therefore the following rules are now generated server side which is much more flexible
+
+  // .sek-grid-layout.sek-all-col-1 {
+  //   -ms-grid-columns: minmax(0,1fr);
+  //   grid-template-columns: minmax(0,1fr);
+  // }
+  // .sek-grid-layout.sek-all-col-2 {
+  //   -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr);
+  //   grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+  //   grid-column-gap: 20px;
+  //   grid-row-gap: 20px;
+  // }
+  // .sek-grid-layout.sek-all-col-3 {
+  //   -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr);
+  //   grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+  //   grid-column-gap: 15px;
+  //   grid-row-gap: 15px;
+  // }
+  // .sek-grid-layout.sek-all-col-4 {
+  //   -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr);
+  //   grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+  //   grid-column-gap: 15px;
+  //   grid-row-gap: 15px;
+  // }
+  // .sek-grid-layout.sek-all-col-5 {
+  //   -ms-grid-columns: minmax(0,1fr) 10px minmax(0,1fr) 10px minmax(0,1fr) 10px minmax(0,1fr) 10px minmax(0,1fr);
+  //   grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+  //   grid-column-gap: 10px;
+  //   grid-row-gap: 10px;
+  // }
+  // .sek-grid-layout.sek-all-col-6 {
+  //   -ms-grid-columns: minmax(0,1fr) 10px minmax(0,1fr) 10px minmax(0,1fr) 10px minmax(0,1fr) 10px minmax(0,1fr) 10px minmax(0,1fr);
+  //   grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+  //   grid-column-gap: 10px;
+  //   grid-row-gap: 10px;
+  // }
+
+
+
+
+// @include media-breakpoint-up(md) {
+//   .sek-post-grid-wrapper {
+//     .sek-grid-layout.sek-desktop-col-1 {
+//       -ms-grid-columns: minmax(0,1fr);
+//       grid-template-columns: minmax(0,1fr);
+//     }
+//     .sek-grid-layout.sek-desktop-col-2 {
+//       -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr);
+//       grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+//       grid-column-gap: 20px;
+//       grid-row-gap: 20px;
+//     }
+//     .sek-grid-layout.sek-desktop-col-3 {
+//       -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr);
+//       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+//       grid-column-gap: 15px;
+//       grid-row-gap: 15px;
+//     }
+//     .sek-grid-layout.sek-desktop-col-4 {
+//       -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr);
+//       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+//       grid-column-gap: 15px;
+//       grid-row-gap: 15px;
+//     }
+//   }
+// }
+
+// @include media-breakpoint-between(sm, sm) {
+//   .sek-post-grid-wrapper {
+//     .sek-grid-layout.sek-tablet-col-1 {
+//       -ms-grid-columns: minmax(0,1fr)!important;
+//       grid-template-columns: minmax(0,1fr)!important;
+//     }
+//     .sek-grid-layout.sek-tablet-col-2 {
+//       -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr)!important;
+//       grid-template-columns: minmax(0,1fr) minmax(0,1fr)!important;
+//       grid-column-gap: 20px;
+//       grid-row-gap: 20px;
+//     }
+//     .sek-grid-layout.sek-tablet-col-3 {
+//       -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr)!important;
+//       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
+//       grid-column-gap: 15px;
+//       grid-row-gap: 15px;
+//     }
+//     .sek-grid-layout.sek-tablet-col-4 {
+//       -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr)!important;
+//       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
+//       grid-column-gap: 15px;
+//       grid-row-gap: 15px;
+//     }
+//   }
+// }
+// @include media-breakpoint-only(xs) {
+//   .sek-post-grid-wrapper {
+//     .sek-grid-layout.sek-mobile-col-1 {
+//       -ms-grid-columns: minmax(0,1fr)!important;
+//       grid-template-columns: minmax(0,1fr)!important;
+//     }
+//     .sek-grid-layout.sek-mobile-col-2 {
+//       -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr)!important;
+//       grid-template-columns: minmax(0,1fr) minmax(0,1fr)!important;
+//       grid-column-gap: 20px;
+//       grid-row-gap: 20px;
+//     }
+//     .sek-grid-layout.sek-mobile-col-3 {
+//       -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr)!important;
+//       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
+//       grid-column-gap: 15px;
+//       grid-row-gap: 15px;
+//     }
+//     .sek-grid-layout.sek-mobile-col-4 {
+//       -ms-grid-columns: minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr)!important;
+//       grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
+//       grid-column-gap: 15px;
+//       grid-row-gap: 15px;
+//     }
+//   }
+// }
+
+
+
+// $grid-breakpoints: (
+//   xs: 0,
+//   sm: 576px,
+//   md: 768px,
+//   lg: 992px,
+//   xl: 1200px
+// ) !default;
+
+// @include media-breakpoint-between(sm, sm) {
+//   .sek-post-grid-wrapper.sek-has-tablet-breakpoint {
+//     .sek-list-layout article {
+//       -ms-grid-columns: minmax(0,1fr)!important;
+//       grid-template-columns: minmax(0,1fr)!important;//<= important because this property can be customized by users for desktop
+//       grid-gap: 0;
+//       .sek-pg-thumbnail {
+//         margin-bottom: 15px;
+//       }
+//     }
+//     // .sek-grid-layout {
+//     //   &[class*="sek-desktop-col-"] {
+//     //     grid-template-columns: minmax(0,1fr);
+//     //   }
+//     // }
+//   }
+// }
+
+// @include media-breakpoint-only(xs) {
+//   .sek-post-grid-wrapper.sek-has-mobile-breakpoint {
+//     .sek-list-layout article {
+//       -ms-grid-columns: minmax(0,1fr)!important;
+//       grid-template-columns: minmax(0,1fr)!important;//<= important because this property can be customized by users for desktop
+//       grid-gap: 0;
+//       .sek-pg-thumbnail {
+//         margin-bottom: 15px;
+//       }
+//     }
+//     // .sek-grid-layout {
+//     //   &[class*="sek-desktop-col-"] {
+//     //     grid-template-columns: minmax(0,1fr);
+//     //   }
+//     // }
+//   }
+// }
+
+

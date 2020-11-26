@@ -396,7 +396,7 @@ if ( is_object( $post_collection ) && $post_collection->have_posts() ) {
   foreach ( $columns_by_device as $device => $column_nb ) {
       $column_nb = (int)$column_nb;
       if ( !empty( $column_nb ) ) {
-        $column_nb = $column_nb > 4 ? 4 : $column_nb;
+        $column_nb = $column_nb > 12 ? 12 : $column_nb;
         $column_nb = $column_nb < 1 ? 1 : $column_nb;
       }
       $normalized_columns_by_device[$device] = $column_nb;
