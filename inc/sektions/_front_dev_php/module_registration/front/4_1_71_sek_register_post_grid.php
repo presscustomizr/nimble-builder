@@ -114,7 +114,8 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'max'         => 12,
                     'step'        => 1,
                     'width-100'   => true,
-                    'title_width' => 'width-100'
+                    'title_width' => 'width-100',
+                    'refresh_stylesheet' => true //<= some CSS rules are layout dependant
                 ),//null,
                 'img_column_width' => array(
                     'input_type'  => 'range_simple_device_switcher',
@@ -133,7 +134,8 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'title'       => '<i class="material-icons sek-input-title-icon">tablet_mac</i>' . __('Reorganize image and content vertically on tablet devices', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
-                    'input_width' => 'width-20'
+                    'input_width' => 'width-20',
+                    'refresh_stylesheet' => true
                     //'html_before' => '<hr>'
                 ),
                 'has_mobile_breakpoint' => array(
@@ -142,6 +144,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
+                    'refresh_stylesheet' => true
                 ),
 
                 'show_title' => array(
@@ -175,7 +178,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'min' => 1,
                     'max' => 100,
                     //'unit' => 'px',
-                    'default' => array( 'desktop' => '15px' ),
+                    'default' => array( 'desktop' => '10px' ),
                     'width-100'   => true,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -205,7 +208,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 'content_padding' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Content blocks padding', 'text_doma'),
-                    'min' => 1,
+                    'min' => 0,
                     'max' => 100,
                     //'unit' => 'px',
                     'default' => array( 'desktop' => '0px' ),
@@ -414,8 +417,8 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
 function sek_get_module_params_for_czr_post_grid_fonts_child() {
     $pt_font_selectors = array( '.sek-module-inner .sek-post-grid-wrapper .sek-pg-title a', '.sek-module-inner .sek-post-grid-wrapper .sek-pg-title' );
     $pe_font_selectors = array( '.sek-module-inner  .sek-post-grid-wrapper .sek-excerpt', '.sek-module-inner  .sek-post-grid-wrapper .sek-excerpt *' );
-    $cat_font_selectors = array( '.sek-module-inner .sek-pg-category a' );
-    $metas_font_selectors = array( '.sek-module-inner .sek-pg-metas span', '.sek-module-inner .sek-pg-metas a');
+    $cat_font_selectors = array( '.sek-module-inner .sek-pg-category', '.sek-module-inner .sek-pg-category a' );
+    $metas_font_selectors = array( '.sek-module-inner .sek-pg-metas', '.sek-module-inner .sek-pg-metas span', '.sek-module-inner .sek-pg-metas a');
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_post_grid_fonts_child',
@@ -473,7 +476,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             'pt_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __( 'Text color', 'text_doma' ),
-                                'default'     => '#444',
+                                'default'     => '#121212',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'width-100'   => true,
@@ -483,7 +486,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             'pt_color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __( 'Text color on mouse over', 'text_doma' ),
-                                'default'     => '',
+                                'default'     => '#666',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'width-100'   => true,
@@ -542,7 +545,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),
                             'pe_font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
-                                'default'     => array( 'desktop' => '16px' ),
+                                'default'     => array( 'desktop' => '14px' ),
                                 'title_width' => 'width-100',
                                 'title'       => __( 'Font size', 'text_doma' ),
                                 'min' => 0,
@@ -556,7 +559,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             'pe_line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
                                 'title'       => __( 'Line height', 'text_doma' ),
-                                'default'     => '1.5em',
+                                'default'     => '1.3em',
                                 'min' => 0,
                                 'max' => 10,
                                 'step' => 0.1,
@@ -569,7 +572,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             'pe_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title'       => __( 'Text color', 'text_doma' ),
-                                'default'     => '#494949',
+                                'default'     => '#555',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
                                 'width-100'   => true,
@@ -638,7 +641,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),
                             'cat_font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
-                                'default'     => array( 'desktop' => '14px' ),
+                                'default'     => array( 'desktop' => '13px' ),
                                 'title_width' => 'width-100',
                                 'title'       => __( 'Font size', 'text_doma' ),
                                 'min' => 0,
@@ -652,7 +655,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             'cat_line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
                                 'title'       => __( 'Line height', 'text_doma' ),
-                                'default'     => '1.5em',
+                                'default'     => '1.2em',
                                 'min' => 0,
                                 'max' => 10,
                                 'step' => 0.1,
@@ -734,7 +737,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),
                             'met_font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
-                                'default'     => array( 'desktop' => '14px' ),
+                                'default'     => array( 'desktop' => '13px' ),
                                 'title_width' => 'width-100',
                                 'title'       => __( 'Font size', 'text_doma' ),
                                 'min' => 0,
@@ -748,7 +751,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             'met_line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
                                 'title'       => __( 'Line height', 'text_doma' ),
-                                'default'     => '1.5em',
+                                'default'     => '1.2em',
                                 'min' => 0,
                                 'max' => 10,
                                 'step' => 0.1,
@@ -840,7 +843,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
     $margin_bottom = $main_settings['space_between_el'];
     $margin_bottom = is_array( $margin_bottom ) ? $margin_bottom : array();
     $defaults = array(
-        'desktop' => '15px',// <= this value matches the static CSS rule and the input default for the module
+        'desktop' => '10px',// <= this value matches the static CSS rule and the input default for the module
         'tablet' => '',
         'mobile' => ''
     );
@@ -996,7 +999,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
               // Leave the device value empty if === to default
               // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
               // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-              if ( !empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
+              //if ( !empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
+              if ( !empty( $num_unit ) ) {
                   $unit = sek_extract_unit( $num_unit );
                   $gap_ready_value[$device] = $numeric . $unit;
               }
@@ -1008,8 +1012,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
               'value' => $gap_ready_value,
               'css_property' => 'grid-column-gap',
               'selector' => implode( ',', [
-                  '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-layout',
-                  '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-list-layout article.sek-has-thumb'
+                  '.nb-loc [data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-post-grid-wrapper .sek-grid-layout',
+                  '.nb-loc [data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-post-grid-wrapper .sek-list-layout article.sek-has-thumb'
               ] ),
               'is_important' => false,
               'level_id' => $complete_modul_model['id']
@@ -1033,7 +1037,8 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
               // Leave the device value empty if === to default
               // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
               // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-              if ( !empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
+              //if ( !empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
+              if ( !empty( $num_unit ) ) {
                   $unit = sek_extract_unit( $num_unit );
                   $v_gap_ready_value[$device] = $numeric . $unit;
               }
@@ -1042,7 +1047,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
           $rules = sek_set_mq_css_rules(array(
               'value' => $v_gap_ready_value,
               'css_property' => 'grid-row-gap',
-              'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-grid-items',
+              'selector' => '.nb-loc [data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-post-grid-wrapper .sek-grid-items',
               'is_important' => false,
               'level_id' => $complete_modul_model['id']
           ), $rules );
@@ -1068,10 +1073,6 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
     } else if ( $has_global_custom_breakpoint ) {
         $custom_tablet_breakpoint = $global_custom_breakpoint;
     }
-
-    sek_error_log('global custom breakpoint => '. $global_custom_breakpoint);
-    sek_error_log('section custom breakpoint => '. $section_custom_breakpoint);
-
 
     $tablet_breakpoint = $custom_tablet_breakpoint;
     // If user define breakpoint ( => always for tablet ) is < to $mobile_breakpoint, make sure $mobile_breakpoint is reset to tablet_breakpoint
@@ -1101,7 +1102,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             'col-2' => '20px',
             'col-3' => '15px',
             'col-4' => '15px',
-            'col-5' => '15px',
+            'col-5' => '10px',
             'col-6' => '10px',
             'col-7' => '10px',
             'col-8' => '10px',
@@ -1148,8 +1149,6 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             $main_settings['columns'],
             [ 'desktop' => '2', 'tablet' => '2', 'mobile' => '1' ]
         );
-
-        sek_error_log('ALORS COLUMNS BY DEVICE ?', $cols_by_device );
 
         $col_css_rules = '';
         foreach ( $cols_by_device as $device => $col_nb ) {
@@ -1220,7 +1219,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             $col_css_rules_ready = [];
             if ( 'desktop' != $device ) {
                 foreach ($col_css_rules as $col_rule) {
-                    $col_css_rules_ready[] = $col_rule .= '!important';
+                    $col_css_rules_ready[] = $col_rule .= '';//!important';
                 }
             } else {
                 $col_css_rules_ready = $col_css_rules;
@@ -1256,7 +1255,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
         );
         $rules[] = array(
             'selector' => '.sek-post-grid-wrapper.sek-has-tablet-breakpoint .sek-list-layout article .sek-pg-thumbnail',
-            'css_rules' => 'margin-bottom:15px;',
+            'css_rules' => 'margin-bottom:10px;',
             'mq' => $media_qu
         );
 
@@ -1269,13 +1268,10 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
         );
         $rules[] = array(
             'selector' => '.sek-post-grid-wrapper.sek-has-mobile-breakpoint .sek-list-layout article .sek-pg-thumbnail',
-            'css_rules' => 'margin-bottom:15px;',
+            'css_rules' => 'margin-bottom:10px;',
             'mq' => $media_qu
         );
     }
-
-    sek_error_log('$rules ??', $rules );
-
     return $rules;
 }
 ?>

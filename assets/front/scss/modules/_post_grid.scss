@@ -10,10 +10,10 @@
   .sek-grid-items {
     grid-row-gap: 25px;
     &.sek-list-layout article>*:not(:last-child):not(.sek-pg-thumbnail){
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
     &.sek-grid-layout article>*:not(:last-child){
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
 
     article {
@@ -30,7 +30,7 @@
       .sek-pg-content {
         >*:not(:last-child) {
           margin-top: 0!important;
-          margin-bottom: 15px;
+          margin-bottom: 10px;
         }
         >:first-child {
           margin-top: 0!important;
@@ -143,42 +143,60 @@
 
 
 // FONTS
-.sek-module-inner .sek-post-grid-wrapper {
+.nb-loc .sek-module-inner .sek-post-grid-wrapper {
   // Category font
-  .sek-pg-category a {
-    text-transform: uppercase;
-    font-size: 14px;
-    text-decoration: none;
+  .sek-pg-category {
+    line-height: 1.2em;
     color: #767676;
+    a {
+      text-transform: uppercase;
+      font-size: 13px;
+      text-decoration: none;
+      color: #767676;
+      &:hover {
+        color: inherit;
+        text-decoration: underline;
+      }
+    }
   }
   // Title
   .sek-pg-title {
     // reset theme and plugins value for h2
     font-size: 28px;
-    line-height: 1.3em;
+    line-height: 1.1em;
     a {
       text-decoration: none;
-      color: #444;
+      color: #121212;
       font-size: 28px;
       font-weight: 400;
-      line-height: 1.3em;
+      line-height: 1.1em;
       -ms-word-wrap: break-word;
       word-wrap: break-word;
+      &:hover {
+        color: #666
+      }
     }
   }
   // Metas font
-  .sek-pg-metas span, .sek-pg-metas a {
-    text-transform: uppercase;
-    font-size: 14px;
-    letter-spacing: 1px;
-    color: #767676;
+  .sek-pg-metas {
+      line-height: 1.2em;
+      span, a {
+      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 1px;
+      color: #767676;
+    }
+    a:hover {
+      text-decoration: underline;
+      color: inherit;
+    }
   }
   // Excerpt
   .sek-pg-content p {
-    margin: 0 0 15px 0;
-    line-height: 1.5;
-    font-size: 16px;
-    color: #494949;
+    margin: 0 0 10px 0;
+    line-height: 1.3em;
+    font-size: 14px;
+    color: #555;
   }
 }// .sek-post-grid-wrapper FONTS
 
