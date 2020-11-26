@@ -320,7 +320,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                 'border_radius_css'       => array(
                     'input_type'  => 'border_radius',
                     'title'       => __( 'Rounded corners', 'text_doma' ),
-                    'default' => array( '_all_' => '0px' ),
+                    'default' => array( '_all_' => '4px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'min'         => 0,
