@@ -19,6 +19,10 @@
   display: none;
 }
 
+.customizer-preview .swiper-wrapper .swiper-lazy-preloader {
+  display: none;
+}
+
 [data-sek-module-type="czr_img_slider_module"] .swiper-container {
   width: 100%;
   height: 100%;

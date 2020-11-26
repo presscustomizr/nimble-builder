@@ -577,9 +577,9 @@ add_filter( 'wp_lazy_loading_enabled', function($default) {
 
 
 
-// /* ------------------------------------------------------------------------- *
-// *  IMPORT IMAGE IF NOT ALREADY IN MEDIA LIB
-// /* ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- *
+*  IMPORT IMAGE IF NOT ALREADY IN MEDIA LIB
+/* ------------------------------------------------------------------------- */
 // @return attachment id or WP_Error
 // this method uses download_url()
 // it first checks if the media already exists in the media library
@@ -659,6 +659,19 @@ function sek_sideload_img_and_return_attachment_id( $img_url ) {
     return $id;
 }
 
+/* ------------------------------------------------------------------------- *
+*  REMOVE IMAGE STYLE ATTRIBUTE
+*  Used in image module, slider module, special image module
+/* ------------------------------------------------------------------------- */
+// Nov 2020 : removes any additional styles added by a theme ( Twenty Twenty one ) or a plugin to the image
+// because otherwise it overrides NB builder custom width, height, and custom width when scrolling ( NB Pro )
+// hook : 'wp_get_attachment_image_attributes'
+function sek_remove_image_style_attr( $attr ) {
+    if ( is_array($attr) && isset($attr['style']) ) {
+        unset($attr['style']);
+    }
+    return $attr;
+}
 ?><?php
 /* ------------------------------------------------------------------------- *
  *  Page Menu for menu module

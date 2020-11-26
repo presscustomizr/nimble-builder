@@ -261,7 +261,7 @@ window.nb_.getQueryVariable = function(variable) {
 
                     // Resizer() resizes items based on the object width divided by the compressor * 10
                     var resizer = function () {
-                      $this.css('font-size', Math.max(Math.min($this.width() / (compressor*10), parseFloat(settings.maxFontSize)), parseFloat(settings.minFontSize)));
+                      $this.css('font-size', Math.max(Math.min($this.width() / (compressor*10), parseFloat(settings.maxFontSize)), parseFloat(settings.minFontSize)) + 'px');
                     };
 
                     // Call once to set.
@@ -519,8 +519,13 @@ window.nb_.getQueryVariable = function(variable) {
                           self._maybe_trigger_load( _evt );
                     }, 100 ) );
 
-                    //on DOM ready
+                    // on DOM ready
                     this._maybe_trigger_load('dom-ready');
+                    // Wait and trigger the dom-ready again, so we don't miss any image initially below the viewport
+                    // ( can happen if the height of a page element like a slider is modified at dom ready )
+                    setTimeout( function() {
+                        self._maybe_trigger_load('dom-ready');
+                    }, 1000 );
 
                     // flag so we can check whether his element has been lazyloaded
                     $(this.element).data('nimbleLazyLoadDone', true );

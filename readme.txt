@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.6
-Stable tag: 2.1.26
+Stable tag: 2.1.27
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -123,6 +123,17 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 2.1.26 : Fixes a compatibility issue with WPML translation plugin. [WP 5.6] improves compatibility with new default theme Twenty Twenty One.
 
 == Changelog ==
+= 2.1.27 November 24th 2020 =
+* fixed : [WP5.7][jquery-migrate] replaced deprecated shorthands and fixed wrong usage $.fn.css() method
+* fixed : [carousel module] when customizing the lazy-load preloader is not self-removed
+* fixed : [images] removes any additional style attribute added by a theme ( Twenty Twenty one ) or a plugin to the image
+* added : [slider module][performances] introduction of a new option to pick an image size
+* fixed : [lazyload][performance] Wait and trigger the dom-ready again after 1 second, so we don't miss any image initially below the viewport (can happen if the height of a page element like a slider is modified at dom ready)
+* added : [post grid module] grid layout now supports up to 12 columns
+* improved : [post grid module] the number of columns by device is now consistent with the global custom breakpoint, and the section custom breakpoint
+* improved : [post grid module] default border-radius of post thumbnail now set to 4px by default
+* improved : [grid module] adjust default font-size, line-height, color css rules for text blocks
+
 = 2.1.26 November 24th 2020 =
 * fixed : [pre-built section] link to demo should not be displayed when not specified
 * fixed : [WP 5.6] images in the image module should not be inline styled by third party themes/plugins (as new default theme Twenty Twenty One does it with a filter for example )
