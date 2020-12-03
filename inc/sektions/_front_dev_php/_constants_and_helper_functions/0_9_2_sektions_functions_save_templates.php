@@ -128,7 +128,8 @@ function sek_get_all_saved_templates() {
 
     foreach ( $query->posts as $post_object ) {
         $content = maybe_unserialize( $post_object->post_content );
-        //sek_error_log( __FUNCTION__ . ' POST OBJECT ?', $post_object->post_modified .  get_option('date_format') );
+        sek_error_log( __FUNCTION__ . ' TYPE ?', gettype($post_object->post_content ) );
+        sek_error_log( __FUNCTION__ . ' POST OBJECT ?', $post_object->post_content );
         // Structure of $content :
         // array(
         //     'data' => $_POST['tmpl_data'],//<= json stringified
@@ -160,9 +161,80 @@ function sek_get_all_saved_templates() {
             'last_modified_date' => mysql2date( 'Y-m-d H:i:s', $post_object->post_modified )
         );
     }
-
+    sek_error_log('GET ALL SAVED TMPL', $collection );
     return $collection;
 }
+
+
+
+
+//TEST
+// Disable rich editor when editing NB custom post types
+add_action( 'current_screen', function() {
+    if ( !is_dev_or_debug_mode() || !is_admin() || skp_is_customizing() )
+      return;
+
+    global $pagenow;
+    global $typenow;
+    if ( 'post.php' === $pagenow && in_array($typenow, [NIMBLE_CPT,NIMBLE_SECTION_CPT,NIMBLE_TEMPLATE_CPT]) ) {
+        add_filter( 'user_can_richedit' , '__return_false', 50 );
+    }
+});
+
+// Jsonify
+add_filter( 'content_edit_pre', function( $content, $post_id ) {
+    if ( !is_dev_or_debug_mode() )
+      return $content;
+    $post_type = get_post_type( $post_id );
+    if ( in_array($post_type, [NIMBLE_CPT,NIMBLE_SECTION_CPT,NIMBLE_TEMPLATE_CPT]) ) {
+        return wp_json_encode(maybe_unserialize($content), JSON_PRETTY_PRINT);
+    }
+    return $content;
+}, 10, 2 );
+
+
+// BEFORE INSERTION / UPDATE
+// @see wp-includes/post.php
+// Reformat edited custom post type when updating from the editor
+add_filter( 'wp_insert_post_data', function( $data, $postarr, $unsanitized_postarr ) {
+    sek_error_log('skp_is_customizing() ??', skp_is_customizing() );
+    sek_error_log('$_POST ??' . (defined('DOING_AJAX') && DOING_AJAX), $_POST  );
+    global $pagenow;
+    global $typenow;
+    error_log('MEEEEEEEEEEEEEEEEEEEEE'.$pagenow . get_post_type() . $typenow);
+
+    if ( !is_dev_or_debug_mode() || skp_is_customizing() || (defined('DOING_AJAX') && DOING_AJAX) )
+      return $data;
+
+    if ( 'post.php' !== $pagenow || !in_array($typenow, [NIMBLE_CPT,NIMBLE_SECTION_CPT,NIMBLE_TEMPLATE_CPT]) )
+      return $data;
+
+    sek_error_log('$data ??', $data);
+    if ( is_array($data) && isset($data['post_status']) && 'publish' !== $data['post_status'] )
+      return $data;
+
+
+    $post_type = 'not_set';
+    if ( is_array($postarr) && !empty($postarr['post_type']) ) {
+        $post_type = $postarr['post_type'];
+    }
+    $pre_content = $data['post_content'];
+    if ( in_array($post_type, [NIMBLE_CPT,NIMBLE_SECTION_CPT,NIMBLE_TEMPLATE_CPT]) && is_array($data) && isset($data['post_content']) ) {
+        $pre_content = json_decode( wp_unslash( $pre_content ), true );
+        sek_error_log('$pre_content ??', $pre_content);
+        $data['post_content'] = maybe_serialize( $pre_content );
+    }
+    return $data;
+}, 10 , 3);
+
+
+
+
+
+
+
+
+
 
 
 
@@ -259,4 +331,5 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
     }
     return get_post( $r );
 }
+
 ?>
