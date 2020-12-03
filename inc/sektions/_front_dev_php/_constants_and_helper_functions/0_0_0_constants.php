@@ -11,6 +11,11 @@ function sek_is_debug_mode() {
 function sek_is_dev_mode() {
   return ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) || ( defined( 'WP_DEBUG' ) && WP_DEBUG );
 }
+// @return bool
+// Nov 2020 : helper used to display NB CPT in admin
+function is_dev_or_debug_mode() {
+  return sek_is_debug_mode() || (defined('NIMBLE_DEV') && NIMBLE_DEV);
+}
 
 if ( !defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'nimble_post_type' ); }
 if ( !defined( 'NIMBLE_TEMPLATE_CPT' ) ) { define( 'NIMBLE_TEMPLATE_CPT' , 'nimble_template' ); }

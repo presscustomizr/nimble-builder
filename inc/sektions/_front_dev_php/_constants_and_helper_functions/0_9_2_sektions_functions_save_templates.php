@@ -6,17 +6,17 @@
 // CPT for template : 'nimble_template'
 register_post_type( NIMBLE_TEMPLATE_CPT , array(
     'labels' => array(
-      'name'          => __( 'Nimble templates', 'text_doma' ),
-      'singular_name' => __( 'Nimble templates', 'text_doma' ),
+      'name'          => is_dev_or_debug_mode() ? __( '[NB debug] user templates') : __( 'NB user templates'),
+      'singular_name' => __( 'NB user templates')
     ),
-    'public'           => false,
+    'public'           => is_dev_or_debug_mode(),
     'hierarchical'     => false,
     'rewrite'          => false,
     'query_var'        => false,
     'delete_with_user' => false,
     'can_export'       => true,
     //'_builtin'         => true, /* internal use only. don't use this when registering your own post type. */
-    'supports'         => array( 'title', 'revisions' ),
+    'supports'         => is_dev_or_debug_mode() ? array( 'editor', 'title', 'revisions' ) : array( 'title', 'revisions' ),
     'capabilities'     => array(
         'delete_posts'           => 'edit_theme_options',
         'delete_post'            => 'edit_theme_options',
