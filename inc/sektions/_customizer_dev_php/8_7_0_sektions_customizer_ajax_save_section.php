@@ -148,12 +148,6 @@ function sek_section_save_clean_id( $seks_data = array() ) {
             $new_seks_data[$key] = sek_section_save_clean_id( $value );
         } else {
             switch( $key ) {
-                // case 'bg-image' :
-                // case 'img' :
-                //     if ( is_int( $value ) && (int)$value > 0 ) {
-                //         $value = '__img_url__' . wp_get_attachment_url((int)$value);
-                //     }
-                // break;
                 case 'id' :
                     if ( is_string( $value ) && false !== strpos( $value, '__nimble__' ) ) {
                         $value = '__rep__me__';

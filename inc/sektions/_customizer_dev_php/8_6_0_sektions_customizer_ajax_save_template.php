@@ -94,6 +94,10 @@ function sek_ajax_save_user_template() {
         wp_send_json_error( __FUNCTION__ . '_missing_active_locations' );
     }
 
+    // clean level ids and replace them with a placeholder string
+    $tmpl_data = json_decode( wp_unslash( $_POST['tmpl_data'] ), true );
+    $tmpl_data = sek_template_save_clean_id( $tmpl_data );
+
     // make sure description and title are clean before DB
     $tmpl_title = wp_strip_all_tags( $_POST['tmpl_title'] );
     $tmpl_description = wp_strip_all_tags( $_POST['tmpl_description'] );
@@ -102,7 +106,7 @@ function sek_ajax_save_user_template() {
 
     // sek_error_log('json decode ?', json_decode( wp_unslash( $_POST['sek_data'] ), true ) );
     $template_to_save = array(
-        'data' => $_POST['tmpl_data'],//<= json stringified
+        'data' => $tmpl_data,//<= json stringified
         'tmpl_post_name' => ( !empty( $_POST['tmpl_post_name'] ) && is_string( $_POST['tmpl_post_name'] ) ) ? $_POST['tmpl_post_name'] : null,
         'metas' => array(
             'title' => $tmpl_title,
@@ -125,6 +129,39 @@ function sek_ajax_save_user_template() {
     }
     //sek_error_log( __FUNCTION__ . '$_POST' ,  $_POST);
 }
+
+
+// SAVE FILTER
+function sek_template_save_clean_id( $tmpl_data = array() ) {
+    $new_tmpl_data = array();
+    if ( !is_array( $tmpl_data ) ) {
+        sek_error_log( __FUNCTION__ . ' error => tmpl_data should be an array');
+        return array();
+    }
+    $level = null;
+    if ( isset($tmpl_data['level'] ) ) {
+        $level = $tmpl_data['level'];
+    }
+    foreach ( $tmpl_data as $key => $value ) {
+        if ( is_array($value) ) {
+            $new_tmpl_data[$key] = sek_template_save_clean_id( $value );
+        } else {
+            switch( $key ) {
+                // we want to replace ids for all levels but locations
+                // only section, columns and modules have an id which starts by __nimble__, for ex : __nimble__2024500518bf
+                // locations id are like : loop_start
+                case 'id' :
+                    if ( 'location' !== $level && is_string( $value ) && false !== strpos( $value, '__nimble__' ) ) {
+                        $value = '__rep__me__';
+                    }
+                break;
+            }
+            $new_tmpl_data[$key] = $value;
+        }
+    }
+    return $new_tmpl_data;
+}
+
 
 ////////////////////////////////////////////////////////////////
 // TEMPLATE REMOVE
