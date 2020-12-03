@@ -3,24 +3,18 @@
 
 // @return bool
 // march 2020 introduced https://github.com/presscustomizr/nimble-builder/issues/632
+// Nov 2020, replaced global option by a PHP constant : https://github.com/presscustomizr/nimble-builder/issues/763
 function sek_is_jquery_replaced() {
     if ( skp_is_customizing() )
       return;
-    $glob_perf = sek_get_global_option_value( 'performances' );
-    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['use_latest_version_jquery'] ) ) {
-        return sek_booleanize_checkbox_val( $glob_perf['use_latest_version_jquery'] );
-    }
-    return false;
+    return defined('NIMBLE_USE_LATEST_JQUERY_VERSION') && NIMBLE_USE_LATEST_JQUERY_VERSION;
 }
 
 // @return bool
 // march 2020 introduced for https://github.com/presscustomizr/nimble-builder/issues/612
+// Nov 2020, replaced global option by a PHP constant : https://github.com/presscustomizr/nimble-builder/issues/763
 function sek_load_jquery_async() {
-    $glob_perf = sek_get_global_option_value( 'performances' );
-    if ( !is_null( $glob_perf ) && is_array( $glob_perf ) && !empty( $glob_perf['load_jquery_async'] ) ) {
-        return sek_booleanize_checkbox_val( $glob_perf['load_jquery_async'] );
-    }
-    return false;
+    return defined('NIMBLE_LOAD_JQUERY_ASYNC') && NIMBLE_LOAD_JQUERY_ASYNC;
 }
 
 // @return bool

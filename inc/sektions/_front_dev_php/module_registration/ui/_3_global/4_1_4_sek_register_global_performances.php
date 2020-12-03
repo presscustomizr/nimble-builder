@@ -80,26 +80,7 @@ function sek_get_module_params_for_sek_global_performances() {
                     'input_width' => 'width-20',
                     'html_before' => '<hr/><h3>' . __('SCRIPTS') .'</h3>'
                     //'notice_after' => __('Beta feature'),
-                ),
-
-
-                'load_jquery_async' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Load jQuery library asynchronously', 'text_doma'),
-                    'default'     => 0,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                    'notice_after' => __('Use with caution, can break third party plugins and themes.'),
-                    'html_before' => '<hr/><h3>' . __('JQUERY') .'</h3>'
-                ),
-                'use_latest_version_jquery' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Use the latest version of jQuery library on front-end, without jquery-migrate', 'text_doma'),
-                    'default'     => 0,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                    'notice_after' => __('Use with caution, can break third party plugins and themes.')
-                ),
+                )
             )
         )//tmpl
     );
