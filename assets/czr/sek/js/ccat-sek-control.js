@@ -693,7 +693,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // Add Pro
                               if ( sektionsLocalizedData.isPro ) {
                                   logoHtml += [
-                                      '<img class="sek-nimble-logo" src="',
+                                      '<img class="sek-nimble-logo sek-pro-pastil" src="',
                                       sektionsLocalizedData.baseUrl,
                                       '/assets/czr/sek/img/pro_white.svg?ver=' + sektionsLocalizedData.nimbleVersion,
                                       '"/>',

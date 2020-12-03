@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.6
-Stable tag: 2.1.27
+Stable tag: 2.1.28
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,13 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.26 : Fixes a compatibility issue with WPML translation plugin. [WP 5.6] improves compatibility with new default theme Twenty Twenty One.
+2.1.28 : Ready for WordPress 5.6, scheduled for December 8, 2020. Fixes possible javascript issues on front end.
 
 == Changelog ==
+= 2.1.28 December 3rd 2020 =
+* fixed : [js] always check that window.nb_ is defined before trying to emit an event
+* fixed : [performance] removed global performance > jQuery options, replaced by PHP boolean constants: NIMBLE_LOAD_JQUERY_ASYNC and NIMBLE_USE_LATEST_JQUERY_VERSION
+
 = 2.1.27 November 24th 2020 =
 * fixed : [WP5.7][jquery-migrate] replaced deprecated shorthands and fixed wrong usage $.fn.css() method
 * fixed : [carousel module] when customizing the lazy-load preloader is not self-removed
