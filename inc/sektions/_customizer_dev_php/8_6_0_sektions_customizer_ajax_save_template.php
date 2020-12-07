@@ -184,7 +184,7 @@ function sek_ajax_remove_user_template() {
     // }
     $tmpl_post_to_remove = sek_get_saved_tmpl_post( $_POST['tmpl_post_name'] );
 
-    sek_error_log( __FUNCTION__ . ' => so $tmpl_post_to_remove ' . $_POST['tmpl_post_name'], $tmpl_post_to_remove );
+    //sek_error_log( __FUNCTION__ . ' => so $tmpl_post_to_remove ' . $_POST['tmpl_post_name'], $tmpl_post_to_remove );
 
     if ( $tmpl_post_to_remove && is_object( $tmpl_post_to_remove ) ) {
         $r = wp_delete_post( $tmpl_post_to_remove->ID, true );
