@@ -2,17 +2,17 @@
 // SEKTION POST
 register_post_type( NIMBLE_CPT , array(
     'labels' => array(
-      'name'          => is_dev_or_debug_mode() ? __( '[NB debug] skoped section') : __( 'NB skoped section'),
+      'name'          => sek_is_cpt_debug_mode() ? __( '[NB debug] skoped section') : __( 'NB skoped section'),
       'singular_name' => __( 'NB skoped section')
     ),
-    'public'           => is_dev_or_debug_mode(),
+    'public'           => sek_is_cpt_debug_mode(),
     'hierarchical'     => false,
     'rewrite'          => false,
     'query_var'        => false,
     'delete_with_user' => false,
     'can_export'       => true,
     //'_builtin'         => true, /* internal use only. don't use this when registering your own post type. */
-    'supports'         => is_dev_or_debug_mode() ? array( 'editor', 'title', 'revisions' ) : array( 'title', 'revisions' ),
+    'supports'         => sek_is_cpt_debug_mode() ? array( 'editor', 'title', 'revisions' ) : array( 'title', 'revisions' ),
     'capabilities'     => array(
         'delete_posts'           => 'edit_theme_options',
         'delete_post'            => 'edit_theme_options',

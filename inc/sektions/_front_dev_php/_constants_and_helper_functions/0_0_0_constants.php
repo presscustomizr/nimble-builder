@@ -13,8 +13,8 @@ function sek_is_dev_mode() {
 }
 // @return bool
 // Nov 2020 : helper used to display NB CPT in admin
-function is_dev_or_debug_mode() {
-  return sek_is_debug_mode() || (defined('NIMBLE_DEV') && NIMBLE_DEV);
+function sek_is_cpt_debug_mode() {
+  return isset( $_GET['nimble_cpt_debug'] ) || (defined('NIMBLE_CPT_DEBUG_MODE') && NIMBLE_CPT_DEBUG_MODE);
 }
 
 if ( !defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'nimble_post_type' ); }
