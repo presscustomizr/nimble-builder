@@ -289,7 +289,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       tmpl_title = $_title.val(),
                       tmpl_description = $('#sek-saved-tmpl-description').val(),
                       collectionSettingId = self.localSectionsSettingId(),
-                      currentLocalSettingValue = self.preProcessTmpl( api( collectionSettingId )() );
+                      currentLocalSettingValue;
+
+                  // Dec 2020 : remove locations not active on the page or empty before saving the tmpl
+                  try { currentLocalSettingValue = self.preProcessTmpl( api( collectionSettingId )() ); } catch( er ) {
+                      api.errorLog( 'error in ::saveOrUpdateTemplate', er );
+                      _dfd_.resolve( {success:false});
+                  }
 
                   if ( _.isEmpty( tmpl_title ) ) {
                         $_title.addClass('error');
@@ -489,7 +495,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.templateCollectionPromise.resolve( tmpl_collection );
                         } else {
                               self.templateCollectionPromise.resolve( {} );
-                              api.errare('control::getSavedTmplCollection => error => tmpl collection is invalid');
+                              api.errare('control::getSavedTmplCollection => error => tmpl collection is invalid', tmpl_collection);
                         }
 
                         // response is {tmpl_post_id: 436}
@@ -521,8 +527,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return self.templateCollectionPromise;
             },
 
-            // @return a tmpl model with clean ids
-            // also removes the tmpl properties "id" and "level", which are dynamically set when dragging and dropping
+            // @return a tmpl model
+            // Note : ids are reset server side
             // Example of tmpl model before preprocessing
             // {
             //    collection: [{…}]
@@ -531,9 +537,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //    options: {bg: {…}}
             //    ver_ini: "1.1.8"
             // }
+            // Dec 2020 : remove locations not active on the page or empty before saving the tmpl
             preProcessTmpl : function( tmpl_data ) {
-                  console.log('TO DO => make sure template is ok to be saved');
-                  return tmpl_data;
+                  var self = this, tmpl_processed, active_locations;
+                  if ( !_.isObject( tmpl_data ) ) {
+                      throw new Error('preProcess Tmpl => error : tmpl_data must be an object');
+                  }
+                  tmpl_processed = $.extend( true, {}, tmpl_data );
+                  tmpl_processed.collection = [];
+                  activeLocations = self.activeLocations();
+
+                  //console.log('TO DO => make sure template is ok to be saved', tmpl_data, self.activeLocations() );
+                  _.each( tmpl_data.collection, function( _loc_params ) {
+                        if ( !_.isObject( _loc_params ) || !_loc_params.id || !_loc_params.collection )
+                          return;
+
+                        if ( _.contains( activeLocations, _loc_params.id ) && !_.isEmpty(_loc_params.collection) ) {
+                            tmpl_processed.collection.push( _loc_params );
+                        }
+                  });
+                  return tmpl_processed;
             },
       });//$.extend()
 })( wp.customize, jQuery );

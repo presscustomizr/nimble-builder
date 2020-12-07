@@ -150,22 +150,9 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         // [ 'collection' => [], 'local_options' => [] ];
         $default_collection = sek_get_default_location_model( $skope_id );
         $seks_data = wp_parse_args( $seks_data, $default_collection );
-
         // Maybe add missing registered locations
-        $maybe_incomplete_locations = [];
-        foreach( $seks_data['collection'] as $location_data ) {
-            if ( !empty( $location_data['id'] ) ) {
-                $maybe_incomplete_locations[] = $location_data['id'];
-            }
-        }
+        $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
 
-        foreach( sek_get_locations() as $loc_id => $params ) {
-            if ( !in_array( $loc_id, $maybe_incomplete_locations ) ) {
-                if ( ( sek_is_global_location( $loc_id ) && $is_global_skope ) || ( !sek_is_global_location( $loc_id ) && !$is_global_skope  ) ) {
-                    $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], Nimble_Manager()->default_location_model );
-                }
-            }
-        }
         // cache now
         if ( $is_global_skope ) {
             Nimble_Manager()->global_seks = $seks_data;
@@ -175,17 +162,22 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
 
     }//end if
 
-    // when customizing, let us filter the value with the 'customized' ones
-    $seks_data = apply_filters(
-        'sek_get_skoped_seks',
-        $seks_data,
-        $skope_id,
-        $location_id
-    );
+    if ( skp_is_customizing() ) {
+        // when customizing, let us filter the value with the 'customized' ones
+        $seks_data = apply_filters(
+            'sek_get_skoped_seks',
+            $seks_data,
+            $skope_id,
+            $location_id
+        );
+        // Maybe add missing registered locations when customizing
+        // December 2020 => needed when importing an entire template
+        $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
+    }
 
-    // sek_error_log( '<sek_get_skoped_seks() location => ' . $location .  array_key_exists( 'collection', $seks_data ), $seks_data );
     // if a location is specified, return specifically the sections of this location
     if ( array_key_exists( 'collection', $seks_data ) && !empty( $location_id ) ) {
+        // sek_error_log( 'sek_get_skoped_seks() location => ' . $location_id .  array_key_exists( 'collection', $seks_data ) );
         if ( !array_key_exists( $location_id, sek_get_locations() ) ) {
             error_log( __FUNCTION__ . ' Error => location ' . $location_id . ' is not registered in the available locations' );
         } else {
@@ -194,6 +186,26 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
     }
 
     return 'no_match' === $seks_data ? Nimble_Manager()->default_location_model : $seks_data;
+}
+
+// make sure the locations in the skoped locations tree match the registered locations for the context
+function sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope ) {
+    // Maybe add missing registered locations
+    $maybe_incomplete_locations = [];
+    foreach( $seks_data['collection'] as $location_data ) {
+        if ( !empty( $location_data['id'] ) ) {
+            $maybe_incomplete_locations[] = $location_data['id'];
+        }
+    }
+
+    foreach( sek_get_locations() as $loc_id => $params ) {
+        if ( !in_array( $loc_id, $maybe_incomplete_locations ) ) {
+            if ( ( sek_is_global_location( $loc_id ) && $is_global_skope ) || ( !sek_is_global_location( $loc_id ) && !$is_global_skope  ) ) {
+                $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], Nimble_Manager()->default_location_model );
+            }
+        }
+    }
+    return $seks_data;
 }
 
 
