@@ -34,39 +34,61 @@ add_filter( 'content_edit_pre', function( $content, $post_id ) {
 // BEFORE INSERTION / UPDATE
 // @see wp-includes/post.php
 // Reformat edited custom post type when updating from the editor
+// We need to make sure that the reformating occurs ONLY when this is a manual update
+// - not an update when customizing => check if skp_is_customzing() and DOING_AJAX
+// - not an insertion of the revision post type => check on $data['post_type']
+// Note that the post status can be 'publish', 'draft', 'pending'
 add_filter( 'wp_insert_post_data', function( $data, $postarr, $unsanitized_postarr ) {
-    sek_error_log('skp_is_customizing() ??', skp_is_customizing() );
-
     global $pagenow;
-    global $typenow;
-    error_log('MEEEEEEEEEEEEEEEEEEEEE'.$pagenow . get_post_type() . $typenow);
+    // error_log(' PAGE NOW ?'.$pagenow );
+    // error_log(' POST TYPE FROM DATA ?'. $data['post_type']);
+    // error_log(' POST STATUS ?'. $data['post_status'] );
+
+    // we must be in an single CPT edit screen
+    // prevent processing data when restoring a revision
+    if ( 'post.php' !== $pagenow )
+      return $data;
 
     if ( !sek_is_cpt_debug_mode() || skp_is_customizing() || (defined('DOING_AJAX') && DOING_AJAX) )
       return $data;
 
-    sek_error_log('$_POST ??' . (defined('DOING_AJAX') && DOING_AJAX), $_POST  );
-
-    if ( 'post.php' !== $pagenow || !in_array($typenow, [NIMBLE_CPT,NIMBLE_SECTION_CPT,NIMBLE_TEMPLATE_CPT]) )
+    // $data should be An array of slashed, sanitized, and processed post data.
+    // @see wp-includes/post.php
+    if ( !is_array($data) )
       return $data;
-
-    sek_error_log('$data ??', $data);
-
-    if ( is_array($data) && isset($data['post_status']) && 'publish' !== $data['post_status'] )
-      return $data;
-
 
     $post_type = 'not_set';
-    if ( is_array($postarr) && !empty($postarr['post_type']) ) {
-        $post_type = $postarr['post_type'];
+    if ( !empty($data['post_type']) ) {
+        $post_type = $data['post_type'];
     }
-    $pre_content = $data['post_content'];
-    if ( in_array($post_type, [NIMBLE_CPT,NIMBLE_SECTION_CPT,NIMBLE_TEMPLATE_CPT]) && is_array($data) && isset($data['post_content']) ) {
+    // make sure we only process nimble CPT post type. Not the 'revision' post types.
+    if ( !in_array( $post_type, [NIMBLE_CPT,NIMBLE_SECTION_CPT,NIMBLE_TEMPLATE_CPT] ) )
+      return $data;
+
+    // Stop here if the post is being removed
+    if ( 'trash' == $data['post_status'] )
+      return $data;
+
+    //sek_error_log('$data ??', $data);
+
+
+    $pre_content = isset($data['post_content']) ? $data['post_content'] : null;
+    //sek_error_log('is SERIALIZED ?', is_serialized( $pre_content ));
+    // Serialized if content has been jsonified in the editor
+    // Important : this check is needed in a scenario when the post has been trashed and is restored. In this case the content is already serialized.
+    if ( isset($pre_content) && !empty($pre_content) && !is_serialized( $pre_content ) ) {
         $pre_content = json_decode( wp_unslash( $pre_content ), true );
-
-        sek_error_log('$pre_content ??', $pre_content);
-
-        $data['post_content'] = maybe_serialize( $pre_content );
+        // Check if content is a valid json ?
+        if ( json_last_error() == JSON_ERROR_NONE ) {
+            // if no json error, serialize
+            $data['post_content'] = maybe_serialize( $pre_content );
+            //sek_error_log('VALID JSON => new post_content ??', $data['post_content'] );
+        } else {
+            //sek_error_log('INVALID JSON', json_last_error() );
+            return new \WP_Error( 'db_insert_error', __('Could not insert NB template into the database : invalid JSON'), json_last_error() );
+        }
     }
     return $data;
 }, 10 , 3);
+
 ?>

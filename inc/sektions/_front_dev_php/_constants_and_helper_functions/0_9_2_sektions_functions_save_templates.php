@@ -128,8 +128,8 @@ function sek_get_all_saved_templates() {
 
     foreach ( $query->posts as $post_object ) {
         $content = maybe_unserialize( $post_object->post_content );
-        sek_error_log( __FUNCTION__ . ' TYPE ?', gettype($post_object->post_content ) );
-        sek_error_log( __FUNCTION__ . ' POST OBJECT ?', $post_object->post_content );
+        // sek_error_log( __FUNCTION__ . ' TYPE ?', gettype($post_object->post_content ) );
+        // sek_error_log( __FUNCTION__ . ' POST OBJECT ?', $post_object->post_content );
         // Structure of $content :
         // array(
         //     'data' => $_POST['tmpl_data'],//<= json stringified
@@ -161,7 +161,7 @@ function sek_get_all_saved_templates() {
             'last_modified_date' => mysql2date( 'Y-m-d H:i:s', $post_object->post_modified )
         );
     }
-    sek_error_log('GET ALL SAVED TMPL', $collection );
+    //sek_error_log('GET ALL SAVED TMPL', $collection );
     return $collection;
 }
 
