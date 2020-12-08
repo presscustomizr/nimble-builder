@@ -387,6 +387,29 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//saveOrUpdateSavedSection
 
 
+            // @return a section model
+            // Note : ids are reset server side
+            // Example of section model before preprocessing
+            // {
+            //    collection: [{…}]
+            //    id: "" //<= reset server side
+            //    level: "section"
+            //    is_nested : false
+            //    options: {bg: {…}}
+            //    ver_ini: "1.1.8"
+            // }
+            preProcessSection : function( sectionModel ) {
+                  if ( !_.isObject( sectionModel ) ) {
+                        return null;
+                  }
+                  var preprocessedModel = $.extend( {}, true, sectionModel );
+                  // Make sure a nested section is saved as normal
+                  if ( _.has( preprocessedModel, 'is_nested') ) {
+                        preprocessedModel = _.omit( preprocessedModel, 'is_nested' );
+                  }
+                  return preprocessedModel;
+            },
+
 
             // Fired on 'click on .sek-do-remove-section btn
             removeSavedSection : function(evt, sectionPostNameCandidateForRemoval ) {
@@ -572,29 +595,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   return self.sectionCollectionPromise;
-            },
-
-            // @return a section model
-            // Note : ids are reset server side
-            // Example of section model before preprocessing
-            // {
-            //    collection: [{…}]
-            //    id: "" //<= reset server side
-            //    level: "section"
-            //    is_nested : false
-            //    options: {bg: {…}}
-            //    ver_ini: "1.1.8"
-            // }
-            preProcessSection : function( sectionModel ) {
-                  if ( !_.isObject( sectionModel ) ) {
-                        return null;
-                  }
-                  var preprocessedModel = $.extend( {}, true, sectionModel );
-                  // Make sure a nested section is saved as normal
-                  if ( _.has( preprocessedModel, 'is_nested') ) {
-                        preprocessedModel = _.omit( preprocessedModel, 'is_nested' );
-                  }
-                  return preprocessedModel;
             }
       });//$.extend()
 })( wp.customize, jQuery );
