@@ -71,6 +71,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+
+
+
+
+
             ////////////////////////////////////////////////////////
             // IMPORT FROM USER SAVED COLLECTION OR REMOTE API
             ////////////////////////////////////////////////////////
@@ -280,7 +285,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // the ajax request is processed and will upload images if needed
                   __request__
                         .done( function( server_resp ) {
-
                               // When manually importing a file, the server adds a "success" property
                               // When loading a template this property is not sent. Let's normalize.
                               if ( _.isObject(server_resp) ) {
@@ -295,7 +299,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //console.log('MANUAL IMPORT DATA', server_resp );
                               server_resp.data.data.collection = self.setIdsForImportedTmpl( server_resp.data.data.collection );
                               // and try to update the api setting
-                              api.czr_sektions.doUpdateApiSettingAfterTmplImport( server_resp, params );
+                              api.czr_sektions.doUpdateApiSettingAfter_TmplGalleryImport( server_resp, params );
                         })
                         .fail( function( response ) {
                               api.errare( '::import_template => ajax error', response );
@@ -313,6 +317,97 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         });
             },//import_template_from_user_collection_or_remote_api
+
+
+            // fired on ajaxrequest done
+            // At this stage, the server_resp data structure has been validated.
+            // We can try to the update the api setting
+            doUpdateApiSettingAfter_TmplGalleryImport : function( server_resp, params ){
+                  params = params || {};
+                  if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_file_import ) {
+                        //api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate( params );
+                        api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
+                        return;
+                  }
+
+                  var _scope = 'local',
+                      _keep_existing_sections = false;//<= only possibly true when importing manually
+
+                  // Manual import => set the relevant scope
+                  if ( params.is_file_import ) {
+                      var _input = params.input,
+                          inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( _input.id, _input.module.module_type );
+
+                      _scope = inputRegistrationParams.scope;
+                      _keep_existing_sections = 'local' === inputRegistrationParams.scope ? _input.input_parent.czr_Input('keep_existing_sections')() : false;
+                      // api.infoLog('api.czr_sektions.localSectionsSettingId()?', api.czr_sektions.localSectionsSettingId());
+                      // api.infoLog('inputRegistrationParams.scope ?', inputRegistrationParams.scope );
+                  }
+
+
+
+                  //api.infoLog('TODO => verify metas => version, active locations, etc ... ');
+
+                  // Update the setting api via the normalized method
+                  // the scope will determine the setting id, local or global
+                  api.czr_sektions.updateAPISetting({
+                        action : 'sek-import-from-file',
+                        scope : _scope,//'global' or 'local'<= will determine which setting will be updated,
+                        // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
+                        imported_content : server_resp.data,
+                        assign_missing_locations : params.assign_missing_locations,
+                        keep_existing_sections : _keep_existing_sections
+                  }).done( function() {
+                        // Clean an regenerate the local option setting
+                        // Settings are normally registered once and never cleaned, unlike controls.
+                        // After the import, updating the setting value will refresh the sections
+                        // but the local options, persisted in separate settings, won't be updated if the settings are not cleaned
+                        if ( 'local' === _scope ) {
+                              api.czr_sektions.generateUI({
+                                    action : 'sek-generate-local-skope-options-ui',
+                                    clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
+                              });
+                        }
+
+                        //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
+                        api.previewer.refresh();
+                        api.previewer.trigger('sek-notify', {
+                              notif_id : 'import-success',
+                              type : 'success',
+                              duration : 30000,
+                              message : [
+                                    '<span>',
+                                      '<strong>',
+                                      sektionsLocalizedData.i18n['File successfully imported'],
+                                      '</strong>',
+                                    '</span>'
+                              ].join('')
+                        });
+                  }).fail( function( response ) {
+                        api.errare( '::doUpdateApiSettingAfter_TmplGalleryImport => error when firing ::updateAPISetting', response );
+                        api.previewer.trigger('sek-notify', {
+                              notif_id : 'import-failed',
+                              type : 'error',
+                              duration : 30000,
+                              message : [
+                                    '<span>',
+                                      '<strong>',
+                                      [ sektionsLocalizedData.i18n['Import failed'], response ].join(' : '),
+                                      '</strong>',
+                                    '</span>'
+                              ].join('')
+                        });
+                  });
+
+                  // Refresh the preview, so the markup is refreshed and the css stylesheet are generated
+                  api.previewer.refresh();
+            },//doUpdateApiSettingAfter_TmplGalleryImport()
+
+
+
+
+
+
 
 
 
@@ -494,7 +589,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //console.log('MANUAL IMPORT DATA', server_resp );
                               server_resp.data.data.collection = api.czr_sektions.setIdsForImportedTmpl( server_resp.data.data.collection );
                               // and try to update the api setting
-                              api.czr_sektions.doUpdateApiSettingAfterTmplImport( server_resp, params );
+                              api.czr_sektions.doUpdateApiSettingAfter_ManualImport( server_resp, params );
                         })
                         .fail( function( response ) {
                               api.errare( '::import_template => ajax error', response );
@@ -738,7 +833,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // fired on ajaxrequest done
             // At this stage, the server_resp data structure has been validated.
             // We can try to the update the api setting
-            doUpdateApiSettingAfterTmplImport : function( server_resp, params ){
+            doUpdateApiSettingAfter_ManualImport : function( server_resp, params ){
                   params = params || {};
                   if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_file_import ) {
                         api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate( params );
@@ -799,7 +894,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               ].join('')
                         });
                   }).fail( function( response ) {
-                        api.errare( '::doUpdateApiSettingAfterTmplImport => error when firing ::updateAPISetting', response );
+                        api.errare( '::doUpdateApiSettingAfter_ManualImport => error when firing ::updateAPISetting', response );
                         api.previewer.trigger('sek-notify', {
                               notif_id : 'import-failed',
                               type : 'error',
@@ -816,7 +911,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Refresh the preview, so the markup is refreshed and the css stylesheet are generated
                   api.previewer.refresh();
-            },//doUpdateApiSettingAfterTmplImport()
+            },//doUpdateApiSettingAfter_ManualImport()
 
 
 
