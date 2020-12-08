@@ -7,8 +7,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             ////////////////////////////////////////////////////////
             // APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/651
             setupTemplateGallery : function() {
-
-
                   var self = this;
                   self.templateGalleryExpanded = new api.Value(false);
                   if ( !sektionsLocalizedData.isTemplateGalleryEnabled )
@@ -93,7 +91,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     .on('propertychange change click keyup input paste', '.sek-filter-tmpl', _.debounce( function(evt) {
                           evt.preventDefault();
                           var _s = $(this).val();
-                          console.log('searched string ??', _s );
+                          //console.log('searched string ??', _s );
                           var _reset = function() {
                                 $galWrapper.removeClass('search-active');
                                 $galWrapper.find('.sek-tmpl-item').each( function() {
