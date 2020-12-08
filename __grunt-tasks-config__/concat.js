@@ -250,7 +250,9 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_4_sektions_generate_UI_local_skope_options.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_5_sektions_generate_UI_global_options.js',
 
-      '<%= paths.czr_assets %>sek/js/_dev_control/_1_7_sektions_update_API_setting.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_7_0_sektions_update_API_setting.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/_1_7_1_sektions_update_API_setting_SECTIONS.js',
+
       '<%= paths.czr_assets %>sek/js/_dev_control/_2_0_sektions_register_utils.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_2_1_sektions_various_utils.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_4_1_sektions_setup_and_react_to_drop.js',
