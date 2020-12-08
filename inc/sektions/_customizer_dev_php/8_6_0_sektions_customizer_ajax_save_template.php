@@ -187,7 +187,8 @@ function sek_ajax_remove_user_template() {
     //sek_error_log( __FUNCTION__ . ' => so $tmpl_post_to_remove ' . $_POST['tmpl_post_name'], $tmpl_post_to_remove );
 
     if ( $tmpl_post_to_remove && is_object( $tmpl_post_to_remove ) ) {
-        $r = wp_delete_post( $tmpl_post_to_remove->ID, true );
+        // the CPT is moved to Trash instead of permanently deleted when using wp_delete_post()
+        $r = wp_trash_post( $tmpl_post_to_remove->ID );
         if ( is_wp_error( $r ) ) {
             wp_send_json_error( __FUNCTION__ . '_removal_error' );
         }

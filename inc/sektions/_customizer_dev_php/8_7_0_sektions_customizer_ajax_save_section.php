@@ -181,7 +181,8 @@ function sek_ajax_remove_user_section() {
     $section_post_to_remove = sek_get_saved_section_post( $_POST['section_post_name'] );
 
     if ( $section_post_to_remove && is_object( $section_post_to_remove ) ) {
-        $r = wp_delete_post( $section_post_to_remove->ID, true );
+        // the CPT is moved to Trash instead of permanently deleted when using wp_delete_post()
+        $r = wp_trash_post( $section_post_to_remove->ID );
         if ( is_wp_error( $r ) ) {
             wp_send_json_error( __FUNCTION__ . '_removal_error' );
         }
