@@ -322,7 +322,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         tmpl_description: tmpl_description,
                         tmpl_post_name: tmplPostNameCandidateForUpdate || '',// <= provided when updating a template
                         skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
-                        active_locations : api.czr_sektions.activeLocations()
+                        tmpl_locations : self.getActiveLocationsForTmpl( currentLocalSettingValue )
                   })
                   .done( function( response ) {
                         //console.log('SAVED POST ID', response );
@@ -354,7 +354,55 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return _dfd_;
             },//saveOrUpdateTemplate
 
+            // return an array of the location used for the template, to be used as template meta for a future injection
+            // we don't need to list all inactive locations of the current page in the template meta
+            getActiveLocationsForTmpl : function( tmpl_data ) {
+                  if ( !_.isObject( tmpl_data ) ) {
+                      throw new Error('preProcess Tmpl => error : tmpl_data must be an object');
+                  }
+                  var _tmpl_locations = [];
+                  _.each( tmpl_data.collection, function( _loc_params ) {
+                        if ( !_.isObject( _loc_params ) || !_loc_params.id || !_loc_params.level )
+                          return;
 
+                        if ( 'location' === _loc_params.level ) {
+                            _tmpl_locations.push( _loc_params.id );
+                        }
+                  });
+                  return _tmpl_locations;
+            },
+
+            // @return a tmpl model
+            // Note : ids are reset server side
+            // Example of tmpl model before preprocessing
+            // {
+            //    collection: [{…}]
+            //    id: "" //<= to remove
+            //    level: "tmpl" // <= to remove
+            //    options: {bg: {…}}
+            //    ver_ini: "1.1.8"
+            // }
+            // Dec 2020 : remove locations not active on the page or empty before saving the tmpl
+            preProcessTmpl : function( tmpl_data ) {
+                  var self = this, tmpl_processed, activeLocations;
+                  if ( !_.isObject( tmpl_data ) ) {
+                      throw new Error('preProcess Tmpl => error : tmpl_data must be an object');
+                  }
+                  tmpl_processed = $.extend( true, {}, tmpl_data );
+                  tmpl_processed.collection = [];
+                  activeLocations = self.activeLocations();
+
+                  //console.log('TO DO => make sure template is ok to be saved', tmpl_data, self.activeLocations() );
+                  _.each( tmpl_data.collection, function( _loc_params ) {
+                        if ( !_.isObject( _loc_params ) || !_loc_params.id || !_loc_params.collection )
+                          return;
+
+                        if ( _.contains( activeLocations, _loc_params.id ) && !_.isEmpty(_loc_params.collection) ) {
+                            tmpl_processed.collection.push( _loc_params );
+                        }
+                  });
+                  return tmpl_processed;
+            },
 
             // Fired on 'click on .sek-do-remove-tmpl btn
             removeTemplate : function(evt, tmplPostNameCandidateForRemoval ) {
@@ -525,38 +573,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   return self.templateCollectionPromise;
-            },
-
-            // @return a tmpl model
-            // Note : ids are reset server side
-            // Example of tmpl model before preprocessing
-            // {
-            //    collection: [{…}]
-            //    id: "" //<= to remove
-            //    level: "tmpl" // <= to remove
-            //    options: {bg: {…}}
-            //    ver_ini: "1.1.8"
-            // }
-            // Dec 2020 : remove locations not active on the page or empty before saving the tmpl
-            preProcessTmpl : function( tmpl_data ) {
-                  var self = this, tmpl_processed, active_locations;
-                  if ( !_.isObject( tmpl_data ) ) {
-                      throw new Error('preProcess Tmpl => error : tmpl_data must be an object');
-                  }
-                  tmpl_processed = $.extend( true, {}, tmpl_data );
-                  tmpl_processed.collection = [];
-                  activeLocations = self.activeLocations();
-
-                  //console.log('TO DO => make sure template is ok to be saved', tmpl_data, self.activeLocations() );
-                  _.each( tmpl_data.collection, function( _loc_params ) {
-                        if ( !_.isObject( _loc_params ) || !_loc_params.id || !_loc_params.collection )
-                          return;
-
-                        if ( _.contains( activeLocations, _loc_params.id ) && !_.isEmpty(_loc_params.collection) ) {
-                            tmpl_processed.collection.push( _loc_params );
-                        }
-                  });
-                  return tmpl_processed;
-            },
+            }
       });//$.extend()
 })( wp.customize, jQuery );

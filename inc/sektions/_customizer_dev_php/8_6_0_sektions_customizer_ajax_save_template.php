@@ -46,7 +46,7 @@ function sek_ajax_sek_get_user_tmpl_json() {
         //         'skope_id' => $_POST['skope_id'],
         //         'version' => NIMBLE_VERSION,
         //         // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
-        //         'active_locations' => is_string( $_POST['active_locations'] ) ? explode( ',', $_POST['active_locations'] ) : array(),
+        //         'tmpl_locations' => is_string( $_POST['tmpl_locations'] ) ? explode( ',', $_POST['tmpl_locations'] ) : array(),
         //         'date' => date("Y-m-d"),
         //         'theme' => sanitize_title_with_dashes( get_stylesheet() )
         //     )
@@ -90,8 +90,8 @@ function sek_ajax_save_user_template() {
     if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
     }
-    if ( !isset( $_POST['active_locations'] ) || empty( $_POST['active_locations'] ) ) {
-        wp_send_json_error( __FUNCTION__ . '_missing_active_locations' );
+    if ( !isset( $_POST['tmpl_locations'] ) || empty( $_POST['tmpl_locations'] ) ) {
+        wp_send_json_error( __FUNCTION__ . '_missing_tmpl_locations' );
     }
 
     // clean level ids and replace them with a placeholder string
@@ -114,7 +114,7 @@ function sek_ajax_save_user_template() {
             'skope_id' => $_POST['skope_id'],
             'version' => NIMBLE_VERSION,
             // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
-            'active_locations' => is_array( $_POST['active_locations'] ) ? $_POST['active_locations'] : array(),
+            'tmpl_locations' => is_array( $_POST['tmpl_locations'] ) ? $_POST['tmpl_locations'] : array(),
             'date' => date("Y-m-d"),
             'theme' => sanitize_title_with_dashes( get_stylesheet() )
         )

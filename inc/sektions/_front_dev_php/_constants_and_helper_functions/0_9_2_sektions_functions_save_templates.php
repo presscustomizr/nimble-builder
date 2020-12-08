@@ -140,7 +140,7 @@ function sek_get_all_saved_templates() {
         //         'skope_id' => $_POST['skope_id'],
         //         'version' => NIMBLE_VERSION,
         //         // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
-        //         'active_locations' => is_string( $_POST['active_locations'] ) ? explode( ',', $_POST['active_locations'] ) : array(),
+        //         'tmpl_locations' => is_string( $_POST['tmpl_locations'] ) ? explode( ',', $_POST['tmpl_locations'] ) : array(),
         //         'date' => date("Y-m-d"),
         //         'theme' => sanitize_title_with_dashes( get_stylesheet() )
         //     )
@@ -178,7 +178,7 @@ function sek_get_all_saved_templates() {
   //         'skope_id' => $_POST['skope_id'],
   //         'version' => NIMBLE_VERSION,
   //         // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
-  //         'active_locations' => is_string( $_POST['active_locations'] ) ? explode( ',', $_POST['active_locations'] ) : array(),
+  //         'tmpl_locations' => is_string( $_POST['tmpl_locations'] ) ? explode( ',', $_POST['tmpl_locations'] ) : array(),
   //         'date' => date("Y-m-d"),
   //         'theme' => sanitize_title_with_dashes( get_stylesheet() )
   //     )
@@ -203,7 +203,7 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
             'description' => '',
             'skope_id' => '',
             'version' => NIMBLE_VERSION,
-            'active_locations' => array(),
+            'tmpl_locations' => array(),
             'date' => '',
             'theme' => ''
         )
