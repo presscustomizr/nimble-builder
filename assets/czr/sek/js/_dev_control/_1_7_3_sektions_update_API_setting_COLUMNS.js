@@ -3,7 +3,8 @@
 //       params : params,
 //       promise : $.Deferred(),
 //       newSetValue : _.isObject( _currentSetValue ) ? $.extend( true, {}, _currentSetValue ) : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ),
-//       cloneId : ''
+//       cloneId : '',
+//       sectionInjectPromise
 // };
 var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {

@@ -20,6 +20,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var _collectionSettingId_ = params.is_global_location ? self.getGlobalSectionsSettingId() : self.localSectionsSettingId();
                   var currentSetValue = api( _collectionSettingId_ )();
 
+                  // The following property is populated on each api setting update
+                  // some properties are modified during the sub-callbacks of _updateSektionSettingInstanceWithAction
                   self.updAPISetParams = {
                         params : params,
                         promise : $.Deferred(),
@@ -28,7 +30,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         sectionInjectPromise : '_not_injection_scenario_'//this property is turned into a $.Deferred() object in a scenario of section injection
                   };
 
-                  var _do_update_setting_id = function() {
+                  // callback ran in api( _collectionSettingId_, function( sektionSetInstance ) {})
+                  var _updateSektionSettingInstanceWithAction = function() {
                         // api( _collectionSettingId_)() = {
                         //    collection : [
                         //       'loop_start' :  { level : location,  collection : [ 'sek124' : { collection : [], level : section, options : {} }], options : {}},
@@ -38,13 +41,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //    options : {}
                         //
                         // }
-                        var locationCandidate,
-                            columnCandidate,
-                            moduleCandidate,
-                            // move variables
-                            //duplication variable
-
-                            parentSektionCandidate;
 
                         // make sure we have a collection array to populate
                         self.updAPISetParams.newSetValue.collection = _.isArray( self.updAPISetParams.newSetValue.collection ) ? self.updAPISetParams.newSetValue.collection : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ).collection;
@@ -305,12 +301,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                               }
                         }
-                  };//_do_update_setting_id()
+                  };//_updateSektionSettingInstanceWithAction()
 
 
                   // Update the sektion collection
                   api( _collectionSettingId_, function( sektionSetInstance ) {
-                        _do_update_setting_id();
+                        _updateSektionSettingInstanceWithAction();
                   });
                   return self.updAPISetParams.promise.promise();
             },//updateAPISetting

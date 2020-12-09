@@ -256,7 +256,6 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_7_3_sektions_update_API_setting_COLUMNS.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_7_4_sektions_update_API_setting_MODULES.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_7_5_sektions_update_API_setting_IMPORT.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/_1_7_6_sektions_update_API_setting_VARIOUS.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/_2_0_sektions_register_utils.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_2_1_sektions_various_utils.js',
