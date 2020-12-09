@@ -73,6 +73,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
                               self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
                         } else {
+                              var position = 0;
                               locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
                               _.each( locationCandidate.collection, function( secModel, index ) {
                                     if ( params.before_section === secModel.id ) {
