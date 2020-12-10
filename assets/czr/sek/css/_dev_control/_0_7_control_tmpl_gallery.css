@@ -1,6 +1,6 @@
 
 /* TEMPLATE GALLERY */
-#nimble-tmpl-gallery {
+#nimble-tmpl-gallery, #nimble-tmpl-gallery .sek-tmpl-gal-import-dialog {
   -webkit-transition: top 0.3s ease-in-out;
   -moz-transition: top, 0.3s ease-in-out;
   -ms-transition: top, 0.3s ease-in-out;
@@ -25,6 +25,28 @@
 .sek-template-gallery-expanded #nimble-tmpl-gallery {
   top: 36px;
 }
+
+
+/* IMPORT DIALOG BOX */
+#nimble-tmpl-gallery .sek-tmpl-gal-import-dialog {
+  background: rgba(240, 240, 240, 0.89)!important;
+  border-bottom: 1px solid #aaa!important;
+  color: #222!important;
+  font-size: 12px!important;
+  position: absolute;
+  top: -100vh;
+  right: 0;
+  left: 0;
+  height: calc(100vh - 36px);
+  overflow: auto;
+  padding: 15px;
+  z-index: 1001;
+}
+.sek-tmpl-dialog-expanded #nimble-tmpl-gallery .sek-tmpl-gal-import-dialog {
+  top: 36px;
+}
+
+
 
 #nimble-tmpl-gallery .sek-tmpl-gallery-inner {
   display: -webkit-box;

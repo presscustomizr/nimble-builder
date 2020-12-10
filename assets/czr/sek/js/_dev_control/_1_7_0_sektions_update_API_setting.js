@@ -130,6 +130,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     self._updAPISet_sek_import_from_file();
                               break;
 
+                              //-------------------------------------------------------------------------------------------------
+                              //-- INJECT TEMPLATE FROM GALLERY
+                              //-------------------------------------------------------------------------------------------------
+                              case 'sek-import-tmpl-from-gallery' :
+                                    self._updAPISet_sek_import_tmpl_from_gallery();
+                              break;
 
                               //-------------------------------------------------------------------------------------------------
                               //-- LEVEL OPTIONS

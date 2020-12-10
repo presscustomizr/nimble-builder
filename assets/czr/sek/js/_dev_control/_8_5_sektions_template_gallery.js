@@ -9,22 +9,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             setupTemplateGallery : function() {
                   var self = this;
                   self.templateGalleryExpanded = new api.Value(false);
+                  self.tmplImportDialogVisible = new api.Value(false);// Hidden by default
                   if ( !sektionsLocalizedData.isTemplateGalleryEnabled )
                     return;
 
                   self.templateGalleryExpanded.bind( function( expanded ) {
-
-
                         self.cachedElements.$body.toggleClass( 'sek-template-gallery-expanded', expanded );
                         if ( expanded ) {
                               // close template saver
                               // close level tree
                               self.tmplDialogVisible(false);
                               self.levelTreeExpanded(false);
+                              self.tmplImportDialogVisible(false);
                               $('#customize-preview iframe').css('z-index', 1);
                               self.renderOrRefreshTempGallery();
                         } else {
                               $('#customize-preview iframe').css('z-index', '');
+                        }
+                  });
+
+                  self.tmplImportDialogVisible.bind( function( expanded ) {
+                        self.cachedElements.$body.toggleClass( 'sek-tmpl-dialog-expanded', expanded );
+                        if ( expanded ) {
+                              // close template saver
+                              // close level tree
+                              self.tmplDialogVisible(false);
+                              self.levelTreeExpanded(false);
+                              $('#customize-preview iframe').css('z-index', 1);
                         }
                   });
 
@@ -69,25 +80,73 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
             },
 
+            // @return boolean
+            currentPageHasNBSections : function() {
+                var self = this,
+                    _bool = false,
+                    _collection,
+                    localCollSetId = this.localSectionsSettingId(),
+                    localColSetValue = api(localCollSetId)(),
+                    activeLocationInfos = this.activeLocationsInfo();
+
+                localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
+                _collection = $.extend( true, {}, localColSetValue );
+                _collection = ! _.isEmpty( _collection.collection ) ? _collection.collection : [];
+                _collection = _.isArray( _collection ) ? _collection : [];
+                _.each( _collection, function( loc_data ){
+                      if ( _bool )
+                        return;
+                      if ( _.isObject(loc_data) && 'location' == loc_data.level && loc_data.collection ) {
+                            // skip if the location is a header
+                            if ( !self.isHeaderLocation( loc_data.id ) && !self.isFooterLocation( loc_data.id ) ) {
+                                  _bool = !_.isEmpty( loc_data.collection );
+                            }
+                      }
+                });
+                return _bool;
+            },
+
             // @return void()
             setupTmplGalleryDOMEvents : function() {
                 var $galWrapper = $('#nimble-tmpl-gallery');
                 var self = this;
                 $galWrapper
                     // Schedule click event with delegation
+                    // PICK A TEMPLATE
                     .on('click', '.sek-tmpl-item .use-tmpl', function( evt ) {
                           evt.preventDefault();
                           evt.stopPropagation();
                           var tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id');
                           if ( _.isEmpty(tmpl_id) ) {
                               api.errare('::setupTmplGalleryDOMEvents => error => invalid template id');
+                              return;
                           }
-                          //api.czr_sektions.import_nimble_template( $(this).data('sek-tmpl-item-id') );
-                          //api.czr_sektions.import_nimble_template( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
-                          api.czr_sektions.import_nimble_template( {template_name : tmpl_id, from: 'user'});
 
+                          // if current page has NB sections, display an import dialog, otherwise import now
+                          if ( self.currentPageHasNBSections() ) {
+                                self._tmplNameWhileImportDialog = tmpl_id;
+                                self.tmplImportDialogVisible(true);
+                          } else {
+                                //api.czr_sektions.get_gallery_tmpl_json_and_import( $(this).data('sek-tmpl-item-id') );
+                                //api.czr_sektions.get_gallery_tmpl_json_and_import( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
+                                api.czr_sektions.get_gallery_tmpl_json_and_import( {template_name : tmpl_id, from: 'user'});
+                                self.templateGalleryExpanded(false);
+                          }
+                    })
+                    // PICK AN IMPORT MODE WHEN PAGE HAS SECTIONS ALREADY
+                    .on('click', '.sek-tmpl-gal-import-dialog .sek-ui-button', function( evt ) {
+                          evt.preventDefault();
+                          evt.stopPropagation();
+                          // 3 possible import modes : replace, before, after
+                          var tmpl_import_mode = $(this).data('sek-tmpl-import-mode');
+                          if ( !_.contains(['replace', 'before', 'after'], tmpl_import_mode ) ) {
+                                api.errare('::setupTmplGalleryDOMEvents => error => invalid import mode');
+                                return;
+                          }
+                          api.czr_sektions.get_gallery_tmpl_json_and_import( {template_name : self._tmplNameWhileImportDialog, from: 'user', tmpl_import_mode: tmpl_import_mode});
                           self.templateGalleryExpanded(false);
                     })
+                    // SEARCH ACTIONS
                     .on('propertychange change click keyup input paste', '.sek-filter-tmpl', _.debounce( function(evt) {
                           evt.preventDefault();
                           var _s = $(this).val();
@@ -120,6 +179,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           }
 
                     }, 100 ) )
+                    // REMOVE
                     .on( 'click', '.sek-tmpl-info .remove-tmpl', function(evt) {
                           evt.preventDefault();
                           var _focusOnRemoveCandidate = function( mode ) {

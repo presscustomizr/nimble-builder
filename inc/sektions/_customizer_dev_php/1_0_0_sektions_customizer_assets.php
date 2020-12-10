@@ -627,6 +627,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'The current page has no available locations to import Nimble Builder sections.' => __('The current page has no available locations to import Nimble Builder sections.', 'text_doma'),
             'Missing file' => __('Missing file', 'text_doma'),
             'File successfully imported' => __('File successfully imported', 'text_doma'),
+            'Template successfully imported' => __('Template successfully imported', 'text_doma'),
             'Import failed, invalid file content' => __('Import failed, invalid file content', 'text_doma'),
             'Import failed, file problem' => __('Import failed, file problem', 'text_doma'),
             'Some image(s) could not be imported' => __('Some image(s) could not be imported', 'text_doma'),
@@ -960,6 +961,20 @@ function sek_print_nimble_customizer_tmpl() {
             </button>
           </div>
           <div class="sek-tmpl-gallery-inner"></div>
+        </div>
+        <div class="sek-tmpl-gal-import-dialog">
+            <p>This page has NB sections already. Select an import options.</p>
+            <div class="sek-ui-button-group" role="group">
+              <button class="sek-ui-button sek-tmpl-import-replace" type="button" title="<?php _e('Replace existing sections', 'text_domain'); ?>" data-sek-tmpl-import-mode="replace">
+                <?php _e('Replace existing sections', 'text_domain'); ?><span class="spinner"></span>
+              </button>
+              <button class="sek-ui-button sek-tmpl-import-before" type="button" title="<?php _e('Insert before existing sections', 'text_domain'); ?>" data-sek-tmpl-import-mode="before">
+                <?php _e('Insert before existing sections', 'text_domain'); ?><span class="spinner"></span>
+              </button>
+              <button class="sek-ui-button sek-tmpl-import-after" type="button" title="<?php _e('Insert after existing sections', 'text_domain'); ?>" data-sek-tmpl-import-mode="after">
+                <?php _e('Insert after existing sections', 'text_domain'); ?><span class="spinner"></span>
+              </button>
+            </div>
         </div>
       </div>
     </script>

@@ -77,7 +77,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             ////////////////////////////////////////////////////////
-            // IMPORT FROM USER SAVED COLLECTION OR REMOTE API
+            // IMPORT TEMPLATE FROM GALLERY => FROM USER SAVED COLLECTION OR REMOTE API
             ////////////////////////////////////////////////////////
             // @return promise
             getTmplJsonFromUserTmpl : function( template_name ) {
@@ -113,12 +113,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $.getJSON( 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan' )
                             .done( function( resp ) {
                                   if ( !_.isObject( resp ) || !resp.lib || !resp.lib.templates ) {
-                                        api.errare( '::import_nimble_template success but invalid response => ', resp  );
+                                        api.errare( '::get_gallery_tmpl_json_and_import success but invalid response => ', resp  );
                                         _dfd_.resolve({success:false});
                                   }
                                   var _json_data = resp.lib.templates[template_name];
                                   if ( !_json_data ) {
-                                        api.errare( '::import_nimble_template => the requested template is not available', resp.lib.templates  );
+                                        api.errare( '::get_gallery_tmpl_json_and_import => the requested template is not available', resp.lib.templates  );
                                         api.previewer.trigger('sek-notify', {
                                               notif_id : 'missing-tmpl',
                                               type : 'info',
@@ -137,37 +137,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             })
                             .fail(function( er ) {
-                                  api.errare( '::import_nimble_template failed => ', er  );
+                                  api.errare( '::get_gallery_tmpl_json_and_import failed => ', er  );
                                   _dfd_.resolve({success:false});
                             });
 
                     return _dfd_.promise();
             },
 
-            // @params
-            // {
-            //     is_file_import : true,
-            //     pre_import_check : false,
-            //     assign_missing_locations : false,
-            //     input : <= input instance when import is manual
-            //     file_input : $file_input
-            // }
+
             // April 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/651
             // @param params {
             //    template_name : string,
-            //    from : nimble_api or user
+            //    from : nimble_api or user,
+            //    import_mode : 3 possible import modes : replace, before, after
             // }
-            import_nimble_template : function( params ) {
+            get_gallery_tmpl_json_and_import : function( params ) {
                   var self = this;
                   params = $.extend( {
                       template_name : '',
-                      from : 'user'
+                      from : 'user',
+                      import_mode : 'replace'
                   }, params || {});
                   var tmpl_name = params.template_name;
                   if ( _.isEmpty( tmpl_name ) || ! _.isString( tmpl_name ) ) {
                         api.errare('::import => error => invalid template name');
                   }
-                  console.log('import_nimble_template params ?', params );
+                  console.log('get_gallery_tmpl_json_and_import params ?', params );
                   var _promise;
                   if ( 'nimble_api' === params.from ) {
                         // doc : https://api.jquery.com/jQuery.getJSON/
@@ -188,33 +183,38 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //  }
                   // }
                   _promise.done( function( response ) {
-                        console.log('SO IMPORT ??', response );
+                        console.log('get_gallery_tmpl_json_and_import', params, response );
                         if ( response.success ) {
                               //console.log('IMPORT NIMBLE TEMPLATE', response.lib.templates[template_name] );
-                              self.import_template_from_user_collection_or_remote_api({
+                              self.import_tmpl_from_gallery({
                                     pre_import_check : false,
                                     template_name : tmpl_name,
-                                    template_data : response.tmpl_json
+                                    template_data : response.tmpl_json,
+                                    import_mode : params.import_mode
                               });
                         }
                   });
             },
 
+            // IMPORT TEMPLATE FROM GALLERY
+            // => REMOTE API COLLECTION + USER COLLECTION
             // @param params
             // {
             //       pre_import_check : false,
             //       template_name : tmpl_name,
-            //       template_data : response.tmpl_json
+            //       template_data : response.tmpl_json,
+            //       import_mode : 3 possible import modes : replace, before, after
             // }
-            import_template_from_user_collection_or_remote_api : function( params ) {
-                  console.log('import_template_from_user_collection_or_remote_api', params );
+            import_tmpl_from_gallery : function( params ) {
+                  console.log('import_tmpl_from_gallery', params );
                   var self = this;
                   params = params || {};
                   // normalize params
                   params = $.extend({
                       is_file_import : false,
                       pre_import_check : false,
-                      assign_missing_locations : false,
+                      assign_missing_locations : true,//<= when importing a tmpl from gallery, if a the page location don't match the template ones, NB injects in "loop_start", or in the first location available
+                      import_mode : 'replace'
                   }, params );
 
                   // SETUP FOR MANUAL INPUT
@@ -316,13 +316,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     ].join('')
                               });
                         });
-            },//import_template_from_user_collection_or_remote_api
+            },//import_tmpl_from_gallery
 
 
             // fired on ajaxrequest done
             // At this stage, the server_resp data structure has been validated.
             // We can try to the update the api setting
+            // @param params
+            // {
+            //       pre_import_check : false,
+            //       template_name : tmpl_name,
+            //       template_data : response.tmpl_json,
+            //       import_mode : 3 possible import modes : replace, before, after,
+            //       is_file_import : false,
+            //       assign_missing_locations: true,
+            // }
             doUpdateApiSettingAfter_TmplGalleryImport : function( server_resp, params ){
+                  console.log('doUpdateApiSettingAfter_TmplGalleryImport ???', params, server_resp );
                   params = params || {};
                   if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_file_import ) {
                         //api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate( params );
@@ -330,33 +340,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return;
                   }
 
-                  var _scope = 'local',
-                      _keep_existing_sections = false;//<= only possibly true when importing manually
-
-                  // Manual import => set the relevant scope
-                  if ( params.is_file_import ) {
-                      var _input = params.input,
-                          inputRegistrationParams = api.czr_sektions.getInputRegistrationParams( _input.id, _input.module.module_type );
-
-                      _scope = inputRegistrationParams.scope;
-                      _keep_existing_sections = 'local' === inputRegistrationParams.scope ? _input.input_parent.czr_Input('keep_existing_sections')() : false;
-                      // api.infoLog('api.czr_sektions.localSectionsSettingId()?', api.czr_sektions.localSectionsSettingId());
-                      // api.infoLog('inputRegistrationParams.scope ?', inputRegistrationParams.scope );
-                  }
-
-
+                  var _scope = 'local';// <= always local when template gallery import
 
                   //api.infoLog('TODO => verify metas => version, active locations, etc ... ');
 
                   // Update the setting api via the normalized method
                   // the scope will determine the setting id, local or global
                   api.czr_sektions.updateAPISetting({
-                        action : 'sek-import-from-file',
+                        action : 'sek-import-tmpl-from-gallery',
                         scope : _scope,//'global' or 'local'<= will determine which setting will be updated,
                         // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
                         imported_content : server_resp.data,
                         assign_missing_locations : params.assign_missing_locations,
-                        keep_existing_sections : _keep_existing_sections
                   }).done( function() {
                         // Clean an regenerate the local option setting
                         // Settings are normally registered once and never cleaned, unlike controls.
@@ -378,7 +373,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               message : [
                                     '<span>',
                                       '<strong>',
-                                      sektionsLocalizedData.i18n['File successfully imported'],
+                                      sektionsLocalizedData.i18n['Template successfully imported'],
                                       '</strong>',
                                     '</span>'
                               ].join('')
@@ -424,10 +419,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             ////////////////////////////////////////////////////////
-            // IMPORT FROM FILE
+            // IMPORT TEMPLATE FROM FILE
             ////////////////////////////////////////////////////////
+            // @params
+            // {
+            //     is_file_import : true,
+            //     pre_import_check : false,
+            //     assign_missing_locations : false,
+            //     input : <= input instance when import is manual
+            //     file_input : $file_input
+            // }
             import_template_from_file : function( params ) {
-                  console.log('import_template_from_file', params );
+                  //console.log('import_template_from_file ??', params );
 
                   params = params || {};
                   // normalize params
@@ -834,6 +837,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // At this stage, the server_resp data structure has been validated.
             // We can try to the update the api setting
             doUpdateApiSettingAfter_ManualImport : function( server_resp, params ){
+                  console.log('doUpdateApiSettingAfter_ManualImport ???', params, server_resp );
                   params = params || {};
                   if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_file_import ) {
                         api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate( params );
