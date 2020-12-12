@@ -2113,6 +2113,29 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },//saveOrUpdateSavedSection
 
 
+            // @return a section model
+            // Note : ids are reset server side
+            // Example of section model before preprocessing
+            // {
+            //    collection: [{…}]
+            //    id: "" //<= reset server side
+            //    level: "section"
+            //    is_nested : false
+            //    options: {bg: {…}}
+            //    ver_ini: "1.1.8"
+            // }
+            preProcessSection : function( sectionModel ) {
+                  if ( !_.isObject( sectionModel ) ) {
+                        return null;
+                  }
+                  var preprocessedModel = $.extend( {}, true, sectionModel );
+                  // Make sure a nested section is saved as normal
+                  if ( _.has( preprocessedModel, 'is_nested') ) {
+                        preprocessedModel = _.omit( preprocessedModel, 'is_nested' );
+                  }
+                  return preprocessedModel;
+            },
+
 
             // Fired on 'click on .sek-do-remove-section btn
             removeSavedSection : function(evt, sectionPostNameCandidateForRemoval ) {
@@ -2298,29 +2321,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   return self.sectionCollectionPromise;
-            },
-
-            // @return a section model
-            // Note : ids are reset server side
-            // Example of section model before preprocessing
-            // {
-            //    collection: [{…}]
-            //    id: "" //<= reset server side
-            //    level: "section"
-            //    is_nested : false
-            //    options: {bg: {…}}
-            //    ver_ini: "1.1.8"
-            // }
-            preProcessSection : function( sectionModel ) {
-                  if ( !_.isObject( sectionModel ) ) {
-                        return null;
-                  }
-                  var preprocessedModel = $.extend( {}, true, sectionModel );
-                  // Make sure a nested section is saved as normal
-                  if ( _.has( preprocessedModel, 'is_nested') ) {
-                        preprocessedModel = _.omit( preprocessedModel, 'is_nested' );
-                  }
-                  return preprocessedModel;
             }
       });//$.extend()
 })( wp.customize, jQuery );
@@ -2615,7 +2615,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       tmpl_title = $_title.val(),
                       tmpl_description = $('#sek-saved-tmpl-description').val(),
                       collectionSettingId = self.localSectionsSettingId(),
-                      currentLocalSettingValue = self.preProcessTmpl( api( collectionSettingId )() );
+                      currentLocalSettingValue;
+
+                  // Dec 2020 : remove locations not active on the page or empty before saving the tmpl
+                  try { currentLocalSettingValue = self.preProcessTmpl( api( collectionSettingId )() ); } catch( er ) {
+                      api.errorLog( 'error in ::saveOrUpdateTemplate', er );
+                      _dfd_.resolve( {success:false});
+                  }
 
                   if ( _.isEmpty( tmpl_title ) ) {
                         $_title.addClass('error');
@@ -2642,7 +2648,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         tmpl_description: tmpl_description,
                         tmpl_post_name: tmplPostNameCandidateForUpdate || '',// <= provided when updating a template
                         skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
-                        active_locations : api.czr_sektions.activeLocations()
+                        tmpl_locations : self.getActiveLocationsForTmpl( currentLocalSettingValue )
                   })
                   .done( function( response ) {
                         //console.log('SAVED POST ID', response );
@@ -2674,7 +2680,55 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return _dfd_;
             },//saveOrUpdateTemplate
 
+            // return an array of the location used for the template, to be used as template meta for a future injection
+            // we don't need to list all inactive locations of the current page in the template meta
+            getActiveLocationsForTmpl : function( tmpl_data ) {
+                  if ( !_.isObject( tmpl_data ) ) {
+                      throw new Error('preProcess Tmpl => error : tmpl_data must be an object');
+                  }
+                  var _tmpl_locations = [];
+                  _.each( tmpl_data.collection, function( _loc_params ) {
+                        if ( !_.isObject( _loc_params ) || !_loc_params.id || !_loc_params.level )
+                          return;
 
+                        if ( 'location' === _loc_params.level ) {
+                            _tmpl_locations.push( _loc_params.id );
+                        }
+                  });
+                  return _tmpl_locations;
+            },
+
+            // @return a tmpl model
+            // Note : ids are reset server side
+            // Example of tmpl model before preprocessing
+            // {
+            //    collection: [{…}]
+            //    id: "" //<= to remove
+            //    level: "tmpl" // <= to remove
+            //    options: {bg: {…}}
+            //    ver_ini: "1.1.8"
+            // }
+            // Dec 2020 : remove locations not active on the page or empty before saving the tmpl
+            preProcessTmpl : function( tmpl_data ) {
+                  var self = this, tmpl_processed, activeLocations;
+                  if ( !_.isObject( tmpl_data ) ) {
+                      throw new Error('preProcess Tmpl => error : tmpl_data must be an object');
+                  }
+                  tmpl_processed = $.extend( true, {}, tmpl_data );
+                  tmpl_processed.collection = [];
+                  activeLocations = self.activeLocations();
+
+                  //console.log('TO DO => make sure template is ok to be saved', tmpl_data, self.activeLocations() );
+                  _.each( tmpl_data.collection, function( _loc_params ) {
+                        if ( !_.isObject( _loc_params ) || !_loc_params.id || !_loc_params.collection )
+                          return;
+
+                        if ( _.contains( activeLocations, _loc_params.id ) && !_.isEmpty(_loc_params.collection) ) {
+                            tmpl_processed.collection.push( _loc_params );
+                        }
+                  });
+                  return tmpl_processed;
+            },
 
             // Fired on 'click on .sek-do-remove-tmpl btn
             removeTemplate : function(evt, tmplPostNameCandidateForRemoval ) {
@@ -2815,7 +2869,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.templateCollectionPromise.resolve( tmpl_collection );
                         } else {
                               self.templateCollectionPromise.resolve( {} );
-                              api.errare('control::getSavedTmplCollection => error => tmpl collection is invalid');
+                              api.errare('control::getSavedTmplCollection => error => tmpl collection is invalid', tmpl_collection);
                         }
 
                         // response is {tmpl_post_id: 436}
@@ -2845,22 +2899,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   return self.templateCollectionPromise;
-            },
-
-            // @return a tmpl model with clean ids
-            // also removes the tmpl properties "id" and "level", which are dynamically set when dragging and dropping
-            // Example of tmpl model before preprocessing
-            // {
-            //    collection: [{…}]
-            //    id: "" //<= to remove
-            //    level: "tmpl" // <= to remove
-            //    options: {bg: {…}}
-            //    ver_ini: "1.1.8"
-            // }
-            preProcessTmpl : function( tmpl_data ) {
-                  console.log('TO DO => make sure template is ok to be saved');
-                  return tmpl_data;
-            },
+            }
       });//$.extend()
 })( wp.customize, jQuery );
 //global sektionsLocalizedData
@@ -6139,8 +6178,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //    in_column
             // }
             updateAPISetting : function( params ) {
-                  var self = this,
-                      __updateAPISettingDeferred__ = $.Deferred();
+                  var self = this;
 
                   // Are we in global location ?
                   // Add the global information to the params
@@ -6149,7 +6187,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   params.is_global_location = 'global' === params.scope || self.isGlobalLocation( params );
 
                   var _collectionSettingId_ = params.is_global_location ? self.getGlobalSectionsSettingId() : self.localSectionsSettingId();
-                  var _do_update_setting_id = function() {
+                  var currentSetValue = api( _collectionSettingId_ )();
+
+                  // The following property is populated on each api setting update
+                  // some properties are modified during the sub-callbacks of _updateSektionSettingInstanceWithAction
+                  self.updAPISetParams = {
+                        params : params,
+                        promise : $.Deferred(),
+                        newSetValue : _.isObject( currentSetValue ) ? $.extend( true, {}, currentSetValue ) : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ),
+                        cloneId : '', // the cloneId is only needed in the duplication scenarii
+                        sectionInjectPromise : '_not_injection_scenario_'//this property is turned into a $.Deferred() object in a scenario of section injection
+                  };
+
+                  // callback ran in api( _collectionSettingId_, function( sektionSetInstance ) {})
+                  var _updateSektionSettingInstanceWithAction = function() {
                         // api( _collectionSettingId_)() = {
                         //    collection : [
                         //       'loop_start' :  { level : location,  collection : [ 'sek124' : { collection : [], level : section, options : {} }], options : {}},
@@ -6159,846 +6210,112 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //    options : {}
                         //
                         // }
-                        var currentSetValue = api( _collectionSettingId_ )(),
-                            newSetValue = _.isObject( currentSetValue ) ? $.extend( true, {}, currentSetValue ) : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ),
-                            locationCandidate,
-                            sektionCandidate,
-                            columnCandidate,
-                            moduleCandidate,
-                            // move variables
-                            originalCollection,
-                            reorderedCollection,
-                            //duplication variable
-                            cloneId, //will be passed in resolve()
-                            startingModuleValue,// will be populated by the optional starting value specificied on module registration
-                            __presetSectionInjected__ = '_not_injection_scenario_',//this property is turned into a $.Deferred() object in a scenario of section injection
-                            parentSektionCandidate,
-                            position;//<= the position of the module or section or nested section in a column or location
 
                         // make sure we have a collection array to populate
-                        newSetValue.collection = _.isArray( newSetValue.collection ) ? newSetValue.collection : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ).collection;
+                        self.updAPISetParams.newSetValue.collection = _.isArray( self.updAPISetParams.newSetValue.collection ) ? self.updAPISetParams.newSetValue.collection : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ).collection;
 
                         switch( params.action ) {
                               //-------------------------------------------------------------------------------------------------
                               //-- SEKTION
                               //-------------------------------------------------------------------------------------------------
                               case 'sek-add-section' :
-                                    // an id must be provided
-                                    if ( _.isEmpty( params.id ) ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
-                                    }
-
-                                    if ( _.isEmpty( params.location ) ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing location' );
-                                    }
-                                    // Is this a nested sektion ?
-                                    if ( true === params.is_nested ) {
-                                          columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                          // can we add this nested sektion ?
-                                          // if the parent sektion of the column has is_nested = true, then we can't
-                                          parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
-                                          if ( 'no_match' == parentSektionCandidate ) {
-                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
-                                                break;
-                                          }
-                                          if ( true === parentSektionCandidate.is_nested ) {
-                                                __updateAPISettingDeferred__.reject('');
-                                                api.previewer.trigger('sek-notify', {
-                                                      type : 'info',
-                                                      duration : 30000,
-                                                      message : [
-                                                            '<span style="font-size:0.95em">',
-                                                              '<strong>' + sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ] + '</strong>',
-                                                            '</span>'
-                                                      ].join('')
-                                                });
-
-                                                break;
-                                          }
-                                          if ( 'no_match' == columnCandidate ) {
-                                                api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
-                                                break;
-                                          }
-                                          columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                          columnCandidate.collection.push({
-                                                id : params.id,
-                                                level : 'section',
-                                                collection : [{
-                                                      id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
-                                                      level : 'column',
-                                                      collection : [],
-                                                      ver_ini : sektionsLocalizedData.nimbleVersion
-                                                }],
-                                                is_nested : true,
-                                                ver_ini : sektionsLocalizedData.nimbleVersion
-                                          });
-                                    } else {
-                                          locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
-                                          if ( 'no_match' == locationCandidate ) {
-                                                api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
-                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
-                                                break;
-                                          }
-                                          locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
-                                          _.each( locationCandidate.collection, function( secModel, index ) {
-                                                if ( params.before_section === secModel.id ) {
-                                                      position = index;
-                                                }
-                                                if ( params.after_section === secModel.id ) {
-                                                      position = index + 1;
-                                                }
-                                          });
-
-                                          // @see reactToCollectionSettingIdChange
-                                          locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
-                                          // insert the section in the collection at the right place
-                                          locationCandidate.collection.splice( position, 0, {
-                                                id : params.id,
-                                                level : 'section',
-                                                collection : [{
-                                                      id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
-                                                      level : 'column',
-                                                      collection : [],
-                                                      ver_ini : sektionsLocalizedData.nimbleVersion
-                                                }],
-                                                ver_ini : sektionsLocalizedData.nimbleVersion
-                                          });
-                                    }
+                                    self._updAPISet_sek_add_sektion();
                               break;
-
-
                               case 'sek-duplicate-section' :
-                                    //api.infoLog('PARAMS IN sek-duplicate-section', params );
-                                    // an id must be provided
-                                    if ( _.isEmpty( params.id ) ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
-                                    }
-
-                                    if ( _.isEmpty( params.location ) ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing location' );
-                                    }
-                                    var deepClonedSektion;
-                                    try { deepClonedSektion = self.cloneLevel( params.id ); } catch( er ) {
-                                          api.errare( 'updateAPISetting => ' + params.action, er );
-                                          break;
-                                    }
-
-                                    // items id of multi-items module must always be unique
-                                    // this recursive method sniff and does the job
-                                    self.maybeGenerateNewItemIdsForCrudModules( deepClonedSektion );
-
-                                    var _position_ = self.getLevelPositionInCollection( params.id, newSetValue.collection );
-                                    // Is this a nested sektion ?
-                                    if ( true === params.is_nested ) {
-                                          columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                          if ( 'no_match' == columnCandidate ) {
-                                                api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
-                                                break;
-                                          }
-
-                                          columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                          columnCandidate.collection.splice( parseInt( _position_ + 1, 10 ), 0, deepClonedSektion );
-
-
-                                    } else {
-                                          locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
-                                          if ( 'no_match' == locationCandidate ) {
-                                                api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
-                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
-                                                break;
-                                          }
-                                          locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
-                                          // @see reactToCollectionSettingIdChange
-                                          locationCandidate.collection.splice( parseInt( _position_ + 1, 10 ), 0, deepClonedSektion );
-
-                                    }
-                                    cloneId = deepClonedSektion.id;//will be passed in resolve()
+                                    self._updAPISet_sek_duplicate_sektion();
                               break;
-
-                              // in the case of a nested sektion, we have to remove it from a column
-                              // otherwise from the root sektion collection
                               case 'sek-remove-section' :
-                                    //api.infoLog('PARAMS IN sek-remove-sektion', params );
-                                    if ( true === params.is_nested ) {
-                                          columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                          if ( 'no_match' != columnCandidate ) {
-                                                columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                                columnCandidate.collection = _.filter( columnCandidate.collection, function( col ) {
-                                                      return col.id != params.id;
-                                                });
-                                          } else {
-                                                api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                          }
-                                    } else {
-                                          locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
-                                          if ( 'no_match' == locationCandidate ) {
-                                                api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
-                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
-                                                break;
-                                          }
-                                          locationCandidate.collection = _.filter( locationCandidate.collection, function( sek ) {
-                                                return sek.id != params.id;
-                                          });
-                                    }
+                                    self._updAPISet_sek_remove_sektion();
                               break;
-
                               case 'sek-move-section' :
-                                    //api.infoLog('PARAMS in sek-move-section', params );
-                                    var toLocationCandidate = self.getLevelModel( params.to_location, newSetValue.collection ),
-                                        movedSektionCandidate,
-                                        copyOfMovedSektionCandidate;
-
-                                    if ( _.isEmpty( toLocationCandidate ) || 'no_match' == toLocationCandidate ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing target location' );
-                                    }
-
-                                    // MOVED CROSS LOCATIONS
-                                    // - make a copy of the moved sektion
-                                    // - remove the moved sektion from the source location
-                                    if ( params.from_location != params.to_location ) {
-                                          // Remove the moved sektion from the source location
-                                          var fromLocationCandidate = self.getLevelModel( params.from_location, newSetValue.collection );
-                                          if ( _.isEmpty( fromLocationCandidate ) || 'no_match' == fromLocationCandidate ) {
-                                                throw new Error( 'updateAPISetting => ' + params.action + ' => missing source location' );
-                                          }
-
-                                          fromLocationCandidate.collection =  _.isArray( fromLocationCandidate.collection ) ? fromLocationCandidate.collection : [];
-                                          // Make a copy of the sektion candidate now, before removing it
-                                          movedSektionCandidate = self.getLevelModel( params.id, fromLocationCandidate.collection );
-                                          copyOfMovedSektionCandidate = $.extend( true, {}, movedSektionCandidate );
-                                          // remove the sektion from its previous sektion
-                                          fromLocationCandidate.collection = _.filter( fromLocationCandidate.collection, function( sektion ) {
-                                                return sektion.id != params.id;
-                                          });
-                                    }
-
-                                    // UPDATE THE TARGET LOCATION
-                                    toLocationCandidate.collection = _.isArray( toLocationCandidate.collection ) ? toLocationCandidate.collection : [];
-                                    originalCollection = $.extend( true, [], toLocationCandidate.collection );
-                                    reorderedCollection = [];
-                                    _.each( params.newOrder, function( _id_ ) {
-                                          // in the case of a cross location movement, we need to add the moved sektion to the target location
-                                          if ( params.from_location != params.to_location && _id_ == copyOfMovedSektionCandidate.id ) {
-                                                reorderedCollection.push( copyOfMovedSektionCandidate );
-                                          } else {
-                                                sektionCandidate = self.getLevelModel( _id_, originalCollection );
-                                                if ( _.isEmpty( sektionCandidate ) || 'no_match' == sektionCandidate ) {
-                                                      throw new Error( 'updateAPISetting => ' + params.action + ' => missing section candidate' );
-                                                }
-                                                reorderedCollection.push( sektionCandidate );
-                                          }
-                                    });
-                                    toLocationCandidate.collection = reorderedCollection;
-
+                                    self._updAPISet_sek_move_sektion();
                               break;
-
-
                               // Fired on click on up / down arrows in the section ui menu
                               // This handles the nested sections case
                               case 'sek-move-section-up-down' :
-                                    parentCandidate = self.getLevelModel( params.is_nested ? params.in_column : params.location , newSetValue.collection );
-                                    if ( _.isEmpty( parentCandidate ) || 'no_match' == parentCandidate ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing target location' );
-                                    }
-                                    parentCandidate.collection = _.isArray( parentCandidate.collection ) ? parentCandidate.collection : [];
-                                    originalCollection = $.extend( true, [], parentCandidate.collection );
-                                    reorderedCollection = $.extend( true, [], parentCandidate.collection );
-
-                                    var _indexInOriginal = _.findIndex( originalCollection, function( _sec_ ) {
-                                          return _sec_.id === params.id;
-                                    });
-                                    // @see https://underscorejs.org/#findIndex
-                                    if ( -1 === _indexInOriginal ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => invalid index' );
-                                    }
-
-                                    // Swap up <=> down
-                                    var direction = params.direction || 'up',
-                                        isLastSectionInLocation = originalCollection.length === _indexInOriginal + 1,
-                                        isFirstSectionInLocation = 0 === _indexInOriginal,
-                                        _locInfo = self.activeLocationsInfo(),
-                                        _currentLocInfo = ! _.isArray( _locInfo ) ? {} : _.findWhere( _locInfo, { id : params.location } ),
-                                        isCurrentLocationGlobal = false,
-                                        isCurrentLocationHeaderOrFooter = false;
-
-                                    // Is current location global ?
-                                    isCurrentLocationGlobal = _.isObject( _currentLocInfo ) && _currentLocInfo.is_global;
-
-                                    // Is current location header footer ?
-                                    isCurrentLocationHeaderOrFooter = _.isObject( _currentLocInfo ) && _currentLocInfo.is_header_footer;
-
-                                    // When a section is last in location and there's another location below, let's move the section to this sibling location
-                                    // This is possible when :
-                                    // - when moved section is not nested
-                                    // - only in locations that are 'local', not header or footer
-
-                                    // Populate the eligible activeLocations in the page
-                                    var activeLocationsInPage = [];
-                                    // self.activeLocationsInfo() is set on ::initialized when send by the preview, and is structured the following way :
-                                    //  [
-                                    //  {
-                                    //   id: "loop_start"
-                                    //   is_global: false
-                                    //   is_header_footer: false
-                                    //  },
-                                    //  {..},
-                                    //  .
-                                    if ( _.isArray( _locInfo ) ) {
-                                          _.each( self.activeLocationsInfo(), function( _loc_ ) {
-                                                if ( ! _loc_.is_global && ! _loc_.is_header_footer ) {
-                                                      activeLocationsInPage.push( _loc_.id );
-                                                }
-                                          });
-                                    }
-
-                                    // Set the index of the current location
-                                    var indexOfCurrentLocation = _.findIndex( activeLocationsInPage, function( _loc_id ) {
-                                          return _loc_id === params.location;
-                                    });
-
-                                    var isCurrentLocationEligibleForSectionMoveOutside = ! params.is_nested && ! isCurrentLocationGlobal && ! isCurrentLocationHeaderOrFooter,
-                                        isFirstLocationInPage = 0 === indexOfCurrentLocation,
-                                        isLastLocationInPage = activeLocationsInPage.length === indexOfCurrentLocation + 1,
-                                        newLocationId, newLocationCandidate;
-
-                                    if ( isCurrentLocationEligibleForSectionMoveOutside && isLastSectionInLocation && 'up' !== direction && ! isLastLocationInPage ) {
-                                          newLocationId = activeLocationsInPage[ indexOfCurrentLocation + 1 ];
-                                          newLocationCandidate = self.getLevelModel( newLocationId , newSetValue.collection );
-
-                                          // Add the section in first position of the section below
-                                          newLocationCandidate.collection.unshift( originalCollection[ _indexInOriginal ] );
-                                          // Removes the section in last position of the original section
-                                          parentCandidate.collection.pop();
-                                          // the new_location param will be used in the 'complete' callback of 'sek-move-section-down' / 'sek-move-section-up'
-                                          params.new_location = newLocationId;
-
-                                    } else if ( isCurrentLocationEligibleForSectionMoveOutside && isFirstSectionInLocation && 'up' === direction && ! isFirstLocationInPage ) {
-                                          newLocationId = activeLocationsInPage[ indexOfCurrentLocation - 1 ];
-                                          newLocationCandidate = self.getLevelModel( newLocationId , newSetValue.collection );
-
-                                          // Add the section in first position of the section below
-                                          newLocationCandidate.collection.push( originalCollection[ _indexInOriginal ] );
-                                          // Removes the section in last position of the original section
-                                          parentCandidate.collection.shift();
-                                          // the new_location param will be used in the 'complete' callback of 'sek-move-section-down' / 'sek-move-section-up'
-                                          params.new_location = newLocationId;
-                                    } else {
-                                          // prevent absurd movements of a section
-                                          // this should not happen because up / down arrows are not displayed when section is positionned top / bottom
-                                          // but safer to add it
-                                          if ( 'up' !== direction && originalCollection.length === _indexInOriginal + 1 ) {
-                                                //throw new Error( 'updateAPISetting => ' + params.action + ' => bottom reached' );
-                                                api.previewer.trigger('sek-notify', {
-                                                      type : 'info',
-                                                      duration : 30000,
-                                                      message : [
-                                                            '<span style="font-size:0.95em">',
-                                                              '<strong>' + sektionsLocalizedData.i18n[ "The section cannot be moved lower." ] + '</strong>',
-                                                            '</span>'
-                                                      ].join('')
-                                                });
-                                          } else if ( 'up' === direction && 0 === _indexInOriginal ){
-                                                api.previewer.trigger('sek-notify', {
-                                                      type : 'info',
-                                                      duration : 30000,
-                                                      message : [
-                                                            '<span style="font-size:0.95em">',
-                                                              '<strong>' + sektionsLocalizedData.i18n[ "The section cannot be moved higher." ] + '</strong>',
-                                                            '</span>'
-                                                      ].join('')
-                                                });
-                                          } else {
-                                                reorderedCollection[ _indexInOriginal ] = originalCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ];
-                                                reorderedCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ] = originalCollection[ _indexInOriginal ];
-                                                parentCandidate.collection = reorderedCollection;
-                                          }
-                                    }
+                                    self._updAPISet_sek_move_sektion_up_down();
                               break;
-
-
-
-
-
-
 
 
                               //-------------------------------------------------------------------------------------------------
                               //-- COLUMN
                               //-------------------------------------------------------------------------------------------------
                               case 'sek-add-column' :
-                                    // an id must be provided
-                                    if ( _.isEmpty( params.id ) ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
-                                    }
-                                    sektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
-                                    if ( 'no_match' == sektionCandidate ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
-                                          break;
-                                    }
-
-                                    sektionCandidate.collection =  _.isArray( sektionCandidate.collection ) ? sektionCandidate.collection : [];
-                                    // can we add another column ?
-                                    if ( ( self.MAX_NUMBER_OF_COLUMNS - 1 ) < _.size( sektionCandidate.collection ) ) {
-                                          __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n["You've reached the maximum number of columns allowed in this section."]);
-                                          break;
-                                    }
-
-                                    // RESET ALL COLUMNS WIDTH
-                                    // _.each( sektionCandidate.collection, function( colModel ) {
-                                    //       colModel.width = '';
-                                    // });
-                                    self.resetColumnsWidthInSection( sektionCandidate );
-
-                                    sektionCandidate.collection.push({
-                                          id :  params.id,
-                                          level : 'column',
-                                          collection : [],
-                                          ver_ini : sektionsLocalizedData.nimbleVersion
-                                    });
+                                    self._updAPISet_sek_add_column();
                               break;
-
-
                               case 'sek-remove-column' :
-                                    sektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
-                                    if ( 'no_match' != sektionCandidate ) {
-                                          // can we remove the column ?
-                                          if ( 1 === _.size( sektionCandidate.collection ) ) {
-                                                __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n["A section must have at least one column."]);
-                                                break;
-                                          }
-                                          sektionCandidate.collection =  _.isArray( sektionCandidate.collection ) ? sektionCandidate.collection : [];
-                                          sektionCandidate.collection = _.filter( sektionCandidate.collection, function( column ) {
-                                                return column.id != params.id;
-                                          });
-                                          // RESET ALL COLUMNS WIDTH
-                                          // _.each( sektionCandidate.collection, function( colModel ) {
-                                          //       colModel.width = '';
-                                          // });
-                                          self.resetColumnsWidthInSection( sektionCandidate );
-                                    } else {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
-                                    }
-
+                                    self._updAPISet_sek_remove_column();
                               break;
-
                               case 'sek-duplicate-column' :
-                                    // an id must be provided
-                                    if ( _.isEmpty( params.id ) ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
-                                    }
-
-                                    sektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
-                                    if ( 'no_match' == sektionCandidate ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
-                                          break;
-                                    }
-
-                                    sektionCandidate.collection =  _.isArray( sektionCandidate.collection ) ? sektionCandidate.collection : [];
-                                    // can we add another column ?
-                                    if ( ( self.MAX_NUMBER_OF_COLUMNS - 1 ) < _.size( sektionCandidate.collection ) ) {
-                                          __updateAPISettingDeferred__.reject( sektionsLocalizedData.i18n["You've reached the maximum number of columns allowed in this section."]);
-                                          break;
-                                    }
-
-                                    var deepClonedColumn;
-                                    try { deepClonedColumn = self.cloneLevel( params.id ); } catch( er ) {
-                                          api.errare( 'updateAPISetting => ' + params.action, er );
-                                          break;
-                                    }
-
-                                    // items id of multi-items module must always be unique
-                                    // this recursive method sniff and does the job
-                                    self.maybeGenerateNewItemIdsForCrudModules( deepClonedColumn );
-
-                                    var _position = self.getLevelPositionInCollection( params.id, newSetValue.collection );
-                                    cloneId = deepClonedColumn.id;//will be passed in resolve()
-                                    sektionCandidate.collection.splice( parseInt( _position + 1, 10 ), 0, deepClonedColumn );
-                                    // RESET ALL COLUMNS WIDTH
-                                    // _.each( sektionCandidate.collection, function( colModel ) {
-                                    //       colModel.width = '';
-                                    // });
-                                    self.resetColumnsWidthInSection( sektionCandidate );
+                                    self._updAPISet_sek_duplicate_column();
                               break;
-
-
                               // Note : the css rules are generated in Sek_Dyn_CSS_Builder::sek_add_rules_for_column_width
                               case 'sek-resize-columns' :
-                                    if ( params.col_number < 2 )
-                                      break;
-
-                                    var resizedColumn = self.getLevelModel( params.resized_column, newSetValue.collection ),
-                                        sistercolumn = self.getLevelModel( params.sister_column, newSetValue.collection );
-
-                                    //api.infoLog( 'updateAPISetting => ' + params.action + ' => ', params );
-
-                                    // SET RESIZED COLUMN WIDTH
-                                    if ( 'no_match' == resizedColumn ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => no resized column matched' );
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no resized column matched');
-                                          break;
-                                    }
-
-                                    var _getColumnWidth = function( _candidate_ ) {
-                                          var _width = '_not_set_';
-                                          var _options = _.isObject( _candidate_.options ) ? _candidate_.options : {};
-                                          if ( ! _.isEmpty( _options ) && _options.width && _options.width['custom-width'] ) {
-                                                _width = parseFloat( _options.width['custom-width'] * 1 );
-                                          }
-                                          return _width;
-                                    };
-
-                                    var _setColumnWidth = function( _candidate_, newWidthValue ) {
-                                          // start from a deep cloned object
-                                          // important => fixes https://github.com/presscustomizr/nimble-builder/issues/455
-                                          var _new_options_values = $.extend( true, {}, _candidate_.options || {} );
-                                          // april 2020 : due to a previous implementation of width option as an array, there could be a bug when trying to set the width
-                                          // because the check on _.isObject() was true for an array
-                                          // Fixes https://github.com/presscustomizr/nimble-builder/issues/620
-                                          _new_options_values.width = ( _.isObject( _new_options_values.width ) && _new_options_values.width['custom-width'] ) ? _new_options_values.width : {};
-                                          _new_options_values.width['custom-width'] = newWidthValue;
-                                          _candidate_.options = _new_options_values;
-
-                                          // Live update the input value ( when rendered )
-                                          self.cachedElements.$body.find('[data-sek-width-range-column-id="'+ _candidate_.id +'"]').val( newWidthValue ).trigger('input', { is_resize_column_trigger : true } );
-                                          return newWidthValue;
-                                    };
-
-                                    // DEPRECATED SINCE JUNE 2019 => resizedColumn.width = parseFloat( params.resizedColumnWidthInPercent );
-                                    var resizedColumnWidthInPercent = _setColumnWidth( resizedColumn, parseFloat( params.resizedColumnWidthInPercent ) );
-                                    // cast to number
-                                    resizedColumnWidthInPercent = parseFloat( resizedColumnWidthInPercent );
-
-                                    // SET OTHER COLUMNS WIDTH
-                                    var parentSektion = self.getLevelModel( params.in_sektion, newSetValue.collection );
-                                    var otherColumns = _.filter( parentSektion.collection, function( _col_ ) {
-                                          return _col_.id != resizedColumn.id && _col_.id != sistercolumn.id;
-                                    });
-                                    var otherColumnsWidth = parseFloat( resizedColumnWidthInPercent.toFixed(3) );
-
-                                    if ( ! _.isEmpty( otherColumns ) ) {
-                                         _.each( otherColumns, function( colModel ) {
-                                                currentColWidth = _getColumnWidth( colModel );
-                                                if ( '_not_set_' === currentColWidth || ! _.isNumber( currentColWidth * 1 ) || _.isEmpty( currentColWidth + '' ) || 1 > currentColWidth ) {
-                                                      // DEPRECATED SINCE JUNE 2019 => colModel.width = parseFloat( ( 100 / params.col_number ).toFixed(3) );
-                                                      currentColWidth = _setColumnWidth( colModel, parseFloat( ( 100 / params.col_number ).toFixed(3) ) );
-                                                }
-
-                                                // sum up all other column's width, excluding the resized and sister one.
-                                                otherColumnsWidth = parseFloat( ( otherColumnsWidth  +  currentColWidth ).toFixed(3) );
-                                          });
-                                    }
-
-                                    // SET SISTER COLUMN WIDTH
-                                    // sum up all other column's width, excluding the resized and sister one.
-                                    // api.infoLog( "resizedColumn.width", resizedColumn.width  );
-                                    // api.infoLog( "otherColumns", otherColumns );
-
-                                    // then calculate the sistercolumn so we are sure that we feel the entire space of the sektion
-                                    // DEPRECATED SINCE JUNE 2019 => sistercolumn.width = parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) );
-                                    _setColumnWidth( sistercolumn, parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) ) );
-                                    // api.infoLog('otherColumnsWidth', otherColumnsWidth );
-                                    // api.infoLog("sistercolumn.width", sistercolumn.width );
-                                    // api.infoLog( "parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) )" , parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) ) );
-                                    //api.infoLog('COLLECTION AFTER UPDATE ', parentSektion.collection );
+                                    self._updAPISet_sek_resize_column();
                               break;
-
-
-
-
                               case 'sek-move-column' :
-                                    var toSektionCandidate = self.getLevelModel( params.to_sektion, newSetValue.collection ),
-                                        movedColumnCandidate,
-                                        copyOfMovedColumnCandidate;
-
-                                    if ( _.isEmpty( toSektionCandidate ) || 'no_match' == toSektionCandidate ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing target sektion' );
-                                    }
-
-                                    if ( params.from_sektion != params.to_sektion ) {
-                                          // Remove the moved column from the source sektion
-                                          var fromSektionCandidate = self.getLevelModel( params.from_sektion, newSetValue.collection );
-                                          if ( _.isEmpty( fromSektionCandidate ) || 'no_match' == fromSektionCandidate ) {
-                                                throw new Error( 'updateAPISetting => ' + params.action + ' => missing source column' );
-                                          }
-
-                                          fromSektionCandidate.collection =  _.isArray( fromSektionCandidate.collection ) ? fromSektionCandidate.collection : [];
-                                          // Make a copy of the column candidate now, before removing it
-                                          movedColumnCandidate = self.getLevelModel( params.id, fromSektionCandidate.collection );
-                                          copyOfMovedColumnCandidate = $.extend( true, {}, movedColumnCandidate );
-                                          // remove the column from its previous sektion
-                                          fromSektionCandidate.collection = _.filter( fromSektionCandidate.collection, function( column ) {
-                                                return column.id != params.id;
-                                          });
-                                          // Reset the column's width in the target sektion
-                                          // _.each( fromSektionCandidate.collection, function( colModel ) {
-                                          //       colModel.width = '';
-                                          // });
-                                          self.resetColumnsWidthInSection( fromSektionCandidate );
-                                    }
-
-                                    // update the target sektion
-                                    toSektionCandidate.collection =  _.isArray( toSektionCandidate.collection ) ? toSektionCandidate.collection : [];
-                                    originalCollection = $.extend( true, [], toSektionCandidate.collection );
-                                    reorderedCollection = [];
-                                    _.each( params.newOrder, function( _id_ ) {
-                                          // in the case of a cross sektion movement, we need to add the moved column to the target sektion
-                                          if ( params.from_sektion != params.to_sektion && _id_ == copyOfMovedColumnCandidate.id ) {
-                                                reorderedCollection.push( copyOfMovedColumnCandidate );
-                                          } else {
-                                                columnCandidate = self.getLevelModel( _id_, originalCollection );
-                                                if ( _.isEmpty( columnCandidate ) || 'no_match' == columnCandidate ) {
-                                                      throw new Error( 'updateAPISetting => moveColumn => missing columnCandidate' );
-                                                }
-                                                reorderedCollection.push( columnCandidate );
-                                          }
-                                    });
-                                    toSektionCandidate.collection = reorderedCollection;
-
-                                    // Reset the column's width in the target sektion
-                                    // _.each( toSektionCandidate.collection, function( colModel ) {
-                                    //       colModel.width = '';
-                                    // });
-                                    self.resetColumnsWidthInSection( toSektionCandidate );
-
+                                    self._updAPISet_sek_move_column();
                               break;
-
-
-
-
-
-
-
-
-
-
 
 
                               //-------------------------------------------------------------------------------------------------
                               //-- MODULE
                               //-------------------------------------------------------------------------------------------------
                               case 'sek-add-module' :
-                                    // an id must be provided
-                                    if ( _.isEmpty( params.id ) ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
-                                    }
-                                    // a module_type must be provided
-                                    if ( _.isEmpty( params.module_type ) ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing module_type' );
-                                    }
-                                    columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                    if ( 'no_match' === columnCandidate ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
-                                          break;
-                                    }
-
-                                    position = 0;
-                                    columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                    // get the position of the before or after module or nested section
-                                    _.each( columnCandidate.collection, function( moduleOrNestedSectionModel, index ) {
-                                          if ( params.before_module_or_nested_section === moduleOrNestedSectionModel.id ) {
-                                                position = index;
-                                          }
-                                          if ( params.after_module_or_nested_section === moduleOrNestedSectionModel.id ) {
-                                                position = index + 1;
-                                          }
-                                    });
-
-                                    var _moduleParams = {
-                                          id : params.id,
-                                          level : 'module',
-                                          module_type : params.module_type,
-                                          ver_ini : sektionsLocalizedData.nimbleVersion
-                                    };
-                                    // Let's add the starting value if provided when registrating the module
-                                    startingModuleValue = self.getModuleStartingValue( params.module_type );
-                                    if ( 'no_starting_value' !== startingModuleValue ) {
-                                          _moduleParams.value = startingModuleValue;
-                                    }
-
-                                    columnCandidate.collection.splice( position, 0, _moduleParams );
+                                    self._updAPISet_sek_add_module();
                               break;
-
                               case 'sek-duplicate-module' :
-                                    // an id must be provided
-                                    if ( _.isEmpty( params.id ) ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
-                                    }
-                                    columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                    if ( 'no_match' == columnCandidate ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
-                                          break;
-                                    }
-
-                                    columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-
-                                    var deepClonedModule;
-                                    try { deepClonedModule = self.cloneLevel( params.id ); } catch( er ) {
-                                          api.errare( 'updateAPISetting => ' + params.action, er );
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => error when cloning the level');
-                                          break;
-                                    }
-                                    // items id of multi-items module must always be unique
-                                    // this recursive method sniff and does the job
-                                    self.maybeGenerateNewItemIdsForCrudModules( deepClonedModule );
-
-                                    var insertInposition = self.getLevelPositionInCollection( params.id, newSetValue.collection );
-                                    cloneId = deepClonedModule.id;//will be passed in resolve()
-                                    columnCandidate.collection.splice( parseInt( insertInposition + 1, 10 ), 0, deepClonedModule );
+                                    self._updAPISet_sek_duplicate_module();
                               break;
-
                               case 'sek-remove-module' :
-                                    // an id must be provided
-                                    if ( _.isEmpty( params.id ) ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
-                                    }
-                                    columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                    if ( 'no_match' != columnCandidate ) {
-                                          columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                          columnCandidate.collection = _.filter( columnCandidate.collection, function( module ) {
-                                                return module.id != params.id;
-                                          });
-
-                                    } else {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                    }
+                                    self._updAPISet_sek_remove_module();
                               break;
-
                               case 'sek-move-module' :
-                                    var toColumnCandidate,
-                                        movedModuleCandidate,
-                                        copyOfMovedModuleCandidate;
-
-                                    // loop on the sektions to find the toColumnCandidate
-                                    // _.each( newSetValue.collection, function( _sektion_ ) {
-                                    //       _.each( _sektion_.collection, function( _column_ ) {
-                                    //             if ( _column_.id == params.to_column ) {
-                                    //                  toColumnCandidate = _column_;
-                                    //             }
-                                    //       });
-                                    // });
-                                    toColumnCandidate = self.getLevelModel( params.to_column, newSetValue.collection );
-
-                                    if ( _.isEmpty( toColumnCandidate ) || 'no_match' == toColumnCandidate ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => missing target column' );
-                                    }
-
-                                    // If the module has been moved to another column
-                                    // => remove the moved module from the source column
-                                    if ( params.from_column != params.to_column ) {
-                                          var fromColumnCandidate;
-                                          fromColumnCandidate = self.getLevelModel( params.from_column, newSetValue.collection );
-
-                                          if ( _.isEmpty( fromColumnCandidate ) || 'no_match' == fromColumnCandidate ) {
-                                                throw new Error( 'updateAPISetting => ' + params.action + ' => missing source column' );
-                                          }
-
-                                          fromColumnCandidate.collection =  _.isArray( fromColumnCandidate.collection ) ? fromColumnCandidate.collection : [];
-                                          // Make a copy of the module candidate now, before removing it
-                                          movedModuleCandidate = self.getLevelModel( params.id, newSetValue.collection );
-                                          copyOfMovedModuleCandidate = $.extend( true, {}, movedModuleCandidate );
-                                          // remove the module from its previous column
-                                          fromColumnCandidate.collection = _.filter( fromColumnCandidate.collection, function( module ) {
-                                                return module.id != params.id;
-                                          });
-                                    }// if params.from_column != params.to_column
-
-                                    // update the target column
-                                    toColumnCandidate.collection =  _.isArray( toColumnCandidate.collection ) ? toColumnCandidate.collection : [];
-                                    originalCollection = $.extend( true, [], toColumnCandidate.collection );
-                                    reorderedCollection = [];
-                                    _.each( params.newOrder, function( _id_ ) {
-                                          if ( params.from_column != params.to_column && _id_ == copyOfMovedModuleCandidate.id ) {
-                                                reorderedCollection.push( copyOfMovedModuleCandidate );
-                                          } else {
-                                                moduleCandidate = self.getLevelModel( _id_, newSetValue.collection );
-                                                if ( _.isEmpty( moduleCandidate ) || 'no_match' == moduleCandidate ) {
-                                                      throw new Error( 'updateAPISetting => ' + params.action + ' => missing moduleCandidate' );
-                                                }
-                                                reorderedCollection.push( moduleCandidate );
-                                          }
-                                    });
-                                    // Check if we have duplicates ?
-                                    if ( reorderedCollection.length != _.uniq( reorderedCollection ).length ) {
-                                          throw new Error( 'updateAPISetting => ' + params.action + ' => there are duplicated modules in column : ' + toColumnCandidate.id );
-                                    } else {
-                                          toColumnCandidate.collection = reorderedCollection;
-                                    }
+                                    self._updAPISet_sek_move_module();
                               break;
-
-
                               case 'sek-set-module-value' :
-                                    moduleCandidate = self.getLevelModel( params.id, newSetValue.collection );
-
-                                    // Is this a multi-item module ?
-                                    // Fixes https://github.com/presscustomizr/nimble-builder/issues/616
-                                    var _ctrl_ = params.settingParams.args.moduleRegistrationParams.control,
-                                        _module_id_ = params.settingParams.args.moduleRegistrationParams.id,
-                                        parentModuleInstance = _ctrl_.czr_Module( _module_id_ );
-
-                                    if ( ! _.isEmpty( parentModuleInstance ) ) {
-                                          isMultiItemModule = parentModuleInstance.isMultiItem();
-                                    } else {
-                                          api.errare( 'updateAPISetting => missing parentModuleInstance', params );
-                                    }
-
-                                    // if multi-item module, the value is array of items, otherwise an object
-                                    var _modValueCandidate = isMultiItemModule ? [] : {};
-                                    // consider only the non empty settings for db
-                                    // booleans should bypass this check
-                                    _.each( params.value || (isMultiItemModule ? [] : {}), function( _val_, _key_ ) {
-                                          // Note : _.isEmpty( 5 ) returns true when checking an integer,
-                                          // that's why we need to cast the _val_ to a string when using _.isEmpty()
-                                          if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
-                                            return;
-                                          _modValueCandidate[ _key_ ] = _val_;
-                                    });
-                                    if ( 'no_match' == moduleCandidate ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => no module matched', params );
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => error no module matched');
-                                          break;
-                                    }
-                                    if ( _.isEmpty( params.options_type ) ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => missing options_type');
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => missing options_type');
-                                          break;
-                                    }
-
-                                    // Is this a father module ?
-                                    // If yes, the module value is structured by option group, each option group being updated by a child module
-                                    // If no, the default option type is : '__no_option_group_to_be_updated_by_children_modules__'
-                                    if ( '__no_option_group_to_be_updated_by_children_modules__' === params.options_type ) {
-                                          moduleCandidate.value = _modValueCandidate;
-                                    } else {
-                                          // start from a deep cloned object
-                                          // prevents issues like https://github.com/presscustomizr/nimble-builder/issues/455
-                                          var _new_module_values = $.extend( true, {}, _.isEmpty( moduleCandidate.value ) ? {} : moduleCandidate.value );
-                                          _new_module_values[ params.options_type ] = _modValueCandidate;
-                                          moduleCandidate.value = _new_module_values;
-                                    }
-
+                                    self._updAPISet_sek_set_module_value();
                               break;
 
 
+                              //-------------------------------------------------------------------------------------------------
+                              //-- CONTENT IN NEW SEKTION
+                              //-------------------------------------------------------------------------------------------------
+                              case 'sek-add-content-in-new-sektion' :
+                                    self._updAPISet_sek_add_content_in_new_sektion();
+                              break;
+                              //-------------------------------------------------------------------------------------------------
+                              //-- CONTENT IN NEW NESTED SEKTION
+                              //-------------------------------------------------------------------------------------------------
+                              case 'sek-add-preset-section-in-new-nested-sektion' :
+                                    self._updAPISet_sek_add_preset_sektion_in_new_nested_sektion();
+                              break;
 
 
+                              //-------------------------------------------------------------------------------------------------
+                              //-- FILE IMPORT
+                              //-------------------------------------------------------------------------------------------------
+                              case 'sek-import-from-file' :
+                                    self._updAPISet_sek_import_from_file();
+                              break;
 
+                              //-------------------------------------------------------------------------------------------------
+                              //-- INJECT TEMPLATE FROM GALLERY
+                              //-------------------------------------------------------------------------------------------------
+                              case 'sek-import-tmpl-from-gallery' :
+                                    self._updAPISet_sek_import_tmpl_from_gallery();
+                              break;
 
                               //-------------------------------------------------------------------------------------------------
                               //-- LEVEL OPTIONS
                               //-------------------------------------------------------------------------------------------------
                               case 'sek-generate-level-options-ui' :
-                                    var _candidate_ = self.getLevelModel( params.id, newSetValue.collection ),
+                                    var _candidate_ = self.getLevelModel( params.id, self.updAPISetParams.newSetValue.collection ),
                                         _valueCandidate = {};
 
                                     if ( 'no_match'=== _candidate_ ) {
                                           api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
+                                          self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
                                           break;
                                     }
                                     // start from a deep cloned object
@@ -7034,7 +6351,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               case 'sek-generate-local-skope-options-ui' :
                                     _valueCandidate = {};
 
-                                    var _currentOptions = $.extend( true, {}, _.isObject( newSetValue.local_options ) ? newSetValue.local_options : {} );
+                                    var _currentOptions = $.extend( true, {}, _.isObject( self.updAPISetParams.newSetValue.local_options ) ? self.updAPISetParams.newSetValue.local_options : {} );
                                     // consider only the non empty settings for db
                                     // booleans should bypass this check
                                     _.each( params.value || {}, function( _val_, _key_ ) {
@@ -7049,360 +6366,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     } else {
                                           var newOptionsValues = {};
                                           newOptionsValues[ params.options_type ] = _valueCandidate;
-                                          newSetValue.local_options = $.extend( _currentOptions, newOptionsValues );
+                                          self.updAPISetParams.newSetValue.local_options = $.extend( _currentOptions, newOptionsValues );
                                     }
                               break;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                              //-------------------------------------------------------------------------------------------------
-                              //-- CONTENT IN NEW SEKTION
-                              //-------------------------------------------------------------------------------------------------
-                              // @params {
-                              //   drop_target_element : $(this),
-                              //   position : _position,// <= top or bottom
-                              //   before_section : $(this).data('sek-before-section'),
-                              //   after_section : $(this).data('sek-after-section'),
-                              //   content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ), //<= module or preset_section
-                              //   content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
-                              // }
-                              case 'sek-add-content-in-new-sektion' :
-                                    // get the position of the before or after section
-                                    var positionIndex = 0;
-                                    locationCandidate = self.getLevelModel( params.location, newSetValue.collection );
-                                    if ( 'no_match' == locationCandidate ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
-                                          break;
-                                    }
-                                    locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
-                                    _.each( locationCandidate.collection, function( secModel, index ) {
-                                          if ( params.before_section === secModel.id ) {
-                                                positionIndex = index;
-                                          }
-                                          if ( params.after_section === secModel.id ) {
-                                                positionIndex = index + 1;
-                                          }
-                                    });
-
-                                    switch( params.content_type) {
-                                          // When a module is dropped in a section + column structure to be generated
-                                          case 'module' :
-                                                // Let's add the starting value if provided when registrating the module
-                                                // Note : params.content_id is the module_type
-                                                startingModuleValue = self.getModuleStartingValue( params.content_id );
-
-                                                // insert the section in the collection at the right place
-                                                locationCandidate.collection.splice( positionIndex, 0, {
-                                                      id : params.id,
-                                                      level : 'section',
-                                                      collection : [
-                                                            {
-                                                                  id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
-                                                                  level : 'column',
-                                                                  collection : [
-                                                                        {
-                                                                              id : params.droppedModuleId,
-                                                                              level : 'module',
-                                                                              module_type : params.content_id,
-                                                                              value : 'no_starting_value' !== startingModuleValue ? startingModuleValue : null,
-                                                                              ver_ini : sektionsLocalizedData.nimbleVersion
-                                                                        }
-                                                                  ],
-                                                                  ver_ini : sektionsLocalizedData.nimbleVersion
-                                                            }
-                                                      ],
-                                                      ver_ini : sektionsLocalizedData.nimbleVersion
-                                                });
-                                          break;//case 'module' :
-
-                                          // When a preset section is dropped
-                                          case 'preset_section' :
-                                                // insert the section in the collection at the right place
-                                                __presetSectionInjected__ = $.Deferred();//defined at the beginning of the method
-
-                                                // we use a section index here to display the section in the same order as in the json
-                                                // introduced when implementing multi-section pre-build section
-                                                // @see https://github.com/presscustomizr/nimble-builder/issues/489
-                                                var _injectPresetSectionInLocationOrParentColumn = function( sectionReadyToInject, positionIndex ) {
-                                                      // If the preset_section is inserted in a an empty nested section, add it at the right place in the parent column of the nested section.
-                                                      // Otherwise, add the preset section at the right position in the parent location of the section.
-                                                      var insertedInANestedSektion = false;
-                                                      if ( ! _.isEmpty( params.sektion_to_replace ) ) {
-                                                            var sektionToReplace = self.getLevelModel( params.sektion_to_replace, newSetValue.collection );
-                                                            if ( 'no_match' === sektionToReplace ) {
-                                                                  api.errare( 'updateAPISetting => ' + params.action + ' => no sektionToReplace matched' );
-                                                                  __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no sektionToReplace matched');
-                                                            }
-                                                            insertedInANestedSektion = true === sektionToReplace.is_nested;
-                                                      }
-
-
-                                                      // The following param "collection_of_preset_section_id" has been introduced when implementing support for multi-section pre-build sections
-                                                      // @see https://github.com/presscustomizr/nimble-builder/issues/489
-                                                      // It is sent to the preview with ::reactToPreviewMsg, see bottom of the method.
-                                                      var injected_section_id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
-                                                      params.collection_of_preset_section_id = params.collection_of_preset_section_id || [];
-                                                      params.collection_of_preset_section_id.push( injected_section_id );
-
-                                                      if ( ! insertedInANestedSektion ) {
-                                                            locationCandidate.collection.splice( positionIndex, 0, {
-                                                                  id : injected_section_id,//params.id,//self.guid()
-                                                                  level : 'section',
-                                                                  collection : sectionReadyToInject.collection,
-                                                                  options : sectionReadyToInject.options || {},
-                                                                  ver_ini : sektionsLocalizedData.nimbleVersion
-                                                            });
-                                                      } else {
-                                                            columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                                            if ( 'no_match' === columnCandidate ) {
-                                                                  api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                                                  __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
-                                                            }
-
-                                                            columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-
-                                                            // get the position of the before or after module
-                                                            _.each( columnCandidate.collection, function( moduleOrSectionModel, index ) {
-                                                                  if ( params.before_section === moduleOrSectionModel.id ) {
-                                                                        positionIndex = index;
-                                                                  }
-                                                                  if ( params.after_section === moduleOrSectionModel.id ) {
-                                                                        positionIndex = index + 1;
-                                                                  }
-                                                            });
-
-                                                            columnCandidate.collection.splice( positionIndex, 0, {
-                                                                  id : injected_section_id,
-                                                                  is_nested : true,
-                                                                  level : 'section',
-                                                                  collection : sectionReadyToInject.collection,
-                                                                  options : sectionReadyToInject.options || {},
-                                                                  ver_ini : sektionsLocalizedData.nimbleVersion
-                                                            });
-                                                      }
-                                                };//_injectPresetSectionInLocationOrParentColumn
-                                                var _doWhenPresetSectionCollectionFetched = function( presetColumnOrSectionCollection ) {
-                                                      self.preparePresetSectionForInjection( presetColumnOrSectionCollection )
-                                                            .fail( function( _er_ ){
-                                                                  __updateAPISettingDeferred__.reject( 'updateAPISetting => error when preparePresetSectionForInjection => ' + params.action + ' => ' + _er_ );
-                                                                  // Used when updating the setting
-                                                                  // @see end of this method
-                                                                  __presetSectionInjected__.reject( _er_ );
-                                                            })
-                                                            .done( function( maybeMultiSectionReadyToInject ) {
-                                                                  var is_multi_section = 'section' === maybeMultiSectionReadyToInject.collection[0].level;
-                                                                  // support for pre-built multi-section has been introduced in july 2019
-                                                                  // @see https://github.com/presscustomizr/nimble-builder/issues/489
-                                                                  if ( is_multi_section ) {
-                                                                        // we use a section index here to display the section in the same order as in the json
-                                                                        var sectionIndex = 0;
-                                                                        _.each( maybeMultiSectionReadyToInject.collection, function( sectionReadyToInject ) {
-                                                                              _injectPresetSectionInLocationOrParentColumn( sectionReadyToInject, positionIndex );
-                                                                              positionIndex++;
-                                                                        });
-                                                                  } else {
-                                                                        _injectPresetSectionInLocationOrParentColumn( maybeMultiSectionReadyToInject, positionIndex );
-                                                                  }
-
-                                                                  // Used when updating the setting
-                                                                  // @see end of this method
-                                                                  __presetSectionInjected__.resolve();
-                                                            });// self.preparePresetSectionForInjection.done()
-                                                };//_doWhenPresetSectionCollectionFetched()
-
-                                                // Try to fetch the sections from the server
-                                                // if sucessfull, resolve __presetSectionInjected__.promise()
-                                                self.getPresetSectionCollection({
-                                                            is_user_section : params.is_user_section,
-                                                            presetSectionId : params.content_id
-                                                      })
-                                                      .fail( function( _er_ ) {
-                                                            api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
-                                                            __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
-                                                      })
-                                                      .done( function( presetColumnOrSectionCollection ) {
-                                                            if ( ! _.isObject( presetColumnOrSectionCollection ) || _.isEmpty( presetColumnOrSectionCollection ) ) {
-                                                                  api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetColumnOrSectionCollection );
-                                                                  __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
-                                                            }
-                                                            // OK. time to resolve __presetSectionInjected__.promise()
-                                                            _doWhenPresetSectionCollectionFetched( presetColumnOrSectionCollection );
-                                                      });//self.getPresetSectionCollection().done()
-
-                                          break;//case 'preset_section' :
-                                    }//switch( params.content_type)
-                              break;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                              //-------------------------------------------------------------------------------------------------
-                              //-- CONTENT IN NEW NESTED SEKTION
-                              //-------------------------------------------------------------------------------------------------
-                              // @params {
-                              //   drop_target_element : $(this),
-                              //   position : _position,// <= top or bottom
-                              //   before_section : $(this).data('sek-before-section'),
-                              //   after_section : $(this).data('sek-after-section'),
-                              //   content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ), //<= module or preset_section
-                              //   content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
-                              // }
-                              case 'sek-add-preset-section-in-new-nested-sektion' :
-
-                                    columnCandidate = self.getLevelModel( params.in_column, newSetValue.collection );
-                                    if ( 'no_match' === columnCandidate ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
-                                          break;
-                                    }
-
-                                    var positionIndexInColumn = 0;
-                                    columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
-                                     // get the position of the before or after module or nested section
-                                    _.each( columnCandidate.collection, function( moduleOrNestedSectionModel, index ) {
-                                          if ( params.before_module_or_nested_section === moduleOrNestedSectionModel.id ) {
-                                                positionIndexInColumn = index;
-                                          }
-                                          if ( params.after_module_or_nested_section === moduleOrNestedSectionModel.id ) {
-                                                positionIndexInColumn = index + 1;
-                                          }
-                                    });
-
-                                    // can we add this nested sektion ?
-                                    // if the parent sektion of the column has is_nested = true, then we can't
-                                    parentSektionCandidate = self.getLevelModel( params.in_sektion, newSetValue.collection );
-                                    if ( 'no_match' == parentSektionCandidate ) {
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
-                                          break;
-                                    }
-                                    if ( true === parentSektionCandidate.is_nested ) {
-                                          __updateAPISettingDeferred__.reject('');
-                                          api.previewer.trigger('sek-notify', {
-                                                type : 'info',
-                                                duration : 30000,
-                                                message : [
-                                                      '<span style="font-size:0.95em">',
-                                                        '<strong>' + sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ] + '</strong>',
-                                                      '</span>'
-                                                ].join('')
-                                          });
-                                          break;
-                                    }
-
-                                    // insert the nested section in the collection at the right place
-                                    var presetColumnOrSectionCollection;
-                                    __presetSectionInjected__ = $.Deferred();//defined at the beginning of the method
-
-                                    var _doWhenPrebuiltSectionCollectionFetched = function( presetColumnOrSectionCollection ) {
-                                          self.preparePresetSectionForInjection( presetColumnOrSectionCollection )
-                                                .fail( function( _er_ ){
-                                                      __updateAPISettingDeferred__.reject( 'updateAPISetting => error when preparePresetSectionForInjection => ' + params.action + ' => ' + _er_ );
-                                                      // Used when updating the setting
-                                                      // @see end of this method
-                                                      __presetSectionInjected__.reject( _er_ );
-                                                })
-                                                .done( function( maybeMultiSectionReadyToInject ) {
-
-                                                      var _injectNestedSectionInParentColumn = function( sectionReadyToInject, positionIndexInColumn  ) {
-                                                            positionIndexInColumn = positionIndexInColumn || 0;
-
-                                                            // The following param "collection_of_preset_section_id" has been introduced when implementing support for multi-section pre-build sections
-                                                            // @see https://github.com/presscustomizr/nimble-builder/issues/489
-                                                            // It is sent to the preview with ::reactToPreviewMsg, see bottom of the method.
-                                                            var injected_section_id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
-                                                            params.collection_of_preset_section_id = params.collection_of_preset_section_id || [];
-                                                            params.collection_of_preset_section_id.push( injected_section_id );
-
-                                                            columnCandidate.collection.splice( positionIndexInColumn, 0, {
-                                                                  id : injected_section_id,
-                                                                  level : 'section',
-                                                                  collection : sectionReadyToInject.collection,
-                                                                  options : sectionReadyToInject.options || {},
-                                                                  is_nested : true,
-                                                                  ver_ini : sektionsLocalizedData.nimbleVersion
-                                                            });
-                                                      };
-
-                                                      // support for pre-built multi-section has been introduced in july 2019
-                                                      // @see https://github.com/presscustomizr/nimble-builder/issues/489
-                                                      var is_multi_section = 'section' === maybeMultiSectionReadyToInject.collection[0].level;
-                                                      if ( is_multi_section ) {
-                                                            _.each( maybeMultiSectionReadyToInject.collection, function( sectionReadyToInject ) {
-                                                                  _injectNestedSectionInParentColumn( sectionReadyToInject, positionIndexInColumn );
-                                                                  positionIndexInColumn++;
-                                                            });
-                                                      } else {
-                                                            _injectNestedSectionInParentColumn( maybeMultiSectionReadyToInject, positionIndexInColumn );
-                                                      }
-
-                                                      // Used when updating the setting
-                                                      // @see end of this method
-                                                      __presetSectionInjected__.resolve();
-                                                });//self.preparePresetSectionForInjection.done()
-                                    };//_doWhenPrebuiltSectionCollectionFetched
-
-
-                                    // Try to fetch the sections from the server
-                                    // if sucessfull, resolve __presetSectionInjected__.promise()
-                                    self.getPresetSectionCollection({
-                                                is_user_section : params.is_user_section,
-                                                presetSectionId : params.content_id
-                                          })
-                                          .fail( function() {
-                                                api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
-                                                __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
-                                          })
-                                          .done( function( presetColumnOrSectionCollection ) {
-                                                if ( ! _.isObject( presetColumnOrSectionCollection ) || _.isEmpty( presetColumnOrSectionCollection ) ) {
-                                                      api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetColumnOrSectionCollection );
-                                                      __updateAPISettingDeferred__.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
-                                                }
-                                                // OK. time to resolve __presetSectionInjected__.promise()
-                                                _doWhenPrebuiltSectionCollectionFetched( presetColumnOrSectionCollection );
-                                          });//self.getPresetSectionCollection().done()
-                              break;
-
-
-
-
-
-
 
 
 
@@ -7426,7 +6392,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     // update the global gfonts collection
                                     // this is then used server side in Sek_Dyn_CSS_Handler::sek_get_gfont_print_candidates to build the Google Fonts request
-                                    newSetValue.fonts = currentGfonts;
+                                    self.updAPISetParams.newSetValue.fonts = currentGfonts;
                               break;
 
                               //-------------------------------------------------------------------------------------------------
@@ -7434,113 +6400,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //-------------------------------------------------------------------------------------------------
                               case 'sek-restore-revision' :
                                     //api.infoLog( 'sek-restore-revision', params );
-                                    newSetValue = params.revision_value;
-                              break;
-
-                              //-------------------------------------------------------------------------------------------------
-                              //-- FILE IMPORT
-                              //-------------------------------------------------------------------------------------------------
-                              case 'sek-import-from-file' :
-                                    api.infoLog( 'sek-import-from-file', params );
-                                    if ( _.isUndefined( params.imported_content.data ) || _.isUndefined( params.imported_content.metas ) ) {
-                                          api.errare( 'updateAPISetting::sek-import-from-file => invalid imported content', imported_content );
-                                          break;
-                                    }
-
-                                    var importedCollection = _.isArray( params.imported_content.data.collection ) ? $.extend( true, [], params.imported_content.data.collection ) : [];
-
-                                    // SHALL WE ASSIGN SECTIONS FROM MISSING LOCATIONS TO THE FIRST ACTIVE LOCATION ?
-                                    // For example the current page has only the 'loop_start' location, whereas the imported content includes 3 locations :
-                                    // - after_header
-                                    // - loop_start
-                                    // - before_footer
-                                    // Among those 3 locations, 2 are not active in the page.
-                                    // We will merge all section collections from the 3 imported locations one new collection, that will be assigned to 'loop_start'
-                                    // Note that the active imported locations are ordered like they were on the page when exported.
-                                    //
-                                    // So :
-                                    // 1) identify the first active location of the page
-                                    // 2) populate a new collection of combined sections from all active imported locations.
-                                    // 3) updated the imported collection with this
-                                    if ( true === params.assign_missing_locations ) {
-                                          var importedActiveLocations = params.imported_content.metas.active_locations,
-                                              currentActiveLocations = api.czr_sektions.activeLocations();
-
-                                          // console.log('Current set value ?', api( _collectionSettingId_ )() );
-                                          // console.log('import params', params );
-                                          // console.log('importedCollection?', importedCollection );
-                                          // console.log('importedActiveLocations', importedActiveLocations );
-
-                                          // first active location of the current setting
-                                          var firstCurrentActiveLocationId = _.first( currentActiveLocations );
-
-                                          if ( !_.isEmpty( firstCurrentActiveLocationId ) && !_.isEmpty( importedActiveLocations ) && _.isArray( importedActiveLocations ) ) {
-                                                // importedActiveLocationsNotAvailableInCurrentActiveLocations
-                                                // Example :
-                                                // active location in the page : loop_start, loop_end
-                                                // active locations imported : after_header, loop_start, before_footer
-                                                // importedActiveLocationsNotAvailableInCurrentActiveLocations => after_header, before_footer
-                                                var importedActiveLocationsNotAvailableInCurrentActiveLocations = $(importedActiveLocations).not(currentActiveLocations).get(),
-                                                    firstCurrentLocationData = self.getLevelModel( firstCurrentActiveLocationId, newSetValue.collection ),
-                                                    importedTargetLocationData = self.getLevelModel( firstCurrentActiveLocationId, params.imported_content.data.collection ),
-                                                    newCollectionForTargetLocation = [];// the collection that will hold the merge of all active imported collections
-
-                                                // normalize
-                                                // => make sure we have a collection array, even empty
-                                                firstCurrentLocationData.collection = _.isArray( firstCurrentLocationData.collection ) ? firstCurrentLocationData.collection : [];
-                                                importedTargetLocationData.collection = _.isArray( importedTargetLocationData.collection ) ? importedTargetLocationData.collection : [];
-
-                                                // loop on the active imported locations
-                                                // Example : ["__after_header", "__before_main_wrapper", "loop_start", "__before_footer"]
-                                                // and populate newCollectionForTargetLocation, with locations ordered as they were on export
-                                                // importedCollection is a clone
-                                                _.each( importedActiveLocations, function( impLocationId ){
-                                                      var impLocationData = self.getLevelModel( impLocationId, importedCollection );
-                                                      if ( _.isEmpty( impLocationData.collection ) )
-                                                        return;
-                                                      newCollectionForTargetLocation = _.union( newCollectionForTargetLocation, impLocationData.collection );
-                                                });//_.each( importedActiveLocations
-
-                                                // replace the previous collection of the target location, by the union of all collections.
-                                                // for example, if 'loop_start' is the target location, all sections will be added to it.
-                                                importedTargetLocationData.collection = newCollectionForTargetLocation;
-
-                                                // remove the missing locations from the imported collection
-                                                // importedActiveLocationsNotAvailableInCurrentActiveLocations
-                                                params.imported_content.data.collection = _.filter( params.imported_content.data.collection, function( _location ) {
-                                                      return !_.contains( importedActiveLocationsNotAvailableInCurrentActiveLocations, _location.id );
-                                                });
-                                          }//if ( !_.isEmpty( firstCurrentActiveLocationId ) )
-                                    }//if ( true === params.assign_missing_locations )
-
-
-                                    // SHALL WE MERGE ?
-                                    // Sept 2019 note : for local import only. Not implemented for global https://github.com/presscustomizr/nimble-builder/issues/495
-                                    // loop on each location of the imported content
-                                    // if the current setting value has sections in a location, add them before the imported ones
-                                    // keep_existing_sections is a user check option
-                                    // @see PHP sek_get_module_params_for_sek_local_imp_exp()
-                                    if ( true === params.keep_existing_sections ) {
-                                        // note that importedCollection is a unlinked clone of params.imported_content.data.collection
-                                        // merge sections
-                                        _.each( importedCollection, function( imp_location_data ) {
-                                              var currentLocationData = self.getLevelModel( imp_location_data.id, newSetValue.collection );
-                                              if ( _.isEmpty( currentLocationData.collection ) )
-                                                return;
-
-                                              var importedLocationData = self.getLevelModel( imp_location_data.id, params.imported_content.data.collection );
-                                              importedLocationData.collection = _.union( currentLocationData.collection, importedLocationData.collection );
-                                        });
-
-                                        // merge fonts if needed
-                                        if ( newSetValue.fonts && !_.isEmpty( newSetValue.fonts ) && _.isArray( newSetValue.fonts ) ) {
-                                              params.imported_content.data.fonts = _.isArray( params.imported_content.data.fonts ) ? params.imported_content.data.fonts : [];
-                                              // merge and remove duplicated fonts
-                                              params.imported_content.data.fonts =  _.uniq( _.union( newSetValue.fonts, params.imported_content.data.fonts ) );
-                                        }
-                                    }// if true === params.merge
-
-                                    newSetValue = params.imported_content.data;
+                                    self.updAPISetParams.newSetValue = params.revision_value;
                               break;
 
                               //-------------------------------------------------------------------------------------------------
@@ -7548,7 +6408,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //-------------------------------------------------------------------------------------------------
                               case 'sek-reset-collection' :
                                     //api.infoLog( 'sek-import-from-file', params );
-                                    try { newSetValue = api.czr_sektions.resetCollectionSetting( params.scope ); } catch( er ) {
+                                    try { self.updAPISetParams.newSetValue = api.czr_sektions.resetCollectionSetting( params.scope ); } catch( er ) {
                                           api.errare( 'sek-reset-collection => error when firing resetCollectionSetting()', er );
                                     }
                               break;
@@ -7558,7 +6418,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // if we did not already rejected the request, let's check if the setting object has actually been modified
                         // at this point it should have been.
-                        if ( 'pending' == __updateAPISettingDeferred__.state() ) {
+                        if ( 'pending' == self.updAPISetParams.promise.state() ) {
                               var mayBeUpdateSektionsSetting = function() {
 
                                     // When a sektion setting is changed, "from" and "to" are passed to the .settingParams property
@@ -7574,18 +6434,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // in a setting value change case, the from and to must be different
                                     // implemented when fixing https://github.com/presscustomizr/nimble-builder/issues/455
                                     if ( isSettingValueChangeCase && _.isEqual( params.settingParams.from, params.settingParams.to ) ) {
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => main sektion setting change => the new setting value is unchanged when firing action : ' + params.action );
-                                    } else if ( ! isSettingValueChangeCase && _.isEqual( currentSetValue, newSetValue ) ) {
-                                          __updateAPISettingDeferred__.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
+                                          self.updAPISetParams.promise.reject( 'updateAPISetting => main sektion setting change => the new setting value is unchanged when firing action : ' + params.action );
+                                    } else if ( ! isSettingValueChangeCase && _.isEqual( currentSetValue, self.updAPISetParams.newSetValue ) ) {
+                                          self.updAPISetParams.promise.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
-                                          if ( null !== self.validateSettingValue( newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
-                                                api( _collectionSettingId_ )( newSetValue, params );
+                                          if ( null !== self.validateSettingValue( self.updAPISetParams.newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
+                                                api( _collectionSettingId_ )( self.updAPISetParams.newSetValue, params );
                                                 // Add the cloneId to the params when we resolve
                                                 // the cloneId is only needed in the duplication scenarii
-                                                params.cloneId = cloneId;
-                                                __updateAPISettingDeferred__.resolve( params );
+                                                params.cloneId = self.updAPISetParams.cloneId;
+                                                self.updAPISetParams.promise.resolve( params );
                                           } else {
-                                                __updateAPISettingDeferred__.reject( 'Validation problem for action ' + params.action );
+                                                self.updAPISetParams.promise.reject( 'Validation problem for action ' + params.action );
                                           }
                                           //api.infoLog('COLLECTION SETTING UPDATED => ', _collectionSettingId_, api( _collectionSettingId_ )() );
                                     }
@@ -7593,37 +6453,37 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               // For all scenarios but section injection, we can update the sektion setting now
                               // otherwise we need to wait for the injection to be processed asynchronously
-                              // CRITICAL => __updateAPISettingDeferred__ has to be resolved / rejected
+                              // CRITICAL => self.updAPISetParams.promise has to be resolved / rejected
                               // otherwise this can lead to scenarios where a change is not taken into account in ::updateAPISettingAndExecutePreviewActions
                               // like in https://github.com/presscustomizr/nimble-builder/issues/373
-                              if ( '_not_injection_scenario_' === __presetSectionInjected__ ) {
+                              if ( '_not_injection_scenario_' === self.updAPISetParams.sectionInjectPromise ) {
                                     mayBeUpdateSektionsSetting();
-                                    // At this point the __updateAPISettingDeferred__ obj can't be in a 'pending' state
-                                    if ( 'pending' === __updateAPISettingDeferred__.state() ) {
-                                          api.errare( '::updateAPISetting => The __updateAPISettingDeferred__ promise has not been resolved properly.');
+                                    // At this point the self.updAPISetParams.promise obj can't be in a 'pending' state
+                                    if ( 'pending' === self.updAPISetParams.promise.state() ) {
+                                          api.errare( '::updateAPISetting => The self.updAPISetParams.promise has not been resolved properly.');
                                     }
                               } else {
-                                    __presetSectionInjected__
+                                    self.updAPISetParams.sectionInjectPromise
                                           .done( function() {
                                                mayBeUpdateSektionsSetting();
-                                               // At this point the __updateAPISettingDeferred__ obj can't be in a 'pending' state
-                                               if ( 'pending' === __updateAPISettingDeferred__.state() ) {
-                                                    api.errare( '::updateAPISetting => The __updateAPISettingDeferred__ promise has not been resolved properly.');
+                                               // At this point the self.updAPISetParams.promise obj can't be in a 'pending' state
+                                               if ( 'pending' === self.updAPISetParams.promise.state() ) {
+                                                    api.errare( '::updateAPISetting => The self.updAPISetParams.promise has not been resolved properly.');
                                                }
                                           })
                                           .fail( function( _er_ ) {
-                                                api.errare( 'updateAPISetting => __presetSectionInjected__ failed', _er_ );
+                                                api.errare( 'updateAPISetting => self.updAPISetParams.sectionInjectPromise failed', _er_ );
                                           });
                               }
                         }
-                  };//_do_update_setting_id()
+                  };//_updateSektionSettingInstanceWithAction()
 
 
                   // Update the sektion collection
                   api( _collectionSettingId_, function( sektionSetInstance ) {
-                        _do_update_setting_id();
+                        _updateSektionSettingInstanceWithAction();
                   });
-                  return __updateAPISettingDeferred__.promise();
+                  return self.updAPISetParams.promise.promise();
             },//updateAPISetting
 
 
@@ -7721,7 +6581,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // the other level's version have to be added
                               userSectionCandidate.collection = self.setPresetSectionVersion( userSectionCandidate.collection );
 
-                              // OK. time to resolve __presetSectionInjected__.promise()
+                              // OK. time to resolve self.updAPISetParams.sectionInjectPromise.promise()
                               __dfd__.resolve( userSectionCandidate );
                         })
                         .fail( function( er ) {
@@ -7852,6 +6712,1516 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                 return _dfd_.promise();
             }
+      });//$.extend()
+})( wp.customize, jQuery );//global sektionsLocalizedData, serverControlParams
+//self.updAPISetParams = {
+//       params : params,
+//       promise : $.Deferred(),
+//       newSetValue : _.isObject( _currentSetValue ) ? $.extend( true, {}, _currentSetValue ) : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ),
+//       cloneId : '',
+//       sectionInjectPromise
+// };
+var CZRSeksPrototype = CZRSeksPrototype || {};
+(function ( api, $ ) {
+      $.extend( CZRSeksPrototype, {
+            //-------------------------------------------------------------------------------------------------
+            //-- ADD SECTION
+            //-------------------------------------------------------------------------------------------------
+            _updAPISet_sek_add_sektion :  function() {
+                  var self = this,
+                      params,
+                      columnCandidate,
+                      parentSektionCandidate,
+                      locationCandidate;
+
+                  params = self.updAPISetParams.params;
+
+                  //console.log('ADD SECTION ?', params, self.updAPISetParams );
+                  // an id must be provided
+                  if ( _.isEmpty( params.id ) ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
+                  }
+
+                  if ( _.isEmpty( params.location ) ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => missing location' );
+                  }
+                  // Is this a nested sektion ?
+                  if ( true === params.is_nested ) {
+                        columnCandidate = self.getLevelModel( params.in_column, self.updAPISetParams.newSetValue.collection );
+                        // can we add this nested sektion ?
+                        // if the parent sektion of the column has is_nested = true, then we can't
+                        parentSektionCandidate = self.getLevelModel( params.in_sektion, self.updAPISetParams.newSetValue.collection );
+                        if ( 'no_match' == parentSektionCandidate ) {
+                              self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
+                        } else if ( true === parentSektionCandidate.is_nested ) {
+                              self.updAPISetParams.promise.reject('');
+                              api.previewer.trigger('sek-notify', {
+                                    type : 'info',
+                                    duration : 30000,
+                                    message : [
+                                          '<span style="font-size:0.95em">',
+                                            '<strong>' + sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ] + '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                        } else if ( 'no_match' == columnCandidate ) {
+                              api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                              self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                        } else {
+                              columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+                              columnCandidate.collection.push({
+                                    id : params.id,
+                                    level : 'section',
+                                    collection : [{
+                                          id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                          level : 'column',
+                                          collection : [],
+                                          ver_ini : sektionsLocalizedData.nimbleVersion
+                                    }],
+                                    is_nested : true,
+                                    ver_ini : sektionsLocalizedData.nimbleVersion
+                              });
+                        }
+                  } else {
+                        locationCandidate = self.getLevelModel( params.location, self.updAPISetParams.newSetValue.collection );
+                        if ( 'no_match' == locationCandidate ) {
+                              api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
+                              self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
+                        } else {
+                              var position = 0;
+                              locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
+                              _.each( locationCandidate.collection, function( secModel, index ) {
+                                    if ( params.before_section === secModel.id ) {
+                                          position = index;
+                                    }
+                                    if ( params.after_section === secModel.id ) {
+                                          position = index + 1;
+                                    }
+                              });
+
+                              // @see reactToCollectionSettingIdChange
+                              locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
+                              // insert the section in the collection at the right place
+                              locationCandidate.collection.splice( position, 0, {
+                                    id : params.id,
+                                    level : 'section',
+                                    collection : [{
+                                          id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                          level : 'column',
+                                          collection : [],
+                                          ver_ini : sektionsLocalizedData.nimbleVersion
+                                    }],
+                                    ver_ini : sektionsLocalizedData.nimbleVersion
+                              });
+                        }
+                  }
+            },//_updAPISet_sek_add_sektion
+
+
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            //-- DUPLICATE SECTION
+            //-------------------------------------------------------------------------------------------------
+            _updAPISet_sek_duplicate_sektion :  function() {
+                  var self = this,
+                      params,
+                      columnCandidate,
+                      locationCandidate,
+                      deepClonedSektion;
+
+                  params = self.updAPISetParams.params;
+
+                  // an id must be provided
+                  if ( _.isEmpty( params.id ) ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
+                  }
+                  if ( _.isEmpty( params.location ) ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => missing location' );
+                  }
+                  try { deepClonedSektion = self.cloneLevel( params.id ); } catch( er ) {
+                        api.errare( 'updateAPISetting => ' + params.action, er );
+                        return;
+                  }
+
+                  // items id of multi-items module must always be unique
+                  // this recursive method sniff and does the job
+                  self.maybeGenerateNewItemIdsForCrudModules( deepClonedSektion );
+
+                  var _position_ = self.getLevelPositionInCollection( params.id, self.updAPISetParams.newSetValue.collection );
+                  // Is this a nested sektion ?
+                  if ( true === params.is_nested ) {
+                        columnCandidate = self.getLevelModel( params.in_column, self.updAPISetParams.newSetValue.collection );
+                        if ( 'no_match' == columnCandidate ) {
+                              api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                              self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                              return;
+                        }
+
+                        columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+                        columnCandidate.collection.splice( parseInt( _position_ + 1, 10 ), 0, deepClonedSektion );
+
+
+                  } else {
+                        locationCandidate = self.getLevelModel( params.location, self.updAPISetParams.newSetValue.collection );
+                        if ( 'no_match' == locationCandidate ) {
+                              api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
+                              self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
+                              return;
+                        }
+                        locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
+                        // @see reactToCollectionSettingIdChange
+                        locationCandidate.collection.splice( parseInt( _position_ + 1, 10 ), 0, deepClonedSektion );
+
+                  }
+                  self.updAPISetParams.cloneId = deepClonedSektion.id;//will be passed in resolve()
+            },//_updAPISet_sek_duplicate_sektion
+
+
+            //-------------------------------------------------------------------------------------------------
+            //-- REMOVE SECTION
+            //-------------------------------------------------------------------------------------------------
+            // in the case of a nested sektion, we have to remove it from a column
+            // otherwise from the root sektion collection
+            _updAPISet_sek_remove_sektion : function() {
+                  var self = this,
+                      params,
+                      columnCandidate,
+                      locationCandidate;
+
+                  params = self.updAPISetParams.params;
+                  //api.infoLog('PARAMS IN sek-remove-sektion', params );
+                  if ( true === params.is_nested ) {
+                        columnCandidate = self.getLevelModel( params.in_column, self.updAPISetParams.newSetValue.collection );
+                        if ( 'no_match' != columnCandidate ) {
+                              columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+                              columnCandidate.collection = _.filter( columnCandidate.collection, function( col ) {
+                                    return col.id != params.id;
+                              });
+                        } else {
+                              api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                        }
+                  } else {
+                        locationCandidate = self.getLevelModel( params.location, self.updAPISetParams.newSetValue.collection );
+                        if ( 'no_match' == locationCandidate ) {
+                              api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
+                              self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
+                              return;
+                        }
+                        locationCandidate.collection = _.filter( locationCandidate.collection, function( sek ) {
+                              return sek.id != params.id;
+                        });
+                  }
+            },
+
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            //-- MOVE SECTION (DRAG IN THE PAGE INSIDE A LOCATION, OR CROSS LOCATIONS)
+            //-------------------------------------------------------------------------------------------------
+            _updAPISet_sek_move_sektion : function() {
+                  var self = this,
+                      params,
+                      originalCollection,
+                      reorderedCollection,
+                      locationCandidate;
+
+                  params = self.updAPISetParams.params;
+
+                  //api.infoLog('PARAMS in sek-move-section', params );
+                  var toLocationCandidate = self.getLevelModel( params.to_location, self.updAPISetParams.newSetValue.collection ),
+                      movedSektionCandidate,
+                      copyOfMovedSektionCandidate;
+
+                  if ( _.isEmpty( toLocationCandidate ) || 'no_match' == toLocationCandidate ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => missing target location' );
+                  }
+
+                  // MOVED CROSS LOCATIONS
+                  // - make a copy of the moved sektion
+                  // - remove the moved sektion from the source location
+                  if ( params.from_location != params.to_location ) {
+                        // Remove the moved sektion from the source location
+                        var fromLocationCandidate = self.getLevelModel( params.from_location, self.updAPISetParams.newSetValue.collection );
+                        if ( _.isEmpty( fromLocationCandidate ) || 'no_match' == fromLocationCandidate ) {
+                              throw new Error( 'updateAPISetting => ' + params.action + ' => missing source location' );
+                        }
+
+                        fromLocationCandidate.collection =  _.isArray( fromLocationCandidate.collection ) ? fromLocationCandidate.collection : [];
+                        // Make a copy of the sektion candidate now, before removing it
+                        movedSektionCandidate = self.getLevelModel( params.id, fromLocationCandidate.collection );
+                        copyOfMovedSektionCandidate = $.extend( true, {}, movedSektionCandidate );
+                        // remove the sektion from its previous sektion
+                        fromLocationCandidate.collection = _.filter( fromLocationCandidate.collection, function( sektion ) {
+                              return sektion.id != params.id;
+                        });
+                  }
+
+                  // UPDATE THE TARGET LOCATION
+                  toLocationCandidate.collection = _.isArray( toLocationCandidate.collection ) ? toLocationCandidate.collection : [];
+                  originalCollection = $.extend( true, [], toLocationCandidate.collection );
+                  reorderedCollection = [];
+                  _.each( params.newOrder, function( _id_ ) {
+                        // in the case of a cross location movement, we need to add the moved sektion to the target location
+                        if ( params.from_location != params.to_location && _id_ == copyOfMovedSektionCandidate.id ) {
+                              reorderedCollection.push( copyOfMovedSektionCandidate );
+                        } else {
+                              sektionCandidate = self.getLevelModel( _id_, originalCollection );
+                              if ( _.isEmpty( sektionCandidate ) || 'no_match' == sektionCandidate ) {
+                                    throw new Error( 'updateAPISetting => ' + params.action + ' => missing section candidate' );
+                              }
+                              reorderedCollection.push( sektionCandidate );
+                        }
+                  });
+                  toLocationCandidate.collection = reorderedCollection;
+            },//_updAPISet_sek_move_sektion
+
+            //-------------------------------------------------------------------------------------------------
+            //-- MOVE SECTION UP DOWN
+            //-------------------------------------------------------------------------------------------------
+            _updAPISet_sek_move_sektion_up_down : function() {
+                  var self = this,
+                      params,
+                      parentCandidate,
+                      originalCollection,
+                      reorderedCollection,
+                      locationCandidate;
+
+                  params = self.updAPISetParams.params;
+
+                  parentCandidate = self.getLevelModel( params.is_nested ? params.in_column : params.location , self.updAPISetParams.newSetValue.collection );
+                  if ( _.isEmpty( parentCandidate ) || 'no_match' == parentCandidate ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => missing target location' );
+                  }
+                  parentCandidate.collection = _.isArray( parentCandidate.collection ) ? parentCandidate.collection : [];
+                  originalCollection = $.extend( true, [], parentCandidate.collection );
+                  reorderedCollection = $.extend( true, [], parentCandidate.collection );
+
+                  var _indexInOriginal = _.findIndex( originalCollection, function( _sec_ ) {
+                        return _sec_.id === params.id;
+                  });
+                  // @see https://underscorejs.org/#findIndex
+                  if ( -1 === _indexInOriginal ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => invalid index' );
+                  }
+
+                  // Swap up <=> down
+                  var direction = params.direction || 'up',
+                      isLastSectionInLocation = originalCollection.length === _indexInOriginal + 1,
+                      isFirstSectionInLocation = 0 === _indexInOriginal,
+                      _locInfo = self.activeLocationsInfo(),
+                      _currentLocInfo = ! _.isArray( _locInfo ) ? {} : _.findWhere( _locInfo, { id : params.location } ),
+                      isCurrentLocationGlobal = false,
+                      isCurrentLocationHeaderOrFooter = false;
+
+                  // Is current location global ?
+                  isCurrentLocationGlobal = _.isObject( _currentLocInfo ) && _currentLocInfo.is_global;
+
+                  // Is current location header footer ?
+                  isCurrentLocationHeaderOrFooter = _.isObject( _currentLocInfo ) && _currentLocInfo.is_header_footer;
+
+                  // When a section is last in location and there's another location below, let's move the section to this sibling location
+                  // This is possible when :
+                  // - when moved section is not nested
+                  // - only in locations that are 'local', not header or footer
+
+                  // Populate the eligible activeLocations in the page
+                  var activeLocationsInPage = [];
+                  // self.activeLocationsInfo() is set on ::initialized when send by the preview, and is structured the following way :
+                  //  [
+                  //  {
+                  //   id: "loop_start"
+                  //   is_global: false
+                  //   is_header_footer: false
+                  //  },
+                  //  {..},
+                  //  .
+                  if ( _.isArray( _locInfo ) ) {
+                        _.each( self.activeLocationsInfo(), function( _loc_ ) {
+                              if ( ! _loc_.is_global && ! _loc_.is_header_footer ) {
+                                    activeLocationsInPage.push( _loc_.id );
+                              }
+                        });
+                  }
+
+                  // Set the index of the current location
+                  var indexOfCurrentLocation = _.findIndex( activeLocationsInPage, function( _loc_id ) {
+                        return _loc_id === params.location;
+                  });
+
+                  var isCurrentLocationEligibleForSectionMoveOutside = ! params.is_nested && ! isCurrentLocationGlobal && ! isCurrentLocationHeaderOrFooter,
+                      isFirstLocationInPage = 0 === indexOfCurrentLocation,
+                      isLastLocationInPage = activeLocationsInPage.length === indexOfCurrentLocation + 1,
+                      newLocationId, newLocationCandidate;
+
+                  if ( isCurrentLocationEligibleForSectionMoveOutside && isLastSectionInLocation && 'up' !== direction && ! isLastLocationInPage ) {
+                        newLocationId = activeLocationsInPage[ indexOfCurrentLocation + 1 ];
+                        newLocationCandidate = self.getLevelModel( newLocationId , self.updAPISetParams.newSetValue.collection );
+
+                        // Add the section in first position of the section below
+                        newLocationCandidate.collection.unshift( originalCollection[ _indexInOriginal ] );
+                        // Removes the section in last position of the original section
+                        parentCandidate.collection.pop();
+                        // the new_location param will be used in the 'complete' callback of 'sek-move-section-down' / 'sek-move-section-up'
+                        params.new_location = newLocationId;
+
+                  } else if ( isCurrentLocationEligibleForSectionMoveOutside && isFirstSectionInLocation && 'up' === direction && ! isFirstLocationInPage ) {
+                        newLocationId = activeLocationsInPage[ indexOfCurrentLocation - 1 ];
+                        newLocationCandidate = self.getLevelModel( newLocationId , self.updAPISetParams.newSetValue.collection );
+
+                        // Add the section in first position of the section below
+                        newLocationCandidate.collection.push( originalCollection[ _indexInOriginal ] );
+                        // Removes the section in last position of the original section
+                        parentCandidate.collection.shift();
+                        // the new_location param will be used in the 'complete' callback of 'sek-move-section-down' / 'sek-move-section-up'
+                        params.new_location = newLocationId;
+                  } else {
+                        // prevent absurd movements of a section
+                        // this should not happen because up / down arrows are not displayed when section is positionned top / bottom
+                        // but safer to add it
+                        if ( 'up' !== direction && originalCollection.length === _indexInOriginal + 1 ) {
+                              //throw new Error( 'updateAPISetting => ' + params.action + ' => bottom reached' );
+                              api.previewer.trigger('sek-notify', {
+                                    type : 'info',
+                                    duration : 30000,
+                                    message : [
+                                          '<span style="font-size:0.95em">',
+                                            '<strong>' + sektionsLocalizedData.i18n[ "The section cannot be moved lower." ] + '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                        } else if ( 'up' === direction && 0 === _indexInOriginal ){
+                              api.previewer.trigger('sek-notify', {
+                                    type : 'info',
+                                    duration : 30000,
+                                    message : [
+                                          '<span style="font-size:0.95em">',
+                                            '<strong>' + sektionsLocalizedData.i18n[ "The section cannot be moved higher." ] + '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                        } else {
+                              reorderedCollection[ _indexInOriginal ] = originalCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ];
+                              reorderedCollection[ 'up' === direction ? _indexInOriginal - 1 : _indexInOriginal + 1 ] = originalCollection[ _indexInOriginal ];
+                              parentCandidate.collection = reorderedCollection;
+                        }
+                  }
+            }//_updAPISet_sek_move_sektion_up_down
+
+      });//$.extend()
+})( wp.customize, jQuery );//global sektionsLocalizedData, serverControlParams
+//self.updAPISetParams = {
+//       params : params,
+//       promise : $.Deferred(),
+//       newSetValue : _.isObject( _currentSetValue ) ? $.extend( true, {}, _currentSetValue ) : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ),
+//       cloneId : '',
+//       sectionInjectPromise
+// };
+var CZRSeksPrototype = CZRSeksPrototype || {};
+(function ( api, $ ) {
+      $.extend( CZRSeksPrototype, {
+            // @params {
+            //   drop_target_element : $(this),
+            //   position : _position,// <= top or bottom
+            //   before_section : $(this).data('sek-before-section'),
+            //   after_section : $(this).data('sek-after-section'),
+            //   content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ), //<= module or preset_section
+            //   content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
+            // }
+            _updAPISet_sek_add_content_in_new_sektion :  function() {
+                  var self = this,
+                      params,
+                      columnCandidate,
+                      locationCandidate;
+
+                  params = self.updAPISetParams.params;
+
+                  // get the position of the before or after section
+                  var positionIndex = 0,
+                      startingModuleValue;
+
+                  locationCandidate = self.getLevelModel( params.location, self.updAPISetParams.newSetValue.collection );
+                  if ( 'no_match' == locationCandidate ) {
+                        api.errare( 'updateAPISetting => ' + params.action + ' => no location matched' );
+                        self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no location matched');
+                        return;
+                  }
+                  locationCandidate.collection = _.isArray( locationCandidate.collection ) ? locationCandidate.collection : [];
+                  _.each( locationCandidate.collection, function( secModel, index ) {
+                        if ( params.before_section === secModel.id ) {
+                              positionIndex = index;
+                        }
+                        if ( params.after_section === secModel.id ) {
+                              positionIndex = index + 1;
+                        }
+                  });
+
+                  switch( params.content_type) {
+                        // When a module is dropped in a section + column structure to be generated
+                        case 'module' :
+                              // Let's add the starting value if provided when registrating the module
+                              // Note : params.content_id is the module_type
+                              startingModuleValue = self.getModuleStartingValue( params.content_id );
+
+                              // insert the section in the collection at the right place
+                              locationCandidate.collection.splice( positionIndex, 0, {
+                                    id : params.id,
+                                    level : 'section',
+                                    collection : [
+                                          {
+                                                id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                                level : 'column',
+                                                collection : [
+                                                      {
+                                                            id : params.droppedModuleId,
+                                                            level : 'module',
+                                                            module_type : params.content_id,
+                                                            value : 'no_starting_value' !== startingModuleValue ? startingModuleValue : null,
+                                                            ver_ini : sektionsLocalizedData.nimbleVersion
+                                                      }
+                                                ],
+                                                ver_ini : sektionsLocalizedData.nimbleVersion
+                                          }
+                                    ],
+                                    ver_ini : sektionsLocalizedData.nimbleVersion
+                              });
+                        break;//case 'module' :
+
+                        // When a preset section is dropped
+                        case 'preset_section' :
+                              // insert the section in the collection at the right place
+                              self.updAPISetParams.sectionInjectPromise = $.Deferred();//defined at the beginning of the method
+
+                              // we use a section index here to display the section in the same order as in the json
+                              // introduced when implementing multi-section pre-build section
+                              // @see https://github.com/presscustomizr/nimble-builder/issues/489
+                              var _injectPresetSectionInLocationOrParentColumn = function( sectionReadyToInject, positionIndex ) {
+                                    // If the preset_section is inserted in a an empty nested section, add it at the right place in the parent column of the nested section.
+                                    // Otherwise, add the preset section at the right position in the parent location of the section.
+                                    var insertedInANestedSektion = false;
+                                    if ( ! _.isEmpty( params.sektion_to_replace ) ) {
+                                          var sektionToReplace = self.getLevelModel( params.sektion_to_replace, self.updAPISetParams.newSetValue.collection );
+                                          if ( 'no_match' === sektionToReplace ) {
+                                                api.errare( 'updateAPISetting => ' + params.action + ' => no sektionToReplace matched' );
+                                                self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no sektionToReplace matched');
+                                          }
+                                          insertedInANestedSektion = true === sektionToReplace.is_nested;
+                                    }
+
+
+                                    // The following param "collection_of_preset_section_id" has been introduced when implementing support for multi-section pre-build sections
+                                    // @see https://github.com/presscustomizr/nimble-builder/issues/489
+                                    // It is sent to the preview with ::reactToPreviewMsg, see bottom of the method.
+                                    var injected_section_id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
+                                    params.collection_of_preset_section_id = params.collection_of_preset_section_id || [];
+                                    params.collection_of_preset_section_id.push( injected_section_id );
+
+                                    if ( ! insertedInANestedSektion ) {
+                                          locationCandidate.collection.splice( positionIndex, 0, {
+                                                id : injected_section_id,//params.id,//self.guid()
+                                                level : 'section',
+                                                collection : sectionReadyToInject.collection,
+                                                options : sectionReadyToInject.options || {},
+                                                ver_ini : sektionsLocalizedData.nimbleVersion
+                                          });
+                                    } else {
+                                          columnCandidate = self.getLevelModel( params.in_column, self.updAPISetParams.newSetValue.collection );
+                                          if ( 'no_match' === columnCandidate ) {
+                                                api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                                                self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                                          }
+
+                                          columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+
+                                          // get the position of the before or after module
+                                          _.each( columnCandidate.collection, function( moduleOrSectionModel, index ) {
+                                                if ( params.before_section === moduleOrSectionModel.id ) {
+                                                      positionIndex = index;
+                                                }
+                                                if ( params.after_section === moduleOrSectionModel.id ) {
+                                                      positionIndex = index + 1;
+                                                }
+                                          });
+
+                                          columnCandidate.collection.splice( positionIndex, 0, {
+                                                id : injected_section_id,
+                                                is_nested : true,
+                                                level : 'section',
+                                                collection : sectionReadyToInject.collection,
+                                                options : sectionReadyToInject.options || {},
+                                                ver_ini : sektionsLocalizedData.nimbleVersion
+                                          });
+                                    }
+                              };//_injectPresetSectionInLocationOrParentColumn
+                              var _doWhenPresetSectionCollectionFetched = function( presetColumnOrSectionCollection ) {
+                                    self.preparePresetSectionForInjection( presetColumnOrSectionCollection )
+                                          .fail( function( _er_ ){
+                                                self.updAPISetParams.promise.reject( 'updateAPISetting => error when preparePresetSectionForInjection => ' + params.action + ' => ' + _er_ );
+                                                // Used when updating the setting
+                                                // @see end of this method
+                                                self.updAPISetParams.sectionInjectPromise.reject( _er_ );
+                                          })
+                                          .done( function( maybeMultiSectionReadyToInject ) {
+                                                var is_multi_section = 'section' === maybeMultiSectionReadyToInject.collection[0].level;
+                                                // support for pre-built multi-section has been introduced in july 2019
+                                                // @see https://github.com/presscustomizr/nimble-builder/issues/489
+                                                if ( is_multi_section ) {
+                                                      // we use a section index here to display the section in the same order as in the json
+                                                      var sectionIndex = 0;
+                                                      _.each( maybeMultiSectionReadyToInject.collection, function( sectionReadyToInject ) {
+                                                            _injectPresetSectionInLocationOrParentColumn( sectionReadyToInject, positionIndex );
+                                                            positionIndex++;
+                                                      });
+                                                } else {
+                                                      _injectPresetSectionInLocationOrParentColumn( maybeMultiSectionReadyToInject, positionIndex );
+                                                }
+
+                                                // Used when updating the setting
+                                                // @see end of this method
+                                                self.updAPISetParams.sectionInjectPromise.resolve();
+                                          });// self.preparePresetSectionForInjection.done()
+                              };//_doWhenPresetSectionCollectionFetched()
+
+                              // Try to fetch the sections from the server
+                              // if sucessfull, resolve self.updAPISetParams.sectionInjectPromise.promise()
+                              self.getPresetSectionCollection({
+                                          is_user_section : params.is_user_section,
+                                          presetSectionId : params.content_id
+                                    })
+                                    .fail( function( _er_ ) {
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
+                                          self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
+                                    })
+                                    .done( function( presetColumnOrSectionCollection ) {
+                                          if ( ! _.isObject( presetColumnOrSectionCollection ) || _.isEmpty( presetColumnOrSectionCollection ) ) {
+                                                api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetColumnOrSectionCollection );
+                                                self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
+                                          }
+                                          // OK. time to resolve self.updAPISetParams.sectionInjectPromise.promise()
+                                          _doWhenPresetSectionCollectionFetched( presetColumnOrSectionCollection );
+                                    });//self.getPresetSectionCollection().done()
+
+                        break;//case 'preset_section' :
+                  }//switch( params.content_type)
+            },
+
+
+
+
+
+
+
+            // @params {
+            //   drop_target_element : $(this),
+            //   position : _position,// <= top or bottom
+            //   before_section : $(this).data('sek-before-section'),
+            //   after_section : $(this).data('sek-after-section'),
+            //   content_type : event.originalEvent.dataTransfer.getData( "sek-content-type" ), //<= module or preset_section
+            //   content_id : event.originalEvent.dataTransfer.getData( "sek-content-id" )
+            // }
+            _updAPISet_sek_add_preset_sektion_in_new_nested_sektion :  function() {
+                  var self = this,
+                      params,
+                      columnCandidate,
+                      parentSektionCandidate;
+
+                  params = self.updAPISetParams.params;
+                  columnCandidate = self.getLevelModel( params.in_column, self.updAPISetParams.newSetValue.collection );
+                  if ( 'no_match' === columnCandidate ) {
+                        api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                        self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                        return;
+                  }
+
+                  var positionIndexInColumn = 0;
+                  columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+                   // get the position of the before or after module or nested section
+                  _.each( columnCandidate.collection, function( moduleOrNestedSectionModel, index ) {
+                        if ( params.before_module_or_nested_section === moduleOrNestedSectionModel.id ) {
+                              positionIndexInColumn = index;
+                        }
+                        if ( params.after_module_or_nested_section === moduleOrNestedSectionModel.id ) {
+                              positionIndexInColumn = index + 1;
+                        }
+                  });
+
+                  // can we add this nested sektion ?
+                  // if the parent sektion of the column has is_nested = true, then we can't
+                  parentSektionCandidate = self.getLevelModel( params.in_sektion, self.updAPISetParams.newSetValue.collection );
+                  if ( 'no_match' == parentSektionCandidate ) {
+                        self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no grand parent sektion found');
+                        return;
+                  }
+                  if ( true === parentSektionCandidate.is_nested ) {
+                        self.updAPISetParams.promise.reject('');
+                        api.previewer.trigger('sek-notify', {
+                              type : 'info',
+                              duration : 30000,
+                              message : [
+                                    '<span style="font-size:0.95em">',
+                                      '<strong>' + sektionsLocalizedData.i18n[ "You've reached the maximum number of allowed nested sections." ] + '</strong>',
+                                    '</span>'
+                              ].join('')
+                        });
+                        return;
+                  }
+
+                  // insert the nested section in the collection at the right place
+                  var presetColumnOrSectionCollection;
+                  self.updAPISetParams.sectionInjectPromise = $.Deferred();
+
+                  var _doWhenPrebuiltSectionCollectionFetched = function( presetColumnOrSectionCollection ) {
+                        self.preparePresetSectionForInjection( presetColumnOrSectionCollection )
+                              .fail( function( _er_ ){
+                                    self.updAPISetParams.promise.reject( 'updateAPISetting => error when preparePresetSectionForInjection => ' + params.action + ' => ' + _er_ );
+                                    // Used when updating the setting
+                                    // @see end of this method
+                                    self.updAPISetParams.sectionInjectPromise.reject( _er_ );
+                              })
+                              .done( function( maybeMultiSectionReadyToInject ) {
+
+                                    var _injectNestedSectionInParentColumn = function( sectionReadyToInject, positionIndexInColumn  ) {
+                                          positionIndexInColumn = positionIndexInColumn || 0;
+
+                                          // The following param "collection_of_preset_section_id" has been introduced when implementing support for multi-section pre-build sections
+                                          // @see https://github.com/presscustomizr/nimble-builder/issues/489
+                                          // It is sent to the preview with ::reactToPreviewMsg, see bottom of the method.
+                                          var injected_section_id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
+                                          params.collection_of_preset_section_id = params.collection_of_preset_section_id || [];
+                                          params.collection_of_preset_section_id.push( injected_section_id );
+
+                                          columnCandidate.collection.splice( positionIndexInColumn, 0, {
+                                                id : injected_section_id,
+                                                level : 'section',
+                                                collection : sectionReadyToInject.collection,
+                                                options : sectionReadyToInject.options || {},
+                                                is_nested : true,
+                                                ver_ini : sektionsLocalizedData.nimbleVersion
+                                          });
+                                    };
+
+                                    // support for pre-built multi-section has been introduced in july 2019
+                                    // @see https://github.com/presscustomizr/nimble-builder/issues/489
+                                    var is_multi_section = 'section' === maybeMultiSectionReadyToInject.collection[0].level;
+                                    if ( is_multi_section ) {
+                                          _.each( maybeMultiSectionReadyToInject.collection, function( sectionReadyToInject ) {
+                                                _injectNestedSectionInParentColumn( sectionReadyToInject, positionIndexInColumn );
+                                                positionIndexInColumn++;
+                                          });
+                                    } else {
+                                          _injectNestedSectionInParentColumn( maybeMultiSectionReadyToInject, positionIndexInColumn );
+                                    }
+
+                                    // Used when updating the setting
+                                    // @see end of this method
+                                    self.updAPISetParams.sectionInjectPromise.resolve();
+                              });//self.preparePresetSectionForInjection.done()
+                  };//_doWhenPrebuiltSectionCollectionFetched
+
+
+                  // Try to fetch the sections from the server
+                  // if sucessfull, resolve self.updAPISetParams.sectionInjectPromise.promise()
+                  self.getPresetSectionCollection({
+                              is_user_section : params.is_user_section,
+                              presetSectionId : params.content_id
+                        })
+                        .fail( function() {
+                              api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
+                              self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
+                        })
+                        .done( function( presetColumnOrSectionCollection ) {
+                              if ( ! _.isObject( presetColumnOrSectionCollection ) || _.isEmpty( presetColumnOrSectionCollection ) ) {
+                                    api.errare( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty : ' + params.content_id, presetColumnOrSectionCollection );
+                                    self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => preset section type not found or empty');
+                              }
+                              // OK. time to resolve self.updAPISetParams.sectionInjectPromise.promise()
+                              _doWhenPrebuiltSectionCollectionFetched( presetColumnOrSectionCollection );
+                        });//self.getPresetSectionCollection().done()
+            }
+
+      });//$.extend()
+})( wp.customize, jQuery );//global sektionsLocalizedData, serverControlParams
+//self.updAPISetParams = {
+//       params : params,
+//       promise : $.Deferred(),
+//       newSetValue : _.isObject( _currentSetValue ) ? $.extend( true, {}, _currentSetValue ) : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ),
+//       cloneId : '',
+//       sectionInjectPromise
+// };
+var CZRSeksPrototype = CZRSeksPrototype || {};
+(function ( api, $ ) {
+      $.extend( CZRSeksPrototype, {
+            _updAPISet_sek_add_column :  function() {
+                  var self = this,
+                      params,
+                      sektionCandidate;
+
+                  params = self.updAPISetParams.params;
+
+                  // an id must be provided
+                  if ( _.isEmpty( params.id ) ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
+                  }
+                  sektionCandidate = self.getLevelModel( params.in_sektion, self.updAPISetParams.newSetValue.collection );
+                  if ( 'no_match' == sektionCandidate ) {
+                        api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
+                        self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
+                        return;
+                  }
+
+                  sektionCandidate.collection =  _.isArray( sektionCandidate.collection ) ? sektionCandidate.collection : [];
+                  // can we add another column ?
+                  if ( ( self.MAX_NUMBER_OF_COLUMNS - 1 ) < _.size( sektionCandidate.collection ) ) {
+                        self.updAPISetParams.promise.reject( sektionsLocalizedData.i18n["You've reached the maximum number of columns allowed in this section."]);
+                        return;
+                  }
+
+                  // RESET ALL COLUMNS WIDTH
+                  // _.each( sektionCandidate.collection, function( colModel ) {
+                  //       colModel.width = '';
+                  // });
+                  self.resetColumnsWidthInSection( sektionCandidate );
+
+                  sektionCandidate.collection.push({
+                        id :  params.id,
+                        level : 'column',
+                        collection : [],
+                        ver_ini : sektionsLocalizedData.nimbleVersion
+                  });
+            },
+
+            _updAPISet_sek_remove_column :  function() {
+                  var self = this,
+                      params,
+                      sektionCandidate;
+
+                  params = self.updAPISetParams.params;
+
+                  sektionCandidate = self.getLevelModel( params.in_sektion, self.updAPISetParams.newSetValue.collection );
+                  if ( 'no_match' != sektionCandidate ) {
+                        // can we remove the column ?
+                        if ( 1 === _.size( sektionCandidate.collection ) ) {
+                              self.updAPISetParams.promise.reject( sektionsLocalizedData.i18n["A section must have at least one column."]);
+                              return;
+                        }
+                        sektionCandidate.collection =  _.isArray( sektionCandidate.collection ) ? sektionCandidate.collection : [];
+                        sektionCandidate.collection = _.filter( sektionCandidate.collection, function( column ) {
+                              return column.id != params.id;
+                        });
+                        // RESET ALL COLUMNS WIDTH
+                        // _.each( sektionCandidate.collection, function( colModel ) {
+                        //       colModel.width = '';
+                        // });
+                        self.resetColumnsWidthInSection( sektionCandidate );
+                  } else {
+                        api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
+                  }
+            },
+
+            _updAPISet_sek_duplicate_column :  function() {
+                  var self = this,
+                      params,
+                      sektionCandidate;
+
+                  params = self.updAPISetParams.params;
+
+                  // an id must be provided
+                  if ( _.isEmpty( params.id ) ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
+                  }
+
+                  sektionCandidate = self.getLevelModel( params.in_sektion, self.updAPISetParams.newSetValue.collection );
+                  if ( 'no_match' == sektionCandidate ) {
+                        api.errare( 'updateAPISetting => ' + params.action + ' => no parent sektion matched' );
+                        self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no parent sektion matched');
+                        return;
+                  }
+
+                  sektionCandidate.collection =  _.isArray( sektionCandidate.collection ) ? sektionCandidate.collection : [];
+                  // can we add another column ?
+                  if ( ( self.MAX_NUMBER_OF_COLUMNS - 1 ) < _.size( sektionCandidate.collection ) ) {
+                        self.updAPISetParams.promise.reject( sektionsLocalizedData.i18n["You've reached the maximum number of columns allowed in this section."]);
+                        return;
+                  }
+
+                  var deepClonedColumn;
+                  try { deepClonedColumn = self.cloneLevel( params.id ); } catch( er ) {
+                        api.errare( 'updateAPISetting => ' + params.action, er );
+                        return;
+                  }
+
+                  // items id of multi-items module must always be unique
+                  // this recursive method sniff and does the job
+                  self.maybeGenerateNewItemIdsForCrudModules( deepClonedColumn );
+
+                  var _position = self.getLevelPositionInCollection( params.id, self.updAPISetParams.newSetValue.collection );
+                  self.updAPISetParams.cloneId = deepClonedColumn.id;//will be passed in resolve()
+                  sektionCandidate.collection.splice( parseInt( _position + 1, 10 ), 0, deepClonedColumn );
+                  // RESET ALL COLUMNS WIDTH
+                  // _.each( sektionCandidate.collection, function( colModel ) {
+                  //       colModel.width = '';
+                  // });
+                  self.resetColumnsWidthInSection( sektionCandidate );
+            },
+
+            _updAPISet_sek_resize_column :  function() {
+                  var self = this,
+                      params;
+
+                  params = self.updAPISetParams.params;
+
+                  if ( params.col_number < 2 )
+                    return;
+
+                  var resizedColumn = self.getLevelModel( params.resized_column, self.updAPISetParams.newSetValue.collection ),
+                      sistercolumn = self.getLevelModel( params.sister_column, self.updAPISetParams.newSetValue.collection );
+
+                  //api.infoLog( 'updateAPISetting => ' + params.action + ' => ', params );
+
+                  // SET RESIZED COLUMN WIDTH
+                  if ( 'no_match' == resizedColumn ) {
+                        api.errare( 'updateAPISetting => ' + params.action + ' => no resized column matched' );
+                        self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no resized column matched');
+                        return;
+                  }
+
+                  var _getColumnWidth = function( _candidate_ ) {
+                        var _width = '_not_set_';
+                        var _options = _.isObject( _candidate_.options ) ? _candidate_.options : {};
+                        if ( ! _.isEmpty( _options ) && _options.width && _options.width['custom-width'] ) {
+                              _width = parseFloat( _options.width['custom-width'] * 1 );
+                        }
+                        return _width;
+                  };
+
+                  var _setColumnWidth = function( _candidate_, newWidthValue ) {
+                        // start from a deep cloned object
+                        // important => fixes https://github.com/presscustomizr/nimble-builder/issues/455
+                        var _new_options_values = $.extend( true, {}, _candidate_.options || {} );
+                        // april 2020 : due to a previous implementation of width option as an array, there could be a bug when trying to set the width
+                        // because the check on _.isObject() was true for an array
+                        // Fixes https://github.com/presscustomizr/nimble-builder/issues/620
+                        _new_options_values.width = ( _.isObject( _new_options_values.width ) && _new_options_values.width['custom-width'] ) ? _new_options_values.width : {};
+                        _new_options_values.width['custom-width'] = newWidthValue;
+                        _candidate_.options = _new_options_values;
+
+                        // Live update the input value ( when rendered )
+                        self.cachedElements.$body.find('[data-sek-width-range-column-id="'+ _candidate_.id +'"]').val( newWidthValue ).trigger('input', { is_resize_column_trigger : true } );
+                        return newWidthValue;
+                  };
+
+                  // DEPRECATED SINCE JUNE 2019 => resizedColumn.width = parseFloat( params.resizedColumnWidthInPercent );
+                  var resizedColumnWidthInPercent = _setColumnWidth( resizedColumn, parseFloat( params.resizedColumnWidthInPercent ) );
+                  // cast to number
+                  resizedColumnWidthInPercent = parseFloat( resizedColumnWidthInPercent );
+
+                  // SET OTHER COLUMNS WIDTH
+                  var parentSektion = self.getLevelModel( params.in_sektion, self.updAPISetParams.newSetValue.collection );
+                  var otherColumns = _.filter( parentSektion.collection, function( _col_ ) {
+                        return _col_.id != resizedColumn.id && _col_.id != sistercolumn.id;
+                  });
+                  var otherColumnsWidth = parseFloat( resizedColumnWidthInPercent.toFixed(3) );
+
+                  if ( ! _.isEmpty( otherColumns ) ) {
+                       _.each( otherColumns, function( colModel ) {
+                              currentColWidth = _getColumnWidth( colModel );
+                              if ( '_not_set_' === currentColWidth || ! _.isNumber( currentColWidth * 1 ) || _.isEmpty( currentColWidth + '' ) || 1 > currentColWidth ) {
+                                    // DEPRECATED SINCE JUNE 2019 => colModel.width = parseFloat( ( 100 / params.col_number ).toFixed(3) );
+                                    currentColWidth = _setColumnWidth( colModel, parseFloat( ( 100 / params.col_number ).toFixed(3) ) );
+                              }
+
+                              // sum up all other column's width, excluding the resized and sister one.
+                              otherColumnsWidth = parseFloat( ( otherColumnsWidth  +  currentColWidth ).toFixed(3) );
+                        });
+                  }
+
+                  // SET SISTER COLUMN WIDTH
+                  // sum up all other column's width, excluding the resized and sister one.
+                  // api.infoLog( "resizedColumn.width", resizedColumn.width  );
+                  // api.infoLog( "otherColumns", otherColumns );
+
+                  // then calculate the sistercolumn so we are sure that we feel the entire space of the sektion
+                  // DEPRECATED SINCE JUNE 2019 => sistercolumn.width = parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) );
+                  _setColumnWidth( sistercolumn, parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) ) );
+                  // api.infoLog('otherColumnsWidth', otherColumnsWidth );
+                  // api.infoLog("sistercolumn.width", sistercolumn.width );
+                  // api.infoLog( "parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) )" , parseFloat( ( 100 - otherColumnsWidth ).toFixed(3) ) );
+                  //api.infoLog('COLLECTION AFTER UPDATE ', parentSektion.collection );
+            },
+
+            _updAPISet_sek_move_column :  function() {
+                  var self = this,
+                      params,
+                      sektionCandidate;
+
+                  params = self.updAPISetParams.params;
+
+                  var toSektionCandidate = self.getLevelModel( params.to_sektion, self.updAPISetParams.newSetValue.collection ),
+                      movedColumnCandidate,
+                      copyOfMovedColumnCandidate;
+
+                  if ( _.isEmpty( toSektionCandidate ) || 'no_match' == toSektionCandidate ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => missing target sektion' );
+                  }
+
+                  if ( params.from_sektion != params.to_sektion ) {
+                        // Remove the moved column from the source sektion
+                        var fromSektionCandidate = self.getLevelModel( params.from_sektion, self.updAPISetParams.newSetValue.collection );
+                        if ( _.isEmpty( fromSektionCandidate ) || 'no_match' == fromSektionCandidate ) {
+                              throw new Error( 'updateAPISetting => ' + params.action + ' => missing source column' );
+                        }
+
+                        fromSektionCandidate.collection =  _.isArray( fromSektionCandidate.collection ) ? fromSektionCandidate.collection : [];
+                        // Make a copy of the column candidate now, before removing it
+                        movedColumnCandidate = self.getLevelModel( params.id, fromSektionCandidate.collection );
+                        copyOfMovedColumnCandidate = $.extend( true, {}, movedColumnCandidate );
+                        // remove the column from its previous sektion
+                        fromSektionCandidate.collection = _.filter( fromSektionCandidate.collection, function( column ) {
+                              return column.id != params.id;
+                        });
+                        // Reset the column's width in the target sektion
+                        // _.each( fromSektionCandidate.collection, function( colModel ) {
+                        //       colModel.width = '';
+                        // });
+                        self.resetColumnsWidthInSection( fromSektionCandidate );
+                  }
+
+                  // update the target sektion
+                  toSektionCandidate.collection =  _.isArray( toSektionCandidate.collection ) ? toSektionCandidate.collection : [];
+                  originalCollection = $.extend( true, [], toSektionCandidate.collection );
+                  reorderedCollection = [];
+                  _.each( params.newOrder, function( _id_ ) {
+                        // in the case of a cross sektion movement, we need to add the moved column to the target sektion
+                        if ( params.from_sektion != params.to_sektion && _id_ == copyOfMovedColumnCandidate.id ) {
+                              reorderedCollection.push( copyOfMovedColumnCandidate );
+                        } else {
+                              columnCandidate = self.getLevelModel( _id_, originalCollection );
+                              if ( _.isEmpty( columnCandidate ) || 'no_match' == columnCandidate ) {
+                                    throw new Error( 'updateAPISetting => moveColumn => missing columnCandidate' );
+                              }
+                              reorderedCollection.push( columnCandidate );
+                        }
+                  });
+                  toSektionCandidate.collection = reorderedCollection;
+
+                  // Reset the column's width in the target sektion
+                  // _.each( toSektionCandidate.collection, function( colModel ) {
+                  //       colModel.width = '';
+                  // });
+                  self.resetColumnsWidthInSection( toSektionCandidate );
+            },
+
+      });//$.extend()
+})( wp.customize, jQuery );//global sektionsLocalizedData, serverControlParams
+//self.updAPISetParams = {
+//       params : params,
+//       promise : $.Deferred(),
+//       newSetValue : _.isObject( _currentSetValue ) ? $.extend( true, {}, _currentSetValue ) : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ),
+//       cloneId : '',
+//       sectionInjectPromise
+// };
+var CZRSeksPrototype = CZRSeksPrototype || {};
+(function ( api, $ ) {
+      $.extend( CZRSeksPrototype, {
+            _updAPISet_sek_add_module :  function() {
+                  var self = this,
+                      params,
+                      columnCandidate,
+                      startingModuleValue,// will be populated by the optional starting value specificied on module registration
+                      position;//<= the position of the module or section or nested section in a column or location
+
+                  params = self.updAPISetParams.params;
+
+                  // an id must be provided
+                  if ( _.isEmpty( params.id ) ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
+                  }
+                  // a module_type must be provided
+                  if ( _.isEmpty( params.module_type ) ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => missing module_type' );
+                  }
+                  columnCandidate = self.getLevelModel( params.in_column, self.updAPISetParams.newSetValue.collection );
+                  if ( 'no_match' === columnCandidate ) {
+                        api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                        self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                        return;
+                  }
+
+                  position = 0;
+                  columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+                  // get the position of the before or after module or nested section
+                  _.each( columnCandidate.collection, function( moduleOrNestedSectionModel, index ) {
+                        if ( params.before_module_or_nested_section === moduleOrNestedSectionModel.id ) {
+                              position = index;
+                        }
+                        if ( params.after_module_or_nested_section === moduleOrNestedSectionModel.id ) {
+                              position = index + 1;
+                        }
+                  });
+
+                  var _moduleParams = {
+                        id : params.id,
+                        level : 'module',
+                        module_type : params.module_type,
+                        ver_ini : sektionsLocalizedData.nimbleVersion
+                  };
+                  // Let's add the starting value if provided when registrating the module
+                  startingModuleValue = self.getModuleStartingValue( params.module_type );
+                  if ( 'no_starting_value' !== startingModuleValue ) {
+                        _moduleParams.value = startingModuleValue;
+                  }
+
+                  columnCandidate.collection.splice( position, 0, _moduleParams );
+            },
+
+
+            _updAPISet_sek_duplicate_module :  function() {
+                  var self = this,
+                      params,
+                      columnCandidate;
+
+                  params = self.updAPISetParams.params;
+
+                  // an id must be provided
+                  if ( _.isEmpty( params.id ) ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
+                  }
+                  columnCandidate = self.getLevelModel( params.in_column, self.updAPISetParams.newSetValue.collection );
+                  if ( 'no_match' == columnCandidate ) {
+                        api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                        self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => no parent column matched');
+                        return;
+                  }
+
+                  columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+
+                  var deepClonedModule;
+                  try { deepClonedModule = self.cloneLevel( params.id ); } catch( er ) {
+                        api.errare( 'updateAPISetting => ' + params.action, er );
+                        self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => error when cloning the level');
+                        return;
+                  }
+                  // items id of multi-items module must always be unique
+                  // this recursive method sniff and does the job
+                  self.maybeGenerateNewItemIdsForCrudModules( deepClonedModule );
+
+                  var insertInposition = self.getLevelPositionInCollection( params.id, self.updAPISetParams.newSetValue.collection );
+                  self.updAPISetParams.cloneId = deepClonedModule.id;//will be passed in resolve()
+                  columnCandidate.collection.splice( parseInt( insertInposition + 1, 10 ), 0, deepClonedModule );
+            },
+
+            _updAPISet_sek_remove_module :  function() {
+                  var self = this,
+                      params,
+                      columnCandidate;
+
+                  params = self.updAPISetParams.params;
+
+                  // an id must be provided
+                  if ( _.isEmpty( params.id ) ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => missing id' );
+                  }
+                  columnCandidate = self.getLevelModel( params.in_column, self.updAPISetParams.newSetValue.collection );
+                  if ( 'no_match' != columnCandidate ) {
+                        columnCandidate.collection =  _.isArray( columnCandidate.collection ) ? columnCandidate.collection : [];
+                        columnCandidate.collection = _.filter( columnCandidate.collection, function( module ) {
+                              return module.id != params.id;
+                        });
+
+                  } else {
+                        api.errare( 'updateAPISetting => ' + params.action + ' => no parent column matched' );
+                  }
+            },
+
+            _updAPISet_sek_move_module :  function() {
+                  var self = this,
+                      params;
+
+                  params = self.updAPISetParams.params;
+
+                  var toColumnCandidate,
+                      movedModuleCandidate,
+                      copyOfMovedModuleCandidate;
+
+                  // loop on the sektions to find the toColumnCandidate
+                  // _.each( self.updAPISetParams.newSetValue.collection, function( _sektion_ ) {
+                  //       _.each( _sektion_.collection, function( _column_ ) {
+                  //             if ( _column_.id == params.to_column ) {
+                  //                  toColumnCandidate = _column_;
+                  //             }
+                  //       });
+                  // });
+                  toColumnCandidate = self.getLevelModel( params.to_column, self.updAPISetParams.newSetValue.collection );
+
+                  if ( _.isEmpty( toColumnCandidate ) || 'no_match' == toColumnCandidate ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => missing target column' );
+                  }
+
+                  // If the module has been moved to another column
+                  // => remove the moved module from the source column
+                  if ( params.from_column != params.to_column ) {
+                        var fromColumnCandidate;
+                        fromColumnCandidate = self.getLevelModel( params.from_column, self.updAPISetParams.newSetValue.collection );
+
+                        if ( _.isEmpty( fromColumnCandidate ) || 'no_match' == fromColumnCandidate ) {
+                              throw new Error( 'updateAPISetting => ' + params.action + ' => missing source column' );
+                        }
+
+                        fromColumnCandidate.collection =  _.isArray( fromColumnCandidate.collection ) ? fromColumnCandidate.collection : [];
+                        // Make a copy of the module candidate now, before removing it
+                        movedModuleCandidate = self.getLevelModel( params.id, self.updAPISetParams.newSetValue.collection );
+                        copyOfMovedModuleCandidate = $.extend( true, {}, movedModuleCandidate );
+                        // remove the module from its previous column
+                        fromColumnCandidate.collection = _.filter( fromColumnCandidate.collection, function( module ) {
+                              return module.id != params.id;
+                        });
+                  }// if params.from_column != params.to_column
+
+                  // update the target column
+                  toColumnCandidate.collection =  _.isArray( toColumnCandidate.collection ) ? toColumnCandidate.collection : [];
+                  originalCollection = $.extend( true, [], toColumnCandidate.collection );
+                  var reorderedCollection = [];
+                  _.each( params.newOrder, function( _id_ ) {
+                        if ( params.from_column != params.to_column && _id_ == copyOfMovedModuleCandidate.id ) {
+                              reorderedCollection.push( copyOfMovedModuleCandidate );
+                        } else {
+                              moduleCandidate = self.getLevelModel( _id_, self.updAPISetParams.newSetValue.collection );
+                              if ( _.isEmpty( moduleCandidate ) || 'no_match' == moduleCandidate ) {
+                                    throw new Error( 'updateAPISetting => ' + params.action + ' => missing moduleCandidate' );
+                              }
+                              reorderedCollection.push( moduleCandidate );
+                        }
+                  });
+                  // Check if we have duplicates ?
+                  if ( reorderedCollection.length != _.uniq( reorderedCollection ).length ) {
+                        throw new Error( 'updateAPISetting => ' + params.action + ' => there are duplicated modules in column : ' + toColumnCandidate.id );
+                  } else {
+                        toColumnCandidate.collection = reorderedCollection;
+                  }
+            },
+
+            _updAPISet_sek_set_module_value :  function() {
+                  var self = this,
+                      params,
+                      moduleCandidate;
+
+                  params = self.updAPISetParams.params;
+
+                  moduleCandidate = self.getLevelModel( params.id, self.updAPISetParams.newSetValue.collection );
+
+                  // Is this a multi-item module ?
+                  // Fixes https://github.com/presscustomizr/nimble-builder/issues/616
+                  var _ctrl_ = params.settingParams.args.moduleRegistrationParams.control,
+                      _module_id_ = params.settingParams.args.moduleRegistrationParams.id,
+                      parentModuleInstance = _ctrl_.czr_Module( _module_id_ );
+
+                  if ( ! _.isEmpty( parentModuleInstance ) ) {
+                        isMultiItemModule = parentModuleInstance.isMultiItem();
+                  } else {
+                        api.errare( 'updateAPISetting => missing parentModuleInstance', params );
+                  }
+
+                  // if multi-item module, the value is array of items, otherwise an object
+                  var _modValueCandidate = isMultiItemModule ? [] : {};
+                  // consider only the non empty settings for db
+                  // booleans should bypass this check
+                  _.each( params.value || (isMultiItemModule ? [] : {}), function( _val_, _key_ ) {
+                        // Note : _.isEmpty( 5 ) returns true when checking an integer,
+                        // that's why we need to cast the _val_ to a string when using _.isEmpty()
+                        if ( ! _.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
+                          return;
+                        _modValueCandidate[ _key_ ] = _val_;
+                  });
+                  if ( 'no_match' == moduleCandidate ) {
+                        api.errare( 'updateAPISetting => ' + params.action + ' => no module matched', params );
+                        self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => error no module matched');
+                        return;
+                  }
+                  if ( _.isEmpty( params.options_type ) ) {
+                        api.errare( 'updateAPISetting => ' + params.action + ' => missing options_type');
+                        self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => missing options_type');
+                        return;
+                  }
+
+                  // Is this a father module ?
+                  // If yes, the module value is structured by option group, each option group being updated by a child module
+                  // If no, the default option type is : '__no_option_group_to_be_updated_by_children_modules__'
+                  if ( '__no_option_group_to_be_updated_by_children_modules__' === params.options_type ) {
+                        moduleCandidate.value = _modValueCandidate;
+                  } else {
+                        // start from a deep cloned object
+                        // prevents issues like https://github.com/presscustomizr/nimble-builder/issues/455
+                        var _new_module_values = $.extend( true, {}, _.isEmpty( moduleCandidate.value ) ? {} : moduleCandidate.value );
+                        _new_module_values[ params.options_type ] = _modValueCandidate;
+                        moduleCandidate.value = _new_module_values;
+                  }
+            },
+
+      });//$.extend()
+})( wp.customize, jQuery );//global sektionsLocalizedData, serverControlParams
+//self.updAPISetParams = {
+//       params : params,
+//       promise : $.Deferred(),
+//       newSetValue : _.isObject( _currentSetValue ) ? $.extend( true, {}, _currentSetValue ) : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ),
+//       cloneId : '',
+//       sectionInjectPromise
+// };
+var CZRSeksPrototype = CZRSeksPrototype || {};
+(function ( api, $ ) {
+      $.extend( CZRSeksPrototype, {
+            //-------------------------------------------------------------------------------------------------
+            //-- FILE IMPORT
+            //-------------------------------------------------------------------------------------------------
+            _updAPISet_sek_import_from_file :  function() {
+                  var self = this,
+                      params;
+
+                  params = self.updAPISetParams.params;
+
+                  //api.infoLog( 'sek-import-from-file', params );
+
+                  if ( _.isUndefined( params.imported_content.data ) || _.isUndefined( params.imported_content.metas ) ) {
+                        api.errare( 'updateAPISetting::sek-import-from-file => invalid imported content', imported_content );
+                        return;
+                  }
+
+                  var importedCollection = _.isArray( params.imported_content.data.collection ) ? $.extend( true, [], params.imported_content.data.collection ) : [];
+
+                  // SHALL WE ASSIGN SECTIONS FROM MISSING LOCATIONS TO THE FIRST ACTIVE LOCATION ?
+                  // For example the current page has only the 'loop_start' location, whereas the imported content includes 3 locations :
+                  // - after_header
+                  // - loop_start
+                  // - before_footer
+                  // Among those 3 locations, 2 are not active in the page.
+                  // We will merge all section collections from the 3 imported locations one new collection, that will be assigned to 'loop_start'
+                  // Note that the active imported locations are ordered like they were on the page when exported.
+                  //
+                  // So :
+                  // 1) identify the first active location of the page
+                  // 2) populate a new collection of combined sections from all active imported locations.
+                  // 3) updated the imported collection with this
+                  if ( true === params.assign_missing_locations ) {
+                        var importedActiveLocations = params.imported_content.metas.active_locations,
+                            currentActiveLocations = api.czr_sektions.activeLocations();
+
+                        // console.log('Current set value ?', api( _collectionSettingId_ )() );
+                        // console.log('import params', params );
+                        // console.log('importedCollection?', importedCollection );
+                        // console.log('importedActiveLocations', importedActiveLocations );
+
+                        // first active location of the current setting
+                        var firstCurrentActiveLocationId = _.first( currentActiveLocations );
+
+                        if ( !_.isEmpty( firstCurrentActiveLocationId ) && !_.isEmpty( importedActiveLocations ) && _.isArray( importedActiveLocations ) ) {
+                              // importedActiveLocationsNotAvailableInCurrentActiveLocations
+                              // Example :
+                              // active location in the page : loop_start, loop_end
+                              // active locations imported : after_header, loop_start, before_footer
+                              // importedActiveLocationsNotAvailableInCurrentActiveLocations => after_header, before_footer
+                              var importedActiveLocationsNotAvailableInCurrentActiveLocations = $(importedActiveLocations).not(currentActiveLocations).get(),
+                                  firstCurrentLocationData = self.getLevelModel( firstCurrentActiveLocationId, self.updAPISetParams.newSetValue.collection ),
+                                  importedTargetLocationData = self.getLevelModel( firstCurrentActiveLocationId, params.imported_content.data.collection ),
+                                  newCollectionForTargetLocation = [];// the collection that will hold the merge of all active imported collections
+
+                              // normalize
+                              // => make sure we have a collection array, even empty
+                              firstCurrentLocationData.collection = _.isArray( firstCurrentLocationData.collection ) ? firstCurrentLocationData.collection : [];
+                              importedTargetLocationData.collection = _.isArray( importedTargetLocationData.collection ) ? importedTargetLocationData.collection : [];
+
+                              // loop on the active imported locations
+                              // Example : ["__after_header", "__before_main_wrapper", "loop_start", "__before_footer"]
+                              // and populate newCollectionForTargetLocation, with locations ordered as they were on export
+                              // importedCollection is a clone
+                              _.each( importedActiveLocations, function( impLocationId ){
+                                    var impLocationData = self.getLevelModel( impLocationId, importedCollection );
+                                    if ( _.isEmpty( impLocationData.collection ) )
+                                      return;
+                                    newCollectionForTargetLocation = _.union( newCollectionForTargetLocation, impLocationData.collection );
+                              });//_.each( importedActiveLocations
+
+                              // replace the previous collection of the target location, by the union of all collections.
+                              // for example, if 'loop_start' is the target location, all sections will be added to it.
+                              importedTargetLocationData.collection = newCollectionForTargetLocation;
+
+                              // remove the missing locations from the imported collection
+                              // importedActiveLocationsNotAvailableInCurrentActiveLocations
+                              params.imported_content.data.collection = _.filter( params.imported_content.data.collection, function( _location ) {
+                                    return !_.contains( importedActiveLocationsNotAvailableInCurrentActiveLocations, _location.id );
+                              });
+                        }//if ( !_.isEmpty( firstCurrentActiveLocationId ) )
+                  }//if ( true === params.assign_missing_locations )
+
+
+                  // SHALL WE MERGE ?
+                  // Sept 2019 note : for local import only. Not implemented for global https://github.com/presscustomizr/nimble-builder/issues/495
+                  // loop on each location of the imported content
+                  // if the current setting value has sections in a location, add them before the imported ones
+                  // keep_existing_sections is a user check option
+                  // @see PHP sek_get_module_params_for_sek_local_imp_exp()
+                  if ( true === params.keep_existing_sections ) {
+                      // note that importedCollection is a unlinked clone of params.imported_content.data.collection
+                      // merge sections
+                      _.each( importedCollection, function( imp_location_data ) {
+                            var currentLocationData = self.getLevelModel( imp_location_data.id, self.updAPISetParams.newSetValue.collection );
+                            if ( _.isEmpty( currentLocationData.collection ) )
+                              return;
+
+                            var importedLocationData = self.getLevelModel( imp_location_data.id, params.imported_content.data.collection );
+                            importedLocationData.collection = _.union( currentLocationData.collection, importedLocationData.collection );
+                      });
+
+                      // merge fonts if needed
+                      if ( self.updAPISetParams.newSetValue.fonts && !_.isEmpty( self.updAPISetParams.newSetValue.fonts ) && _.isArray( self.updAPISetParams.newSetValue.fonts ) ) {
+                            params.imported_content.data.fonts = _.isArray( params.imported_content.data.fonts ) ? params.imported_content.data.fonts : [];
+                            // merge and remove duplicated fonts
+                            params.imported_content.data.fonts =  _.uniq( _.union( self.updAPISetParams.newSetValue.fonts, params.imported_content.data.fonts ) );
+                      }
+                  }// if true === params.merge
+
+                  self.updAPISetParams.newSetValue = params.imported_content.data;
+            },
+
+
+
+
+
+
+
+
+
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            //-- IMPORT FROM TMPL GALLERY
+            //-------------------------------------------------------------------------------------------------
+            _updAPISet_sek_import_tmpl_from_gallery : function() {
+                  var self = this,
+                      params;
+
+                  params = self.updAPISetParams.params;
+
+                  api.infoLog( 'sek-import-tmpl-from-gallery', params );
+
+                  if ( _.isUndefined( params.imported_content.data ) || _.isUndefined( params.imported_content.metas ) ) {
+                        api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => invalid imported content', imported_content );
+                        return;
+                  }
+
+                  var importedCollection = _.isArray( params.imported_content.data.collection ) ? $.extend( true, [], params.imported_content.data.collection ) : [],
+                      importedActiveLocations = params.imported_content.metas.tmpl_locations,
+                      currentActiveLocations = api.czr_sektions.activeLocations();
+
+                  // PAGE HAS NO SECTIONS
+                  // TMPL LOCATIONS === PAGE LOCATIONS
+                  // => import as is.
+                  self.updAPISetParams.newSetValue = params.imported_content.data;
+
+
+                  // SHALL WE ASSIGN SECTIONS FROM MISSING LOCATIONS TO THE FIRST ACTIVE LOCATION ?
+                  // For example the current page has only the 'loop_start' location, whereas the imported content includes 3 locations :
+                  // - after_header
+                  // - loop_start
+                  // - before_footer
+                  // Among those 3 locations, 2 are not active in the page.
+                  // We will merge all section collections from the 3 imported locations one new collection, that will be assigned to 'loop_start'
+                  // Note that the active imported locations are ordered like they were on the page when exported.
+                  //
+                  // So :
+                  // 1) identify the first active location of the page
+                  // 2) populate a new collection of combined sections from all active imported locations.
+                  // 3) updated the imported collection with this
+                  if ( true === params.assign_missing_locations ) {
+
+
+                        console.log('SO COLLECTION BEFORE ?', params.imported_content.data.collection );
+
+                        // console.log('Current set value ?', api( _collectionSettingId_ )() );
+                        // console.log('import params', params );
+                        console.log('currentActiveLocations?', currentActiveLocations );
+                        console.log('importedCollection?', importedCollection );
+                        console.log('importedActiveLocations?', importedActiveLocations );
+
+                        // first active location of the current setting
+                        var firstCurrentActiveLocationId = _.first( currentActiveLocations );
+
+                        if ( !_.isEmpty( firstCurrentActiveLocationId ) && !_.isEmpty( importedActiveLocations ) && _.isArray( importedActiveLocations ) ) {
+                              // importedActiveLocationsNotAvailableInCurrentActiveLocations
+                              // Example :
+                              // active location in the page : loop_start, loop_end
+                              // active locations imported : after_header, loop_start, before_footer
+                              // importedActiveLocationsNotAvailableInCurrentActiveLocations => after_header, before_footer
+                              var importedActiveLocationsNotAvailableInCurrentActiveLocations = $(importedActiveLocations).not(currentActiveLocations).get(),
+                                  firstCurrentLocationData = self.getLevelModel( firstCurrentActiveLocationId, self.updAPISetParams.newSetValue.collection ),
+                                  importedTargetLocationData = self.getLevelModel( firstCurrentActiveLocationId, params.imported_content.data.collection ),
+                                  newCollectionForTargetLocation = [];// the collection that will hold the merge of all active imported collections
+
+                              // normalize
+                              // => make sure we have a collection array, even empty
+                              firstCurrentLocationData.collection = _.isArray( firstCurrentLocationData.collection ) ? firstCurrentLocationData.collection : [];
+                              importedTargetLocationData.collection = _.isArray( importedTargetLocationData.collection ) ? importedTargetLocationData.collection : [];
+
+                              // loop on the active imported locations
+                              // Example : ["__after_header", "__before_main_wrapper", "loop_start", "__before_footer"]
+                              // and populate newCollectionForTargetLocation, with locations ordered as they were on export
+                              // importedCollection is a clone
+                              _.each( importedActiveLocations, function( impLocationId ){
+                                    var impLocationData = self.getLevelModel( impLocationId, importedCollection );
+                                    if ( _.isEmpty( impLocationData.collection ) )
+                                      return;
+                                    newCollectionForTargetLocation = _.union( newCollectionForTargetLocation, impLocationData.collection );
+                              });//_.each( importedActiveLocations
+
+                              // replace the previous collection of the target location, by the union of all collections.
+                              // for example, if 'loop_start' is the target location, all sections will be added to it.
+                              importedTargetLocationData.collection = newCollectionForTargetLocation;
+
+
+
+                              // remove the missing locations from the imported collection
+                              // importedActiveLocationsNotAvailableInCurrentActiveLocations
+                              // params.imported_content.data.collection = _.filter( params.imported_content.data.collection, function( _location ) {
+                              //       return !_.contains( importedActiveLocationsNotAvailableInCurrentActiveLocations, _location.id );
+                              // });
+                              params.imported_content.data.collection = _.filter( params.imported_content.data.collection, function( _location ) {
+                                    return _location.id === firstCurrentActiveLocationId;
+                              });
+                              console.log('SO NEW COLLECTION ?', params.imported_content.data.collection );
+                        }//if ( !_.isEmpty( firstCurrentActiveLocationId ) )
+                  }//if ( true === params.assign_missing_locations )
+
+
+                  // SHALL WE MERGE ?
+                  // Sept 2019 note : for local import only. Not implemented for global https://github.com/presscustomizr/nimble-builder/issues/495
+                  // loop on each location of the imported content
+                  // if the current setting value has sections in a location, add them before the imported ones
+                  // keep_existing_sections is a user check option
+                  // @see PHP sek_get_module_params_for_sek_local_imp_exp()
+                  if ( true === params.keep_existing_sections ) {
+                      // note that importedCollection is a unlinked clone of params.imported_content.data.collection
+                      // merge sections
+                      _.each( importedCollection, function( imp_location_data ) {
+                            var currentLocationData = self.getLevelModel( imp_location_data.id, self.updAPISetParams.newSetValue.collection );
+                            if ( _.isEmpty( currentLocationData.collection ) )
+                              return;
+
+                            var importedLocationData = self.getLevelModel( imp_location_data.id, params.imported_content.data.collection );
+                            importedLocationData.collection = _.union( currentLocationData.collection, importedLocationData.collection );
+                      });
+
+                      // merge fonts if needed
+                      if ( self.updAPISetParams.newSetValue.fonts && !_.isEmpty( self.updAPISetParams.newSetValue.fonts ) && _.isArray( self.updAPISetParams.newSetValue.fonts ) ) {
+                            params.imported_content.data.fonts = _.isArray( params.imported_content.data.fonts ) ? params.imported_content.data.fonts : [];
+                            // merge and remove duplicated fonts
+                            params.imported_content.data.fonts =  _.uniq( _.union( self.updAPISetParams.newSetValue.fonts, params.imported_content.data.fonts ) );
+                      }
+                  }// if true === params.merge
+
+                  //self.updAPISetParams.newSetValue = params.imported_content.data;
+            }
+
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
@@ -8100,7 +8470,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @return bool
             // June 2020 : introduced for https://github.com/presscustomizr/nimble-builder-pro/issues/6
             isFooterLocation : function( id ) {
-                  var _locCollection = self.activeLocationsInfo(),
+                  var _locCollection = this.activeLocationsInfo(),
                       _currentLocInfo = !_.isArray( _locCollection ) ? {} : _.findWhere( _locCollection, { id : id } );
                   return _.isObject( _currentLocInfo ) && _currentLocInfo.is_footer;
             },
@@ -8968,6 +9338,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // @see api.czrInputMap['code_editor']
                         // @see https://github.com/presscustomizr/nimble-builder/issues/176
                         $control.trigger( "true" == $control.attr('data-sek-expanded') ? 'sek-accordion-expanded' : 'sek-accordion-collapsed' );
+                        if ( true === $control.data('module_ready_on_custom_control_event_is_setup' ) ) {
+                              $control.trigger( 'sek-accordion-expanded' );
+                        } else {
+                              $control.one('module_ready_on_custom_control_event_is_setup', function() {
+                                    $control.trigger( 'sek-accordion-expanded' );
+                              });
+
+                        }
                   });
 
                   _section_.container.data('sek-module-accordion-has-been-setup', true );
@@ -9002,7 +9380,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // Nov 2020 => make sure the setup has been done on the control so that it reacts on a on custom event ( here 'sek-accordion-expanded' )
                                     // see fmk CZRModuleMths::initialize
                                     // event defined on module registration with api.czrModuleMap[ module.module_type ].ready_on_section_expanded
-                                    if ( _ctrl_.module_ready_on_custom_control_event_is_setup ) {
+                                    if ( true === _ctrl_.container.data('module_ready_on_custom_control_event_is_setup' ) ) {
                                           _ctrl_.container.trigger( 'sek-accordion-expanded' );
                                     } else {
                                           _ctrl_.container.one('module_ready_on_custom_control_event_is_setup', function() {
@@ -10320,8 +10698,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
+
+
+
+
+
             ////////////////////////////////////////////////////////
-            // IMPORT FROM USER SAVED COLLECTION OR REMOTE API
+            // IMPORT TEMPLATE FROM GALLERY => FROM USER SAVED COLLECTION OR REMOTE API
             ////////////////////////////////////////////////////////
             // @return promise
             getTmplJsonFromUserTmpl : function( template_name ) {
@@ -10357,12 +10740,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $.getJSON( 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan' )
                             .done( function( resp ) {
                                   if ( !_.isObject( resp ) || !resp.lib || !resp.lib.templates ) {
-                                        api.errare( '::import_nimble_template success but invalid response => ', resp  );
+                                        api.errare( '::get_gallery_tmpl_json_and_import success but invalid response => ', resp  );
                                         _dfd_.resolve({success:false});
                                   }
                                   var _json_data = resp.lib.templates[template_name];
                                   if ( !_json_data ) {
-                                        api.errare( '::import_nimble_template => the requested template is not available', resp.lib.templates  );
+                                        api.errare( '::get_gallery_tmpl_json_and_import => the requested template is not available', resp.lib.templates  );
                                         api.previewer.trigger('sek-notify', {
                                               notif_id : 'missing-tmpl',
                                               type : 'info',
@@ -10381,37 +10764,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                             })
                             .fail(function( er ) {
-                                  api.errare( '::import_nimble_template failed => ', er  );
+                                  api.errare( '::get_gallery_tmpl_json_and_import failed => ', er  );
                                   _dfd_.resolve({success:false});
                             });
 
                     return _dfd_.promise();
             },
 
-            // @params
-            // {
-            //     is_file_import : true,
-            //     pre_import_check : false,
-            //     assign_missing_locations : false,
-            //     input : <= input instance when import is manual
-            //     file_input : $file_input
-            // }
+
             // April 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/651
             // @param params {
             //    template_name : string,
-            //    from : nimble_api or user
+            //    from : nimble_api or user,
+            //    import_mode : 3 possible import modes : replace, before, after
             // }
-            import_nimble_template : function( params ) {
+            get_gallery_tmpl_json_and_import : function( params ) {
                   var self = this;
                   params = $.extend( {
                       template_name : '',
-                      from : 'user'
+                      from : 'user',
+                      import_mode : 'replace'
                   }, params || {});
                   var tmpl_name = params.template_name;
                   if ( _.isEmpty( tmpl_name ) || ! _.isString( tmpl_name ) ) {
                         api.errare('::import => error => invalid template name');
                   }
-                  console.log('import_nimble_template params ?', params );
+                  console.log('get_gallery_tmpl_json_and_import params ?', params );
                   var _promise;
                   if ( 'nimble_api' === params.from ) {
                         // doc : https://api.jquery.com/jQuery.getJSON/
@@ -10432,33 +10810,38 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //  }
                   // }
                   _promise.done( function( response ) {
-                        console.log('SO IMPORT ??', response );
+                        console.log('get_gallery_tmpl_json_and_import', params, response );
                         if ( response.success ) {
                               //console.log('IMPORT NIMBLE TEMPLATE', response.lib.templates[template_name] );
-                              self.import_template_from_user_collection_or_remote_api({
+                              self.import_tmpl_from_gallery({
                                     pre_import_check : false,
                                     template_name : tmpl_name,
-                                    template_data : response.tmpl_json
+                                    template_data : response.tmpl_json,
+                                    import_mode : params.import_mode
                               });
                         }
                   });
             },
 
+            // IMPORT TEMPLATE FROM GALLERY
+            // => REMOTE API COLLECTION + USER COLLECTION
             // @param params
             // {
             //       pre_import_check : false,
             //       template_name : tmpl_name,
-            //       template_data : response.tmpl_json
+            //       template_data : response.tmpl_json,
+            //       import_mode : 3 possible import modes : replace, before, after
             // }
-            import_template_from_user_collection_or_remote_api : function( params ) {
-                  console.log('import_template_from_user_collection_or_remote_api', params );
+            import_tmpl_from_gallery : function( params ) {
+                  console.log('import_tmpl_from_gallery', params );
                   var self = this;
                   params = params || {};
                   // normalize params
                   params = $.extend({
                       is_file_import : false,
                       pre_import_check : false,
-                      assign_missing_locations : false,
+                      assign_missing_locations : true,//<= when importing a tmpl from gallery, if a the page location don't match the template ones, NB injects in "loop_start", or in the first location available
+                      import_mode : 'replace'
                   }, params );
 
                   // SETUP FOR MANUAL INPUT
@@ -10529,7 +10912,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // the ajax request is processed and will upload images if needed
                   __request__
                         .done( function( server_resp ) {
-
                               // When manually importing a file, the server adds a "success" property
                               // When loading a template this property is not sent. Let's normalize.
                               if ( _.isObject(server_resp) ) {
@@ -10544,7 +10926,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //console.log('MANUAL IMPORT DATA', server_resp );
                               server_resp.data.data.collection = self.setIdsForImportedTmpl( server_resp.data.data.collection );
                               // and try to update the api setting
-                              api.czr_sektions.doUpdateApiSettingAfterTmplImport( server_resp, params );
+                              api.czr_sektions.doUpdateApiSettingAfter_TmplGalleryImport( server_resp, params );
                         })
                         .fail( function( response ) {
                               api.errare( '::import_template => ajax error', response );
@@ -10561,7 +10943,93 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     ].join('')
                               });
                         });
-            },//import_template_from_user_collection_or_remote_api
+            },//import_tmpl_from_gallery
+
+
+            // fired on ajaxrequest done
+            // At this stage, the server_resp data structure has been validated.
+            // We can try to the update the api setting
+            // @param params
+            // {
+            //       pre_import_check : false,
+            //       template_name : tmpl_name,
+            //       template_data : response.tmpl_json,
+            //       import_mode : 3 possible import modes : replace, before, after,
+            //       is_file_import : false,
+            //       assign_missing_locations: true,
+            // }
+            doUpdateApiSettingAfter_TmplGalleryImport : function( server_resp, params ){
+                  console.log('doUpdateApiSettingAfter_TmplGalleryImport ???', params, server_resp );
+                  params = params || {};
+                  if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_file_import ) {
+                        //api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate( params );
+                        api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
+                        return;
+                  }
+
+                  var _scope = 'local';// <= always local when template gallery import
+
+                  //api.infoLog('TODO => verify metas => version, active locations, etc ... ');
+
+                  // Update the setting api via the normalized method
+                  // the scope will determine the setting id, local or global
+                  api.czr_sektions.updateAPISetting({
+                        action : 'sek-import-tmpl-from-gallery',
+                        scope : _scope,//'global' or 'local'<= will determine which setting will be updated,
+                        // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
+                        imported_content : server_resp.data,
+                        assign_missing_locations : params.assign_missing_locations,
+                  }).done( function() {
+                        // Clean an regenerate the local option setting
+                        // Settings are normally registered once and never cleaned, unlike controls.
+                        // After the import, updating the setting value will refresh the sections
+                        // but the local options, persisted in separate settings, won't be updated if the settings are not cleaned
+                        if ( 'local' === _scope ) {
+                              api.czr_sektions.generateUI({
+                                    action : 'sek-generate-local-skope-options-ui',
+                                    clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
+                              });
+                        }
+
+                        //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
+                        api.previewer.refresh();
+                        api.previewer.trigger('sek-notify', {
+                              notif_id : 'import-success',
+                              type : 'success',
+                              duration : 30000,
+                              message : [
+                                    '<span>',
+                                      '<strong>',
+                                      sektionsLocalizedData.i18n['Template successfully imported'],
+                                      '</strong>',
+                                    '</span>'
+                              ].join('')
+                        });
+                  }).fail( function( response ) {
+                        api.errare( '::doUpdateApiSettingAfter_TmplGalleryImport => error when firing ::updateAPISetting', response );
+                        api.previewer.trigger('sek-notify', {
+                              notif_id : 'import-failed',
+                              type : 'error',
+                              duration : 30000,
+                              message : [
+                                    '<span>',
+                                      '<strong>',
+                                      [ sektionsLocalizedData.i18n['Import failed'], response ].join(' : '),
+                                      '</strong>',
+                                    '</span>'
+                              ].join('')
+                        });
+                  });
+
+                  // Refresh the preview, so the markup is refreshed and the css stylesheet are generated
+                  api.previewer.refresh();
+            },//doUpdateApiSettingAfter_TmplGalleryImport()
+
+
+
+
+
+
 
 
 
@@ -10578,10 +11046,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             ////////////////////////////////////////////////////////
-            // IMPORT FROM FILE
+            // IMPORT TEMPLATE FROM FILE
             ////////////////////////////////////////////////////////
+            // @params
+            // {
+            //     is_file_import : true,
+            //     pre_import_check : false,
+            //     assign_missing_locations : false,
+            //     input : <= input instance when import is manual
+            //     file_input : $file_input
+            // }
             import_template_from_file : function( params ) {
-                  console.log('import_template_from_file', params );
+                  //console.log('import_template_from_file ??', params );
 
                   params = params || {};
                   // normalize params
@@ -10743,7 +11219,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //console.log('MANUAL IMPORT DATA', server_resp );
                               server_resp.data.data.collection = api.czr_sektions.setIdsForImportedTmpl( server_resp.data.data.collection );
                               // and try to update the api setting
-                              api.czr_sektions.doUpdateApiSettingAfterTmplImport( server_resp, params );
+                              api.czr_sektions.doUpdateApiSettingAfter_ManualImport( server_resp, params );
                         })
                         .fail( function( response ) {
                               api.errare( '::import_template => ajax error', response );
@@ -10987,7 +11463,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // fired on ajaxrequest done
             // At this stage, the server_resp data structure has been validated.
             // We can try to the update the api setting
-            doUpdateApiSettingAfterTmplImport : function( server_resp, params ){
+            doUpdateApiSettingAfter_ManualImport : function( server_resp, params ){
+                  console.log('doUpdateApiSettingAfter_ManualImport ???', params, server_resp );
                   params = params || {};
                   if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_file_import ) {
                         api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate( params );
@@ -11048,7 +11525,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               ].join('')
                         });
                   }).fail( function( response ) {
-                        api.errare( '::doUpdateApiSettingAfterTmplImport => error when firing ::updateAPISetting', response );
+                        api.errare( '::doUpdateApiSettingAfter_ManualImport => error when firing ::updateAPISetting', response );
                         api.previewer.trigger('sek-notify', {
                               notif_id : 'import-failed',
                               type : 'error',
@@ -11065,7 +11542,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Refresh the preview, so the markup is refreshed and the css stylesheet are generated
                   api.previewer.refresh();
-            },//doUpdateApiSettingAfterTmplImport()
+            },//doUpdateApiSettingAfter_ManualImport()
 
 
 
@@ -11113,26 +11590,35 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             ////////////////////////////////////////////////////////
             // APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/651
             setupTemplateGallery : function() {
-
-
                   var self = this;
                   self.templateGalleryExpanded = new api.Value(false);
+                  self.tmplImportDialogVisible = new api.Value(false);// Hidden by default
                   if ( !sektionsLocalizedData.isTemplateGalleryEnabled )
                     return;
 
                   self.templateGalleryExpanded.bind( function( expanded ) {
-
-
                         self.cachedElements.$body.toggleClass( 'sek-template-gallery-expanded', expanded );
                         if ( expanded ) {
                               // close template saver
                               // close level tree
                               self.tmplDialogVisible(false);
                               self.levelTreeExpanded(false);
+                              self.tmplImportDialogVisible(false);
                               $('#customize-preview iframe').css('z-index', 1);
                               self.renderOrRefreshTempGallery();
                         } else {
                               $('#customize-preview iframe').css('z-index', '');
+                        }
+                  });
+
+                  self.tmplImportDialogVisible.bind( function( expanded ) {
+                        self.cachedElements.$body.toggleClass( 'sek-tmpl-dialog-expanded', expanded );
+                        if ( expanded ) {
+                              // close template saver
+                              // close level tree
+                              self.tmplDialogVisible(false);
+                              self.levelTreeExpanded(false);
+                              $('#customize-preview iframe').css('z-index', 1);
                         }
                   });
 
@@ -11177,29 +11663,77 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
             },
 
+            // @return boolean
+            currentPageHasNBSections : function() {
+                var self = this,
+                    _bool = false,
+                    _collection,
+                    localCollSetId = this.localSectionsSettingId(),
+                    localColSetValue = api(localCollSetId)(),
+                    activeLocationInfos = this.activeLocationsInfo();
+
+                localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
+                _collection = $.extend( true, {}, localColSetValue );
+                _collection = ! _.isEmpty( _collection.collection ) ? _collection.collection : [];
+                _collection = _.isArray( _collection ) ? _collection : [];
+                _.each( _collection, function( loc_data ){
+                      if ( _bool )
+                        return;
+                      if ( _.isObject(loc_data) && 'location' == loc_data.level && loc_data.collection ) {
+                            // skip if the location is a header
+                            if ( !self.isHeaderLocation( loc_data.id ) && !self.isFooterLocation( loc_data.id ) ) {
+                                  _bool = !_.isEmpty( loc_data.collection );
+                            }
+                      }
+                });
+                return _bool;
+            },
+
             // @return void()
             setupTmplGalleryDOMEvents : function() {
                 var $galWrapper = $('#nimble-tmpl-gallery');
                 var self = this;
                 $galWrapper
                     // Schedule click event with delegation
+                    // PICK A TEMPLATE
                     .on('click', '.sek-tmpl-item .use-tmpl', function( evt ) {
                           evt.preventDefault();
                           evt.stopPropagation();
                           var tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id');
                           if ( _.isEmpty(tmpl_id) ) {
                               api.errare('::setupTmplGalleryDOMEvents => error => invalid template id');
+                              return;
                           }
-                          //api.czr_sektions.import_nimble_template( $(this).data('sek-tmpl-item-id') );
-                          //api.czr_sektions.import_nimble_template( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
-                          api.czr_sektions.import_nimble_template( {template_name : tmpl_id, from: 'user'});
 
+                          // if current page has NB sections, display an import dialog, otherwise import now
+                          if ( self.currentPageHasNBSections() ) {
+                                self._tmplNameWhileImportDialog = tmpl_id;
+                                self.tmplImportDialogVisible(true);
+                          } else {
+                                //api.czr_sektions.get_gallery_tmpl_json_and_import( $(this).data('sek-tmpl-item-id') );
+                                //api.czr_sektions.get_gallery_tmpl_json_and_import( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
+                                api.czr_sektions.get_gallery_tmpl_json_and_import( {template_name : tmpl_id, from: 'user'});
+                                self.templateGalleryExpanded(false);
+                          }
+                    })
+                    // PICK AN IMPORT MODE WHEN PAGE HAS SECTIONS ALREADY
+                    .on('click', '.sek-tmpl-gal-import-dialog .sek-ui-button', function( evt ) {
+                          evt.preventDefault();
+                          evt.stopPropagation();
+                          // 3 possible import modes : replace, before, after
+                          var tmpl_import_mode = $(this).data('sek-tmpl-import-mode');
+                          if ( !_.contains(['replace', 'before', 'after'], tmpl_import_mode ) ) {
+                                api.errare('::setupTmplGalleryDOMEvents => error => invalid import mode');
+                                return;
+                          }
+                          api.czr_sektions.get_gallery_tmpl_json_and_import( {template_name : self._tmplNameWhileImportDialog, from: 'user', tmpl_import_mode: tmpl_import_mode});
                           self.templateGalleryExpanded(false);
                     })
+                    // SEARCH ACTIONS
                     .on('propertychange change click keyup input paste', '.sek-filter-tmpl', _.debounce( function(evt) {
                           evt.preventDefault();
                           var _s = $(this).val();
-                          console.log('searched string ??', _s );
+                          //console.log('searched string ??', _s );
                           var _reset = function() {
                                 $galWrapper.removeClass('search-active');
                                 $galWrapper.find('.sek-tmpl-item').each( function() {
@@ -11228,6 +11762,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           }
 
                     }, 100 ) )
+                    // REMOVE
                     .on( 'click', '.sek-tmpl-info .remove-tmpl', function(evt) {
                           evt.preventDefault();
                           var _focusOnRemoveCandidate = function( mode ) {

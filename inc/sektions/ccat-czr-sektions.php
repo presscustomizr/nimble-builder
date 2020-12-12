@@ -627,6 +627,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'The current page has no available locations to import Nimble Builder sections.' => __('The current page has no available locations to import Nimble Builder sections.', 'text_doma'),
             'Missing file' => __('Missing file', 'text_doma'),
             'File successfully imported' => __('File successfully imported', 'text_doma'),
+            'Template successfully imported' => __('Template successfully imported', 'text_doma'),
             'Import failed, invalid file content' => __('Import failed, invalid file content', 'text_doma'),
             'Import failed, file problem' => __('Import failed, file problem', 'text_doma'),
             'Some image(s) could not be imported' => __('Some image(s) could not be imported', 'text_doma'),
@@ -960,6 +961,20 @@ function sek_print_nimble_customizer_tmpl() {
             </button>
           </div>
           <div class="sek-tmpl-gallery-inner"></div>
+        </div>
+        <div class="sek-tmpl-gal-import-dialog">
+            <p>This page has NB sections already. Select an import options.</p>
+            <div class="sek-ui-button-group" role="group">
+              <button class="sek-ui-button sek-tmpl-import-replace" type="button" title="<?php _e('Replace existing sections', 'text_domain'); ?>" data-sek-tmpl-import-mode="replace">
+                <?php _e('Replace existing sections', 'text_domain'); ?><span class="spinner"></span>
+              </button>
+              <button class="sek-ui-button sek-tmpl-import-before" type="button" title="<?php _e('Insert before existing sections', 'text_domain'); ?>" data-sek-tmpl-import-mode="before">
+                <?php _e('Insert before existing sections', 'text_domain'); ?><span class="spinner"></span>
+              </button>
+              <button class="sek-ui-button sek-tmpl-import-after" type="button" title="<?php _e('Insert after existing sections', 'text_domain'); ?>" data-sek-tmpl-import-mode="after">
+                <?php _e('Insert after existing sections', 'text_domain'); ?><span class="spinner"></span>
+              </button>
+            </div>
         </div>
       </div>
     </script>
@@ -4715,7 +4730,7 @@ function sek_ajax_sek_get_user_tmpl_json() {
         //         'skope_id' => $_POST['skope_id'],
         //         'version' => NIMBLE_VERSION,
         //         // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
-        //         'active_locations' => is_string( $_POST['active_locations'] ) ? explode( ',', $_POST['active_locations'] ) : array(),
+        //         'tmpl_locations' => is_string( $_POST['tmpl_locations'] ) ? explode( ',', $_POST['tmpl_locations'] ) : array(),
         //         'date' => date("Y-m-d"),
         //         'theme' => sanitize_title_with_dashes( get_stylesheet() )
         //     )
@@ -4759,9 +4774,13 @@ function sek_ajax_save_user_template() {
     if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
     }
-    if ( !isset( $_POST['active_locations'] ) || empty( $_POST['active_locations'] ) ) {
-        wp_send_json_error( __FUNCTION__ . '_missing_active_locations' );
+    if ( !isset( $_POST['tmpl_locations'] ) || empty( $_POST['tmpl_locations'] ) ) {
+        wp_send_json_error( __FUNCTION__ . '_missing_tmpl_locations' );
     }
+
+    // clean level ids and replace them with a placeholder string
+    $tmpl_data = json_decode( wp_unslash( $_POST['tmpl_data'] ), true );
+    $tmpl_data = sek_template_save_clean_id( $tmpl_data );
 
     // make sure description and title are clean before DB
     $tmpl_title = wp_strip_all_tags( $_POST['tmpl_title'] );
@@ -4771,7 +4790,7 @@ function sek_ajax_save_user_template() {
 
     // sek_error_log('json decode ?', json_decode( wp_unslash( $_POST['sek_data'] ), true ) );
     $template_to_save = array(
-        'data' => $_POST['tmpl_data'],//<= json stringified
+        'data' => $tmpl_data,//<= json stringified
         'tmpl_post_name' => ( !empty( $_POST['tmpl_post_name'] ) && is_string( $_POST['tmpl_post_name'] ) ) ? $_POST['tmpl_post_name'] : null,
         'metas' => array(
             'title' => $tmpl_title,
@@ -4779,7 +4798,7 @@ function sek_ajax_save_user_template() {
             'skope_id' => $_POST['skope_id'],
             'version' => NIMBLE_VERSION,
             // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
-            'active_locations' => is_array( $_POST['active_locations'] ) ? $_POST['active_locations'] : array(),
+            'tmpl_locations' => is_array( $_POST['tmpl_locations'] ) ? $_POST['tmpl_locations'] : array(),
             'date' => date("Y-m-d"),
             'theme' => sanitize_title_with_dashes( get_stylesheet() )
         )
@@ -4794,6 +4813,39 @@ function sek_ajax_save_user_template() {
     }
     //sek_error_log( __FUNCTION__ . '$_POST' ,  $_POST);
 }
+
+
+// SAVE FILTER
+function sek_template_save_clean_id( $tmpl_data = array() ) {
+    $new_tmpl_data = array();
+    if ( !is_array( $tmpl_data ) ) {
+        sek_error_log( __FUNCTION__ . ' error => tmpl_data should be an array');
+        return array();
+    }
+    $level = null;
+    if ( isset($tmpl_data['level'] ) ) {
+        $level = $tmpl_data['level'];
+    }
+    foreach ( $tmpl_data as $key => $value ) {
+        if ( is_array($value) ) {
+            $new_tmpl_data[$key] = sek_template_save_clean_id( $value );
+        } else {
+            switch( $key ) {
+                // we want to replace ids for all levels but locations
+                // only section, columns and modules have an id which starts by __nimble__, for ex : __nimble__2024500518bf
+                // locations id are like : loop_start
+                case 'id' :
+                    if ( 'location' !== $level && is_string( $value ) && false !== strpos( $value, '__nimble__' ) ) {
+                        $value = '__rep__me__';
+                    }
+                break;
+            }
+            $new_tmpl_data[$key] = $value;
+        }
+    }
+    return $new_tmpl_data;
+}
+
 
 ////////////////////////////////////////////////////////////////
 // TEMPLATE REMOVE
@@ -4816,10 +4868,11 @@ function sek_ajax_remove_user_template() {
     // }
     $tmpl_post_to_remove = sek_get_saved_tmpl_post( $_POST['tmpl_post_name'] );
 
-    sek_error_log( __FUNCTION__ . ' => so $tmpl_post_to_remove ' . $_POST['tmpl_post_name'], $tmpl_post_to_remove );
+    //sek_error_log( __FUNCTION__ . ' => so $tmpl_post_to_remove ' . $_POST['tmpl_post_name'], $tmpl_post_to_remove );
 
     if ( $tmpl_post_to_remove && is_object( $tmpl_post_to_remove ) ) {
-        $r = wp_delete_post( $tmpl_post_to_remove->ID, true );
+        // the CPT is moved to Trash instead of permanently deleted when using wp_delete_post()
+        $r = wp_trash_post( $tmpl_post_to_remove->ID );
         if ( is_wp_error( $r ) ) {
             wp_send_json_error( __FUNCTION__ . '_removal_error' );
         }
@@ -4986,12 +5039,6 @@ function sek_section_save_clean_id( $seks_data = array() ) {
             $new_seks_data[$key] = sek_section_save_clean_id( $value );
         } else {
             switch( $key ) {
-                // case 'bg-image' :
-                // case 'img' :
-                //     if ( is_int( $value ) && (int)$value > 0 ) {
-                //         $value = '__img_url__' . wp_get_attachment_url((int)$value);
-                //     }
-                // break;
                 case 'id' :
                     if ( is_string( $value ) && false !== strpos( $value, '__nimble__' ) ) {
                         $value = '__rep__me__';
@@ -5025,7 +5072,8 @@ function sek_ajax_remove_user_section() {
     $section_post_to_remove = sek_get_saved_section_post( $_POST['section_post_name'] );
 
     if ( $section_post_to_remove && is_object( $section_post_to_remove ) ) {
-        $r = wp_delete_post( $section_post_to_remove->ID, true );
+        // the CPT is moved to Trash instead of permanently deleted when using wp_delete_post()
+        $r = wp_trash_post( $section_post_to_remove->ID );
         if ( is_wp_error( $r ) ) {
             wp_send_json_error( __FUNCTION__ . '_removal_error' );
         }

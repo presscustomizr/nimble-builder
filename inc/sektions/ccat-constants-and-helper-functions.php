@@ -11,6 +11,11 @@ function sek_is_debug_mode() {
 function sek_is_dev_mode() {
   return ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) || ( defined( 'WP_DEBUG' ) && WP_DEBUG );
 }
+// @return bool
+// Nov 2020 : helper used to display NB CPT in admin
+function sek_is_cpt_debug_mode() {
+  return isset( $_GET['nimble_cpt_debug'] ) || (defined('NIMBLE_CPT_DEBUG_MODE') && NIMBLE_CPT_DEBUG_MODE);
+}
 
 if ( !defined( 'NIMBLE_CPT' ) ) { define( 'NIMBLE_CPT' , 'nimble_post_type' ); }
 if ( !defined( 'NIMBLE_TEMPLATE_CPT' ) ) { define( 'NIMBLE_TEMPLATE_CPT' , 'nimble_template' ); }
@@ -3725,17 +3730,17 @@ function sek_map_compat_1_0_4_to_1_1_0_do_level_spacing_mapping( $old_user_data 
 // SEKTION POST
 register_post_type( NIMBLE_CPT , array(
     'labels' => array(
-      'name'          => __( 'Nimble sections', 'text_doma' ),
-      'singular_name' => __( 'Nimble sections', 'text_doma' ),
+      'name'          => sek_is_cpt_debug_mode() ? __( '[NB debug] skoped section') : __( 'NB skoped section'),
+      'singular_name' => __( 'NB skoped section')
     ),
-    'public'           => false,
+    'public'           => sek_is_cpt_debug_mode(),
     'hierarchical'     => false,
     'rewrite'          => false,
     'query_var'        => false,
     'delete_with_user' => false,
     'can_export'       => true,
-    '_builtin'         => true, /* internal use only. don't use this when registering your own post type. */
-    'supports'         => array( 'title', 'revisions' ),
+    //'_builtin'         => true, /* internal use only. don't use this when registering your own post type. */
+    'supports'         => sek_is_cpt_debug_mode() ? array( 'editor', 'title', 'revisions' ) : array( 'title', 'revisions' ),
     'capabilities'     => array(
         'delete_posts'           => 'edit_theme_options',
         'delete_post'            => 'edit_theme_options',
@@ -3873,22 +3878,9 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         // [ 'collection' => [], 'local_options' => [] ];
         $default_collection = sek_get_default_location_model( $skope_id );
         $seks_data = wp_parse_args( $seks_data, $default_collection );
-
         // Maybe add missing registered locations
-        $maybe_incomplete_locations = [];
-        foreach( $seks_data['collection'] as $location_data ) {
-            if ( !empty( $location_data['id'] ) ) {
-                $maybe_incomplete_locations[] = $location_data['id'];
-            }
-        }
+        $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
 
-        foreach( sek_get_locations() as $loc_id => $params ) {
-            if ( !in_array( $loc_id, $maybe_incomplete_locations ) ) {
-                if ( ( sek_is_global_location( $loc_id ) && $is_global_skope ) || ( !sek_is_global_location( $loc_id ) && !$is_global_skope  ) ) {
-                    $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], Nimble_Manager()->default_location_model );
-                }
-            }
-        }
         // cache now
         if ( $is_global_skope ) {
             Nimble_Manager()->global_seks = $seks_data;
@@ -3898,17 +3890,22 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
 
     }//end if
 
-    // when customizing, let us filter the value with the 'customized' ones
-    $seks_data = apply_filters(
-        'sek_get_skoped_seks',
-        $seks_data,
-        $skope_id,
-        $location_id
-    );
+    if ( skp_is_customizing() ) {
+        // when customizing, let us filter the value with the 'customized' ones
+        $seks_data = apply_filters(
+            'sek_get_skoped_seks',
+            $seks_data,
+            $skope_id,
+            $location_id
+        );
+        // Maybe add missing registered locations when customizing
+        // December 2020 => needed when importing an entire template
+        $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
+    }
 
-    // sek_error_log( '<sek_get_skoped_seks() location => ' . $location .  array_key_exists( 'collection', $seks_data ), $seks_data );
     // if a location is specified, return specifically the sections of this location
     if ( array_key_exists( 'collection', $seks_data ) && !empty( $location_id ) ) {
+        // sek_error_log( 'sek_get_skoped_seks() location => ' . $location_id .  array_key_exists( 'collection', $seks_data ) );
         if ( !array_key_exists( $location_id, sek_get_locations() ) ) {
             error_log( __FUNCTION__ . ' Error => location ' . $location_id . ' is not registered in the available locations' );
         } else {
@@ -3917,6 +3914,26 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
     }
 
     return 'no_match' === $seks_data ? Nimble_Manager()->default_location_model : $seks_data;
+}
+
+// make sure the locations in the skoped locations tree match the registered locations for the context
+function sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope ) {
+    // Maybe add missing registered locations
+    $maybe_incomplete_locations = [];
+    foreach( $seks_data['collection'] as $location_data ) {
+        if ( !empty( $location_data['id'] ) ) {
+            $maybe_incomplete_locations[] = $location_data['id'];
+        }
+    }
+
+    foreach( sek_get_locations() as $loc_id => $params ) {
+        if ( !in_array( $loc_id, $maybe_incomplete_locations ) ) {
+            if ( ( sek_is_global_location( $loc_id ) && $is_global_skope ) || ( !sek_is_global_location( $loc_id ) && !$is_global_skope  ) ) {
+                $seks_data['collection'][] = wp_parse_args( [ 'id' => $loc_id ], Nimble_Manager()->default_location_model );
+            }
+        }
+    }
+    return $seks_data;
 }
 
 
@@ -3991,17 +4008,17 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
 // CPT for section : 'nimble_section'
 register_post_type( NIMBLE_SECTION_CPT , array(
     'labels' => array(
-      'name'          => __( 'Nimble sections', 'text_doma' ),
-      'singular_name' => __( 'Nimble sections', 'text_doma' ),
+      'name'          => sek_is_cpt_debug_mode() ? __( '[NB debug] user prebuilt sections') : __( 'NB user prebuilt sections'),
+      'singular_name' => __( 'NB User prebuilt sections')
     ),
-    'public'           => false,
+    'public'           => sek_is_cpt_debug_mode(),
     'hierarchical'     => false,
     'rewrite'          => false,
     'query_var'        => false,
     'delete_with_user' => false,
     'can_export'       => true,
     //'_builtin'         => true, /* internal use only. don't use this when registering your own post type. */
-    'supports'         => array( 'title', 'revisions' ),
+    'supports'         => sek_is_cpt_debug_mode() ? array( 'editor', 'title', 'revisions' ) : array( 'title', 'revisions' ),
     'capabilities'     => array(
         'delete_posts'           => 'edit_theme_options',
         'delete_post'            => 'edit_theme_options',
@@ -4244,17 +4261,17 @@ function sek_update_saved_section_post( $section_data ) {
 // CPT for template : 'nimble_template'
 register_post_type( NIMBLE_TEMPLATE_CPT , array(
     'labels' => array(
-      'name'          => __( 'Nimble templates', 'text_doma' ),
-      'singular_name' => __( 'Nimble templates', 'text_doma' ),
+      'name'          => sek_is_cpt_debug_mode() ? __( '[NB debug] user templates') : __( 'NB user templates'),
+      'singular_name' => __( 'NB user templates')
     ),
-    'public'           => false,
+    'public'           => sek_is_cpt_debug_mode(),
     'hierarchical'     => false,
     'rewrite'          => false,
     'query_var'        => false,
     'delete_with_user' => false,
     'can_export'       => true,
     //'_builtin'         => true, /* internal use only. don't use this when registering your own post type. */
-    'supports'         => array( 'title', 'revisions' ),
+    'supports'         => sek_is_cpt_debug_mode() ? array( 'editor', 'title', 'revisions' ) : array( 'title', 'revisions' ),
     'capabilities'     => array(
         'delete_posts'           => 'edit_theme_options',
         'delete_post'            => 'edit_theme_options',
@@ -4366,7 +4383,8 @@ function sek_get_all_saved_templates() {
 
     foreach ( $query->posts as $post_object ) {
         $content = maybe_unserialize( $post_object->post_content );
-        //sek_error_log( __FUNCTION__ . ' POST OBJECT ?', $post_object->post_modified .  get_option('date_format') );
+        // sek_error_log( __FUNCTION__ . ' TYPE ?', gettype($post_object->post_content ) );
+        // sek_error_log( __FUNCTION__ . ' POST OBJECT ?', $post_object->post_content );
         // Structure of $content :
         // array(
         //     'data' => $_POST['tmpl_data'],//<= json stringified
@@ -4377,7 +4395,7 @@ function sek_get_all_saved_templates() {
         //         'skope_id' => $_POST['skope_id'],
         //         'version' => NIMBLE_VERSION,
         //         // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
-        //         'active_locations' => is_string( $_POST['active_locations'] ) ? explode( ',', $_POST['active_locations'] ) : array(),
+        //         'tmpl_locations' => is_string( $_POST['tmpl_locations'] ) ? explode( ',', $_POST['tmpl_locations'] ) : array(),
         //         'date' => date("Y-m-d"),
         //         'theme' => sanitize_title_with_dashes( get_stylesheet() )
         //     )
@@ -4398,7 +4416,7 @@ function sek_get_all_saved_templates() {
             'last_modified_date' => mysql2date( 'Y-m-d H:i:s', $post_object->post_modified )
         );
     }
-
+    //sek_error_log('GET ALL SAVED TMPL', $collection );
     return $collection;
 }
 
@@ -4415,7 +4433,7 @@ function sek_get_all_saved_templates() {
   //         'skope_id' => $_POST['skope_id'],
   //         'version' => NIMBLE_VERSION,
   //         // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
-  //         'active_locations' => is_string( $_POST['active_locations'] ) ? explode( ',', $_POST['active_locations'] ) : array(),
+  //         'tmpl_locations' => is_string( $_POST['tmpl_locations'] ) ? explode( ',', $_POST['tmpl_locations'] ) : array(),
   //         'date' => date("Y-m-d"),
   //         'theme' => sanitize_title_with_dashes( get_stylesheet() )
   //     )
@@ -4440,7 +4458,7 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
             'description' => '',
             'skope_id' => '',
             'version' => NIMBLE_VERSION,
-            'active_locations' => array(),
+            'tmpl_locations' => array(),
             'date' => '',
             'theme' => ''
         )
@@ -4497,6 +4515,100 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
     }
     return get_post( $r );
 }
+
+?><?php
+// Nov 2020
+// When sek_is_cpt_debug_mode() = isset( $_GET['nimble_cpt_debug'] ) || (defined('NIMBLE_CPT_DEBUG_MODE') && NIMBLE_CPT_DEBUG_MODE);
+// NB custom post types for skoped sections, user saved sections and templates are set to "public" in the WP admin
+// To properly vizualise and edit the CPT we need :
+// 1) to filter content before it's rendered in the CPT admin editor, so it's rendered as a JSON
+// This is done with 'content_edit_pre'
+// 2) to disable the rich editor when editing NB CPT, to prevent any html tags insertion done by rich text editor ( done at 'current_screen' )
+// 3) before db insertion, to make sur the NB CPT is turned from JSON to serialized value ( done with 'wp_insert_post_data' )
+// Disable rich editor when editing NB custom post types
+add_action( 'current_screen', function() {
+    if ( !sek_is_cpt_debug_mode() || !is_admin() || skp_is_customizing() )
+      return;
+
+    global $pagenow;
+    global $typenow;
+    if ( 'post.php' === $pagenow && in_array($typenow, [NIMBLE_CPT,NIMBLE_SECTION_CPT,NIMBLE_TEMPLATE_CPT]) ) {
+        add_filter( 'user_can_richedit' , '__return_false', 50 );
+    }
+});
+
+// Jsonify
+add_filter( 'content_edit_pre', function( $content, $post_id ) {
+    if ( !sek_is_cpt_debug_mode() )
+      return $content;
+    $post_type = get_post_type( $post_id );
+    if ( in_array($post_type, [NIMBLE_CPT,NIMBLE_SECTION_CPT,NIMBLE_TEMPLATE_CPT]) ) {
+        return wp_json_encode(maybe_unserialize($content), JSON_PRETTY_PRINT);
+    }
+    return $content;
+}, 10, 2 );
+
+
+// BEFORE INSERTION / UPDATE
+// @see wp-includes/post.php
+// Reformat edited custom post type when updating from the editor
+// We need to make sure that the reformating occurs ONLY when this is a manual update
+// - not an update when customizing => check if skp_is_customzing() and DOING_AJAX
+// - not an insertion of the revision post type => check on $data['post_type']
+// Note that the post status can be 'publish', 'draft', 'pending'
+add_filter( 'wp_insert_post_data', function( $data, $postarr, $unsanitized_postarr ) {
+    global $pagenow;
+    // error_log(' PAGE NOW ?'.$pagenow );
+    // error_log(' POST TYPE FROM DATA ?'. $data['post_type']);
+    // error_log(' POST STATUS ?'. $data['post_status'] );
+
+    // we must be in an single CPT edit screen
+    // prevent processing data when restoring a revision
+    if ( 'post.php' !== $pagenow )
+      return $data;
+
+    if ( !sek_is_cpt_debug_mode() || skp_is_customizing() || (defined('DOING_AJAX') && DOING_AJAX) )
+      return $data;
+
+    // $data should be An array of slashed, sanitized, and processed post data.
+    // @see wp-includes/post.php
+    if ( !is_array($data) )
+      return $data;
+
+    $post_type = 'not_set';
+    if ( !empty($data['post_type']) ) {
+        $post_type = $data['post_type'];
+    }
+    // make sure we only process nimble CPT post type. Not the 'revision' post types.
+    if ( !in_array( $post_type, [NIMBLE_CPT,NIMBLE_SECTION_CPT,NIMBLE_TEMPLATE_CPT] ) )
+      return $data;
+
+    // Stop here if the post is being removed
+    if ( 'trash' == $data['post_status'] )
+      return $data;
+
+    //sek_error_log('$data ??', $data);
+
+
+    $pre_content = isset($data['post_content']) ? $data['post_content'] : null;
+    //sek_error_log('is SERIALIZED ?', is_serialized( $pre_content ));
+    // Serialized if content has been jsonified in the editor
+    // Important : this check is needed in a scenario when the post has been trashed and is restored. In this case the content is already serialized.
+    if ( isset($pre_content) && !empty($pre_content) && !is_serialized( $pre_content ) ) {
+        $pre_content = json_decode( wp_unslash( $pre_content ), true );
+        // Check if content is a valid json ?
+        if ( json_last_error() == JSON_ERROR_NONE ) {
+            // if no json error, serialize
+            $data['post_content'] = maybe_serialize( $pre_content );
+            //sek_error_log('VALID JSON => new post_content ??', $data['post_content'] );
+        } else {
+            //sek_error_log('INVALID JSON', json_last_error() );
+            return new \WP_Error( 'db_insert_error', __('Could not insert NB template into the database : invalid JSON'), json_last_error() );
+        }
+    }
+    return $data;
+}, 10 , 3);
+
 ?><?php
 /* ------------------------------------------------------------------------- *
  *  REVISION HELPERS

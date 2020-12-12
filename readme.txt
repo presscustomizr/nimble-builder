@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.6
-Stable tag: 2.1.28
+Stable tag: 2.1.29
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,14 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.28 : Ready for WordPress 5.6, scheduled for December 8, 2020. Fixes possible javascript issues on front end.
+2.1.29 : Ready for WordPress 5.6, released December 8, 2020. Various improvements in the customizer.
 
 == Changelog ==
+= 2.1.29 December 12, 2020 =
+* fixed : [customizer] minor issue when adding a new section in an empty location
+* fixed : [customizer][pre-built sections ui] pre-opened section group is broken
+* improved : [user template] added various component to prepare introduction of reusable templates
+
 = 2.1.28 December 3rd 2020 =
 * fixed : [js] always check that window.nb_ is defined before trying to emit an event
 * fixed : [performance] removed global performance > jQuery options, replaced by PHP boolean constants: NIMBLE_LOAD_JQUERY_ASYNC and NIMBLE_USE_LATEST_JQUERY_VERSION
