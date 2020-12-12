@@ -148,7 +148,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return;
                   }
 
-                  var importedCollection = _.isArray( params.imported_content.data.collection ) ? $.extend( true, [], params.imported_content.data.collection ) : [];
+                  var importedCollection = _.isArray( params.imported_content.data.collection ) ? $.extend( true, [], params.imported_content.data.collection ) : [],
+                      importedActiveLocations = params.imported_content.metas.tmpl_locations,
+                      currentActiveLocations = api.czr_sektions.activeLocations();
+
+                  // PAGE HAS NO SECTIONS
+                  // TMPL LOCATIONS === PAGE LOCATIONS
+                  // => import as is.
+                  self.updAPISetParams.newSetValue = params.imported_content.data;
+
 
                   // SHALL WE ASSIGN SECTIONS FROM MISSING LOCATIONS TO THE FIRST ACTIVE LOCATION ?
                   // For example the current page has only the 'loop_start' location, whereas the imported content includes 3 locations :
@@ -164,8 +172,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // 2) populate a new collection of combined sections from all active imported locations.
                   // 3) updated the imported collection with this
                   if ( true === params.assign_missing_locations ) {
-                        var importedActiveLocations = params.imported_content.metas.tmpl_locations,
-                            currentActiveLocations = api.czr_sektions.activeLocations();
+
 
                         console.log('SO COLLECTION BEFORE ?', params.imported_content.data.collection );
 
@@ -250,7 +257,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       }
                   }// if true === params.merge
 
-                  self.updAPISetParams.newSetValue = params.imported_content.data;
+                  //self.updAPISetParams.newSetValue = params.imported_content.data;
             }
 
       });//$.extend()
