@@ -1031,6 +1031,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // @see api.czrInputMap['code_editor']
                         // @see https://github.com/presscustomizr/nimble-builder/issues/176
                         $control.trigger( "true" == $control.attr('data-sek-expanded') ? 'sek-accordion-expanded' : 'sek-accordion-collapsed' );
+                        if ( true === $control.data('module_ready_on_custom_control_event_is_setup' ) ) {
+                              $control.trigger( 'sek-accordion-expanded' );
+                        } else {
+                              $control.one('module_ready_on_custom_control_event_is_setup', function() {
+                                    $control.trigger( 'sek-accordion-expanded' );
+                              });
+
+                        }
                   });
 
                   _section_.container.data('sek-module-accordion-has-been-setup', true );
@@ -1065,7 +1073,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // Nov 2020 => make sure the setup has been done on the control so that it reacts on a on custom event ( here 'sek-accordion-expanded' )
                                     // see fmk CZRModuleMths::initialize
                                     // event defined on module registration with api.czrModuleMap[ module.module_type ].ready_on_section_expanded
-                                    if ( _ctrl_.module_ready_on_custom_control_event_is_setup ) {
+                                    if ( true === _ctrl_.container.data('module_ready_on_custom_control_event_is_setup' ) ) {
                                           _ctrl_.container.trigger( 'sek-accordion-expanded' );
                                     } else {
                                           _ctrl_.container.one('module_ready_on_custom_control_event_is_setup', function() {
