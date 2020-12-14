@@ -80,31 +80,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
             },
 
-            // @return boolean
-            currentPageHasNBSections : function() {
-                var self = this,
-                    _bool = false,
-                    _collection,
-                    localCollSetId = this.localSectionsSettingId(),
-                    localColSetValue = api(localCollSetId)(),
-                    activeLocationInfos = this.activeLocationsInfo();
-
-                localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
-                _collection = $.extend( true, {}, localColSetValue );
-                _collection = ! _.isEmpty( _collection.collection ) ? _collection.collection : [];
-                _collection = _.isArray( _collection ) ? _collection : [];
-                _.each( _collection, function( loc_data ){
-                      if ( _bool )
-                        return;
-                      if ( _.isObject(loc_data) && 'location' == loc_data.level && loc_data.collection ) {
-                            // skip if the location is a header
-                            if ( !self.isHeaderLocation( loc_data.id ) && !self.isFooterLocation( loc_data.id ) ) {
-                                  _bool = !_.isEmpty( loc_data.collection );
-                            }
-                      }
-                });
-                return _bool;
-            },
 
             // @return void()
             setupTmplGalleryDOMEvents : function() {
@@ -123,7 +98,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           }
 
                           // if current page has NB sections, display an import dialog, otherwise import now
-                          if ( self.currentPageHasNBSections() ) {
+                          if ( self.hasCurrentPageNBSectionsNotHeaderFooter() ) {
                                 self._tmplNameWhileImportDialog = tmpl_id;
                                 self.tmplImportDialogVisible(true);
                           } else {
@@ -143,7 +118,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 api.errare('::setupTmplGalleryDOMEvents => error => invalid import mode');
                                 return;
                           }
-                          api.czr_sektions.get_gallery_tmpl_json_and_import( {template_name : self._tmplNameWhileImportDialog, from: 'user', tmpl_import_mode: tmpl_import_mode});
+                          api.czr_sektions.get_gallery_tmpl_json_and_import({
+                                template_name : self._tmplNameWhileImportDialog,
+                                from: 'user',
+                                tmpl_import_mode: tmpl_import_mode
+                          });
                           self.templateGalleryExpanded(false);
                     })
                     // SEARCH ACTIONS

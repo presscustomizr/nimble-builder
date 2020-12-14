@@ -1210,6 +1210,40 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   this.bind( function( to ) {
                         item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
                   });
+            },
+
+
+            //-------------------------------------------------------------------------------------------------
+            //-- TEMPLATE HELPERS
+            // Dec 2020
+            //-------------------------------------------------------------------------------------------------
+
+            // @return boolean
+            // introduced when implementing #655
+            // When importing a template, if current page has NB sections, out of header and footer, display an import dialog, otherwise import now
+            hasCurrentPageNBSectionsNotHeaderFooter : function() {
+                var self = this,
+                    _bool = false,
+                    _collection,
+                    localCollSetId = this.localSectionsSettingId(),
+                    localColSetValue = api(localCollSetId)(),
+                    activeLocationInfos = this.activeLocationsInfo();
+
+                localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
+                _collection = $.extend( true, {}, localColSetValue );
+                _collection = ! _.isEmpty( _collection.collection ) ? _collection.collection : [];
+                _collection = _.isArray( _collection ) ? _collection : [];
+                _.each( _collection, function( loc_data ){
+                      if ( _bool )
+                        return;
+                      if ( _.isObject(loc_data) && 'location' == loc_data.level && loc_data.collection ) {
+                            // skip if the location is a header
+                            if ( !self.isHeaderLocation( loc_data.id ) && !self.isFooterLocation( loc_data.id ) ) {
+                                  _bool = !_.isEmpty( loc_data.collection );
+                            }
+                      }
+                });
+                return _bool;
             }
       });//$.extend()
 })( wp.customize, jQuery );
