@@ -149,20 +149,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @param params {
             //    template_name : string,
             //    from : nimble_api or user,
-            //    import_mode : 3 possible import modes : replace, before, after
+            //    tmpl_import_mode : 3 possible import modes : replace, before, after
             // }
             get_gallery_tmpl_json_and_import : function( params ) {
                   var self = this;
                   params = $.extend( {
                       template_name : '',
                       from : 'user',
-                      import_mode : 'replace'
+                      tmpl_import_mode : 'replace'
                   }, params || {});
                   var tmpl_name = params.template_name;
                   if ( _.isEmpty( tmpl_name ) || ! _.isString( tmpl_name ) ) {
                         api.errare('::import => error => invalid template name');
                   }
-                  console.log('get_gallery_tmpl_json_and_import params ?', params );
+                  //console.log('get_gallery_tmpl_json_and_import params ?', params );
                   var _promise;
                   if ( 'nimble_api' === params.from ) {
                         // doc : https://api.jquery.com/jQuery.getJSON/
@@ -183,14 +183,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //  }
                   // }
                   _promise.done( function( response ) {
-                        console.log('get_gallery_tmpl_json_and_import', params, response );
+                        //console.log('get_gallery_tmpl_json_and_import', params, response );
                         if ( response.success ) {
                               //console.log('IMPORT NIMBLE TEMPLATE', response.lib.templates[template_name] );
                               self.import_tmpl_from_gallery({
                                     pre_import_check : false,
                                     template_name : tmpl_name,
                                     template_data : response.tmpl_json,
-                                    import_mode : params.import_mode
+                                    tmpl_import_mode : params.tmpl_import_mode
                               });
                         }
                   });
@@ -203,18 +203,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //       pre_import_check : false,
             //       template_name : tmpl_name,
             //       template_data : response.tmpl_json,
-            //       import_mode : 3 possible import modes : replace, before, after
+            //       tmpl_import_mode : 3 possible import modes : replace, before, after
             // }
             import_tmpl_from_gallery : function( params ) {
-                  console.log('import_tmpl_from_gallery', params );
+                  //console.log('import_tmpl_from_gallery', params );
                   var self = this;
                   params = params || {};
                   // normalize params
                   params = $.extend({
                       is_file_import : false,
                       pre_import_check : false,
-                      assign_missing_locations : true,//<= when importing a tmpl from gallery, if a the page location don't match the template ones, NB injects in "loop_start", or in the first location available
-                      import_mode : 'replace'
+                      tmpl_import_mode : 'replace'
                   }, params );
 
                   // SETUP FOR MANUAL INPUT
@@ -234,7 +233,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
                         //active_locations : api.czr_sektions.activeLocations()
                   }).done( function( server_resp ) {
-                        api.infoLog('TEMPLATE PRE PROCESS DONE', server_resp );
+                        //api.infoLog('TEMPLATE PRE PROCESS DONE', server_resp );
                   }).fail( function( error_resp ) {
                         api.previewer.trigger('sek-notify', {
                               notif_id : 'import-failed',
@@ -327,12 +326,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //       pre_import_check : false,
             //       template_name : tmpl_name,
             //       template_data : response.tmpl_json,
-            //       import_mode : 3 possible import modes : replace, before, after,
-            //       is_file_import : false,
-            //       assign_missing_locations: true,
+            //       tmpl_import_mode : 3 possible import modes : replace, before, after,
+            //       is_file_import : false
             // }
             doUpdateApiSettingAfter_TmplGalleryImport : function( server_resp, params ){
-                  console.log('doUpdateApiSettingAfter_TmplGalleryImport ???', params, server_resp );
+                  //console.log('doUpdateApiSettingAfter_TmplGalleryImport ???', params, server_resp );
                   params = params || {};
                   if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_file_import ) {
                         //api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate( params );
@@ -351,7 +349,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         scope : _scope,//'global' or 'local'<= will determine which setting will be updated,
                         // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
                         imported_content : server_resp.data,
-                        assign_missing_locations : params.assign_missing_locations,
+                        tmpl_import_mode : params.tmpl_import_mode
                   }).done( function() {
                         // Clean an regenerate the local option setting
                         // Settings are normally registered once and never cleaned, unlike controls.
