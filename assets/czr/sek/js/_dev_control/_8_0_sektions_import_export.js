@@ -590,7 +590,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //console.log('MANUAL IMPORT DATA', server_resp );
                               server_resp.data.data.collection = api.czr_sektions.setIdsForImportedTmpl( server_resp.data.data.collection );
                               // and try to update the api setting
-                              api.czr_sektions.doUpdateApiSettingAfter_ManualImport( server_resp, params );
+                              api.czr_sektions.doUpdateApiSettingAfter_FileImport( server_resp, params );
                         })
                         .fail( function( response ) {
                               api.errare( '::import_template => ajax error', response );
@@ -834,8 +834,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // fired on ajaxrequest done
             // At this stage, the server_resp data structure has been validated.
             // We can try to the update the api setting
-            doUpdateApiSettingAfter_ManualImport : function( server_resp, params ){
-                  console.log('doUpdateApiSettingAfter_ManualImport ???', params, server_resp );
+            doUpdateApiSettingAfter_FileImport : function( server_resp, params ){
+                  //console.log('doUpdateApiSettingAfter_FileImport ???', params, server_resp );
                   params = params || {};
                   if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_file_import ) {
                         api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate( params );
@@ -896,7 +896,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               ].join('')
                         });
                   }).fail( function( response ) {
-                        api.errare( '::doUpdateApiSettingAfter_ManualImport => error when firing ::updateAPISetting', response );
+                        api.errare( '::doUpdateApiSettingAfter_FileImport => error when firing ::updateAPISetting', response );
                         api.previewer.trigger('sek-notify', {
                               notif_id : 'import-failed',
                               type : 'error',
@@ -913,7 +913,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Refresh the preview, so the markup is refreshed and the css stylesheet are generated
                   api.previewer.refresh();
-            },//doUpdateApiSettingAfter_ManualImport()
+            },//doUpdateApiSettingAfter_FileImport()
 
 
 

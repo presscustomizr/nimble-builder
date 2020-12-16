@@ -27,7 +27,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   var importedCollection = _.isArray( params.imported_content.data.collection ) ? $.extend( true, [], params.imported_content.data.collection ) : [];
 
-                  // SHALL WE ASSIGN SECTIONS FROM MISSING LOCATIONS TO THE FIRST ACTIVE LOCATION ?
+                  // ASSIGN MISSING LOCATIONS => IF IMPORTED LOCATIONS DON'T MATCH CURRENT PAGE LOCATIONS
+                  // NB will import sections in the first active location of the page
+                  // Important : header and footer must be excluded from active locations
+                  //
                   // For example the current page has only the 'loop_start' location, whereas the imported content includes 3 locations :
                   // - after_header
                   // - loop_start
@@ -42,7 +45,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // 3) updated the imported collection with this
                   if ( true === params.assign_missing_locations ) {
                         var importedActiveLocations = params.imported_content.metas.active_locations,
-                            currentActiveLocations = api.czr_sektions.activeLocations();
+                            allActiveLocations = api.czr_sektions.activeLocations(),
+                            currentActiveLocations;
+
+                        // Set the current active locations excluding header and footer location
+                        _.each( allActiveLocations, function( loc_id ) {
+                              if( !self.isHeaderLocation( loc_id ) && !self.isFooterLocation( loc_id ) ) {
+                                    currentActiveLocations.push(loc_id);
+                              }
+                        });
 
                         // console.log('Current set value ?', api( _collectionSettingId_ )() );
                         // console.log('import params', params );
@@ -111,10 +122,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       });
 
                       // merge fonts if needed
-                      if ( self.updAPISetParams.newSetValue.fonts && !_.isEmpty( self.updAPISetParams.newSetValue.fonts ) && _.isArray( self.updAPISetParams.newSetValue.fonts ) ) {
-                            params.imported_content.data.fonts = _.isArray( params.imported_content.data.fonts ) ? params.imported_content.data.fonts : [];
+                      var currentFonts = self.updAPISetParams.newSetValue.fonts,
+                          importedFonts = params.imported_content.data.fonts;
+
+                      if ( currentFonts && !_.isEmpty( currentFonts ) && _.isArray( currentFonts ) ) {
+                            importedFonts = _.isArray( importedFonts ) ? importedFonts : [];
                             // merge and remove duplicated fonts
-                            params.imported_content.data.fonts =  _.uniq( _.union( self.updAPISetParams.newSetValue.fonts, params.imported_content.data.fonts ) );
+                            params.imported_content.data.fonts =  _.uniq( _.union( currentFonts, importedFonts ) );
                       }
                   }// if true === params.merge
 
