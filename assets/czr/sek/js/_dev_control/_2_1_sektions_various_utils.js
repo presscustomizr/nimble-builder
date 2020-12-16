@@ -153,6 +153,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
             // @return bool
+            isGlobalLocationId : function( id ) {
+                var _locCollection = this.activeLocationsInfo(),
+                    _currentLocInfo = !_.isArray( _locCollection ) ? {} : _.findWhere( _locCollection, { id : id } );
+                return _.isObject( _currentLocInfo ) && _currentLocInfo.is_global;
+            },
+
+            // @return bool
             // June 2020 : introduced for https://github.com/presscustomizr/nimble-builder-pro/issues/6
             isHeaderLocation : function( id ) {
                   var _locCollection = this.activeLocationsInfo(),
