@@ -161,8 +161,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   var importedCollection = _.isArray( params.imported_content.data.collection ) ? $.extend( true, [], params.imported_content.data.collection ) : [],
                       importedActiveLocations = params.imported_content.metas.tmpl_locations,
-                      currentActiveLocations = api.czr_sektions.activeLocations(),
+                      allActiveLocations = api.czr_sektions.activeLocations(),
+                      currentLocalActiveLocations = [],
                       currentSettingCollection = self.updAPISetParams.newSetValue.collection;
+
+                  // Set the current local active locations, make sure we exclude all global locations
+                  _.each( allActiveLocations, function( loc_id ) {
+                        if( !self.isGlobalLocationId(loc_id) ) {
+                              currentLocalActiveLocations.push(loc_id);
+                        }
+                  });
 
                   // EMPTY PAGE
                   // api.infoLog('CURRENT SETTING VALUE ?', self.updAPISetParams.newSetValue );
@@ -175,7 +183,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 return;
 
                               if ( !self.isHeaderLocation( loc_id ) && !self.isFooterLocation( loc_id ) ) {
-                                    bool = _.contains(currentActiveLocations, loc_id);
+                                    bool = _.contains(currentLocalActiveLocations, loc_id);
                               }
                         });
                         return bool;
@@ -213,19 +221,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           return !_.contains(importedActiveLocations, loc.id);
                                     });
 
-                                    _.each( currentActiveLocations, function( loc_id ){
+                                    _.each( currentLocalActiveLocations, function( loc_id ){
+                                          locModel = self.getLevelModel( loc_id, params.imported_content.data.collection );
+                                          if ( 'no_match' === locModel ) {
+                                                api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => loc_id ' + loc_id );
+                                                return;
+                                          }
+
                                           // skip if the location is a header or a footer
                                           if ( !self.isHeaderLocation( loc_id ) && !self.isFooterLocation( loc_id ) ) {
-                                                newSetValueCollection.push( self.getLevelModel( loc_id, params.imported_content.data.collection ) );
+                                                newSetValueCollection.push( locModel );
                                           }
                                     });
                               } else {
                               // IF IMPORTED LOCATIONS DO NOT EXIST IN CURRENT PAGE => ASSIGN ALL IMPORTED SECTIONS TO LOOP_START OR First Active location on page
                                     // if loop_start exists, use it to inject all imported sections, otherwise inject in the first available location
-                                    if ( _.contains(currentActiveLocations, 'loop_start') ) {
+                                    if ( _.contains(currentLocalActiveLocations, 'loop_start') ) {
                                           targetLocationId = 'loop_start';
                                     } else {
-                                          targetLocationId = currentActiveLocations[0];
+                                          targetLocationId = currentLocalActiveLocations[0];
                                     }
                                     // At this point, we need a target location id
                                     if ( '__not_set__' === targetLocationId ) {
@@ -234,7 +248,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                                     // Get the current target location model
-                                    targetLocationModel = $.extend( true, {}, self.getLevelModel( targetLocationId, newSetValueCollection ) );
+                                    targetLocationModel = self.getLevelModel( targetLocationId, newSetValueCollection );
+                                    if ( 'no_match' === targetLocationModel ) {
+                                          api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => target location id ' + targetLocationId );
+                                          break;
+                                    }
+                                    targetLocationModel = $.extend( true, {}, targetLocationModel );// <= create a deep copy
 
                                     // Replace the target location collection with the imported one
                                     targetLocationModel.collection = _allImportedSections;
@@ -243,14 +262,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     newSetValueCollection = [];
 
                                     // Re-populate the header and footer location previously removed (if any) + the target location id
-                                    _.each( currentActiveLocations, function( loc_id ){
+                                    _.each( currentLocalActiveLocations, function( loc_id ) {
                                           if ( targetLocationId === loc_id ) {
                                                 newSetValueCollection.push( targetLocationModel );
                                           }
-
+                                          locModel = self.getLevelModel( loc_id, currentSettingCollection );
+                                          if ( 'no_match' === locModel ) {
+                                                api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => location id ' + loc_id +' not found in current setting collection');
+                                                return;
+                                          }
                                           // re-add header and footer if any
                                           if ( self.isHeaderLocation( loc_id ) || self.isFooterLocation( loc_id ) ) {
-                                                newSetValueCollection.push( self.getLevelModel( loc_id, currentSettingCollection ) );
+                                                newSetValueCollection.push( locModel );
                                           }
                                     });
                               }
@@ -264,14 +287,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // For the before case, we are sure that hasCurrentPageNBSectionsNotHeaderFooter() is true
                               // so there's at least one location that has section(s)
                               // Find the first non header/footer location not empty
-                              _.each( currentActiveLocations, function( loc_id ){
+                              _.each( currentLocalActiveLocations, function( loc_id ){
                                     // stop if the location id has been found
                                     if ( '__not_set__' != targetLocationId )
                                       return;
+
+                                    locModel = self.getLevelModel( loc_id, newSetValueCollection );
+                                    if ( 'no_match' === locModel ) {
+                                          api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => location id not found' + loc_id );
+                                          return;
+                                    }
                                     if ( !self.isHeaderLocation( loc_id ) && !self.isFooterLocation( loc_id ) ) {
-                                          locModel = self.getLevelModel( loc_id, newSetValueCollection );
                                           if ( !_.isEmpty( locModel.collection ) ) {
-                                              targetLocationId = loc_id;
+                                                targetLocationId = loc_id;
+                                                targetLocationModel = locModel;
                                           }
                                     }
                               });
@@ -283,7 +312,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
 
                               // Get the current target location model
-                              targetLocationModel = $.extend( true, {}, self.getLevelModel( targetLocationId, newSetValueCollection ) );
+                              targetLocationModel = $.extend( true, {}, targetLocationModel );
 
                               // Adds the imported sections BEFORE the existing sections of the target location
                               targetLocationModel.collection = _.union( _allImportedSections, targetLocationModel.collection );
@@ -292,10 +321,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               newSetValueCollection = [];
 
                               // Re-populate the location models previously removed the updated target location model
-                              _.each( currentActiveLocations, function( loc_id ){
+                              _.each( currentLocalActiveLocations, function( loc_id ){
                                     if ( targetLocationId === loc_id ) {
                                           newSetValueCollection.push( targetLocationModel );
                                     } else {
+                                          if ( 'no_match' === locModel ) {
+                                                api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => location id not found' + loc_id );
+                                                return;
+                                          }
                                           newSetValueCollection.push( self.getLevelModel( loc_id, currentSettingCollection ) );
                                     }
                               });
@@ -308,14 +341,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // For the after case, we are sure that hasCurrentPageNBSectionsNotHeaderFooter() is true
                               // so there's at least one location that has section(s)
                               // Find the last non header/footer location not empty
-                              _.each( currentActiveLocations.reverse(), function( loc_id ){
+                              _.each( currentLocalActiveLocations.reverse(), function( loc_id ){
                                     // stop if the location id has been found
                                     if ( '__not_set__' != targetLocationId )
                                       return;
+
+                                    locModel = self.getLevelModel( loc_id, newSetValueCollection );
+                                    if ( 'no_match' === locModel ) {
+                                          api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => location id not found' + loc_id );
+                                          return;
+                                    }
                                     if ( !self.isHeaderLocation( loc_id ) && !self.isFooterLocation( loc_id ) ) {
-                                          locModel = self.getLevelModel( loc_id, newSetValueCollection );
                                           if ( !_.isEmpty( locModel.collection ) ) {
-                                              targetLocationId = loc_id;
+                                                targetLocationId = loc_id;
+                                                targetLocationModel = locModel;
                                           }
                                     }
                               });
@@ -327,7 +366,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
 
                               // Get the current target location model
-                              targetLocationModel = $.extend( true, {}, self.getLevelModel( targetLocationId, newSetValueCollection ) );
+                              targetLocationModel = $.extend( true, {}, targetLocationModel );
 
                               // Adds the imported sections AFTER the existing sections of the target location
                               targetLocationModel.collection = _.union( targetLocationModel.collection, _allImportedSections );
@@ -336,11 +375,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               newSetValueCollection = [];
 
                               // Re-populate the location models previously removed the updated target location model
-                              _.each( currentActiveLocations, function( loc_id ){
+                              _.each( currentLocalActiveLocations, function( loc_id ){
                                     if ( targetLocationId === loc_id ) {
                                           newSetValueCollection.push( targetLocationModel );
                                     } else {
-                                          newSetValueCollection.push( self.getLevelModel( loc_id, currentSettingCollection ) );
+                                          locModel = self.getLevelModel( loc_id, currentSettingCollection );
+                                          if ( 'no_match' === locModel ) {
+                                                api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => loc id not found' + loc_id );
+                                                return;
+                                          }
+                                          newSetValueCollection.push( locModel );
                                     }
                               });
                         break;
@@ -349,8 +393,48 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // update the API setting
                   // this is a candiate setting value, the new setting value will be validated in ::updateAPISetting => ::validateSettingValue()
                   self.updAPISetParams.newSetValue.collection = newSetValueCollection;
+
+                  // LOCAL OPTIONS and FONTS
+                  // Important :
+                  // - Local options is structured as an object : { local_header_footer: {…}, widths: {…}} }. But when not populated, it can be an array []. So make sure the type if set as object before merging it with current page local options
+                  // - Fonts is a collection described with an array
+                  var importedLocalOptions = params.imported_content.data.local_options;
+                  importedLocalOptions = $.extend( true, {}, _.isObject( importedLocalOptions ) ? importedLocalOptions : {} );
+                  importedFonts = _.isArray( params.imported_content.data.fonts ) ? $.extend( true, [], params.imported_content.data.fonts ) : [];
+
+                  // LOCAL OPTIONS
+                  // local_options states if the imported template uses nimble_template, or use custom_width, custom_css, performance, etc.. see the full list of local options in ::generateUIforLocalSkopeOptions
+                  // Design decision : by default NB extends existing local options with the imported ones.
+                  // import mode :
+                  // 'replace' (default) => local options extended
+                  // insert 'before' or 'after' => existing local options are preserved
                   //
-                  api.infoLog('SETTING VALUE AFTER ?', self.updAPISetParams.newSetValue );
+                  // Scenario :
+                  // 1) user has created NB sections on a single post and wants to insert a NB template before the existing sections ( 'before' import_mode )
+                  // => in this case, we need to keep the default theme template, local options must be the existing ones => no extension of local options.
+                  //
+                  // 2) the current page has no NB sections yet, import mode is 'replace' by default
+                  // => it means that if the imported template uses NB template as canvas, it must be set in local options => extension of local options
+                  if ( !_.isEmpty( importedLocalOptions ) && 'replace' === params.tmpl_import_mode ) {
+                        var currentLocalOptions = self.updAPISetParams.newSetValue.local_options;
+                        currentLocalOptions = $.extend( true, {}, _.isObject( currentLocalOptions ) ? currentLocalOptions : {} );
+                        self.updAPISetParams.newSetValue.local_options = _.extend( currentLocalOptions, importedLocalOptions );
+                  }
+
+                  // FONTS
+                  // If there are imported fonts, we need to merge when import mode is not 'replace', otherwise we need to copy the imported font collection in .fonts property of the API setting.
+                  if ( _.isArray( importedFonts ) && !_.isEmpty( importedFonts ) ) {
+                        if ( 'replace' != params.tmpl_import_mode ) {
+                              var currentFonts = self.updAPISetParams.newSetValue.fonts;
+                              currentFonts = $.extend( true, [], _.isArray( currentFonts ) ? currentFonts : [] );
+                              // merge two collection of fonts without duplicates
+                              self.updAPISetParams.newSetValue.fonts = _.uniq( _.union( importedFonts, currentFonts ));
+                        } else {
+                              self.updAPISetParams.newSetValue.fonts = importedFonts;
+                        }
+                  }
+
+                  //api.infoLog('SETTING VALUE AFTER ?', self.updAPISetParams.newSetValue );
             }//_updAPISet_sek_import_tmpl_from_gallery
 
       });//$.extend()
