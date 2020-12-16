@@ -102,7 +102,7 @@ function sek_emit_js_event( $event = '', $echo = true ) {
       return;
     $emitted[] = $event;
     Nimble_Manager()->emitted_js_event = $emitted;
-    $html = sprintf('<script>if(window.nb_){nb_.emit("%1$s");}</script>', $event );
+    $html = sprintf('<script>(function(){if(window.nb_){nb_.emit("%1$s");}})();</script>', $event );
     if ( $echo ) {
         echo $html;
     } else {
