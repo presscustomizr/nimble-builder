@@ -324,6 +324,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.previewer.bind('sek-active-locations-in-preview', function( activelocs ){
                         self.activeLocations( ( _.isObject(activelocs) && _.isArray( activelocs.active_locations ) ) ? activelocs.active_locations : [] );
                         self.activeLocationsInfo( ( _.isObject(activelocs) && _.isArray( activelocs.active_locs_info ) ) ? activelocs.active_locs_info : [] );
+                        // December 2020 => refresh local setting when an active location is available locally but not present in the local setting
+                        // Fixes the problem of importing template from the gallery, with locations different than the current local page
+                        if ( !_.isEmpty( api.dirtyValues() ) ) {
+                              try{ self.updateAPISetting({ action : 'sek-maybe-add-missing-locations'}); } catch(er) {
+                                    api.errare( '::initialize => error with sek-maybe-add-missing-locations', er );
+                              }
+                        }
                   });
 
 

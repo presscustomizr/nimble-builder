@@ -47,6 +47,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         switch( params.action ) {
                               //-------------------------------------------------------------------------------------------------
+                              //-- LOCATION
+                              //-------------------------------------------------------------------------------------------------
+                              // December 2020 => this action is triggered in ::initialize self.activeLocations.bind()
+                              // when injecting template from the gallery it may happen that the collection of location in the local setting value is not synchronized anymore with the actual active locations on the page
+                              case 'sek-maybe-add-missing-locations' :
+                                    var activeLocations = self.activeLocations(),
+                                        settingLocations = [],
+                                        locInSetting,
+                                        missingLoc,
+                                        newSettingCollection = [],
+                                        currentSettingCollection = $.extend( true, [], self.updAPISetParams.newSetValue.collection );
+
+                                        //console.log('SOO current Setting Collection', currentSettingCollection, activeLocations );
+
+                                        _.each( self.activeLocations(), function( _loc_id ) {
+                                              locInSetting = _.findWhere( self.updAPISetParams.newSetValue.collection, { id : _loc_id } );
+                                              if ( _.isUndefined( locInSetting ) ) {
+                                                    missingLoc = $.extend( true, {}, sektionsLocalizedData.defaultLocationModel );
+                                                    missingLoc.id = _loc_id;
+                                                    api.infoLog('=> adding missing location to api setting value', missingLoc );
+                                                    self.updAPISetParams.newSetValue.collection.push(missingLoc);
+                                              }
+                                        });
+                              break;
+
+                              //-------------------------------------------------------------------------------------------------
                               //-- SEKTION
                               //-------------------------------------------------------------------------------------------------
                               case 'sek-add-section' :
