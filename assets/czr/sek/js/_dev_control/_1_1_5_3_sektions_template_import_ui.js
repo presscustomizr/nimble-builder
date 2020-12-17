@@ -104,7 +104,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //  metas : {
                   //    skope_id :
                   //    version :
-                  //    active_location :
+                  //    tmpl_locations :
                   //    date :
                   //    theme :
                   //  }
