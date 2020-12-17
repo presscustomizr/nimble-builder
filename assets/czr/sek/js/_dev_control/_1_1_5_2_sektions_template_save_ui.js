@@ -322,7 +322,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         tmpl_description: tmpl_description,
                         tmpl_post_name: tmplPostNameCandidateForUpdate || '',// <= provided when updating a template
                         skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
-                        tmpl_locations : self.getActiveLocationsForTmpl( currentLocalSettingValue )
+                        tmpl_locations : self.getActiveLocationsForTmpl( currentLocalSettingValue ),
+                        tmpl_header_location : self.getHeaderOrFooterLocationIdForTmpl( 'header', currentLocalSettingValue ),
+                        tmpl_footer_location : self.getHeaderOrFooterLocationIdForTmpl( 'footer', currentLocalSettingValue )
                   })
                   .done( function( response ) {
                         //console.log('SAVED POST ID', response );
@@ -370,6 +372,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
                   return _tmpl_locations;
+            },
+
+            getHeaderOrFooterLocationIdForTmpl : function( headerOrFooter, tmpl_data) {
+                  var self = this;
+                  if ( !_.isObject( tmpl_data ) ) {
+                      throw new Error('preProcess Tmpl => error : tmpl_data must be an object');
+                  }
+                  var _loc = '';
+                  _.each( tmpl_data.collection, function( _loc_params ) {
+                        if ( !_.isObject( _loc_params ) || !_loc_params.id || !_loc_params.level )
+                          return;
+                        if ( ( 'header' === headerOrFooter && self.isHeaderLocation( _loc_params.id ) ) || ( 'footer' === headerOrFooter && self.isFooterLocation( _loc_params.id ) ) ) {
+                              _loc = _loc_params.id;
+                        }
+                  });
+                  return _loc;
             },
 
             // @return a tmpl model

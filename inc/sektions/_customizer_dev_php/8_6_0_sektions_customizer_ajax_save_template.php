@@ -115,6 +115,8 @@ function sek_ajax_save_user_template() {
             'version' => NIMBLE_VERSION,
             // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
             'tmpl_locations' => is_array( $_POST['tmpl_locations'] ) ? $_POST['tmpl_locations'] : array(),
+            'tmpl_header_location' => isset( $_POST['tmpl_header_location'] ) ? $_POST['tmpl_header_location'] : '',
+            'tmpl_footer_location' => isset( $_POST['tmpl_footer_location'] ) ? $_POST['tmpl_footer_location'] : '',
             'date' => date("Y-m-d"),
             'theme' => sanitize_title_with_dashes( get_stylesheet() )
         )
