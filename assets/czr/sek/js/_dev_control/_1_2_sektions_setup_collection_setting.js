@@ -195,6 +195,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       } else {
                             // we have a level.
                             // - make sure we have at least the following properties : id, level
+                            // LEVEL should be an object
+                            if ( _.isUndefined( level ) || !_.isObject( level ) ) {
+                                  _errorDetected_('validation error => a level is invalid' );
+                                  return;
+                            }
 
                             // ID
                             if ( _.isEmpty( level.id ) || ! _.isString( level.id )) {
