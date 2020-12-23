@@ -559,6 +559,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   .done( function( tmpl_collection ) {
                         if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
                               self.templateCollectionPromise.resolve( tmpl_collection );
+                              console.log('GET SAVED TMPL COLLECTION', tmpl_collection );
                         } else {
                               self.templateCollectionPromise.resolve( {} );
                               api.errare('control::getSavedTmplCollection => error => tmpl collection is invalid', tmpl_collection);

@@ -209,7 +209,10 @@ function sek_enqueue_controls_js_css() {
                 // ),
                 'alreadyUsedFonts' => get_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS ),
                 'isTemplateGalleryEnabled' => defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) && NIMBLE_TEMPLATE_GALLERY_ENABLED, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/651
-                'isTemplateSaveEnabled' => defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) && NIMBLE_TEMPLATE_SAVE_ENABLED //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/655
+                'isTemplateSaveEnabled' => defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) && NIMBLE_TEMPLATE_SAVE_ENABLED, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/655
+
+                // Dec 2020
+                'templateAPIUrl' => defined('API_TEMPLATE_CPT') ? 'http://customizr-dev.test/wp-json/nimble/v2/cravan' : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
             )
         )
     );//wp_localize_script()

@@ -123,6 +123,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 from: 'user',
                                 tmpl_import_mode: tmpl_import_mode
                           });
+                          // api.czr_sektions.get_gallery_tmpl_json_and_import({
+                          //       template_name : 'test_one',
+                          //       from: 'nimble_api',
+                          //       tmpl_import_mode: tmpl_import_mode
+                          // });
                           self.templateGalleryExpanded(false);
                     })
                     // SEARCH ACTIONS

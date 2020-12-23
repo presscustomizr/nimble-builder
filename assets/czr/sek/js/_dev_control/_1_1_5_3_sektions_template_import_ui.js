@@ -37,36 +37,44 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @return promise
             getTmplJsonFromApi : function( template_name ) {
                   var self, _dfd_ = $.Deferred();
-                  $.getJSON( 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan' )
-                            .done( function( resp ) {
-                                  if ( !_.isObject( resp ) || !resp.lib || !resp.lib.templates ) {
-                                        api.errare( '::get_gallery_tmpl_json_and_import success but invalid response => ', resp  );
-                                        _dfd_.resolve({success:false});
-                                  }
-                                  var _json_data = resp.lib.templates[template_name];
-                                  if ( !_json_data ) {
-                                        api.errare( '::get_gallery_tmpl_json_and_import => the requested template is not available', resp.lib.templates  );
-                                        api.previewer.trigger('sek-notify', {
-                                              notif_id : 'missing-tmpl',
-                                              type : 'info',
-                                              duration : 10000,
-                                              message : [
-                                                    '<span style="color:#0075a2">',
-                                                      '<strong>',
-                                                      '@missi18n the requested template is not available',
-                                                      '</strong>',
-                                                    '</span>'
-                                              ].join('')
-                                        });
-                                        _dfd_.resolve({success:false});
-                                  }
-                                  _dfd_.resolve( {success:true, tmpl_json:_json_data } );
+                  if ( self.apiTmplGalleryJson ) {
+                        api.infoLog( 'cached api tmpl gallery json', self.apiTmplGalleryJson );
+                        _dfd_.resolve( {success : true, tmpl_json : self.apiTmplGalleryJson } );
+                  } else {
+                        $.getJSON( sektionsLocalizedData.templateAPIUrl )
+                                  .done( function( resp ) {
+                                        if ( !_.isObject( resp ) || !resp.lib || !resp.lib.templates ) {
+                                              api.errare( '::get_gallery_tmpl_json_and_import success but invalid response => ', resp  );
+                                              _dfd_.resolve({success:false});
+                                              return;
+                                        }
+                                        var _json_data = resp.lib.templates[template_name];
+                                        if ( !_json_data ) {
+                                              api.errare( '::get_gallery_tmpl_json_and_import => the requested template is not available', resp.lib.templates  );
+                                              api.previewer.trigger('sek-notify', {
+                                                    notif_id : 'missing-tmpl',
+                                                    type : 'info',
+                                                    duration : 10000,
+                                                    message : [
+                                                          '<span style="color:#0075a2">',
+                                                            '<strong>',
+                                                            '@missi18n the requested template is not available',
+                                                            '</strong>',
+                                                          '</span>'
+                                                    ].join('')
+                                              });
+                                              _dfd_.resolve({success:false});
+                                              return;
+                                        }
+                                        self.apiTmplGalleryJson = _json_data;
+                                        _dfd_.resolve( {success:true, tmpl_json:self.apiTmplGalleryJson } );
 
-                            })
-                            .fail(function( er ) {
-                                  api.errare( '::get_gallery_tmpl_json_and_import failed => ', er  );
-                                  _dfd_.resolve({success:false});
-                            });
+                                  })
+                                  .fail(function( er ) {
+                                        api.errare( '::get_gallery_tmpl_json_and_import failed => ', er  );
+                                        _dfd_.resolve({success:false});
+                                  });
+                    }
 
                     return _dfd_.promise();
             },
