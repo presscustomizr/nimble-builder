@@ -240,6 +240,7 @@
                   };
 
                   init_settings.wpautop = isAutoPEnabled();
+
                   // forced_root_block is added to remove <p> tags automatically added
                   // @see https://stackoverflow.com/questions/20464028/how-to-remove-unwanted-p-tags-from-wordpress-editor-using-tinymce
                   if ( !isAutoPEnabled() ) {
@@ -249,6 +250,7 @@
                   // TOOLBARS
                   init_settings.toolbar1 = sektionsLocalizedData.defaultToolbarBtns;
                   init_settings.toolbar2 = "";
+
 
                   window.tinymce.init( init_settings );
                   window.QTags.getInstance( _id );
@@ -270,7 +272,11 @@
                         // To ensure retro-compat with content created prior to Nimble v1.5.2, in which the editor has been updated
                         // @see https://github.com/presscustomizr/nimble-builder/issues/404
                         // we add the <p> tag on init, if autop option is checked
-                        var initial_content = ( !isAutoPEnabled() || ! _.isFunction( wp.editor.autop ) ) ? input() : wp.editor.autop( input() );
+                        // December 2020 : when running wp.editor.autop( input()  , line break not preserved when re-opening a text module UI,
+                        // see https://github.com/presscustomizr/nimble-builder/issues/769
+                        // var initial_content = ( !isAutoPEnabled() || ! _.isFunction( wp.editor.autop ) ) ? input() : wp.editor.autop( input() );
+                        // console.log('INITIAL CONTENT', input(), wp.editor.autop( input() ) );
+                        var initial_content = input();
                         _editor.setContent( initial_content );
                         api.sekEditorExpanded( true );
                         // trigger a resize to adjust height on init https://github.com/presscustomizr/nimble-builder/issues/409
