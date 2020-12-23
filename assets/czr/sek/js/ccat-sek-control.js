@@ -551,6 +551,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.previewer.bind('sek-active-locations-in-preview', function( activelocs ){
                         self.activeLocations( ( _.isObject(activelocs) && _.isArray( activelocs.active_locations ) ) ? activelocs.active_locations : [] );
                         self.activeLocationsInfo( ( _.isObject(activelocs) && _.isArray( activelocs.active_locs_info ) ) ? activelocs.active_locs_info : [] );
+                        // December 2020 => refresh local setting when an active location is available locally but not present in the local setting
+                        // Fixes the problem of importing template from the gallery, with locations different than the current local page
+                        if ( !_.isEmpty( api.dirtyValues() ) ) {
+                              try{ self.updateAPISetting({ action : 'sek-maybe-add-missing-locations'}); } catch(er) {
+                                    api.errare( '::initialize => error with sek-maybe-add-missing-locations', er );
+                              }
+                        }
                   });
 
 
@@ -2648,7 +2655,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         tmpl_description: tmpl_description,
                         tmpl_post_name: tmplPostNameCandidateForUpdate || '',// <= provided when updating a template
                         skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
-                        tmpl_locations : self.getActiveLocationsForTmpl( currentLocalSettingValue )
+                        tmpl_locations : self.getActiveLocationsForTmpl( currentLocalSettingValue ),
+                        tmpl_header_location : self.getHeaderOrFooterLocationIdForTmpl( 'header', currentLocalSettingValue ),
+                        tmpl_footer_location : self.getHeaderOrFooterLocationIdForTmpl( 'footer', currentLocalSettingValue )
                   })
                   .done( function( response ) {
                         //console.log('SAVED POST ID', response );
@@ -2696,6 +2705,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
                   return _tmpl_locations;
+            },
+
+            getHeaderOrFooterLocationIdForTmpl : function( headerOrFooter, tmpl_data) {
+                  var self = this;
+                  if ( !_.isObject( tmpl_data ) ) {
+                      throw new Error('preProcess Tmpl => error : tmpl_data must be an object');
+                  }
+                  var _loc = '';
+                  _.each( tmpl_data.collection, function( _loc_params ) {
+                        if ( !_.isObject( _loc_params ) || !_loc_params.id || !_loc_params.level )
+                          return;
+                        if ( ( 'header' === headerOrFooter && self.isHeaderLocation( _loc_params.id ) ) || ( 'footer' === headerOrFooter && self.isFooterLocation( _loc_params.id ) ) ) {
+                              _loc = _loc_params.id;
+                        }
+                  });
+                  return _loc;
             },
 
             // @return a tmpl model
@@ -2867,6 +2892,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   .done( function( tmpl_collection ) {
                         if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
                               self.templateCollectionPromise.resolve( tmpl_collection );
+                              console.log('GET SAVED TMPL COLLECTION', tmpl_collection );
                         } else {
                               self.templateCollectionPromise.resolve( {} );
                               api.errare('control::getSavedTmplCollection => error => tmpl collection is invalid', tmpl_collection);
@@ -2900,6 +2926,340 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   return self.templateCollectionPromise;
             }
+      });//$.extend()
+})( wp.customize, jQuery );
+//global sektionsLocalizedData
+// introduced in december 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
+var CZRSeksPrototype = CZRSeksPrototype || {};
+(function ( api, $ ) {
+      $.extend( CZRSeksPrototype, {
+            ////////////////////////////////////////////////////////
+            // IMPORT TEMPLATE FROM GALLERY => FROM USER SAVED COLLECTION OR REMOTE API
+            ////////////////////////////////////////////////////////
+            // @return promise
+            getTmplJsonFromUserTmpl : function( template_name ) {
+                  var self = this, _dfd_ = $.Deferred();
+                  wp.ajax.post( 'sek_get_user_tmpl_json', {
+                        nonce: api.settings.nonce.save,
+                        tmpl_post_name: template_name
+                        //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                  })
+                  .done( function( response ) {
+                        _dfd_.resolve( {success:true, tmpl_json:response });
+                  })
+                  .fail( function( er ) {
+                        _dfd_.resolve( {success:false});
+                        api.errorLog( 'ajax getTmplJsonFromUserTmpl => error', er );
+                        api.previewer.trigger('sek-notify', {
+                            type : 'error',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>@missi18n error when fetching the template</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                  });
+
+                  return _dfd_;
+            },
+
+            // @return promise
+            getTmplJsonFromApi : function( template_name ) {
+                  var self, _dfd_ = $.Deferred();
+                  if ( self.apiTmplGalleryJson ) {
+                        api.infoLog( 'cached api tmpl gallery json', self.apiTmplGalleryJson );
+                        _dfd_.resolve( {success : true, tmpl_json : self.apiTmplGalleryJson } );
+                  } else {
+                        $.getJSON( sektionsLocalizedData.templateAPIUrl )
+                                  .done( function( resp ) {
+                                        if ( !_.isObject( resp ) || !resp.lib || !resp.lib.templates ) {
+                                              api.errare( '::get_gallery_tmpl_json_and_import success but invalid response => ', resp  );
+                                              _dfd_.resolve({success:false});
+                                              return;
+                                        }
+                                        var _json_data = resp.lib.templates[template_name];
+                                        if ( !_json_data ) {
+                                              api.errare( '::get_gallery_tmpl_json_and_import => the requested template is not available', resp.lib.templates  );
+                                              api.previewer.trigger('sek-notify', {
+                                                    notif_id : 'missing-tmpl',
+                                                    type : 'info',
+                                                    duration : 10000,
+                                                    message : [
+                                                          '<span style="color:#0075a2">',
+                                                            '<strong>',
+                                                            '@missi18n the requested template is not available',
+                                                            '</strong>',
+                                                          '</span>'
+                                                    ].join('')
+                                              });
+                                              _dfd_.resolve({success:false});
+                                              return;
+                                        }
+                                        self.apiTmplGalleryJson = _json_data;
+                                        _dfd_.resolve( {success:true, tmpl_json:self.apiTmplGalleryJson } );
+
+                                  })
+                                  .fail(function( er ) {
+                                        api.errare( '::get_gallery_tmpl_json_and_import failed => ', er  );
+                                        _dfd_.resolve({success:false});
+                                  });
+                    }
+
+                    return _dfd_.promise();
+            },
+
+
+            // April 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/651
+            // @param params {
+            //    template_name : string,
+            //    from : nimble_api or user,
+            //    tmpl_import_mode : 3 possible import modes : replace, before, after
+            // }
+            get_gallery_tmpl_json_and_import : function( params ) {
+                  var self = this;
+                  params = $.extend( {
+                      template_name : '',
+                      from : 'user',
+                      tmpl_import_mode : 'replace'
+                  }, params || {});
+                  var tmpl_name = params.template_name;
+                  if ( _.isEmpty( tmpl_name ) || ! _.isString( tmpl_name ) ) {
+                        api.errare('::import => error => invalid template name');
+                  }
+                  //console.log('get_gallery_tmpl_json_and_import params ?', params );
+                  var _promise;
+                  if ( 'nimble_api' === params.from ) {
+                        // doc : https://api.jquery.com/jQuery.getJSON/
+                        _promise = self.getTmplJsonFromApi(tmpl_name);
+                  } else {
+                        _promise = self.getTmplJsonFromUserTmpl(tmpl_name);
+                  }
+
+                  // response object structure :
+                  // {
+                  //  data : { nimble content },
+                  //  metas : {
+                  //    skope_id :
+                  //    version :
+                  //    tmpl_locations :
+                  //    date :
+                  //    theme :
+                  //  }
+                  // }
+                  _promise.done( function( response ) {
+                        //console.log('get_gallery_tmpl_json_and_import', params, response );
+                        if ( response.success ) {
+                              //console.log('IMPORT NIMBLE TEMPLATE', response.lib.templates[template_name] );
+                              self.import_tmpl_from_gallery({
+                                    pre_import_check : false,
+                                    template_name : tmpl_name,
+                                    template_data : response.tmpl_json,
+                                    tmpl_import_mode : params.tmpl_import_mode
+                              });
+                        }
+                  });
+            },
+
+            // IMPORT TEMPLATE FROM GALLERY
+            // => REMOTE API COLLECTION + USER COLLECTION
+            // @param params
+            // {
+            //       pre_import_check : false,
+            //       template_name : tmpl_name,
+            //       template_data : response.tmpl_json,
+            //       tmpl_import_mode : 3 possible import modes : replace, before, after
+            // }
+            import_tmpl_from_gallery : function( params ) {
+                  //console.log('import_tmpl_from_gallery', params );
+                  var self = this;
+                  params = params || {};
+                  // normalize params
+                  params = $.extend({
+                      is_file_import : false,
+                      pre_import_check : false,
+                      tmpl_import_mode : 'replace'
+                  }, params );
+
+                  // SETUP FOR MANUAL INPUT
+                  var __request__,
+                      _scope = 'local';//<= when importing a template not manually, scope is always local
+
+
+                  // remote template import case
+                  if ( !params.template_data ) {
+                        throw new Error( '::import_template => missing remote template data' );
+                  }
+                  __request__ = wp.ajax.post( 'sek_process_template_json', {
+                        nonce: api.settings.nonce.save,
+                        template_data : JSON.stringify( params.template_data ),
+                        pre_import_check : false//<= might be used in the future do stuffs. For example when importing manually, this property is used to skip the img sniffing on the first pass.
+                        //sek_export_nonce : api.settings.nonce.save,
+                        //skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
+                        //active_locations : api.czr_sektions.activeLocations()
+                  }).done( function( server_resp ) {
+                        //api.infoLog('TEMPLATE PRE PROCESS DONE', server_resp );
+                  }).fail( function( error_resp ) {
+                        api.previewer.trigger('sek-notify', {
+                              notif_id : 'import-failed',
+                              type : 'error',
+                              duration : 30000,
+                              message : [
+                                    '<span>',
+                                      '<strong>',
+                                      [ sektionsLocalizedData.i18n['Export failed'], encodeURIComponent( error_resp ) ].join(' '),
+                                      '</strong>',
+                                    '</span>'
+                              ].join('')
+                        });
+                  });
+
+
+
+                  /////////////////////////////////////////////
+                  /// NOW THAT WE HAVE OUR PROMISE
+                  /// 1) CHECK IF CONTENT IS WELL FORMED AND ELIGIBLE FOR API
+                  /// 2) LET'S PROCESS THE SETTING ID'S
+                  /// 3) ATTEMPT TO UPDATE THE SETTING API, LOCAL OR GLOBAL. ( always local for template import )
+
+                  // fire a previewer loader removed on .always()
+                  api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
+
+                  // After 30 s display a failure notification
+                  // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
+                  _.delay( function() {
+                        if ( 'pending' !== __request__.state() )
+                          return;
+                        api.previewer.trigger('sek-notify', {
+                              notif_id : 'import-too-long',
+                              type : 'error',
+                              duration : 20000,
+                              message : [
+                                    '<span>',
+                                      '<strong>',
+                                      sektionsLocalizedData.i18n['Import exceeds server response time, try to uncheck "import images" option.'],
+                                      '</strong>',
+                                    '</span>'
+                              ].join('')
+                        });
+                  }, 30000 );
+
+
+                  // At this stage, we are not in a pre-check case
+                  // the ajax request is processed and will upload images if needed
+                  __request__
+                        .done( function( server_resp ) {
+                              // When manually importing a file, the server adds a "success" property
+                              // When loading a template this property is not sent. Let's normalize.
+                              if ( _.isObject(server_resp) ) {
+                                    server_resp = {success:true, data:server_resp};
+                              }
+                              //console.log('SERVER RESP 2 ?', server_resp );
+                              if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
+                                    api.infoLog('::import_template problem => !api.czr_sektions.isImportedContentEligibleForAPI', server_resp, params );
+                                    return;
+                              }
+
+                              //console.log('MANUAL IMPORT DATA', server_resp );
+                              server_resp.data.data.collection = self.setIdsForImportedTmpl( server_resp.data.data.collection );
+                              // and try to update the api setting
+                              api.czr_sektions.doUpdateApiSettingAfter_TmplGalleryImport( server_resp, params );
+                        })
+                        .fail( function( response ) {
+                              api.errare( '::import_template => ajax error', response );
+                              api.previewer.trigger('sek-notify', {
+                                    notif_id : 'import-failed',
+                                    type : 'error',
+                                    duration : 30000,
+                                    message : [
+                                          '<span>',
+                                            '<strong>',
+                                            sektionsLocalizedData.i18n['Import failed, file problem'],
+                                            '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                        });
+            },//import_tmpl_from_gallery
+
+
+            // fired on ajaxrequest done
+            // At this stage, the server_resp data structure has been validated.
+            // We can try to the update the api setting
+            // @param params
+            // {
+            //       pre_import_check : false,
+            //       template_name : tmpl_name,
+            //       template_data : response.tmpl_json,
+            //       tmpl_import_mode : 3 possible import modes : replace, before, after,
+            //       is_file_import : false
+            // }
+            doUpdateApiSettingAfter_TmplGalleryImport : function( server_resp, params ){
+                  //console.log('doUpdateApiSettingAfter_TmplGalleryImport ???', params, server_resp );
+                  params = params || {};
+                  if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_file_import ) {
+                        api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
+                        return;
+                  }
+
+                  var _scope = 'local';// <= always local when template gallery import
+
+                  //api.infoLog('TODO => verify metas => version, active locations, etc ... ');
+
+                  // Update the setting api via the normalized method
+                  // the scope will determine the setting id, local or global
+                  api.czr_sektions.updateAPISetting({
+                        action : 'sek-import-tmpl-from-gallery',
+                        scope : _scope,//'global' or 'local'<= will determine which setting will be updated,
+                        // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
+                        imported_content : server_resp.data,
+                        tmpl_import_mode : params.tmpl_import_mode
+                  }).done( function() {
+                        // Clean an regenerate the local option setting
+                        // Settings are normally registered once and never cleaned, unlike controls.
+                        // After the import, updating the setting value will refresh the sections
+                        // but the local options, persisted in separate settings, won't be updated if the settings are not cleaned
+                        if ( 'local' === _scope ) {
+                              api.czr_sektions.generateUI({
+                                    action : 'sek-generate-local-skope-options-ui',
+                                    clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
+                              });
+                        }
+
+                        //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
+                        api.previewer.refresh();
+                        api.previewer.trigger('sek-notify', {
+                              notif_id : 'import-success',
+                              type : 'success',
+                              duration : 30000,
+                              message : [
+                                    '<span>',
+                                      '<strong>',
+                                      sektionsLocalizedData.i18n['Template successfully imported'],
+                                      '</strong>',
+                                    '</span>'
+                              ].join('')
+                        });
+                  }).fail( function( response ) {
+                        api.errare( '::doUpdateApiSettingAfter_TmplGalleryImport => error when firing ::updateAPISetting', response );
+                        api.previewer.trigger('sek-notify', {
+                              notif_id : 'import-failed',
+                              type : 'error',
+                              duration : 30000,
+                              message : [
+                                    '<span>',
+                                      '<strong>',
+                                      [ sektionsLocalizedData.i18n['Import failed'], response ].join(' : '),
+                                      '</strong>',
+                                    '</span>'
+                              ].join('')
+                        });
+                  });
+
+                  // Refresh the preview, so the markup is refreshed and the css stylesheet are generated
+                  api.previewer.refresh();
+            }//doUpdateApiSettingAfter_TmplGalleryImport()
+
       });//$.extend()
 })( wp.customize, jQuery );
 //global sektionsLocalizedData
@@ -3169,6 +3529,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       } else {
                             // we have a level.
                             // - make sure we have at least the following properties : id, level
+                            // LEVEL should be an object
+                            if ( _.isUndefined( level ) || !_.isObject( level ) ) {
+                                  _errorDetected_('validation error => a level is invalid' );
+                                  return;
+                            }
 
                             // ID
                             if ( _.isEmpty( level.id ) || ! _.isString( level.id )) {
@@ -6216,6 +6581,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         switch( params.action ) {
                               //-------------------------------------------------------------------------------------------------
+                              //-- LOCATION
+                              //-------------------------------------------------------------------------------------------------
+                              // December 2020 => this action is triggered in ::initialize self.activeLocations.bind()
+                              // when injecting template from the gallery it may happen that the collection of location in the local setting value is not synchronized anymore with the actual active locations on the page
+                              case 'sek-maybe-add-missing-locations' :
+                                    var activeLocations = self.activeLocations(),
+                                        settingLocations = [],
+                                        locInSetting,
+                                        missingLoc,
+                                        newSettingCollection = [],
+                                        currentSettingCollection = $.extend( true, [], self.updAPISetParams.newSetValue.collection );
+
+                                        //console.log('SOO current Setting Collection', currentSettingCollection, activeLocations );
+
+                                        _.each( self.activeLocations(), function( _loc_id ) {
+                                              locInSetting = _.findWhere( self.updAPISetParams.newSetValue.collection, { id : _loc_id } );
+                                              if ( _.isUndefined( locInSetting ) ) {
+                                                    missingLoc = $.extend( true, {}, sektionsLocalizedData.defaultLocationModel );
+                                                    missingLoc.id = _loc_id;
+                                                    api.infoLog('=> adding missing location to api setting value', missingLoc );
+                                                    self.updAPISetParams.newSetValue.collection.push(missingLoc);
+                                              }
+                                        });
+                              break;
+
+                              //-------------------------------------------------------------------------------------------------
                               //-- SEKTION
                               //-------------------------------------------------------------------------------------------------
                               case 'sek-add-section' :
@@ -7989,7 +8380,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   var importedCollection = _.isArray( params.imported_content.data.collection ) ? $.extend( true, [], params.imported_content.data.collection ) : [];
 
-                  // SHALL WE ASSIGN SECTIONS FROM MISSING LOCATIONS TO THE FIRST ACTIVE LOCATION ?
+                  // ASSIGN MISSING LOCATIONS => IF IMPORTED LOCATIONS DON'T MATCH CURRENT PAGE LOCATIONS
+                  // NB will import sections in the first active location of the page
+                  // Important : header and footer must be excluded from active locations
+                  //
                   // For example the current page has only the 'loop_start' location, whereas the imported content includes 3 locations :
                   // - after_header
                   // - loop_start
@@ -8004,7 +8398,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // 3) updated the imported collection with this
                   if ( true === params.assign_missing_locations ) {
                         var importedActiveLocations = params.imported_content.metas.active_locations,
-                            currentActiveLocations = api.czr_sektions.activeLocations();
+                            allActiveLocations = api.czr_sektions.activeLocations(),
+                            currentActiveLocations;
+
+                        // Set the current active locations excluding header and footer location
+                        _.each( allActiveLocations, function( loc_id ) {
+                              if( !self.isHeaderLocation( loc_id ) && !self.isFooterLocation( loc_id ) ) {
+                                    currentActiveLocations.push(loc_id);
+                              }
+                        });
 
                         // console.log('Current set value ?', api( _collectionSettingId_ )() );
                         // console.log('import params', params );
@@ -8073,10 +8475,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       });
 
                       // merge fonts if needed
-                      if ( self.updAPISetParams.newSetValue.fonts && !_.isEmpty( self.updAPISetParams.newSetValue.fonts ) && _.isArray( self.updAPISetParams.newSetValue.fonts ) ) {
-                            params.imported_content.data.fonts = _.isArray( params.imported_content.data.fonts ) ? params.imported_content.data.fonts : [];
+                      var currentFonts = self.updAPISetParams.newSetValue.fonts,
+                          importedFonts = params.imported_content.data.fonts;
+
+                      if ( currentFonts && !_.isEmpty( currentFonts ) && _.isArray( currentFonts ) ) {
+                            importedFonts = _.isArray( importedFonts ) ? importedFonts : [];
                             // merge and remove duplicated fonts
-                            params.imported_content.data.fonts =  _.uniq( _.union( self.updAPISetParams.newSetValue.fonts, params.imported_content.data.fonts ) );
+                            params.imported_content.data.fonts =  _.uniq( _.union( currentFonts, importedFonts ) );
                       }
                   }// if true === params.merge
 
@@ -8097,6 +8502,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //-------------------------------------------------------------------------------------------------
             //-- IMPORT FROM TMPL GALLERY
             //-------------------------------------------------------------------------------------------------
+            // self.updAPISetParams.params : {
+            //    action: "sek-import-tmpl-from-gallery"
+            //    assign_missing_locations: undefined
+            //    cloneId: ""
+            //    imported_content: {data: {…}, metas: {…}, img_errors: Array(0)}
+            //    is_global_location: false
+            //    scope: "local"
+            //    tmpl_import_mode: "replace"
+            // }
             _updAPISet_sek_import_tmpl_from_gallery : function() {
                   var self = this,
                       params;
@@ -8105,122 +8519,372 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   api.infoLog( 'sek-import-tmpl-from-gallery', params );
 
+                  // DO WE HAVE PROPER CONTENT DO IMPORT ?
                   if ( _.isUndefined( params.imported_content.data ) || _.isUndefined( params.imported_content.metas ) ) {
                         api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => invalid imported content', imported_content );
                         return;
                   }
 
-                  var importedCollection = _.isArray( params.imported_content.data.collection ) ? $.extend( true, [], params.imported_content.data.collection ) : [],
-                      importedActiveLocations = params.imported_content.metas.tmpl_locations,
-                      currentActiveLocations = api.czr_sektions.activeLocations();
+                  //-------------------------------------------------------------------------------------------------
+                  //-- HELPERS
+                  //-------------------------------------------------------------------------------------------------
+                  var _allTmplLocationsExistLocally = function() {
+                        var bool = true;
+                        _.each( tmplLocations, function( loc_id ){
+                              if (!bool)
+                                return;
+                              bool = _.contains(localLocations, loc_id);
+                        });
+                        return bool;
+                  };
 
-                  // PAGE HAS NO SECTIONS
-                  // TMPL LOCATIONS === PAGE LOCATIONS
-                  // => import as is.
-                  self.updAPISetParams.newSetValue = params.imported_content.data;
+                  // @return bool
+                  var _isTmplHeaderLocId = function( loc_id ) {
+                        return params.imported_content && params.imported_content.metas && loc_id === params.imported_content.metas.tmpl_header_location;
+                  };
+
+                  // @return bool
+                  var _isTmplFooterLocId = function( loc_id ) {
+                        return params.imported_content && params.imported_content.metas && loc_id === params.imported_content.metas.tmpl_footer_location;
+                  };
+
+                  // The template has a header/footer if we find the header or the footer location
+                  // AND
+                  // if there's a local_header_footer property set in the local_options
+                  var _hasTmplHeaderFooter = function() {
+                        var hasHeaderFooterLoc = false;
+                        _.each( tmplLocations, function( loc_id ){
+                              if (hasHeaderFooterLoc)
+                                return;
+
+                              if ( _isTmplHeaderLocId( loc_id ) || _isTmplFooterLocId( loc_id ) ) {
+                                    hasHeaderFooterLoc = self.getLevelModel( loc_id, tmplCollection );
+                                    hasHeaderFooterLoc = 'no_match' != hasHeaderFooterLoc;
+                              }
+                        });
+                        return hasHeaderFooterLoc && !_.isEmpty( tmplLocalOptions.local_header_footer );
+                  };
+
+                  var _tmplUsesNBtemplate = function() {
+                        return tmplLocalOptions && tmplLocalOptions.template && 'nimble_template' === tmplLocalOptions.template.local_template;
+                  };
+
+                  var tmplCollection = _.isArray( params.imported_content.data.collection ) ? $.extend( true, [], params.imported_content.data.collection ) : [],
+                      tmplLocations = params.imported_content.metas.tmpl_locations,
+                      localLocations = [],
+                      currentSettingCollection = self.updAPISetParams.newSetValue.collection;
 
 
-                  // SHALL WE ASSIGN SECTIONS FROM MISSING LOCATIONS TO THE FIRST ACTIVE LOCATION ?
-                  // For example the current page has only the 'loop_start' location, whereas the imported content includes 3 locations :
-                  // - after_header
-                  // - loop_start
-                  // - before_footer
-                  // Among those 3 locations, 2 are not active in the page.
-                  // We will merge all section collections from the 3 imported locations one new collection, that will be assigned to 'loop_start'
-                  // Note that the active imported locations are ordered like they were on the page when exported.
-                  //
-                  // So :
-                  // 1) identify the first active location of the page
-                  // 2) populate a new collection of combined sections from all active imported locations.
-                  // 3) updated the imported collection with this
-                  if ( true === params.assign_missing_locations ) {
+                  // Set the current local locations, make sure we exclude all global locations
+                  _.each( api.czr_sektions.activeLocations(), function( loc_id ) {
+                        if( !self.isGlobalLocationId(loc_id) ) {
+                              localLocations.push(loc_id);
+                        }
+                  });
+
+                  // Imported Active Locations has to be an array not empty
+                  if ( !_.isArray(tmplLocations) || _.isEmpty(tmplLocations) ) {
+                        api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => invalid imported template locations', params );
+                        return;
+                  }
+
+                  // TEMPLATE LOCAL OPTIONS and FONTS
+                  // Important :
+                  // - Local options is structured as an object : { local_header_footer: {…}, widths: {…}} }. But when not populated, it can be an array []. So make sure the type if set as object before merging it with current page local options
+                  // - Fonts is a collection described with an array
+                  var tmplLocalOptions = params.imported_content.data.local_options;
+                  tmplLocalOptions = $.extend( true, {}, _.isObject( tmplLocalOptions ) ? tmplLocalOptions : {} );
+                  var tmplFonts = params.imported_content.data.fonts;
+                  tmplFonts = _.isArray( tmplFonts ) ? $.extend( true, [], tmplFonts ) : [];
+
+                  // Define variables uses for all cases
+                  var newSetValueCollection = $.extend( true, [], currentSettingCollection ),// Create a deep copy of the current API collection
+                      _allContentSectionsInTmpl = [],
+                      targetLocationId = '__not_set__',
+                      locModel,
+                      targetLocationModel,
+                      tmplLocCandidate, localLocCandidate;
+
+                  // Gather all template content sections from potentially multiple locations in one collection
+                  // => header and footer locations are excluded from this collection
+                  // This collection is used :
+                  // - in 'replace' mode when template locations don't exists in the local context
+                  // - in 'before' and 'after' mode
+                  // Note : if this collection is used the template header and footer ( if any ) have to be added separately
+                  _.each( tmplCollection, function( loc_data ){
+                        if ( _isTmplHeaderLocId( loc_data.id ) || _isTmplFooterLocId( loc_data.id ) )
+                          return;
+                        if( !_.isEmpty( loc_data.collection ) ) {
+                              _allContentSectionsInTmpl = _.union( _allContentSectionsInTmpl, loc_data.collection );
+                        }
+                  });
 
 
-                        console.log('SO COLLECTION BEFORE ?', params.imported_content.data.collection );
 
-                        // console.log('Current set value ?', api( _collectionSettingId_ )() );
-                        // console.log('import params', params );
-                        console.log('currentActiveLocations?', currentActiveLocations );
-                        console.log('importedCollection?', importedCollection );
-                        console.log('importedActiveLocations?', importedActiveLocations );
+                  // console.log('_hasTmplHeaderFooter ?', _hasTmplHeaderFooter() );
 
-                        // first active location of the current setting
-                        var firstCurrentActiveLocationId = _.first( currentActiveLocations );
+                  // console.log('_allContentSectionsInTmpl ?',  _allContentSectionsInTmpl);
+                  // console.log('NEW SET VALUE COLLECTION? ', $.extend( true, [], newSetValueCollection ) );
+                  // If the current page already has NB sections, the user can chose 3 options : REPLACE, BEFORE, AFTER.
+                  // when the page has no NB sections, the default option is REPLACE
+                  switch( params.tmpl_import_mode ) {
+                        //-------------------------------------------------------------------------------------------------
+                        //-- REPLACE CASE ( default case )
+                        //-------------------------------------------------------------------------------------------------
+                        case 'replace' :
+                              // api.infoLog('CURRENT SETTING VALUE ?', self.updAPISetParams.newSetValue );
+                              // console.log('SO COLLECTION BEFORE ?', tmplCollection );
+                              // return bool
 
-                        if ( !_.isEmpty( firstCurrentActiveLocationId ) && !_.isEmpty( importedActiveLocations ) && _.isArray( importedActiveLocations ) ) {
-                              // importedActiveLocationsNotAvailableInCurrentActiveLocations
-                              // Example :
-                              // active location in the page : loop_start, loop_end
-                              // active locations imported : after_header, loop_start, before_footer
-                              // importedActiveLocationsNotAvailableInCurrentActiveLocations => after_header, before_footer
-                              var importedActiveLocationsNotAvailableInCurrentActiveLocations = $(importedActiveLocations).not(currentActiveLocations).get(),
-                                  firstCurrentLocationData = self.getLevelModel( firstCurrentActiveLocationId, self.updAPISetParams.newSetValue.collection ),
-                                  importedTargetLocationData = self.getLevelModel( firstCurrentActiveLocationId, params.imported_content.data.collection ),
-                                  newCollectionForTargetLocation = [];// the collection that will hold the merge of all active imported collections
+                              // IF ALL TEMPLATE LOCATIONS EXIST IN CURRENT PAGE
+                              // Loop on local locations, use template locations when exists, otherwise use local ones
+                              if ( _allTmplLocationsExistLocally() ) {
+                                    // Replace locations from local collection that are provided by the tmpl, and not empty
+                                    // => if the header / footer template location is empty, keep the local one
+                                    // => the tmpl location will replace the local location in the collection
+                                    newSetValueCollection = [];
+                                    var resetLocalLocation, newLocalLocation;
+                                    _.each( currentSettingCollection, function( _localLocation ) {
+                                          tmplLocCandidate = _.findWhere(tmplCollection, { id : _localLocation.id }) || {};
+                                          if ( _.isEmpty( tmplLocCandidate.collection ) ) {
+                                                if ( self.isHeaderLocation( _localLocation.id ) || self.isFooterLocation( _localLocation.id ) ) {
+                                                      newSetValueCollection.push( _localLocation );
+                                                } else {
+                                                      // Reset previous local location to defaults
+                                                      resetLocalLocation = { collection : [], options :[] };
+                                                      newLocalLocation = $.extend( true, {}, _localLocation );
+                                                      newLocalLocation = $.extend( newLocalLocation, resetLocalLocation );
+                                                      newSetValueCollection.push( newLocalLocation );
+                                                }
+                                          } else {
+                                                newSetValueCollection.push( tmplLocCandidate );
+                                          }
+                                    });
+                                    // console.log('tmplCollection ??', tmplCollection );
+                                    // console.log('localLocations ??', localLocations);
+                              } else {
+                                    // IF TEMPLATE LOCATIONS DO NOT MATCH THE ONES OF THE CURRENT PAGE => ASSIGN ALL TEMPLATE SECTIONS TO LOOP_START OR First local content location
+                                    if ( _tmplUsesNBtemplate() ) {
+                                          targetLocationId = 'loop_start';
+                                    } else {
+                                          if ( _.contains(localLocations, 'loop_start') ) {
+                                                targetLocationId = 'loop_start';
+                                          } else {
+                                                _.each( localLocations, function( loc_id ) {
+                                                      if ( !self.isHeaderLocation( loc_id ) && !self.isFooterLocation( loc_id ) ) {
+                                                            targetLocationId = loc_id;
+                                                      }
+                                                });
+                                          }
+                                    }
+                                    // At this point, we need a target location id
+                                    if ( '__not_set__' === targetLocationId ) {
+                                          api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => target location id is empty' );
+                                          break;
+                                    }
 
-                              // normalize
-                              // => make sure we have a collection array, even empty
-                              firstCurrentLocationData.collection = _.isArray( firstCurrentLocationData.collection ) ? firstCurrentLocationData.collection : [];
-                              importedTargetLocationData.collection = _.isArray( importedTargetLocationData.collection ) ? importedTargetLocationData.collection : [];
+                                    // Get the current target location model
+                                    targetLocationModel = self.getLevelModel( targetLocationId, newSetValueCollection );
+                                    if ( 'no_match' === targetLocationModel ) {
+                                          api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => target location id ' + targetLocationId );
+                                          break;
+                                    }
+                                    targetLocationModel = $.extend( true, {}, targetLocationModel );// <= create a deep copy
 
-                              // loop on the active imported locations
-                              // Example : ["__after_header", "__before_main_wrapper", "loop_start", "__before_footer"]
-                              // and populate newCollectionForTargetLocation, with locations ordered as they were on export
-                              // importedCollection is a clone
-                              _.each( importedActiveLocations, function( impLocationId ){
-                                    var impLocationData = self.getLevelModel( impLocationId, importedCollection );
-                                    if ( _.isEmpty( impLocationData.collection ) )
+                                    // Replace the target location collection with the template one
+                                    targetLocationModel.collection = _allContentSectionsInTmpl;
+
+                                    // remove all locations from future setting value
+                                    newSetValueCollection = [];
+
+                                    // If the template has a header/footer use it
+                                    // else, if a header footer is defined locally
+                                    if ( _hasTmplHeaderFooter() ) {
+                                          _.each( tmplLocations, function( loc_id ) {
+                                                if ( _isTmplHeaderLocId( loc_id ) || _isTmplFooterLocId( loc_id ) ) {
+                                                      tmplLocCandidate = self.getLevelModel( loc_id, tmplCollection );
+                                                      if ( 'no_match' === tmplLocCandidate ) {
+                                                            api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => location id ' + loc_id +' not found in template collection');
+                                                            return;
+                                                      } else {
+                                                            newSetValueCollection.push( tmplLocCandidate );
+                                                      }
+                                                }
+                                          });
+                                    }
+
+
+                                    // Populate the local target location with the template section collection
+                                    // AND
+                                    // Re-populate the header and footer location, either with the local one, or the template one ( if any)
+                                    _.each( localLocations, function( loc_id ) {
+                                          if ( targetLocationId === loc_id ) {
+                                                newSetValueCollection.push( targetLocationModel );
+                                          }
+                                          localLocModel = self.getLevelModel( loc_id, currentSettingCollection );
+                                          if ( 'no_match' === localLocModel ) {
+                                                api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => location id ' + loc_id +' not found in current setting collection');
+                                                return;
+                                          }
+                                          // re-add header and footer if _hasTmplHeaderFooter()
+                                          if ( !_hasTmplHeaderFooter() ) {
+                                                if ( self.isHeaderLocation( loc_id ) || self.isFooterLocation( loc_id ) ) {
+                                                      newSetValueCollection.push( localLocModel );
+                                                }
+                                          }
+                                    });
+                              }
+                        break;
+
+
+                        //-------------------------------------------------------------------------------------------------
+                        //-- INJECT BEFORE CASE
+                        //-------------------------------------------------------------------------------------------------
+                        case 'before' :
+                              // For the before case, we are sure that hasCurrentPageNBSectionsNotHeaderFooter() is true
+                              // so there's at least one location that has section(s)
+                              // Find the first non header/footer location not empty
+                              _.each( localLocations, function( loc_id ){
+                                    // stop if the location id has been found
+                                    if ( '__not_set__' != targetLocationId )
                                       return;
-                                    newCollectionForTargetLocation = _.union( newCollectionForTargetLocation, impLocationData.collection );
-                              });//_.each( importedActiveLocations
 
-                              // replace the previous collection of the target location, by the union of all collections.
-                              // for example, if 'loop_start' is the target location, all sections will be added to it.
-                              importedTargetLocationData.collection = newCollectionForTargetLocation;
-
-
-
-                              // remove the missing locations from the imported collection
-                              // importedActiveLocationsNotAvailableInCurrentActiveLocations
-                              // params.imported_content.data.collection = _.filter( params.imported_content.data.collection, function( _location ) {
-                              //       return !_.contains( importedActiveLocationsNotAvailableInCurrentActiveLocations, _location.id );
-                              // });
-                              params.imported_content.data.collection = _.filter( params.imported_content.data.collection, function( _location ) {
-                                    return _location.id === firstCurrentActiveLocationId;
+                                    locModel = self.getLevelModel( loc_id, newSetValueCollection );
+                                    if ( 'no_match' === locModel ) {
+                                          api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => location id not found' + loc_id );
+                                          return;
+                                    }
+                                    if ( !self.isHeaderLocation( loc_id ) && !self.isFooterLocation( loc_id ) ) {
+                                          if ( !_.isEmpty( locModel.collection ) ) {
+                                                targetLocationId = loc_id;
+                                                targetLocationModel = locModel;
+                                          }
+                                    }
                               });
-                              console.log('SO NEW COLLECTION ?', params.imported_content.data.collection );
-                        }//if ( !_.isEmpty( firstCurrentActiveLocationId ) )
-                  }//if ( true === params.assign_missing_locations )
 
+                              // At this point, we need a target location id
+                              if ( '__not_set__' === targetLocationId ) {
+                                    api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => target location id is empty' );
+                                    break;
+                              }
 
-                  // SHALL WE MERGE ?
-                  // Sept 2019 note : for local import only. Not implemented for global https://github.com/presscustomizr/nimble-builder/issues/495
-                  // loop on each location of the imported content
-                  // if the current setting value has sections in a location, add them before the imported ones
-                  // keep_existing_sections is a user check option
-                  // @see PHP sek_get_module_params_for_sek_local_imp_exp()
-                  if ( true === params.keep_existing_sections ) {
-                      // note that importedCollection is a unlinked clone of params.imported_content.data.collection
-                      // merge sections
-                      _.each( importedCollection, function( imp_location_data ) {
-                            var currentLocationData = self.getLevelModel( imp_location_data.id, self.updAPISetParams.newSetValue.collection );
-                            if ( _.isEmpty( currentLocationData.collection ) )
-                              return;
+                              // Get the current target location model
+                              targetLocationModel = $.extend( true, {}, targetLocationModel );
 
-                            var importedLocationData = self.getLevelModel( imp_location_data.id, params.imported_content.data.collection );
-                            importedLocationData.collection = _.union( currentLocationData.collection, importedLocationData.collection );
-                      });
+                              // Adds the template sections BEFORE the existing sections of the target location
+                              targetLocationModel.collection = _.union( _allContentSectionsInTmpl, targetLocationModel.collection );
 
-                      // merge fonts if needed
-                      if ( self.updAPISetParams.newSetValue.fonts && !_.isEmpty( self.updAPISetParams.newSetValue.fonts ) && _.isArray( self.updAPISetParams.newSetValue.fonts ) ) {
-                            params.imported_content.data.fonts = _.isArray( params.imported_content.data.fonts ) ? params.imported_content.data.fonts : [];
-                            // merge and remove duplicated fonts
-                            params.imported_content.data.fonts =  _.uniq( _.union( self.updAPISetParams.newSetValue.fonts, params.imported_content.data.fonts ) );
-                      }
-                  }// if true === params.merge
+                              // remove all locations from future setting value
+                              newSetValueCollection = [];
 
-                  //self.updAPISetParams.newSetValue = params.imported_content.data;
-            }
+                              // Re-populate the location models previously removed the updated target location model
+                              _.each( localLocations, function( loc_id ){
+                                    if ( targetLocationId === loc_id ) {
+                                          newSetValueCollection.push( targetLocationModel );
+                                    } else {
+                                          if ( 'no_match' === locModel ) {
+                                                api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => location id not found' + loc_id );
+                                                return;
+                                          }
+                                          newSetValueCollection.push( self.getLevelModel( loc_id, currentSettingCollection ) );
+                                    }
+                              });
+                        break;
+
+                        //-------------------------------------------------------------------------------------------------
+                        //-- INJECT AFTER CASE
+                        //-------------------------------------------------------------------------------------------------
+                        case 'after' :
+                              // For the after case, we are sure that hasCurrentPageNBSectionsNotHeaderFooter() is true
+                              // so there's at least one location that has section(s)
+                              // Find the last non header/footer location not empty
+                              _.each( localLocations.reverse(), function( loc_id ){
+                                    // stop if the location id has been found
+                                    if ( '__not_set__' != targetLocationId )
+                                      return;
+
+                                    locModel = self.getLevelModel( loc_id, newSetValueCollection );
+                                    if ( 'no_match' === locModel ) {
+                                          api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => location id not found' + loc_id );
+                                          return;
+                                    }
+                                    if ( !self.isHeaderLocation( loc_id ) && !self.isFooterLocation( loc_id ) ) {
+                                          if ( !_.isEmpty( locModel.collection ) ) {
+                                                targetLocationId = loc_id;
+                                                targetLocationModel = locModel;
+                                          }
+                                    }
+                              });
+
+                              // At this point, we need a target location id
+                              if ( '__not_set__' === targetLocationId ) {
+                                    api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => target location id is empty' );
+                                    break;
+                              }
+
+                              // Get the current target location model
+                              targetLocationModel = $.extend( true, {}, targetLocationModel );
+
+                              // Adds the template sections AFTER the existing sections of the target location
+                              targetLocationModel.collection = _.union( targetLocationModel.collection, _allContentSectionsInTmpl );
+
+                              // remove all locations from future setting value
+                              newSetValueCollection = [];
+
+                              // Re-populate the location models previously removed the updated target location model
+                              _.each( localLocations, function( loc_id ){
+                                    if ( targetLocationId === loc_id ) {
+                                          newSetValueCollection.push( targetLocationModel );
+                                    } else {
+                                          locModel = self.getLevelModel( loc_id, currentSettingCollection );
+                                          if ( 'no_match' === locModel ) {
+                                                api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => loc id not found' + loc_id );
+                                                return;
+                                          }
+                                          newSetValueCollection.push( locModel );
+                                    }
+                              });
+                        break;
+                  }
+
+                  // update the API setting
+                  // this is a candiate setting value, the new setting value will be validated in ::updateAPISetting => ::validateSettingValue()
+                  self.updAPISetParams.newSetValue.collection = newSetValueCollection;
+
+                  // LOCAL OPTIONS
+                  // local_options states if the imported template uses nimble_template, or use custom_width, custom_css, performance, etc.. see the full list of local options in ::generateUIforLocalSkopeOptions
+                  // Design decision : by default NB extends existing local options with the imported ones.
+                  // import mode :
+                  // 'replace' (default) => local options extended
+                  // insert 'before' or 'after' => existing local options are preserved
+                  //
+                  // Scenario :
+                  // 1) user has created NB sections on a single post and wants to insert a NB template before the existing sections ( 'before' import_mode )
+                  // => in this case, we need to keep the default theme template, local options must be the existing ones => no extension of local options.
+                  //
+                  // 2) the current page has no NB sections yet, import mode is 'replace' by default
+                  // => it means that if the imported template uses NB template as canvas, it must be set in local options => extension of local options
+                  if ( !_.isEmpty( tmplLocalOptions ) && 'replace' === params.tmpl_import_mode ) {
+                        var currentLocalOptions = self.updAPISetParams.newSetValue.local_options;
+                        currentLocalOptions = $.extend( true, {}, _.isObject( currentLocalOptions ) ? currentLocalOptions : {} );
+                        self.updAPISetParams.newSetValue.local_options = _.extend( currentLocalOptions, tmplLocalOptions );
+                  }
+
+                  // FONTS
+                  // If there are imported fonts, we need to merge when import mode is not 'replace', otherwise we need to copy the imported font collection in .fonts property of the API setting.
+                  if ( _.isArray( tmplFonts ) && !_.isEmpty( tmplFonts ) ) {
+                        if ( 'replace' != params.tmpl_import_mode ) {
+                              var currentFonts = self.updAPISetParams.newSetValue.fonts;
+                              currentFonts = $.extend( true, [], _.isArray( currentFonts ) ? currentFonts : [] );
+                              // merge two collection of fonts without duplicates
+                              self.updAPISetParams.newSetValue.fonts = _.uniq( _.union( tmplFonts, currentFonts ));
+                        } else {
+                              self.updAPISetParams.newSetValue.fonts = tmplFonts;
+                        }
+                  }
+
+                  //api.infoLog('SETTING VALUE AFTER ?', self.updAPISetParams.newSetValue );
+            }//_updAPISet_sek_import_tmpl_from_gallery
 
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
@@ -8457,6 +9121,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             return _data_;
                       };
                   return walkCollection( id ) !== 'no_match';
+            },
+
+            // @return bool
+            isGlobalLocationId : function( id ) {
+                var _locCollection = this.activeLocationsInfo(),
+                    _currentLocInfo = !_.isArray( _locCollection ) ? {} : _.findWhere( _locCollection, { id : id } );
+                return _.isObject( _currentLocInfo ) && _currentLocInfo.is_global;
             },
 
             // @return bool
@@ -9517,6 +10188,40 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   this.bind( function( to ) {
                         item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
                   });
+            },
+
+
+            //-------------------------------------------------------------------------------------------------
+            //-- TEMPLATE HELPERS
+            // Dec 2020
+            //-------------------------------------------------------------------------------------------------
+
+            // @return boolean
+            // introduced when implementing #655
+            // When importing a template, if current page has NB sections, out of header and footer, display an import dialog, otherwise import now
+            hasCurrentPageNBSectionsNotHeaderFooter : function() {
+                var self = this,
+                    _bool = false,
+                    _collection,
+                    localCollSetId = this.localSectionsSettingId(),
+                    localColSetValue = api(localCollSetId)(),
+                    activeLocationInfos = this.activeLocationsInfo();
+
+                localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
+                _collection = $.extend( true, {}, localColSetValue );
+                _collection = ! _.isEmpty( _collection.collection ) ? _collection.collection : [];
+                _collection = _.isArray( _collection ) ? _collection : [];
+                _.each( _collection, function( loc_data ){
+                      if ( _bool )
+                        return;
+                      if ( _.isObject(loc_data) && 'location' == loc_data.level && loc_data.collection ) {
+                            // skip if the location is a header
+                            if ( !self.isHeaderLocation( loc_data.id ) && !self.isFooterLocation( loc_data.id ) ) {
+                                  _bool = !_.isEmpty( loc_data.collection );
+                            }
+                      }
+                });
+                return _bool;
             }
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
@@ -10692,359 +11397,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-            ////////////////////////////////////////////////////////
-            // IMPORT TEMPLATE FROM GALLERY => FROM USER SAVED COLLECTION OR REMOTE API
-            ////////////////////////////////////////////////////////
-            // @return promise
-            getTmplJsonFromUserTmpl : function( template_name ) {
-                  var self = this, _dfd_ = $.Deferred();
-                  wp.ajax.post( 'sek_get_user_tmpl_json', {
-                        nonce: api.settings.nonce.save,
-                        tmpl_post_name: template_name
-                        //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
-                  })
-                  .done( function( response ) {
-                        _dfd_.resolve( {success:true, tmpl_json:response });
-                  })
-                  .fail( function( er ) {
-                        _dfd_.resolve( {success:false});
-                        api.errorLog( 'ajax getTmplJsonFromUserTmpl => error', er );
-                        api.previewer.trigger('sek-notify', {
-                            type : 'error',
-                            duration : 10000,
-                            message : [
-                                  '<span style="font-size:0.95em">',
-                                    '<strong>@missi18n error when fetching the template</strong>',
-                                  '</span>'
-                            ].join('')
-                        });
-                  });
-
-                  return _dfd_;
-            },
-
-            // @return promise
-            getTmplJsonFromApi : function( template_name ) {
-                  var self, _dfd_ = $.Deferred();
-                  $.getJSON( 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan' )
-                            .done( function( resp ) {
-                                  if ( !_.isObject( resp ) || !resp.lib || !resp.lib.templates ) {
-                                        api.errare( '::get_gallery_tmpl_json_and_import success but invalid response => ', resp  );
-                                        _dfd_.resolve({success:false});
-                                  }
-                                  var _json_data = resp.lib.templates[template_name];
-                                  if ( !_json_data ) {
-                                        api.errare( '::get_gallery_tmpl_json_and_import => the requested template is not available', resp.lib.templates  );
-                                        api.previewer.trigger('sek-notify', {
-                                              notif_id : 'missing-tmpl',
-                                              type : 'info',
-                                              duration : 10000,
-                                              message : [
-                                                    '<span style="color:#0075a2">',
-                                                      '<strong>',
-                                                      '@missi18n the requested template is not available',
-                                                      '</strong>',
-                                                    '</span>'
-                                              ].join('')
-                                        });
-                                        _dfd_.resolve({success:false});
-                                  }
-                                  _dfd_.resolve( {success:true, tmpl_json:_json_data } );
-
-                            })
-                            .fail(function( er ) {
-                                  api.errare( '::get_gallery_tmpl_json_and_import failed => ', er  );
-                                  _dfd_.resolve({success:false});
-                            });
-
-                    return _dfd_.promise();
-            },
-
-
-            // April 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/651
-            // @param params {
-            //    template_name : string,
-            //    from : nimble_api or user,
-            //    import_mode : 3 possible import modes : replace, before, after
-            // }
-            get_gallery_tmpl_json_and_import : function( params ) {
-                  var self = this;
-                  params = $.extend( {
-                      template_name : '',
-                      from : 'user',
-                      import_mode : 'replace'
-                  }, params || {});
-                  var tmpl_name = params.template_name;
-                  if ( _.isEmpty( tmpl_name ) || ! _.isString( tmpl_name ) ) {
-                        api.errare('::import => error => invalid template name');
-                  }
-                  console.log('get_gallery_tmpl_json_and_import params ?', params );
-                  var _promise;
-                  if ( 'nimble_api' === params.from ) {
-                        // doc : https://api.jquery.com/jQuery.getJSON/
-                        _promise = self.getTmplJsonFromApi(tmpl_name);
-                  } else {
-                        _promise = self.getTmplJsonFromUserTmpl(tmpl_name);
-                  }
-
-                  // response object structure :
-                  // {
-                  //  data : { nimble content },
-                  //  metas : {
-                  //    skope_id :
-                  //    version :
-                  //    active_location :
-                  //    date :
-                  //    theme :
-                  //  }
-                  // }
-                  _promise.done( function( response ) {
-                        console.log('get_gallery_tmpl_json_and_import', params, response );
-                        if ( response.success ) {
-                              //console.log('IMPORT NIMBLE TEMPLATE', response.lib.templates[template_name] );
-                              self.import_tmpl_from_gallery({
-                                    pre_import_check : false,
-                                    template_name : tmpl_name,
-                                    template_data : response.tmpl_json,
-                                    import_mode : params.import_mode
-                              });
-                        }
-                  });
-            },
-
-            // IMPORT TEMPLATE FROM GALLERY
-            // => REMOTE API COLLECTION + USER COLLECTION
-            // @param params
-            // {
-            //       pre_import_check : false,
-            //       template_name : tmpl_name,
-            //       template_data : response.tmpl_json,
-            //       import_mode : 3 possible import modes : replace, before, after
-            // }
-            import_tmpl_from_gallery : function( params ) {
-                  console.log('import_tmpl_from_gallery', params );
-                  var self = this;
-                  params = params || {};
-                  // normalize params
-                  params = $.extend({
-                      is_file_import : false,
-                      pre_import_check : false,
-                      assign_missing_locations : true,//<= when importing a tmpl from gallery, if a the page location don't match the template ones, NB injects in "loop_start", or in the first location available
-                      import_mode : 'replace'
-                  }, params );
-
-                  // SETUP FOR MANUAL INPUT
-                  var __request__,
-                      _scope = 'local';//<= when importing a template not manually, scope is always local
-
-
-                  // remote template import case
-                  if ( !params.template_data ) {
-                        throw new Error( '::import_template => missing remote template data' );
-                  }
-                  __request__ = wp.ajax.post( 'sek_process_template_json', {
-                        nonce: api.settings.nonce.save,
-                        template_data : JSON.stringify( params.template_data ),
-                        pre_import_check : false//<= might be used in the future do stuffs. For example when importing manually, this property is used to skip the img sniffing on the first pass.
-                        //sek_export_nonce : api.settings.nonce.save,
-                        //skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
-                        //active_locations : api.czr_sektions.activeLocations()
-                  }).done( function( server_resp ) {
-                        api.infoLog('TEMPLATE PRE PROCESS DONE', server_resp );
-                  }).fail( function( error_resp ) {
-                        api.previewer.trigger('sek-notify', {
-                              notif_id : 'import-failed',
-                              type : 'error',
-                              duration : 30000,
-                              message : [
-                                    '<span>',
-                                      '<strong>',
-                                      [ sektionsLocalizedData.i18n['Export failed'], encodeURIComponent( error_resp ) ].join(' '),
-                                      '</strong>',
-                                    '</span>'
-                              ].join('')
-                        });
-                  });
-
-
-
-                  /////////////////////////////////////////////
-                  /// NOW THAT WE HAVE OUR PROMISE
-                  /// 1) CHECK IF CONTENT IS WELL FORMED AND ELIGIBLE FOR API
-                  /// 2) LET'S PROCESS THE SETTING ID'S
-                  /// 3) ATTEMPT TO UPDATE THE SETTING API, LOCAL OR GLOBAL. ( always local for template import )
-
-                  // fire a previewer loader removed on .always()
-                  api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
-
-                  // After 30 s display a failure notification
-                  // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
-                  _.delay( function() {
-                        if ( 'pending' !== __request__.state() )
-                          return;
-                        api.previewer.trigger('sek-notify', {
-                              notif_id : 'import-too-long',
-                              type : 'error',
-                              duration : 20000,
-                              message : [
-                                    '<span>',
-                                      '<strong>',
-                                      sektionsLocalizedData.i18n['Import exceeds server response time, try to uncheck "import images" option.'],
-                                      '</strong>',
-                                    '</span>'
-                              ].join('')
-                        });
-                  }, 30000 );
-
-
-                  // At this stage, we are not in a pre-check case
-                  // the ajax request is processed and will upload images if needed
-                  __request__
-                        .done( function( server_resp ) {
-                              // When manually importing a file, the server adds a "success" property
-                              // When loading a template this property is not sent. Let's normalize.
-                              if ( _.isObject(server_resp) ) {
-                                    server_resp = {success:true, data:server_resp};
-                              }
-                              //console.log('SERVER RESP 2 ?', server_resp );
-                              if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
-                                    api.infoLog('::import_template problem => !api.czr_sektions.isImportedContentEligibleForAPI', server_resp, params );
-                                    return;
-                              }
-
-                              //console.log('MANUAL IMPORT DATA', server_resp );
-                              server_resp.data.data.collection = self.setIdsForImportedTmpl( server_resp.data.data.collection );
-                              // and try to update the api setting
-                              api.czr_sektions.doUpdateApiSettingAfter_TmplGalleryImport( server_resp, params );
-                        })
-                        .fail( function( response ) {
-                              api.errare( '::import_template => ajax error', response );
-                              api.previewer.trigger('sek-notify', {
-                                    notif_id : 'import-failed',
-                                    type : 'error',
-                                    duration : 30000,
-                                    message : [
-                                          '<span>',
-                                            '<strong>',
-                                            sektionsLocalizedData.i18n['Import failed, file problem'],
-                                            '</strong>',
-                                          '</span>'
-                                    ].join('')
-                              });
-                        });
-            },//import_tmpl_from_gallery
-
-
-            // fired on ajaxrequest done
-            // At this stage, the server_resp data structure has been validated.
-            // We can try to the update the api setting
-            // @param params
-            // {
-            //       pre_import_check : false,
-            //       template_name : tmpl_name,
-            //       template_data : response.tmpl_json,
-            //       import_mode : 3 possible import modes : replace, before, after,
-            //       is_file_import : false,
-            //       assign_missing_locations: true,
-            // }
-            doUpdateApiSettingAfter_TmplGalleryImport : function( server_resp, params ){
-                  console.log('doUpdateApiSettingAfter_TmplGalleryImport ???', params, server_resp );
-                  params = params || {};
-                  if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_file_import ) {
-                        //api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate( params );
-                        api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
-                        return;
-                  }
-
-                  var _scope = 'local';// <= always local when template gallery import
-
-                  //api.infoLog('TODO => verify metas => version, active locations, etc ... ');
-
-                  // Update the setting api via the normalized method
-                  // the scope will determine the setting id, local or global
-                  api.czr_sektions.updateAPISetting({
-                        action : 'sek-import-tmpl-from-gallery',
-                        scope : _scope,//'global' or 'local'<= will determine which setting will be updated,
-                        // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
-                        imported_content : server_resp.data,
-                        assign_missing_locations : params.assign_missing_locations,
-                  }).done( function() {
-                        // Clean an regenerate the local option setting
-                        // Settings are normally registered once and never cleaned, unlike controls.
-                        // After the import, updating the setting value will refresh the sections
-                        // but the local options, persisted in separate settings, won't be updated if the settings are not cleaned
-                        if ( 'local' === _scope ) {
-                              api.czr_sektions.generateUI({
-                                    action : 'sek-generate-local-skope-options-ui',
-                                    clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
-                              });
-                        }
-
-                        //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
-                        api.previewer.refresh();
-                        api.previewer.trigger('sek-notify', {
-                              notif_id : 'import-success',
-                              type : 'success',
-                              duration : 30000,
-                              message : [
-                                    '<span>',
-                                      '<strong>',
-                                      sektionsLocalizedData.i18n['Template successfully imported'],
-                                      '</strong>',
-                                    '</span>'
-                              ].join('')
-                        });
-                  }).fail( function( response ) {
-                        api.errare( '::doUpdateApiSettingAfter_TmplGalleryImport => error when firing ::updateAPISetting', response );
-                        api.previewer.trigger('sek-notify', {
-                              notif_id : 'import-failed',
-                              type : 'error',
-                              duration : 30000,
-                              message : [
-                                    '<span>',
-                                      '<strong>',
-                                      [ sektionsLocalizedData.i18n['Import failed'], response ].join(' : '),
-                                      '</strong>',
-                                    '</span>'
-                              ].join('')
-                        });
-                  });
-
-                  // Refresh the preview, so the markup is refreshed and the css stylesheet are generated
-                  api.previewer.refresh();
-            },//doUpdateApiSettingAfter_TmplGalleryImport()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             ////////////////////////////////////////////////////////
             // IMPORT TEMPLATE FROM FILE
             ////////////////////////////////////////////////////////
@@ -11219,7 +11571,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //console.log('MANUAL IMPORT DATA', server_resp );
                               server_resp.data.data.collection = api.czr_sektions.setIdsForImportedTmpl( server_resp.data.data.collection );
                               // and try to update the api setting
-                              api.czr_sektions.doUpdateApiSettingAfter_ManualImport( server_resp, params );
+                              api.czr_sektions.doUpdateApiSettingAfter_FileImport( server_resp, params );
                         })
                         .fail( function( response ) {
                               api.errare( '::import_template => ajax error', response );
@@ -11237,7 +11589,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         })
                         .always( function() {
-                              api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate( params );
+                              api.czr_sektions.doAlwaysAfterFileImportAndApiSettingUpdate( params );
                         });
             },//import_template_from_file
 
@@ -11312,7 +11664,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               ].join('')
                         });
                         if ( params.is_file_import ) {
-                              api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate( params );
+                              api.czr_sektions.doAlwaysAfterFileImportAndApiSettingUpdate( params );
                         }
                   }
             },//pre_checks_from_file_import
@@ -11463,11 +11815,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // fired on ajaxrequest done
             // At this stage, the server_resp data structure has been validated.
             // We can try to the update the api setting
-            doUpdateApiSettingAfter_ManualImport : function( server_resp, params ){
-                  console.log('doUpdateApiSettingAfter_ManualImport ???', params, server_resp );
+            doUpdateApiSettingAfter_FileImport : function( server_resp, params ){
+                  //console.log('doUpdateApiSettingAfter_FileImport ???', params, server_resp );
                   params = params || {};
                   if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_file_import ) {
-                        api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate( params );
+                        api.czr_sektions.doAlwaysAfterFileImportAndApiSettingUpdate( params );
                         return;
                   }
 
@@ -11525,7 +11877,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               ].join('')
                         });
                   }).fail( function( response ) {
-                        api.errare( '::doUpdateApiSettingAfter_ManualImport => error when firing ::updateAPISetting', response );
+                        api.errare( '::doUpdateApiSettingAfter_FileImport => error when firing ::updateAPISetting', response );
                         api.previewer.trigger('sek-notify', {
                               notif_id : 'import-failed',
                               type : 'error',
@@ -11542,7 +11894,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Refresh the preview, so the markup is refreshed and the css stylesheet are generated
                   api.previewer.refresh();
-            },//doUpdateApiSettingAfter_ManualImport()
+            },//doUpdateApiSettingAfter_FileImport()
 
 
 
@@ -11554,7 +11906,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             // Fired when params.is_file_import only
-            doAlwaysAfterManualImportAndApiSettingUpdate : function( params ) {
+            doAlwaysAfterFileImportAndApiSettingUpdate : function( params ) {
                   api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
 
                   params = params || {};
@@ -11663,31 +12015,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
             },
 
-            // @return boolean
-            currentPageHasNBSections : function() {
-                var self = this,
-                    _bool = false,
-                    _collection,
-                    localCollSetId = this.localSectionsSettingId(),
-                    localColSetValue = api(localCollSetId)(),
-                    activeLocationInfos = this.activeLocationsInfo();
-
-                localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
-                _collection = $.extend( true, {}, localColSetValue );
-                _collection = ! _.isEmpty( _collection.collection ) ? _collection.collection : [];
-                _collection = _.isArray( _collection ) ? _collection : [];
-                _.each( _collection, function( loc_data ){
-                      if ( _bool )
-                        return;
-                      if ( _.isObject(loc_data) && 'location' == loc_data.level && loc_data.collection ) {
-                            // skip if the location is a header
-                            if ( !self.isHeaderLocation( loc_data.id ) && !self.isFooterLocation( loc_data.id ) ) {
-                                  _bool = !_.isEmpty( loc_data.collection );
-                            }
-                      }
-                });
-                return _bool;
-            },
 
             // @return void()
             setupTmplGalleryDOMEvents : function() {
@@ -11706,7 +12033,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           }
 
                           // if current page has NB sections, display an import dialog, otherwise import now
-                          if ( self.currentPageHasNBSections() ) {
+                          if ( self.hasCurrentPageNBSectionsNotHeaderFooter() ) {
                                 self._tmplNameWhileImportDialog = tmpl_id;
                                 self.tmplImportDialogVisible(true);
                           } else {
@@ -11726,7 +12053,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 api.errare('::setupTmplGalleryDOMEvents => error => invalid import mode');
                                 return;
                           }
-                          api.czr_sektions.get_gallery_tmpl_json_and_import( {template_name : self._tmplNameWhileImportDialog, from: 'user', tmpl_import_mode: tmpl_import_mode});
+                          api.czr_sektions.get_gallery_tmpl_json_and_import({
+                                template_name : self._tmplNameWhileImportDialog,
+                                from: 'user',
+                                tmpl_import_mode: tmpl_import_mode
+                          });
+                          // api.czr_sektions.get_gallery_tmpl_json_and_import({
+                          //       template_name : 'test_one',
+                          //       from: 'nimble_api',
+                          //       tmpl_import_mode: tmpl_import_mode
+                          // });
                           self.templateGalleryExpanded(false);
                     })
                     // SEARCH ACTIONS
@@ -14624,6 +14960,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
 
                   init_settings.wpautop = isAutoPEnabled();
+
                   // forced_root_block is added to remove <p> tags automatically added
                   // @see https://stackoverflow.com/questions/20464028/how-to-remove-unwanted-p-tags-from-wordpress-editor-using-tinymce
                   if ( !isAutoPEnabled() ) {
@@ -14633,6 +14970,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // TOOLBARS
                   init_settings.toolbar1 = sektionsLocalizedData.defaultToolbarBtns;
                   init_settings.toolbar2 = "";
+
 
                   window.tinymce.init( init_settings );
                   window.QTags.getInstance( _id );
@@ -14654,7 +14992,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // To ensure retro-compat with content created prior to Nimble v1.5.2, in which the editor has been updated
                         // @see https://github.com/presscustomizr/nimble-builder/issues/404
                         // we add the <p> tag on init, if autop option is checked
-                        var initial_content = ( !isAutoPEnabled() || ! _.isFunction( wp.editor.autop ) ) ? input() : wp.editor.autop( input() );
+                        // December 2020 : when running wp.editor.autop( input()  , line break not preserved when re-opening a text module UI,
+                        // see https://github.com/presscustomizr/nimble-builder/issues/769
+                        // var initial_content = ( !isAutoPEnabled() || ! _.isFunction( wp.editor.autop ) ) ? input() : wp.editor.autop( input() );
+                        // console.log('INITIAL CONTENT', input(), wp.editor.autop( input() ) );
+                        var initial_content = input();
                         _editor.setContent( initial_content );
                         api.sekEditorExpanded( true );
                         // trigger a resize to adjust height on init https://github.com/presscustomizr/nimble-builder/issues/409
@@ -14785,7 +15127,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     })
                                     .fail( function( error_resp ) {
                                           api.errare( 'import_export_ input => pre_checks_from_file_import failed', error_resp );
-                                          api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate({
+                                          api.czr_sektions.doAlwaysAfterFileImportAndApiSettingUpdate({
                                               input : input,
                                               file_input : $file_input
                                           });
@@ -14810,7 +15152,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                               break;
                               case 'sek-cancel-import' :
-                                    api.czr_sektions.doAlwaysAfterManualImportAndApiSettingUpdate({
+                                    api.czr_sektions.doAlwaysAfterFileImportAndApiSettingUpdate({
                                         input : input,
                                         file_input : $file_input
                                     });

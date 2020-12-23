@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.6
-Stable tag: 2.1.29
+Stable tag: 2.1.30
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,14 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.29 : Ready for WordPress 5.6, released December 8, 2020. Various improvements in the customizer.
+2.1.30 : Ready for WordPress 5.6. Ready for PHP 8.0. [text editor module] Fixed a line-break issue.
 
 == Changelog ==
+= 2.1.30 December 23rd, 2020 =
+* fixed : [dynamic CSS] insufficient specificity when setting section style options
+* fixed : [file import] bug when trying to assign sections to missing locations if current page uses a local header/footer
+* fixed : [text editor module] line break not preserved when re-opening a text module UI
+
 = 2.1.29 December 12, 2020 =
 * fixed : [customizer] minor issue when adding a new section in an empty location
 * fixed : [customizer][pre-built sections ui] pre-opened section group is broken

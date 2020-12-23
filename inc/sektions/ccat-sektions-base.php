@@ -1531,8 +1531,10 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
     }
 
     // Make sure we have the right specificity depending on the level type
+    // When styling a section, the specificity has to be > to the global option one
+    // This is important in particular to make sure that text CSS rules follow the rule : Global < Section < Module
     if ( 'section' === $parent_level['level'] ) {
-        $selector = sprintf( '.nb-loc [data-sek-id="%1$s"] .sek-row', $parent_level['id'] );
+        $selector = sprintf( '.nb-loc [data-sek-id="%1$s"] [data-sek-level]', $parent_level['id'] );
     } else {
         // for modules and columns
         $selector = sprintf( '.nb-loc .sek-row [data-sek-id="%1$s"]', $parent_level['id'] );
@@ -1542,7 +1544,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
     // implemented to allow CSS rules to be generated on a per-item basis
     // for https://github.com/presscustomizr/nimble-builder/issues/78
     if ( $is_multi_items ) {
-        $selector = sprintf( '[data-sek-id="%1$s"] [data-sek-item-id="%2$s"]', $parent_level['id'], $item_id );
+        $selector = sprintf( '.nb-loc [data-sek-id="%1$s"] [data-sek-item-id="%2$s"]', $parent_level['id'], $item_id );
     }
     $css_identifier = $input_registration_params['css_identifier'];
 
