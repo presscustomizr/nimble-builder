@@ -553,11 +553,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.activeLocationsInfo( ( _.isObject(activelocs) && _.isArray( activelocs.active_locs_info ) ) ? activelocs.active_locs_info : [] );
                         // December 2020 => refresh local setting when an active location is available locally but not present in the local setting
                         // Fixes the problem of importing template from the gallery, with locations different than the current local page
-                        if ( !_.isEmpty( api.dirtyValues() ) ) {
-                              try{ self.updateAPISetting({ action : 'sek-maybe-add-missing-locations'}); } catch(er) {
-                                    api.errare( '::initialize => error with sek-maybe-add-missing-locations', er );
-                              }
-                        }
+                        // update : December 24th => deactivated because of https://github.com/presscustomizr/nimble-builder/issues/770
+                        // if ( !_.isEmpty( api.dirtyValues() ) ) {
+                        //       try{ self.updateAPISetting({ action : 'sek-maybe-add-missing-locations'}); } catch(er) {
+                        //             api.errare( '::initialize => error with sek-maybe-add-missing-locations', er );
+                        //       }
+                        // }
                   });
 
 
