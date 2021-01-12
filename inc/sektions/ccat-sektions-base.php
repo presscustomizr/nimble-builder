@@ -6027,16 +6027,18 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             if ( !$echo_form ) {
                 ?>
                   <script type="text/javascript">
-                      jQuery( function($) {
-                          var $elToFocusOn = $('div[data-sek-id="<?php echo $module_id; ?>"]' );
-                          if ( $elToFocusOn.length > 0 ) {
-                                var _do = function() {
-                                    $('html, body').animate({
-                                        scrollTop : $elToFocusOn.offset().top - ( $(window).height() / 2 ) + ( $elToFocusOn.outerHeight() / 2 )
-                                    }, 'slow');
-                                };
-                                try { _do(); } catch(er) {}
-                          }
+                      nb_.listenTo( 'nb-jquery-loaded', function() {
+                            jQuery( function($) {
+                                var $elToFocusOn = $('div[data-sek-id="<?php echo $module_id; ?>"]' );
+                                if ( $elToFocusOn.length > 0 ) {
+                                      var _do = function() {
+                                          $('html, body').animate({
+                                              scrollTop : $elToFocusOn.offset().top - ( $(window).height() / 2 ) + ( $elToFocusOn.outerHeight() / 2 )
+                                          }, 'slow');
+                                      };
+                                      try { _do(); } catch(er) {}
+                                }
+                            });
                       });
                   </script>
                 <?php

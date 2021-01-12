@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.6
-Stable tag: 2.1.31
+Stable tag: 2.1.32
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,12 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.31 : Ready for WordPress 5.6. Ready for PHP 8.0. [text editor module] Fixed a line-break issue.
+2.1.32 : [form module] fixed a minor javascript issue that could occur after submitting a form
 
 == Changelog ==
+= 2.1.32 January 12, 2021 =
+* fixed : [form module] javascript may break after submitting the form when jQuery called too early
+
 = 2.1.31 December 24th, 2020 =
 * fixed : [customizer] minor possible bug when initializing NB customization interface
 
