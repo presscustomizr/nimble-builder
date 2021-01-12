@@ -25,6 +25,7 @@
                           DROPDOWN_SUBMENU        : 'sek-dropdown-submenu',
                           SHOW                    : 'show',
                           PARENTS                 : 'menu-item-has-children',
+                          ALLOW_POINTER_ON_SCROLL : 'allow-pointer-events-on-scroll'
                         },
                         Selector = {
                           DATA_TOGGLE              : '[data-toggle="sek-dropdown"]',
@@ -33,6 +34,7 @@
                           HOVER_PARENT             : '.sek-nav-wrap .menu-item-has-children',
                           PARENTS                  : '.sek-nav-wrap .menu-item-has-children',
                           SNAKE_PARENTS            : '.sek-nav-wrap .menu-item-has-children',
+                          CHILD_DROPDOWN           : 'ul.sek-dropdown-menu'
                         };
 
                     // unify all the dropdowns classes whether the menu is a proper menu or the all pages fall-back
@@ -44,24 +46,34 @@
                     var dropdownMenuOnHover = function() {
                           var _dropdown_selector = Selector.HOVER_PARENT;
 
-                          function _addOpenClass () {
-                                var $_el = $(this);
+                          enableDropdownOnHover();
 
+                          function _addOpenClass( evt ) {
+                                var $_el = $(this),
+                                    $_child_dropdown = $_el.find( Selector.CHILD_DROPDOWN ).first();
+                                // Jan 2021 : start of a fix for https://github.com/presscustomizr/nimble-builder/issues/772
+                                if ( nb_.cachedElements.$body.hasClass('is-touch-device') ) {
+                                      if ( "true" != $_child_dropdown.attr('aria-expanded') ) {
+                                            evt.preventDefault();
+                                      }
+                                }
                                 //a little delay to balance the one added in removing the open class
                                 var _debounced_addOpenClass = nb_.debounce( function() {
                                       //do nothing if menu is mobile
                                       if( 'static' == $_el.find( '.'+ClassName.DROPDOWN ).css( 'position' ) ) {
                                             return false;
                                       }
-                                      if ( ! $_el.hasClass(ClassName.SHOW) ) {
+                                      var $_child_dropdown = $_el.find( Selector.CHILD_DROPDOWN ).first();
+
+                                      if ( !$_el.hasClass(ClassName.SHOW) ) {
+                                            nb_.cachedElements.$body.addClass( ClassName.ALLOW_POINTER_ON_SCROLL );
+
                                             $_el.trigger( Event.SHOW )
-                                                .addClass(ClassName.SHOW)
-                                                .trigger( Event.SHOWN);
+                                                  .addClass(ClassName.SHOW)
+                                                  .trigger( Event.SHOWN);
 
-                                            var $_data_toggle = $_el.children( Selector.DATA_TOGGLE );
-
-                                            if ( $_data_toggle.length ) {
-                                                  $_data_toggle[0].setAttribute('aria-expanded', 'true');
+                                            if ( $_child_dropdown.length > 0 ) {
+                                                  $_child_dropdown[0].setAttribute('aria-expanded', 'true');
                                             }
                                       }
                                 }, 30);
@@ -69,21 +81,33 @@
                                 _debounced_addOpenClass();
                           }
 
-                          function _removeOpenClass () {
+                          function _removeOpenClass() {
 
-                                var $_el = $(this);
+                                var $_el = $(this),
+                                    $_child_dropdown = $_el.find( Selector.CHILD_DROPDOWN ).first();
 
                                 //a little delay before closing to avoid closing a parent before accessing the child
                                 var _debounced_removeOpenClass = nb_.debounce( function() {
                                       if ( $_el.find("ul li:hover").length < 1 && ! $_el.closest('ul').find('li:hover').is( $_el ) ) {
+                                            // april 2020 => some actions should be only done when not on a "touch" device
+                                            // otherwise we have a bug on submenu expansion
+                                            // see : https://github.com/presscustomizr/customizr/issues/1824
+                                            //if ( !nb_.cachedElements.$body.hasClass('is-touch-device') ) {
+                                                  // $_el.trigger( Event.HIDE )
+                                                  //     .removeClass( ClassName.SHOW)
+                                                  //     .trigger( Event.HIDDEN );
+                                            //}
                                             $_el.trigger( Event.HIDE )
-                                                .removeClass( ClassName.SHOW)
-                                                .trigger( Event.HIDDEN );
+                                                  .removeClass( ClassName.SHOW)
+                                                  .trigger( Event.HIDDEN );
 
-                                            var $_data_toggle = $_el.children( Selector.DATA_TOGGLE );
+                                            //make sure pointer events on scroll are still allowed if there's at least one submenu opened
+                                            if ( $_el.closest( Selector.HOVER_MENU ).find( '.' + ClassName.SHOW ).length < 1 ) {
+                                                  nb_.cachedElements.$body.removeClass( ClassName.ALLOW_POINTER_ON_SCROLL );
+                                            }
 
-                                            if ( $_data_toggle.length ) {
-                                                  $_data_toggle[0].setAttribute('aria-expanded', 'false');
+                                            if ( $_child_dropdown.length > 0 ) {
+                                                  $_child_dropdown[0].setAttribute('aria-expanded', 'false');
                                             }
                                       }
                                 }, 30 );
@@ -91,10 +115,20 @@
                                 _debounced_removeOpenClass();
                           }
 
-                          //BIND
-                          $( document )
-                              .on( 'mouseenter', _dropdown_selector, _addOpenClass )
-                              .on( 'mouseleave', _dropdown_selector , _removeOpenClass );
+                          function enableDropdownOnHover() {
+                                // april 2020 : is-touch-device class is added on body on the first touch
+                                // This way, we can prevent the problem reported on https://github.com/presscustomizr/customizr/issues/1824
+                                // ( two touches needed to reveal submenus on touch devices )
+                                nb_.cachedElements.$body.on('touchstart', function() {
+                                      if ( !$(this).hasClass('is-touch-device') ) {
+                                            $(this).addClass('is-touch-device');
+                                      }
+                                });
+                                //BIND
+                                nb_.cachedElements.$body.on( 'mouseenter', _dropdown_selector, _addOpenClass );
+                                nb_.cachedElements.$body.on( 'mouseleave', _dropdown_selector , _removeOpenClass );
+                                nb_.cachedElements.$body.on( 'click', _dropdown_selector, _addOpenClass );
+                          }
                     },
 
                     //SNAKE
@@ -384,4 +418,3 @@
       // on 'nb-app-ready', jQuery is loaded
       nb_.listenTo('nb-app-ready', callbackFunc );
 }(window, document));
-
