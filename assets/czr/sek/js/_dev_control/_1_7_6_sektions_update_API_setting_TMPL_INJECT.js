@@ -13,10 +13,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //-- INJECT FROM TMPL GALLERY
             //-------------------------------------------------------------------------------------------------
             // self.updAPISetParams.params : {
-            //    action: "sek-import-tmpl-from-gallery"
+            //    action: "sek-inject-tmpl-from-gallery"
             //    assign_missing_locations: undefined
             //    cloneId: ""
-            //    imported_content: {data: {…}, metas: {…}, img_errors: Array(0)}
+            //    injected_content: {data: {…}, metas: {…}, img_errors: Array(0)}
             //    is_global_location: false
             //    scope: "local"
             //    tmpl_inject_mode: "replace"
@@ -27,11 +27,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   params = self.updAPISetParams.params;
 
-                  api.infoLog( 'sek-import-tmpl-from-gallery', params );
+                  api.infoLog( 'sek-inject-tmpl-from-gallery', params );
 
                   // DO WE HAVE PROPER CONTENT DO INJECT ?
-                  if ( _.isUndefined( params.imported_content.data ) || _.isUndefined( params.imported_content.metas ) ) {
-                        api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => invalid imported content', imported_content );
+                  if ( _.isUndefined( params.injected_content.data ) || _.isUndefined( params.injected_content.metas ) ) {
+                        api.errare( 'updateAPISetting::sek-inject-tmpl-from-gallery => invalid imported content', injected_content );
                         return;
                   }
 
@@ -50,12 +50,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // @return bool
                   var _isTmplHeaderLocId = function( loc_id ) {
-                        return params.imported_content && params.imported_content.metas && loc_id === params.imported_content.metas.tmpl_header_location;
+                        return params.injected_content && params.injected_content.metas && loc_id === params.injected_content.metas.tmpl_header_location;
                   };
 
                   // @return bool
                   var _isTmplFooterLocId = function( loc_id ) {
-                        return params.imported_content && params.imported_content.metas && loc_id === params.imported_content.metas.tmpl_footer_location;
+                        return params.injected_content && params.injected_content.metas && loc_id === params.injected_content.metas.tmpl_footer_location;
                   };
 
                   // The template has a header/footer if we find the header or the footer location
@@ -79,8 +79,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return tmplLocalOptions && tmplLocalOptions.template && 'nimble_template' === tmplLocalOptions.template.local_template;
                   };
 
-                  var tmplCollection = _.isArray( params.imported_content.data.collection ) ? $.extend( true, [], params.imported_content.data.collection ) : [],
-                      tmplLocations = params.imported_content.metas.tmpl_locations,
+                  var tmplCollection = _.isArray( params.injected_content.data.collection ) ? $.extend( true, [], params.injected_content.data.collection ) : [],
+                      tmplLocations = params.injected_content.metas.tmpl_locations,
                       localLocations = [],
                       currentSettingCollection = self.updAPISetParams.newSetValue.collection;
 
@@ -94,7 +94,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Imported Active Locations has to be an array not empty
                   if ( !_.isArray(tmplLocations) || _.isEmpty(tmplLocations) ) {
-                        api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => invalid imported template locations', params );
+                        api.errare( 'updateAPISetting::sek-inject-tmpl-from-gallery => invalid imported template locations', params );
                         return;
                   }
 
@@ -102,9 +102,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Important :
                   // - Local options is structured as an object : { local_header_footer: {…}, widths: {…}} }. But when not populated, it can be an array []. So make sure the type if set as object before merging it with current page local options
                   // - Fonts is a collection described with an array
-                  var tmplLocalOptions = params.imported_content.data.local_options;
+                  var tmplLocalOptions = params.injected_content.data.local_options;
                   tmplLocalOptions = $.extend( true, {}, _.isObject( tmplLocalOptions ) ? tmplLocalOptions : {} );
-                  var tmplFonts = params.imported_content.data.fonts;
+                  var tmplFonts = params.injected_content.data.fonts;
                   tmplFonts = _.isArray( tmplFonts ) ? $.extend( true, [], tmplFonts ) : [];
 
                   // Define variables uses for all cases
@@ -189,7 +189,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                                     // At this point, we need a target location id
                                     if ( '__not_set__' === targetLocationId ) {
-                                          api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => target location id is empty' );
+                                          api.errare( 'updateAPISetting::sek-inject-tmpl-from-gallery => target location id is empty' );
                                           break;
                                     }
 
@@ -274,7 +274,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               // At this point, we need a target location id
                               if ( '__not_set__' === targetLocationId ) {
-                                    api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => target location id is empty' );
+                                    api.errare( 'updateAPISetting::sek-inject-tmpl-from-gallery => target location id is empty' );
                                     break;
                               }
 
@@ -328,7 +328,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               // At this point, we need a target location id
                               if ( '__not_set__' === targetLocationId ) {
-                                    api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => target location id is empty' );
+                                    api.errare( 'updateAPISetting::sek-inject-tmpl-from-gallery => target location id is empty' );
                                     break;
                               }
 

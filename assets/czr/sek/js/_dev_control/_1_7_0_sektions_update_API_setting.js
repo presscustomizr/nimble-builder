@@ -159,8 +159,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //-------------------------------------------------------------------------------------------------
                               //-- INJECT TEMPLATE FROM GALLERY
                               //-------------------------------------------------------------------------------------------------
-                              case 'sek-import-tmpl-from-gallery' :
-                                    self._updAPISet_sek_import_tmpl_from_gallery();
+                              case 'sek-inject-tmpl-from-gallery' :
+                                    self._updAPISet_sek_inject_tmpl_from_gallery();
                               break;
 
                               //-------------------------------------------------------------------------------------------------

@@ -970,13 +970,13 @@ function sek_print_nimble_customizer_tmpl() {
         <div class="sek-tmpl-gal-import-dialog">
             <p>This page has NB sections already. Select an import options.</p>
             <div class="sek-ui-button-group" role="group">
-              <button class="sek-ui-button sek-tmpl-import-replace" type="button" title="<?php _e('Replace existing sections', 'text_domain'); ?>" data-sek-tmpl-import-mode="replace">
+              <button class="sek-ui-button sek-tmpl-import-replace" type="button" title="<?php _e('Replace existing sections', 'text_domain'); ?>" data-sek-tmpl-inject-mode="replace">
                 <?php _e('Replace existing sections', 'text_domain'); ?><span class="spinner"></span>
               </button>
-              <button class="sek-ui-button sek-tmpl-import-before" type="button" title="<?php _e('Insert before existing sections', 'text_domain'); ?>" data-sek-tmpl-import-mode="before">
+              <button class="sek-ui-button sek-tmpl-import-before" type="button" title="<?php _e('Insert before existing sections', 'text_domain'); ?>" data-sek-tmpl-inject-mode="before">
                 <?php _e('Insert before existing sections', 'text_domain'); ?><span class="spinner"></span>
               </button>
-              <button class="sek-ui-button sek-tmpl-import-after" type="button" title="<?php _e('Insert after existing sections', 'text_domain'); ?>" data-sek-tmpl-import-mode="after">
+              <button class="sek-ui-button sek-tmpl-import-after" type="button" title="<?php _e('Insert after existing sections', 'text_domain'); ?>" data-sek-tmpl-inject-mode="after">
                 <?php _e('Insert after existing sections', 'text_domain'); ?><span class="spinner"></span>
               </button>
             </div>

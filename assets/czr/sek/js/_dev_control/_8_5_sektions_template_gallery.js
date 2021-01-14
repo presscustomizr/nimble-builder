@@ -102,9 +102,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 self._tmplNameWhileImportDialog = tmpl_id;
                                 self.tmplImportDialogVisible(true);
                           } else {
-                                //api.czr_sektions.get_gallery_tmpl_json_and_import( $(this).data('sek-tmpl-item-id') );
-                                //api.czr_sektions.get_gallery_tmpl_json_and_import( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
-                                api.czr_sektions.get_gallery_tmpl_json_and_import( {template_name : tmpl_id, from: 'user'});
+                                //api.czr_sektions.get_gallery_tmpl_json_and_inject( $(this).data('sek-tmpl-item-id') );
+                                //api.czr_sektions.get_gallery_tmpl_json_and_inject( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
+                                api.czr_sektions.get_gallery_tmpl_json_and_inject( {template_name : tmpl_id, from: 'user'});
                                 self.templateGalleryExpanded(false);
                           }
                     })
@@ -113,20 +113,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                           evt.preventDefault();
                           evt.stopPropagation();
                           // 3 possible import modes : replace, before, after
-                          var tmpl_import_mode = $(this).data('sek-tmpl-import-mode');
-                          if ( !_.contains(['replace', 'before', 'after'], tmpl_import_mode ) ) {
+                          var tmpl_inject_mode = $(this).data('sek-tmpl-inject-mode');
+                          if ( !_.contains(['replace', 'before', 'after'], tmpl_inject_mode ) ) {
                                 api.errare('::setupTmplGalleryDOMEvents => error => invalid import mode');
                                 return;
                           }
-                          api.czr_sektions.get_gallery_tmpl_json_and_import({
+                          api.czr_sektions.get_gallery_tmpl_json_and_inject({
                                 template_name : self._tmplNameWhileImportDialog,
                                 from: 'user',
-                                tmpl_import_mode: tmpl_import_mode
+                                tmpl_inject_mode: tmpl_inject_mode
                           });
-                          // api.czr_sektions.get_gallery_tmpl_json_and_import({
+                          // api.czr_sektions.get_gallery_tmpl_json_and_inject({
                           //       template_name : 'test_one',
                           //       from: 'nimble_api',
-                          //       tmpl_import_mode: tmpl_import_mode
+                          //       tmpl_inject_mode: tmpl_inject_mode
                           // });
                           self.templateGalleryExpanded(false);
                     })

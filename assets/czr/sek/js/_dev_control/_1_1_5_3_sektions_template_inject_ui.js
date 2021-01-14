@@ -44,13 +44,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $.getJSON( sektionsLocalizedData.templateAPIUrl )
                                   .done( function( resp ) {
                                         if ( !_.isObject( resp ) || !resp.lib || !resp.lib.templates ) {
-                                              api.errare( '::get_gallery_tmpl_json_and_import success but invalid response => ', resp  );
+                                              api.errare( '::get_gallery_tmpl_json_and_inject success but invalid response => ', resp  );
                                               _dfd_.resolve({success:false});
                                               return;
                                         }
                                         var _json_data = resp.lib.templates[template_name];
                                         if ( !_json_data ) {
-                                              api.errare( '::get_gallery_tmpl_json_and_import => the requested template is not available', resp.lib.templates  );
+                                              api.errare( '::get_gallery_tmpl_json_and_inject => the requested template is not available', resp.lib.templates  );
                                               api.previewer.trigger('sek-notify', {
                                                     notif_id : 'missing-tmpl',
                                                     type : 'info',
@@ -71,7 +71,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                   })
                                   .fail(function( er ) {
-                                        api.errare( '::get_gallery_tmpl_json_and_import failed => ', er  );
+                                        api.errare( '::get_gallery_tmpl_json_and_inject failed => ', er  );
                                         _dfd_.resolve({success:false});
                                   });
                     }
@@ -84,20 +84,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @param params {
             //    template_name : string,
             //    from : nimble_api or user,
-            //    tmpl_import_mode : 3 possible import modes : replace, before, after
+            //    tmpl_inject_mode : 3 possible import modes : replace, before, after
             // }
-            get_gallery_tmpl_json_and_import : function( params ) {
+            get_gallery_tmpl_json_and_inject : function( params ) {
                   var self = this;
                   params = $.extend( {
                       template_name : '',
                       from : 'user',
-                      tmpl_import_mode : 'replace'
+                      tmpl_inject_mode : 'replace'
                   }, params || {});
                   var tmpl_name = params.template_name;
                   if ( _.isEmpty( tmpl_name ) || ! _.isString( tmpl_name ) ) {
-                        api.errare('::import => error => invalid template name');
+                        api.errare('::tmpl inject => error => invalid template name');
                   }
-                  //console.log('get_gallery_tmpl_json_and_import params ?', params );
+                  //console.log('get_gallery_tmpl_json_and_inject params ?', params );
                   var _promise;
                   if ( 'nimble_api' === params.from ) {
                         // doc : https://api.jquery.com/jQuery.getJSON/
@@ -118,14 +118,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //  }
                   // }
                   _promise.done( function( response ) {
-                        //console.log('get_gallery_tmpl_json_and_import', params, response );
+                        //console.log('get_gallery_tmpl_json_and_inject', params, response );
                         if ( response.success ) {
                               //console.log('INJECT NIMBLE TEMPLATE', response.lib.templates[template_name] );
-                              self.import_tmpl_from_gallery({
+                              self.inject_tmpl_from_gallery({
                                     pre_import_check : false,
                                     template_name : tmpl_name,
                                     template_data : response.tmpl_json,
-                                    tmpl_import_mode : params.tmpl_import_mode
+                                    tmpl_inject_mode : params.tmpl_inject_mode
                               });
                         }
                   });
@@ -138,32 +138,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //       pre_import_check : false,
             //       template_name : tmpl_name,
             //       template_data : response.tmpl_json,
-            //       tmpl_import_mode : 3 possible import modes : replace, before, after
+            //       tmpl_inject_mode : 3 possible import modes : replace, before, after
             // }
-            import_tmpl_from_gallery : function( params ) {
-                  //console.log('import_tmpl_from_gallery', params );
+            inject_tmpl_from_gallery : function( params ) {
+                  //console.log('inject_tmpl_from_gallery', params );
                   var self = this;
                   params = params || {};
                   // normalize params
                   params = $.extend({
                       is_file_import : false,
                       pre_import_check : false,
-                      tmpl_import_mode : 'replace'
+                      tmpl_inject_mode : 'replace'
                   }, params );
 
                   // SETUP FOR MANUAL INPUT
                   var __request__,
-                      _scope = 'local';//<= when importing a template not manually, scope is always local
+                      _scope = 'local';//<= when injecting a template not manually, scope is always local
 
 
-                  // remote template import case
+                  // remote template inject case
                   if ( !params.template_data ) {
-                        throw new Error( '::import_template => missing remote template data' );
+                        throw new Error( '::inject_tmpl => missing remote template data' );
                   }
                   __request__ = wp.ajax.post( 'sek_process_template_json', {
                         nonce: api.settings.nonce.save,
                         template_data : JSON.stringify( params.template_data ),
-                        pre_import_check : false//<= might be used in the future do stuffs. For example when importing manually, this property is used to skip the img sniffing on the first pass.
+                        pre_import_check : false//<= might be used in the future do stuffs. For example when importing manually a file, this property is used to skip the img sniffing on the first pass.
                         //sek_export_nonce : api.settings.nonce.save,
                         //skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
                         //active_locations : api.czr_sektions.activeLocations()
@@ -190,7 +190,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   /// NOW THAT WE HAVE OUR PROMISE
                   /// 1) CHECK IF CONTENT IS WELL FORMED AND ELIGIBLE FOR API
                   /// 2) LET'S PROCESS THE SETTING ID'S
-                  /// 3) ATTEMPT TO UPDATE THE SETTING API, LOCAL OR GLOBAL. ( always local for template import )
+                  /// 3) ATTEMPT TO UPDATE THE SETTING API, LOCAL OR GLOBAL. ( always local for template inject )
 
                   // fire a previewer loader removed on .always()
                   api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
@@ -219,14 +219,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // the ajax request is processed and will upload images if needed
                   __request__
                         .done( function( server_resp ) {
-                              // When manually importing a file, the server adds a "success" property
+                              // When manually injecting a file, the server adds a "success" property
                               // When loading a template this property is not sent. Let's normalize.
                               if ( _.isObject(server_resp) ) {
                                     server_resp = {success:true, data:server_resp};
                               }
                               //console.log('SERVER RESP 2 ?', server_resp );
                               if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
-                                    api.infoLog('::import_template problem => !api.czr_sektions.isImportedContentEligibleForAPI', server_resp, params );
+                                    api.infoLog('::inject_tmpl problem => !api.czr_sektions.isImportedContentEligibleForAPI', server_resp, params );
                                     return;
                               }
 
@@ -236,7 +236,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.czr_sektions.doUpdateApiSettingAfter_TmplGalleryImport( server_resp, params );
                         })
                         .fail( function( response ) {
-                              api.errare( '::import_template => ajax error', response );
+                              api.errare( '::inject_template => ajax error', response );
                               api.previewer.trigger('sek-notify', {
                                     notif_id : 'import-failed',
                                     type : 'error',
@@ -250,7 +250,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     ].join('')
                               });
                         });
-            },//import_tmpl_from_gallery
+            },//inject_tmpl_from_gallery
 
 
             // fired on ajaxrequest done
@@ -261,7 +261,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //       pre_import_check : false,
             //       template_name : tmpl_name,
             //       template_data : response.tmpl_json,
-            //       tmpl_import_mode : 3 possible import modes : replace, before, after,
+            //       tmpl_inject_mode : 3 possible import modes : replace, before, after,
             //       is_file_import : false
             // }
             doUpdateApiSettingAfter_TmplGalleryImport : function( server_resp, params ){
@@ -272,22 +272,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return;
                   }
 
-                  var _scope = 'local';// <= always local when template gallery import
+                  var _scope = 'local';// <= always local when template gallery inject
 
                   //api.infoLog('TODO => verify metas => version, active locations, etc ... ');
 
                   // Update the setting api via the normalized method
                   // the scope will determine the setting id, local or global
                   api.czr_sektions.updateAPISetting({
-                        action : 'sek-import-tmpl-from-gallery',
+                        action : 'sek-inject-tmpl-from-gallery',
                         scope : _scope,//'global' or 'local'<= will determine which setting will be updated,
                         // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
-                        imported_content : server_resp.data,
-                        tmpl_import_mode : params.tmpl_import_mode
+                        injected_content : server_resp.data,
+                        tmpl_inject_mode : params.tmpl_inject_mode
                   }).done( function() {
                         // Clean an regenerate the local option setting
                         // Settings are normally registered once and never cleaned, unlike controls.
-                        // After the import, updating the setting value will refresh the sections
+                        // After the inject, updating the setting value will refresh the sections
                         // but the local options, persisted in separate settings, won't be updated if the settings are not cleaned
                         if ( 'local' === _scope ) {
                               api.czr_sektions.generateUI({
