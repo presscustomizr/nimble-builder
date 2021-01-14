@@ -4,7 +4,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
             ////////////////////////////////////////////////////////
-            // IMPORT TEMPLATE FROM GALLERY => FROM USER SAVED COLLECTION OR REMOTE API
+            // INJECT TEMPLATE FROM GALLERY => FROM USER SAVED COLLECTION OR REMOTE API
             ////////////////////////////////////////////////////////
             // @return promise
             getTmplJsonFromUserTmpl : function( template_name ) {
@@ -120,7 +120,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   _promise.done( function( response ) {
                         //console.log('get_gallery_tmpl_json_and_import', params, response );
                         if ( response.success ) {
-                              //console.log('IMPORT NIMBLE TEMPLATE', response.lib.templates[template_name] );
+                              //console.log('INJECT NIMBLE TEMPLATE', response.lib.templates[template_name] );
                               self.import_tmpl_from_gallery({
                                     pre_import_check : false,
                                     template_name : tmpl_name,
@@ -131,7 +131,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
             },
 
-            // IMPORT TEMPLATE FROM GALLERY
+            // INJECT TEMPLATE FROM GALLERY
             // => REMOTE API COLLECTION + USER COLLECTION
             // @param params
             // {
@@ -230,7 +230,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     return;
                               }
 
-                              //console.log('MANUAL IMPORT DATA', server_resp );
+                              //console.log('MANUAL INJECT DATA', server_resp );
                               server_resp.data.data.collection = self.setIdsForImportedTmpl( server_resp.data.data.collection );
                               // and try to update the api setting
                               api.czr_sektions.doUpdateApiSettingAfter_TmplGalleryImport( server_resp, params );
