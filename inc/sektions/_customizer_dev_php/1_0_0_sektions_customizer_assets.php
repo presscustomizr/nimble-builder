@@ -212,7 +212,8 @@ function sek_enqueue_controls_js_css() {
                 'isTemplateSaveEnabled' => defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) && NIMBLE_TEMPLATE_SAVE_ENABLED, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/655
 
                 // Dec 2020
-                'templateAPIUrl' => defined('API_TEMPLATE_CPT') ? 'http://customizr-dev.test/wp-json/nimble/v2/cravan' : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
+                // When developing locally, allow a local template api request
+                'templateAPIUrl' => ( defined('NIMBLE_FETCH_API_TMPL_LOCALLY') && NIMBLE_FETCH_API_TMPL_LOCALLY ) ? 'http://customizr-dev.test/wp-json/nimble/v2/cravan' : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
             )
         )
     );//wp_localize_script()
