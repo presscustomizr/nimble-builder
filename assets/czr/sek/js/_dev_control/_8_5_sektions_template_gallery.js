@@ -237,7 +237,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       _dfd_ = $.Deferred(),
                       _titleAttr;
 
-                  self.getSavedTmplCollection().done( function( tmpl_collection ) {
+                  self.setSavedTmplCollection().done( function( tmpl_collection ) {
                         _.each( tmpl_collection, function( _data, _temp_id ) {
                               if( !_.isEmpty( _data.description ) ) {
                                   _titleAttr = [ _data.title, _data.last_modified_date, _data.description ].join(' | ');
