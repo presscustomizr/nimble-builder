@@ -19,6 +19,26 @@ function sek_ajax_get_all_saved_templates() {
 }
 
 ////////////////////////////////////////////////////////////////
+// Fetches the api templates
+add_action( 'wp_ajax_sek_get_all_api_tmpl', '\Nimble\sek_ajax_get_all_api_templates' );
+// @hook wp_ajax_sek_get_user_saved_templates
+function sek_ajax_get_all_api_templates() {
+    sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+
+    $decoded_templates = sek_get_all_api_templates();
+
+    if ( is_array($decoded_templates) ) {
+        wp_send_json_success( $decoded_templates );
+    } else {
+        if ( !empty( $decoded_templates ) ) {
+            sek_error_log(  __FUNCTION__ . ' error => invalid templates returned', $decoded_templates );
+            wp_send_json_error(  __FUNCTION__ . ' error => invalid templates returned' );
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
 // TEMPLATE GET CONTENT + METAS
 // Fetches the json of a given user template
 add_action( 'wp_ajax_sek_get_user_tmpl_json', '\Nimble\sek_ajax_sek_get_user_tmpl_json' );

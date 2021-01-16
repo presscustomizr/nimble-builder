@@ -166,6 +166,29 @@ function sek_get_all_saved_templates() {
 }
 
 
+// invoked on 'wp_ajax_sek_get_all_api_tmpl'
+// @return an unserialized array of api templates
+function sek_get_all_api_templates() {
+    $raw_tmpl = sek_get_tmpl_api_data( $force_update = true );
+    $collection = [];
+    if( !is_array( $raw_tmpl) )
+        return $collection;
+    foreach ( $raw_tmpl as $tmpl_cpt_post_name => $tmpl_data ) {
+        $metas = !is_array( $tmpl_data['metas'] ) ? [] : $tmpl_data['metas'];
+        if ( empty($metas) )
+            continue;
+            
+        $collection[ 'nb_api_'. $tmpl_cpt_post_name] = [
+            'title' => $metas['title'],
+            'description' => $metas['description'],
+            'last_modified_date' => mysql2date( 'Y-m-d', $metas['date'] ),
+            'thumb' => !empty( $metas['thumb'] ) ? $metas['thumb'] : ''
+        ];
+    }
+    return $collection;
+}
+
+
 
  // Update the 'nimble_template' post
  // Inserts a 'nimble_template' post when one doesn't yet exist.

@@ -564,18 +564,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.templateCollectionPromise.resolve( {} );
                               api.errare('control::getSavedTmplCollection => error => tmpl collection is invalid', tmpl_collection);
                         }
-
-                        // response is {tmpl_post_id: 436}
-                        //self.tmplDialogVisible( false );
-                        // api.previewer.trigger('sek-notify', {
-                        //     type : 'success',
-                        //     duration : 10000,
-                        //     message : [
-                        //           '<span style="font-size:0.95em">',
-                        //             '<strong>@missi18n Your template has been saved.</strong>',
-                        //           '</span>'
-                        //     ].join('')
-                        // });
                   })
                   .fail( function( er ) {
                         api.errorLog( 'ajax sek_get_all_saved_tmpl => error', er );
@@ -592,6 +580,44 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   return self.templateCollectionPromise;
-            }
+            },
+
+
+
+            // API TMPL COLLECTION
+            // @return a promise
+            getApiTmplCollection : function() {
+                  var self = this,
+                        dfd = $.Deferred();
+
+                  wp.ajax.post( 'sek_get_all_api_tmpl', {
+                        nonce: api.settings.nonce.save
+                        //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                  })
+                  .done( function( tmpl_collection ) {
+                        if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
+                              dfd.resolve( tmpl_collection );
+                              console.log('GET API TMPL COLLECTION', tmpl_collection );
+                        } else {
+                              dfd.resolve( {} );
+                              api.errare('control::getApiTmplCollection => error => tmpl collection is invalid', tmpl_collection);
+                        }
+                  })
+                  .fail( function( er ) {
+                        api.errorLog( 'ajax sek_get_all_api_tmpl => error', er );
+                        api.previewer.trigger('sek-notify', {
+                            type : 'error',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>' + sektionsLocalizedData.i18n['Error when processing templates'] + '</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                        dfd.resolve({});
+                  });
+
+                  return dfd;
+            },
       });//$.extend()
 })( wp.customize, jQuery );
