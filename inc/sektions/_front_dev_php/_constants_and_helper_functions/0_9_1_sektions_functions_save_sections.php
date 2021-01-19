@@ -206,6 +206,7 @@ function sek_update_saved_section_post( $section_data ) {
 
     // the section post name is provided only when updating
     $is_update_case = !is_null($section_data['section_post_name']);
+    $is_edit_metas_only_case = 'yes' === $section_data['edit_metas_only'];
 
     // $post_name_to_update will be used when user updates an existing section
     if ( !is_null($section_data['section_post_name']) ) {
@@ -217,7 +218,23 @@ function sek_update_saved_section_post( $section_data ) {
     // Update the post name now
     $section_data['section_post_name'] = $section_post_name;
 
-    $post_data = array(
+    // Update post if it already exists, otherwise create a new one.
+    $current_section_post = null;
+    if ( $is_update_case ) {
+        // When this is an update case, we fetch the existing tmpl_post in order to later get its id
+        $current_section_post = sek_get_saved_section_post( $section_post_name );
+
+        // if this is an update case + editing metas only, then we use the current content
+        if ( $is_edit_metas_only_case && isset($current_section_post->post_content) ) {
+            sek_error_log('IS EDIT METAS ONLY ?');
+            $current_section_data = maybe_unserialize( $current_section_post->post_content );
+            if ( is_array($current_section_data) && isset($current_section_data['data']) && is_array($current_section_data['data']) && !empty($current_section_data['data']) ) {
+                $section_data['data'] = $current_section_data['data'];
+            }
+        }
+    }
+
+    $new_or_updated_post_data = array(
         'post_title' => esc_attr( $section_data['metas']['title'] ),
         'post_name' => $section_post_name,
         'post_type' => NIMBLE_SECTION_CPT,
@@ -225,17 +242,13 @@ function sek_update_saved_section_post( $section_data ) {
         'post_content' => maybe_serialize( $section_data )
     );
 
-    // Update post if it already exists, otherwise create a new one.
-    $section_post = null;
-    if ( $is_update_case ) {
-        $section_post = sek_get_saved_section_post( $section_post_name );
-    }
+    
 
-    if ( $section_post && is_object($section_post) ) {
-        $post_data['ID'] = $section_post->ID;
-        $r = wp_update_post( wp_slash( $post_data ), true );
+    if ( $current_section_post && is_object($current_section_post) ) {
+        $new_or_updated_post_data['ID'] = $current_section_post->ID;
+        $r = wp_update_post( wp_slash( $new_or_updated_post_data ), true );
     } else {
-        $r = wp_insert_post( wp_slash( $post_data ), true );
+        $r = wp_insert_post( wp_slash( $new_or_updated_post_data ), true );
         if ( !is_wp_error( $r ) ) {
             $post_id = $r;//$r is the post ID
             // Trigger creation of a revision. This should be removed once #30854 is resolved.

@@ -155,7 +155,7 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
   font-size: italic;
 }
 
-.sek-sec-info > .remove-user-sec {
+.sek-sec-info > .remove-user-sec, .sek-sec-info > .edit-user-sec {
   cursor: pointer;
   font-size: 16px;
   width: 30px;
@@ -163,7 +163,7 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
   color: #535353;
   background: rgba(255, 255, 255, 0.7);
   border-radius: 30px;
-  opacity: 0;
+  opacity: 0.3;
   -webkit-box-shadow: 0 2px 6px rgba(0,0,0,.2);
   box-shadow: 0 2px 6px rgba(0,0,0,.2);
   -webkit-transition: all .20s ease;
@@ -179,17 +179,29 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
   -ms-flex-pack: center;
   justify-content: center;
   position: absolute;
+}
+.sek-sec-info > .remove-user-sec {
   bottom: 0px;
   right: 5px;
 }
+.sek-sec-info > .edit-user-sec {
+  bottom: 0px;
+  left: 5px;
+}
 .sek-sec-info:hover > .remove-user-sec {
     opacity: 0.7;
+}
+.sek-sec-info:hover > .edit-user-sec {
+  opacity: 0.7;
 }
 .sek-sec-info > .remove-user-sec:hover {
     opacity: 0.95;
     color: red;
 }
-
+.sek-sec-info > .edit-user-sec:hover {
+  opacity: 0.95;
+  color: #000000;
+}
 /* DRAGGING STUFFS */
 .sek-dragging [data-sek-content-type] {
   -webkit-box-shadow: 0 2px 5px rgba(0,0,0,.25)!important;

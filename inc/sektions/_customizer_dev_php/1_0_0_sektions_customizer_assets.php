@@ -846,6 +846,9 @@ function sek_print_nimble_customizer_tmpl() {
               <button aria-pressed="false" data-section-mode-switcher="update" class="sek-ui-button" type="button" title="<?php _e('Update a section', 'text_domain'); ?>">
                   <i class="far fa-edit"></i>&nbsp;<?php _e('Update a section', 'text_domain'); ?>
               </button>
+              <button aria-pressed="false" data-section-mode-switcher="edit" class="sek-ui-button" type="button" title="<?php _e('Edit a section', 'text_domain'); ?>">
+                  <i class="far fa-edit"></i>&nbsp;<?php _e('Edit a section', 'text_domain'); ?>
+              </button>
               <button aria-pressed="false" data-section-mode-switcher="remove" class="sek-ui-button" type="button" title="<?php _e('Remove section(s)', 'text_domain'); ?>">
                   <i class="fas fa-trash"></i>&nbsp;<?php _e('Remove section(s)', 'text_domain'); ?>
               </button>

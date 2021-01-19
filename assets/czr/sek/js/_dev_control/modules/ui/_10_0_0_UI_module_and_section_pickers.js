@@ -214,6 +214,7 @@
                                                           '<h3 class="sec-title">' + secData.title + '</h3>',
                                                           '<p class="sec-date"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', secData.last_modified_date ].join(' ') + '</i></p>',
                                                           '<p class="sec-desc">' + secData.description + '</p>',
+                                                          '<i class="material-icons edit-user-sec" title="'+ sektionsLocalizedData.i18n['Edit this template'] +'">edit</i>',
                                                           '<i class="material-icons remove-user-sec" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>',
                                                           //'<div class="sek-overlay"></div>',
                                                           //'<div class="sek-saved-section-description">' + secData.description + '</div>',
@@ -247,17 +248,36 @@
                         // with delegation
                         attachDomEvents : function() {
                               // Attach events
-                              this.container.on('click', '.sek-sec-info .remove-user-sec', function(evt) {
-                                    evt.preventDefault();
-                                    var self = api.czr_sektions;
-                                    var _focusOnRemoveCandidate = function( mode ) {
-                                          self.saveSectionDialogMode( 'remove' );
-                                          // self unbind
-                                          self.saveSectionDialogMode.unbind( _focusOnRemoveCandidate );
-                                    };
-                                    self.saveSectionDialogMode.bind( _focusOnRemoveCandidate );
-                                    self.saveSectionDialogVisible(true);
-                              });
+                              this.container
+                                    .on('click', '.sek-sec-info .remove-user-sec', function(evt) {
+                                          evt.preventDefault();
+                                          var self = api.czr_sektions;
+                                          self.saveSectionDialogVisible(false);
+                                          // Close section dialog if it was open 
+                                          //self.saveSectionDialogMode( 'hidden' );
+                                          var _focusOnRemoveCandidate = function( mode ) {
+                                                self.saveSectionDialogMode( 'remove' );
+                                                // self unbind
+                                                self.saveSectionDialogMode.unbind( _focusOnRemoveCandidate );
+                                          };
+                                          self.userSectionToRemove = $(this).closest("[data-sek-content-id]").data('sek-content-id');
+                                          self.saveSectionDialogMode.bind( _focusOnRemoveCandidate );
+                                          self.saveSectionDialogVisible(true);
+                                    })
+                                    .on('click', '.sek-sec-info .edit-user-sec', function(evt) {
+                                          evt.preventDefault();
+                                          var self = api.czr_sektions;
+                                          self.saveSectionDialogVisible(false);
+                                          //self.saveSectionDialogMode( 'hidden' );
+                                          var _focusOnEditCandidate = function( mode ) {
+                                                self.saveSectionDialogMode( 'edit' );
+                                                // self unbind
+                                                self.saveSectionDialogMode.unbind( _focusOnEditCandidate );
+                                          };
+                                          self.userSectionToEdit = $(this).closest("[data-sek-content-id]").data('sek-content-id');
+                                          self.saveSectionDialogMode.bind( _focusOnEditCandidate );
+                                          self.saveSectionDialogVisible(true);
+                                    });
                         }
                   });//module.inputConstructor
 

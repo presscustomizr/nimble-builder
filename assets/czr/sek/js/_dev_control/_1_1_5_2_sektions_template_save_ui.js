@@ -333,7 +333,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   wp.ajax.post( 'sek_save_user_template', {
                         nonce: api.settings.nonce.save,
-                        tmpl_data: JSON.stringify( currentLocalSettingValue ),
+                        tmpl_data: 'edit' === self.tmplDialogMode() ? '' : JSON.stringify( currentLocalSettingValue ),
                         // the following will be saved in 'metas'
                         tmpl_title: tmpl_title,
                         tmpl_description: tmpl_description,

@@ -43,7 +43,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   self.saveSectionDialogMode = new api.Value('hidden');// 'save' default mode is set when dialog html is rendered
                   self.saveSectionDialogMode.bind( function(mode){
-                        if ( !_.contains(['hidden', 'save', 'update', 'remove' ], mode ) ) {
+                        if ( !_.contains(['hidden', 'save', 'update', 'remove', 'edit' ], mode ) ) {
                               api.errare('error setupSaveSectionUI => unknown section dialog mode', mode );
                               mode = 'save';
                         }
@@ -61,7 +61,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // make sure the remove dialog is hidden
                         $secSaveDialogWrap.removeClass('sek-removal-confirmation-opened');
-
+                        var $selectEl;
                         // execute actions depending on the selected mode
                         switch( mode ) {
                               case 'save' :
@@ -70,14 +70,29 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     $descInput.val('');
                               break;
                               case 'update' :
-                              case 'remove' :
-                                    var $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker');
-                                        // Make sure the select value is always reset when switching mode
-                                        $selectEl.val('none').trigger('change');
+                              case 'edit' :
+                                    $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker');
+                                    // Make sure the select value is always reset when switching mode
+                                    $selectEl.val('none').trigger('change');
 
                                     self.setSavedSectionCollection().done( function( sec_collection ) {
                                           // refresh section picker in case the user updated without changing anything
                                           self.refreshSectionPickerHtml();
+                                          $selectEl.val( self.userSectionToEdit || 'none' ).trigger('change');
+                                          self.userSectionToEdit = null;
+                                    });
+                              break;
+                              case 'remove' :
+                                    console.log('sOOO ?', self.userSectionToRemove );
+                                    $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker');
+                                    // Make sure the select value is always reset when switching mode
+                                    $selectEl.val('none').trigger('change');
+
+                                    self.setSavedSectionCollection().done( function( sec_collection ) {
+                                          // refresh section picker in case the user updated without changing anything
+                                          self.refreshSectionPickerHtml();
+                                          $selectEl.val( self.userSectionToRemove || 'none' ).trigger('change');
+                                          self.userSectionToRemove = null;
                                     });
                               break;
                         }//switch
@@ -170,77 +185,78 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // ATTACH DOM EVENTS
                   // Dialog Mode Switcher
-                  $secSaveDialogWrap.on( 'click', '[data-section-mode-switcher]', function(evt) {
-                        evt.preventDefault();
-                        self.saveSectionDialogMode($(this).data('section-mode-switcher'));
-                  });
+                  $secSaveDialogWrap
+                        .on( 'click', '[data-section-mode-switcher]', function(evt) {
+                              evt.preventDefault();
+                              self.saveSectionDialogMode($(this).data('section-mode-switcher'));
+                        })
 
-                  // React to section select
-                  // update title and description fields on section selection
-                  $secSaveDialogWrap.on( 'change', '.sek-saved-section-picker', function(evt){ self.reactOnSectionSelection(evt, $(this) ); });
+                        // React to section select
+                        // update title and description fields on section selection
+                        .on( 'change', '.sek-saved-section-picker', function(evt){ self.reactOnSectionSelection(evt, $(this) ); })
 
-                  // SAVE
-                  $secSaveDialogWrap.on( 'click', '.sek-do-save-section', function(evt){
-                        $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
-                        self.saveOrUpdateSavedSection(evt).done( function( response ) {
-                              $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
-                              if ( response.success ) {
-                                    self.saveSectionDialogVisible( false );
-                                    self.setSavedSectionCollection( { refresh : true } );// <= true for refresh
-                              }
-                        });
-                  });
+                        // SAVE
+                        .on( 'click', '.sek-do-save-section', function(evt){
+                              $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
+                              self.saveOrUpdateSavedSection(evt).done( function( response ) {
+                                    $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
+                                    if ( response.success ) {
+                                          self.saveSectionDialogVisible( false );
+                                          self.setSavedSectionCollection( { refresh : true } );// <= true for refresh
+                                    }
+                              });
+                        })
 
-                  // UPDATE
-                  $secSaveDialogWrap.on( 'click', '.sek-do-update-section', function(evt){
-                        var $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker'),
-                            sectionPostNameCandidateForUpdate = $selectEl.val();
-                        // make sure we don't try to remove the default option
-                        if ( 'none' === sectionPostNameCandidateForUpdate || _.isEmpty(sectionPostNameCandidateForUpdate) )
-                          return;
+                        // UPDATE
+                        .on( 'click', '.sek-do-update-section', function(evt){
+                              var $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker'),
+                              sectionPostNameCandidateForUpdate = $selectEl.val();
+                              // make sure we don't try to remove the default option
+                              if ( 'none' === sectionPostNameCandidateForUpdate || _.isEmpty(sectionPostNameCandidateForUpdate) )
+                              return;
 
-                        $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
-                        self.saveOrUpdateSavedSection(evt, sectionPostNameCandidateForUpdate).done( function(response) {
-                              $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
-                              if ( response.success ) {
-                                    self.saveSectionDialogVisible( false );
-                                    self.setSavedSectionCollection( { refresh : true } )// <= true for refresh
-                                          .done( function( sec_collection ) {
-                                                // refresh section picker in case the user updated without changing anything
-                                                self.refreshSectionPickerHtml();
-                                          });
-                              }
-                        });
-                  });
+                              $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
+                              self.saveOrUpdateSavedSection(evt, sectionPostNameCandidateForUpdate).done( function(response) {
+                                    $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
+                                    if ( response.success ) {
+                                          self.saveSectionDialogVisible( false );
+                                          self.setSavedSectionCollection( { refresh : true } )// <= true for refresh
+                                                .done( function( sec_collection ) {
+                                                      // refresh section picker in case the user updated without changing anything
+                                                      self.refreshSectionPickerHtml();
+                                                });
+                                    }
+                              });
+                        })
 
-                  // REMOVE
-                  // Reveal remove dialog
-                  $secSaveDialogWrap.on( 'click', '.sek-open-remove-confirmation', function(evt){
-                        $secSaveDialogWrap.addClass('sek-removal-confirmation-opened');
-                  });
+                        // REMOVE
+                        // Reveal remove dialog
+                        .on( 'click', '.sek-open-remove-confirmation', function(evt){
+                              $secSaveDialogWrap.addClass('sek-removal-confirmation-opened');
+                        })
 
-                  // Do Remove
-                  $secSaveDialogWrap.on( 'click', '.sek-do-remove-section', function(evt){
-                        var $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker'),
-                            sectionPostNameCandidateForRemoval = $selectEl.val();
-                        // make sure we don't try to remove the default option
-                        if ( 'none' === sectionPostNameCandidateForRemoval || _.isEmpty(sectionPostNameCandidateForRemoval) )
-                          return;
+                        // Do Remove
+                        .on( 'click', '.sek-do-remove-section', function(evt){
+                              var $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker'),
+                              sectionPostNameCandidateForRemoval = $selectEl.val();
+                              // make sure we don't try to remove the default option
+                              if ( 'none' === sectionPostNameCandidateForRemoval || _.isEmpty(sectionPostNameCandidateForRemoval) )
+                              return;
 
-                        $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
-                        self.removeSavedSection(evt, sectionPostNameCandidateForRemoval).done( function(response) {
-                              $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
+                              $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
+                              self.removeSavedSection(evt, sectionPostNameCandidateForRemoval).done( function(response) {
+                                    $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
+                                    $secSaveDialogWrap.removeClass('sek-removal-confirmation-opened');
+                                    if ( response.success ) {
+                                          self.setSavedSectionCollection( { refresh : true } );// <= true for refresh
+                                    }
+                              });
+                        })
+
+                        // Cancel Remove
+                        .on( 'click', '.sek-cancel-remove-section', function(evt){
                               $secSaveDialogWrap.removeClass('sek-removal-confirmation-opened');
-                              if ( response.success ) {
-                                    self.setSavedSectionCollection( { refresh : true } );// <= true for refresh
-                              }
                         });
-                  });
-
-                  // Cancel Remove
-                  $secSaveDialogWrap.on( 'click', '.sek-cancel-remove-section', function(evt){
-                        $secSaveDialogWrap.removeClass('sek-removal-confirmation-opened');
-                  });
 
 
                   // Switch to update mode
@@ -297,22 +313,38 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Fired on 'click' on .sek-do-save-section btn
             // @param sectionPostNameCandidateForUpdate is only provided when saving
             saveOrUpdateSavedSection : function(evt, sectionPostNameCandidateForUpdate ) {
-                  var self = this, _dfd_ = $.Deferred();
+                  var self = this,
+                        _dfd_ = $.Deferred(),
+                        _isEditSectionMode = 'edit' === self.saveSectionDialogMode();
+
                   // idOfSectionToSave is set when reacting to click action
                   // @see react to preview 'sek-toggle-save-section-ui'
-                  if ( !self.idOfSectionToSave || _.isEmpty( self.idOfSectionToSave ) ) {
-                        api.errare('saveOrUpdateSavedSection => error => missing section id');
-                        return _dfd_.resolve( {success:false});
+                  if ( !_isEditSectionMode ) {
+                        if ( !self.idOfSectionToSave || _.isEmpty( self.idOfSectionToSave ) ) {
+                              api.errare('saveOrUpdateSavedSection => error => missing section id');
+                              return _dfd_.resolve( {success:false});
+                        }
                   }
                   evt.preventDefault();
                   var $_title = $('#sek-saved-section-title'),
                       section_title = $_title.val(),
                       section_description = $('#sek-saved-section-description').val(),
-                      sectionModel = $.extend( true, {}, self.getLevelModel( self.idOfSectionToSave ) );
+                      sectionModel;
 
-                  if ( 'no_match' == sectionModel ) {
-                        api.errare('saveOrUpdateSavedSection => error => no section model with id ' + self.idOfSectionToSave );
-                        return _dfd_.resolve( {success:false});
+                  // Only get the section model when not in edit section mode 
+                  if ( !_isEditSectionMode ) {
+                        sectionModel = $.extend( true, {}, self.getLevelModel( self.idOfSectionToSave ) );
+                        if ( 'no_match' == sectionModel ) {
+                              api.errare('saveOrUpdateSavedSection => error => no section model with id ' + self.idOfSectionToSave );
+                              return _dfd_.resolve( {success:false});
+                        }
+                        // Do some pre-processing before ajaxing
+                        // Note : ids will be replaced server side
+                        sectionModel = self.preProcessSection( sectionModel );
+                        if ( !_.isObject( sectionModel ) ) {
+                              api.errare('::saveOrUpdateSavedSection => error => invalid sectionModel');
+                              return _dfd_.resolve( {success:false});
+                        }
                   }
 
                   if ( _.isEmpty( section_title ) ) {
@@ -332,22 +364,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   $('#sek-saved-section-title').removeClass('error');
 
-                  // Do some pre-processing before ajaxing
-                  // Note : ids will be replaced server side
-                  sectionModel = self.preProcessSection( sectionModel );
-                  if ( !_.isObject( sectionModel ) ) {
-                        api.errare('::saveOrUpdateSavedSection => error => invalid sectionModel');
-                        _dfd_.resolve( {success:false});
-                  }
-
                   wp.ajax.post( 'sek_save_user_section', {
                         nonce: api.settings.nonce.save,
-                        section_data: JSON.stringify( sectionModel ),
+                        section_data: _isEditSectionMode ? '' : JSON.stringify( sectionModel ),
                         // the following will be saved in 'metas'
                         section_title: section_title,
                         section_description: section_description,
                         section_post_name: sectionPostNameCandidateForUpdate || '',// <= provided when updating a section
                         skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                        edit_metas_only: _isEditSectionMode ? 'yes' : 'no'//<= in this case we only update title and description. Not the template content
                         //active_locations : api.czr_sektions.activeLocations()
                   })
                   .done( function( response ) {

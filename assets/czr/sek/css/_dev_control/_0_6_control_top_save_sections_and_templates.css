@@ -161,14 +161,26 @@ select.sek-saved-section-picker {
 [data-sek-tmpl-dialog-mode="remove"].sek-removal-confirmation-opened .sek-tmpl-remove-dialog { display: block;}
 
 /* SECTION UI VISIBILITY = f(mode) */
+[data-sek-section-dialog-mode="save"] [data-section-mode-switcher="remove"] {display: none;}
 [data-sek-section-dialog-mode="save"] .sek-saved-section-picker {display: none;}
 [data-sek-section-dialog-mode="save"] .sek-section-title {display: block;}
 [data-sek-section-dialog-mode="save"] .sek-section-description {display: block;}
 [data-sek-section-dialog-mode="save"] .sek-do-save-section {display: block;border-color: #ffff00;background: #f9f9b6f7;border-radius: 3px!important;}
 
+[data-sek-section-dialog-mode="update"] [data-section-mode-switcher="remove"] {display: none;}
 [data-sek-section-dialog-mode="update"].sek-section-update-selected .sek-section-title {display: block;}
 [data-sek-section-dialog-mode="update"].sek-section-update-selected .sek-section-description {display: block;}
 [data-sek-section-dialog-mode="update"].sek-section-update-selected .sek-do-update-section {display: block;}
+
+.sek-save-section-mode-switcher .sek-ui-button[data-section-mode-switcher="edit"] {display: none;}
+[data-sek-section-dialog-mode="edit"] [data-section-mode-switcher="edit"] {display: inline-block!important;}
+[data-sek-section-dialog-mode="edit"] [data-section-mode-switcher="update"] {display: none;}
+[data-sek-section-dialog-mode="edit"] [data-section-mode-switcher="save"] {display: none;}
+[data-sek-section-dialog-mode="edit"] [data-section-mode-switcher="remove"] {display: none;}
+[data-sek-section-dialog-mode="edit"] .sek-saved-section-picker {display: block;}
+[data-sek-section-dialog-mode="edit"] .sek-section-title {display: block;}
+[data-sek-section-dialog-mode="edit"] .sek-section-description {display: block;}
+[data-sek-section-dialog-mode="edit"] .sek-do-update-section {display: block;}
 
 [data-sek-section-dialog-mode="remove"].sek-section-remove-selected .sek-open-remove-confirmation {display: block;}
 [data-sek-section-dialog-mode="remove"].sek-removal-confirmation-opened .sek-open-remove-confirmation {display: none!important;}

@@ -78,11 +78,12 @@ add_action( 'wp_ajax_sek_save_user_section', '\Nimble\sek_ajax_save_user_section
 // hook : wp_ajax_sek_save_user_section
 function sek_ajax_save_user_section() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+    $is_edit_metas_only_case = isset( $_POST['edit_metas_only'] ) && 'yes' === $_POST['edit_metas_only'];
     // TMPL DATA => the nimble content
-    if ( empty( $_POST['section_data']) ) {
+    if ( !$is_edit_metas_only_case && empty( $_POST['section_data']) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_section_data' );
     }
-    if ( !is_string( $_POST['section_data'] ) ) {
+    if ( !$is_edit_metas_only_case && !is_string( $_POST['section_data'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_section_data_must_be_a_json_stringified' );
     }
 
@@ -101,10 +102,13 @@ function sek_ajax_save_user_section() {
     //     wp_send_json_error( __FUNCTION__ . '_missing_active_locations' );
     // }
 
-
-    // clean level ids and replace them with a placeholder string
-    $seks_data = json_decode( wp_unslash( $_POST['section_data'] ), true );
-    $seks_data = sek_section_save_clean_id( $seks_data );
+    if ( $is_edit_metas_only_case ) {
+        $seks_data = [];
+    } else {
+        // clean level ids and replace them with a placeholder string
+        $seks_data = json_decode( wp_unslash( $_POST['section_data'] ), true );
+        $seks_data = sek_section_save_clean_id( $seks_data );
+    }
 
     // make sure description and title are clean before DB
     $sec_title = wp_strip_all_tags( $_POST['section_title'] );
@@ -123,7 +127,8 @@ function sek_ajax_save_user_section() {
             //'active_locations' => is_array( $_POST['active_locations'] ) ? $_POST['active_locations'] : array(),
             'date' => date("Y-m-d"),
             'theme' => sanitize_title_with_dashes( get_stylesheet() )
-        )
+        ),
+        'edit_metas_only' => $is_edit_metas_only_case ? 'yes' : 'no'
     );
 
     $saved_section_post = sek_update_saved_section_post( $section_to_save );
