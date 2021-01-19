@@ -91,6 +91,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               _doPrintTmplGalleryHtml( {what:'user_tmpl'} );
                         } else {
+                              $tmplGalWrapper = $('#nimble-tmpl-gallery');
                               $tmplGalWrapper.find('#sek-tmpl-source-switcher').show();
                               // Reset template source switcher buttons
                               $tmplGalWrapper.find('#sek-tmpl-source-switcher button').attr('aria-pressed', "false").removeClass('is-selected');
@@ -155,7 +156,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         if ( $cssLoader.length > 0 ) {
                               $cssLoader.hide({
-                                    duration : 300,
+                                    duration : 100,
                                     complete : function() {
                                           //$(this).remove();
                                           _dfd_.resolve( _html );
