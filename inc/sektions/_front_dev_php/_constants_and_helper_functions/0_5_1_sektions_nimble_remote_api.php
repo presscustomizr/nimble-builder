@@ -87,7 +87,7 @@ function sek_get_nimble_api_data( $force_update = false ) {
         
         if ( !empty( $info_data['lib'] ) ) {
             if ( !empty( $info_data['lib']['templates'] ) ) {
-                sek_error_log('UPDATE TMPL API DATA ?', $info_data['lib']['templates'] );
+                //sek_error_log('UPDATE TMPL API DATA ?', $info_data['lib']['templates'] );
                 update_option( NIMBLE_API_TMPL_LIB_OPT_NAME, maybe_serialize( $info_data['lib']['templates'] ), 'no' );
             }
             unset( $info_data['lib'] );
@@ -100,7 +100,7 @@ function sek_get_nimble_api_data( $force_update = false ) {
         //sek_error_log('API DATA ?', $info_data );
         set_transient( $api_data_transient_name, $info_data, 12 * HOUR_IN_SECONDS );
     }//if ( $force_update || false === $info_data ) {
-
+    
     return $info_data;
 }
 
@@ -121,7 +121,8 @@ function sek_get_tmpl_api_data( $force_update = false ) {
         sek_error_log( __FUNCTION__ . ' => error => no json_collection' );
         return array();
     }
-    
+   
+    //return [];
     return maybe_unserialize( $tmpl_data );
 }
 
