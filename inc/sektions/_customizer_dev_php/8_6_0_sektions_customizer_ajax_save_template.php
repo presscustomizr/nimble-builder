@@ -91,11 +91,13 @@ function sek_ajax_save_user_template() {
     //sek_error_log( __FUNCTION__ . ' ALORS YEAH ? ?', $_POST );
 
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+    $is_edit_metas_only_case = isset( $_POST['edit_metas_only'] ) && 'yes' === $_POST['edit_metas_only'];
+
     // TMPL DATA => the nimble content
-    if ( empty( $_POST['tmpl_data']) ) {
+    if ( !$is_edit_metas_only_case && empty( $_POST['tmpl_data']) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_template_data' );
     }
-    if ( !is_string( $_POST['tmpl_data'] ) ) {
+    if ( !$is_edit_metas_only_case && !is_string( $_POST['tmpl_data'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_template_data_must_be_a_json_stringified' );
     }
 
@@ -114,10 +116,14 @@ function sek_ajax_save_user_template() {
         wp_send_json_error( __FUNCTION__ . '_missing_tmpl_locations' );
     }
 
-    // clean level ids and replace them with a placeholder string
-    $tmpl_data = json_decode( wp_unslash( $_POST['tmpl_data'] ), true );
-    $tmpl_data = sek_template_save_clean_id( $tmpl_data );
-
+    if ( $is_edit_metas_only_case ) {
+        $tmpl_data = [];
+    } else {
+        // clean level ids and replace them with a placeholder string
+        $tmpl_data = json_decode( wp_unslash( $_POST['tmpl_data'] ), true );
+        $tmpl_data = sek_template_save_clean_id( $tmpl_data );
+    }
+    
     // make sure description and title are clean before DB
     $tmpl_title = wp_strip_all_tags( $_POST['tmpl_title'] );
     $tmpl_description = wp_strip_all_tags( $_POST['tmpl_description'] );
@@ -126,7 +132,7 @@ function sek_ajax_save_user_template() {
 
     // sek_error_log('json decode ?', json_decode( wp_unslash( $_POST['sek_data'] ), true ) );
     $template_to_save = array(
-        'data' => $tmpl_data,//<= json stringified
+        'data' => $tmpl_data,//<= array
         'tmpl_post_name' => ( !empty( $_POST['tmpl_post_name'] ) && is_string( $_POST['tmpl_post_name'] ) ) ? $_POST['tmpl_post_name'] : null,
         'metas' => array(
             'title' => $tmpl_title,
@@ -140,7 +146,7 @@ function sek_ajax_save_user_template() {
             'date' => date("Y-m-d"),
             'theme' => sanitize_title_with_dashes( get_stylesheet() )
         ),
-        'edit_metas_only' => isset( $_POST['edit_metas_only'] ) ? $_POST['edit_metas_only'] : 'no'
+        'edit_metas_only' => $is_edit_metas_only_case ? 'yes' : 'no'
     );
 
     $saved_template_post = sek_update_saved_tmpl_post( $template_to_save );

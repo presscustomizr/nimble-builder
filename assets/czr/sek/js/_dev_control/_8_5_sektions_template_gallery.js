@@ -266,13 +266,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // EDIT
                         .on( 'click', '.sek-tmpl-info .edit-tmpl', function(evt) {
                               evt.preventDefault();
-                              var _focusOnRemoveCandidate = function( mode ) {
+                              var _focusOnEditCandidate = function( mode ) {
                                     self.tmplDialogMode( 'edit' );
                                     // self unbind
-                                    self.tmplDialogMode.unbind( _focusOnRemoveCandidate );
+                                    self.tmplDialogMode.unbind( _focusOnEditCandidate );
                               };
                               self.tmplToEdit = $(this).closest("[data-sek-tmpl-item-id]").data('sek-tmpl-item-id');
-                              self.tmplDialogMode.bind( _focusOnRemoveCandidate );
+                              self.tmplDialogMode.bind( _focusOnEditCandidate );
                               self.tmplDialogVisible(true);
                         })
                         // REMOVE
