@@ -149,7 +149,7 @@
 }
 
 /* REMOVE TMPL BUTTON */
-.sek-tmpl-info > .remove-tmpl {
+.sek-tmpl-info > .remove-tmpl, .sek-tmpl-info > .edit-tmpl {
     cursor: pointer;
     font-size: 16px;
     width: 30px;
@@ -157,7 +157,7 @@
     color: #535353;
     background: rgba(255, 255, 255, 0.7);
     border-radius: 30px;
-    opacity: 0;
+    opacity: 0.4;
     -webkit-box-shadow: 0 2px 6px rgba(0,0,0,.2);
     box-shadow: 0 2px 6px rgba(0,0,0,.2);
     -webkit-transition: all .20s ease;
@@ -173,15 +173,25 @@
     -ms-flex-pack: center;
     justify-content: center;
     position: absolute;
-    bottom: 10px;
-    right: 10px;
 }
-.sek-tmpl-info:hover > .remove-tmpl {
+.sek-tmpl-info > .remove-tmpl {
+  bottom: 10px;
+  right: 10px;
+}
+.sek-tmpl-info > .edit-tmpl {
+  bottom: 10px;
+  left: 10px;
+}
+.sek-tmpl-info:hover > .remove-tmpl, .sek-tmpl-info:hover > .edit-tmpl {
   opacity: 0.7;
 }
-.sek-tmpl-info > .remove-tmpl:hover {
+.sek-tmpl-info > .remove-tmpl:hover{
   opacity: 0.95;
   color: red;
+}
+.sek-tmpl-info > .edit-tmpl:hover {
+  opacity: 0.95;
+  color: #000000;
 }
 
 /*.sek-tmpl-gallery-inner .sek-tmpl-item:after, .sek-tmpl-gallery-inner .sek-tmpl-item:before {
@@ -190,9 +200,11 @@
 .sek-tmpl-gallery-inner .sek-tmpl-thumb {
     cursor: pointer;
     position: relative;
-    height: 350px;
+    height: 380px;
     width: 100%;
     background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 .sek-tmpl-thumb img { max-width: 100%; }
 .sek-tmpl-gallery-inner .sek-tmpl-thumb::after {
@@ -241,6 +253,18 @@ input.sek-filter-tmpl {
 
 /* TMPL SOURCE SWITCHER */
 #sek-tmpl-source-switcher{
+  display: none;/* <= rendered only if we could access NB api */
   width:100%;
   padding: 10px 0;
+}
+#sek-tmpl-source-switcher .sek-ui-button-group {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  /* flex-direction: column; */
+  flex: 0 0 100%;
+  max-width: 100%;
 }

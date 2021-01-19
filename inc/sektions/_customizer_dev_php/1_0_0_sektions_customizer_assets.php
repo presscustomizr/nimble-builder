@@ -647,6 +647,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             // Template gallery and save
             'Last modified' => __('Last modified', 'text_dom'),
             'Use this template' => __('Use this template', 'text_dom'),
+            'Edit this template' => __('Edit this template', 'text_dom'),
             'Remove this template' => __('Remove this template', 'text_dom'),
             'A title is required' => __('A title is required', 'text_dom'),
             'Template saved' => __('Template saved', 'text_dom'),
@@ -906,6 +907,9 @@ function sek_print_nimble_customizer_tmpl() {
               </button>
               <button aria-pressed="false" data-tmpl-mode-switcher="update" class="sek-ui-button" type="button" title="<?php _e('Update a template', 'text_domain'); ?>">
                   <i class="far fa-edit"></i>&nbsp;<?php _e('Update a template', 'text_domain'); ?>
+              </button>
+              <button aria-pressed="false" data-tmpl-mode-switcher="edit" class="sek-ui-button" type="button" title="<?php _e('Edit a template', 'text_domain'); ?>">
+                  <i class="far fa-edit"></i>&nbsp;<?php _e('Edit a template', 'text_domain'); ?>
               </button>
               <button aria-pressed="false" data-tmpl-mode-switcher="remove" class="sek-ui-button" type="button" title="<?php _e('Remove template(s)', 'text_domain'); ?>">
                   <i class="fas fa-trash"></i>&nbsp;<?php _e('Remove template(s)', 'text_domain'); ?>

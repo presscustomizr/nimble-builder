@@ -133,15 +133,29 @@ select.sek-saved-section-picker {
 }
 
 /* TMPL UI VISIBILITY = f(mode) */
+[data-sek-tmpl-dialog-mode="save"] [data-tmpl-mode-switcher="remove"] {display: none;}
 [data-sek-tmpl-dialog-mode="save"] .sek-saved-tmpl-picker {display: none;}
 [data-sek-tmpl-dialog-mode="save"] .sek-tmpl-title {display: block;}
 [data-sek-tmpl-dialog-mode="save"] .sek-tmpl-description {display: block;}
 [data-sek-tmpl-dialog-mode="save"] .sek-do-save-tmpl {display: block;border-color: #ffff00;background: #f9f9b6f7;border-radius: 3px!important;}
 
+[data-sek-tmpl-dialog-mode="update"] [data-tmpl-mode-switcher="remove"] {display: none;}
 [data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-tmpl-title {display: block;}
 [data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-tmpl-description {display: block;}
 [data-sek-tmpl-dialog-mode="update"].sek-tmpl-update-selected .sek-do-update-tmpl {display: block;}
 
+.sek-save-tmpl-mode-switcher .sek-ui-button[data-tmpl-mode-switcher="edit"] {display: none;}
+[data-sek-tmpl-dialog-mode="edit"] [data-tmpl-mode-switcher="edit"] {display: inline-block!important;}
+[data-sek-tmpl-dialog-mode="edit"] [data-tmpl-mode-switcher="update"] {display: none;}
+[data-sek-tmpl-dialog-mode="edit"] [data-tmpl-mode-switcher="save"] {display: none;}
+[data-sek-tmpl-dialog-mode="edit"] [data-tmpl-mode-switcher="remove"] {display: none;}
+[data-sek-tmpl-dialog-mode="edit"] .sek-saved-tmpl-picker {display: block;}
+[data-sek-tmpl-dialog-mode="edit"] .sek-tmpl-title {display: block;}
+[data-sek-tmpl-dialog-mode="edit"] .sek-tmpl-description {display: block;}
+[data-sek-tmpl-dialog-mode="edit"] .sek-do-update-tmpl {display: block;}
+
+[data-sek-tmpl-dialog-mode="remove"] [data-tmpl-mode-switcher="update"] {display: none;}
+[data-sek-tmpl-dialog-mode="remove"] [data-tmpl-mode-switcher="save"] {display: none;}
 [data-sek-tmpl-dialog-mode="remove"].sek-tmpl-remove-selected .sek-open-remove-confirmation {display: block;}
 [data-sek-tmpl-dialog-mode="remove"].sek-removal-confirmation-opened .sek-open-remove-confirmation {display: none!important;}
 [data-sek-tmpl-dialog-mode="remove"].sek-removal-confirmation-opened .sek-tmpl-remove-dialog { display: block;}
