@@ -87,6 +87,7 @@ function sek_get_nimble_api_data( $force_update = false ) {
         
         if ( !empty( $info_data['lib'] ) ) {
             if ( !empty( $info_data['lib']['templates'] ) ) {
+                sek_error_log('UPDATE TMPL API DATA ?', $info_data['lib']['templates'] );
                 update_option( NIMBLE_API_TMPL_LIB_OPT_NAME, maybe_serialize( $info_data['lib']['templates'] ), 'no' );
             }
             unset( $info_data['lib'] );
@@ -110,10 +111,10 @@ function sek_get_tmpl_api_data( $force_update = false ) {
     // Let's use the data saved as options
     // Those data are updated on plugin install, plugin update( upgrader_process_complete ), theme switch
     // @see https://github.com/presscustomizr/nimble-builder/issues/441
-    $tmpl_data = get_option( NIMBLE_API_TMPL_LIB_OPT_NAME );
-    if ( empty( $tmpl_data ) || !is_array( $tmpl_data ) ) {
+    $tmpl_data = maybe_unserialize( get_option( NIMBLE_API_TMPL_LIB_OPT_NAME ) );
+    if ( $force_update || empty( $tmpl_data ) || !is_array( $tmpl_data ) ) {
         sek_get_nimble_api_data( true );//<= true for "force_update"
-        $tmpl_data = get_option( NIMBLE_API_TMPL_LIB_OPT_NAME );
+        $tmpl_data = maybe_unserialize( get_option( NIMBLE_API_TMPL_LIB_OPT_NAME ) );
     }
     //sek_error_log('TMPL DATA ?', $tmpl_data);
     if ( empty( $tmpl_data ) || !is_array( $tmpl_data ) ) {

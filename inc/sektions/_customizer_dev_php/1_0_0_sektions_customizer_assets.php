@@ -959,14 +959,20 @@ function sek_print_nimble_customizer_tmpl() {
       <div id="nimble-tmpl-gallery" class="czr-preview-notification" data-sek-tmpl-dialog-mode="hidden">
         <div class="czr-css-loader czr-mr-loader" style="display:block"><div></div><div></div><div></div></div>
         <div id="sek-gal-top-bar">
+          <div id="sek-tmpl-source-switcher">
+            <div aria-label="" class="sek-ui-button-group" role="group">
+                <button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="Module Content" data-sek-tmpl-type="api_tmpl"><span>Nimble Builder templates</span></button>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="Module Settings" data-sek-tmpl-type="user_tmpl"><span>My templates</span></button>
+            </div>
+          </div>
           <input type="text" class="sek-filter-tmpl" placeholder="<?php _e('Filter templates', 'text_domain'); ?>">
           <div class="sek-ui-button-group" role="group">
             <button class="sek-ui-button sek-close-dialog" type="button" title="<?php _e('Close', 'text_domain'); ?>">
                 <i class="far fa-times-circle"></i>&nbsp;<?php _e('Close', 'text_domain'); ?>
             </button>
           </div>
-          <div class="sek-tmpl-gallery-inner"></div>
         </div>
+        <div class="sek-tmpl-gallery-inner"></div>
         <div class="sek-tmpl-gal-import-dialog">
             <p>This page has NB sections already. Select an import options.</p>
             <div class="sek-ui-button-group" role="group">

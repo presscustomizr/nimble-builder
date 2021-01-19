@@ -41,6 +41,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.refreshTmplPickerHtml( tmpl_collection );
                   });
 
+                  // Will store the collection of saved templates
+                  self.allApiTemplates = new api.Value('_not_populated_');
+
                   self.tmplDialogMode = new api.Value('hidden');// 'save' default mode is set when dialog html is rendered
                   self.tmplDialogMode.bind( function(mode){
                         if ( !_.contains(['hidden', 'save', 'update', 'remove' ], mode ) ) {
@@ -588,35 +591,39 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @return a promise
             getApiTmplCollection : function() {
                   var self = this,
-                        dfd = $.Deferred();
-
-                  wp.ajax.post( 'sek_get_all_api_tmpl', {
-                        nonce: api.settings.nonce.save
-                        //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
-                  })
-                  .done( function( tmpl_collection ) {
-                        if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
-                              dfd.resolve( tmpl_collection );
-                              console.log('GET API TMPL COLLECTION', tmpl_collection );
-                        } else {
-                              dfd.resolve( {} );
-                              api.errare('control::getApiTmplCollection => error => tmpl collection is invalid', tmpl_collection);
-                        }
-                  })
-                  .fail( function( er ) {
-                        api.errorLog( 'ajax sek_get_all_api_tmpl => error', er );
-                        api.previewer.trigger('sek-notify', {
-                            type : 'error',
-                            duration : 10000,
-                            message : [
-                                  '<span style="font-size:0.95em">',
-                                    '<strong>' + sektionsLocalizedData.i18n['Error when processing templates'] + '</strong>',
-                                  '</span>'
-                            ].join('')
+                        dfd = $.Deferred(),
+                        _collection = {};
+                  if ( '_not_populated_' !== self.allApiTemplates() ) {
+                        dfd.resolve( self.allApiTemplates() );
+                  } else {
+                        wp.ajax.post( 'sek_get_all_api_tmpl', {
+                              nonce: api.settings.nonce.save
+                              //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                        })
+                        .done( function( tmpl_collection ) {
+                              if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
+                                    _collection = tmpl_collection;
+                                    console.log('AJAX GET API TMPL COLLECTION DONE', tmpl_collection );
+                              } else {
+                                    api.errare('control::getApiTmplCollection => error => tmpl collection is invalid', tmpl_collection);
+                              }
+                              self.allApiTemplates( _collection );
+                              dfd.resolve( _collection );
+                        })
+                        .fail( function( er ) {
+                              api.errorLog( 'ajax sek_get_all_api_tmpl => error', er );
+                              api.previewer.trigger('sek-notify', {
+                                  type : 'error',
+                                  duration : 10000,
+                                  message : [
+                                        '<span style="font-size:0.95em">',
+                                          '<strong>' + sektionsLocalizedData.i18n['Error when processing templates'] + '</strong>',
+                                        '</span>'
+                                  ].join('')
+                              });
+                              dfd.resolve({});
                         });
-                        dfd.resolve({});
-                  });
-
+                  }
                   return dfd;
             },
       });//$.extend()

@@ -177,12 +177,12 @@ function sek_get_all_api_templates() {
         $metas = !is_array( $tmpl_data['metas'] ) ? [] : $tmpl_data['metas'];
         if ( empty($metas) )
             continue;
-            
+
         $collection[ 'nb_api_'. $tmpl_cpt_post_name] = [
             'title' => $metas['title'],
             'description' => $metas['description'],
             'last_modified_date' => mysql2date( 'Y-m-d', $metas['date'] ),
-            'thumb' => !empty( $metas['thumb'] ) ? $metas['thumb'] : ''
+            'thumb_url' => !empty( $metas['thumb_url'] ) ? $metas['thumb_url'] : ''
         ];
     }
     return $collection;
