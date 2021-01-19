@@ -180,7 +180,7 @@
                               var _refreshUserSectionView = function( sec_collection ) {
                                     // clean
                                     $wrapper.find('.sek-user-section-wrapper').remove();
-
+                                    
                                     // Write
                                     if ( _.isEmpty( sec_collection ) ) {
                                         var _placeholdImgUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/save_section_notice.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join('');
@@ -223,6 +223,7 @@
                                                     '</div>'
                                               ].join('');
                                               $wrapper.append( html );
+                                              $wrapper.find('.czr-css-loader').remove();
                                         });//_.each
                                     }
 
@@ -231,6 +232,8 @@
                               };//_refreshUserSectionView
 
                               // on input instantiation, render the collection
+                              // print a loader
+                              $wrapper.append('<div class="czr-css-loader czr-mr-loader" style="display:block"><div></div><div></div><div></div></div>');
                               input.getUserSavedSections().done( function( sec_collection ) {
                                     _refreshUserSectionView( sec_collection );
                               });
