@@ -212,7 +212,8 @@ function sek_enqueue_controls_js_css() {
                 'isTemplateSaveEnabled' => defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) && NIMBLE_TEMPLATE_SAVE_ENABLED, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/655
 
                 // Dec 2020
-                'templateAPIUrl' => defined('API_TEMPLATE_CPT') ? 'http://customizr-dev.test/wp-json/nimble/v2/cravan' : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
+                // When developing locally, allow a local template api request
+                'templateAPIUrl' => ( defined('NIMBLE_FETCH_API_TMPL_LOCALLY') && NIMBLE_FETCH_API_TMPL_LOCALLY ) ? 'http://customizr-dev.test/wp-json/nimble/v2/cravan' : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
             )
         )
     );//wp_localize_script()
@@ -958,24 +959,30 @@ function sek_print_nimble_customizer_tmpl() {
       <div id="nimble-tmpl-gallery" class="czr-preview-notification" data-sek-tmpl-dialog-mode="hidden">
         <div class="czr-css-loader czr-mr-loader" style="display:block"><div></div><div></div><div></div></div>
         <div id="sek-gal-top-bar">
+          <div id="sek-tmpl-source-switcher">
+            <div aria-label="" class="sek-ui-button-group" role="group">
+                <button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="Module Content" data-sek-tmpl-type="api_tmpl"><span>Nimble Builder templates</span></button>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="Module Settings" data-sek-tmpl-type="user_tmpl"><span>My templates</span></button>
+            </div>
+          </div>
           <input type="text" class="sek-filter-tmpl" placeholder="<?php _e('Filter templates', 'text_domain'); ?>">
           <div class="sek-ui-button-group" role="group">
             <button class="sek-ui-button sek-close-dialog" type="button" title="<?php _e('Close', 'text_domain'); ?>">
                 <i class="far fa-times-circle"></i>&nbsp;<?php _e('Close', 'text_domain'); ?>
             </button>
           </div>
-          <div class="sek-tmpl-gallery-inner"></div>
         </div>
+        <div class="sek-tmpl-gallery-inner"></div>
         <div class="sek-tmpl-gal-import-dialog">
             <p>This page has NB sections already. Select an import options.</p>
             <div class="sek-ui-button-group" role="group">
-              <button class="sek-ui-button sek-tmpl-import-replace" type="button" title="<?php _e('Replace existing sections', 'text_domain'); ?>" data-sek-tmpl-import-mode="replace">
+              <button class="sek-ui-button sek-tmpl-import-replace" type="button" title="<?php _e('Replace existing sections', 'text_domain'); ?>" data-sek-tmpl-inject-mode="replace">
                 <?php _e('Replace existing sections', 'text_domain'); ?><span class="spinner"></span>
               </button>
-              <button class="sek-ui-button sek-tmpl-import-before" type="button" title="<?php _e('Insert before existing sections', 'text_domain'); ?>" data-sek-tmpl-import-mode="before">
+              <button class="sek-ui-button sek-tmpl-import-before" type="button" title="<?php _e('Insert before existing sections', 'text_domain'); ?>" data-sek-tmpl-inject-mode="before">
                 <?php _e('Insert before existing sections', 'text_domain'); ?><span class="spinner"></span>
               </button>
-              <button class="sek-ui-button sek-tmpl-import-after" type="button" title="<?php _e('Insert after existing sections', 'text_domain'); ?>" data-sek-tmpl-import-mode="after">
+              <button class="sek-ui-button sek-tmpl-import-after" type="button" title="<?php _e('Insert after existing sections', 'text_domain'); ?>" data-sek-tmpl-inject-mode="after">
                 <?php _e('Insert after existing sections', 'text_domain'); ?><span class="spinner"></span>
               </button>
             </div>
@@ -4705,6 +4712,26 @@ function sek_ajax_get_all_saved_templates() {
         }
     }
 }
+
+////////////////////////////////////////////////////////////////
+// Fetches the api templates
+add_action( 'wp_ajax_sek_get_all_api_tmpl', '\Nimble\sek_ajax_get_all_api_templates' );
+// @hook wp_ajax_sek_get_user_saved_templates
+function sek_ajax_get_all_api_templates() {
+    sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+
+    $decoded_templates = sek_get_all_api_templates();
+
+    if ( is_array($decoded_templates) ) {
+        wp_send_json_success( $decoded_templates );
+    } else {
+        if ( !empty( $decoded_templates ) ) {
+            sek_error_log(  __FUNCTION__ . ' error => invalid templates returned', $decoded_templates );
+            wp_send_json_error(  __FUNCTION__ . ' error => invalid templates returned' );
+        }
+    }
+}
+
 
 ////////////////////////////////////////////////////////////////
 // TEMPLATE GET CONTENT + METAS

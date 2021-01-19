@@ -1949,6 +1949,9 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
 .sek-tmpl-gallery-inner .sek-tmpl-thumb {
     cursor: pointer;
     position: relative;
+    height: 350px;
+    width: 100%;
+    background-size: cover;
 }
 .sek-tmpl-thumb img { max-width: 100%; }
 .sek-tmpl-gallery-inner .sek-tmpl-thumb::after {
@@ -1993,6 +1996,12 @@ input.sek-filter-tmpl {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+}
+
+/* TMPL SOURCE SWITCHER */
+#sek-tmpl-source-switcher{
+  width:100%;
+  padding: 10px 0;
 }
 /* LEVEL TREE */
 #nimble-level-tree {

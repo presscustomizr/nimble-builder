@@ -2375,6 +2375,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.refreshTmplPickerHtml( tmpl_collection );
                   });
 
+                  // Will store the collection of saved templates
+                  self.allApiTemplates = new api.Value('_not_populated_');
+
                   self.tmplDialogMode = new api.Value('hidden');// 'save' default mode is set when dialog html is rendered
                   self.tmplDialogMode.bind( function(mode){
                         if ( !_.contains(['hidden', 'save', 'update', 'remove' ], mode ) ) {
@@ -2898,18 +2901,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.templateCollectionPromise.resolve( {} );
                               api.errare('control::getSavedTmplCollection => error => tmpl collection is invalid', tmpl_collection);
                         }
-
-                        // response is {tmpl_post_id: 436}
-                        //self.tmplDialogVisible( false );
-                        // api.previewer.trigger('sek-notify', {
-                        //     type : 'success',
-                        //     duration : 10000,
-                        //     message : [
-                        //           '<span style="font-size:0.95em">',
-                        //             '<strong>@missi18n Your template has been saved.</strong>',
-                        //           '</span>'
-                        //     ].join('')
-                        // });
                   })
                   .fail( function( er ) {
                         api.errorLog( 'ajax sek_get_all_saved_tmpl => error', er );
@@ -2926,7 +2917,49 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   return self.templateCollectionPromise;
-            }
+            },
+
+
+
+            // API TMPL COLLECTION
+            // @return a promise
+            getApiTmplCollection : function() {
+                  var self = this,
+                        dfd = $.Deferred(),
+                        _collection = {};
+                  if ( '_not_populated_' !== self.allApiTemplates() ) {
+                        dfd.resolve( self.allApiTemplates() );
+                  } else {
+                        wp.ajax.post( 'sek_get_all_api_tmpl', {
+                              nonce: api.settings.nonce.save
+                              //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                        })
+                        .done( function( tmpl_collection ) {
+                              if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
+                                    _collection = tmpl_collection;
+                                    console.log('AJAX GET API TMPL COLLECTION DONE', tmpl_collection );
+                              } else {
+                                    api.errare('control::getApiTmplCollection => error => tmpl collection is invalid', tmpl_collection);
+                              }
+                              self.allApiTemplates( _collection );
+                              dfd.resolve( _collection );
+                        })
+                        .fail( function( er ) {
+                              api.errorLog( 'ajax sek_get_all_api_tmpl => error', er );
+                              api.previewer.trigger('sek-notify', {
+                                  type : 'error',
+                                  duration : 10000,
+                                  message : [
+                                        '<span style="font-size:0.95em">',
+                                          '<strong>' + sektionsLocalizedData.i18n['Error when processing templates'] + '</strong>',
+                                        '</span>'
+                                  ].join('')
+                              });
+                              dfd.resolve({});
+                        });
+                  }
+                  return dfd;
+            },
       });//$.extend()
 })( wp.customize, jQuery );
 //global sektionsLocalizedData
@@ -2935,7 +2968,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 (function ( api, $ ) {
       $.extend( CZRSeksPrototype, {
             ////////////////////////////////////////////////////////
-            // IMPORT TEMPLATE FROM GALLERY => FROM USER SAVED COLLECTION OR REMOTE API
+            // INJECT TEMPLATE FROM GALLERY => FROM USER SAVED COLLECTION OR REMOTE API
             ////////////////////////////////////////////////////////
             // @return promise
             getTmplJsonFromUserTmpl : function( template_name ) {
@@ -2975,13 +3008,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $.getJSON( sektionsLocalizedData.templateAPIUrl )
                                   .done( function( resp ) {
                                         if ( !_.isObject( resp ) || !resp.lib || !resp.lib.templates ) {
-                                              api.errare( '::get_gallery_tmpl_json_and_import success but invalid response => ', resp  );
+                                              api.errare( '::get_gallery_tmpl_json_and_inject success but invalid response => ', resp  );
                                               _dfd_.resolve({success:false});
                                               return;
                                         }
                                         var _json_data = resp.lib.templates[template_name];
                                         if ( !_json_data ) {
-                                              api.errare( '::get_gallery_tmpl_json_and_import => the requested template is not available', resp.lib.templates  );
+                                              api.errare( '::get_gallery_tmpl_json_and_inject => the requested template is not available', resp.lib.templates  );
                                               api.previewer.trigger('sek-notify', {
                                                     notif_id : 'missing-tmpl',
                                                     type : 'info',
@@ -3002,7 +3035,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                   })
                                   .fail(function( er ) {
-                                        api.errare( '::get_gallery_tmpl_json_and_import failed => ', er  );
+                                        api.errare( '::get_gallery_tmpl_json_and_inject failed => ', er  );
                                         _dfd_.resolve({success:false});
                                   });
                     }
@@ -3015,20 +3048,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @param params {
             //    template_name : string,
             //    from : nimble_api or user,
-            //    tmpl_import_mode : 3 possible import modes : replace, before, after
+            //    tmpl_inject_mode : 3 possible import modes : replace, before, after
             // }
-            get_gallery_tmpl_json_and_import : function( params ) {
+            get_gallery_tmpl_json_and_inject : function( params ) {
                   var self = this;
                   params = $.extend( {
                       template_name : '',
                       from : 'user',
-                      tmpl_import_mode : 'replace'
+                      tmpl_inject_mode : 'replace'
                   }, params || {});
                   var tmpl_name = params.template_name;
                   if ( _.isEmpty( tmpl_name ) || ! _.isString( tmpl_name ) ) {
-                        api.errare('::import => error => invalid template name');
+                        api.errare('::tmpl inject => error => invalid template name');
                   }
-                  //console.log('get_gallery_tmpl_json_and_import params ?', params );
+                  //console.log('get_gallery_tmpl_json_and_inject params ?', params );
                   var _promise;
                   if ( 'nimble_api' === params.from ) {
                         // doc : https://api.jquery.com/jQuery.getJSON/
@@ -3049,52 +3082,52 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //  }
                   // }
                   _promise.done( function( response ) {
-                        //console.log('get_gallery_tmpl_json_and_import', params, response );
+                        //console.log('get_gallery_tmpl_json_and_inject', params, response );
                         if ( response.success ) {
-                              //console.log('IMPORT NIMBLE TEMPLATE', response.lib.templates[template_name] );
-                              self.import_tmpl_from_gallery({
+                              //console.log('INJECT NIMBLE TEMPLATE', response.lib.templates[template_name] );
+                              self.inject_tmpl_from_gallery({
                                     pre_import_check : false,
                                     template_name : tmpl_name,
                                     template_data : response.tmpl_json,
-                                    tmpl_import_mode : params.tmpl_import_mode
+                                    tmpl_inject_mode : params.tmpl_inject_mode
                               });
                         }
                   });
             },
 
-            // IMPORT TEMPLATE FROM GALLERY
+            // INJECT TEMPLATE FROM GALLERY
             // => REMOTE API COLLECTION + USER COLLECTION
             // @param params
             // {
             //       pre_import_check : false,
             //       template_name : tmpl_name,
             //       template_data : response.tmpl_json,
-            //       tmpl_import_mode : 3 possible import modes : replace, before, after
+            //       tmpl_inject_mode : 3 possible import modes : replace, before, after
             // }
-            import_tmpl_from_gallery : function( params ) {
-                  //console.log('import_tmpl_from_gallery', params );
+            inject_tmpl_from_gallery : function( params ) {
+                  //console.log('inject_tmpl_from_gallery', params );
                   var self = this;
                   params = params || {};
                   // normalize params
                   params = $.extend({
                       is_file_import : false,
                       pre_import_check : false,
-                      tmpl_import_mode : 'replace'
+                      tmpl_inject_mode : 'replace'
                   }, params );
 
                   // SETUP FOR MANUAL INPUT
                   var __request__,
-                      _scope = 'local';//<= when importing a template not manually, scope is always local
+                      _scope = 'local';//<= when injecting a template not manually, scope is always local
 
 
-                  // remote template import case
+                  // remote template inject case
                   if ( !params.template_data ) {
-                        throw new Error( '::import_template => missing remote template data' );
+                        throw new Error( '::inject_tmpl => missing remote template data' );
                   }
                   __request__ = wp.ajax.post( 'sek_process_template_json', {
                         nonce: api.settings.nonce.save,
                         template_data : JSON.stringify( params.template_data ),
-                        pre_import_check : false//<= might be used in the future do stuffs. For example when importing manually, this property is used to skip the img sniffing on the first pass.
+                        pre_import_check : false//<= might be used in the future do stuffs. For example when importing manually a file, this property is used to skip the img sniffing on the first pass.
                         //sek_export_nonce : api.settings.nonce.save,
                         //skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
                         //active_locations : api.czr_sektions.activeLocations()
@@ -3121,7 +3154,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   /// NOW THAT WE HAVE OUR PROMISE
                   /// 1) CHECK IF CONTENT IS WELL FORMED AND ELIGIBLE FOR API
                   /// 2) LET'S PROCESS THE SETTING ID'S
-                  /// 3) ATTEMPT TO UPDATE THE SETTING API, LOCAL OR GLOBAL. ( always local for template import )
+                  /// 3) ATTEMPT TO UPDATE THE SETTING API, LOCAL OR GLOBAL. ( always local for template inject )
 
                   // fire a previewer loader removed on .always()
                   api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
@@ -3150,24 +3183,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // the ajax request is processed and will upload images if needed
                   __request__
                         .done( function( server_resp ) {
-                              // When manually importing a file, the server adds a "success" property
+                              // When manually injecting a file, the server adds a "success" property
                               // When loading a template this property is not sent. Let's normalize.
                               if ( _.isObject(server_resp) ) {
                                     server_resp = {success:true, data:server_resp};
                               }
                               //console.log('SERVER RESP 2 ?', server_resp );
                               if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
-                                    api.infoLog('::import_template problem => !api.czr_sektions.isImportedContentEligibleForAPI', server_resp, params );
+                                    api.infoLog('::inject_tmpl problem => !api.czr_sektions.isImportedContentEligibleForAPI', server_resp, params );
                                     return;
                               }
 
-                              //console.log('MANUAL IMPORT DATA', server_resp );
+                              //console.log('MANUAL INJECT DATA', server_resp );
                               server_resp.data.data.collection = self.setIdsForImportedTmpl( server_resp.data.data.collection );
                               // and try to update the api setting
                               api.czr_sektions.doUpdateApiSettingAfter_TmplGalleryImport( server_resp, params );
                         })
                         .fail( function( response ) {
-                              api.errare( '::import_template => ajax error', response );
+                              api.errare( '::inject_template => ajax error', response );
                               api.previewer.trigger('sek-notify', {
                                     notif_id : 'import-failed',
                                     type : 'error',
@@ -3181,7 +3214,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     ].join('')
                               });
                         });
-            },//import_tmpl_from_gallery
+            },//inject_tmpl_from_gallery
 
 
             // fired on ajaxrequest done
@@ -3192,7 +3225,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //       pre_import_check : false,
             //       template_name : tmpl_name,
             //       template_data : response.tmpl_json,
-            //       tmpl_import_mode : 3 possible import modes : replace, before, after,
+            //       tmpl_inject_mode : 3 possible import modes : replace, before, after,
             //       is_file_import : false
             // }
             doUpdateApiSettingAfter_TmplGalleryImport : function( server_resp, params ){
@@ -3203,22 +3236,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return;
                   }
 
-                  var _scope = 'local';// <= always local when template gallery import
+                  var _scope = 'local';// <= always local when template gallery inject
 
                   //api.infoLog('TODO => verify metas => version, active locations, etc ... ');
 
                   // Update the setting api via the normalized method
                   // the scope will determine the setting id, local or global
                   api.czr_sektions.updateAPISetting({
-                        action : 'sek-import-tmpl-from-gallery',
+                        action : 'sek-inject-tmpl-from-gallery',
                         scope : _scope,//'global' or 'local'<= will determine which setting will be updated,
                         // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
-                        imported_content : server_resp.data,
-                        tmpl_import_mode : params.tmpl_import_mode
+                        injected_content : server_resp.data,
+                        tmpl_inject_mode : params.tmpl_inject_mode
                   }).done( function() {
                         // Clean an regenerate the local option setting
                         // Settings are normally registered once and never cleaned, unlike controls.
-                        // After the import, updating the setting value will refresh the sections
+                        // After the inject, updating the setting value will refresh the sections
                         // but the local options, persisted in separate settings, won't be updated if the settings are not cleaned
                         if ( 'local' === _scope ) {
                               api.czr_sektions.generateUI({
@@ -6694,8 +6727,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //-------------------------------------------------------------------------------------------------
                               //-- INJECT TEMPLATE FROM GALLERY
                               //-------------------------------------------------------------------------------------------------
-                              case 'sek-import-tmpl-from-gallery' :
-                                    self._updAPISet_sek_import_tmpl_from_gallery();
+                              case 'sek-inject-tmpl-from-gallery' :
+                                    self._updAPISet_sek_inject_tmpl_from_gallery();
                               break;
 
                               //-------------------------------------------------------------------------------------------------
@@ -8487,42 +8520,42 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }// if true === params.merge
 
                   self.updAPISetParams.newSetValue = params.imported_content.data;
-            },
-
-
-
-
-
-
-
-
-
-
-
-
+            }
+      });//$.extend()
+})( wp.customize, jQuery );//global sektionsLocalizedData, serverControlParams
+//self.updAPISetParams = {
+//       params : params,
+//       promise : $.Deferred(),
+//       newSetValue : _.isObject( _currentSetValue ) ? $.extend( true, {}, _currentSetValue ) : self.getDefaultSektionSettingValue( params.is_global_location ? 'global' : 'local' ),
+//       cloneId : '',
+//       sectionInjectPromise
+// };
+var CZRSeksPrototype = CZRSeksPrototype || {};
+(function ( api, $ ) {
+      $.extend( CZRSeksPrototype, {
             //-------------------------------------------------------------------------------------------------
-            //-- IMPORT FROM TMPL GALLERY
+            //-- INJECT FROM TMPL GALLERY
             //-------------------------------------------------------------------------------------------------
             // self.updAPISetParams.params : {
-            //    action: "sek-import-tmpl-from-gallery"
+            //    action: "sek-inject-tmpl-from-gallery"
             //    assign_missing_locations: undefined
             //    cloneId: ""
-            //    imported_content: {data: {…}, metas: {…}, img_errors: Array(0)}
+            //    injected_content: {data: {…}, metas: {…}, img_errors: Array(0)}
             //    is_global_location: false
             //    scope: "local"
-            //    tmpl_import_mode: "replace"
+            //    tmpl_inject_mode: "replace"
             // }
-            _updAPISet_sek_import_tmpl_from_gallery : function() {
+            _updAPISet_sek_inject_tmpl_from_gallery : function() {
                   var self = this,
                       params;
 
                   params = self.updAPISetParams.params;
 
-                  api.infoLog( 'sek-import-tmpl-from-gallery', params );
+                  api.infoLog( 'sek-inject-tmpl-from-gallery', params );
 
-                  // DO WE HAVE PROPER CONTENT DO IMPORT ?
-                  if ( _.isUndefined( params.imported_content.data ) || _.isUndefined( params.imported_content.metas ) ) {
-                        api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => invalid imported content', imported_content );
+                  // DO WE HAVE PROPER CONTENT DO INJECT ?
+                  if ( _.isUndefined( params.injected_content.data ) || _.isUndefined( params.injected_content.metas ) ) {
+                        api.errare( 'updateAPISetting::sek-inject-tmpl-from-gallery => invalid imported content', injected_content );
                         return;
                   }
 
@@ -8541,12 +8574,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // @return bool
                   var _isTmplHeaderLocId = function( loc_id ) {
-                        return params.imported_content && params.imported_content.metas && loc_id === params.imported_content.metas.tmpl_header_location;
+                        return params.injected_content && params.injected_content.metas && loc_id === params.injected_content.metas.tmpl_header_location;
                   };
 
                   // @return bool
                   var _isTmplFooterLocId = function( loc_id ) {
-                        return params.imported_content && params.imported_content.metas && loc_id === params.imported_content.metas.tmpl_footer_location;
+                        return params.injected_content && params.injected_content.metas && loc_id === params.injected_content.metas.tmpl_footer_location;
                   };
 
                   // The template has a header/footer if we find the header or the footer location
@@ -8570,8 +8603,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return tmplLocalOptions && tmplLocalOptions.template && 'nimble_template' === tmplLocalOptions.template.local_template;
                   };
 
-                  var tmplCollection = _.isArray( params.imported_content.data.collection ) ? $.extend( true, [], params.imported_content.data.collection ) : [],
-                      tmplLocations = params.imported_content.metas.tmpl_locations,
+                  var tmplCollection = _.isArray( params.injected_content.data.collection ) ? $.extend( true, [], params.injected_content.data.collection ) : [],
+                      tmplLocations = params.injected_content.metas.tmpl_locations,
                       localLocations = [],
                       currentSettingCollection = self.updAPISetParams.newSetValue.collection;
 
@@ -8585,7 +8618,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Imported Active Locations has to be an array not empty
                   if ( !_.isArray(tmplLocations) || _.isEmpty(tmplLocations) ) {
-                        api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => invalid imported template locations', params );
+                        api.errare( 'updateAPISetting::sek-inject-tmpl-from-gallery => invalid imported template locations', params );
                         return;
                   }
 
@@ -8593,9 +8626,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Important :
                   // - Local options is structured as an object : { local_header_footer: {…}, widths: {…}} }. But when not populated, it can be an array []. So make sure the type if set as object before merging it with current page local options
                   // - Fonts is a collection described with an array
-                  var tmplLocalOptions = params.imported_content.data.local_options;
+                  var tmplLocalOptions = params.injected_content.data.local_options;
                   tmplLocalOptions = $.extend( true, {}, _.isObject( tmplLocalOptions ) ? tmplLocalOptions : {} );
-                  var tmplFonts = params.imported_content.data.fonts;
+                  var tmplFonts = params.injected_content.data.fonts;
                   tmplFonts = _.isArray( tmplFonts ) ? $.extend( true, [], tmplFonts ) : [];
 
                   // Define variables uses for all cases
@@ -8628,7 +8661,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // console.log('NEW SET VALUE COLLECTION? ', $.extend( true, [], newSetValueCollection ) );
                   // If the current page already has NB sections, the user can chose 3 options : REPLACE, BEFORE, AFTER.
                   // when the page has no NB sections, the default option is REPLACE
-                  switch( params.tmpl_import_mode ) {
+                  switch( params.tmpl_inject_mode ) {
                         //-------------------------------------------------------------------------------------------------
                         //-- REPLACE CASE ( default case )
                         //-------------------------------------------------------------------------------------------------
@@ -8680,14 +8713,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                                     // At this point, we need a target location id
                                     if ( '__not_set__' === targetLocationId ) {
-                                          api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => target location id is empty' );
+                                          api.errare( 'updateAPISetting::sek-inject-tmpl-from-gallery => target location id is empty' );
                                           break;
                                     }
 
                                     // Get the current target location model
                                     targetLocationModel = self.getLevelModel( targetLocationId, newSetValueCollection );
                                     if ( 'no_match' === targetLocationModel ) {
-                                          api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => target location id ' + targetLocationId );
+                                          api.errare('::_updAPISet_sek_inject_tmpl_from_gallery => error => target location id ' + targetLocationId );
                                           break;
                                     }
                                     targetLocationModel = $.extend( true, {}, targetLocationModel );// <= create a deep copy
@@ -8705,7 +8738,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 if ( _isTmplHeaderLocId( loc_id ) || _isTmplFooterLocId( loc_id ) ) {
                                                       tmplLocCandidate = self.getLevelModel( loc_id, tmplCollection );
                                                       if ( 'no_match' === tmplLocCandidate ) {
-                                                            api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => location id ' + loc_id +' not found in template collection');
+                                                            api.errare('::_updAPISet_sek_inject_tmpl_from_gallery => error => location id ' + loc_id +' not found in template collection');
                                                             return;
                                                       } else {
                                                             newSetValueCollection.push( tmplLocCandidate );
@@ -8724,7 +8757,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }
                                           localLocModel = self.getLevelModel( loc_id, currentSettingCollection );
                                           if ( 'no_match' === localLocModel ) {
-                                                api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => location id ' + loc_id +' not found in current setting collection');
+                                                api.errare('::_updAPISet_sek_inject_tmpl_from_gallery => error => location id ' + loc_id +' not found in current setting collection');
                                                 return;
                                           }
                                           // re-add header and footer if _hasTmplHeaderFooter()
@@ -8752,7 +8785,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     locModel = self.getLevelModel( loc_id, newSetValueCollection );
                                     if ( 'no_match' === locModel ) {
-                                          api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => location id not found' + loc_id );
+                                          api.errare('::_updAPISet_sek_inject_tmpl_from_gallery => error => location id not found' + loc_id );
                                           return;
                                     }
                                     if ( !self.isHeaderLocation( loc_id ) && !self.isFooterLocation( loc_id ) ) {
@@ -8765,7 +8798,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               // At this point, we need a target location id
                               if ( '__not_set__' === targetLocationId ) {
-                                    api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => target location id is empty' );
+                                    api.errare( 'updateAPISetting::sek-inject-tmpl-from-gallery => target location id is empty' );
                                     break;
                               }
 
@@ -8784,7 +8817,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           newSetValueCollection.push( targetLocationModel );
                                     } else {
                                           if ( 'no_match' === locModel ) {
-                                                api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => location id not found' + loc_id );
+                                                api.errare('::_updAPISet_sek_inject_tmpl_from_gallery => error => location id not found' + loc_id );
                                                 return;
                                           }
                                           newSetValueCollection.push( self.getLevelModel( loc_id, currentSettingCollection ) );
@@ -8806,7 +8839,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     locModel = self.getLevelModel( loc_id, newSetValueCollection );
                                     if ( 'no_match' === locModel ) {
-                                          api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => location id not found' + loc_id );
+                                          api.errare('::_updAPISet_sek_inject_tmpl_from_gallery => error => location id not found' + loc_id );
                                           return;
                                     }
                                     if ( !self.isHeaderLocation( loc_id ) && !self.isFooterLocation( loc_id ) ) {
@@ -8819,7 +8852,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               // At this point, we need a target location id
                               if ( '__not_set__' === targetLocationId ) {
-                                    api.errare( 'updateAPISetting::sek-import-tmpl-from-gallery => target location id is empty' );
+                                    api.errare( 'updateAPISetting::sek-inject-tmpl-from-gallery => target location id is empty' );
                                     break;
                               }
 
@@ -8839,7 +8872,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     } else {
                                           locModel = self.getLevelModel( loc_id, currentSettingCollection );
                                           if ( 'no_match' === locModel ) {
-                                                api.errare('::_updAPISet_sek_import_tmpl_from_gallery => error => loc id not found' + loc_id );
+                                                api.errare('::_updAPISet_sek_inject_tmpl_from_gallery => error => loc id not found' + loc_id );
                                                 return;
                                           }
                                           newSetValueCollection.push( locModel );
@@ -8860,12 +8893,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // insert 'before' or 'after' => existing local options are preserved
                   //
                   // Scenario :
-                  // 1) user has created NB sections on a single post and wants to insert a NB template before the existing sections ( 'before' import_mode )
+                  // 1) user has created NB sections on a single post and wants to insert a NB template before the existing sections ( 'before' inject_mode )
                   // => in this case, we need to keep the default theme template, local options must be the existing ones => no extension of local options.
                   //
                   // 2) the current page has no NB sections yet, import mode is 'replace' by default
                   // => it means that if the imported template uses NB template as canvas, it must be set in local options => extension of local options
-                  if ( !_.isEmpty( tmplLocalOptions ) && 'replace' === params.tmpl_import_mode ) {
+                  if ( !_.isEmpty( tmplLocalOptions ) && 'replace' === params.tmpl_inject_mode ) {
                         var currentLocalOptions = self.updAPISetParams.newSetValue.local_options;
                         currentLocalOptions = $.extend( true, {}, _.isObject( currentLocalOptions ) ? currentLocalOptions : {} );
                         self.updAPISetParams.newSetValue.local_options = _.extend( currentLocalOptions, tmplLocalOptions );
@@ -8874,7 +8907,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // FONTS
                   // If there are imported fonts, we need to merge when import mode is not 'replace', otherwise we need to copy the imported font collection in .fonts property of the API setting.
                   if ( _.isArray( tmplFonts ) && !_.isEmpty( tmplFonts ) ) {
-                        if ( 'replace' != params.tmpl_import_mode ) {
+                        if ( 'replace' != params.tmpl_inject_mode ) {
                               var currentFonts = self.updAPISetParams.newSetValue.fonts;
                               currentFonts = $.extend( true, [], _.isArray( currentFonts ) ? currentFonts : [] );
                               // merge two collection of fonts without duplicates
@@ -8885,7 +8918,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   //api.infoLog('SETTING VALUE AFTER ?', self.updAPISetParams.newSetValue );
-            }//_updAPISet_sek_import_tmpl_from_gallery
+            }//_updAPISet_sek_inject_tmpl_from_gallery
 
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
@@ -11958,7 +11991,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.levelTreeExpanded(false);
                               self.tmplImportDialogVisible(false);
                               $('#customize-preview iframe').css('z-index', 1);
-                              self.renderOrRefreshTempGallery();
+                              self.renderOrRefreshTempGallery( { what:'api_tmpl' });
                         } else {
                               $('#customize-preview iframe').css('z-index', '');
                         }
@@ -11998,9 +12031,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
             // print and schedule dom events
-            renderOrRefreshTempGallery : function() {
+            renderOrRefreshTempGallery : function( params ) {
+                  params = $.extend( {what:'api_tmpl'}, params || {} );
                   var self = this,
-                      _tmpl;
+                      _tmpl,
+                      $tmplGalWrapper;
                   if( $('#nimble-tmpl-gallery').length < 1 ) {
                         $.when( self.renderTmplGalleryUI({}) ).done( function() {
                               self.setupTmplGalleryDOMEvents();
@@ -12008,116 +12043,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   // Clean previous html
-                  var $galleryInner = $('#nimble-tmpl-gallery').find('.sek-tmpl-gallery-inner');
-                  $galleryInner.html('');
+                  $('#nimble-tmpl-gallery').find('.sek-tmpl-gallery-inner').html('');
                   // Wait for the gallery to be fetched and rendered
-                  self.getTemplateGalleryHtml().done( function( html ) {
-                        $galleryInner.html( html );
+                  self.getTemplateGalleryHtml( params ).done( function( html ) {
+                        $tmplGalWrapper = $('#nimble-tmpl-gallery');
+                        $tmplGalWrapper.find('.sek-tmpl-gallery-inner').html( html );
+                        // Reset template source switcher buttons
+                        $tmplGalWrapper.find('#sek-tmpl-source-switcher button').attr('aria-pressed', "false").removeClass('is-selected');
+                        $tmplGalWrapper.find('[data-sek-tmpl-type="'+ params.what +'"]').attr('aria-pressed', "true").addClass('is-selected');
                   });
             },
 
-
-            // @return void()
-            setupTmplGalleryDOMEvents : function() {
-                var $galWrapper = $('#nimble-tmpl-gallery');
-                var self = this;
-                $galWrapper
-                    // Schedule click event with delegation
-                    // PICK A TEMPLATE
-                    .on('click', '.sek-tmpl-item .use-tmpl', function( evt ) {
-                          evt.preventDefault();
-                          evt.stopPropagation();
-                          var tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id');
-                          if ( _.isEmpty(tmpl_id) ) {
-                              api.errare('::setupTmplGalleryDOMEvents => error => invalid template id');
-                              return;
-                          }
-
-                          // if current page has NB sections, display an import dialog, otherwise import now
-                          if ( self.hasCurrentPageNBSectionsNotHeaderFooter() ) {
-                                self._tmplNameWhileImportDialog = tmpl_id;
-                                self.tmplImportDialogVisible(true);
-                          } else {
-                                //api.czr_sektions.get_gallery_tmpl_json_and_import( $(this).data('sek-tmpl-item-id') );
-                                //api.czr_sektions.get_gallery_tmpl_json_and_import( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
-                                api.czr_sektions.get_gallery_tmpl_json_and_import( {template_name : tmpl_id, from: 'user'});
-                                self.templateGalleryExpanded(false);
-                          }
-                    })
-                    // PICK AN IMPORT MODE WHEN PAGE HAS SECTIONS ALREADY
-                    .on('click', '.sek-tmpl-gal-import-dialog .sek-ui-button', function( evt ) {
-                          evt.preventDefault();
-                          evt.stopPropagation();
-                          // 3 possible import modes : replace, before, after
-                          var tmpl_import_mode = $(this).data('sek-tmpl-import-mode');
-                          if ( !_.contains(['replace', 'before', 'after'], tmpl_import_mode ) ) {
-                                api.errare('::setupTmplGalleryDOMEvents => error => invalid import mode');
-                                return;
-                          }
-                          api.czr_sektions.get_gallery_tmpl_json_and_import({
-                                template_name : self._tmplNameWhileImportDialog,
-                                from: 'user',
-                                tmpl_import_mode: tmpl_import_mode
-                          });
-                          // api.czr_sektions.get_gallery_tmpl_json_and_import({
-                          //       template_name : 'test_one',
-                          //       from: 'nimble_api',
-                          //       tmpl_import_mode: tmpl_import_mode
-                          // });
-                          self.templateGalleryExpanded(false);
-                    })
-                    // SEARCH ACTIONS
-                    .on('propertychange change click keyup input paste', '.sek-filter-tmpl', _.debounce( function(evt) {
-                          evt.preventDefault();
-                          var _s = $(this).val();
-                          //console.log('searched string ??', _s );
-                          var _reset = function() {
-                                $galWrapper.removeClass('search-active');
-                                $galWrapper.find('.sek-tmpl-item').each( function() {
-                                      $(this).removeClass('search-match');
-                                });
-                          };
-                          if ( !_.isString(_s) ) {
-                                _reset();
-                                return;
-                          }
-                          _s = _s.trim().toLowerCase();
-                          if ( _.isEmpty( _s.replace(/\s/g, '') ) ) {
-                                _reset();
-                          } else {
-                                $galWrapper.addClass('search-active');
-                                var title,desc,date,titleMatch, descMatch,dateMatch;
-                                $galWrapper.find('.sek-tmpl-item').each( function() {
-                                      title = ( $(this).find('.tmpl-title').html() + '' ).toLowerCase();
-                                      desc = ( $(this).find('.tmpl-desc').html() + '' ).toLowerCase();
-                                      date = ( $(this).find('.tmpl-date').html() + '' ).toLowerCase();
-                                      titleMatch = -1 != title.indexOf(_s);
-                                      descMatch = -1 != desc.indexOf(_s);
-                                      dateMatch = -1 != date.indexOf(_s);
-                                      $(this).toggleClass( 'search-match', titleMatch || descMatch || dateMatch );
-                                });
-                          }
-
-                    }, 100 ) )
-                    // REMOVE
-                    .on( 'click', '.sek-tmpl-info .remove-tmpl', function(evt) {
-                          evt.preventDefault();
-                          var _focusOnRemoveCandidate = function( mode ) {
-                                self.tmplDialogMode( 'remove' );
-                                // self unbind
-                                self.tmplDialogMode.unbind( _focusOnRemoveCandidate );
-                          };
-                          self.tmplDialogMode.bind( _focusOnRemoveCandidate );
-                          self.tmplDialogVisible(true);
-                    })
-                    .on( 'click', '.sek-close-dialog', function(evt) {
-                          evt.preventDefault();
-                          self.templateGalleryExpanded( false );
-                    });
-            },
-
             // @return html
-            getTemplateGalleryHtml : function() {
+            getTemplateGalleryHtml : function( params ) {
                   var self = this,
                       _html = '';
                   // var _templates = {
@@ -12128,39 +12066,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //       temp_two : {
                   //           thumb_url : 'https://nimblebuilder.com/wp-content/uploads/2020/04/2020-04-06_16-36-12.jpg',
                   //           preview_url : ''
-                  //       },
-                  //       temp_three : {
-                  //           thumb_url : 'https://nimblebuilder.com/wp-content/uploads/2020/04/2020-04-06_16-36-12.jpg',
-                  //           preview_url : ''
-                  //       },
-                  //       temp_four : {
-                  //           thumb_url : 'https://nimblebuilder.com/wp-content/uploads/2020/04/2020-04-06_16-36-12.jpg',
-                  //           preview_url : ''
-                  //       },
-                  //       temp_fsour : {
-                  //           thumb_url : 'https://nimblebuilder.com/wp-content/uploads/2020/04/2020-04-06_16-36-12.jpg',
-                  //           preview_url : ''
-                  //       },
-                  //       temp_fosur : {
-                  //           thumb_url : 'https://nimblebuilder.com/wp-content/uploads/2020/04/2020-04-06_16-36-12.jpg',
-                  //           preview_url : ''
-                  //       },
-                  //       temp_five : {
-                  //           thumb_url : 'https://nimblebuilder.com/wp-content/uploads/2020/04/2020-04-06_16-36-12.jpg',
-                  //           preview_url : ''
-                  //       },
-                  //       temp_six : {
-                  //           thumb_url : 'https://nimblebuilder.com/wp-content/uploads/2020/04/2020-04-06_16-36-12.jpg',
-                  //           preview_url : ''
-                  //       },
-                  //       temp_seven : {
-                  //           thumb_url : 'https://nimblebuilder.com/wp-content/uploads/2020/04/2020-04-06_16-36-12.jpg',
-                  //           preview_url : ''
-                  //       },
-                  //       temp_height : {
-                  //           thumb_url : 'https://nimblebuilder.com/wp-content/uploads/2020/04/2020-04-06_16-36-12.jpg',
-                  //           preview_url : ''
-                  //       }
                   // };
 
                   // _.each( _templates, function( _data, _temp_id ) {
@@ -12169,11 +12074,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //       _html += '<div class="sek-tmpl-thumb"><img src="'+ _data.thumb_url +'"/></div>';
                   //     _html += '</div>';
                   // });
-                  var _thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/wire_frame.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
+                  var _defaultThumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/wire_frame.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
                       _dfd_ = $.Deferred(),
-                      _titleAttr;
+                      _titleAttr,
+                      _thumbUrl,
+                      $cssLoader = $('#nimble-tmpl-gallery').find('.czr-css-loader');
 
-                  self.getSavedTmplCollection().done( function( tmpl_collection ) {
+                  $cssLoader.show();
+
+                  var _doRender = function( tmpl_collection ) {
                         _.each( tmpl_collection, function( _data, _temp_id ) {
                               if( !_.isEmpty( _data.description ) ) {
                                   _titleAttr = [ _data.title, _data.last_modified_date, _data.description ].join(' | ');
@@ -12181,8 +12090,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   _titleAttr = [ _data.title, _data.last_modified_date ].join(' | ');
                               }
 
+                              _thumbUrl = !_.isEmpty( _data.thumb_url ) ? _data.thumb_url : _defaultThumbUrl;                        
+
                               _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '">';
-                                _html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
+                                //_html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
+                                _html += '<div class="sek-tmpl-thumb" style="background-image:url('+ _thumbUrl +')"></div>';
                                 _html += '<div class="sek-tmpl-info" title="'+ _titleAttr +'">';
                                   _html += '<h3 class="tmpl-title">' + _data.title + '</h3>';
                                   _html += '<p class="tmpl-date"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', _data.last_modified_date ].join(' ') + '</i></p>';
@@ -12193,22 +12105,137 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _html += '</div>';
                         });
 
-                        var $cssLoader = $('#nimble-tmpl-gallery').find('.czr-css-loader');
                         if ( $cssLoader.length > 0 ) {
                               $cssLoader.hide({
                                     duration : 300,
                                     complete : function() {
-                                          $(this).remove();
+                                          //$(this).remove();
                                           _dfd_.resolve( _html );
                                     }
                               });
                         } else {
                               _dfd_.resolve( _html );
                         }
-                  });
-
+                  };
+                  var _tmpl_collection_promise = 'user_tmpl' === params.what ? self.setSavedTmplCollection : self.getApiTmplCollection;
+                  _tmpl_collection_promise.call(self)
+                        .done( function(tmpl_collection) { 
+                              setTimeout( function() { _doRender(tmpl_collection); console.log('so render ?', tmpl_collection); }, 1000 );
+                        })
+                        .fail( function() {
+                              console.log('tmpl collection promise failed', params );
+                              _dfd_.resolve('');
+                        });
                   return _dfd_.promise();
-            }
+            },
+
+
+
+            // @return void()
+            setupTmplGalleryDOMEvents : function() {
+                  var $galWrapper = $('#nimble-tmpl-gallery');
+                  var self = this;
+                  $galWrapper
+                      // Schedule click event with delegation
+                      // PICK A TEMPLATE
+                      .on('click', '.sek-tmpl-item .use-tmpl', function( evt ) {
+                            evt.preventDefault();
+                            evt.stopPropagation();
+                            var tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id');
+                            if ( _.isEmpty(tmpl_id) ) {
+                                api.errare('::setupTmplGalleryDOMEvents => error => invalid template id');
+                                return;
+                            }
+  
+                            // if current page has NB sections, display an import dialog, otherwise import now
+                            if ( self.hasCurrentPageNBSectionsNotHeaderFooter() ) {
+                                  self._tmplNameWhileImportDialog = tmpl_id;
+                                  self.tmplImportDialogVisible(true);
+                            } else {
+                                  //api.czr_sektions.get_gallery_tmpl_json_and_inject( $(this).data('sek-tmpl-item-id') );
+                                  //api.czr_sektions.get_gallery_tmpl_json_and_inject( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
+                                  api.czr_sektions.get_gallery_tmpl_json_and_inject( {template_name : tmpl_id, from: 'user'});
+                                  self.templateGalleryExpanded(false);
+                            }
+                      })
+                      // PICK AN IMPORT MODE WHEN PAGE HAS SECTIONS ALREADY
+                      .on('click', '.sek-tmpl-gal-import-dialog .sek-ui-button', function( evt ) {
+                            evt.preventDefault();
+                            evt.stopPropagation();
+                            // 3 possible import modes : replace, before, after
+                            var tmpl_inject_mode = $(this).data('sek-tmpl-inject-mode');
+                            if ( !_.contains(['replace', 'before', 'after'], tmpl_inject_mode ) ) {
+                                  api.errare('::setupTmplGalleryDOMEvents => error => invalid import mode');
+                                  return;
+                            }
+                            api.czr_sektions.get_gallery_tmpl_json_and_inject({
+                                  template_name : self._tmplNameWhileImportDialog,
+                                  from: 'user',
+                                  tmpl_inject_mode: tmpl_inject_mode
+                            });
+                            // api.czr_sektions.get_gallery_tmpl_json_and_inject({
+                            //       template_name : 'test_one',
+                            //       from: 'nimble_api',
+                            //       tmpl_inject_mode: tmpl_inject_mode
+                            // });
+                            self.templateGalleryExpanded(false);
+                      })
+                      // SEARCH ACTIONS
+                      .on('propertychange change click keyup input paste', '.sek-filter-tmpl', _.debounce( function(evt) {
+                            evt.preventDefault();
+                            var _s = $(this).val();
+                            //console.log('searched string ??', _s );
+                            var _reset = function() {
+                                  $galWrapper.removeClass('search-active');
+                                  $galWrapper.find('.sek-tmpl-item').each( function() {
+                                        $(this).removeClass('search-match');
+                                  });
+                            };
+                            if ( !_.isString(_s) ) {
+                                  _reset();
+                                  return;
+                            }
+                            _s = _s.trim().toLowerCase();
+                            if ( _.isEmpty( _s.replace(/\s/g, '') ) ) {
+                                  _reset();
+                            } else {
+                                  $galWrapper.addClass('search-active');
+                                  var title,desc,date,titleMatch, descMatch,dateMatch;
+                                  $galWrapper.find('.sek-tmpl-item').each( function() {
+                                        title = ( $(this).find('.tmpl-title').html() + '' ).toLowerCase();
+                                        desc = ( $(this).find('.tmpl-desc').html() + '' ).toLowerCase();
+                                        date = ( $(this).find('.tmpl-date').html() + '' ).toLowerCase();
+                                        titleMatch = -1 != title.indexOf(_s);
+                                        descMatch = -1 != desc.indexOf(_s);
+                                        dateMatch = -1 != date.indexOf(_s);
+                                        $(this).toggleClass( 'search-match', titleMatch || descMatch || dateMatch );
+                                  });
+                            }
+  
+                      }, 100 ) )
+                      // REMOVE
+                      .on( 'click', '.sek-tmpl-info .remove-tmpl', function(evt) {
+                          evt.preventDefault();
+                          var _focusOnRemoveCandidate = function( mode ) {
+                                self.tmplDialogMode( 'remove' );
+                                // self unbind
+                                self.tmplDialogMode.unbind( _focusOnRemoveCandidate );
+                          };
+                          self.tmplDialogMode.bind( _focusOnRemoveCandidate );
+                          self.tmplDialogVisible(true);
+                      })
+                      .on( 'click', '.sek-close-dialog', function(evt) {
+                          evt.preventDefault();
+                          self.templateGalleryExpanded( false );
+                      })
+                      .on( 'click', '#sek-tmpl-source-switcher button', function( evt ) {
+                          console.log('SO CLICK ?', $(this).data('sek-tmpl-type' ) );
+                          evt.preventDefault();
+                          $('#sek-tmpl-source-switcher button').removeClass('is-selected').attr('aria-pressed', "false");
+                          $(this).addClass('is-selected').attr('aria-pressed', "true");
+                          self.renderOrRefreshTempGallery( { what : $(this).data('sek-tmpl-type') } );
+                      });
+              },
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
 var CZRSeksPrototype = CZRSeksPrototype || {};
