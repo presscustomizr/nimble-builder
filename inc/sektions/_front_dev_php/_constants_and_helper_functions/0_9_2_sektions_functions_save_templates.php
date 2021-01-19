@@ -234,6 +234,7 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
 
     // the template post name is provided only when updating
     $is_update_case = !is_null($tmpl_data['tmpl_post_name']);
+    $is_edit_metas_only_case = 'yes' === $tmpl_data['edit_metas_only'];
 
     // $post_name_to_update will be used when user updates an existing template
     if ( !is_null($tmpl_data['tmpl_post_name']) ) {
@@ -247,7 +248,23 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
     // Update the post name now
     $tmpl_data['tmpl_post_name'] = $tmpl_post_name;
 
-    $post_data = array(
+    //sek_error_log('serialized $tmpl_data??', maybe_serialize( $tmpl_data ) );
+    // Update post if it already exists, otherwise create a new one.
+    $current_tmpl_post = null;
+    if ( $is_update_case ) {
+        // When this is an update case, we fetch the existing tmpl_post in order to later get its id
+        $current_tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
+
+        // if this is an update case + editing metas only, then we use the current content
+        if ( $is_edit_metas_only_case && isset($current_tmpl_post->post_content) ) {
+            $current_tmpl_data = maybe_unserialize( $current_tmpl_post->post_content );
+            if ( is_array($current_tmpl_data) && isset($current_tmpl_data['data']) && is_array($current_tmpl_data['data']) && !empty($current_tmpl_data['data']) ) {
+                $tmpl_data['data'] = $current_tmpl_data['data'];
+            }
+        }
+    }
+
+    $new_or_updated_post_data = array(
         'post_title' => esc_attr( $tmpl_data['metas']['title'] ),
         'post_name' => $tmpl_post_name,
         'post_type' => NIMBLE_TEMPLATE_CPT,
@@ -255,20 +272,15 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
         'post_content' => maybe_serialize( $tmpl_data )
     );
 
-    //sek_error_log('serialized $tmpl_data??', maybe_serialize( $tmpl_data ) );
-    // Update post if it already exists, otherwise create a new one.
-    $tmpl_post = null;
-    if ( $is_update_case ) {
-        $tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
-    }
+    // sek_error_log( __FUNCTION__ . ' => so $is_edit_metas_only_case ' . $is_edit_metas_only_case );
+    // sek_error_log( __FUNCTION__ . ' => so $tmpl_data for skope ' . $tmpl_post_name, $current_tmpl_data['data'] );
+    $r = '';
 
-    //sek_error_log( __FUNCTION__ . ' => so $tmpl_data for skope ' . $tmpl_post_name, $tmpl_data );
-
-    if ( $tmpl_post && is_object($tmpl_post) ) {
-        $post_data['ID'] = $tmpl_post->ID;
-        $r = wp_update_post( wp_slash( $post_data ), true );
+    if ( $current_tmpl_post && is_object($current_tmpl_post) ) {
+        $new_or_updated_post_data['ID'] = $current_tmpl_post->ID;
+        $r = wp_update_post( wp_slash( $new_or_updated_post_data ), true );
     } else {
-        $r = wp_insert_post( wp_slash( $post_data ), true );
+        $r = wp_insert_post( wp_slash( $new_or_updated_post_data ), true );
         if ( !is_wp_error( $r ) ) {
             $post_id = $r;//$r is the post ID
             // Trigger creation of a revision. This should be removed once #30854 is resolved.

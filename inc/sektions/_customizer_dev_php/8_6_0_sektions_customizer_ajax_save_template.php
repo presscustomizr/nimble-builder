@@ -139,7 +139,8 @@ function sek_ajax_save_user_template() {
             'tmpl_footer_location' => isset( $_POST['tmpl_footer_location'] ) ? $_POST['tmpl_footer_location'] : '',
             'date' => date("Y-m-d"),
             'theme' => sanitize_title_with_dashes( get_stylesheet() )
-        )
+        ),
+        'edit_metas_only' => isset( $_POST['edit_metas_only'] ) ? $_POST['edit_metas_only'] : 'no'
     );
 
     $saved_template_post = sek_update_saved_tmpl_post( $template_to_save );

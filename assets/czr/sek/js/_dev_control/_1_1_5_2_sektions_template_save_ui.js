@@ -46,7 +46,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   self.tmplDialogMode = new api.Value('hidden');// 'save' default mode is set when dialog html is rendered
                   self.tmplDialogMode.bind( function(mode){
-                        if ( !_.contains(['hidden', 'save', 'update', 'remove' ], mode ) ) {
+                        if ( !_.contains(['hidden', 'save', 'update', 'remove', 'edit' ], mode ) ) {
                               api.errare('::setupSaveTmplUI => unknown tmpl dialog mode', mode );
                               mode = 'save';
                         }
@@ -64,7 +64,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // make sure the remove dialog is hidden
                         $tmplDialogWrapper.removeClass('sek-removal-confirmation-opened');
-
+                        var $selectEl;
                         // execute actions depending on the selected mode
                         switch( mode ) {
                               case 'save' :
@@ -74,13 +74,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
                               case 'update' :
                               case 'remove' :
-                                    var $selectEl = $tmplDialogWrapper.find('.sek-saved-tmpl-picker');
-                                        // Make sure the select value is always reset when switching mode
-                                        $selectEl.val('none').trigger('change');
+                                    $selectEl = $tmplDialogWrapper.find('.sek-saved-tmpl-picker');
+                                    // Make sure the select value is always reset when switching mode
+                                    $selectEl.val('none').trigger('change');
 
                                     self.setSavedTmplCollection().done( function( tmpl_collection ) {
                                           // refresh tmpl picker in case the user updated without changing anything
                                           self.refreshTmplPickerHtml();
+                                          $selectEl.val( self.tmplToRemove || 'none' ).trigger('change');
+                                          self.tmplToRemove = null;
+                                    });
+                              break;
+                              case 'edit' :
+                                    $selectEl = $tmplDialogWrapper.find('.sek-saved-tmpl-picker');
+                                    // Make sure the select value is always reset when switching mode
+                                    $selectEl.val('none').trigger('change');
+
+                                    self.setSavedTmplCollection().done( function( tmpl_collection ) {
+                                          // refresh tmpl picker in case the user updated without changing anything
+                                          self.refreshTmplPickerHtml();
+                                          $selectEl.val( self.tmplToEdit || 'none' ).trigger('change');
+                                          self.tmplToEdit = null;
                                     });
                               break;
                         }//switch
@@ -324,6 +338,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         tmpl_title: tmpl_title,
                         tmpl_description: tmpl_description,
                         tmpl_post_name: tmplPostNameCandidateForUpdate || '',// <= provided when updating a template
+                        edit_metas_only: 'edit' === self.tmplDialogMode() ? 'yes' : 'no',//<= in this case we only update title and description. Not the template content
                         skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
                         tmpl_locations : self.getActiveLocationsForTmpl( currentLocalSettingValue ),
                         tmpl_header_location : self.getHeaderOrFooterLocationIdForTmpl( 'header', currentLocalSettingValue ),
