@@ -25,6 +25,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.renderOrRefreshTempGallery( { what:'api_tmpl' });
                         } else {
                               $('#customize-preview iframe').css('z-index', '');
+                              api.trigger('nb-template-gallery-closed');
                         }
                   });
 

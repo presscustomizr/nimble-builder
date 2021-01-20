@@ -54,7 +54,7 @@
                         input.container.find('[data-sek-content-type]').attr( 'aria-pressed', false );
 
                         // close other dialog
-                        nbApiInstance.templateGalleryExpanded(false);
+                        //nbApiInstance.templateGalleryExpanded(false);
                         nbApiInstance.levelTreeExpanded(false);
                         if ( nbApiInstance.tmplDialogVisible ) {
                               nbApiInstance.tmplDialogVisible(false);
@@ -78,6 +78,11 @@
                               // case for section and module content type
                               api.czr_sektions.currentContentPickerType( _contentType );
                         }
+                  });
+
+                  // Specific for templates
+                  api.bind('nb-template-gallery-closed', function() {
+                        input.container.find('[data-sek-content-type="template"]').attr( 'aria-pressed', false );
                   });
 
                   // initialize with module or section picker depending on the scenario :
