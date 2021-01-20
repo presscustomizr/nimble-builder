@@ -23,13 +23,15 @@
 }
 .sek-is-pro {
   position: absolute;
-  top: 0px;
+  top: 5px;
   z-index: 10;
-  right: 2px;
+  right: 5px;
   height: 20px;
   width: 28px;
 }
-
+[data-sek-content-type="preset_section"]:hover .sek-is-pro img, [data-sek-tmpl-item-id]:hover .sek-is-pro img {
+  opacity: 0.5;
+}
 
 
 /* When sections are displayed in the module picker. Typically the columns sections */

@@ -577,10 +577,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   .done( function( tmpl_collection ) {
                         if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
                               self.templateCollectionPromise.resolve( tmpl_collection );
-                              console.log('GET SAVED TMPL COLLECTION', tmpl_collection );
+                              //console.log('GET SAVED TMPL COLLECTION', tmpl_collection );
                         } else {
                               self.templateCollectionPromise.resolve( {} );
-                              api.errare('control::getSavedTmplCollection => error => tmpl collection is invalid', tmpl_collection);
+                              if ( !_.isEmpty( tmpl_collection ) ) {
+                                    api.errare('control::getSavedTmplCollection => error => tmpl collection is invalid', tmpl_collection);
+                              }
                         }
                   })
                   .fail( function( er ) {
@@ -618,7 +620,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         .done( function( tmpl_collection ) {
                               if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
                                     _collection = tmpl_collection;
-                                    console.log('AJAX GET API TMPL COLLECTION DONE', tmpl_collection );
+                                    //console.log('AJAX GET API TMPL COLLECTION DONE', tmpl_collection );
                               } else {
                                     api.errare('control::getApiTmplCollection => error => tmpl collection is invalid', tmpl_collection);
                               }

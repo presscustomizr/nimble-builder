@@ -182,7 +182,8 @@ function sek_get_all_api_templates() {
             'title' => $metas['title'],
             'description' => $metas['description'],
             'last_modified_date' => mysql2date( 'Y-m-d', $metas['date'] ),
-            'thumb_url' => !empty( $metas['thumb_url'] ) ? $metas['thumb_url'] : ''
+            'thumb_url' => !empty( $metas['thumb_url'] ) ? $metas['thumb_url'] : '',
+            'is_pro_tmpl' => !empty( $metas['is_pro_tmpl'] ) ? $metas['is_pro_tmpl'] : false
         ];
     }
     return $collection;

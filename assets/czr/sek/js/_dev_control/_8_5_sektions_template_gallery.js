@@ -129,31 +129,46 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $cssLoader.show();
 
                   var _doRender = function( tmpl_collection ) {
-                        _.each( tmpl_collection, function( _data, _temp_id ) {
-                              if( !_.isEmpty( _data.description ) ) {
-                                  _titleAttr = [ _data.title, _data.last_modified_date, _data.description ].join(' | ');
-                              } else {
-                                  _titleAttr = [ _data.title, _data.last_modified_date ].join(' | ');
-                              }
+                        if ( _.isEmpty( tmpl_collection ) && 'user_tmpl' === params.what ) {
+                              var _placeholdImgUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/empty_tmpl_collection_notice.jpg',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
+                                    doc_url = 'https://docs.presscustomizr.com/article/417-how-to-save-and-reuse-sections-with-nimble-builder';
 
-                              _thumbUrl = !_.isEmpty( _data.thumb_url ) ? _data.thumb_url : _defaultThumbUrl;                        
-
-                              _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '">';
-                                //_html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
-                                _html += '<div class="sek-tmpl-thumb" style="background-image:url('+ _thumbUrl +')"></div>';
-                                _html += '<div class="sek-tmpl-info" title="'+ _titleAttr +'">';
-                                  _html += '<h3 class="tmpl-title">' + _data.title + '</h3>';
-                                  _html += '<p class="tmpl-date"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', _data.last_modified_date ].join(' ') + '</i></p>';
-                                  _html += '<p class="tmpl-desc">' + _data.description + '</p>';
-                                  _html += '<i class="material-icons use-tmpl" title="'+ sektionsLocalizedData.i18n['Use this template'] +'">add_circle_outline</i>';
-                                  if ( 'user_tmpl' === params.what ) {
-                                    _html += '<i class="material-icons edit-tmpl" title="'+ sektionsLocalizedData.i18n['Edit this template'] +'">edit</i>';
-                                    _html += '<i class="material-icons remove-tmpl" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>';
-                                  }
-                                _html += '</div>';
+                              _html += '<div class="sek-tmpl-empty-collection">';
+                                    _html += '<p>' + sektionsLocalizedData.i18n['You did not save any template yet.'] + '</p>';
+                                    _html += '<img src="'+ _placeholdImgUrl +'" />';
+                                    //_html += '<br/><a href="'+ doc_url +'" target="_blank" rel="noreferrer nofollow">'+ doc_url +'</a>';
                               _html += '</div>';
-                        });
-
+                        } else {
+                              _.each( tmpl_collection, function( _data, _temp_id ) {
+                                    if( !_.isEmpty( _data.description ) ) {
+                                        _titleAttr = [ _data.title, _data.last_modified_date, _data.description ].join(' | ');
+                                    } else {
+                                        _titleAttr = [ _data.title, _data.last_modified_date ].join(' | ');
+                                    }
+      
+                                    _thumbUrl = !_.isEmpty( _data.thumb_url ) ? _data.thumb_url : _defaultThumbUrl;                        
+      
+                                    _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '">';
+                                      //_html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
+                                      _html += '<div class="sek-tmpl-thumb" style="background-image:url('+ _thumbUrl +')"></div>';
+                                      _html += '<div class="sek-tmpl-info" title="'+ _titleAttr +'">';
+                                        _html += '<h3 class="tmpl-title">' + _data.title + '</h3>';
+                                        _html += '<p class="tmpl-date"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', _data.last_modified_date ].join(' ') + '</i></p>';
+                                        _html += '<p class="tmpl-desc">' + _data.description + '</p>';
+                                        _html += '<i class="material-icons use-tmpl" title="'+ sektionsLocalizedData.i18n['Use this template'] +'">add_circle_outline</i>';
+                                        if ( 'user_tmpl' === params.what ) {
+                                          _html += '<i class="material-icons edit-tmpl" title="'+ sektionsLocalizedData.i18n['Edit this template'] +'">edit</i>';
+                                          _html += '<i class="material-icons remove-tmpl" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>';
+                                        }
+                                        if ( "true" == _data.is_pro_tmpl ) {
+                                          _html += '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
+                                        }
+                                      _html += '</div>';
+                                    _html += '</div>';
+                              });
+                        }
+                        
+                        
                         if ( $cssLoader.length > 0 ) {
                               $cssLoader.hide({
                                     duration : 100,
@@ -165,7 +180,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         } else {
                               _dfd_.resolve( _html );
                         }
-                  };
+                  };//_doRender
+
                   var _tmpl_collection_promise = 'user_tmpl' === params.what ? self.setSavedTmplCollection : self.getApiTmplCollection;
                   _tmpl_collection_promise.call(self)
                         .done( function(tmpl_collection) { 
@@ -293,7 +309,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     self.templateGalleryExpanded( false );
                         })
                         .on( 'click', '#sek-tmpl-source-switcher button', function( evt ) {
-                              console.log('SO CLICK ?', $(this).data('sek-tmpl-type' ) );
+                              //console.log('SO CLICK ?', $(this).data('sek-tmpl-type' ) );
                               evt.preventDefault();
                               $('#sek-tmpl-source-switcher button').removeClass('is-selected').attr('aria-pressed', "false");
                               $(this).addClass('is-selected').attr('aria-pressed', "true");

@@ -183,7 +183,7 @@
                                     
                                     // Write
                                     if ( _.isEmpty( sec_collection ) ) {
-                                        var _placeholdImgUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/save_section_notice.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join('');
+                                        var _placeholdImgUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/save_section_notice.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
                                           doc_url = 'https://docs.presscustomizr.com/article/417-how-to-save-and-reuse-sections-with-nimble-builder';
                                         html = [
                                               '<div class="sek-user-section-wrapper">',
@@ -192,7 +192,7 @@
                                               '</div>'
                                         ].join('');
                                         $wrapper.append( html );
-                                        input.module.container.find('.czr-item-content .customize-control-title').html('You did not save any section yet.');
+                                        input.module.container.find('.czr-item-content .customize-control-title').html(sektionsLocalizedData.i18n['You did not save any section yet.']);
                                     } else {
                                         var _thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/nb_sec_pholder.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
                                         styleAttr = 'background: url(' + _thumbUrl  + ') 50% 50% / cover no-repeat;';

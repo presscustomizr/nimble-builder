@@ -654,9 +654,10 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Template removed' => __('Template removed', 'text_dom'),
             'Error when processing templates' => __('Error when processing templates', 'text_dom'),
             'Last modified' => __('Last modified', 'text_dom'),
+            'You did not save any template yet.' => __('You did not save any template yet.', 'text_dom'),
 
             // Section Save
-            //'My sections' => __('My sections', 'text_dom')
+            'You did not save any section yet.' => __('You did not save any section yet.', 'text_dom')
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
