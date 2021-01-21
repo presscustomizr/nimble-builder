@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.6
-Stable tag: 2.1.32
+Stable tag: 2.1.33
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,13 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.32 : [form module] fixed a minor javascript issue that could occur after submitting a form
+2.1.33 : [menu module] clicking on a sub menu item doesn't open the link. [user sections] edit icon to modify the title and description of the section.
 
 == Changelog ==
+= 2.1.33 January 21, 2021 =
+* fixed : [menu module] clicking on a sub menu item doesn't open the link
+* added : [user sections] edit icon to modify the title and description of the section
+
 = 2.1.32 January 12, 2021 =
 * fixed : [form module] javascript may break after submitting the form when jQuery called too early
 

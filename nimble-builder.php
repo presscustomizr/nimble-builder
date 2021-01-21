@@ -3,7 +3,7 @@
 * Plugin Name: Nimble Page Builder
 * Plugin URI: https://nimblebuilder.com
 * Description: Simple and smart companion that allows you to insert sections into any existing page, create landing pages or entire websites including header and footer.
-* Version: 2.1.32
+* Version: 2.1.33
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://nimblebuilder.com/?utm_source=wp-plugins&utm_medium=wp-dashboard&utm_campaign=author-uri
@@ -16,7 +16,7 @@ if ( !defined( 'ABSPATH' ) ) {
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
-$current_version = "2.1.32";
+$current_version = "2.1.33";
 
 if ( !defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version ); }
 if ( !defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }

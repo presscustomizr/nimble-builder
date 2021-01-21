@@ -1777,7 +1777,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   self.saveSectionDialogMode = new api.Value('hidden');// 'save' default mode is set when dialog html is rendered
                   self.saveSectionDialogMode.bind( function(mode){
-                        if ( !_.contains(['hidden', 'save', 'update', 'remove' ], mode ) ) {
+                        if ( !_.contains(['hidden', 'save', 'update', 'remove', 'edit' ], mode ) ) {
                               api.errare('error setupSaveSectionUI => unknown section dialog mode', mode );
                               mode = 'save';
                         }
@@ -1795,7 +1795,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // make sure the remove dialog is hidden
                         $secSaveDialogWrap.removeClass('sek-removal-confirmation-opened');
-
+                        var $selectEl;
                         // execute actions depending on the selected mode
                         switch( mode ) {
                               case 'save' :
@@ -1804,14 +1804,29 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     $descInput.val('');
                               break;
                               case 'update' :
-                              case 'remove' :
-                                    var $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker');
-                                        // Make sure the select value is always reset when switching mode
-                                        $selectEl.val('none').trigger('change');
+                              case 'edit' :
+                                    $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker');
+                                    // Make sure the select value is always reset when switching mode
+                                    $selectEl.val('none').trigger('change');
 
                                     self.setSavedSectionCollection().done( function( sec_collection ) {
                                           // refresh section picker in case the user updated without changing anything
                                           self.refreshSectionPickerHtml();
+                                          $selectEl.val( self.userSectionToEdit || 'none' ).trigger('change');
+                                          self.userSectionToEdit = null;
+                                    });
+                              break;
+                              case 'remove' :
+                                    console.log('sOOO ?', self.userSectionToRemove );
+                                    $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker');
+                                    // Make sure the select value is always reset when switching mode
+                                    $selectEl.val('none').trigger('change');
+
+                                    self.setSavedSectionCollection().done( function( sec_collection ) {
+                                          // refresh section picker in case the user updated without changing anything
+                                          self.refreshSectionPickerHtml();
+                                          $selectEl.val( self.userSectionToRemove || 'none' ).trigger('change');
+                                          self.userSectionToRemove = null;
                                     });
                               break;
                         }//switch
@@ -1904,77 +1919,78 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // ATTACH DOM EVENTS
                   // Dialog Mode Switcher
-                  $secSaveDialogWrap.on( 'click', '[data-section-mode-switcher]', function(evt) {
-                        evt.preventDefault();
-                        self.saveSectionDialogMode($(this).data('section-mode-switcher'));
-                  });
+                  $secSaveDialogWrap
+                        .on( 'click', '[data-section-mode-switcher]', function(evt) {
+                              evt.preventDefault();
+                              self.saveSectionDialogMode($(this).data('section-mode-switcher'));
+                        })
 
-                  // React to section select
-                  // update title and description fields on section selection
-                  $secSaveDialogWrap.on( 'change', '.sek-saved-section-picker', function(evt){ self.reactOnSectionSelection(evt, $(this) ); });
+                        // React to section select
+                        // update title and description fields on section selection
+                        .on( 'change', '.sek-saved-section-picker', function(evt){ self.reactOnSectionSelection(evt, $(this) ); })
 
-                  // SAVE
-                  $secSaveDialogWrap.on( 'click', '.sek-do-save-section', function(evt){
-                        $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
-                        self.saveOrUpdateSavedSection(evt).done( function( response ) {
-                              $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
-                              if ( response.success ) {
-                                    self.saveSectionDialogVisible( false );
-                                    self.setSavedSectionCollection( { refresh : true } );// <= true for refresh
-                              }
-                        });
-                  });
+                        // SAVE
+                        .on( 'click', '.sek-do-save-section', function(evt){
+                              $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
+                              self.saveOrUpdateSavedSection(evt).done( function( response ) {
+                                    $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
+                                    if ( response.success ) {
+                                          self.saveSectionDialogVisible( false );
+                                          self.setSavedSectionCollection( { refresh : true } );// <= true for refresh
+                                    }
+                              });
+                        })
 
-                  // UPDATE
-                  $secSaveDialogWrap.on( 'click', '.sek-do-update-section', function(evt){
-                        var $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker'),
-                            sectionPostNameCandidateForUpdate = $selectEl.val();
-                        // make sure we don't try to remove the default option
-                        if ( 'none' === sectionPostNameCandidateForUpdate || _.isEmpty(sectionPostNameCandidateForUpdate) )
-                          return;
+                        // UPDATE
+                        .on( 'click', '.sek-do-update-section', function(evt){
+                              var $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker'),
+                              sectionPostNameCandidateForUpdate = $selectEl.val();
+                              // make sure we don't try to remove the default option
+                              if ( 'none' === sectionPostNameCandidateForUpdate || _.isEmpty(sectionPostNameCandidateForUpdate) )
+                              return;
 
-                        $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
-                        self.saveOrUpdateSavedSection(evt, sectionPostNameCandidateForUpdate).done( function(response) {
-                              $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
-                              if ( response.success ) {
-                                    self.saveSectionDialogVisible( false );
-                                    self.setSavedSectionCollection( { refresh : true } )// <= true for refresh
-                                          .done( function( sec_collection ) {
-                                                // refresh section picker in case the user updated without changing anything
-                                                self.refreshSectionPickerHtml();
-                                          });
-                              }
-                        });
-                  });
+                              $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
+                              self.saveOrUpdateSavedSection(evt, sectionPostNameCandidateForUpdate).done( function(response) {
+                                    $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
+                                    if ( response.success ) {
+                                          self.saveSectionDialogVisible( false );
+                                          self.setSavedSectionCollection( { refresh : true } )// <= true for refresh
+                                                .done( function( sec_collection ) {
+                                                      // refresh section picker in case the user updated without changing anything
+                                                      self.refreshSectionPickerHtml();
+                                                });
+                                    }
+                              });
+                        })
 
-                  // REMOVE
-                  // Reveal remove dialog
-                  $secSaveDialogWrap.on( 'click', '.sek-open-remove-confirmation', function(evt){
-                        $secSaveDialogWrap.addClass('sek-removal-confirmation-opened');
-                  });
+                        // REMOVE
+                        // Reveal remove dialog
+                        .on( 'click', '.sek-open-remove-confirmation', function(evt){
+                              $secSaveDialogWrap.addClass('sek-removal-confirmation-opened');
+                        })
 
-                  // Do Remove
-                  $secSaveDialogWrap.on( 'click', '.sek-do-remove-section', function(evt){
-                        var $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker'),
-                            sectionPostNameCandidateForRemoval = $selectEl.val();
-                        // make sure we don't try to remove the default option
-                        if ( 'none' === sectionPostNameCandidateForRemoval || _.isEmpty(sectionPostNameCandidateForRemoval) )
-                          return;
+                        // Do Remove
+                        .on( 'click', '.sek-do-remove-section', function(evt){
+                              var $selectEl = $secSaveDialogWrap.find('.sek-saved-section-picker'),
+                              sectionPostNameCandidateForRemoval = $selectEl.val();
+                              // make sure we don't try to remove the default option
+                              if ( 'none' === sectionPostNameCandidateForRemoval || _.isEmpty(sectionPostNameCandidateForRemoval) )
+                              return;
 
-                        $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
-                        self.removeSavedSection(evt, sectionPostNameCandidateForRemoval).done( function(response) {
-                              $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
+                              $secSaveDialogWrap.addClass('nimble-section-processing-ajax');
+                              self.removeSavedSection(evt, sectionPostNameCandidateForRemoval).done( function(response) {
+                                    $secSaveDialogWrap.removeClass('nimble-section-processing-ajax');
+                                    $secSaveDialogWrap.removeClass('sek-removal-confirmation-opened');
+                                    if ( response.success ) {
+                                          self.setSavedSectionCollection( { refresh : true } );// <= true for refresh
+                                    }
+                              });
+                        })
+
+                        // Cancel Remove
+                        .on( 'click', '.sek-cancel-remove-section', function(evt){
                               $secSaveDialogWrap.removeClass('sek-removal-confirmation-opened');
-                              if ( response.success ) {
-                                    self.setSavedSectionCollection( { refresh : true } );// <= true for refresh
-                              }
                         });
-                  });
-
-                  // Cancel Remove
-                  $secSaveDialogWrap.on( 'click', '.sek-cancel-remove-section', function(evt){
-                        $secSaveDialogWrap.removeClass('sek-removal-confirmation-opened');
-                  });
 
 
                   // Switch to update mode
@@ -2031,22 +2047,38 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Fired on 'click' on .sek-do-save-section btn
             // @param sectionPostNameCandidateForUpdate is only provided when saving
             saveOrUpdateSavedSection : function(evt, sectionPostNameCandidateForUpdate ) {
-                  var self = this, _dfd_ = $.Deferred();
+                  var self = this,
+                        _dfd_ = $.Deferred(),
+                        _isEditSectionMode = 'edit' === self.saveSectionDialogMode();
+
                   // idOfSectionToSave is set when reacting to click action
                   // @see react to preview 'sek-toggle-save-section-ui'
-                  if ( !self.idOfSectionToSave || _.isEmpty( self.idOfSectionToSave ) ) {
-                        api.errare('saveOrUpdateSavedSection => error => missing section id');
-                        return _dfd_.resolve( {success:false});
+                  if ( !_isEditSectionMode ) {
+                        if ( !self.idOfSectionToSave || _.isEmpty( self.idOfSectionToSave ) ) {
+                              api.errare('saveOrUpdateSavedSection => error => missing section id');
+                              return _dfd_.resolve( {success:false});
+                        }
                   }
                   evt.preventDefault();
                   var $_title = $('#sek-saved-section-title'),
                       section_title = $_title.val(),
                       section_description = $('#sek-saved-section-description').val(),
-                      sectionModel = $.extend( true, {}, self.getLevelModel( self.idOfSectionToSave ) );
+                      sectionModel;
 
-                  if ( 'no_match' == sectionModel ) {
-                        api.errare('saveOrUpdateSavedSection => error => no section model with id ' + self.idOfSectionToSave );
-                        return _dfd_.resolve( {success:false});
+                  // Only get the section model when not in edit section mode 
+                  if ( !_isEditSectionMode ) {
+                        sectionModel = $.extend( true, {}, self.getLevelModel( self.idOfSectionToSave ) );
+                        if ( 'no_match' == sectionModel ) {
+                              api.errare('saveOrUpdateSavedSection => error => no section model with id ' + self.idOfSectionToSave );
+                              return _dfd_.resolve( {success:false});
+                        }
+                        // Do some pre-processing before ajaxing
+                        // Note : ids will be replaced server side
+                        sectionModel = self.preProcessSection( sectionModel );
+                        if ( !_.isObject( sectionModel ) ) {
+                              api.errare('::saveOrUpdateSavedSection => error => invalid sectionModel');
+                              return _dfd_.resolve( {success:false});
+                        }
                   }
 
                   if ( _.isEmpty( section_title ) ) {
@@ -2066,22 +2098,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   $('#sek-saved-section-title').removeClass('error');
 
-                  // Do some pre-processing before ajaxing
-                  // Note : ids will be replaced server side
-                  sectionModel = self.preProcessSection( sectionModel );
-                  if ( !_.isObject( sectionModel ) ) {
-                        api.errare('::saveOrUpdateSavedSection => error => invalid sectionModel');
-                        _dfd_.resolve( {success:false});
-                  }
-
                   wp.ajax.post( 'sek_save_user_section', {
                         nonce: api.settings.nonce.save,
-                        section_data: JSON.stringify( sectionModel ),
+                        section_data: _isEditSectionMode ? '' : JSON.stringify( sectionModel ),
                         // the following will be saved in 'metas'
                         section_title: section_title,
                         section_description: section_description,
                         section_post_name: sectionPostNameCandidateForUpdate || '',// <= provided when updating a section
                         skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                        edit_metas_only: _isEditSectionMode ? 'yes' : 'no'//<= in this case we only update title and description. Not the template content
                         //active_locations : api.czr_sektions.activeLocations()
                   })
                   .done( function( response ) {
@@ -2299,7 +2324,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.sectionCollectionPromise.resolve( sec_collection );
                         } else {
                               self.sectionCollectionPromise.resolve( {} );
-                              api.errorLog('control::getSavedSectionCollection => collection is empty or invalid');
+                              if ( !_.isEmpty( sec_collection ) ) {
+                                    api.errorLog('control::getSavedSectionCollection => collection is empty or invalid');
+                              }
                         }
 
                         // response is {section_post_id: 436}
@@ -2309,7 +2336,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //     duration : 10000,
                         //     message : [
                         //           '<span style="font-size:0.95em">',
-                        //             '<strong>@missi18n Your section has been saved.</strong>',
+                        //             '<strong>Your section has been saved.</strong>',
                         //           '</span>'
                         //     ].join('')
                         // });
@@ -2380,7 +2407,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   self.tmplDialogMode = new api.Value('hidden');// 'save' default mode is set when dialog html is rendered
                   self.tmplDialogMode.bind( function(mode){
-                        if ( !_.contains(['hidden', 'save', 'update', 'remove' ], mode ) ) {
+                        if ( !_.contains(['hidden', 'save', 'update', 'remove', 'edit' ], mode ) ) {
                               api.errare('::setupSaveTmplUI => unknown tmpl dialog mode', mode );
                               mode = 'save';
                         }
@@ -2398,7 +2425,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         // make sure the remove dialog is hidden
                         $tmplDialogWrapper.removeClass('sek-removal-confirmation-opened');
-
+                        var $selectEl;
                         // execute actions depending on the selected mode
                         switch( mode ) {
                               case 'save' :
@@ -2408,13 +2435,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               break;
                               case 'update' :
                               case 'remove' :
-                                    var $selectEl = $tmplDialogWrapper.find('.sek-saved-tmpl-picker');
-                                        // Make sure the select value is always reset when switching mode
-                                        $selectEl.val('none').trigger('change');
+                                    $selectEl = $tmplDialogWrapper.find('.sek-saved-tmpl-picker');
+                                    // Make sure the select value is always reset when switching mode
+                                    $selectEl.val('none').trigger('change');
 
                                     self.setSavedTmplCollection().done( function( tmpl_collection ) {
                                           // refresh tmpl picker in case the user updated without changing anything
                                           self.refreshTmplPickerHtml();
+                                          $selectEl.val( self.tmplToRemove || 'none' ).trigger('change');
+                                          self.tmplToRemove = null;
+                                    });
+                              break;
+                              case 'edit' :
+                                    $selectEl = $tmplDialogWrapper.find('.sek-saved-tmpl-picker');
+                                    // Make sure the select value is always reset when switching mode
+                                    $selectEl.val('none').trigger('change');
+
+                                    self.setSavedTmplCollection().done( function( tmpl_collection ) {
+                                          // refresh tmpl picker in case the user updated without changing anything
+                                          self.refreshTmplPickerHtml();
+                                          $selectEl.val( self.tmplToEdit || 'none' ).trigger('change');
+                                          self.tmplToEdit = null;
                                     });
                               break;
                         }//switch
@@ -2653,11 +2694,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   wp.ajax.post( 'sek_save_user_template', {
                         nonce: api.settings.nonce.save,
-                        tmpl_data: JSON.stringify( currentLocalSettingValue ),
+                        tmpl_data: 'edit' === self.tmplDialogMode() ? '' : JSON.stringify( currentLocalSettingValue ),
                         // the following will be saved in 'metas'
                         tmpl_title: tmpl_title,
                         tmpl_description: tmpl_description,
                         tmpl_post_name: tmplPostNameCandidateForUpdate || '',// <= provided when updating a template
+                        edit_metas_only: 'edit' === self.tmplDialogMode() ? 'yes' : 'no',//<= in this case we only update title and description. Not the template content
                         skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
                         tmpl_locations : self.getActiveLocationsForTmpl( currentLocalSettingValue ),
                         tmpl_header_location : self.getHeaderOrFooterLocationIdForTmpl( 'header', currentLocalSettingValue ),
@@ -2896,10 +2938,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   .done( function( tmpl_collection ) {
                         if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
                               self.templateCollectionPromise.resolve( tmpl_collection );
-                              console.log('GET SAVED TMPL COLLECTION', tmpl_collection );
+                              //console.log('GET SAVED TMPL COLLECTION', tmpl_collection );
                         } else {
                               self.templateCollectionPromise.resolve( {} );
-                              api.errare('control::getSavedTmplCollection => error => tmpl collection is invalid', tmpl_collection);
+                              if ( !_.isEmpty( tmpl_collection ) ) {
+                                    api.errare('control::getSavedTmplCollection => error => tmpl collection is invalid', tmpl_collection);
+                              }
                         }
                   })
                   .fail( function( er ) {
@@ -2937,7 +2981,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         .done( function( tmpl_collection ) {
                               if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
                                     _collection = tmpl_collection;
-                                    console.log('AJAX GET API TMPL COLLECTION DONE', tmpl_collection );
+                                    //console.log('AJAX GET API TMPL COLLECTION DONE', tmpl_collection );
                               } else {
                                     api.errare('control::getApiTmplCollection => error => tmpl collection is invalid', tmpl_collection);
                               }
@@ -2971,11 +3015,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // INJECT TEMPLATE FROM GALLERY => FROM USER SAVED COLLECTION OR REMOTE API
             ////////////////////////////////////////////////////////
             // @return promise
-            getTmplJsonFromUserTmpl : function( template_name ) {
+            getTmplJsonFromUserTmpl : function( tmpl_name ) {
                   var self = this, _dfd_ = $.Deferred();
                   wp.ajax.post( 'sek_get_user_tmpl_json', {
                         nonce: api.settings.nonce.save,
-                        tmpl_post_name: template_name
+                        tmpl_post_name: tmpl_name
                         //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
                   })
                   .done( function( response ) {
@@ -2989,7 +3033,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             duration : 10000,
                             message : [
                                   '<span style="font-size:0.95em">',
-                                    '<strong>@missi18n error when fetching the template</strong>',
+                                    '<strong>error when fetching the template</strong>',
                                   '</span>'
                             ].join('')
                         });
@@ -2998,72 +3042,55 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return _dfd_;
             },
 
-            // @return promise
-            getTmplJsonFromApi : function( template_name ) {
-                  var self, _dfd_ = $.Deferred();
-                  if ( self.apiTmplGalleryJson ) {
-                        api.infoLog( 'cached api tmpl gallery json', self.apiTmplGalleryJson );
-                        _dfd_.resolve( {success : true, tmpl_json : self.apiTmplGalleryJson } );
-                  } else {
-                        $.getJSON( sektionsLocalizedData.templateAPIUrl )
-                                  .done( function( resp ) {
-                                        if ( !_.isObject( resp ) || !resp.lib || !resp.lib.templates ) {
-                                              api.errare( '::get_gallery_tmpl_json_and_inject success but invalid response => ', resp  );
-                                              _dfd_.resolve({success:false});
-                                              return;
-                                        }
-                                        var _json_data = resp.lib.templates[template_name];
-                                        if ( !_json_data ) {
-                                              api.errare( '::get_gallery_tmpl_json_and_inject => the requested template is not available', resp.lib.templates  );
-                                              api.previewer.trigger('sek-notify', {
-                                                    notif_id : 'missing-tmpl',
-                                                    type : 'info',
-                                                    duration : 10000,
-                                                    message : [
-                                                          '<span style="color:#0075a2">',
-                                                            '<strong>',
-                                                            '@missi18n the requested template is not available',
-                                                            '</strong>',
-                                                          '</span>'
-                                                    ].join('')
-                                              });
-                                              _dfd_.resolve({success:false});
-                                              return;
-                                        }
-                                        self.apiTmplGalleryJson = _json_data;
-                                        _dfd_.resolve( {success:true, tmpl_json:self.apiTmplGalleryJson } );
-
-                                  })
-                                  .fail(function( er ) {
-                                        api.errare( '::get_gallery_tmpl_json_and_inject failed => ', er  );
-                                        _dfd_.resolve({success:false});
-                                  });
-                    }
-
-                    return _dfd_.promise();
+            getTmplJsonFromApi : function( tmpl_name ) {
+                  var self = this, _dfd_ = $.Deferred();
+                  wp.ajax.post( 'sek_get_api_tmpl_json', {
+                        nonce: api.settings.nonce.save,
+                        api_tmpl_name: tmpl_name
+                        //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                  })
+                  .done( function( response ) {
+                        _dfd_.resolve( {success:true, tmpl_json:response });
+                  })
+                  .fail( function( er ) {
+                        _dfd_.resolve( {success:false});
+                        api.errorLog( 'ajax getTmplJsonFromApiTmpl => error', er );
+                        api.previewer.trigger('sek-notify', {
+                            type : 'error',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>error when fetching the template</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                  });
+                  return _dfd_;
             },
+
+            
 
 
             // April 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/651
             // @param params {
-            //    template_name : string,
-            //    from : nimble_api or user,
+            //    tmpl_name : string,
+            //    tmpl_source : api_tmpl or user_tmpl,
             //    tmpl_inject_mode : 3 possible import modes : replace, before, after
             // }
             get_gallery_tmpl_json_and_inject : function( params ) {
                   var self = this;
                   params = $.extend( {
-                      template_name : '',
-                      from : 'user',
+                      tmpl_name : '',
+                      tmpl_source  : 'user',
                       tmpl_inject_mode : 'replace'
                   }, params || {});
-                  var tmpl_name = params.template_name;
+                  var tmpl_name = params.tmpl_name;
                   if ( _.isEmpty( tmpl_name ) || ! _.isString( tmpl_name ) ) {
                         api.errare('::tmpl inject => error => invalid template name');
                   }
                   //console.log('get_gallery_tmpl_json_and_inject params ?', params );
                   var _promise;
-                  if ( 'nimble_api' === params.from ) {
+                  if ( 'api_tmpl' === params.tmpl_source ) {
                         // doc : https://api.jquery.com/jQuery.getJSON/
                         _promise = self.getTmplJsonFromApi(tmpl_name);
                   } else {
@@ -3082,25 +3109,42 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //  }
                   // }
                   _promise.done( function( response ) {
-                        //console.log('get_gallery_tmpl_json_and_inject', params, response );
+                        //console.log('get_gallery_tmpl_json_and_inject ??', params, response );
                         if ( response.success ) {
-                              //console.log('INJECT NIMBLE TEMPLATE', response.lib.templates[template_name] );
+                              //console.log('INJECT NIMBLE TEMPLATE', response.lib.templates[tmpl_name] );
                               self.inject_tmpl_from_gallery({
-                                    pre_import_check : false,
-                                    template_name : tmpl_name,
+                                    tmpl_name : tmpl_name,
                                     template_data : response.tmpl_json,
                                     tmpl_inject_mode : params.tmpl_inject_mode
                               });
                         }
                   });
+
+                  // After 30 s display a failure notification
+                  // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
+                  _.delay( function() {
+                        if ( 'pending' !== _promise.state() )
+                          return;
+                        api.previewer.trigger('sek-notify', {
+                              notif_id : 'import-too-long',
+                              type : 'error',
+                              duration : 20000,
+                              message : [
+                                    '<span>',
+                                      '<strong>',
+                                      'Template import failed',
+                                      '</strong>',
+                                    '</span>'
+                              ].join('')
+                        });
+                  }, 30000 );
             },
 
             // INJECT TEMPLATE FROM GALLERY
             // => REMOTE API COLLECTION + USER COLLECTION
             // @param params
             // {
-            //       pre_import_check : false,
-            //       template_name : tmpl_name,
+            //       tmpl_name : tmpl_name,
             //       template_data : response.tmpl_json,
             //       tmpl_inject_mode : 3 possible import modes : replace, before, after
             // }
@@ -3110,110 +3154,31 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   params = params || {};
                   // normalize params
                   params = $.extend({
-                      is_file_import : false,
-                      pre_import_check : false,
                       tmpl_inject_mode : 'replace'
                   }, params );
 
-                  // SETUP FOR MANUAL INPUT
-                  var __request__,
-                      _scope = 'local';//<= when injecting a template not manually, scope is always local
-
-
+                  var _scope = 'local';//<= when injecting a template not manually, scope is always local
+                      
                   // remote template inject case
                   if ( !params.template_data ) {
                         throw new Error( '::inject_tmpl => missing remote template data' );
                   }
-                  __request__ = wp.ajax.post( 'sek_process_template_json', {
-                        nonce: api.settings.nonce.save,
-                        template_data : JSON.stringify( params.template_data ),
-                        pre_import_check : false//<= might be used in the future do stuffs. For example when importing manually a file, this property is used to skip the img sniffing on the first pass.
-                        //sek_export_nonce : api.settings.nonce.save,
-                        //skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
-                        //active_locations : api.czr_sektions.activeLocations()
-                  }).done( function( server_resp ) {
-                        //api.infoLog('TEMPLATE PRE PROCESS DONE', server_resp );
-                  }).fail( function( error_resp ) {
-                        api.previewer.trigger('sek-notify', {
-                              notif_id : 'import-failed',
-                              type : 'error',
-                              duration : 30000,
-                              message : [
-                                    '<span>',
-                                      '<strong>',
-                                      [ sektionsLocalizedData.i18n['Export failed'], encodeURIComponent( error_resp ) ].join(' '),
-                                      '</strong>',
-                                    '</span>'
-                              ].join('')
-                        });
-                  });
-
-
 
                   /////////////////////////////////////////////
-                  /// NOW THAT WE HAVE OUR PROMISE
                   /// 1) CHECK IF CONTENT IS WELL FORMED AND ELIGIBLE FOR API
                   /// 2) LET'S PROCESS THE SETTING ID'S
                   /// 3) ATTEMPT TO UPDATE THE SETTING API, LOCAL OR GLOBAL. ( always local for template inject )
-
                   // fire a previewer loader removed on .always()
                   api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
+                  //console.log('inject_tmpl_from_gallery ?', params );
+                  if ( !api.czr_sektions.isImportedContentEligibleForAPI( {success:true, data:params.template_data}, params ) ) {
+                        api.infoLog('::inject_tmpl problem => !api.czr_sektions.isImportedContentEligibleForAPI', params );
+                        return;
+                  }
 
-                  // After 30 s display a failure notification
-                  // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
-                  _.delay( function() {
-                        if ( 'pending' !== __request__.state() )
-                          return;
-                        api.previewer.trigger('sek-notify', {
-                              notif_id : 'import-too-long',
-                              type : 'error',
-                              duration : 20000,
-                              message : [
-                                    '<span>',
-                                      '<strong>',
-                                      sektionsLocalizedData.i18n['Import exceeds server response time, try to uncheck "import images" option.'],
-                                      '</strong>',
-                                    '</span>'
-                              ].join('')
-                        });
-                  }, 30000 );
-
-
-                  // At this stage, we are not in a pre-check case
-                  // the ajax request is processed and will upload images if needed
-                  __request__
-                        .done( function( server_resp ) {
-                              // When manually injecting a file, the server adds a "success" property
-                              // When loading a template this property is not sent. Let's normalize.
-                              if ( _.isObject(server_resp) ) {
-                                    server_resp = {success:true, data:server_resp};
-                              }
-                              //console.log('SERVER RESP 2 ?', server_resp );
-                              if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
-                                    api.infoLog('::inject_tmpl problem => !api.czr_sektions.isImportedContentEligibleForAPI', server_resp, params );
-                                    return;
-                              }
-
-                              //console.log('MANUAL INJECT DATA', server_resp );
-                              server_resp.data.data.collection = self.setIdsForImportedTmpl( server_resp.data.data.collection );
-                              // and try to update the api setting
-                              api.czr_sektions.doUpdateApiSettingAfter_TmplGalleryImport( server_resp, params );
-                        })
-                        .fail( function( response ) {
-                              api.errare( '::inject_template => ajax error', response );
-                              api.previewer.trigger('sek-notify', {
-                                    notif_id : 'import-failed',
-                                    type : 'error',
-                                    duration : 30000,
-                                    message : [
-                                          '<span>',
-                                            '<strong>',
-                                            sektionsLocalizedData.i18n['Import failed, file problem'],
-                                            '</strong>',
-                                          '</span>'
-                                    ].join('')
-                              });
-                        });
+                  params.template_data.data.collection = self.setIdsForImportedTmpl( params.template_data.data.collection );
+                  // and try to update the api setting
+                  api.czr_sektions.doUpdateApiSettingAfter_TmplGalleryImport( {success:true, data:params.template_data}, params );
             },//inject_tmpl_from_gallery
 
 
@@ -3222,16 +3187,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // We can try to the update the api setting
             // @param params
             // {
-            //       pre_import_check : false,
-            //       template_name : tmpl_name,
+            //       tmpl_name : tmpl_name,
             //       template_data : response.tmpl_json,
             //       tmpl_inject_mode : 3 possible import modes : replace, before, after,
-            //       is_file_import : false
             // }
             doUpdateApiSettingAfter_TmplGalleryImport : function( server_resp, params ){
                   //console.log('doUpdateApiSettingAfter_TmplGalleryImport ???', params, server_resp );
                   params = params || {};
-                  if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_file_import ) {
+                  if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
                         api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
                         return;
                   }
@@ -8551,7 +8514,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   params = self.updAPISetParams.params;
 
-                  api.infoLog( 'sek-inject-tmpl-from-gallery', params );
+                  api.infoLog( 'api update params for sek-inject-tmpl-from-gallery', params );
 
                   // DO WE HAVE PROPER CONTENT DO INJECT ?
                   if ( _.isUndefined( params.injected_content.data ) || _.isUndefined( params.injected_content.metas ) ) {
@@ -11991,9 +11954,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.levelTreeExpanded(false);
                               self.tmplImportDialogVisible(false);
                               $('#customize-preview iframe').css('z-index', 1);
-                              self.renderOrRefreshTempGallery( { what:'api_tmpl' });
+                              self.renderOrRefreshTempGallery( { tmpl_source:'api_tmpl' });
                         } else {
                               $('#customize-preview iframe').css('z-index', '');
+                              api.trigger('nb-template-gallery-closed');
                         }
                   });
 
@@ -12032,7 +11996,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // print and schedule dom events
             renderOrRefreshTempGallery : function( params ) {
-                  params = $.extend( {what:'api_tmpl'}, params || {} );
+                  params = $.extend( {tmpl_source:'api_tmpl'}, params || {} );
                   var self = this,
                       _tmpl,
                       $tmplGalWrapper;
@@ -12044,13 +12008,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Clean previous html
                   $('#nimble-tmpl-gallery').find('.sek-tmpl-gallery-inner').html('');
+
+                  var _doPrintTmplGalleryHtml = function(params) {
+                        self.getTemplateGalleryHtml( params ).done( function( html ) {
+                              $tmplGalWrapper = $('#nimble-tmpl-gallery');
+                              $tmplGalWrapper.find('.sek-tmpl-gallery-inner').html( html );
+                        });
+                        return self.getTemplateGalleryHtml( params );
+                  };
                   // Wait for the gallery to be fetched and rendered
-                  self.getTemplateGalleryHtml( params ).done( function( html ) {
-                        $tmplGalWrapper = $('#nimble-tmpl-gallery');
-                        $tmplGalWrapper.find('.sek-tmpl-gallery-inner').html( html );
-                        // Reset template source switcher buttons
-                        $tmplGalWrapper.find('#sek-tmpl-source-switcher button').attr('aria-pressed', "false").removeClass('is-selected');
-                        $tmplGalWrapper.find('[data-sek-tmpl-type="'+ params.what +'"]').attr('aria-pressed', "true").addClass('is-selected');
+                  _doPrintTmplGalleryHtml( params ).done( function( html ) {
+                        if ( _.isEmpty( html ) && 'api_tmpl' === params.tmpl_source ) {
+                              if ( typeof window.console.log == 'function' ) {
+                                    console.log('Nimble Builder API problem => could not fetch templates');
+                              }
+                              _doPrintTmplGalleryHtml( {tmpl_source:'user_tmpl'} );
+                        } else {
+                              $tmplGalWrapper = $('#nimble-tmpl-gallery');
+                              $tmplGalWrapper.find('#sek-tmpl-source-switcher').show();
+                              // Reset template source switcher buttons
+                              $tmplGalWrapper.find('#sek-tmpl-source-switcher button').attr('aria-pressed', "false").removeClass('is-selected');
+                              $tmplGalWrapper.find('[data-sek-tmpl-source="'+ params.tmpl_source +'"]').attr('aria-pressed', "true").addClass('is-selected');
+                        }
                   });
             },
 
@@ -12083,31 +12062,49 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $cssLoader.show();
 
                   var _doRender = function( tmpl_collection ) {
-                        _.each( tmpl_collection, function( _data, _temp_id ) {
-                              if( !_.isEmpty( _data.description ) ) {
-                                  _titleAttr = [ _data.title, _data.last_modified_date, _data.description ].join(' | ');
-                              } else {
-                                  _titleAttr = [ _data.title, _data.last_modified_date ].join(' | ');
-                              }
+                        if ( _.isEmpty( tmpl_collection ) && 'user_tmpl' === params.tmpl_source ) {
+                              var _placeholdImgUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/empty_tmpl_collection_notice.jpg',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
+                                    doc_url = 'https://docs.presscustomizr.com/article/417-how-to-save-and-reuse-sections-with-nimble-builder';
 
-                              _thumbUrl = !_.isEmpty( _data.thumb_url ) ? _data.thumb_url : _defaultThumbUrl;                        
-
-                              _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '">';
-                                //_html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
-                                _html += '<div class="sek-tmpl-thumb" style="background-image:url('+ _thumbUrl +')"></div>';
-                                _html += '<div class="sek-tmpl-info" title="'+ _titleAttr +'">';
-                                  _html += '<h3 class="tmpl-title">' + _data.title + '</h3>';
-                                  _html += '<p class="tmpl-date"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', _data.last_modified_date ].join(' ') + '</i></p>';
-                                  _html += '<p class="tmpl-desc">' + _data.description + '</p>';
-                                  _html += '<i class="material-icons use-tmpl" title="'+ sektionsLocalizedData.i18n['Use this template'] +'">add_circle_outline</i>';
-                                  _html += '<i class="material-icons remove-tmpl" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>';
-                                _html += '</div>';
+                              _html += '<div class="sek-tmpl-empty-collection">';
+                                    _html += '<p>' + sektionsLocalizedData.i18n['You did not save any template yet.'] + '</p>';
+                                    _html += '<img src="'+ _placeholdImgUrl +'" />';
+                                    //_html += '<br/><a href="'+ doc_url +'" target="_blank" rel="noreferrer nofollow">'+ doc_url +'</a>';
                               _html += '</div>';
-                        });
-
+                        } else {
+                              _.each( tmpl_collection, function( _data, _temp_id ) {
+                                    if( !_.isEmpty( _data.description ) ) {
+                                        _titleAttr = [ _data.title, _data.last_modified_date, _data.description ].join(' | ');
+                                    } else {
+                                        _titleAttr = [ _data.title, _data.last_modified_date ].join(' | ');
+                                    }
+      
+                                    _thumbUrl = !_.isEmpty( _data.thumb_url ) ? _data.thumb_url : _defaultThumbUrl;                        
+      
+                                    _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '" data-sek-tmpl-item-source="'+ params.tmpl_source +'">';
+                                      //_html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
+                                      _html += '<div class="sek-tmpl-thumb" style="background-image:url('+ _thumbUrl +')"></div>';
+                                      _html += '<div class="sek-tmpl-info" title="'+ _titleAttr +'">';
+                                        _html += '<h3 class="tmpl-title">' + _data.title + '</h3>';
+                                        _html += '<p class="tmpl-date"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', _data.last_modified_date ].join(' ') + '</i></p>';
+                                        _html += '<p class="tmpl-desc">' + _data.description + '</p>';
+                                        _html += '<i class="material-icons use-tmpl" title="'+ sektionsLocalizedData.i18n['Use this template'] +'">add_circle_outline</i>';
+                                        if ( 'user_tmpl' === params.tmpl_source ) {
+                                          _html += '<i class="material-icons edit-tmpl" title="'+ sektionsLocalizedData.i18n['Edit this template'] +'">edit</i>';
+                                          _html += '<i class="material-icons remove-tmpl" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>';
+                                        }
+                                        if ( "true" == _data.is_pro_tmpl ) {
+                                          _html += '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
+                                        }
+                                      _html += '</div>';
+                                    _html += '</div>';
+                              });
+                        }
+                        
+                        
                         if ( $cssLoader.length > 0 ) {
                               $cssLoader.hide({
-                                    duration : 300,
+                                    duration : 100,
                                     complete : function() {
                                           //$(this).remove();
                                           _dfd_.resolve( _html );
@@ -12116,11 +12113,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         } else {
                               _dfd_.resolve( _html );
                         }
-                  };
-                  var _tmpl_collection_promise = 'user_tmpl' === params.what ? self.setSavedTmplCollection : self.getApiTmplCollection;
+                  };//_doRender
+
+                  var _tmpl_collection_promise = 'user_tmpl' === params.tmpl_source ? self.setSavedTmplCollection : self.getApiTmplCollection;
                   _tmpl_collection_promise.call(self)
                         .done( function(tmpl_collection) { 
-                              setTimeout( function() { _doRender(tmpl_collection); console.log('so render ?', tmpl_collection); }, 1000 );
+                              setTimeout( function() { 
+                                    _doRender(tmpl_collection);
+                              }, 0 );
                         })
                         .fail( function() {
                               console.log('tmpl collection promise failed', params );
@@ -12136,105 +12136,120 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var $galWrapper = $('#nimble-tmpl-gallery');
                   var self = this;
                   $galWrapper
-                      // Schedule click event with delegation
-                      // PICK A TEMPLATE
-                      .on('click', '.sek-tmpl-item .use-tmpl', function( evt ) {
-                            evt.preventDefault();
-                            evt.stopPropagation();
-                            var tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id');
-                            if ( _.isEmpty(tmpl_id) ) {
-                                api.errare('::setupTmplGalleryDOMEvents => error => invalid template id');
-                                return;
-                            }
-  
-                            // if current page has NB sections, display an import dialog, otherwise import now
-                            if ( self.hasCurrentPageNBSectionsNotHeaderFooter() ) {
-                                  self._tmplNameWhileImportDialog = tmpl_id;
-                                  self.tmplImportDialogVisible(true);
-                            } else {
-                                  //api.czr_sektions.get_gallery_tmpl_json_and_inject( $(this).data('sek-tmpl-item-id') );
-                                  //api.czr_sektions.get_gallery_tmpl_json_and_inject( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
-                                  api.czr_sektions.get_gallery_tmpl_json_and_inject( {template_name : tmpl_id, from: 'user'});
-                                  self.templateGalleryExpanded(false);
-                            }
-                      })
-                      // PICK AN IMPORT MODE WHEN PAGE HAS SECTIONS ALREADY
-                      .on('click', '.sek-tmpl-gal-import-dialog .sek-ui-button', function( evt ) {
-                            evt.preventDefault();
-                            evt.stopPropagation();
-                            // 3 possible import modes : replace, before, after
-                            var tmpl_inject_mode = $(this).data('sek-tmpl-inject-mode');
-                            if ( !_.contains(['replace', 'before', 'after'], tmpl_inject_mode ) ) {
-                                  api.errare('::setupTmplGalleryDOMEvents => error => invalid import mode');
-                                  return;
-                            }
-                            api.czr_sektions.get_gallery_tmpl_json_and_inject({
-                                  template_name : self._tmplNameWhileImportDialog,
-                                  from: 'user',
-                                  tmpl_inject_mode: tmpl_inject_mode
-                            });
-                            // api.czr_sektions.get_gallery_tmpl_json_and_inject({
-                            //       template_name : 'test_one',
-                            //       from: 'nimble_api',
-                            //       tmpl_inject_mode: tmpl_inject_mode
-                            // });
-                            self.templateGalleryExpanded(false);
-                      })
-                      // SEARCH ACTIONS
-                      .on('propertychange change click keyup input paste', '.sek-filter-tmpl', _.debounce( function(evt) {
-                            evt.preventDefault();
-                            var _s = $(this).val();
-                            //console.log('searched string ??', _s );
-                            var _reset = function() {
-                                  $galWrapper.removeClass('search-active');
-                                  $galWrapper.find('.sek-tmpl-item').each( function() {
-                                        $(this).removeClass('search-match');
-                                  });
-                            };
-                            if ( !_.isString(_s) ) {
-                                  _reset();
-                                  return;
-                            }
-                            _s = _s.trim().toLowerCase();
-                            if ( _.isEmpty( _s.replace(/\s/g, '') ) ) {
-                                  _reset();
-                            } else {
-                                  $galWrapper.addClass('search-active');
-                                  var title,desc,date,titleMatch, descMatch,dateMatch;
-                                  $galWrapper.find('.sek-tmpl-item').each( function() {
-                                        title = ( $(this).find('.tmpl-title').html() + '' ).toLowerCase();
-                                        desc = ( $(this).find('.tmpl-desc').html() + '' ).toLowerCase();
-                                        date = ( $(this).find('.tmpl-date').html() + '' ).toLowerCase();
-                                        titleMatch = -1 != title.indexOf(_s);
-                                        descMatch = -1 != desc.indexOf(_s);
-                                        dateMatch = -1 != date.indexOf(_s);
-                                        $(this).toggleClass( 'search-match', titleMatch || descMatch || dateMatch );
-                                  });
-                            }
-  
-                      }, 100 ) )
-                      // REMOVE
-                      .on( 'click', '.sek-tmpl-info .remove-tmpl', function(evt) {
-                          evt.preventDefault();
-                          var _focusOnRemoveCandidate = function( mode ) {
-                                self.tmplDialogMode( 'remove' );
-                                // self unbind
-                                self.tmplDialogMode.unbind( _focusOnRemoveCandidate );
-                          };
-                          self.tmplDialogMode.bind( _focusOnRemoveCandidate );
-                          self.tmplDialogVisible(true);
-                      })
-                      .on( 'click', '.sek-close-dialog', function(evt) {
-                          evt.preventDefault();
-                          self.templateGalleryExpanded( false );
-                      })
-                      .on( 'click', '#sek-tmpl-source-switcher button', function( evt ) {
-                          console.log('SO CLICK ?', $(this).data('sek-tmpl-type' ) );
-                          evt.preventDefault();
-                          $('#sek-tmpl-source-switcher button').removeClass('is-selected').attr('aria-pressed', "false");
-                          $(this).addClass('is-selected').attr('aria-pressed', "true");
-                          self.renderOrRefreshTempGallery( { what : $(this).data('sek-tmpl-type') } );
-                      });
+                        // Schedule click event with delegation
+                        // PICK A TEMPLATE
+                        .on('click', '.sek-tmpl-item .use-tmpl', function( evt ) {
+                              evt.preventDefault();
+                              evt.stopPropagation();
+                              var _tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id'),
+                                    _tmpl_source = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-source');
+                              if ( _.isEmpty(_tmpl_id) ) {
+                                    api.errare('::setupTmplGalleryDOMEvents => error => invalid template id');
+                                    return;
+                              }
+      
+                              // if current page has NB sections, display an import dialog, otherwise import now
+                              if ( self.hasCurrentPageNBSectionsNotHeaderFooter() ) {
+                                    self._tmplNameWhileImportDialog = _tmpl_id;
+                                    self._tmplSourceWhileImportDialog = _tmpl_source;
+                                    self.tmplImportDialogVisible(true);
+                              } else {
+                                    //api.czr_sektions.get_gallery_tmpl_json_and_inject( $(this).data('sek-tmpl-item-id') );
+                                    //api.czr_sektions.get_gallery_tmpl_json_and_inject( {tmpl_name : 'test_one', tmpl_source: 'api_tmpl'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
+                                    api.czr_sektions.get_gallery_tmpl_json_and_inject( { tmpl_name : _tmpl_id, tmpl_source: _tmpl_source });
+                                    self.templateGalleryExpanded(false);
+                              }
+                        })
+                        // PICK AN IMPORT MODE WHEN PAGE HAS SECTIONS ALREADY
+                        .on('click', '.sek-tmpl-gal-import-dialog .sek-ui-button', function( evt ) {
+                              evt.preventDefault();
+                              evt.stopPropagation();
+                              // 3 possible import modes : replace, before, after
+                              var tmpl_inject_mode = $(this).data('sek-tmpl-inject-mode');
+                              
+                              if ( !_.contains(['replace', 'before', 'after'], tmpl_inject_mode ) ) {
+                                    api.errare('::setupTmplGalleryDOMEvents => error => invalid import mode');
+                                    return;
+                              }
+                              api.czr_sektions.get_gallery_tmpl_json_and_inject({
+                                    tmpl_name : self._tmplNameWhileImportDialog,
+                                    tmpl_source: self._tmplSourceWhileImportDialog,
+                                    tmpl_inject_mode: tmpl_inject_mode
+                              });
+                              // api.czr_sektions.get_gallery_tmpl_json_and_inject({
+                              //       tmpl_name : 'test_one',
+                              //       tmpl_source: 'nimble_api',
+                              //       tmpl_inject_mode: tmpl_inject_mode
+                              // });
+                              self.templateGalleryExpanded(false);
+                        })
+                        // SEARCH ACTIONS
+                        .on('propertychange change click keyup input paste', '.sek-filter-tmpl', _.debounce( function(evt) {
+                              evt.preventDefault();
+                              var _s = $(this).val();
+                              //console.log('searched string ??', _s );
+                              var _reset = function() {
+                                    $galWrapper.removeClass('search-active');
+                                    $galWrapper.find('.sek-tmpl-item').each( function() {
+                                          $(this).removeClass('search-match');
+                                    });
+                              };
+                              if ( !_.isString(_s) ) {
+                                    _reset();
+                                    return;
+                              }
+                              _s = _s.trim().toLowerCase();
+                              if ( _.isEmpty( _s.replace(/\s/g, '') ) ) {
+                                    _reset();
+                              } else {
+                                    $galWrapper.addClass('search-active');
+                                    var title,desc,date,titleMatch, descMatch,dateMatch;
+                                    $galWrapper.find('.sek-tmpl-item').each( function() {
+                                          title = ( $(this).find('.tmpl-title').html() + '' ).toLowerCase();
+                                          desc = ( $(this).find('.tmpl-desc').html() + '' ).toLowerCase();
+                                          date = ( $(this).find('.tmpl-date').html() + '' ).toLowerCase();
+                                          titleMatch = -1 != title.indexOf(_s);
+                                          descMatch = -1 != desc.indexOf(_s);
+                                          dateMatch = -1 != date.indexOf(_s);
+                                          $(this).toggleClass( 'search-match', titleMatch || descMatch || dateMatch );
+                                    });
+                              }
+      
+                        }, 100 ) )
+                        // EDIT
+                        .on( 'click', '.sek-tmpl-info .edit-tmpl', function(evt) {
+                              evt.preventDefault();
+                              var _focusOnEditCandidate = function( mode ) {
+                                    self.tmplDialogMode( 'edit' );
+                                    // self unbind
+                                    self.tmplDialogMode.unbind( _focusOnEditCandidate );
+                              };
+                              self.tmplToEdit = $(this).closest("[data-sek-tmpl-item-id]").data('sek-tmpl-item-id');
+                              self.tmplDialogMode.bind( _focusOnEditCandidate );
+                              self.tmplDialogVisible(true);
+                        })
+                        // REMOVE
+                        .on( 'click', '.sek-tmpl-info .remove-tmpl', function(evt) {
+                              evt.preventDefault();
+                              var _focusOnRemoveCandidate = function( mode ) {
+                                    self.tmplDialogMode( 'remove' );
+                                    // self unbind
+                                    self.tmplDialogMode.unbind( _focusOnRemoveCandidate );
+                              };
+                              self.tmplToRemove = $(this).closest("[data-sek-tmpl-item-id]").data('sek-tmpl-item-id');
+                              self.tmplDialogMode.bind( _focusOnRemoveCandidate );
+                              self.tmplDialogVisible(true);
+                        })
+                        .on( 'click', '.sek-close-dialog', function(evt) {
+                                    evt.preventDefault();
+                                    self.templateGalleryExpanded( false );
+                        })
+                        .on( 'click', '#sek-tmpl-source-switcher button', function( evt ) {
+                              evt.preventDefault();
+                              $('#sek-tmpl-source-switcher button').removeClass('is-selected').attr('aria-pressed', "false");
+                              $(this).addClass('is-selected').attr('aria-pressed', "true");
+                              self.renderOrRefreshTempGallery( { tmpl_source: $(this).data('sek-tmpl-source') } );
+                        });
               },
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
@@ -12307,7 +12322,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         input.container.find('[data-sek-content-type]').attr( 'aria-pressed', false );
 
                         // close other dialog
-                        nbApiInstance.templateGalleryExpanded(false);
+                        //nbApiInstance.templateGalleryExpanded(false);
                         nbApiInstance.levelTreeExpanded(false);
                         if ( nbApiInstance.tmplDialogVisible ) {
                               nbApiInstance.tmplDialogVisible(false);
@@ -12331,6 +12346,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // case for section and module content type
                               api.czr_sektions.currentContentPickerType( _contentType );
                         }
+                  });
+
+                  // Specific for templates
+                  api.bind('nb-template-gallery-closed', function() {
+                        input.container.find('[data-sek-content-type="template"]').attr( 'aria-pressed', false );
                   });
 
                   // initialize with module or section picker depending on the scenario :
@@ -15690,10 +15710,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               var _refreshUserSectionView = function( sec_collection ) {
                                     // clean
                                     $wrapper.find('.sek-user-section-wrapper').remove();
-
+                                    
                                     // Write
                                     if ( _.isEmpty( sec_collection ) ) {
-                                        var _placeholdImgUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/save_section_notice.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join('');
+                                        var _placeholdImgUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/save_section_notice.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
                                           doc_url = 'https://docs.presscustomizr.com/article/417-how-to-save-and-reuse-sections-with-nimble-builder';
                                         html = [
                                               '<div class="sek-user-section-wrapper">',
@@ -15702,7 +15722,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               '</div>'
                                         ].join('');
                                         $wrapper.append( html );
-                                        input.module.container.find('.czr-item-content .customize-control-title').html('You did not save any section yet.');
+                                        input.module.container.find('.czr-item-content .customize-control-title').html(sektionsLocalizedData.i18n['You did not save any section yet.']);
                                     } else {
                                         var _thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/nb_sec_pholder.png',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
                                         styleAttr = 'background: url(' + _thumbUrl  + ') 50% 50% / cover no-repeat;';
@@ -15724,10 +15744,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                           '<h3 class="sec-title">' + secData.title + '</h3>',
                                                           '<p class="sec-date"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', secData.last_modified_date ].join(' ') + '</i></p>',
                                                           '<p class="sec-desc">' + secData.description + '</p>',
+                                                          '<i class="material-icons edit-user-sec" title="'+ sektionsLocalizedData.i18n['Edit this template'] +'">edit</i>',
                                                           '<i class="material-icons remove-user-sec" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>',
                                                           //'<div class="sek-overlay"></div>',
                                                           //'<div class="sek-saved-section-description">' + secData.description + '</div>',
-                                                          //! _.isEmpty( creation_date ) ? ( '<div class="sek-saved-section-date"><i class="far fa-calendar-alt"></i> @missi18n Created : ' + creation_date + '</div>' ) : '',
+                                                          //! _.isEmpty( creation_date ) ? ( '<div class="sek-saved-section-date"><i class="far fa-calendar-alt"></i> Created : ' + creation_date + '</div>' ) : '',
                                                         '</div>',
                                                       '</div>',
                                                     '</div>'
@@ -15735,12 +15756,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               $wrapper.append( html );
                                         });//_.each
                                     }
+                                    // Remove the loader previously added
+                                    $wrapper.find('.czr-css-loader').remove();
 
                                     // Make section draggable now
                                     api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
                               };//_refreshUserSectionView
 
                               // on input instantiation, render the collection
+                              // print a loader
+                              $wrapper.append('<div class="czr-css-loader czr-mr-loader" style="display:block"><div></div><div></div><div></div></div>');
                               input.getUserSavedSections().done( function( sec_collection ) {
                                     _refreshUserSectionView( sec_collection );
                               });
@@ -15754,17 +15779,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // with delegation
                         attachDomEvents : function() {
                               // Attach events
-                              this.container.on('click', '.sek-sec-info .remove-user-sec', function(evt) {
-                                    evt.preventDefault();
-                                    var self = api.czr_sektions;
-                                    var _focusOnRemoveCandidate = function( mode ) {
-                                          self.saveSectionDialogMode( 'remove' );
-                                          // self unbind
-                                          self.saveSectionDialogMode.unbind( _focusOnRemoveCandidate );
-                                    };
-                                    self.saveSectionDialogMode.bind( _focusOnRemoveCandidate );
-                                    self.saveSectionDialogVisible(true);
-                              });
+                              this.container
+                                    .on('click', '.sek-sec-info .remove-user-sec', function(evt) {
+                                          evt.preventDefault();
+                                          var self = api.czr_sektions;
+                                          self.saveSectionDialogVisible(false);
+                                          // Close section dialog if it was open 
+                                          //self.saveSectionDialogMode( 'hidden' );
+                                          var _focusOnRemoveCandidate = function( mode ) {
+                                                self.saveSectionDialogMode( 'remove' );
+                                                // self unbind
+                                                self.saveSectionDialogMode.unbind( _focusOnRemoveCandidate );
+                                          };
+                                          self.userSectionToRemove = $(this).closest("[data-sek-content-id]").data('sek-content-id');
+                                          self.saveSectionDialogMode.bind( _focusOnRemoveCandidate );
+                                          self.saveSectionDialogVisible(true);
+                                    })
+                                    .on('click', '.sek-sec-info .edit-user-sec', function(evt) {
+                                          evt.preventDefault();
+                                          var self = api.czr_sektions;
+                                          self.saveSectionDialogVisible(false);
+                                          //self.saveSectionDialogMode( 'hidden' );
+                                          var _focusOnEditCandidate = function( mode ) {
+                                                self.saveSectionDialogMode( 'edit' );
+                                                // self unbind
+                                                self.saveSectionDialogMode.unbind( _focusOnEditCandidate );
+                                          };
+                                          self.userSectionToEdit = $(this).closest("[data-sek-content-id]").data('sek-content-id');
+                                          self.saveSectionDialogMode.bind( _focusOnEditCandidate );
+                                          self.saveSectionDialogVisible(true);
+                                    });
                         }
                   });//module.inputConstructor
 
@@ -20093,7 +20137,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     return _itm.id === item.id;
                               });
                               _index = _.isUndefined( _index ) ? index : _index + 1;
-                              //_title = [ '@missi18n Slide', _index ].join( ' ' );
                         }
 
                         //if the slide title is set, use it
@@ -20641,7 +20684,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     return _itm.id === item.id;
                               });
                               _index = _.isUndefined( _index ) ? index : _index + 1;
-                              //_title = [ '@missi18n Slide', _index ].join( ' ' );
                         }
 
                         //if the slide title is set, use it
