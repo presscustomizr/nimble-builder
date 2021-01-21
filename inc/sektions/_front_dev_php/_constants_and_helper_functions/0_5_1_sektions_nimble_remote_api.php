@@ -104,9 +104,13 @@ function sek_get_nimble_api_data( $force_update = false ) {
     return $info_data;
 }
 
+
 //////////////////////////////////////////////////
 /// TEMPLATE DATA
 function sek_get_tmpl_api_data( $force_update = false ) {
+    // set this constant in wp_config.php
+    $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
+
     // To avoid a possible refresh, hence a reconnection to the api when opening the customizer
     // Let's use the data saved as options
     // Those data are updated on plugin install, plugin update( upgrader_process_complete ), theme switch
@@ -131,6 +135,9 @@ function sek_get_tmpl_api_data( $force_update = false ) {
 /// LATESTS POSTS
 // @return array of posts
 function sek_get_latest_posts_api_data( $force_update = false ) {
+    // set this constant in wp_config.php
+    $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
+
     sek_get_nimble_api_data( $force_update );
     $latest_posts = get_option( NIMBLE_API_NEWS_OPT_NAME );
     if ( empty( $latest_posts ) ) {
@@ -142,6 +149,9 @@ function sek_get_latest_posts_api_data( $force_update = false ) {
 
 // @return html string
 function sek_start_msg_from_api( $theme_name, $force_update = false ) {
+    // set this constant in wp_config.php
+    $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
+
     $info_data = sek_get_nimble_api_data( $force_update );
     if ( !sek_is_presscustomizr_theme( $theme_name ) || !is_array( $info_data ) ) {
         return '';
@@ -161,7 +171,7 @@ add_action( 'upgrader_process_complete', '\Nimble\sek_refresh_nimble_api_data');
 function sek_refresh_nimble_api_data() {
     // Refresh data on theme switch
     // => so the posts and message are up to date
-    sek_get_nimble_api_data(true);
+    sek_get_nimble_api_data($force_update = true);
 }
 
 
