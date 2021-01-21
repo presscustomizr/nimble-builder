@@ -969,8 +969,8 @@ function sek_print_nimble_customizer_tmpl() {
         <div id="sek-gal-top-bar">
           <div id="sek-tmpl-source-switcher">
             <div aria-label="" class="sek-ui-button-group" role="group">
-                <button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="Module Content" data-sek-tmpl-type="api_tmpl"><span>Nimble Builder templates</span></button>
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="Module Settings" data-sek-tmpl-type="user_tmpl"><span>My templates</span></button>
+                <button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="<?php _e('Nimble Builder templates', 'text_domain'); ?>" data-sek-tmpl-source="api_tmpl"><span><?php _e('Nimble Builder templates', 'text_domain'); ?></span></button>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('My templates', 'text_domain'); ?>" data-sek-tmpl-source="user_tmpl"><span><?php _e('My templates', 'text_domain'); ?></span></button>
             </div>
           </div>
           <input type="text" class="sek-filter-tmpl" placeholder="<?php _e('Filter templates', 'text_domain'); ?>">
