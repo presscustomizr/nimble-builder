@@ -169,7 +169,7 @@ function sek_get_all_saved_templates() {
 // invoked on 'wp_ajax_sek_get_all_api_tmpl'
 // @return an unserialized array of api templates
 function sek_get_all_api_templates() {
-    $raw_tmpl = sek_get_tmpl_api_data( $force_update = true );
+    $raw_tmpl = sek_get_tmpl_api_data();
     $collection = [];
     if( !is_array( $raw_tmpl) )
         return $collection;
@@ -178,7 +178,7 @@ function sek_get_all_api_templates() {
         if ( empty($metas) )
             continue;
 
-        $collection[ 'nb_api_'. $tmpl_cpt_post_name] = [
+        $collection[$tmpl_cpt_post_name] = [
             'title' => $metas['title'],
             'description' => $metas['description'],
             'last_modified_date' => mysql2date( 'Y-m-d', $metas['date'] ),
@@ -188,7 +188,6 @@ function sek_get_all_api_templates() {
     }
     return $collection;
 }
-
 
 
  // Update the 'nimble_template' post

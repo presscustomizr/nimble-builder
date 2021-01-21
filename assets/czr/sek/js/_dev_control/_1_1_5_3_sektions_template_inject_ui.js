@@ -7,11 +7,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // INJECT TEMPLATE FROM GALLERY => FROM USER SAVED COLLECTION OR REMOTE API
             ////////////////////////////////////////////////////////
             // @return promise
-            getTmplJsonFromUserTmpl : function( template_name ) {
+            getTmplJsonFromUserTmpl : function( tmpl_name ) {
                   var self = this, _dfd_ = $.Deferred();
                   wp.ajax.post( 'sek_get_user_tmpl_json', {
                         nonce: api.settings.nonce.save,
-                        tmpl_post_name: template_name
+                        tmpl_post_name: tmpl_name
                         //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
                   })
                   .done( function( response ) {
@@ -25,7 +25,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             duration : 10000,
                             message : [
                                   '<span style="font-size:0.95em">',
-                                    '<strong>@missi18n error when fetching the template</strong>',
+                                    '<strong>error when fetching the template</strong>',
                                   '</span>'
                             ].join('')
                         });
@@ -34,72 +34,55 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return _dfd_;
             },
 
-            // @return promise
-            getTmplJsonFromApi : function( template_name ) {
-                  var self, _dfd_ = $.Deferred();
-                  if ( self.apiTmplGalleryJson ) {
-                        api.infoLog( 'cached api tmpl gallery json', self.apiTmplGalleryJson );
-                        _dfd_.resolve( {success : true, tmpl_json : self.apiTmplGalleryJson } );
-                  } else {
-                        $.getJSON( sektionsLocalizedData.templateAPIUrl )
-                                  .done( function( resp ) {
-                                        if ( !_.isObject( resp ) || !resp.lib || !resp.lib.templates ) {
-                                              api.errare( '::get_gallery_tmpl_json_and_inject success but invalid response => ', resp  );
-                                              _dfd_.resolve({success:false});
-                                              return;
-                                        }
-                                        var _json_data = resp.lib.templates[template_name];
-                                        if ( !_json_data ) {
-                                              api.errare( '::get_gallery_tmpl_json_and_inject => the requested template is not available', resp.lib.templates  );
-                                              api.previewer.trigger('sek-notify', {
-                                                    notif_id : 'missing-tmpl',
-                                                    type : 'info',
-                                                    duration : 10000,
-                                                    message : [
-                                                          '<span style="color:#0075a2">',
-                                                            '<strong>',
-                                                            '@missi18n the requested template is not available',
-                                                            '</strong>',
-                                                          '</span>'
-                                                    ].join('')
-                                              });
-                                              _dfd_.resolve({success:false});
-                                              return;
-                                        }
-                                        self.apiTmplGalleryJson = _json_data;
-                                        _dfd_.resolve( {success:true, tmpl_json:self.apiTmplGalleryJson } );
-
-                                  })
-                                  .fail(function( er ) {
-                                        api.errare( '::get_gallery_tmpl_json_and_inject failed => ', er  );
-                                        _dfd_.resolve({success:false});
-                                  });
-                    }
-
-                    return _dfd_.promise();
+            getTmplJsonFromApi : function( tmpl_name ) {
+                  var self = this, _dfd_ = $.Deferred();
+                  wp.ajax.post( 'sek_get_api_tmpl_json', {
+                        nonce: api.settings.nonce.save,
+                        api_tmpl_name: tmpl_name
+                        //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                  })
+                  .done( function( response ) {
+                        _dfd_.resolve( {success:true, tmpl_json:response });
+                  })
+                  .fail( function( er ) {
+                        _dfd_.resolve( {success:false});
+                        api.errorLog( 'ajax getTmplJsonFromApiTmpl => error', er );
+                        api.previewer.trigger('sek-notify', {
+                            type : 'error',
+                            duration : 10000,
+                            message : [
+                                  '<span style="font-size:0.95em">',
+                                    '<strong>error when fetching the template</strong>',
+                                  '</span>'
+                            ].join('')
+                        });
+                  });
+                  return _dfd_;
             },
+
+            
 
 
             // April 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/651
             // @param params {
-            //    template_name : string,
-            //    from : nimble_api or user,
+            //    tmpl_name : string,
+            //    tmpl_source : api_tmpl or user_tmpl,
             //    tmpl_inject_mode : 3 possible import modes : replace, before, after
             // }
             get_gallery_tmpl_json_and_inject : function( params ) {
                   var self = this;
                   params = $.extend( {
-                      template_name : '',
-                      from : 'user',
+                      tmpl_name : '',
+                      tmpl_source  : 'user',
                       tmpl_inject_mode : 'replace'
                   }, params || {});
-                  var tmpl_name = params.template_name;
+                  var tmpl_name = params.tmpl_name;
                   if ( _.isEmpty( tmpl_name ) || ! _.isString( tmpl_name ) ) {
                         api.errare('::tmpl inject => error => invalid template name');
                   }
                   //console.log('get_gallery_tmpl_json_and_inject params ?', params );
                   var _promise;
-                  if ( 'nimble_api' === params.from ) {
+                  if ( 'api_tmpl' === params.tmpl_source ) {
                         // doc : https://api.jquery.com/jQuery.getJSON/
                         _promise = self.getTmplJsonFromApi(tmpl_name);
                   } else {
@@ -118,25 +101,42 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //  }
                   // }
                   _promise.done( function( response ) {
-                        //console.log('get_gallery_tmpl_json_and_inject', params, response );
+                        //console.log('get_gallery_tmpl_json_and_inject ??', params, response );
                         if ( response.success ) {
-                              //console.log('INJECT NIMBLE TEMPLATE', response.lib.templates[template_name] );
+                              //console.log('INJECT NIMBLE TEMPLATE', response.lib.templates[tmpl_name] );
                               self.inject_tmpl_from_gallery({
-                                    pre_import_check : false,
-                                    template_name : tmpl_name,
+                                    tmpl_name : tmpl_name,
                                     template_data : response.tmpl_json,
                                     tmpl_inject_mode : params.tmpl_inject_mode
                               });
                         }
                   });
+
+                  // After 30 s display a failure notification
+                  // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
+                  _.delay( function() {
+                        if ( 'pending' !== _promise.state() )
+                          return;
+                        api.previewer.trigger('sek-notify', {
+                              notif_id : 'import-too-long',
+                              type : 'error',
+                              duration : 20000,
+                              message : [
+                                    '<span>',
+                                      '<strong>',
+                                      'Template import failed',
+                                      '</strong>',
+                                    '</span>'
+                              ].join('')
+                        });
+                  }, 30000 );
             },
 
             // INJECT TEMPLATE FROM GALLERY
             // => REMOTE API COLLECTION + USER COLLECTION
             // @param params
             // {
-            //       pre_import_check : false,
-            //       template_name : tmpl_name,
+            //       tmpl_name : tmpl_name,
             //       template_data : response.tmpl_json,
             //       tmpl_inject_mode : 3 possible import modes : replace, before, after
             // }
@@ -146,110 +146,31 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   params = params || {};
                   // normalize params
                   params = $.extend({
-                      is_file_import : false,
-                      pre_import_check : false,
                       tmpl_inject_mode : 'replace'
                   }, params );
 
-                  // SETUP FOR MANUAL INPUT
-                  var __request__,
-                      _scope = 'local';//<= when injecting a template not manually, scope is always local
-
-
+                  var _scope = 'local';//<= when injecting a template not manually, scope is always local
+                      
                   // remote template inject case
                   if ( !params.template_data ) {
                         throw new Error( '::inject_tmpl => missing remote template data' );
                   }
-                  __request__ = wp.ajax.post( 'sek_process_template_json', {
-                        nonce: api.settings.nonce.save,
-                        template_data : JSON.stringify( params.template_data ),
-                        pre_import_check : false//<= might be used in the future do stuffs. For example when importing manually a file, this property is used to skip the img sniffing on the first pass.
-                        //sek_export_nonce : api.settings.nonce.save,
-                        //skope_id : 'local' === params.scope ? api.czr_skopeBase.getSkopeProperty( 'skope_id' ) : sektionsLocalizedData.globalSkopeId,
-                        //active_locations : api.czr_sektions.activeLocations()
-                  }).done( function( server_resp ) {
-                        //api.infoLog('TEMPLATE PRE PROCESS DONE', server_resp );
-                  }).fail( function( error_resp ) {
-                        api.previewer.trigger('sek-notify', {
-                              notif_id : 'import-failed',
-                              type : 'error',
-                              duration : 30000,
-                              message : [
-                                    '<span>',
-                                      '<strong>',
-                                      [ sektionsLocalizedData.i18n['Export failed'], encodeURIComponent( error_resp ) ].join(' '),
-                                      '</strong>',
-                                    '</span>'
-                              ].join('')
-                        });
-                  });
-
-
 
                   /////////////////////////////////////////////
-                  /// NOW THAT WE HAVE OUR PROMISE
                   /// 1) CHECK IF CONTENT IS WELL FORMED AND ELIGIBLE FOR API
                   /// 2) LET'S PROCESS THE SETTING ID'S
                   /// 3) ATTEMPT TO UPDATE THE SETTING API, LOCAL OR GLOBAL. ( always local for template inject )
-
                   // fire a previewer loader removed on .always()
                   api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
+                  //console.log('inject_tmpl_from_gallery ?', params );
+                  if ( !api.czr_sektions.isImportedContentEligibleForAPI( {success:true, data:params.template_data}, params ) ) {
+                        api.infoLog('::inject_tmpl problem => !api.czr_sektions.isImportedContentEligibleForAPI', params );
+                        return;
+                  }
 
-                  // After 30 s display a failure notification
-                  // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
-                  _.delay( function() {
-                        if ( 'pending' !== __request__.state() )
-                          return;
-                        api.previewer.trigger('sek-notify', {
-                              notif_id : 'import-too-long',
-                              type : 'error',
-                              duration : 20000,
-                              message : [
-                                    '<span>',
-                                      '<strong>',
-                                      sektionsLocalizedData.i18n['Import exceeds server response time, try to uncheck "import images" option.'],
-                                      '</strong>',
-                                    '</span>'
-                              ].join('')
-                        });
-                  }, 30000 );
-
-
-                  // At this stage, we are not in a pre-check case
-                  // the ajax request is processed and will upload images if needed
-                  __request__
-                        .done( function( server_resp ) {
-                              // When manually injecting a file, the server adds a "success" property
-                              // When loading a template this property is not sent. Let's normalize.
-                              if ( _.isObject(server_resp) ) {
-                                    server_resp = {success:true, data:server_resp};
-                              }
-                              //console.log('SERVER RESP 2 ?', server_resp );
-                              if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
-                                    api.infoLog('::inject_tmpl problem => !api.czr_sektions.isImportedContentEligibleForAPI', server_resp, params );
-                                    return;
-                              }
-
-                              //console.log('MANUAL INJECT DATA', server_resp );
-                              server_resp.data.data.collection = self.setIdsForImportedTmpl( server_resp.data.data.collection );
-                              // and try to update the api setting
-                              api.czr_sektions.doUpdateApiSettingAfter_TmplGalleryImport( server_resp, params );
-                        })
-                        .fail( function( response ) {
-                              api.errare( '::inject_template => ajax error', response );
-                              api.previewer.trigger('sek-notify', {
-                                    notif_id : 'import-failed',
-                                    type : 'error',
-                                    duration : 30000,
-                                    message : [
-                                          '<span>',
-                                            '<strong>',
-                                            sektionsLocalizedData.i18n['Import failed, file problem'],
-                                            '</strong>',
-                                          '</span>'
-                                    ].join('')
-                              });
-                        });
+                  params.template_data.data.collection = self.setIdsForImportedTmpl( params.template_data.data.collection );
+                  // and try to update the api setting
+                  api.czr_sektions.doUpdateApiSettingAfter_TmplGalleryImport( {success:true, data:params.template_data}, params );
             },//inject_tmpl_from_gallery
 
 
@@ -258,16 +179,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // We can try to the update the api setting
             // @param params
             // {
-            //       pre_import_check : false,
-            //       template_name : tmpl_name,
+            //       tmpl_name : tmpl_name,
             //       template_data : response.tmpl_json,
             //       tmpl_inject_mode : 3 possible import modes : replace, before, after,
-            //       is_file_import : false
             // }
             doUpdateApiSettingAfter_TmplGalleryImport : function( server_resp, params ){
                   //console.log('doUpdateApiSettingAfter_TmplGalleryImport ???', params, server_resp );
                   params = params || {};
-                  if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) && params.is_file_import ) {
+                  if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
                         api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
                         return;
                   }

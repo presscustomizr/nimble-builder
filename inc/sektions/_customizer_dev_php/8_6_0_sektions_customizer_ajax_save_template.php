@@ -73,12 +73,53 @@ function sek_ajax_sek_get_user_tmpl_json() {
         // );
         if ( is_array( $tmpl_decoded ) && !empty( $tmpl_decoded['data'] ) && is_string( $tmpl_decoded['data'] ) ) {
             $tmpl_decoded['data'] = json_decode( wp_unslash( $tmpl_decoded['data'], true ) );
+            $tmpl_decoded['data'] = sek_maybe_import_imgs( $tmpl_decoded['data'], $do_import_images = true );
+            // the image import errors won't block the import
+            // they are used when notifying user in the customizer
+            $tmpl_decoded['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
         }
         wp_send_json_success( $tmpl_decoded );
     } else {
         wp_send_json_error( __FUNCTION__ . '_tmpl_post_not_found' );
     }
 }
+
+
+
+add_action( 'wp_ajax_sek_get_api_tmpl_json', '\Nimble\sek_ajax_sek_get_api_tmpl_json' );
+// @hook wp_ajax_sek_get_user_saved_templates
+function sek_ajax_sek_get_api_tmpl_json() {
+    sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+
+    // We must have a tmpl_post_name
+    if ( empty( $_POST['api_tmpl_name']) || !is_string( $_POST['api_tmpl_name'] ) ) {
+        wp_send_json_error( __FUNCTION__ . '_missing_tmpl_post_name' );
+    }
+    $tmpl_name = $_POST['api_tmpl_name'];
+    $raw_tmpl = sek_get_tmpl_api_data();// <= returns an unserialized array, in which the template['data'] is NOT a JSON, unlike for user saved templates
+    if( !is_array( $raw_tmpl) || empty( $raw_tmpl ) ) {
+        sek_error_log( __FUNCTION__ . ' problem => no api template collection available when getting template : ' . $tmpl_name );
+        wp_send_json_error( __FUNCTION__ . '_empty_api_template_collection' );
+    }
+    //sek_error_log( __FUNCTION__ . ' api template collection', $raw_tmpl[$tmpl_name] );
+    if ( empty( $raw_tmpl[$tmpl_name] ) ) {
+        sek_error_log( __FUNCTION__ . ' problem => template not found in api template collection : ' . $tmpl_name );
+        wp_send_json_error( __FUNCTION__ . '_api_template_not_found' );
+    // Note that $raw_tmpl[$tmpl_name]['data'] is saved as a json
+    } else if ( !isset($raw_tmpl[$tmpl_name]['data'] ) || empty( $raw_tmpl[$tmpl_name]['data'] ) ) {
+        sek_error_log( __FUNCTION__ . ' problem => missing or invalid data property for template : ' . $tmpl_name, $raw_tmpl[$tmpl_name] );
+        wp_send_json_error( __FUNCTION__ . '_missing_data_property' );
+    } else {
+        // $tmpl_decoded = $raw_tmpl[$tmpl_name];
+        $tmpl_as_array = $raw_tmpl[$tmpl_name];
+        $raw_tmpl[$tmpl_name]['data'] = sek_maybe_import_imgs( $raw_tmpl[$tmpl_name]['data'], $do_import_images = true );
+        $raw_tmpl[$tmpl_name]['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
+        wp_send_json_success( $raw_tmpl[$tmpl_name] );
+    }
+    return [];
+}
+
+
 
 ////////////////////////////////////////////////////////////////
 // TEMPLATE SAVE
@@ -88,7 +129,7 @@ add_action( 'wp_ajax_sek_save_user_template', '\Nimble\sek_ajax_save_user_templa
 /////////////////////////////////////////////////////////////////
 // hook : wp_ajax_sek_save_user_template
 function sek_ajax_save_user_template() {
-    //sek_error_log( __FUNCTION__ . ' ALORS YEAH ? ?', $_POST );
+    //sek_error_log( __FUNCTION__ . ' ALORS ??', $_POST );
 
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
     $is_edit_metas_only_case = isset( $_POST['edit_metas_only'] ) && 'yes' === $_POST['edit_metas_only'];

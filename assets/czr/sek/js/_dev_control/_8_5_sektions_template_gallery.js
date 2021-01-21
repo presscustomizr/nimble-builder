@@ -22,7 +22,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.levelTreeExpanded(false);
                               self.tmplImportDialogVisible(false);
                               $('#customize-preview iframe').css('z-index', 1);
-                              self.renderOrRefreshTempGallery( { what:'api_tmpl' });
+                              self.renderOrRefreshTempGallery( { tmpl_source:'api_tmpl' });
                         } else {
                               $('#customize-preview iframe').css('z-index', '');
                               api.trigger('nb-template-gallery-closed');
@@ -64,7 +64,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // print and schedule dom events
             renderOrRefreshTempGallery : function( params ) {
-                  params = $.extend( {what:'api_tmpl'}, params || {} );
+                  params = $.extend( {tmpl_source:'api_tmpl'}, params || {} );
                   var self = this,
                       _tmpl,
                       $tmplGalWrapper;
@@ -86,17 +86,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
                   // Wait for the gallery to be fetched and rendered
                   _doPrintTmplGalleryHtml( params ).done( function( html ) {
-                        if ( _.isEmpty( html ) && 'api_tmpl' === params.what ) {
+                        if ( _.isEmpty( html ) && 'api_tmpl' === params.tmpl_source ) {
                               if ( typeof window.console.log == 'function' ) {
                                     console.log('Nimble Builder API problem => could not fetch templates');
                               }
-                              _doPrintTmplGalleryHtml( {what:'user_tmpl'} );
+                              _doPrintTmplGalleryHtml( {tmpl_source:'user_tmpl'} );
                         } else {
                               $tmplGalWrapper = $('#nimble-tmpl-gallery');
                               $tmplGalWrapper.find('#sek-tmpl-source-switcher').show();
                               // Reset template source switcher buttons
                               $tmplGalWrapper.find('#sek-tmpl-source-switcher button').attr('aria-pressed', "false").removeClass('is-selected');
-                              $tmplGalWrapper.find('[data-sek-tmpl-type="'+ params.what +'"]').attr('aria-pressed', "true").addClass('is-selected');
+                              $tmplGalWrapper.find('[data-sek-tmpl-source="'+ params.tmpl_source +'"]').attr('aria-pressed', "true").addClass('is-selected');
                         }
                   });
             },
@@ -130,7 +130,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $cssLoader.show();
 
                   var _doRender = function( tmpl_collection ) {
-                        if ( _.isEmpty( tmpl_collection ) && 'user_tmpl' === params.what ) {
+                        if ( _.isEmpty( tmpl_collection ) && 'user_tmpl' === params.tmpl_source ) {
                               var _placeholdImgUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/empty_tmpl_collection_notice.jpg',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
                                     doc_url = 'https://docs.presscustomizr.com/article/417-how-to-save-and-reuse-sections-with-nimble-builder';
 
@@ -149,7 +149,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       
                                     _thumbUrl = !_.isEmpty( _data.thumb_url ) ? _data.thumb_url : _defaultThumbUrl;                        
       
-                                    _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '">';
+                                    _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '" data-sek-tmpl-item-source="'+ params.tmpl_source +'">';
                                       //_html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
                                       _html += '<div class="sek-tmpl-thumb" style="background-image:url('+ _thumbUrl +')"></div>';
                                       _html += '<div class="sek-tmpl-info" title="'+ _titleAttr +'">';
@@ -157,7 +157,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         _html += '<p class="tmpl-date"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', _data.last_modified_date ].join(' ') + '</i></p>';
                                         _html += '<p class="tmpl-desc">' + _data.description + '</p>';
                                         _html += '<i class="material-icons use-tmpl" title="'+ sektionsLocalizedData.i18n['Use this template'] +'">add_circle_outline</i>';
-                                        if ( 'user_tmpl' === params.what ) {
+                                        if ( 'user_tmpl' === params.tmpl_source ) {
                                           _html += '<i class="material-icons edit-tmpl" title="'+ sektionsLocalizedData.i18n['Edit this template'] +'">edit</i>';
                                           _html += '<i class="material-icons remove-tmpl" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>';
                                         }
@@ -183,7 +183,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   };//_doRender
 
-                  var _tmpl_collection_promise = 'user_tmpl' === params.what ? self.setSavedTmplCollection : self.getApiTmplCollection;
+                  var _tmpl_collection_promise = 'user_tmpl' === params.tmpl_source ? self.setSavedTmplCollection : self.getApiTmplCollection;
                   _tmpl_collection_promise.call(self)
                         .done( function(tmpl_collection) { 
                               setTimeout( function() { 
@@ -209,20 +209,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         .on('click', '.sek-tmpl-item .use-tmpl', function( evt ) {
                               evt.preventDefault();
                               evt.stopPropagation();
-                              var tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id');
-                              if ( _.isEmpty(tmpl_id) ) {
+                              var _tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id'),
+                                    _tmpl_source = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-source');
+                              if ( _.isEmpty(_tmpl_id) ) {
                                     api.errare('::setupTmplGalleryDOMEvents => error => invalid template id');
                                     return;
                               }
       
                               // if current page has NB sections, display an import dialog, otherwise import now
                               if ( self.hasCurrentPageNBSectionsNotHeaderFooter() ) {
-                                    self._tmplNameWhileImportDialog = tmpl_id;
+                                    self._tmplNameWhileImportDialog = _tmpl_id;
+                                    self._tmplSourceWhileImportDialog = _tmpl_source;
                                     self.tmplImportDialogVisible(true);
                               } else {
                                     //api.czr_sektions.get_gallery_tmpl_json_and_inject( $(this).data('sek-tmpl-item-id') );
-                                    //api.czr_sektions.get_gallery_tmpl_json_and_inject( {template_name : 'test_one', from: 'nimble_api'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
-                                    api.czr_sektions.get_gallery_tmpl_json_and_inject( {template_name : tmpl_id, from: 'user'});
+                                    //api.czr_sektions.get_gallery_tmpl_json_and_inject( {tmpl_name : 'test_one', tmpl_source: 'api_tmpl'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
+                                    api.czr_sektions.get_gallery_tmpl_json_and_inject( { tmpl_name : _tmpl_id, tmpl_source: _tmpl_source });
                                     self.templateGalleryExpanded(false);
                               }
                         })
@@ -232,18 +234,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               evt.stopPropagation();
                               // 3 possible import modes : replace, before, after
                               var tmpl_inject_mode = $(this).data('sek-tmpl-inject-mode');
+                              
                               if ( !_.contains(['replace', 'before', 'after'], tmpl_inject_mode ) ) {
                                     api.errare('::setupTmplGalleryDOMEvents => error => invalid import mode');
                                     return;
                               }
                               api.czr_sektions.get_gallery_tmpl_json_and_inject({
-                                    template_name : self._tmplNameWhileImportDialog,
-                                    from: 'user',
+                                    tmpl_name : self._tmplNameWhileImportDialog,
+                                    tmpl_source: self._tmplSourceWhileImportDialog,
                                     tmpl_inject_mode: tmpl_inject_mode
                               });
                               // api.czr_sektions.get_gallery_tmpl_json_and_inject({
-                              //       template_name : 'test_one',
-                              //       from: 'nimble_api',
+                              //       tmpl_name : 'test_one',
+                              //       tmpl_source: 'nimble_api',
                               //       tmpl_inject_mode: tmpl_inject_mode
                               // });
                               self.templateGalleryExpanded(false);
@@ -310,11 +313,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     self.templateGalleryExpanded( false );
                         })
                         .on( 'click', '#sek-tmpl-source-switcher button', function( evt ) {
-                              //console.log('SO CLICK ?', $(this).data('sek-tmpl-type' ) );
                               evt.preventDefault();
                               $('#sek-tmpl-source-switcher button').removeClass('is-selected').attr('aria-pressed', "false");
                               $(this).addClass('is-selected').attr('aria-pressed', "true");
-                              self.renderOrRefreshTempGallery( { what : $(this).data('sek-tmpl-type') } );
+                              self.renderOrRefreshTempGallery( { tmpl_source: $(this).data('sek-tmpl-source') } );
                         });
               },
       });//$.extend()
