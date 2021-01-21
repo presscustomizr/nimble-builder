@@ -174,7 +174,6 @@
                                     return _itm.id === item.id;
                               });
                               _index = _.isUndefined( _index ) ? index : _index + 1;
-                              //_title = [ '@missi18n Slide', _index ].join( ' ' );
                         }
 
                         //if the slide title is set, use it

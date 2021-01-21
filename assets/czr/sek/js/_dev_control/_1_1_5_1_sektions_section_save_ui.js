@@ -600,7 +600,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //     duration : 10000,
                         //     message : [
                         //           '<span style="font-size:0.95em">',
-                        //             '<strong>@missi18n Your section has been saved.</strong>',
+                        //             '<strong>Your section has been saved.</strong>',
                         //           '</span>'
                         //     ].join('')
                         // });

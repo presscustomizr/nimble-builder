@@ -218,7 +218,7 @@
                                                           '<i class="material-icons remove-user-sec" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>',
                                                           //'<div class="sek-overlay"></div>',
                                                           //'<div class="sek-saved-section-description">' + secData.description + '</div>',
-                                                          //! _.isEmpty( creation_date ) ? ( '<div class="sek-saved-section-date"><i class="far fa-calendar-alt"></i> @missi18n Created : ' + creation_date + '</div>' ) : '',
+                                                          //! _.isEmpty( creation_date ) ? ( '<div class="sek-saved-section-date"><i class="far fa-calendar-alt"></i> Created : ' + creation_date + '</div>' ) : '',
                                                         '</div>',
                                                       '</div>',
                                                     '</div>'
