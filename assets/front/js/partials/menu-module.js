@@ -41,7 +41,14 @@
                     $( '.sek-nav .children, .sek-nav .sub-menu' ).addClass( ClassName.DROPDOWN );
                     $( '.sek-nav-wrap .page_item_has_children' ).addClass( ClassName.PARENTS );
                     $( '.sek-nav' + ' .' + ClassName.DROPDOWN + ' .' + ClassName.PARENTS ).addClass( ClassName.DROPDOWN_SUBMENU );
-
+                        
+                        // this is the element
+                        var _isMobileMenu = function() {
+                              if ( this.length && this.length > 0 ) {
+                                    return "yes" === this.closest('[data-sek-is-mobile-menu]').data('sek-is-mobile-menu');
+                              }
+                              return false;
+                        };
                     //Handle dropdown on hover via js
                     var dropdownMenuOnHover = function() {
                           var _dropdown_selector = Selector.HOVER_PARENT;
@@ -49,11 +56,15 @@
                           enableDropdownOnHover();
 
                           function _addOpenClass( evt ) {
+                                
                                 var $_el = $(this),
                                     $_child_dropdown = $_el.find( Selector.CHILD_DROPDOWN ).first();
+
                                 // Jan 2021 : start of a fix for https://github.com/presscustomizr/nimble-builder/issues/772
                                 if ( nb_.cachedElements.$body.hasClass('is-touch-device') ) {
-                                      if ( "true" != $_child_dropdown.attr('aria-expanded') ) {
+                                      // When navigating the regular menu ( horizontal ) on a mobile device, typically a tablet in landscape orientation
+                                      // we want to prevent opening the link of a parent menu if the children are not displayed yet
+                                      if ( "true" != $_child_dropdown.attr('aria-expanded') && !_isMobileMenu.call($_child_dropdown) ) {
                                             evt.preventDefault();
                                       }
                                 }
