@@ -118,7 +118,7 @@ function sek_register_dashboard_widgets() {
 // @return void()
 // callback of wp_add_dashboard_widget()
 function sek_nimble_dashboard_callback_fn() {
-    $post_data = sek_get_latest_posts_api_data( false );
+    $post_data = sek_get_latest_posts_api_data();
     $theme_name = sek_get_parent_theme_slug();
     ?>
     <div class="nimble-db-wrapper">
@@ -175,7 +175,7 @@ function sek_nimble_dashboard_callback_fn() {
         $theme_name = sek_get_parent_theme_slug();
 
         if ( sek_is_presscustomizr_theme( $theme_name ) ) {
-            $start_msg = sek_start_msg_from_api( $theme_name, false );
+            $start_msg = sek_start_msg_from_api( $theme_name );
             if ( !empty( $start_msg ) ) {
               $start_msg_array = array(
                 'start_msg' => array(
