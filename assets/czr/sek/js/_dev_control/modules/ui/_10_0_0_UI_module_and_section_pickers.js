@@ -224,9 +224,10 @@
                                                     '</div>'
                                               ].join('');
                                               $wrapper.append( html );
-                                              $wrapper.find('.czr-css-loader').remove();
                                         });//_.each
                                     }
+                                    // Remove the loader previously added
+                                    $wrapper.find('.czr-css-loader').remove();
 
                                     // Make section draggable now
                                     api.czr_sektions.trigger( 'sek-refresh-dragzones', { type : 'preset_section', input_container : input.container } );
