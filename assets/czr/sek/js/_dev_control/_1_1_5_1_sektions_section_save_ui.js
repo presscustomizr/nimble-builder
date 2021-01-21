@@ -590,7 +590,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.sectionCollectionPromise.resolve( sec_collection );
                         } else {
                               self.sectionCollectionPromise.resolve( {} );
-                              api.errorLog('control::getSavedSectionCollection => collection is empty or invalid');
+                              if ( !_.isEmpty( sec_collection ) ) {
+                                    api.errorLog('control::getSavedSectionCollection => collection is empty or invalid');
+                              }
                         }
 
                         // response is {section_post_id: 436}
