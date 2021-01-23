@@ -56,6 +56,7 @@ function sek_ajax_sek_get_user_tmpl_json() {
     $tmpl_post = sek_get_saved_tmpl_post( $_POST['tmpl_post_name'] );
     if ( !is_wp_error( $tmpl_post ) && $tmpl_post && is_object( $tmpl_post ) ) {
         $tmpl_decoded = maybe_unserialize( $tmpl_post->post_content );
+
         // Structure of $content :
         // array(
         //     'data' => $_POST['tmpl_data'],//<= json stringified
@@ -71,14 +72,16 @@ function sek_ajax_sek_get_user_tmpl_json() {
         //         'theme' => sanitize_title_with_dashes( get_stylesheet() )
         //     )
         // );
-        if ( is_array( $tmpl_decoded ) && !empty( $tmpl_decoded['data'] ) && is_string( $tmpl_decoded['data'] ) ) {
-            $tmpl_decoded['data'] = json_decode( wp_unslash( $tmpl_decoded['data'], true ) );
+        if ( is_array( $tmpl_decoded ) && !empty( $tmpl_decoded['data'] ) && is_array( $tmpl_decoded['data'] ) ) {
+            //$tmpl_decoded['data'] = json_decode( wp_unslash( $tmpl_decoded['data'], true ) );
             $tmpl_decoded['data'] = sek_maybe_import_imgs( $tmpl_decoded['data'], $do_import_images = true );
             // the image import errors won't block the import
             // they are used when notifying user in the customizer
             $tmpl_decoded['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
+            wp_send_json_success( $tmpl_decoded );
+        } else {
+            wp_send_json_error( __FUNCTION__ . '_invalid_tmpl_post_data' );
         }
-        wp_send_json_success( $tmpl_decoded );
     } else {
         wp_send_json_error( __FUNCTION__ . '_tmpl_post_not_found' );
     }
@@ -116,7 +119,7 @@ function sek_ajax_sek_get_api_tmpl_json() {
         $raw_tmpl[$tmpl_name]['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
         wp_send_json_success( $raw_tmpl[$tmpl_name] );
     }
-    return [];
+    //return [];
 }
 
 
