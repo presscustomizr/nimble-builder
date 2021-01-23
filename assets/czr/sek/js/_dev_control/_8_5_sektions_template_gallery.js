@@ -9,10 +9,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             setupTemplateGallery : function() {
                   var self = this;
                   self.templateGalleryExpanded = new api.Value(false);
-                  self.tmplImportDialogVisible = new api.Value(false);// Hidden by default
+                  self.tmplInjectDialogVisible = new api.Value(false);// Hidden by default
                   if ( !sektionsLocalizedData.isTemplateGalleryEnabled )
                     return;
 
+                  self.tmplSearchFieldVisible = new api.Value(false);// Hidden by default
+                  self.tmplSearchFieldVisible.bind( function( visible ) {
+                        var $tmplSearchWrap = self.cachedElements.$body.find('.sek-tmpl-filter-wrapper');
+                        if ( visible ) {
+                              $tmplSearchWrap.fadeIn('fast');
+                        } else {
+                              $tmplSearchWrap.fadeOut('fast');
+                        }
+                  });
+                  
                   self.templateGalleryExpanded.bind( function( expanded ) {
                         self.cachedElements.$body.toggleClass( 'sek-template-gallery-expanded', expanded );
                         if ( expanded ) {
@@ -20,7 +30,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // close level tree
                               self.tmplDialogVisible(false);
                               self.levelTreeExpanded(false);
-                              self.tmplImportDialogVisible(false);
+                              self.tmplInjectDialogVisible(false);
                               $('#customize-preview iframe').css('z-index', 1);
                               self.renderOrRefreshTempGallery( { tmpl_source:'api_tmpl' });
                         } else {
@@ -29,7 +39,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                   });
 
-                  self.tmplImportDialogVisible.bind( function( expanded ) {
+                  self.tmplInjectDialogVisible.bind( function( expanded ) {
                         self.cachedElements.$body.toggleClass( 'sek-tmpl-dialog-expanded', expanded );
                         if ( expanded ) {
                               // close template saver
@@ -188,6 +198,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         .done( function(tmpl_collection) { 
                               setTimeout( function() { 
                                     _doRender(tmpl_collection);
+                                    self.tmplSearchFieldVisible( !_.isEmpty( tmpl_collection ) );
                               }, 0 );
                         })
                         .fail( function() {
@@ -220,7 +231,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( self.hasCurrentPageNBSectionsNotHeaderFooter() ) {
                                     self._tmplNameWhileImportDialog = _tmpl_id;
                                     self._tmplSourceWhileImportDialog = _tmpl_source;
-                                    self.tmplImportDialogVisible(true);
+                                    self.tmplInjectDialogVisible(true);
                               } else {
                                     //api.czr_sektions.get_gallery_tmpl_json_and_inject( $(this).data('sek-tmpl-item-id') );
                                     //api.czr_sektions.get_gallery_tmpl_json_and_inject( {tmpl_name : 'test_one', tmpl_source: 'api_tmpl'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
@@ -229,12 +240,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         })
                         // PICK AN IMPORT MODE WHEN PAGE HAS SECTIONS ALREADY
-                        .on('click', '.sek-tmpl-gal-import-dialog .sek-ui-button', function( evt ) {
+                        .on('click', '.sek-tmpl-gal-inject-dialog .sek-ui-button', function( evt ) {
                               evt.preventDefault();
                               evt.stopPropagation();
-                              // 3 possible import modes : replace, before, after
                               var tmpl_inject_mode = $(this).data('sek-tmpl-inject-mode');
-                              
+
+                              // Did user cancel tmpl injection ?
+                              if ( 'cancel' === tmpl_inject_mode ) {
+                                    self.tmplInjectDialogVisible(false);
+                                    return;
+                              }
+
+                              // 3 possible import modes : replace, before, after
                               if ( !_.contains(['replace', 'before', 'after'], tmpl_inject_mode ) ) {
                                     api.errare('::setupTmplGalleryDOMEvents => error => invalid import mode');
                                     return;
