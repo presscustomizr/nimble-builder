@@ -5106,7 +5106,7 @@ function sek_get_module_params_for_czr_menu_module() {
             //     'color_css'  => '#ffffff',
             // )
         ),
-        'css_selectors' => array( '.sek-menu-module li > a', '.nb-search-expand-inner input', '[data-sek-is-mobile-menu="yes"] .nb-mobile-search input' ),//<=@see tmpl/modules/menu_module_tmpl.php
+        'css_selectors' => array( '.sek-menu-module li > a', '.nb-search-expand-inner input', '[data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search input' ),//<=@see tmpl/modules/menu_module_tmpl.php
         'render_tmpl_path' => "menu_module_tmpl.php"
     );
 }
@@ -5139,14 +5139,15 @@ function sek_get_module_params_for_czr_menu_content_child() {
                         )
                     ),
                 ),
+                // janv 2021 : alignement of menu items in the vertical mobile mnenu
                 'h_alignment_css' => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
                     'title'       => __('Menu items alignment', 'text_doma'),
-                    'default'     => array( 'desktop' => 'center' ),
+                    'default'     => array( 'desktop' => 'right' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'h_flex_alignment',
-                    'css_selectors' => array( '.sek-nav-collapse', '[data-sek-is-mobile-menu="yes"] .sek-nav li a' ),
+                    'css_selectors' => array( '.sek-nav-collapse', '[data-sek-is-mobile-vertical-menu="yes"] .sek-nav li a' ),
                     'title_width' => 'width-100',
                     'width-100'   => true,
                 ),

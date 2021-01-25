@@ -63,7 +63,7 @@
 
                                 // Jan 2021 : start of a fix for https://github.com/presscustomizr/nimble-builder/issues/772
                                 if ( nb_.cachedElements.$body.hasClass('is-touch-device') ) {
-                                      // When navigating the regular menu ( horizontal ) on a mobile device, typically a tablet in landscape orientation
+                                      // When navigating the regular menu ( horizontal ) on a mobile touch device, typically a tablet in landscape orientation
                                       // we want to prevent opening the link of a parent menu if the children are not displayed yet
                                       if ( "true" != $_child_dropdown.attr('aria-expanded') && !_isMobileMenu.call($_child_dropdown) ) {
                                             evt.preventDefault();

@@ -973,26 +973,23 @@ function sek_print_nimble_customizer_tmpl() {
                 <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('My templates', 'text_domain'); ?>" data-sek-tmpl-source="user_tmpl"><span><?php _e('My templates', 'text_domain'); ?></span></button>
             </div>
           </div>
-          <input type="text" class="sek-filter-tmpl" placeholder="<?php _e('Filter templates', 'text_domain'); ?>">
-          <div class="sek-ui-button-group" role="group">
+          <div class="sek-tmpl-filter-wrapper">
+            <input type="text" class="sek-filter-tmpl" placeholder="<?php _e('Filter templates', 'text_domain'); ?>">
+          </div>
+          <div class="sek-close-button">
             <button class="sek-ui-button sek-close-dialog" type="button" title="<?php _e('Close', 'text_domain'); ?>">
                 <i class="far fa-times-circle"></i>&nbsp;<?php _e('Close', 'text_domain'); ?>
             </button>
           </div>
         </div>
         <div class="sek-tmpl-gallery-inner"></div>
-        <div class="sek-tmpl-gal-import-dialog">
-            <p>This page has NB sections already. Select an import options.</p>
+        <div class="sek-tmpl-gal-inject-dialog">
+            <p><strong><?php _e('This page already has Nimble Builder sections. What do you want to do ?') ?></strong></p>
             <div class="sek-ui-button-group" role="group">
-              <button class="sek-ui-button sek-tmpl-import-replace" type="button" title="<?php _e('Replace existing sections', 'text_domain'); ?>" data-sek-tmpl-inject-mode="replace">
-                <?php _e('Replace existing sections', 'text_domain'); ?><span class="spinner"></span>
-              </button>
-              <button class="sek-ui-button sek-tmpl-import-before" type="button" title="<?php _e('Insert before existing sections', 'text_domain'); ?>" data-sek-tmpl-inject-mode="before">
-                <?php _e('Insert before existing sections', 'text_domain'); ?><span class="spinner"></span>
-              </button>
-              <button class="sek-ui-button sek-tmpl-import-after" type="button" title="<?php _e('Insert after existing sections', 'text_domain'); ?>" data-sek-tmpl-inject-mode="after">
-                <?php _e('Insert after existing sections', 'text_domain'); ?><span class="spinner"></span>
-              </button>
+              <button class="sek-ui-button" type="button" title="<?php _e('Replace existing sections', 'text_domain'); ?>" data-sek-tmpl-inject-mode="replace"><?php _e('Replace existing sections', 'text_domain'); ?></button>
+              <button class="sek-ui-button" type="button" title="<?php _e('Insert before existing sections', 'text_domain'); ?>" data-sek-tmpl-inject-mode="before"><?php _e('Insert before existing sections', 'text_domain'); ?></button>
+              <button class="sek-ui-button" type="button" title="<?php _e('Insert after existing sections', 'text_domain'); ?>" data-sek-tmpl-inject-mode="after"><?php _e('Insert after existing sections', 'text_domain'); ?></button>
+              <button class="sek-ui-button" type="button" title="<?php _e('Cancel', 'text_domain'); ?>" data-sek-tmpl-inject-mode="cancel"><?php _e('Cancel', 'text_domain'); ?></button>
             </div>
         </div>
       </div>
@@ -4674,6 +4671,7 @@ function sek_ajax_sek_get_user_tmpl_json() {
     $tmpl_post = sek_get_saved_tmpl_post( $_POST['tmpl_post_name'] );
     if ( !is_wp_error( $tmpl_post ) && $tmpl_post && is_object( $tmpl_post ) ) {
         $tmpl_decoded = maybe_unserialize( $tmpl_post->post_content );
+
         // Structure of $content :
         // array(
         //     'data' => $_POST['tmpl_data'],//<= json stringified
@@ -4689,14 +4687,16 @@ function sek_ajax_sek_get_user_tmpl_json() {
         //         'theme' => sanitize_title_with_dashes( get_stylesheet() )
         //     )
         // );
-        if ( is_array( $tmpl_decoded ) && !empty( $tmpl_decoded['data'] ) && is_string( $tmpl_decoded['data'] ) ) {
-            $tmpl_decoded['data'] = json_decode( wp_unslash( $tmpl_decoded['data'], true ) );
+        if ( is_array( $tmpl_decoded ) && !empty( $tmpl_decoded['data'] ) && is_array( $tmpl_decoded['data'] ) ) {
+            //$tmpl_decoded['data'] = json_decode( wp_unslash( $tmpl_decoded['data'], true ) );
             $tmpl_decoded['data'] = sek_maybe_import_imgs( $tmpl_decoded['data'], $do_import_images = true );
             // the image import errors won't block the import
             // they are used when notifying user in the customizer
             $tmpl_decoded['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
+            wp_send_json_success( $tmpl_decoded );
+        } else {
+            wp_send_json_error( __FUNCTION__ . '_invalid_tmpl_post_data' );
         }
-        wp_send_json_success( $tmpl_decoded );
     } else {
         wp_send_json_error( __FUNCTION__ . '_tmpl_post_not_found' );
     }
@@ -4734,7 +4734,7 @@ function sek_ajax_sek_get_api_tmpl_json() {
         $raw_tmpl[$tmpl_name]['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
         wp_send_json_success( $raw_tmpl[$tmpl_name] );
     }
-    return [];
+    //return [];
 }
 
 
