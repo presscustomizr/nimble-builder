@@ -45,7 +45,8 @@
                         // this is the element
                         var _isMobileMenu = function() {
                               if ( this.length && this.length > 0 ) {
-                                    return "yes" === this.closest('[data-sek-is-mobile-menu]').data('sek-is-mobile-menu');
+                                    // Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
+                                    return "yes" === this.closest('[data-sek-is-mobile-vertical-menu]').data('sek-is-mobile-vertical-menu');
                               }
                               return false;
                         };
@@ -379,42 +380,66 @@
                           nb_.cachedElements.$window.trigger('scroll');
                     });
 
+              // Set the attribute data-sek-is-mobile-vertical-menu on page load and dynamically set on resize
+              var _setVerticalMobileBooleanAttribute = function() {
+                  var breakpoint = 768, $menu_wrapper, deviceWidth;
+                  $('.sek-nav-toggler').each( function() {
+                        $menu_wrapper = $(this).closest('[data-sek-mobile-menu-breakpoint]');
+                        if ( $menu_wrapper.length < 1 ) {
+                              nb_.errorLog('Menu module => error => no menu wrapper found');
+                        } else {
+                              breakpoint = $(this).closest('[data-sek-mobile-menu-breakpoint]').data('sek-mobile-menu-breakpoint') || breakpoint;
+                              // cast to integer
+                              breakpoint = parseInt( breakpoint, 10 );
+                              deviceWidth = window.innerWidth > 0 ? window.innerWidth : screen.width;
+                              // console.log('window.innerWidth ??', window.innerWidth, window.innerWidth > 0 );
+                              // console.log('SOO ? breakpoint | device width', breakpoint + ' | ' + deviceWidth );
+                              
+                              // add a data attribute so we can target the mobile menu with dynamic css rules
+                              // @needed when coding : https://github.com/presscustomizr/nimble-builder/issues/491
+                              $menu_wrapper.attr('data-sek-is-mobile-vertical-menu', deviceWidth < breakpoint ? 'yes' : 'no');
+                        }
+                  });
+              };
+
+              _setVerticalMobileBooleanAttribute();
+              nb_.cachedElements.$window.on('resize', nb_.debounce( _setVerticalMobileBooleanAttribute, 100) );
+
+
               // How to have a logo plus an hamburger in mobiles on the same line?
               // => clone the menu module, and append it to the closest sektion-inner wrapper
               // => this way it will occupy 100% of the width
               // => and also the clone inherits the style of the module
               // https://github.com/presscustomizr/nimble-builder/issues/368
               var _doMobileMenuSetup = function() {
-                      $( '[data-sek-module-type="czr_menu_module"]' ).find('[data-sek-expand-below="yes"]').each( function() {
-                            // make sure we don't do the setup twice when customizing
-                            if ( true === $(this).data('sek-setup-menu-mobile-expanded-below-done') )
+                        $( '[data-sek-module-type="czr_menu_module"]' ).find('[data-sek-expand-below="yes"]').each( function() {
+                              // make sure we don't do the setup twice when customizing
+                              if ( true === $(this).data('sek-setup-menu-mobile-expanded-below-done') )
                               return;
 
-                            var $_mobile_menu_module  = $(this).closest('[data-sek-module-type="czr_menu_module"]').clone(true),
-                                //create a new id for the mobile menu nav collapse that will used by the button toggler too
-                                _new_id = $( '.sek-nav-collapse', this ).attr('id') + '-mobile';
+                              var $_mobile_menu_module  = $(this).closest('[data-sek-module-type="czr_menu_module"]').clone(true),
+                              //create a new id for the mobile menu nav collapse that will used by the button toggler too
+                              _new_id = $( '.sek-nav-collapse', this ).attr('id') + '-mobile';
 
-                          $_mobile_menu_module
-                                /// place the mobile menu at the end of this sektion inner
-                                .appendTo( $(this).closest( '.sek-sektion-inner' ) )
-                                //wrap in a convenient div for styling and targeting
-                                .wrap( '<div class="sek-col-base sek-mobile-menu-expanded-below" id="'+_new_id+'-wrapper"></div>');
+                        $_mobile_menu_module
+                              /// place the mobile menu at the end of this sektion inner
+                              .appendTo( $(this).closest( '.sek-sektion-inner' ) )
+                              //wrap in a convenient div for styling and targeting
+                              .wrap( '<div class="sek-col-base sek-mobile-menu-expanded-below" id="'+_new_id+'-wrapper"></div>');
 
-                          // assign the new id to the mobile nav collapse
-                          $( '.sek-nav-collapse', '#'+_new_id+'-wrapper' ).attr( 'id', _new_id );
-                          // add a data attribute so we can target the mobile menu with dynamic css rules
-                          // @needed when coding : https://github.com/presscustomizr/nimble-builder/issues/491
-                          $( '.sek-nav-wrap', '#'+_new_id+'-wrapper' ).attr('data-sek-is-mobile-menu', 'yes');
-                          // remove the duplicate button
-                          $( '.sek-nav-toggler', '#'+_new_id+'-wrapper' ).detach();
-                          // update the toggler button so that will now refer to the "cloned" mobile menu
-                          $( '.sek-nav-toggler', this ).data( 'target', '#' + _new_id )
-                                                       .attr( 'aria-controls', _new_id );
-                          // flag setup done
-                          $(this).data('sek-setup-menu-mobile-expanded-below-done', true );
-                    });//$.each()
-              };
+                        // assign the new id to the mobile nav collapse
+                        $( '.sek-nav-collapse', '#'+_new_id+'-wrapper' ).attr( 'id', _new_id );
+                        // remove the duplicate button
+                        $( '.sek-nav-toggler', '#'+_new_id+'-wrapper' ).detach();
+                        // update the toggler button so that will now refer to the "cloned" mobile menu
+                        $( '.sek-nav-toggler', this ).data( 'target', '#' + _new_id )
+                                                      .attr( 'aria-controls', _new_id );
+                        // flag setup done
+                        $(this).data('sek-setup-menu-mobile-expanded-below-done', true );
+                  });//$.each()
+            };
               _doMobileMenuSetup();
+
               // When previewing, react to level refresh
               // This can occur to any level. We listen to the bubbling event on 'body' tag
               nb_.cachedElements.$body.on('sek-level-refreshed sek-modules-refreshed sek-columns-refreshed sek-section-added', function( evt ){
