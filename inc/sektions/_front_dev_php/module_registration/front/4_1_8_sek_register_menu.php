@@ -70,7 +70,8 @@ function sek_get_module_params_for_czr_menu_content_child() {
                         )
                     ),
                 ),
-                // janv 2021 : alignement of menu items in the vertical mobile mnenu
+                // alignment of items on desktops devices ( when items are horizontal ), is controled with selector .sek-nav-collapse
+                // janv 2021 : alignement of menu items in the vertical mobile mnenu with '[data-sek-is-mobile-vertical-menu="yes"] .sek-nav li a'
                 'h_alignment_css' => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
                     'title'       => __('Menu items alignment', 'text_doma'),
