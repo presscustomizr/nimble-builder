@@ -382,23 +382,18 @@
 
               // Set the attribute data-sek-is-mobile-vertical-menu on page load and dynamically set on resize
               var _setVerticalMobileBooleanAttribute = function() {
-                  var breakpoint = 768, $menu_wrapper, deviceWidth;
-                  $('.sek-nav-toggler').each( function() {
-                        $menu_wrapper = $(this).closest('[data-sek-mobile-menu-breakpoint]');
-                        if ( $menu_wrapper.length < 1 ) {
-                              nb_.errorLog('Menu module => error => no menu wrapper found');
-                        } else {
-                              breakpoint = $(this).closest('[data-sek-mobile-menu-breakpoint]').data('sek-mobile-menu-breakpoint') || breakpoint;
-                              // cast to integer
-                              breakpoint = parseInt( breakpoint, 10 );
-                              deviceWidth = window.innerWidth > 0 ? window.innerWidth : screen.width;
-                              // console.log('window.innerWidth ??', window.innerWidth, window.innerWidth > 0 );
-                              // console.log('SOO ? breakpoint | device width', breakpoint + ' | ' + deviceWidth );
-                              
-                              // add a data attribute so we can target the mobile menu with dynamic css rules
-                              // @needed when coding : https://github.com/presscustomizr/nimble-builder/issues/491
-                              $menu_wrapper.attr('data-sek-is-mobile-vertical-menu', deviceWidth < breakpoint ? 'yes' : 'no');
-                        }
+                  var breakpoint = 768, deviceWidth;
+                  $('nav.sek-nav-wrap').each( function() {
+                        breakpoint = $(this).data('sek-mobile-menu-breakpoint') || breakpoint;
+                        // cast to integer
+                        breakpoint = parseInt( breakpoint, 10 );
+                        deviceWidth = window.innerWidth > 0 ? window.innerWidth : screen.width;
+                        // console.log('window.innerWidth ??', window.innerWidth, window.innerWidth > 0 );
+                        // console.log('SOO ? breakpoint | device width', breakpoint + ' | ' + deviceWidth );
+                        
+                        // add a data attribute so we can target the mobile menu with dynamic css rules
+                        // @needed when coding : https://github.com/presscustomizr/nimble-builder/issues/491
+                        $(this).attr('data-sek-is-mobile-vertical-menu', deviceWidth < breakpoint ? 'yes' : 'no');
                   });
               };
 
