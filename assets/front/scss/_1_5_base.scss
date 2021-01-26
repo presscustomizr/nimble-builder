@@ -334,3 +334,9 @@
 // SEPT 2020 : Animate
 .sek-animate-candidate { opacity: 0;}
 .sek-overflow-hidden-while-animating { overflow: hidden;}
+
+// Janv 2021 : Pro header
+// default background color on scroll, consistent with default registration param in nimble-builder-pro\inc\front\nb-pro-menu.php
+.nb-scroll-down #nimble-header, .nb-scroll-up #nimble-header {
+  background-color: rgba(255,255,255,0.9);
+}
