@@ -1,17 +1,12 @@
 // stylelint-disable selector-no-qualifying-type
-.#{$project-prefix}fade {
-  @include transition($transition-fade);
+// .sek-fade {
+//   @include transition($transition-fade);
 
-  &:not(.show) {
-    opacity: 0;
-  }
-}
+//   &:not(.show) {
+//     opacity: 0;
+//   }
+// }
 
-.#{$project-prefix}collapse {
-  &:not(.show) {
-    display: none;
-  }
-}
 /*
 .#{$project-prefix}collapsing {
   position: relative;

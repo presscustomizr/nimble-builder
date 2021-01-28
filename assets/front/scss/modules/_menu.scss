@@ -145,248 +145,11 @@
     }
 }
 
-.sek-dropdown-submenu {
-    & > a{
-        &::after {
-            @if ( true == $is_rtl ) {
-                transform: translateZ(0) rotate(0deg)!important;
-                -ms-transform: rotate(0deg)!important;
-            }
-            @else {
-                transform: translateZ(0) rotate(0deg)!important;
-                -ms-transform: rotate(0deg)!important;
-            }
-        }
-        //TODO: row reverse
-        &[class*=-reverse]::after {
-            top: .1em;
-            @if ( true == $is_rtl ) {
-                transform: translateZ(0) rotate(180deg)!important;
-                -ms-transform: rotate(180deg)!important;
-            }
-            @else {
-                transform: translateZ(0) rotate(-180deg)!important;
-                -ms-transform: rotate(-180deg)!important;
-            }
-        }
-    }
-}
-
-//Hueman inspired nav toggler
-.nb-loc .sek-module-inner .sek-nav-toggler {
-    -webkit-appearance: none !important;
-    cursor: pointer;
-    &, &:hover, &:focus {
-        //following 3 should be customizable
-        background: 0 0;
-        background-color: rgba(0, 0, 0, 0);
-        color: black;
-
-        border: none;
-    }
-
-    height: 40px;
-    width: 40px;
-    padding: 0;
-    vertical-align: middle;
-    //align to the right (left when rtl)
-    // @if ( true == $is_rtl ) {
-    //     margin-right: auto;
-    //     margin-left: -10px;
-    // }
-    // @else {
-    //     margin-left: auto;
-    //     margin-right: -10px;
-    // }
-    @at-root .sek-ham__span-wrapper {
-        height: 12px;
-        position: relative;
-        display: block;
-        .line {
-            display: block;
-            height: 1.5px;
-            position: absolute;
-            left: 10px;
-            border-radius: 5px;
-            background-clip: padding-box;
-            transition: all ease .35s;
-            backface-visibility: hidden;
-            border-top: 1.5px solid;
-        }
-        .line-1 {
-            top: 0;
-        }
-        .line-2 {
-            top: 50%;
-        }
-        .line-3 {
-            top: 100%;
-        }
-
-        @at-root .sek-nav-toggler {
-            .line-1 {
-                transform: translate(-3px, 6px) rotate(45deg);
-                width: 28px;
-            }
-            .line-2 {
-                opacity: 0;
-            }
-            .line-3 {
-                transform: translate(-3px, -6px) rotate(-45deg);
-                width: 28px;
-            }
-        }
-        @at-root .sek-nav-toggler.sek-collapsed .line {
-            width: 20px;
-            transform: translate(0,0) rotate(0);
-            opacity: 1;
-        }
-        @at-root .sek-nav-toggler.sek-collapsed.hovering .line {
-            transform: translateX(-3px);
-            width: 26px;
-        }
-    }
-}
-
-.sek-dropdown-menu {
-    @include dropdown-menu-base();
-
-    .show > & {
-        display: block;
-    }
-
-    .sek-nav__title {
-        //the sidemenu and mobile menu should NOT break lines
-        word-break: break-word;// was break-all; Fixed in dec-2017 @see https://github.com/presscustomizr/customizr/issues/1339
-        white-space: normal;
-    }
-    //SNAKE
-    &.open-right {
-        left: 0;
-        right: auto;
-    }
-    @at-root &.open-right ul:not(.open-left),
-    & ul.open-right {
-        left: 100%;
-        right: auto;
-    }
-
-    &.open-left {
-        left: auto;
-        right: 0;
-    }
-    @at-root &.open-left ul:not(.open-right),
-    & ul.open-left {
-        right: 100%;
-        left: auto;
-    }
-    // progressive background filling on hover not activated when releasing the menu module initial version, in v1.4.0
-    // li {
-    //     position: relative;
-    //     &::before {
-    //         content: '';
-    //         position: absolute;
-    //         width: 0%;
-    //         height: 100%;
-    //         top: 0;
-    //         left: 0;
-    //         transition-delay: 0s;
-    //         transition-duration: .6s;
-    //         transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
-    //         transform-origin: 0 100%;
-    //         background-color: rgba(0, 0, 0, 0.045);
-    //     }
-    //     &:hover::before {
-    //         width: 100%;
-    //     }
-    // }
-}
-
-// June 2020 for https://github.com/presscustomizr/nimble-builder/issues/721
-// Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
-[data-sek-is-mobile-vertical-menu="yes"] {
-  > .show {
-    overflow: auto;
-    max-height: 80vh;
-  }
-  li .sub-menu li > a {
-    font-size: 0.8em;
-    padding: .6em 15px;
-  }
-}
-// Janv 2021 : default alignment of vertical mobile menu items
-// consistent with registration params
-// Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
-[data-sek-is-mobile-vertical-menu="yes"] .sek-nav li a {
-    justify-content: flex-end;
-    -webkit-box-pack: end;
-    -ms-flex-pack: end;
-}
-
-// PRO SEARCH ICON IN DESKTOP + SEARCH FIELD DESKTOP AND MOBILE
-// June 2020 search icon + form in menu module for https://github.com/presscustomizr/nimble-builder-pro/issues/12
-.nb-module-menu-search {
-  position: relative;
-}
-// Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
-[data-sek-is-mobile-vertical-menu="yes"] .nb-module-menu-search {
-  display: none;
-}
-.nb-svg-search-icon {
-  cursor: pointer;
-  padding: 0;
-}
-.nb-module-menu-search .nb-search-expand {
-  display:none;
-  background: #fff;
-  position: absolute;
-  z-index: 100;
-  top: 49px;
-  right: 0;
-  left: 0;
-  width: 340px;
-  -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.1);
-  box-shadow: 0 1px 0 rgba(255,255,255,.1);
-}
-.nb-search-expand .nb-search-expand-inner {
-  border: 1px solid #eee;
-  box-shadow: 0 0 5px rgba(0,0,0,.2),0 1px 0 rgba(255,255,255,.15);
-  transition: -webkit-transform .35s ease-in-out,height .25s ease-in-out,background-color .45s ease-in-out;
-  transition: transform .35s ease-in-out,height .25s ease-in-out,background-color .45s ease-in-out;
-  padding: 15px;
-}
-
-[data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner [role=search].search-form {
-  display: flex;
-  float: none;
-}
-[data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner label input[type=search] {
-  max-width: 100%;
-}
-[data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=submit], [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search form input[type=submit] {
-  margin: 0;
-  background: #808080;
-    color: #fff;
-}
-// Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
-[data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=search], [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search input[type=search],
-[data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=submit], [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search form input[type=submit] {
-  text-transform: none!important;
-}
-.nb-mobile-search {
-  display: none;
-}
-// Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
-[data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search {
-  display: block;
-  padding: 6px 14px 15px;
-}
-[data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search input {
-  font-size: 16px;
-}
 
 
-// MOBILE VERTICAL MENU
+
+
+// RULES FOR HORIZONTAL DESKTOP MENU
 //mobile up breakpoint -> min-width:768px
 @include media-breakpoint-up( 'md' ) {
     .sek-nav {
@@ -405,7 +168,7 @@
         }
     }
     .sek-nav-collapse {
-        display: flex!important;
+        display: flex!important;// <= !important because the php template sets this selector to display:none with inline style. This hack allows us to prevent a Content Layout Shift on page load
         flex-basis: auto;
     }
 
@@ -512,4 +275,391 @@
         }
      }
      // end fade effect
+
+     .nb-collapsible-mobile-menu .nb-dd-mm-toggle-wrapper {
+        display: none;
+    }
+}//@include media-breakpoint-up( 'md' )
+
+
+
+
+
+
+
+
+// ANIMATION : ROTATING ARROWS FOR SUBMENU PARENTS
+.sek-dropdown-submenu {
+    & > a{
+        &::after {
+            @if ( true == $is_rtl ) {
+                transform: translateZ(0) rotate(0deg)!important;
+                -ms-transform: rotate(0deg)!important;
+            }
+            @else {
+                transform: translateZ(0) rotate(0deg)!important;
+                -ms-transform: rotate(0deg)!important;
+            }
+        }
+        //TODO: row reverse
+        &[class*=-reverse]::after {
+            top: .1em;
+            @if ( true == $is_rtl ) {
+                transform: translateZ(0) rotate(180deg)!important;
+                -ms-transform: rotate(180deg)!important;
+            }
+            @else {
+                transform: translateZ(0) rotate(-180deg)!important;
+                -ms-transform: rotate(-180deg)!important;
+            }
+        }
+    }
 }
+
+
+.sek-dropdown-menu {
+    @include dropdown-menu-base();
+
+    .show > & {
+        display: block;
+    }
+
+    .sek-nav__title {
+        //the sidemenu and mobile menu should NOT break lines
+        word-break: break-word;// was break-all; Fixed in dec-2017 @see https://github.com/presscustomizr/customizr/issues/1339
+        white-space: normal;
+    }
+    //SNAKE
+    &.open-right {
+        left: 0;
+        right: auto;
+    }
+    @at-root &.open-right ul:not(.open-left),
+    & ul.open-right {
+        left: 100%;
+        right: auto;
+    }
+
+    &.open-left {
+        left: auto;
+        right: 0;
+    }
+    @at-root &.open-left ul:not(.open-right),
+    & ul.open-left {
+        right: 100%;
+        left: auto;
+    }
+    // progressive background filling on hover not activated when releasing the menu module initial version, in v1.4.0
+    // li {
+    //     position: relative;
+    //     &::before {
+    //         content: '';
+    //         position: absolute;
+    //         width: 0%;
+    //         height: 100%;
+    //         top: 0;
+    //         left: 0;
+    //         transition-delay: 0s;
+    //         transition-duration: .6s;
+    //         transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+    //         transform-origin: 0 100%;
+    //         background-color: rgba(0, 0, 0, 0.045);
+    //     }
+    //     &:hover::before {
+    //         width: 100%;
+    //     }
+    // }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// MOBILE : HAMBURGER BUTTON
+//Hueman inspired nav toggler
+.nb-loc .sek-module-inner .sek-nav-toggler {
+    -webkit-appearance: none !important;
+    cursor: pointer;
+    &, &:hover, &:focus {
+        //following 3 should be customizable
+        background: 0 0;
+        background-color: rgba(0, 0, 0, 0);
+        color: black;
+
+        border: none;
+    }
+
+    height: 40px;
+    width: 40px;
+    padding: 0;
+    vertical-align: middle;
+    //align to the right (left when rtl)
+    // @if ( true == $is_rtl ) {
+    //     margin-right: auto;
+    //     margin-left: -10px;
+    // }
+    // @else {
+    //     margin-left: auto;
+    //     margin-right: -10px;
+    // }
+    @at-root .sek-ham__span-wrapper {
+        height: 12px;
+        position: relative;
+        display: block;
+        .line {
+            display: block;
+            height: 1.5px;
+            position: absolute;
+            left: 10px;
+            border-radius: 5px;
+            background-clip: padding-box;
+            transition: all ease .35s;
+            backface-visibility: hidden;
+            border-top: 1.5px solid;
+        }
+        .line-1 {
+            top: 0;
+        }
+        .line-2 {
+            top: 50%;
+        }
+        .line-3 {
+            top: 100%;
+        }
+
+        @at-root .sek-nav-toggler {
+            .line-1 {
+                transform: translate(-3px, 6px) rotate(45deg);
+                width: 28px;
+            }
+            .line-2 {
+                opacity: 0;
+            }
+            .line-3 {
+                transform: translate(-3px, -6px) rotate(-45deg);
+                width: 28px;
+            }
+        }
+        @at-root .sek-nav-toggler.sek-collapsed .line {
+            width: 20px;
+            transform: translate(0,0) rotate(0);
+            opacity: 1;
+        }
+        @at-root .sek-nav-toggler.sek-collapsed.hovering .line {
+            transform: translateX(-3px);
+            width: 26px;
+        }
+    }
+}
+
+// MOBILE MENU
+// June 2020 for https://github.com/presscustomizr/nimble-builder/issues/721
+// Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
+[data-sek-is-mobile-vertical-menu="yes"] {
+    > .show {
+      overflow: auto;
+      max-height: 80vh;
+    }
+    li .sub-menu li > a {
+      font-size: 0.8em;
+      padding: .6em 15px;
+    }
+  }
+  // Janv 2021 : default alignment of vertical mobile menu items
+  // consistent with registration params
+  // Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
+  [data-sek-is-mobile-vertical-menu="yes"] .sek-nav li a {
+      justify-content: flex-end;
+      -webkit-box-pack: end;
+      -ms-flex-pack: end;
+  }
+
+
+
+
+
+// NEW COLLAPSIBLE MOBILE MENU
+/*
+* Mobile dropdown on click
+*/
+nav.nb-collapsible-mobile-menu [data-sek-mm-state] { display: none }
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] { display: block; }
+
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"],
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] li,
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] ul { background: inherit; }
+
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .sub-menu,
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] li {
+    position: relative;
+}
+
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .page_item_has_children > a,
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .menu-item-has-children  > a {
+    padding-right: 44px;
+}
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] li a {
+    min-height: 37px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] > li > a {
+    min-height: 43px;
+}
+
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .sub-menu { display: none; }
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .sub-menu.expanded { display: block; }
+
+.nb-dd-mm-toggle-wrapper {
+    position: absolute;
+    top: 1px;
+    right: 0;
+    text-align: center;
+    line-height: 1;
+    bottom: 1px;
+    height: 45px;
+    width: 44px;
+}
+
+
+.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .nb-dd-mm-toggle-wrapper {
+    display: block;
+}
+
+.nb-dd-mm-toggle {
+    background: none;
+    -webkit-appearance: none;
+    outline: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: block;
+    height: 45px;
+    width: 44px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+li li .nb-dd-mm-toggle {
+    height: 39px;
+}
+
+.nb-dd-mm-toggle i {
+    display: block;
+    -webkit-transition: all .3s ease;
+    -o-transition: all .3s ease;
+    transition: all .3s ease;
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
+    width: 100%;
+    font-size: 13px;
+}
+
+li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
+    -webkit-transform: rotate(-180deg);
+    -moz-transform: rotate(-180deg);
+    transform: rotate(-180deg);
+}
+
+.nb-arrow-for-mobile-menu::after {
+    content: "\25BE";//https://unicode-table.com/en/25BE/
+    font-family: "Arial Unicode MS", Arial;//<= https://www.fileformat.info/info/unicode/char/203A/fontsupport.htm
+    moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    // display: none;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    font-weight: 900;
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    perspective: 1000px;
+    padding: 0 .45em;
+    font-size: 1em;
+    position: relative;
+}
+
+
+
+
+
+
+// PRO SEARCH ICON IN DESKTOP + SEARCH FIELD DESKTOP AND MOBILE
+// June 2020 search icon + form in menu module for https://github.com/presscustomizr/nimble-builder-pro/issues/12
+.nb-module-menu-search {
+    position: relative;
+  }
+  // Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
+  [data-sek-is-mobile-vertical-menu="yes"] .nb-module-menu-search {
+    display: none;
+  }
+  .nb-svg-search-icon {
+    cursor: pointer;
+    padding: 0;
+  }
+  .nb-module-menu-search .nb-search-expand {
+    display:none;
+    background: #fff;
+    position: absolute;
+    z-index: 100;
+    top: 49px;
+    right: 0;
+    left: 0;
+    width: 340px;
+    -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.1);
+    box-shadow: 0 1px 0 rgba(255,255,255,.1);
+  }
+  .nb-search-expand .nb-search-expand-inner {
+    border: 1px solid #eee;
+    box-shadow: 0 0 5px rgba(0,0,0,.2),0 1px 0 rgba(255,255,255,.15);
+    transition: -webkit-transform .35s ease-in-out,height .25s ease-in-out,background-color .45s ease-in-out;
+    transition: transform .35s ease-in-out,height .25s ease-in-out,background-color .45s ease-in-out;
+    padding: 15px;
+  }
+  
+  [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner [role=search].search-form {
+    display: flex;
+    float: none;
+  }
+  [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner label input[type=search] {
+    max-width: 100%;
+  }
+  [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=submit], [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search form input[type=submit] {
+    margin: 0;
+    background: #808080;
+      color: #fff;
+  }
+  // Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
+  [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=search], [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search input[type=search],
+  [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=submit], [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search form input[type=submit] {
+    text-transform: none!important;
+  }
+  .nb-mobile-search {
+    display: none;
+  }
+  // Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
+  [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search {
+    display: block;
+    padding: 6px 14px 15px;
+  }
+  [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search input {
+    font-size: 16px;
+  }
