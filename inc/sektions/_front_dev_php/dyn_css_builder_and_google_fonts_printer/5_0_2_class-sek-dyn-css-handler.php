@@ -14,14 +14,12 @@ class Sek_Dyn_CSS_Handler {
 
     /**
      * Functioning mode constant
-     *
      * @access public
      */
     const MODE_INLINE  = 'inline';
 
     /**
      * Functioning mode constant
-     *
      * @access public
      */
     const MODE_FILE    = 'file';
@@ -282,7 +280,7 @@ class Sek_Dyn_CSS_Handler {
         //build no parameterized properties
         $this->_sek_dyn_css_set_properties();
 
-        // Possible scenarios :
+        // Possible scenarii :
         // 1) customizing :
         //    the css is always printed inline. If there's already an existing css file for this skope_id, it's not enqueued.
         // 2) saving in the customizer :

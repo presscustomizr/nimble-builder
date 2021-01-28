@@ -469,17 +469,23 @@ class Sek_Dyn_CSS_Builder {
         // CONCATENATE MODULE STYLESHEETS
         // Oct 2020 => https://github.com/presscustomizr/nimble-builder/issues/749
         $this->module_types = array_unique($this->module_types);
-        //sek_error_log('$this->module_types ?', $this->module_types );
+
         $modules_css = '';
         $base_uri = NIMBLE_BASE_PATH . '/assets/front/css/modules/';
         global $wp_filesystem;
         $reading_issue = false;
         $read_attempt = false;
+        $concatenated_module_stylesheets = Nimble_Manager()->concatenated_module_stylesheets;
+
         foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
             if ( $reading_issue )
                 continue;
             if ( !in_array($module_type , $this->module_types ) )
               continue;
+            // abort if the module stylesheet has already been concatenated in another stylesheet
+            if ( in_array( $module_type, $concatenated_module_stylesheets ) )
+                continue;
+
             $uri = sprintf( '%1$s%2$s%3$s',
                 $base_uri ,
                 $stylesheet_name,
@@ -491,10 +497,16 @@ class Sek_Dyn_CSS_Builder {
             //sek_error_log('$uri ??' . $module_type . $stylesheet_name, $uri );
             if ( $wp_filesystem->exists($uri) && $wp_filesystem->is_readable($uri) ) {
                 $modules_css .= $wp_filesystem->get_contents($uri);
+                // add this stylesheet to the already concatenated list
+                $concatenated_module_stylesheets[] = $module_type; 
             } else {
                 $reading_issue = true;
             }
-        }
+        }//foreach
+        
+        // update the list of concatenated module stylesheets so that NB doesn't concatenate a module stylesheet twice for the local css and for the global css
+        Nimble_Manager()->concatenated_module_stylesheets = array_unique($concatenated_module_stylesheets);
+
         if ( $read_attempt ) {
             if ( $reading_issue ) {
                 update_option( NIMBLE_OPT_FOR_MODULE_CSS_READING_STATUS, 'failed' );

@@ -10,7 +10,10 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             add_filter( 'script_loader_tag', array( $this, 'sek_filter_script_loader_tag' ), 10, 2 );
 
             add_action( 'template_redirect', array( $this, 'sek_check_if_page_has_nimble_content' ) );
+            
             // Load Front CSS
+            // Contextual stylesheets for local and global sections are loaded with ::print_or_enqueue_seks_style()
+            // see inc\sektions\_front_dev_php\8_4_1_sektions_front_class_render_css.php
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_maybe_enqueue_front_css_assets' ) );
 
             // Load Front JS
@@ -59,6 +62,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
 
         // hook : 'wp_enqueue_scripts'
+        // Contextual stylesheets for local and global sections are loaded with ::print_or_enqueue_seks_style()
+        // see inc\sektions\_front_dev_php\8_4_1_sektions_front_class_render_css.php
         function sek_maybe_enqueue_front_css_assets() {
             /* ------------------------------------------------------------------------- *
              *  MAIN STYLESHEET
