@@ -313,6 +313,10 @@
   overflow: hidden;
 }
 
+.nb-scroll-down #nimble-header, .nb-scroll-up #nimble-header {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
 .sek-service-font, .sek-module .sek-module-inner .sek-btn {
   font-family: sans-serif;
 }
@@ -538,24 +542,6 @@
   .sek-order-12 {
     order: 12;
   }
-}
-
-.sek-fade {
-  transition: opacity 0.15s linear;
-}
-
-@media screen and (prefers-reduced-motion: reduce) {
-  .sek-fade {
-    transition: none;
-  }
-}
-
-.sek-fade:not(.show) {
-  opacity: 0;
-}
-
-.sek-collapse:not(.show) {
-  display: none;
 }
 
 /*

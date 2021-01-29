@@ -469,17 +469,23 @@ class Sek_Dyn_CSS_Builder {
         // CONCATENATE MODULE STYLESHEETS
         // Oct 2020 => https://github.com/presscustomizr/nimble-builder/issues/749
         $this->module_types = array_unique($this->module_types);
-        //sek_error_log('$this->module_types ?', $this->module_types );
+
         $modules_css = '';
         $base_uri = NIMBLE_BASE_PATH . '/assets/front/css/modules/';
         global $wp_filesystem;
         $reading_issue = false;
         $read_attempt = false;
+        $concatenated_module_stylesheets = Nimble_Manager()->concatenated_module_stylesheets;
+
         foreach (Nimble_Manager()->big_module_stylesheet_map as $module_type => $stylesheet_name ) {
             if ( $reading_issue )
                 continue;
             if ( !in_array($module_type , $this->module_types ) )
               continue;
+            // abort if the module stylesheet has already been concatenated in another stylesheet
+            if ( in_array( $module_type, $concatenated_module_stylesheets ) )
+                continue;
+
             $uri = sprintf( '%1$s%2$s%3$s',
                 $base_uri ,
                 $stylesheet_name,
@@ -491,10 +497,16 @@ class Sek_Dyn_CSS_Builder {
             //sek_error_log('$uri ??' . $module_type . $stylesheet_name, $uri );
             if ( $wp_filesystem->exists($uri) && $wp_filesystem->is_readable($uri) ) {
                 $modules_css .= $wp_filesystem->get_contents($uri);
+                // add this stylesheet to the already concatenated list
+                $concatenated_module_stylesheets[] = $module_type; 
             } else {
                 $reading_issue = true;
             }
-        }
+        }//foreach
+        
+        // update the list of concatenated module stylesheets so that NB doesn't concatenate a module stylesheet twice for the local css and for the global css
+        Nimble_Manager()->concatenated_module_stylesheets = array_unique($concatenated_module_stylesheets);
+
         if ( $read_attempt ) {
             if ( $reading_issue ) {
                 update_option( NIMBLE_OPT_FOR_MODULE_CSS_READING_STATUS, 'failed' );
@@ -702,14 +714,12 @@ class Sek_Dyn_CSS_Handler {
 
     /**
      * Functioning mode constant
-     *
      * @access public
      */
     const MODE_INLINE  = 'inline';
 
     /**
      * Functioning mode constant
-     *
      * @access public
      */
     const MODE_FILE    = 'file';
@@ -970,7 +980,7 @@ class Sek_Dyn_CSS_Handler {
         //build no parameterized properties
         $this->_sek_dyn_css_set_properties();
 
-        // Possible scenarios :
+        // Possible scenarii :
         // 1) customizing :
         //    the css is always printed inline. If there's already an existing css file for this skope_id, it's not enqueued.
         // 2) saving in the customizer :
@@ -2293,6 +2303,11 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             'accordion-module' => 'nb-needs-accordion'
         ];
 
+        // janv 2021 => will populate the modules stylesheets already concatenated, so that NB doesn't concatenate a module stylesheet twice for the local css and for the global css (if any)
+        // see in inc\sektions\_front_dev_php\dyn_css_builder_and_google_fonts_printer\5_0_1_class-sek-dyn-css-builder.php
+        public $concatenated_module_stylesheets = [];
+    
+
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
         function __construct( $params = array() ) {
@@ -2864,7 +2879,10 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             add_filter( 'script_loader_tag', array( $this, 'sek_filter_script_loader_tag' ), 10, 2 );
 
             add_action( 'template_redirect', array( $this, 'sek_check_if_page_has_nimble_content' ) );
+            
             // Load Front CSS
+            // Contextual stylesheets for local and global sections are loaded with ::print_or_enqueue_seks_style()
+            // see inc\sektions\_front_dev_php\8_4_1_sektions_front_class_render_css.php
             add_action( 'wp_enqueue_scripts', array( $this, 'sek_maybe_enqueue_front_css_assets' ) );
 
             // Load Front JS
@@ -2913,6 +2931,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
 
         // hook : 'wp_enqueue_scripts'
+        // Contextual stylesheets for local and global sections are loaded with ::print_or_enqueue_seks_style()
+        // see inc\sektions\_front_dev_php\8_4_1_sektions_front_class_render_css.php
         function sek_maybe_enqueue_front_css_assets() {
             /* ------------------------------------------------------------------------- *
              *  MAIN STYLESHEET
@@ -5642,6 +5662,46 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
         }//print_or_enqueue_seks_style
 
 
+        
+
+
+        
+        // @param params = array( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) )
+        // fired @'wp_enqueue_scripts'
+        private function _instantiate_css_handler( $params = array() ) {
+            $params = wp_parse_args( $params, array( 'skope_id' => '', 'is_global_stylesheet' => false ) );
+
+            // Print inline or enqueue ?
+            $print_mode = Sek_Dyn_CSS_Handler::MODE_FILE;
+            if ( is_customize_preview() ) {
+              $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
+            } else if ( sek_inline_dynamic_stylesheets_on_front() ) {
+              $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
+            }
+            // Which hook ?
+            $fire_at_hook = '';
+            if ( !defined( 'DOING_AJAX' ) && is_customize_preview() ) {
+              $fire_at_hook = 'wp_head';
+            }
+            // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
+            else if ( !defined( 'DOING_AJAX' ) && !is_customize_preview() && sek_inline_dynamic_stylesheets_on_front() ) {
+              $fire_at_hook = 'wp_head';
+            }
+
+            $css_handler_instance = new Sek_Dyn_CSS_Handler( array(
+                'id'             => $params['skope_id'],
+                'skope_id'       => $params['skope_id'],
+                // property "is_global_stylesheet" has been added when fixing https://github.com/presscustomizr/nimble-builder/issues/273
+                'is_global_stylesheet' => $params['is_global_stylesheet'],
+                'mode'           => $print_mode,
+                //these are taken in account only when 'mode' is 'file'
+                'force_write'    => true, //<- write if the file doesn't exist
+                'force_rewrite'  => is_user_logged_in() && current_user_can( 'customize' ), //<- write even if the file exists
+                'hook'           => $fire_at_hook
+            ));
+            return $css_handler_instance;
+        }
+        
 
         // hook : wp_head
         // or fired directly when ajaxing
@@ -5743,43 +5803,6 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
             Nimble_Manager()->google_fonts_print_candidates = $print_candidates;
             return Nimble_Manager()->google_fonts_print_candidates;
         }
-
-        // @param params = array( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) )
-        // fired @'wp_enqueue_scripts'
-        private function _instantiate_css_handler( $params = array() ) {
-            $params = wp_parse_args( $params, array( 'skope_id' => '', 'is_global_stylesheet' => false ) );
-
-            // Print inline or enqueue ?
-            $print_mode = Sek_Dyn_CSS_Handler::MODE_FILE;
-            if ( is_customize_preview() ) {
-              $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
-            } else if ( sek_inline_dynamic_stylesheets_on_front() ) {
-              $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
-            }
-            // Which hook ?
-            $fire_at_hook = '';
-            if ( !defined( 'DOING_AJAX' ) && is_customize_preview() ) {
-              $fire_at_hook = 'wp_head';
-            }
-            // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-            else if ( !defined( 'DOING_AJAX' ) && !is_customize_preview() && sek_inline_dynamic_stylesheets_on_front() ) {
-              $fire_at_hook = 'wp_head';
-            }
-
-            $css_handler_instance = new Sek_Dyn_CSS_Handler( array(
-                'id'             => $params['skope_id'],
-                'skope_id'       => $params['skope_id'],
-                // property "is_global_stylesheet" has been added when fixing https://github.com/presscustomizr/nimble-builder/issues/273
-                'is_global_stylesheet' => $params['is_global_stylesheet'],
-                'mode'           => $print_mode,
-                //these are taken in account only when 'mode' is 'file'
-                'force_write'    => true, //<- write if the file doesn't exist
-                'force_rewrite'  => is_user_logged_in() && current_user_can( 'customize' ), //<- write even if the file exists
-                'hook'           => $fire_at_hook
-            ));
-            return $css_handler_instance;
-        }
-
     }//class
 endif;
 
@@ -5980,11 +6003,8 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     // @hook body_class
     public function set_the_recaptcha_badge_visibility_class( $classes ) {
         // Shall we print the badge ?
-        // @todo : we don't handle the case when recaptcha badge is globally displayed but
-        // the current page has disabled recaptcha
-        if ( !sek_is_recaptcha_badge_globally_displayed() ) {
-            $classes[] = 'sek-hide-rc-badge';
-        }
+        // @todo : we don't handle the case when recaptcha badge is globally displayed but the current page has disabled recaptcha
+        $classes[] = !sek_is_recaptcha_badge_globally_displayed() ? 'sek-hide-rc-badge' : 'sek-show-rc-badge';
         return $classes;
     }
 

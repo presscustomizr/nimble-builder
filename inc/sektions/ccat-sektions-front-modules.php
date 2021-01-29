@@ -5106,7 +5106,7 @@ function sek_get_module_params_for_czr_menu_module() {
             //     'color_css'  => '#ffffff',
             // )
         ),
-        'css_selectors' => array( '.sek-menu-module li > a', '.nb-search-expand-inner input', '[data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search input' ),//<=@see tmpl/modules/menu_module_tmpl.php
+        'css_selectors' => array( '.sek-menu-module li > a', '.nb-search-expand-inner input', '[data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search input', '.nb-arrow-for-mobile-menu' ),//<=@see tmpl/modules/menu_module_tmpl.php
         'render_tmpl_path' => "menu_module_tmpl.php"
     );
 }
@@ -5144,7 +5144,7 @@ function sek_get_module_params_for_czr_menu_content_child() {
                 'h_alignment_css' => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
                     'title'       => __('Menu items alignment', 'text_doma'),
-                    'default'     => array( 'desktop' => 'right' ),
+                    'default'     => array( 'desktop' => 'right', 'tablet' => 'left' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'h_flex_alignment',

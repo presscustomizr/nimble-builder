@@ -1750,7 +1750,7 @@ function sek_get_local_option_value( $option_name = '', $skope_id = null ) {
     } else {
         // use the provided skope_id if in the signature
         $skope_id = ( !empty( $skope_id ) && is_string( $skope_id ))? $skope_id : skp_get_skope_id();
-        $localSkopeNimble = sek_get_skoped_seks( skp_get_skope_id() );
+        $localSkopeNimble = sek_get_skoped_seks( $skope_id );
         $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
         // Cache only after 'wp' && 'nimble_front_classes_ready'
         // never cache when doing ajax

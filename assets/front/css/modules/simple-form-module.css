@@ -90,3 +90,8 @@
 .sek-hide-rc-badge .grecaptcha-badge {
   display: none;
 }
+
+.sek-show-rc-badge .grecaptcha-badge {
+  display: block;
+  visibility: visible !important;
+}
