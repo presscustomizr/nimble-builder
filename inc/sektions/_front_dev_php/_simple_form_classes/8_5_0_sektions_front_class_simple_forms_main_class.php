@@ -195,11 +195,8 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     // @hook body_class
     public function set_the_recaptcha_badge_visibility_class( $classes ) {
         // Shall we print the badge ?
-        // @todo : we don't handle the case when recaptcha badge is globally displayed but
-        // the current page has disabled recaptcha
-        if ( !sek_is_recaptcha_badge_globally_displayed() ) {
-            $classes[] = 'sek-hide-rc-badge';
-        }
+        // @todo : we don't handle the case when recaptcha badge is globally displayed but the current page has disabled recaptcha
+        $classes[] = !sek_is_recaptcha_badge_globally_displayed() ? 'sek-hide-rc-badge' : 'sek-show-rc-badge';
         return $classes;
     }
 
