@@ -337,7 +337,7 @@
         display: block;
     }
 
-    .sek-nav__title {
+    .sek-nav .sek-nav__title {
         //the sidemenu and mobile menu should NOT break lines
         word-break: break-word;// was break-all; Fixed in dec-2017 @see https://github.com/presscustomizr/customizr/issues/1339
         white-space: normal;
