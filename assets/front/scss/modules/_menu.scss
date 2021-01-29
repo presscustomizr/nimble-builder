@@ -47,7 +47,9 @@
     flex-grow: 1;
     align-items: center;
     // justify-content property should be consistent with the default value in sek_get_module_params_for_czr_menu_content_child()
-    justify-content : center;
+    // justify-content: flex-start;
+    // -webkit-box-pack: start;
+    // -ms-flex-pack: start;
 }
 .sek-nav {
     display: flex;
@@ -65,13 +67,9 @@
         margin-left: -10px !important;
         li {
             list-style: none;
-            margin: 0 5px;
+            padding: 0;
             & > ul li {
-                @if ( true == $is_rtl ) {
-                    padding: 0 .9rem 0 0;
-                } @else {
-                    padding: 0 0 0 .9rem;
-                }
+                padding: 0;
             }
         }
     }
@@ -166,12 +164,27 @@
         & > li > a {
             padding: 5px;
         }
+        .sek-module .sek-module-inner & {
+            li {
+                margin: 0 5px;
+                & > ul li {
+                    @if ( true == $is_rtl ) {
+                        padding: 0 .9rem 0 0;
+                    } @else {
+                        padding: 0 0 0 .9rem;
+                    }
+                }
+            }
+        }
     }
     .sek-nav-collapse {
         display: flex!important;// <= !important because the php template sets this selector to display:none with inline style. This hack allows us to prevent a Content Layout Shift on page load
         flex-basis: auto;
+        // justify-content property should be consistent with the default value in sek_get_module_params_for_czr_menu_content_child()
+        justify-content: flex-end;
+        -webkit-box-pack: end;
+        -ms-flex-pack: end;
     }
-
     // https://github.com/presscustomizr/nimble-builder/issues/368
     .sek-mobile-menu-expanded-below {
         display: none!important;
@@ -385,6 +398,148 @@
 
 
 
+
+// Janv 2021 NEW COLLAPSIBLE MOBILE MENU
+// June 2020 for https://github.com/presscustomizr/nimble-builder/issues/721
+// Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
+nav.nb-collapsible-mobile-menu {
+    [data-sek-mm-state="expanded"] {
+        overflow: auto;
+        max-height: 80vh;
+    }
+    li .sub-menu {
+        li a { font-size: 0.88em; }
+        li > a { padding: .6em 32px; }
+        li li > a { padding: .6em 60px; }
+        li li li > a { padding: .6em 80px; }
+        li li li li > a { padding: .6em 100px; }
+    }
+}
+
+
+nav.nb-collapsible-mobile-menu [data-sek-mm-state] { display: none }
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] { display: block; }
+
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"],
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] li,
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] ul { background: inherit; }
+
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .sub-menu,
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] li {
+    position: relative;
+}
+
+[data-sek-is-mobile-vertical-menu="yes"] .sek-nav li a {
+    min-height: 45px;//<= which is also the height if the toggle button when there are children items ( .nb-dd-mm-toggle )
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    // Janv 2021 : default alignment of vertical mobile menu items
+    // consistent with registration params
+    // see in sek_get_module_params_for_czr_menu_content_child()
+    justify-content: flex-start;
+    -webkit-box-pack: start;
+    -ms-flex-pack: start;
+}
+// nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] > li > a {
+//     min-height: 43px;
+// }
+// Hide sub-menus for mobile vertical menu
+// show sub-menus when .expanded class is added
+[data-sek-is-mobile-vertical-menu="yes"] .sub-menu { display: none; }
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .sub-menu { display: none; }
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .sub-menu.expanded { display: block; }
+
+
+
+
+
+
+
+
+// MOBILE MENU ARROW TOGGLE WHEN THERE IS A SUBMENU
+/*
+* Mobile dropdown on click
+*/
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .page_item_has_children > a,
+nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .menu-item-has-children  > a {
+    // this padding gives the necessary space for the toggle arrow button
+    padding-right: 60px;
+}
+.nb-dd-mm-toggle-wrapper {
+    position: absolute;
+    top: 1px;
+    right: 0;
+    text-align: center;
+    line-height: 1;
+    bottom: 1px;
+    height: 45px;
+    width: 60px;
+}
+
+.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .nb-dd-mm-toggle-wrapper {
+    display: block;
+}
+
+.nb-dd-mm-toggle {
+    background: none;
+    -webkit-appearance: none;
+    outline: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: block;
+    height: 45px;
+    width: 60px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.nb-dd-mm-toggle i {
+    display: block;
+    -webkit-transition: all .3s ease;
+    -o-transition: all .3s ease;
+    transition: all .3s ease;
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
+    width: 100%;
+    color:#000000;
+}
+
+li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
+    -webkit-transform: rotate(-180deg);
+    -moz-transform: rotate(-180deg);
+    transform: rotate(-180deg);
+}
+
+.nb-arrow-for-mobile-menu::after {
+    content: "\25BE";//https://unicode-table.com/en/25BE/
+    font-family: "Arial Unicode MS", Arial;//<= https://www.fileformat.info/info/unicode/char/203A/fontsupport.htm
+    moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    // display: none;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    font-weight: 900;
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    perspective: 1000px;
+    padding: 0 .45em;
+    font-size: 18px;
+    line-height: 45px;
+    position: relative;
+}
+
+
+
 // MOBILE : HAMBURGER BUTTON
 //Hueman inspired nav toggler
 .nb-loc .sek-module-inner .sek-nav-toggler {
@@ -462,140 +617,7 @@
     }
 }
 
-// MOBILE MENU
-// June 2020 for https://github.com/presscustomizr/nimble-builder/issues/721
-// Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
-[data-sek-is-mobile-vertical-menu="yes"] {
-    > .show {
-      overflow: auto;
-      max-height: 80vh;
-    }
-    li .sub-menu li > a {
-      font-size: 0.8em;
-      padding: .6em 15px;
-    }
-  }
-  // Janv 2021 : default alignment of vertical mobile menu items
-  // consistent with registration params
-  // Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
-  [data-sek-is-mobile-vertical-menu="yes"] .sek-nav li a {
-      justify-content: flex-end;
-      -webkit-box-pack: end;
-      -ms-flex-pack: end;
-  }
 
-
-
-
-
-// NEW COLLAPSIBLE MOBILE MENU
-/*
-* Mobile dropdown on click
-*/
-nav.nb-collapsible-mobile-menu [data-sek-mm-state] { display: none }
-nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] { display: block; }
-
-nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"],
-nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] li,
-nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] ul { background: inherit; }
-
-nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .sub-menu,
-nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] li {
-    position: relative;
-}
-
-nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .page_item_has_children > a,
-nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .menu-item-has-children  > a {
-    padding-right: 44px;
-}
-nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] li a {
-    min-height: 37px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] > li > a {
-    min-height: 43px;
-}
-
-nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .sub-menu { display: none; }
-nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .sub-menu.expanded { display: block; }
-
-.nb-dd-mm-toggle-wrapper {
-    position: absolute;
-    top: 1px;
-    right: 0;
-    text-align: center;
-    line-height: 1;
-    bottom: 1px;
-    height: 45px;
-    width: 44px;
-}
-
-
-.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .nb-dd-mm-toggle-wrapper {
-    display: block;
-}
-
-.nb-dd-mm-toggle {
-    background: none;
-    -webkit-appearance: none;
-    outline: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    display: block;
-    height: 45px;
-    width: 44px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    overflow: hidden;
-}
-
-li li .nb-dd-mm-toggle {
-    height: 39px;
-}
-
-.nb-dd-mm-toggle i {
-    display: block;
-    -webkit-transition: all .3s ease;
-    -o-transition: all .3s ease;
-    transition: all .3s ease;
-    -webkit-transform-style: preserve-3d;
-    -moz-transform-style: preserve-3d;
-    transform-style: preserve-3d;
-    -webkit-backface-visibility: hidden;
-    -moz-backface-visibility: hidden;
-    backface-visibility: hidden;
-    width: 100%;
-    font-size: 13px;
-}
-
-li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
-    -webkit-transform: rotate(-180deg);
-    -moz-transform: rotate(-180deg);
-    transform: rotate(-180deg);
-}
-
-.nb-arrow-for-mobile-menu::after {
-    content: "\25BE";//https://unicode-table.com/en/25BE/
-    font-family: "Arial Unicode MS", Arial;//<= https://www.fileformat.info/info/unicode/char/203A/fontsupport.htm
-    moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    // display: none;
-    font-style: normal;
-    font-variant: normal;
-    text-rendering: auto;
-    font-weight: 900;
-    transition: all 0.3s ease;
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
-    perspective: 1000px;
-    padding: 0 .45em;
-    font-size: 1em;
-    position: relative;
-}
 
 
 

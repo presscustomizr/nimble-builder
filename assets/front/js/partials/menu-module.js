@@ -46,29 +46,29 @@
                         var   DATA_KEY  = 'sek.sekDropdown',
                               EVENT_KEY = '.' + DATA_KEY,
                               Event     = {
-                              PLACE_ME  : 'placeme'+ EVENT_KEY,
-                              PLACE_ALL : 'placeall' + EVENT_KEY,
-                              SHOWN     : 'shown' + EVENT_KEY,
-                              SHOW      : 'show' + EVENT_KEY,
-                              HIDDEN    : 'hidden' + EVENT_KEY,
-                              HIDE      : 'hide' + EVENT_KEY,
-                              CLICK     : 'click' + EVENT_KEY,
-                              TAP       : 'tap' + EVENT_KEY,
+                                    PLACE_ME  : 'placeme'+ EVENT_KEY,
+                                    PLACE_ALL : 'placeall' + EVENT_KEY,
+                                    SHOWN     : 'shown' + EVENT_KEY,
+                                    SHOW      : 'show' + EVENT_KEY,
+                                    HIDDEN    : 'hidden' + EVENT_KEY,
+                                    HIDE      : 'hide' + EVENT_KEY,
+                                    CLICK     : 'click' + EVENT_KEY,
+                                    TAP       : 'tap' + EVENT_KEY,
                               },
                               ClassName = {
-                              DROPDOWN                : 'sek-dropdown-menu',
-                              DROPDOWN_SUBMENU        : 'sek-dropdown-submenu',
-                              SHOW                    : 'show',
-                              PARENTS                 : 'menu-item-has-children',
-                              ALLOW_POINTER_ON_SCROLL : 'allow-pointer-events-on-scroll'
+                                    DROPDOWN                : 'sek-dropdown-menu',
+                                    DROPDOWN_SUBMENU        : 'sek-dropdown-submenu',
+                                    SHOW                    : 'show',
+                                    PARENTS                 : 'menu-item-has-children',
+                                    ALLOW_POINTER_ON_SCROLL : 'allow-pointer-events-on-scroll'
                               },
                               Selector = {
-                              DATA_SHOWN_TOGGLE_LINK   : '.' +ClassName.SHOW+ '> a',
-                              HOVER_MENU               : '.sek-nav-wrap',
-                              HOVER_PARENT             : '.sek-nav-wrap .menu-item-has-children',
-                              PARENTS                  : '.sek-nav-wrap .menu-item-has-children',
-                              SNAKE_PARENTS            : '.sek-nav-wrap .menu-item-has-children',
-                              CHILD_DROPDOWN           : 'ul.sek-dropdown-menu'
+                                    DATA_SHOWN_TOGGLE_LINK   : '.' +ClassName.SHOW+ '> a',
+                                    HOVER_MENU               : '.sek-nav-wrap',
+                                    HOVER_PARENT             : '.sek-nav-wrap .menu-item-has-children',
+                                    PARENTS                  : '.sek-nav-wrap .menu-item-has-children',
+                                    SNAKE_PARENTS            : '.sek-nav-wrap .menu-item-has-children',
+                                    CHILD_DROPDOWN           : 'ul.sek-dropdown-menu'
                               };
 
                         // unify all the dropdowns classes whether the menu is a proper menu or the all pages fall-back
@@ -445,10 +445,16 @@
 
 
                   ////////////////////////////////////////////////////////////////////////
-                  //////////// NEW COLLAPSIBLE MENU 
+                  //////////// COLLAPSIBLE MENU ( janv 2021 )
                   //hueman theme inspired
-                  var _collapsibleSubmenu = function() {
+                  var maybeApplyCollapsibleMenu = function() {
                         var $mobMenuWrapper  = this;
+                        if ( 'true' == $mobMenuWrapper.data('nb-mm-menu-is-instantiated') )
+                              return;
+
+                        // Flag so we don't instantiate twice ( typically when previewing)
+                        $mobMenuWrapper.data('nb-mm-menu-is-instantiated', 'true');
+
                         //specific class added to this mobile menu which tells its submenus have to be expanded on click (purpose: style)
                         $mobMenuWrapper.addClass( 'nb-collapsible-mobile-menu' );
                         
@@ -597,10 +603,10 @@
                                           if ( $(evt.target).length > 0 ) {
                                                 $(evt.target).removeClass( 'nb-mm-focused');
                                           }
-                                          if ( $mobMenuWrapper.find('.nb-mm-focused').length < 1 ) {
-                                                console.log('TOP DO => TRIGGER MOBILE MENU COLLAPSE NOW');
-                                                //mobMenu( 'collapsed');
-                                          }
+                                          // if ( $mobMenuWrapper.find('.nb-mm-focused').length < 1 ) {
+                                          //       console.log('TOP DO => TRIGGER MOBILE MENU COLLAPSE NOW');
+                                          //       //mobMenu( 'collapsed');
+                                          // }
                                     }, 200 );
 
                               });
@@ -620,15 +626,24 @@
                                     $(_toggles[i]).trigger( Event.HIDE );
                               }
                         };
-                  };//_collapsibleSubmenu()
+                  };//maybeApplyCollapsibleMenu()
 
 
 
                   // Instanciate collabsible menu
                   $('.sek-nav-wrap').each( function() {
-                        try { _collapsibleSubmenu.call($(this) ); } catch( er ) {
+                        try { maybeApplyCollapsibleMenu.call($(this) ); } catch( er ) {
                               console.log('NB error => collapsible menu', er );
                         }
+                  });
+                  // When previewing, react to level refresh
+                  // This can occur to any level. We listen to the bubbling event on 'body' tag
+                  nb_.cachedElements.$body.on('sek-level-refreshed sek-modules-refreshed sek-columns-refreshed sek-section-added', function( evt ){
+                        $('.sek-nav-wrap').each( function() {
+                              try { maybeApplyCollapsibleMenu.call($(this) ); } catch( er ) {
+                                    console.log('NB error => collapsible menu', er );
+                              }
+                        });
                   });
 
 
