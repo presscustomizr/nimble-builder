@@ -164,19 +164,19 @@
                                     });
                                     //BIND
                                     nb_.cachedElements.$body
-                                          .on( 'mouseenter', _dropdown_selector, function() {
+                                          .on( 'mouseenter', _dropdown_selector, function(evt) {
                                                 if ( !nodeBelongsToAMobileMenu.call($(this)) ) {
-                                                      _addOpenClass.call($(this));
+                                                      _addOpenClass.call($(this), evt );
                                                 }
                                           })
-                                          .on( 'mouseleave', _dropdown_selector , function() {
+                                          .on( 'mouseleave', _dropdown_selector , function(evt) {
                                                 if ( !nodeBelongsToAMobileMenu.call($(this)) ) {
-                                                      _removeOpenClass.call($(this));
+                                                      _removeOpenClass.call($(this), evt );
                                                 }
                                           })
-                                          .on( 'click', _dropdown_selector, function() {
+                                          .on( 'click', _dropdown_selector, function(evt) {
                                                 if ( !nodeBelongsToAMobileMenu.call($(this)) ) {
-                                                      _addOpenClass.call($(this));
+                                                      _addOpenClass.call($(this), evt );
                                                 }
                                           });
                               }

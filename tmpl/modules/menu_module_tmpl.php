@@ -24,9 +24,9 @@ sek_emit_js_event('nb-needs-menu-js');
 <?php do_action('nb_menu_module_before_nav', $model ); ?>
 <?php 
 // janv 2021 => added data-sek-mobile-menu-breakpoint attribute which is hard coded to min-width:768px for the moment
-// in the future, this value could be set by users
+// in the future, this value could be set by users, see $grid-breakpoints in scss variables
 ?>
-<nav class="<?php echo $nav_classes; ?>" data-sek-expand-below="<?php echo $expand_below; ?>" data-sek-mobile-menu-breakpoint="768">
+<nav class="<?php echo $nav_classes; ?>" data-sek-expand-below="<?php echo $expand_below; ?>" data-sek-mobile-menu-breakpoint=768>
     <button class="sek-nav-toggler sek-collapsed" type="button" data-target="#<?php echo $model['id'] ?>" aria-controls="<?php echo $model['id'] ?>" aria-expanded="false" aria-label="<?php esc_attr_e( 'Toggle navigation', 'textdomain_to_be_replaced' ) ?>">
         <span class="sek-ham__span-wrapper">
           <span class="line line-1"></span>
