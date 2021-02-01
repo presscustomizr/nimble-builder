@@ -464,7 +464,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // As explained here https://stackoverflow.com/questions/49268352/preload-font-awesome
         // FA fonts can be preloaded. the crossorigin param has to be added
         // => this removes Google Speed tests message "preload key requests"
-        // important => the url of the font must be exactly the same as in font awesome stylesheet, including the query param at the end fa-brands-400.woff2?5.12.1
+        // important => the url of the font must be exactly the same as in font awesome stylesheet, including the query param at the end fa-brands-400.woff2?5.15.2
         // // note that we could preload all other types available ( eot, woff, ttf, svg )
         // but NB focus on preloading woff2 which is the type used by most recent browsers
         // see https://css-tricks.com/snippets/css/using-font-face/
@@ -472,9 +472,9 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             if ( !skp_is_customizing() && !Nimble_Manager()->page_has_local_or_global_sections )
               return;
             $fonts = [
-                'fa-brands' => 'fa-brands-400.woff2?5.12.1',
-                'fa-regular' => 'fa-regular-400.woff2?5.12.1',
-                'fa-solid' => 'fa-solid-900.woff2?5.12.1'
+                'fa-brands' => 'fa-brands-400.woff2?5.15.2',
+                'fa-regular' => 'fa-regular-400.woff2?5.15.2',
+                'fa-solid' => 'fa-solid-900.woff2?5.15.2'
             ];
             ?>
               <?php foreach( $fonts as $id => $name ) : ?>
