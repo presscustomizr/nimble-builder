@@ -123,7 +123,7 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 2.1.36 : Updated FontAwesome icons to latest version (v5.15.2)
 
 == Changelog ==
-= 2.1.36 January 29th, 2021 =
+= 2.1.36 February 2nd, 2021 =
 * Updated : FontAwesome icons to latest version (v5.15.2)
 
 = 2.1.35 January 29th, 2021 =
