@@ -226,7 +226,7 @@ function sek_update_saved_section_post( $section_data ) {
 
         // if this is an update case + editing metas only, then we use the current content
         if ( $is_edit_metas_only_case && isset($current_section_post->post_content) ) {
-            sek_error_log('IS EDIT METAS ONLY ?');
+            //sek_error_log('IS EDIT METAS ONLY ?');
             $current_section_data = maybe_unserialize( $current_section_post->post_content );
             if ( is_array($current_section_data) && isset($current_section_data['data']) && is_array($current_section_data['data']) && !empty($current_section_data['data']) ) {
                 $section_data['data'] = $current_section_data['data'];
