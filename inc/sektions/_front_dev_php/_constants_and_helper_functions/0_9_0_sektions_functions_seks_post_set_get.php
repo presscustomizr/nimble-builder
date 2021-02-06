@@ -152,8 +152,22 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         $seks_data = wp_parse_args( $seks_data, $default_collection );
         // Maybe add missing registered locations
         $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
+        
+        // EXPERIMENTAL
+        // Feb 2021 : for https://github.com/presscustomizr/nimble-builder/issues/478
+        if ( !$is_global_skope && defined('NIMBLE_USE_GROUP_TMPL') &&  NIMBLE_USE_GROUP_TMPL ) {
+            sek_error_log('SOOO ? seks_data for skope_id => ' . $skope_id, 'is page ? '. is_page() );
+            $post = sek_get_saved_tmpl_post( 'nb_tmpl_nimble-template-loop-start-only' );
+            if ( $post ) {
+                $new_seks_data = maybe_unserialize( $post->post_content );
+            }
+            // sek_error_log('CURRENT SEKS DATA ?', $seks_data );
+            // sek_error_log('NEW SEKS DATA ?', $new_seks_data );
+            $seks_data = $new_seks_data['data'];
+            $seks_data = is_array( $seks_data ) ? $seks_data : array(); 
+        }
 
-        // cache now
+        // cache now 
         if ( $is_global_skope ) {
             Nimble_Manager()->global_seks = $seks_data;
         } else {
