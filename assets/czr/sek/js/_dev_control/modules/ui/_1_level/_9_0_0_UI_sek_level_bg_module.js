@@ -42,32 +42,6 @@
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
-                                    case 'bg-image' :
-                                          _.each( [ 'bg-attachment', 'bg-scale', 'bg-repeat', 'bg-parallax', 'bg-parallax-force' ] , function( _inputId_ ) {
-                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      var bool = false;
-                                                      switch( _inputId_ ) {
-                                                            // case 'bg-color-overlay' :
-                                                            // case 'bg-opacity-overlay' :
-                                                            //       bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-apply-overlay')() );
-                                                            // break;
-                                                            case 'bg-parallax-force' :
-                                                                  bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-parallax')() );
-                                                            break;
-                                                            case 'bg-scale' :
-                                                            case 'bg-repeat' :
-                                                                  bool = ! _.isEmpty( input() + '' ) && !api.CZR_Helpers.isChecked( item.czr_Input('bg-parallax')() );
-                                                            break;
-                                                            default :
-                                                                  bool = ! _.isEmpty( input() + '' );
-                                                            break;
-                                                      }
-                                                      return bool;
-                                                }); } catch( er ) {
-                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
-                                                }
-                                          });
-                                    break;
                                     case 'bg-apply-overlay' :
                                           _.each( [ 'bg-color-overlay', 'bg-opacity-overlay' ] , function(_inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
@@ -83,11 +57,11 @@
                                                       var bool = false;
                                                       switch( _inputId_ ) {
                                                             case 'bg-parallax-force' :
-                                                                  bool = ! _.isEmpty( item.czr_Input('bg-image')() + '' ) && api.CZR_Helpers.isChecked( input() );
+                                                                  bool = api.CZR_Helpers.isChecked( input() );
                                                             break;
                                                             case 'bg-repeat' :
                                                             case 'bg-scale' :
-                                                                  bool = ! _.isEmpty( item.czr_Input('bg-image')() + '' ) && ! api.CZR_Helpers.isChecked( input() );
+                                                                  bool = !api.CZR_Helpers.isChecked( input() );
                                                             break;
                                                       }
                                                       return bool;

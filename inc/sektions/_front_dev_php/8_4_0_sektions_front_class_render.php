@@ -987,13 +987,25 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
 
             if ( !empty( $model[ 'options' ] ) && is_array( $model['options'] ) ) {
                 $bg_options = ( !empty( $model[ 'options' ][ 'bg' ] ) && is_array( $model[ 'options' ][ 'bg' ] ) ) ? $model[ 'options' ][ 'bg' ] : array();
-                if ( !empty( $bg_options[ 'bg-image'] ) ) {
-                    $bg_image_id_or_url = $bg_options[ 'bg-image'];
+                $use_post_thumbnail_bg = !empty( $bg_options['bg-use-post-thumb'] ) && sek_is_checked( $bg_options['bg-use-post-thumb'] );
+                if ( !empty( $bg_options[ 'bg-image'] ) || $use_post_thumbnail_bg ) {
+                    $bg_image_id_or_url = '';
+                    
+                    // Feb 2021
+                    // First check if user wants to use the current post thumbnail
+                    // Fallback on the regular image background if not
+                    if ( $use_post_thumbnail_bg ) {
+                        $current_post_id = sek_get_post_id_on_front_and_when_customizing();
+                        $bg_image_id_or_url = ( has_post_thumbnail( $current_post_id ) ) ? get_post_thumbnail_id( $current_post_id ) : $bg_image_id_or_url;
+                    }
+                    if ( empty($bg_image_id_or_url) ) {
+                        $bg_image_id_or_url = $bg_options[ 'bg-image'];
+                    }
+                    
                     // April 2020 :
                     // on import, user can decide to use the image url instead of importing
                     // we need to check if the image is set as an attachement id or starts with 'http'
                     // introduced for https://github.com/presscustomizr/nimble-builder/issues/663
-                    $new_attributes[] = 'data-sek-has-bg="true"';
                     if ( is_numeric( $bg_image_id_or_url ) ) {
                         $bg_img_url = wp_get_attachment_url( $bg_image_id_or_url );
                     } else if ( "http" === substr( $bg_image_id_or_url, 0, 4 ) ) {
@@ -1003,6 +1015,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     // At this point we may not have a valid $bg_img_url
                     // let's check
                     if ( !empty( $bg_img_url ) ) {
+                        $new_attributes[] = 'data-sek-has-bg="true"';
                         if ( defined('DOING_AJAX') && DOING_AJAX ) {
                             $new_attributes[] = sprintf('style="background-image:url(\'%1$s\');"', $bg_img_url );
                         } else {

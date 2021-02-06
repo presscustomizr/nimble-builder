@@ -37,12 +37,7 @@ add_filter( 'nimble_parse_template_tags', '\Nimble\sek_parse_template_tags' );
 
 // introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
 function sek_get_the_title() {
-  if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-      $post_id = sek_get_posted_query_param_when_customizing( 'post_id' );
-      return is_int($post_id) ? get_the_title($post_id) : null;
-  } else {
-      return get_the_title();
-  }
+  return get_the_title( sek_get_post_id_on_front_and_when_customizing() );
 }
 
 // introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
@@ -60,6 +55,17 @@ function sek_get_the_content() {
         return !empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
       }
   }
+}
+
+// @return the post id in all cases
+// when performing ajax action, we need the posted query params made available from the ajax params
+function sek_get_post_id_on_front_and_when_customizing() {
+    if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+        $post_id = sek_get_posted_query_param_when_customizing( 'post_id' );
+    } else {
+        $post_id = get_the_ID();
+    }
+    return is_int($post_id) ? $post_id : null;
 }
 
 // introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
