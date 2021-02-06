@@ -62,6 +62,15 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                     'title'       => __('Pick an image', 'text_doma'),
                     'default'     => ''
                 ),
+                'use-post-thumb' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Use the current post thumbnail', 'text_doma'),
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => true,
+                    'default'     => 0,
+                    'notice_after' => __('When enabled and possible, Nimble will use the post thumbnail.', 'text_doma'),
+                ),
                 'img-size' => array(
                     'input_type'  => 'simpleselect',
                     'title'       => __('Select the image size', 'text_doma'),

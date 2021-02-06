@@ -33,6 +33,12 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
     function sek_get_img_module_img_html( $value, $for_mobile = false, $img = null, $img_size = null ) {
         $img = !is_null($img) ? $img : $value['img'];
         $img_size = !is_null($img_size) ? $img_size : $value['img-size'];
+        $use_post_thumbnail = !empty( $value['use-post-thumb'] ) && sek_is_checked( $value['use-post-thumb'] );
+
+        if ( $use_post_thumbnail ) {
+            $current_post_id = sek_get_post_id_on_front_and_when_customizing();
+            $img = ( has_post_thumbnail( $current_post_id ) ) ? get_post_thumbnail_id( $current_post_id ) : $img;
+        }
 
         $img_figure_classes = '';
         //visual effect classes
