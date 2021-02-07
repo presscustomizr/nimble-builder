@@ -142,12 +142,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var _doRender = function( tmpl_collection ) {
                         if ( _.isEmpty( tmpl_collection ) && 'user_tmpl' === params.tmpl_source ) {
                               var _placeholdImgUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/empty_tmpl_collection_notice.jpg',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
-                                    doc_url = 'https://docs.presscustomizr.com/article/417-how-to-save-and-reuse-sections-with-nimble-builder';
+                                    doc_url = 'https://docs.presscustomizr.com/article/426-how-to-save-and-reuse-templates-with-nimble-builder';
 
                               _html += '<div class="sek-tmpl-empty-collection">';
                                     _html += '<p>' + sektionsLocalizedData.i18n['You did not save any template yet.'] + '</p>';
                                     _html += '<img src="'+ _placeholdImgUrl +'" />';
-                                    //_html += '<br/><a href="'+ doc_url +'" target="_blank" rel="noreferrer nofollow">'+ doc_url +'</a>';
+                                    _html += '<br/><a href="'+ doc_url +'" target="_blank" rel="noreferrer nofollow">'+ doc_url +'</a>';
                               _html += '</div>';
                         } else {
                               _.each( tmpl_collection, function( _data, _temp_id ) {
