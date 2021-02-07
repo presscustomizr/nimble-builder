@@ -5,9 +5,6 @@
 // if ( !defined( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME" ) ) { define( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME", 'nimble_api_prebuilt_sections_data' ); } <= DEPRECATED, Now uses local json
 if ( !defined( "NIMBLE_API_TMPL_LIB_OPT_NAME" ) ) { define( "NIMBLE_API_TMPL_LIB_OPT_NAME", 'nimble_api_tmpl_data' ); }
 if ( !defined( "NIMBLE_API_NEWS_OPT_NAME" ) ) { define( "NIMBLE_API_NEWS_OPT_NAME", 'nimble_api_news_data' ); }
-if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2",
-    ( defined('NIMBLE_FETCH_API_TMPL_LOCALLY') && NIMBLE_FETCH_API_TMPL_LOCALLY ) ? 'http://customizr-dev.test/wp-json/nimble/v2/cravan' : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
-); }
 
 
 // Nimble api returns a set of value structured as follow

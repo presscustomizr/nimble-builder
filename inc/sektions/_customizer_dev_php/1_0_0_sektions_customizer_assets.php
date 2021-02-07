@@ -210,10 +210,11 @@ function sek_enqueue_controls_js_css() {
                 'alreadyUsedFonts' => get_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS ),
                 'isTemplateGalleryEnabled' => defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) && NIMBLE_TEMPLATE_GALLERY_ENABLED, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/651
                 'isTemplateSaveEnabled' => defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) && NIMBLE_TEMPLATE_SAVE_ENABLED, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/655
-
+                
+                'useAPItemplates' => defined('NIMBLE_USE_API_TMPL') && NIMBLE_USE_API_TMPL,
                 // Dec 2020
                 // When developing locally, allow a local template api request
-                'templateAPIUrl' => ( defined('NIMBLE_FETCH_API_TMPL_LOCALLY') && NIMBLE_FETCH_API_TMPL_LOCALLY ) ? 'http://customizr-dev.test/wp-json/nimble/v2/cravan' : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
+                'templateAPIUrl' => NIMBLE_DATA_API_URL_V2
             )
         )
     );//wp_localize_script()

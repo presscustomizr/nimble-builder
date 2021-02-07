@@ -613,33 +613,39 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( '_not_populated_' !== self.allApiTemplates() ) {
                         dfd.resolve( self.allApiTemplates() );
                   } else {
-                        wp.ajax.post( 'sek_get_all_api_tmpl', {
-                              nonce: api.settings.nonce.save
-                              //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
-                        })
-                        .done( function( tmpl_collection ) {
-                              if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
-                                    _collection = tmpl_collection;
-                                    //console.log('AJAX GET API TMPL COLLECTION DONE', tmpl_collection );
-                              } else {
-                                    api.errare('control::getApiTmplCollection => error => tmpl collection is invalid', tmpl_collection);
-                              }
-                              self.allApiTemplates( _collection );
-                              dfd.resolve( _collection );
-                        })
-                        .fail( function( er ) {
-                              api.errorLog( 'ajax sek_get_all_api_tmpl => error', er );
-                              api.previewer.trigger('sek-notify', {
-                                  type : 'error',
-                                  duration : 10000,
-                                  message : [
-                                        '<span style="font-size:0.95em">',
-                                          '<strong>' + sektionsLocalizedData.i18n['Error when processing templates'] + '</strong>',
-                                        '</span>'
-                                  ].join('')
+                        // Feb 2021 : for the moment, api templates are fetched when define( 'NIMBLE_USE_API_TMPL', true );
+                        if ( !sektionsLocalizedData.useAPItemplates ) {
+                              self.allApiTemplates([]);
+                              dfd.resolve([]);
+                        } else {
+                              wp.ajax.post( 'sek_get_all_api_tmpl', {
+                                    nonce: api.settings.nonce.save
+                                    //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                              })
+                              .done( function( tmpl_collection ) {
+                                    if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
+                                          _collection = tmpl_collection;
+                                          //console.log('AJAX GET API TMPL COLLECTION DONE', tmpl_collection );
+                                    } else {
+                                          api.errare('control::getApiTmplCollection => error => tmpl collection is invalid', tmpl_collection);
+                                    }
+                                    self.allApiTemplates( _collection );
+                                    dfd.resolve( _collection );
+                              })
+                              .fail( function( er ) {
+                                    api.errorLog( 'ajax sek_get_all_api_tmpl => error', er );
+                                    api.previewer.trigger('sek-notify', {
+                                    type : 'error',
+                                    duration : 10000,
+                                    message : [
+                                          '<span style="font-size:0.95em">',
+                                                '<strong>' + sektionsLocalizedData.i18n['Error when processing templates'] + '</strong>',
+                                          '</span>'
+                                    ].join('')
+                                    });
+                                    dfd.resolve({});
                               });
-                              dfd.resolve({});
-                        });
+                        }
                   }
                   return dfd;
             },
