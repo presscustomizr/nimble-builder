@@ -2974,33 +2974,39 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( '_not_populated_' !== self.allApiTemplates() ) {
                         dfd.resolve( self.allApiTemplates() );
                   } else {
-                        wp.ajax.post( 'sek_get_all_api_tmpl', {
-                              nonce: api.settings.nonce.save
-                              //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
-                        })
-                        .done( function( tmpl_collection ) {
-                              if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
-                                    _collection = tmpl_collection;
-                                    //console.log('AJAX GET API TMPL COLLECTION DONE', tmpl_collection );
-                              } else {
-                                    api.errare('control::getApiTmplCollection => error => tmpl collection is invalid', tmpl_collection);
-                              }
-                              self.allApiTemplates( _collection );
-                              dfd.resolve( _collection );
-                        })
-                        .fail( function( er ) {
-                              api.errorLog( 'ajax sek_get_all_api_tmpl => error', er );
-                              api.previewer.trigger('sek-notify', {
-                                  type : 'error',
-                                  duration : 10000,
-                                  message : [
-                                        '<span style="font-size:0.95em">',
-                                          '<strong>' + sektionsLocalizedData.i18n['Error when processing templates'] + '</strong>',
-                                        '</span>'
-                                  ].join('')
+                        // Feb 2021 : for the moment, api templates are fetched when define( 'NIMBLE_USE_API_TMPL', true );
+                        if ( !sektionsLocalizedData.useAPItemplates ) {
+                              self.allApiTemplates([]);
+                              dfd.resolve([]);
+                        } else {
+                              wp.ajax.post( 'sek_get_all_api_tmpl', {
+                                    nonce: api.settings.nonce.save
+                                    //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
+                              })
+                              .done( function( tmpl_collection ) {
+                                    if ( _.isObject(tmpl_collection) && !_.isArray( tmpl_collection ) ) {
+                                          _collection = tmpl_collection;
+                                          //console.log('AJAX GET API TMPL COLLECTION DONE', tmpl_collection );
+                                    } else {
+                                          api.errare('control::getApiTmplCollection => error => tmpl collection is invalid', tmpl_collection);
+                                    }
+                                    self.allApiTemplates( _collection );
+                                    dfd.resolve( _collection );
+                              })
+                              .fail( function( er ) {
+                                    api.errorLog( 'ajax sek_get_all_api_tmpl => error', er );
+                                    api.previewer.trigger('sek-notify', {
+                                    type : 'error',
+                                    duration : 10000,
+                                    message : [
+                                          '<span style="font-size:0.95em">',
+                                                '<strong>' + sektionsLocalizedData.i18n['Error when processing templates'] + '</strong>',
+                                          '</span>'
+                                    ].join('')
+                                    });
+                                    dfd.resolve({});
                               });
-                              dfd.resolve({});
-                        });
+                        }
                   }
                   return dfd;
             },
@@ -6582,25 +6588,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //-------------------------------------------------------------------------------------------------
                               // December 2020 => this action is triggered in ::initialize self.activeLocations.bind()
                               // when injecting template from the gallery it may happen that the collection of location in the local setting value is not synchronized anymore with the actual active locations on the page
+                              // update : December 24th => deactivated because of https://github.com/presscustomizr/nimble-builder/issues/770
                               case 'sek-maybe-add-missing-locations' :
                                     var activeLocations = self.activeLocations(),
-                                        settingLocations = [],
-                                        locInSetting,
-                                        missingLoc,
-                                        newSettingCollection = [],
-                                        currentSettingCollection = $.extend( true, [], self.updAPISetParams.newSetValue.collection );
+                                          settingLocations = [],
+                                          locInSetting,
+                                          missingLoc,
+                                          newSettingCollection = [],
+                                          currentSettingCollection = $.extend( true, [], self.updAPISetParams.newSetValue.collection );
 
-                                        //console.log('SOO current Setting Collection', currentSettingCollection, activeLocations );
+                                    //console.log('SOO current Setting Collection', currentSettingCollection, activeLocations );
 
-                                        _.each( self.activeLocations(), function( _loc_id ) {
-                                              locInSetting = _.findWhere( self.updAPISetParams.newSetValue.collection, { id : _loc_id } );
-                                              if ( _.isUndefined( locInSetting ) ) {
-                                                    missingLoc = $.extend( true, {}, sektionsLocalizedData.defaultLocationModel );
-                                                    missingLoc.id = _loc_id;
-                                                    api.infoLog('=> adding missing location to api setting value', missingLoc );
-                                                    self.updAPISetParams.newSetValue.collection.push(missingLoc);
-                                              }
-                                        });
+                                    // loop on the active locations of the current page.
+                                    // if one is missing in the setting value, let's add it.
+                                    _.each( activeLocations, function( _loc_id ) {
+                                          locInSetting = _.findWhere( self.updAPISetParams.newSetValue.collection, { id : _loc_id } );
+                                          if ( _.isUndefined( locInSetting ) ) {
+                                                missingLoc = $.extend( true, {}, sektionsLocalizedData.defaultLocationModel );
+                                                missingLoc.id = _loc_id;
+                                                api.infoLog('=> need to add missing location to api setting value', missingLoc );
+                                                self.updAPISetParams.newSetValue.collection.push(missingLoc);
+                                          }
+                                    });
                               break;
 
                               //-------------------------------------------------------------------------------------------------
@@ -12074,12 +12083,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var _doRender = function( tmpl_collection ) {
                         if ( _.isEmpty( tmpl_collection ) && 'user_tmpl' === params.tmpl_source ) {
                               var _placeholdImgUrl = [ sektionsLocalizedData.baseUrl , '/assets/admin/img/empty_tmpl_collection_notice.jpg',  '?ver=' , sektionsLocalizedData.nimbleVersion ].join(''),
-                                    doc_url = 'https://docs.presscustomizr.com/article/417-how-to-save-and-reuse-sections-with-nimble-builder';
+                                    doc_url = 'https://docs.presscustomizr.com/article/426-how-to-save-and-reuse-templates-with-nimble-builder';
 
                               _html += '<div class="sek-tmpl-empty-collection">';
                                     _html += '<p>' + sektionsLocalizedData.i18n['You did not save any template yet.'] + '</p>';
                                     _html += '<img src="'+ _placeholdImgUrl +'" />';
-                                    //_html += '<br/><a href="'+ doc_url +'" target="_blank" rel="noreferrer nofollow">'+ doc_url +'</a>';
+                                    _html += '<br/><a href="'+ doc_url +'" target="_blank" rel="noreferrer nofollow">'+ doc_url +'</a>';
                               _html += '</div>';
                         } else {
                               _.each( tmpl_collection, function( _data, _temp_id ) {
@@ -15960,32 +15969,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
-                                    case 'bg-image' :
-                                          _.each( [ 'bg-attachment', 'bg-scale', 'bg-repeat', 'bg-parallax', 'bg-parallax-force' ] , function( _inputId_ ) {
-                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      var bool = false;
-                                                      switch( _inputId_ ) {
-                                                            // case 'bg-color-overlay' :
-                                                            // case 'bg-opacity-overlay' :
-                                                            //       bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-apply-overlay')() );
-                                                            // break;
-                                                            case 'bg-parallax-force' :
-                                                                  bool = ! _.isEmpty( input() + '' ) && api.CZR_Helpers.isChecked( item.czr_Input('bg-parallax')() );
-                                                            break;
-                                                            case 'bg-scale' :
-                                                            case 'bg-repeat' :
-                                                                  bool = ! _.isEmpty( input() + '' ) && !api.CZR_Helpers.isChecked( item.czr_Input('bg-parallax')() );
-                                                            break;
-                                                            default :
-                                                                  bool = ! _.isEmpty( input() + '' );
-                                                            break;
-                                                      }
-                                                      return bool;
-                                                }); } catch( er ) {
-                                                      api.errare( module.id + ' => error in setInputVisibilityDeps', er );
-                                                }
-                                          });
-                                    break;
                                     case 'bg-apply-overlay' :
                                           _.each( [ 'bg-color-overlay', 'bg-opacity-overlay' ] , function(_inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
@@ -16001,11 +15984,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       var bool = false;
                                                       switch( _inputId_ ) {
                                                             case 'bg-parallax-force' :
-                                                                  bool = ! _.isEmpty( item.czr_Input('bg-image')() + '' ) && api.CZR_Helpers.isChecked( input() );
+                                                                  bool = api.CZR_Helpers.isChecked( input() );
                                                             break;
                                                             case 'bg-repeat' :
                                                             case 'bg-scale' :
-                                                                  bool = ! _.isEmpty( item.czr_Input('bg-image')() + '' ) && ! api.CZR_Helpers.isChecked( input() );
+                                                                  bool = !api.CZR_Helpers.isChecked( input() );
                                                             break;
                                                       }
                                                       return bool;
@@ -17709,11 +17692,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
-                                    case 'img' :
-                                          api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'img-size', function() {
-                                                return ! _.isEmpty( input()+'' ) && _.isNumber( input() );
-                                          });
-                                    break;
+                                    // case 'img' :
+                                    //       api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'img-size', function() {
+                                    //             return ! _.isEmpty( input()+'' ) && _.isNumber( input() );
+                                    //       });
+                                    // break;
                                     case 'link-to' :
                                           _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {

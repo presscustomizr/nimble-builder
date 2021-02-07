@@ -1541,7 +1541,15 @@ function sek_get_module_params_for_sek_level_bg_module() {
                     'refresh_markup' => true,
                     'html_before' => '<hr/><h3>' . __('Image background', 'text-doma') .'</h3>'
                 ),
-
+                'bg-use-post-thumb' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Use the current post thumbnail', 'text_doma'),
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => true,
+                    'default'     => 0,
+                    'notice_after' => __('When enabled and possible, Nimble will use the post thumbnail.', 'text_doma'),
+                ),
                 'bg-position' => array(
                     'input_type'  => 'bgPositionWithDeviceSwitcher',
                     'title'       => __('Image position', 'text_doma'),

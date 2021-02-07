@@ -57,6 +57,13 @@ if ( !defined( 'NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID' ) ) { define ( 'NIMBLE_GLOB
 if ( !defined( 'NIMBLE_JQUERY_ID' ) ) { define ( 'NIMBLE_JQUERY_ID', 'nb-jquery' ); }
 if ( !defined( 'NIMBLE_JQUERY_LATEST_CDN_URL' ) ) { define ( 'NIMBLE_JQUERY_LATEST_CDN_URL', 'https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js' ); }
 if ( !defined( 'NIMBLE_JQUERY_MIGRATE_URL' ) ) { define ( 'NIMBLE_JQUERY_MIGRATE_URL', site_url() . '/wp-includes/js/jquery/jquery-migrate.min.js' ); }
+// Feb 2021 : Template deployed only for Customizr Pro users
+if ( !defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) ) { define ( 'NIMBLE_TEMPLATE_SAVE_ENABLED', file_exists( get_template_directory() . '/core/init-pro.php' )); }
+if ( !defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) ) { define ( 'NIMBLE_TEMPLATE_GALLERY_ENABLED', file_exists( get_template_directory() . '/core/init-pro.php' )); }
+
+if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2",
+  ( defined('NIMBLE_FETCH_API_TMPL_LOCALLY') && NIMBLE_FETCH_API_TMPL_LOCALLY ) ? 'http://customizr-dev.test/wp-json/nimble/v2/cravan' : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
+); }
 
 ?><?php
 /* ------------------------------------------------------------------------- *
@@ -1904,12 +1911,7 @@ add_filter( 'nimble_parse_template_tags', '\Nimble\sek_parse_template_tags' );
 
 // introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
 function sek_get_the_title() {
-  if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-      $post_id = sek_get_posted_query_param_when_customizing( 'post_id' );
-      return is_int($post_id) ? get_the_title($post_id) : null;
-  } else {
-      return get_the_title();
-  }
+  return get_the_title( sek_get_post_id_on_front_and_when_customizing() );
 }
 
 // introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
@@ -1927,6 +1929,17 @@ function sek_get_the_content() {
         return !empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
       }
   }
+}
+
+// @return the post id in all cases
+// when performing ajax action, we need the posted query params made available from the ajax params
+function sek_get_post_id_on_front_and_when_customizing() {
+    if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+        $post_id = sek_get_posted_query_param_when_customizing( 'post_id' );
+    } else {
+        $post_id = get_the_ID();
+    }
+    return is_int($post_id) ? $post_id : null;
 }
 
 // introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
@@ -2883,9 +2896,6 @@ add_filter('sek_get_raw_section_registration_params', function( $collection ) {
 // if ( !defined( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME" ) ) { define( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME", 'nimble_api_prebuilt_sections_data' ); } <= DEPRECATED, Now uses local json
 if ( !defined( "NIMBLE_API_TMPL_LIB_OPT_NAME" ) ) { define( "NIMBLE_API_TMPL_LIB_OPT_NAME", 'nimble_api_tmpl_data' ); }
 if ( !defined( "NIMBLE_API_NEWS_OPT_NAME" ) ) { define( "NIMBLE_API_NEWS_OPT_NAME", 'nimble_api_news_data' ); }
-if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2",
-    ( defined('NIMBLE_FETCH_API_TMPL_LOCALLY') && NIMBLE_FETCH_API_TMPL_LOCALLY ) ? 'http://customizr-dev.test/wp-json/nimble/v2/cravan' : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
-); }
 
 
 // Nimble api returns a set of value structured as follow
@@ -3922,8 +3932,22 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         $seks_data = wp_parse_args( $seks_data, $default_collection );
         // Maybe add missing registered locations
         $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
+        
+        // EXPERIMENTAL
+        // Feb 2021 : for https://github.com/presscustomizr/nimble-builder/issues/478
+        if ( !$is_global_skope && defined('NIMBLE_USE_GROUP_TMPL') &&  NIMBLE_USE_GROUP_TMPL ) {
+            sek_error_log('SOOO ? seks_data for skope_id => ' . $skope_id, 'is page ? '. is_page() );
+            $post = sek_get_saved_tmpl_post( 'nb_tmpl_nimble-template-loop-start-only' );
+            if ( $post ) {
+                $new_seks_data = maybe_unserialize( $post->post_content );
+            }
+            // sek_error_log('CURRENT SEKS DATA ?', $seks_data );
+            // sek_error_log('NEW SEKS DATA ?', $new_seks_data );
+            $seks_data = $new_seks_data['data'];
+            $seks_data = is_array( $seks_data ) ? $seks_data : array(); 
+        }
 
-        // cache now
+        // cache now 
         if ( $is_global_skope ) {
             Nimble_Manager()->global_seks = $seks_data;
         } else {
@@ -4270,7 +4294,7 @@ function sek_update_saved_section_post( $section_data ) {
 
         // if this is an update case + editing metas only, then we use the current content
         if ( $is_edit_metas_only_case && isset($current_section_post->post_content) ) {
-            sek_error_log('IS EDIT METAS ONLY ?');
+            //sek_error_log('IS EDIT METAS ONLY ?');
             $current_section_data = maybe_unserialize( $current_section_post->post_content );
             if ( is_array($current_section_data) && isset($current_section_data['data']) && is_array($current_section_data['data']) && !empty($current_section_data['data']) ) {
                 $section_data['data'] = $current_section_data['data'];

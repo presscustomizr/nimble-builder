@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.6
-Stable tag: 2.1.36
+Stable tag: 2.2.0-beta
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,14 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.1.36 : Updated FontAwesome icons to latest version (v5.15.2)
+2.2.0 : [image module] new option to use the current post thumbnail as source of the image. [level background] new option to use the current post thumbnail as source for the background url. [template] beta version of template saving
 
 == Changelog ==
+= 2.2.0 February 7th, 2021 =
+* added : [template] beta version of template saving
+* added : [image module] new option to use the current post thumbnail as source of the image
+* added : [level background] new option to use the current post thumbnail as source for the background url
+
 = 2.1.36 February 2nd, 2021 =
 * Updated : FontAwesome icons to latest version (v5.15.2)
 
