@@ -21,6 +21,15 @@ if ( !function_exists( 'Nimble\sek_print_text_heading_content' ) ) {
             // Use our own content filter instead of $content = apply_filters( 'the_content', $tiny_mce_content );
             // because of potential third party plugins corrupting 'the_content' filter. https://github.com/presscustomizr/nimble-builder/issues/233
             remove_filter( 'the_nimble_tinymce_module_content', 'wpautop');
+            
+            // Feb 2021 : now saved as a json to fix emojis issues
+            // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
+            // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
+            $maybe_json_content = json_decode( $heading_content );
+            if ( $maybe_json_content != FALSE ) {
+                $heading_content = $maybe_json_content;
+            }
+
             $heading_content = apply_filters( 'the_nimble_tinymce_module_content', $heading_content );
             $heading_content = sek_strip_script_tags($heading_content);
             add_filter( 'the_nimble_tinymce_module_content', 'wpautop');

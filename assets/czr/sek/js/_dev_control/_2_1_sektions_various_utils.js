@@ -1251,6 +1251,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       }
                 });
                 return _bool;
+            },
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            //-- VARIOUS
+            //-------------------------------------------------------------------------------------------------
+            isJsonString : function(str) {
+                  try {
+                        JSON.parse(str);
+                  } catch (e) {
+                        return false;
+                  }
+                  return true;
             }
       });//$.extend()
 })( wp.customize, jQuery );

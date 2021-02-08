@@ -20,14 +20,21 @@ function sek_get_module_params_for_czr_heading_module() {
             )
         ),
         'css_selectors' => array( '.sek-module-inner > .sek-heading' ),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        'sanitize_callback' => '\Nimble\sek_sanitize_czr_heading_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'render_tmpl_path' => "heading_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     );
 }
 
-
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
+function sek_sanitize_czr_heading_module( $content ) {
+    if ( is_array($content) && !empty($content['main_settings']) && !empty($content['main_settings']['heading_text']) ) {
+        $content['main_settings']['heading_text'] = json_encode($content['main_settings']['heading_text']);
+    }
+    return $content;
+}
 
 /* ------------------------------------------------------------------------- *
  *  TEXT EDITOR CONTENT CHILD

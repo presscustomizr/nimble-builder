@@ -116,11 +116,20 @@
 
                   // Let's set the input() value when the editor is ready
                   // Because when we instantiate it, the textarea might not reflect the input value because too early
-                  var _doOnInit = function() {
+                  var initial_value, _doOnInit = function() {
                         // inject the content in the code editor now
                         // @fixes the problem of {{...}} syntax being parsed by _. templating system
-                        $textarea.html( input() );
-                        _editor.setContent( input() );
+
+                        // Feb 2021 : modules using this input will now be saved as a json to fix emojis issues
+                        // we've started to implement the json saved for the heading module, but all modules will progressively transition to this new format
+                        // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
+                        // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
+                        initial_value = input();
+                        if ( api.czr_sektions.isJsonString(initial_value) ) {
+                              initial_value = JSON.parse( initial_value );
+                        }
+                        $textarea.html( initial_value );
+                        _editor.setContent( initial_value );
                         //$('#wp-' + _editor.id + '-wrap' ).find('iframe').addClass('labite').css('height','50px');
                   };
                   if ( _editor.initialized ) {
@@ -268,16 +277,25 @@
 
                   // Let's set the input() value when the editor is ready
                   // Because when we instantiate it, the textarea might not reflect the input value because too early
-                  var _doOnInit = function() {
+                  var initial_value, _doOnInit = function() {
                         // To ensure retro-compat with content created prior to Nimble v1.5.2, in which the editor has been updated
                         // @see https://github.com/presscustomizr/nimble-builder/issues/404
                         // we add the <p> tag on init, if autop option is checked
                         // December 2020 : when running wp.editor.autop( input()  , line break not preserved when re-opening a text module UI,
                         // see https://github.com/presscustomizr/nimble-builder/issues/769
-                        // var initial_content = ( !isAutoPEnabled() || ! _.isFunction( wp.editor.autop ) ) ? input() : wp.editor.autop( input() );
+                        // var initial_value = ( !isAutoPEnabled() || ! _.isFunction( wp.editor.autop ) ) ? input() : wp.editor.autop( input() );
                         // console.log('INITIAL CONTENT', input(), wp.editor.autop( input() ) );
-                        var initial_content = input();
-                        _editor.setContent( initial_content );
+                         
+                        // Feb 2021 : modules using this input will now be saved as a json to fix emojis issues
+                        // we've started to implement the json saved for the heading module, but all modules will progressively transition to this new format
+                        // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
+                        // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
+                        initial_value = input();
+                        if ( api.czr_sektions.isJsonString(initial_value) ) {
+                              initial_value = JSON.parse( initial_value );
+                        }
+
+                        _editor.setContent( initial_value );
                         api.sekEditorExpanded( true );
                         // trigger a resize to adjust height on init https://github.com/presscustomizr/nimble-builder/issues/409
                         $(window).trigger('resize');
