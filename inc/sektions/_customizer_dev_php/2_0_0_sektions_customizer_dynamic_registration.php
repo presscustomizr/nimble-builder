@@ -36,7 +36,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     'transport' => 'refresh',
                     'type' => 'option',
                     'default' => array(),
-                    //'sanitize_callback'    => array( $this, 'sanitize_callback' )
+                    'sanitize_callback'    => array( $this, 'sanitize_callback' )
                     //'validate_callback'    => array( $this, 'validate_callback' )
                 );
             } else if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_LEVEL_UI ) ) {
@@ -45,8 +45,8 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     'transport' => 'refresh',
                     'type' => '_nimble_ui_',//won't be saved as is,
                     'default' => array(),
-                    'sanitize_callback' => array( $this, 'sanitize_callback' ),
-                    'validate_callback' => array( $this, 'validate_callback' )
+                    //'sanitize_callback' => array( $this, 'sanitize_callback' ),
+                    //'validate_callback' => array( $this, 'validate_callback' )
                 );
             }
             return $setting_args;
@@ -66,21 +66,25 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
         // Uses the sanitize_callback function specified on module registration if any
         function sanitize_callback( $setting_data, $setting_instance ) {
-            if ( isset( $_POST['location_skope_id'] ) ) {
-                $sektionSettingValue = sek_get_skoped_seks( $_POST['location_skope_id'] );
-                if ( is_array( $sektionSettingValue ) ) {
-                    $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
-                    if ( is_array( $sektion_collection ) ) {
-                        $model = sek_get_level_model( $setting_instance->id, $sektion_collection );
-                        if ( is_array( $model ) && !empty( $model['module_type'] ) ) {
-                            $sanitize_callback = sek_get_registered_module_type_property( $model['module_type'], 'sanitize_callback' );
-                            if ( !empty( $sanitize_callback ) && is_string( $sanitize_callback ) && function_exists( $sanitize_callback ) ) {
-                                $setting_data = $sanitize_callback( $setting_data );
-                            }
+            if ( !is_array( $setting_data ) ) {
+                return $setting_data;
+            } else {
+                if ( !is_array( $setting_data ) ) {
+                    return $setting_data;
+                } else {
+                    if ( array_key_exists('module_type', $setting_data ) ) {
+                        $san_callback = sek_get_registered_module_type_property( $setting_data['module_type'], 'sanitize_callback' );
+                        if ( !empty( $san_callback ) && is_string( $san_callback ) && function_exists( $san_callback ) && array_key_exists('value', $setting_data ) ) {
+                            $setting_data['value'] = $san_callback( $setting_data['value'] );
+                        }
+                    } else {
+                        foreach( $setting_data as $k => $data ) {
+                            $setting_data[$k] = $this->sanitize_callback($data, $setting_instance);
                         }
                     }
                 }
             }
+
             //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_doma' ), $setting_data );
             return $setting_data;
         }
@@ -89,21 +93,25 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         // @return validity object
         function validate_callback( $validity, $setting_data, $setting_instance ) {
             $validated = true;
-            if ( isset( $_POST['location_skope_id'] ) ) {
-                $sektionSettingValue = sek_get_skoped_seks( $_POST['location_skope_id'] );
-                if ( is_array( $sektionSettingValue ) ) {
-                    $sektion_collection = array_key_exists('collection', $sektionSettingValue) ? $sektionSettingValue['collection'] : array();
-                    if ( is_array( $sektion_collection ) ) {
-                        $model = sek_get_level_model( $setting_instance->id, $sektion_collection );
-                        if ( is_array( $model ) && !empty( $model['module_type'] ) ) {
-                            $validate_callback = sek_get_registered_module_type_property( $model['module_type'], 'validate_callback' );
-                            if ( !empty( $validate_callback ) && is_string( $validate_callback ) && function_exists( $validate_callback ) ) {
-                                $validated = $validate_callback( $setting_data );
-                            }
+            if ( !is_array( $setting_data ) ) {
+                return $setting_data;
+            } else {
+                if ( !is_array( $setting_data ) ) {
+                    return $setting_data;
+                } else {
+                    if ( array_key_exists('module_type', $setting_data ) ) {
+                        $validation_callback = sek_get_registered_module_type_property( $setting_data['module_type'], 'validate_callback' );
+                        if ( !empty( $validation_callback ) && is_string( $validation_callback ) && function_exists( $validation_callback ) && array_key_exists('value', $setting_data ) ) {
+                            $validated = $validation_callback( $setting_data );
+                        }
+                    } else {
+                        foreach( $setting_data as $k => $data ) {
+                            $validated = $this->validate_callback($validity, $data, $setting_instance);
                         }
                     }
                 }
             }
+
             //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_doma' ), $setting_data );
             if ( true !== $validated ) {
                 if ( is_wp_error( $validated ) ) {
