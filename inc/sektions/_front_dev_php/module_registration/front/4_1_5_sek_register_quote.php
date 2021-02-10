@@ -478,7 +478,11 @@ function sek_get_module_params_for_czr_quote_design_child() {
 
 
 
-
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
 function sanitize_callback__czr_quote_module( $value ) {
     if ( !is_array( $value ) )
         return $value;

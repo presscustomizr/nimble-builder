@@ -306,7 +306,11 @@ function sek_get_module_params_for_czr_btn_design_child() {
 
 
 
-
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
 function sanitize_callback__czr_button_module( $value ) {
     if ( is_array( $value ) && !empty($value['content']) && is_array( $value['content'] ) && array_key_exists( 'button_text', $value['content'] ) ) {
         $value['content'][ 'button_text' ] = sanitize_text_field( $value['content'][ 'button_text' ] );
