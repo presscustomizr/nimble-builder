@@ -117,11 +117,11 @@ function sek_get_module_params_for_czr_heading_child() {
 function sek_sanitize_czr_heading_module( $content ) {
     if ( is_array($content) && is_array($content['main_settings']) ) {
         // main heading text
-        if ( !empty($content['main_settings']['heading_text']) && !sek_is_json( $content['main_settings']['heading_text'] ) ) {
-            $content['main_settings']['heading_text'] = json_encode($content['main_settings']['heading_text']);
+        if ( !empty($content['main_settings']['heading_text']) ) {
+            $content['main_settings']['heading_text'] = sek_maybe_encode_json($content['main_settings']['heading_text']);
         }
-        if ( !empty($content['main_settings']['heading_title']) && !sek_is_json( $content['main_settings']['heading_title'] ) ) {
-            $content['main_settings']['heading_title'] = json_encode($content['main_settings']['heading_title']);
+        if ( !empty($content['main_settings']['heading_title']) ) {
+            $content['main_settings']['heading_title'] = sek_maybe_encode_json($content['main_settings']['heading_title']);
         }
     }
     return $content;

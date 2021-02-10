@@ -490,9 +490,7 @@ function sanitize_callback__czr_quote_module( $value ) {
         }
         // convert into a json to prevent emoji breaking global json data structure
         // fix for https://github.com/presscustomizr/nimble-builder/issues/544
-        if ( !sek_is_json( $value['quote_content']['quote_text'] ) ) {
-            $value['quote_content']['quote_text'] = json_encode($value['quote_content']['quote_text']);
-        }
+        $value['quote_content']['quote_text'] = sek_maybe_encode_json($value['quote_content']['quote_text']);
     }
     if ( array_key_exists( 'cite_content', $value ) && is_array( $value['cite_content'] ) && !empty($value['cite_content']['cite_text']) ) {
         //sanitize quote_text
@@ -501,9 +499,7 @@ function sanitize_callback__czr_quote_module( $value ) {
         }
         // convert into a json to prevent emoji breaking global json data structure
         // fix for https://github.com/presscustomizr/nimble-builder/issues/544
-        if ( !sek_is_json( $value['cite_content']['cite_text'] ) ) {
-            $value['cite_content']['cite_text'] = json_encode($value['cite_content']['cite_text']);
-        }
+        $value['cite_content']['cite_text'] = sek_maybe_encode_json($value['cite_content']['cite_text']);
     }
     return $value;
 }

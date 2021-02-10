@@ -41,9 +41,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
 function sek_sanitize_czr_tiny_mce_editor_module( $content ) {
     if ( is_array($content) && !empty($content['main_settings']) && is_array($content['main_settings']) ) {
         $editor_content = !empty($content['main_settings']['content']) ? $content['main_settings']['content'] : '';
-        if ( !sek_is_json( $editor_content ) ) {
-            $content['main_settings']['content'] = json_encode($editor_content);
-        }
+        $content['main_settings']['content'] = sek_maybe_encode_json($editor_content);
     }
     //sek_error_log( 'ALORS MODULE CONTENT ?', $content );
     return $content;

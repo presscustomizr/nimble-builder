@@ -408,4 +408,16 @@ function sek_maybe_decode_json( $string ){
   }
   return $string;
 }
+
+// @return string
+function sek_maybe_encode_json( $string ){
+  if ( !is_string($string) )
+    return $string;
+  // only encode if not already encoded
+  if ( !sek_is_json($string) ) {
+    $string = json_encode($string);
+  }
+  return $string;
+}
+
 ?>
