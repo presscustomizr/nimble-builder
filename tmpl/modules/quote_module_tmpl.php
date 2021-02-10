@@ -35,7 +35,6 @@ if ( !function_exists( __NAMESPACE__ . '\sek_print_quote_content' ) ) {
         } else {
             return $to_print;
         }
-
     }
 }
 
