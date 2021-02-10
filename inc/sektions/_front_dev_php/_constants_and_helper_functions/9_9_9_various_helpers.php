@@ -410,7 +410,7 @@ function sek_maybe_decode_json( $string ){
 }
 
 // @return string
-function sek_maybe_encode_json( $string ){
+function sek_maybe_json_encode( $string ){
   if ( !is_string($string) )
     return $string;
   // only encode if not already encoded

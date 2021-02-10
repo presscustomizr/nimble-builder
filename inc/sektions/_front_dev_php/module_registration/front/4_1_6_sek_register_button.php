@@ -316,7 +316,7 @@ function sanitize_callback__czr_button_module( $value ) {
         $value['content'][ 'button_text' ] = sanitize_text_field( $value['content'][ 'button_text' ] );
         // convert into a json to prevent emoji breaking global json data structure
         // fix for https://github.com/presscustomizr/nimble-builder/issues/544
-        $value['content']['button_text'] = sek_maybe_encode_json($value['content']['button_text']);
+        $value['content']['button_text'] = sek_maybe_json_encode($value['content']['button_text']);
     }
     return $value;
 }
