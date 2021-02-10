@@ -19,7 +19,7 @@ function sek_get_module_params_for_czr_simple_form_module() {
             'form_submission'    => 'czr_simple_form_submission_child'
         ),
         'name' => __( 'Simple Form', 'text_doma' ),
-        //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
+        'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         'starting_value' => array(
             'fields_design' => array(
                 'border' => array(
@@ -888,10 +888,27 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
     );
 }
 
-// function sanitize_callback__czr_simple_form_module( $value ) {
-//     $value[ 'button_text' ] = sanitize_text_field( $value[ 'button_text' ] );
-//     return $value;
-// }
+function sanitize_callback__czr_simple_form_module( $value ) {
+    if ( !is_array( $value ) )
+        return $value;
+    // convert into a json to prevent emoji breaking global json data structure
+    // fix for https://github.com/presscustomizr/nimble-builder/issues/544
+    if ( array_key_exists( 'form_fields', $value ) && is_array( $value['form_fields'] ) ) {
+        if ( !empty($value['form_fields']['button_text']) ) {
+            $value['form_fields']['button_text'] = sanitize_text_field( $value['form_fields']['button_text'] );
+            $value['form_fields']['button_text'] = sek_maybe_encode_json($value['form_fields']['button_text']);
+        }
+        if ( !empty($value['form_fields']['privacy_field_label']) ) {
+            $value['form_fields']['privacy_field_label'] = sek_maybe_encode_json($value['form_fields']['privacy_field_label']);
+        }
+    }
+    if ( array_key_exists( 'form_submission', $value ) && is_array( $value['form_submission'] ) ) {
+        if ( !empty($value['form_submission']['email_footer']) ) {
+            $value['form_submission']['email_footer'] = sek_maybe_encode_json($value['form_submission']['email_footer']);
+        }
+    }
+    return $value;
+}
 
 
 
