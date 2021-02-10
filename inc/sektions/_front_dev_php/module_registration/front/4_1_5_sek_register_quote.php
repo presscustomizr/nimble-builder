@@ -480,14 +480,29 @@ function sek_get_module_params_for_czr_quote_design_child() {
 
 
 function sanitize_callback__czr_quote_module( $value ) {
-    if ( !current_user_can( 'unfiltered_html' ) ) {
-        if ( array_key_exists( 'quote_text', $value ) ) {
-            //sanitize quote_text
-            $value[ 'quote_text' ] = wp_kses_post( $value[ 'quote_text' ] );
+    if ( !is_array( $value ) )
+        return $value;
+
+    if ( array_key_exists( 'quote_content', $value ) && is_array( $value['quote_content'] ) && !empty($value['quote_content']['quote_text']) ) {
+        //sanitize quote_text
+        if ( !current_user_can( 'unfiltered_html' ) ) {
+            $value['quote_content']['quote_text'] = wp_kses_post( $value['quote_content']['quote_text'] );
         }
-        if ( array_key_exists( 'cite_text', $value ) ) {
-            //sanitize cite_text
-            $value[ 'cite_text' ] = wp_kses_post( $value[ 'cite_text' ] );
+        // convert into a json to prevent emoji breaking global json data structure
+        // fix for https://github.com/presscustomizr/nimble-builder/issues/544
+        if ( !sek_is_json( $value['quote_content']['quote_text'] ) ) {
+            $value['quote_content']['quote_text'] = json_encode($value['quote_content']['quote_text']);
+        }
+    }
+    if ( array_key_exists( 'cite_content', $value ) && is_array( $value['cite_content'] ) && !empty($value['cite_content']['cite_text']) ) {
+        //sanitize quote_text
+        if ( !current_user_can( 'unfiltered_html' ) ) {
+            $value['cite_content']['cite_text'] = wp_kses_post( $value['cite_content']['cite_text'] );
+        }
+        // convert into a json to prevent emoji breaking global json data structure
+        // fix for https://github.com/presscustomizr/nimble-builder/issues/544
+        if ( !sek_is_json( $value['cite_content']['cite_text'] ) ) {
+            $value['cite_content']['cite_text'] = json_encode($value['cite_content']['cite_text']);
         }
     }
     return $value;
