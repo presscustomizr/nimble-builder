@@ -10228,6 +10228,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       }
                 });
                 return _bool;
+            },
+
+
+
+            //-------------------------------------------------------------------------------------------------
+            //-- VARIOUS
+            //-------------------------------------------------------------------------------------------------
+            isJsonString : function(str) {
+                  try {
+                        JSON.parse(str);
+                  } catch (e) {
+                        return false;
+                  }
+                  return true;
             }
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
@@ -13386,7 +13400,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       item           = input.input_parent(),
                       editorSettings = false,
                       $textarea      = input.container.find( 'textarea' ),
-                      $input_title   = input.container.find( '.customize-control-title' );
+                      $input_title   = input.container.find( '.customize-control-title' ),
+                      initial_content;
                       //editor_params  = $textarea.data( 'editor-params' );
 
                   // // When using blocking notifications (type: error) the following block will append a checkbox to the
@@ -13476,10 +13491,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                    $input_title.trigger('click');
                               }, 10 );
                         };
+                        // Feb 2021 : modules using this input will now be saved as a json to fix emojis issues
+                        // we've started to implement the json saved for the heading module, but all modules will progressively transition to this new format
+                        // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
+                        // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
+                        initial_content = input();
+                        if ( api.czr_sektions.isJsonString(initial_content) ) {
+                              initial_content = JSON.parse( initial_content );
+                        }
 
                         // inject the content in the code editor now
                         // @fixes the problem of {{...}} syntax being parsed by _. templating system
-                        $textarea.html( input() );
+                        $textarea.html( initial_content );
 
                         $.when( _getEditorParams() ).done( function( editorParams ) {
                               //$textarea.attr( 'data-editor-params', editorParams );
@@ -13496,7 +13519,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // e.g. bad ui (bad inline CSS maths), not visible content until click.
                               // When the code_editor input is rendered in an accordion control ( @see CZRSeksPrototype.scheduleModuleAccordion ), we need to defer the instantiation when the control has been expanded.
                               // fixes @see https://github.com/presscustomizr/nimble-builder/issues/176
-                              input.module.control.container.on('sek-accordion-expanded', function() {
+                              input.module.control.container.first().one('sek-accordion-expanded', function() {
                                     _doInstantiate.call( input );
                               });
                         }).fail( function(er) {
@@ -13547,7 +13570,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               suspendEditorUpdate = false;
                         });
 
-                        input.editor.codemirror.setValue( input() );
+                        // Feb 2021 : modules using this input will now be saved as a json to fix emojis issues
+                        // we've started to implement the json saved for the heading module, but all modules will progressively transition to this new format
+                        // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
+                        // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
+                        initial_content = input();
+                        if ( api.czr_sektions.isJsonString(initial_content) ) {
+                              initial_content = JSON.parse( initial_content );
+                        }
+                        input.editor.codemirror.setValue( initial_content );
 
                         // Update CodeMirror when the setting is changed by another plugin.
                         /* TODO: check this */
@@ -14910,11 +14941,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Let's set the input() value when the editor is ready
                   // Because when we instantiate it, the textarea might not reflect the input value because too early
-                  var _doOnInit = function() {
+                  var initial_value, _doOnInit = function() {
                         // inject the content in the code editor now
                         // @fixes the problem of {{...}} syntax being parsed by _. templating system
-                        $textarea.html( input() );
-                        _editor.setContent( input() );
+
+                        // Feb 2021 : modules using this input will now be saved as a json to fix emojis issues
+                        // we've started to implement the json saved for the heading module, but all modules will progressively transition to this new format
+                        // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
+                        // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
+                        initial_value = input();
+                        if ( api.czr_sektions.isJsonString(initial_value) ) {
+                              initial_value = JSON.parse( initial_value );
+                        }
+                        $textarea.html( initial_value );
+                        _editor.setContent( initial_value );
                         //$('#wp-' + _editor.id + '-wrap' ).find('iframe').addClass('labite').css('height','50px');
                   };
                   if ( _editor.initialized ) {
@@ -15062,16 +15102,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Let's set the input() value when the editor is ready
                   // Because when we instantiate it, the textarea might not reflect the input value because too early
-                  var _doOnInit = function() {
+                  var initial_value, _doOnInit = function() {
                         // To ensure retro-compat with content created prior to Nimble v1.5.2, in which the editor has been updated
                         // @see https://github.com/presscustomizr/nimble-builder/issues/404
                         // we add the <p> tag on init, if autop option is checked
                         // December 2020 : when running wp.editor.autop( input()  , line break not preserved when re-opening a text module UI,
                         // see https://github.com/presscustomizr/nimble-builder/issues/769
-                        // var initial_content = ( !isAutoPEnabled() || ! _.isFunction( wp.editor.autop ) ) ? input() : wp.editor.autop( input() );
+                        // var initial_value = ( !isAutoPEnabled() || ! _.isFunction( wp.editor.autop ) ) ? input() : wp.editor.autop( input() );
                         // console.log('INITIAL CONTENT', input(), wp.editor.autop( input() ) );
-                        var initial_content = input();
-                        _editor.setContent( initial_content );
+                         
+                        // Feb 2021 : modules using this input will now be saved as a json to fix emojis issues
+                        // we've started to implement the json saved for the heading module, but all modules will progressively transition to this new format
+                        // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
+                        // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
+                        initial_value = input();
+                        if ( api.czr_sektions.isJsonString(initial_value) ) {
+                              initial_value = JSON.parse( initial_value );
+                        }
+
+                        _editor.setContent( initial_value );
                         api.sekEditorExpanded( true );
                         // trigger a resize to adjust height on init https://github.com/presscustomizr/nimble-builder/issues/409
                         $(window).trigger('resize');

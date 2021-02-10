@@ -2889,6 +2889,35 @@ add_filter('sek_get_raw_section_registration_params', function( $collection ) {
     return $filtered;
 });
 
+// @return bool
+function sek_is_json( $string ){
+  json_decode($string);
+  return (json_last_error() == JSON_ERROR_NONE);
+}
+
+// @return string
+function sek_maybe_decode_json( $string ){
+  if ( !is_string($string) )
+    return $string;
+
+  $json_decoded_candidate = json_decode($string, true);
+  if ( json_last_error() == JSON_ERROR_NONE ) {
+      return $json_decoded_candidate;
+  }
+  return $string;
+}
+
+// @return string
+function sek_maybe_json_encode( $string ){
+  if ( !is_string($string) )
+    return $string;
+  // only encode if not already encoded
+  if ( !sek_is_json($string) ) {
+    $string = json_encode($string);
+  }
+  return $string;
+}
+
 ?><?php
 // /* ------------------------------------------------------------------------- *
 // *  NIMBLE API

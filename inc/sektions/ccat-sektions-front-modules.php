@@ -174,11 +174,17 @@ function sek_get_module_params_for_czr_simple_html_module() {
     );
 }
 
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
 function sanitize_callback__czr_simple_html_module( $value ) {
-    if ( array_key_exists( 'html_content', $value ) ) {
+    if ( array_key_exists( 'html_content', $value ) && is_string( $value[ 'html_content' ] ) ) {
         if ( !current_user_can( 'unfiltered_html' ) ) {
             $value[ 'html_content' ] = wp_kses_post( $value[ 'html_content' ] );
         }
+        // convert into a json to prevent emoji breaking global json data structure
+        // fix for https://github.com/presscustomizr/nimble-builder/issues/544
+        $value[ 'html_content' ] = sek_maybe_json_encode( $value[ 'html_content' ] );
     }
     return $value;
 }
@@ -203,7 +209,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                 'content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
             )
         ),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        'sanitize_callback' => '\Nimble\sek_sanitize_czr_tiny_mce_editor_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array(
             // this list is limited to the most commonly used tags in the editor.
@@ -218,7 +224,19 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
     );
 }
 
-
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
+function sek_sanitize_czr_tiny_mce_editor_module( $content ) {
+    if ( is_array($content) && !empty($content['main_settings']) && is_array($content['main_settings']) ) {
+        $editor_content = !empty($content['main_settings']['content']) ? $content['main_settings']['content'] : '';
+        $content['main_settings']['content'] = sek_maybe_json_encode($editor_content);
+    }
+    //sek_error_log( 'ALORS MODULE CONTENT ?', $content );
+    return $content;
+}
 
 /* ------------------------------------------------------------------------- *
  *  TEXT EDITOR CONTENT CHILD
@@ -1127,13 +1145,12 @@ function sek_get_module_params_for_czr_heading_module() {
             )
         ),
         'css_selectors' => array( '.sek-module-inner > .sek-heading' ),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        'sanitize_callback' => '\Nimble\sek_sanitize_czr_heading_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'render_tmpl_path' => "heading_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     );
 }
-
 
 
 /* ------------------------------------------------------------------------- *
@@ -1218,6 +1235,29 @@ function sek_get_module_params_for_czr_heading_child() {
 
 
 /* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+function sek_sanitize_czr_heading_module( $content ) {
+    if ( is_array($content) && is_array($content['main_settings']) ) {
+        // main heading text
+        if ( !empty($content['main_settings']['heading_text']) ) {
+            // https://wordpress.org/support/article/roles-and-capabilities/#unfiltered_html
+            if ( !current_user_can( 'unfiltered_html' ) ) {
+                $value['main_settings'][ 'heading_text' ] = wp_kses_post( $content['main_settings']['heading_text'] );
+            }
+            // convert into a json to prevent emoji breaking global json data structure
+            // fix for https://github.com/presscustomizr/nimble-builder/issues/544
+            $content['main_settings']['heading_text'] = sek_maybe_json_encode($content['main_settings']['heading_text']);
+        }
+        if ( !empty($content['main_settings']['heading_title']) ) {
+            $content['main_settings']['heading_title'] = sek_maybe_json_encode($content['main_settings']['heading_title']);
+        }
+    }
+    return $content;
+}
+
+
+/* ------------------------------------------------------------------------- *
  *  HEADING SPACING CHILD
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
@@ -1246,28 +1286,6 @@ function sek_get_module_params_for_czr_heading_spacing_child() {
         'render_tmpl_path' =>'',
     );
 }
-
-
-
-
-function sanitize_callback__czr_heading_module( $value ) {
-    if (  !current_user_can( 'unfiltered_html' ) && array_key_exists('main_settings', $value ) && is_array( $value['main_settings'] ) && array_key_exists('heading_text', $value['main_settings'] ) ) {
-        //sanitize heading_text
-        if ( function_exists( 'czr_heading_module_kses_text' ) ) {
-            $value['main_settings'][ 'heading_text' ] = czr_heading_module_kses_text( $value['main_settings'][ 'heading_text' ] );
-        }
-    }
-    return $value;
-    //return new \WP_Error('required' ,'heading did not pass sanitization');
-}
-
-// @see SEK_CZR_Dyn_Register::set_dyn_setting_args
-// Only the boolean true or a WP_error object will be valid returned value considered when validating
-function validate_callback__czr_heading_module( $value ) {
-    //return new \WP_Error('required' ,'heading did not pass ');
-    return true;
-}
-
 
 ?>
 <?php
@@ -2260,17 +2278,32 @@ function sek_get_module_params_for_czr_quote_design_child() {
 
 
 
-
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
 function sanitize_callback__czr_quote_module( $value ) {
-    if ( !current_user_can( 'unfiltered_html' ) ) {
-        if ( array_key_exists( 'quote_text', $value ) ) {
-            //sanitize quote_text
-            $value[ 'quote_text' ] = wp_kses_post( $value[ 'quote_text' ] );
+    if ( !is_array( $value ) )
+        return $value;
+
+    if ( array_key_exists( 'quote_content', $value ) && is_array( $value['quote_content'] ) && !empty($value['quote_content']['quote_text']) ) {
+        //sanitize quote_text
+        if ( !current_user_can( 'unfiltered_html' ) ) {
+            $value['quote_content']['quote_text'] = wp_kses_post( $value['quote_content']['quote_text'] );
         }
-        if ( array_key_exists( 'cite_text', $value ) ) {
-            //sanitize cite_text
-            $value[ 'cite_text' ] = wp_kses_post( $value[ 'cite_text' ] );
+        // convert into a json to prevent emoji breaking global json data structure
+        // fix for https://github.com/presscustomizr/nimble-builder/issues/544
+        $value['quote_content']['quote_text'] = sek_maybe_json_encode($value['quote_content']['quote_text']);
+    }
+    if ( array_key_exists( 'cite_content', $value ) && is_array( $value['cite_content'] ) && !empty($value['cite_content']['cite_text']) ) {
+        //sanitize quote_text
+        if ( !current_user_can( 'unfiltered_html' ) ) {
+            $value['cite_content']['cite_text'] = wp_kses_post( $value['cite_content']['cite_text'] );
         }
+        // convert into a json to prevent emoji breaking global json data structure
+        // fix for https://github.com/presscustomizr/nimble-builder/issues/544
+        $value['cite_content']['cite_text'] = sek_maybe_json_encode($value['cite_content']['cite_text']);
     }
     return $value;
 }
@@ -2584,10 +2617,17 @@ function sek_get_module_params_for_czr_btn_design_child() {
 
 
 
-
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
 function sanitize_callback__czr_button_module( $value ) {
-    if ( is_array( $value ) && is_array( $value['content'] ) && array_key_exists( 'button_text', $value['content'] ) ) {
+    if ( is_array( $value ) && !empty($value['content']) && is_array( $value['content'] ) && array_key_exists( 'button_text', $value['content'] ) ) {
         $value['content'][ 'button_text' ] = sanitize_text_field( $value['content'][ 'button_text' ] );
+        // convert into a json to prevent emoji breaking global json data structure
+        // fix for https://github.com/presscustomizr/nimble-builder/issues/544
+        $value['content']['button_text'] = sek_maybe_json_encode($value['content']['button_text']);
     }
     return $value;
 }
@@ -2731,7 +2771,7 @@ function sek_get_module_params_for_czr_simple_form_module() {
             'form_submission'    => 'czr_simple_form_submission_child'
         ),
         'name' => __( 'Simple Form', 'text_doma' ),
-        //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
+        'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         'starting_value' => array(
             'fields_design' => array(
                 'border' => array(
@@ -3600,10 +3640,27 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
     );
 }
 
-// function sanitize_callback__czr_simple_form_module( $value ) {
-//     $value[ 'button_text' ] = sanitize_text_field( $value[ 'button_text' ] );
-//     return $value;
-// }
+function sanitize_callback__czr_simple_form_module( $value ) {
+    if ( !is_array( $value ) )
+        return $value;
+    // convert into a json to prevent emoji breaking global json data structure
+    // fix for https://github.com/presscustomizr/nimble-builder/issues/544
+    if ( array_key_exists( 'form_fields', $value ) && is_array( $value['form_fields'] ) ) {
+        if ( !empty($value['form_fields']['button_text']) ) {
+            $value['form_fields']['button_text'] = sanitize_text_field( $value['form_fields']['button_text'] );
+            $value['form_fields']['button_text'] = sek_maybe_json_encode($value['form_fields']['button_text']);
+        }
+        if ( !empty($value['form_fields']['privacy_field_label']) ) {
+            $value['form_fields']['privacy_field_label'] = sek_maybe_json_encode($value['form_fields']['privacy_field_label']);
+        }
+    }
+    if ( array_key_exists( 'form_submission', $value ) && is_array( $value['form_submission'] ) ) {
+        if ( !empty($value['form_submission']['email_footer']) ) {
+            $value['form_submission']['email_footer'] = sek_maybe_json_encode($value['form_submission']['email_footer']);
+        }
+    }
+    return $value;
+}
 
 
 
@@ -5421,7 +5478,7 @@ function sek_get_module_params_for_czr_img_slider_module() {
                 array( 'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png' )
             )
         ),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        'sanitize_callback' => '\Nimble\sanitize_cb__czr_img_slider_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '[data-sek-swiper-id]' ),//array( '.sek-icon i' ),
         'render_tmpl_path' => "img_slider_tmpl.php",
@@ -5434,6 +5491,25 @@ function sek_get_module_params_for_czr_img_slider_module() {
         //       )
         // )
     );
+}
+
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
+function sanitize_cb__czr_img_slider_module( $value ) {
+    if ( !is_array( $value ) )
+        return $value;
+
+    if ( !empty($value['img_collection']) && is_array( $value['img_collection'] ) ) {
+        foreach( $value['img_collection'] as $key => $data ) {
+            if ( array_key_exists( 'text_content', $data ) && is_string( $data['text_content'] ) ) {
+                $value['img_collection'][$key]['text_content'] = sek_maybe_json_encode( $data['text_content'] );
+            }
+        }
+    }
+    return $value;
 }
 
 
@@ -6035,7 +6111,7 @@ function sek_get_module_params_for_czr_accordion_module() {
                 array('text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.')
             )
         ),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        'sanitize_callback' => '\Nimble\sanitize_cb__czr_accordion_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '[data-sek-accordion-id]' ),//array( '.sek-icon i' ),
         'render_tmpl_path' => "accordion_tmpl.php",
@@ -6050,6 +6126,26 @@ function sek_get_module_params_for_czr_accordion_module() {
     );
 }
 
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
+function sanitize_cb__czr_accordion_module( $value ) {
+    if ( !is_array( $value ) )
+        return $value;
+    if ( !empty($value['accord_collec']) && is_array( $value['accord_collec'] ) ) {
+        foreach( $value['accord_collec'] as $key => $data ) {
+            if ( array_key_exists( 'text_content', $data ) && is_string( $data['text_content'] ) ) {
+                $value['accord_collec'][$key]['text_content'] = sek_maybe_json_encode( $data['text_content'] );
+            }
+            if ( array_key_exists( 'title_text', $data ) && is_string( $data['title_text'] ) ) {
+                $value['accord_collec'][$key]['title_text'] = sek_maybe_json_encode( $data['title_text'] );
+            }
+        }
+    }
+    return $value;
+}
 
 /* ------------------------------------------------------------------------- *
  *  MAIN SETTINGS
@@ -6539,7 +6635,7 @@ function sek_get_module_params_for_czr_shortcode_module() {
         'module_type' => 'czr_shortcode_module',
         'name' => __('Shortcode', 'text_doma'),
         'css_selectors' => array( '.sek-module-inner > *' ),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        'sanitize_callback' => '\Nimble\sek_sanitize_czr_shortcode_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
@@ -6597,5 +6693,17 @@ function sek_get_module_params_for_czr_shortcode_module() {
         ),
         'render_tmpl_path' => "shortcode_module_tmpl.php",
     );
+}
+
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
+function sek_sanitize_czr_shortcode_module( $content ) {
+    if ( is_array($content) && !empty($content['text_content']) ) {
+        $content['text_content'] = sek_maybe_json_encode($content['text_content']);
+    }
+    return $content;
 }
 ?>
