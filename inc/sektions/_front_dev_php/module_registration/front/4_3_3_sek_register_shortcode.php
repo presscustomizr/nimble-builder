@@ -9,7 +9,7 @@ function sek_get_module_params_for_czr_shortcode_module() {
         'module_type' => 'czr_shortcode_module',
         'name' => __('Shortcode', 'text_doma'),
         'css_selectors' => array( '.sek-module-inner > *' ),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        'sanitize_callback' => '\Nimble\sek_sanitize_czr_shortcode_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
@@ -67,5 +67,19 @@ function sek_get_module_params_for_czr_shortcode_module() {
         ),
         'render_tmpl_path' => "shortcode_module_tmpl.php",
     );
+}
+
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
+function sek_sanitize_czr_shortcode_module( $content ) {
+    if ( is_array($content) && !empty($content['text_content']) ) {
+        if ( !sek_is_json( $content['text_content'] ) ) {
+            $content['text_content'] = json_encode($content['text_content']);
+        }
+    }
+    return $content;
 }
 ?>

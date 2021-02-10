@@ -25,10 +25,7 @@ if ( !function_exists( 'Nimble\sek_print_text_heading_content' ) ) {
             // Feb 2021 : now saved as a json to fix emojis issues
             // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
             // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
-            $maybe_json_content = json_decode( $heading_content );
-            if ( $maybe_json_content != FALSE ) {
-                $heading_content = $maybe_json_content;
-            }
+            $heading_content = sek_maybe_decode_json($heading_content);
 
             $heading_content = apply_filters( 'the_nimble_tinymce_module_content', $heading_content );
             $heading_content = sek_strip_script_tags($heading_content);
@@ -71,11 +68,15 @@ if ( !function_exists( 'Nimble\sek_get_heading_module_link') ) {
 // print the module content if not empty
 if ( array_key_exists('heading_text', $value ) ) {
     $tag = empty( $value[ 'heading_tag' ] ) ? 'h1' : $value[ 'heading_tag' ];
+    // Feb 2021 : now saved as a json to fix emojis issues
+    // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
+    // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
+    $heading_title = sek_maybe_decode_json( empty( $value['heading_title'] ) ? '' : $value['heading_title'] );
     if ( false === sek_booleanize_checkbox_val( $value['link-to'] ) ) {
         printf( '<%1$s %3$s class="sek-heading">%2$s</%1$s>',
             $tag,
             sek_print_text_heading_content( $value['heading_text'], 'heading_text', $model ),
-            !empty( $value['heading_title'] ) ? 'title="' . esc_html( $value['heading_title'] ) . '"' : ''
+            !empty( $heading_title ) ? 'title="' . esc_html( $heading_title ) . '"' : ''
         );
     } else {
         printf( '<%1$s %3$s class="sek-heading">%2$s</%1$s>',
@@ -85,7 +86,7 @@ if ( array_key_exists('heading_text', $value ) ) {
                 true === sek_booleanize_checkbox_val( $value['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
                 sek_print_text_heading_content( $value['heading_text'], 'heading_text', $model )
             ),
-            !empty( $value['heading_title'] ) ? 'title="' . esc_html( $value['heading_title'] ) . '"' : ''
+            !empty( $heading_title ) ? 'title="' . esc_html( $heading_title ) . '"' : ''
         );
     }
 

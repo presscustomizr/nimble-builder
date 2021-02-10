@@ -18,7 +18,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
                 'content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
             )
         ),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        'sanitize_callback' => '\Nimble\sek_sanitize_czr_tiny_mce_editor_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array(
             // this list is limited to the most commonly used tags in the editor.
@@ -33,7 +33,21 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
     );
 }
 
-
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
+function sek_sanitize_czr_tiny_mce_editor_module( $content ) {
+    if ( is_array($content) && is_array($content['main_settings']) ) {
+        $editor_content = !empty($content['main_settings']['content']) ? $content['main_settings']['content'] : '';
+        if ( !sek_is_json( $editor_content ) ) {
+            $content['main_settings']['content'] = json_encode($editor_content);
+        }
+    }
+    //sek_error_log( 'ALORS MODULE CONTENT ?', $content );
+    return $content;
+}
 
 /* ------------------------------------------------------------------------- *
  *  TEXT EDITOR CONTENT CHILD

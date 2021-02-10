@@ -65,6 +65,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
 
         // Uses the sanitize_callback function specified on module registration if any
+        // Recursively loop on the local or global main NB collection and fire the sanitize callback
         function sanitize_callback( $setting_data, $setting_instance ) {
             if ( !is_array( $setting_data ) ) {
                 return $setting_data;
@@ -84,7 +85,6 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     }
                 }
             }
-
             //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_doma' ), $setting_data );
             return $setting_data;
         }

@@ -27,14 +27,6 @@ function sek_get_module_params_for_czr_heading_module() {
     );
 }
 
-// convert into a json to prevent emoji breaking global json data structure
-// fix for https://github.com/presscustomizr/nimble-builder/issues/544
-function sek_sanitize_czr_heading_module( $content ) {
-    if ( is_array($content) && !empty($content['main_settings']) && !empty($content['main_settings']['heading_text']) ) {
-        $content['main_settings']['heading_text'] = json_encode($content['main_settings']['heading_text']);
-    }
-    return $content;
-}
 
 /* ------------------------------------------------------------------------- *
  *  TEXT EDITOR CONTENT CHILD
@@ -115,6 +107,26 @@ function sek_get_module_params_for_czr_heading_child() {
         'render_tmpl_path' =>'',
     );
 }
+
+
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
+function sek_sanitize_czr_heading_module( $content ) {
+    if ( is_array($content) && is_array($content['main_settings']) ) {
+        // main heading text
+        if ( !empty($content['main_settings']['heading_text']) && !sek_is_json( $content['main_settings']['heading_text'] ) ) {
+            $content['main_settings']['heading_text'] = json_encode($content['main_settings']['heading_text']);
+        }
+        if ( !empty($content['main_settings']['heading_title']) && !sek_is_json( $content['main_settings']['heading_title'] ) ) {
+            $content['main_settings']['heading_title'] = json_encode($content['main_settings']['heading_title']);
+        }
+    }
+    return $content;
+}
+
 
 
 /* ------------------------------------------------------------------------- *
