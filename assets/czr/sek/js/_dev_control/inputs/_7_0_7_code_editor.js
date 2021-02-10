@@ -124,7 +124,7 @@
                               // e.g. bad ui (bad inline CSS maths), not visible content until click.
                               // When the code_editor input is rendered in an accordion control ( @see CZRSeksPrototype.scheduleModuleAccordion ), we need to defer the instantiation when the control has been expanded.
                               // fixes @see https://github.com/presscustomizr/nimble-builder/issues/176
-                              input.module.control.container.on('sek-accordion-expanded', function() {
+                              input.module.control.container.first().one('sek-accordion-expanded', function() {
                                     _doInstantiate.call( input );
                               });
                         }).fail( function(er) {
