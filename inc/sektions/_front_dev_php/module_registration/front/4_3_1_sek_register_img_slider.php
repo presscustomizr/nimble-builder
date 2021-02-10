@@ -21,7 +21,7 @@ function sek_get_module_params_for_czr_img_slider_module() {
                 array( 'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png' )
             )
         ),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        'sanitize_callback' => '\Nimble\sanitize_cb__czr_img_slider_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '[data-sek-swiper-id]' ),//array( '.sek-icon i' ),
         'render_tmpl_path' => "img_slider_tmpl.php",
@@ -34,6 +34,25 @@ function sek_get_module_params_for_czr_img_slider_module() {
         //       )
         // )
     );
+}
+
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
+function sanitize_cb__czr_img_slider_module( $value ) {
+    if ( !is_array( $value ) )
+        return $value;
+
+    if ( !empty($value['img_collection']) && is_array( $value['img_collection'] ) ) {
+        foreach( $value['img_collection'] as $key => $data ) {
+            if ( array_key_exists( 'text_content', $data ) && is_string( $data['text_content'] ) ) {
+                $value['img_collection'][$key]['text_content'] = sek_maybe_encode_json( $data['text_content'] );
+            }
+        }
+    }
+    return $value;
 }
 
 

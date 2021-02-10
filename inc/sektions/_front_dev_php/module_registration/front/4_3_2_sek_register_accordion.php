@@ -21,7 +21,7 @@ function sek_get_module_params_for_czr_accordion_module() {
                 array('text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.')
             )
         ),
-        // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
+        'sanitize_callback' => '\Nimble\sanitize_cb__czr_accordion_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'css_selectors' => array( '[data-sek-accordion-id]' ),//array( '.sek-icon i' ),
         'render_tmpl_path' => "accordion_tmpl.php",
@@ -36,6 +36,26 @@ function sek_get_module_params_for_czr_accordion_module() {
     );
 }
 
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
+function sanitize_cb__czr_accordion_module( $value ) {
+    if ( !is_array( $value ) )
+        return $value;
+    if ( !empty($value['accord_collec']) && is_array( $value['accord_collec'] ) ) {
+        foreach( $value['accord_collec'] as $key => $data ) {
+            if ( array_key_exists( 'text_content', $data ) && is_string( $data['text_content'] ) ) {
+                $value['accord_collec'][$key]['text_content'] = sek_maybe_encode_json( $data['text_content'] );
+            }
+            if ( array_key_exists( 'title_text', $data ) && is_string( $data['title_text'] ) ) {
+                $value['accord_collec'][$key]['title_text'] = sek_maybe_encode_json( $data['title_text'] );
+            }
+        }
+    }
+    return $value;
+}
 
 /* ------------------------------------------------------------------------- *
  *  MAIN SETTINGS

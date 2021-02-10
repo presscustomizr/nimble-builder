@@ -27,36 +27,41 @@ if ( !function_exists( 'Nimble\sek_print_accordion' ) ) {
             $title_border_width > 0 ? "true" : "false"
           ); ?>
           <?php if ( is_array( $accord_collec ) && count( $accord_collec ) > 0 ) : ?>
-              <?php
-              $ind = 1;
-              foreach( $accord_collec as $key => $item ) {
-                  $title = !empty( $item['title_text'] ) ? $item['title_text'] : sprintf( '%s %s', __('Accordion title', 'text_dom'), '#' . $ind );
-                  $item_html_content = $item['text_content'];
-                  if ( !skp_is_customizing() ) {
-                      $item_html_content = apply_filters( 'nimble_parse_for_smart_load', $item_html_content );
-                  }
+            <?php
+                $ind = 1;
+                foreach( $accord_collec as $key => $item ) {
+                    $title = !empty( $item['title_text'] ) ? $item['title_text'] : sprintf( '%s %s', __('Accordion title', 'text_dom'), '#' . $ind );
+                    $item_html_content = $item['text_content'];
+                    // convert into a json to prevent emoji breaking global json data structure
+                    // fix for https://github.com/presscustomizr/nimble-builder/issues/544
+                    $title = sek_maybe_decode_json($title);
+                    $item_html_content = sek_maybe_decode_json($item_html_content);
 
-                  // added may 2020 related to https://github.com/presscustomizr/nimble-builder/issues/688
-                  $item_html_content = sek_strip_script_tags( $item_html_content );
+                    if ( !skp_is_customizing() ) {
+                        $item_html_content = apply_filters( 'nimble_parse_for_smart_load', $item_html_content );
+                    }
 
-                  // Use our own content filter instead of $content = apply_filters( 'the_content', $tiny_mce_content );
-                  // because of potential third party plugins corrupting 'the_content' filter. https://github.com/presscustomizr/nimble-builder/issues/233
-                  // added may 2020 for #699
-                  // 'the_nimble_tinymce_module_content' includes parsing template tags
-                  $item_html_content = apply_filters( 'the_nimble_tinymce_module_content', $item_html_content );
+                    // added may 2020 related to https://github.com/presscustomizr/nimble-builder/issues/688
+                    $item_html_content = sek_strip_script_tags( $item_html_content );
 
-                  // Put them together
-                  $title_attr = esc_html( esc_attr( $item['title_attr'] ) );
-                  printf( '<div class="sek-accord-item" %1$s data-sek-item-id="%2$s" data-sek-expanded="%5$s"><div id="sek-tab-title-%2$s" class="sek-accord-title" role="tab" aria-controls="sek-tab-content-%2$s"><span class="sek-inner-accord-title">%3$s</span><div class="expander"><span></span><span></span></div></div><div id="sek-tab-content-%2$s" class="sek-accord-content" role="tabpanel" aria-labelledby="sek-tab-title-%2$s">%4$s</div></div>',
-                      empty($title_attr) ? '' : 'title="'. $title_attr . '"',
-                      $item['id'],
-                      $title,
-                      $item_html_content,
-                      ( 'true' === $first_expanded && 1 === $ind ) ? "true" : "false"
-                  );
-                  $ind++;
-              }//foreach
-              ?>
+                    // Use our own content filter instead of $content = apply_filters( 'the_content', $tiny_mce_content );
+                    // because of potential third party plugins corrupting 'the_content' filter. https://github.com/presscustomizr/nimble-builder/issues/233
+                    // added may 2020 for #699
+                    // 'the_nimble_tinymce_module_content' includes parsing template tags
+                    $item_html_content = apply_filters( 'the_nimble_tinymce_module_content', $item_html_content );
+
+                    // Put them together
+                    $title_attr = esc_html( esc_attr( $item['title_attr'] ) );
+                    printf( '<div class="sek-accord-item" %1$s data-sek-item-id="%2$s" data-sek-expanded="%5$s"><div id="sek-tab-title-%2$s" class="sek-accord-title" role="tab" aria-controls="sek-tab-content-%2$s"><span class="sek-inner-accord-title">%3$s</span><div class="expander"><span></span><span></span></div></div><div id="sek-tab-content-%2$s" class="sek-accord-content" role="tabpanel" aria-labelledby="sek-tab-title-%2$s">%4$s</div></div>',
+                        empty($title_attr) ? '' : 'title="'. $title_attr . '"',
+                        $item['id'],
+                        $title,
+                        $item_html_content,
+                        ( 'true' === $first_expanded && 1 === $ind ) ? "true" : "false"
+                    );
+                    $ind++;
+                }//foreach
+            ?>
           <?php endif; ?>
         </div><?php //.sek-accord-wrapper ?>
 

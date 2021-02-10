@@ -224,6 +224,11 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
                   $is_text_enabled = true === sek_booleanize_checkbox_val( $item['enable_text'] );
                   $text_content = $is_text_enabled ? $item['text_content'] : '';
                   $has_text_content = !empty( $text_content );
+
+                  // Feb 2021 : now saved as a json to fix emojis issues
+                  // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
+                  // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
+                  $text_content = sek_maybe_decode_json( $text_content );
                   $text_content = sek_strip_script_tags( $text_content );
                   $text_html = sprintf('<div class="sek-slider-text-wrapper"><div class="sek-slider-text-content">%1$s</div></div>', $text_content );
                   if ( !skp_is_customizing() ) {
