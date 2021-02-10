@@ -46,26 +46,29 @@ if ( isset( $design_settings['use_box_shadow'] ) && true === sek_booleanize_chec
 }
 
 // Print
+// Feb 2021 : now saved as a json to fix emojis issues
+// see fix for https://github.com/presscustomizr/nimble-builder/issues/544
+// to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
+$btn_text = sek_maybe_decode_json( $content_settings[ 'button_text'] );
+$icon_html = sek_get_button_module_icon( $content_settings );
+$icon_side = empty($content_settings['icon-side']) ? 'left' : $content_settings['icon-side'];
+
 if ( !isset( $content_settings['link-to'] ) || isset( $content_settings['link-to'] ) && 'no-link' === $content_settings['link-to'] )  {
-    $icon_html = sek_get_button_module_icon( $content_settings );
-    $icon_side = empty($content_settings['icon-side']) ? 'left' : $content_settings['icon-side'];
     printf('<button %5$s class="sek-btn%3$s"><span class="sek-btn-inner">%1$s<span class="sek-btn-text">%2$s</span>%4$s</span></button>',
         'left' === $icon_side ? $icon_html : '',
         // allow user to use smileys in buttons
-        sek_strip_script_tags( convert_smilies( $content_settings[ 'button_text' ] ) ),
+        sek_strip_script_tags( convert_smilies( $btn_text ) ),
         $visual_effect_class,
         'right' === $icon_side ? $icon_html : '',
         !empty($content_settings['btn_text_on_hover']) ? 'title="' . esc_html( $content_settings['btn_text_on_hover'] ) . '"' : ''
     );
 } else {
-    $icon_html = sek_get_button_module_icon( $content_settings );
-    $icon_side = empty($content_settings['icon-side']) ? 'left' : $content_settings['icon-side'];
     printf('<a %7$s class="sek-btn%5$s" href="%1$s" %2$s><span class="sek-btn-inner">%3$s<span class="sek-btn-text">%4$s</span>%6$s</span></a>',
         sek_get_button_module_link( $content_settings ),
         true === sek_booleanize_checkbox_val( $content_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
         'left' === $icon_side ? $icon_html : '',
         // allow user to use smileys in buttons
-        sek_strip_script_tags( convert_smilies( $content_settings['button_text'] ) ),
+        sek_strip_script_tags( convert_smilies( $btn_text ) ),
         $visual_effect_class,
         'right' === $icon_side ? $icon_html : '',
         !empty($content_settings['btn_text_on_hover']) ? 'title="' . esc_html( $content_settings['btn_text_on_hover'] ) . '"' : ''
