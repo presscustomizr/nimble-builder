@@ -112,12 +112,16 @@ function sek_get_module_params_for_czr_heading_child() {
 /* ------------------------------------------------------------------------- *
  *  SANITIZATION
 /* ------------------------------------------------------------------------- */
-// convert into a json to prevent emoji breaking global json data structure
-// fix for https://github.com/presscustomizr/nimble-builder/issues/544
 function sek_sanitize_czr_heading_module( $content ) {
     if ( is_array($content) && is_array($content['main_settings']) ) {
         // main heading text
         if ( !empty($content['main_settings']['heading_text']) ) {
+            // https://wordpress.org/support/article/roles-and-capabilities/#unfiltered_html
+            if ( !current_user_can( 'unfiltered_html' ) ) {
+                $value['main_settings'][ 'heading_text' ] = wp_kses_post( $content['main_settings']['heading_text'] );
+            }
+            // convert into a json to prevent emoji breaking global json data structure
+            // fix for https://github.com/presscustomizr/nimble-builder/issues/544
             $content['main_settings']['heading_text'] = sek_maybe_encode_json($content['main_settings']['heading_text']);
         }
         if ( !empty($content['main_settings']['heading_title']) ) {
@@ -126,7 +130,6 @@ function sek_sanitize_czr_heading_module( $content ) {
     }
     return $content;
 }
-
 
 
 /* ------------------------------------------------------------------------- *
@@ -158,27 +161,5 @@ function sek_get_module_params_for_czr_heading_spacing_child() {
         'render_tmpl_path' =>'',
     );
 }
-
-
-
-
-function sanitize_callback__czr_heading_module( $value ) {
-    if (  !current_user_can( 'unfiltered_html' ) && array_key_exists('main_settings', $value ) && is_array( $value['main_settings'] ) && array_key_exists('heading_text', $value['main_settings'] ) ) {
-        //sanitize heading_text
-        if ( function_exists( 'czr_heading_module_kses_text' ) ) {
-            $value['main_settings'][ 'heading_text' ] = czr_heading_module_kses_text( $value['main_settings'][ 'heading_text' ] );
-        }
-    }
-    return $value;
-    //return new \WP_Error('required' ,'heading did not pass sanitization');
-}
-
-// @see SEK_CZR_Dyn_Register::set_dyn_setting_args
-// Only the boolean true or a WP_error object will be valid returned value considered when validating
-function validate_callback__czr_heading_module( $value ) {
-    //return new \WP_Error('required' ,'heading did not pass ');
-    return true;
-}
-
 
 ?>
