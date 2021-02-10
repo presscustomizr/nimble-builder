@@ -16,6 +16,11 @@ if ( !function_exists( 'Nimble\sek_print_html_content') ) {
         if ( empty( $html_content ) ) {
             echo Nimble_Manager()->sek_get_input_placeholder_content( 'text', 'html_content' );
         } else {
+            // Feb 2021 : now saved as a json to fix emojis issues
+            // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
+            // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
+            $html_content = sek_maybe_decode_json( $html_content );
+
             // added September 2019 when revamping presscustomizr.com
             $html_content = sek_parse_template_tags( $html_content );
 

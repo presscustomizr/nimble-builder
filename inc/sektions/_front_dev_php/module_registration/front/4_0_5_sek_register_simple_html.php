@@ -174,11 +174,17 @@ function sek_get_module_params_for_czr_simple_html_module() {
     );
 }
 
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
 function sanitize_callback__czr_simple_html_module( $value ) {
-    if ( array_key_exists( 'html_content', $value ) ) {
+    if ( array_key_exists( 'html_content', $value ) && is_string( $value[ 'html_content' ] ) ) {
         if ( !current_user_can( 'unfiltered_html' ) ) {
             $value[ 'html_content' ] = wp_kses_post( $value[ 'html_content' ] );
         }
+        // convert into a json to prevent emoji breaking global json data structure
+        // fix for https://github.com/presscustomizr/nimble-builder/issues/544
+        $value[ 'html_content' ] = sek_maybe_encode_json( $value[ 'html_content' ] );
     }
     return $value;
 }

@@ -14,7 +14,8 @@
                       item           = input.input_parent(),
                       editorSettings = false,
                       $textarea      = input.container.find( 'textarea' ),
-                      $input_title   = input.container.find( '.customize-control-title' );
+                      $input_title   = input.container.find( '.customize-control-title' ),
+                      initial_content;
                       //editor_params  = $textarea.data( 'editor-params' );
 
                   // // When using blocking notifications (type: error) the following block will append a checkbox to the
@@ -104,10 +105,18 @@
                                    $input_title.trigger('click');
                               }, 10 );
                         };
+                        // Feb 2021 : modules using this input will now be saved as a json to fix emojis issues
+                        // we've started to implement the json saved for the heading module, but all modules will progressively transition to this new format
+                        // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
+                        // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
+                        initial_content = input();
+                        if ( api.czr_sektions.isJsonString(initial_content) ) {
+                              initial_content = JSON.parse( initial_content );
+                        }
 
                         // inject the content in the code editor now
                         // @fixes the problem of {{...}} syntax being parsed by _. templating system
-                        $textarea.html( input() );
+                        $textarea.html( initial_content );
 
                         $.when( _getEditorParams() ).done( function( editorParams ) {
                               //$textarea.attr( 'data-editor-params', editorParams );
@@ -175,7 +184,15 @@
                               suspendEditorUpdate = false;
                         });
 
-                        input.editor.codemirror.setValue( input() );
+                        // Feb 2021 : modules using this input will now be saved as a json to fix emojis issues
+                        // we've started to implement the json saved for the heading module, but all modules will progressively transition to this new format
+                        // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
+                        // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
+                        initial_content = input();
+                        if ( api.czr_sektions.isJsonString(initial_content) ) {
+                              initial_content = JSON.parse( initial_content );
+                        }
+                        input.editor.codemirror.setValue( initial_content );
 
                         // Update CodeMirror when the setting is changed by another plugin.
                         /* TODO: check this */
