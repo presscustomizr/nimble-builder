@@ -39,7 +39,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
 // convert into a json to prevent emoji breaking global json data structure
 // fix for https://github.com/presscustomizr/nimble-builder/issues/544
 function sek_sanitize_czr_tiny_mce_editor_module( $content ) {
-    if ( is_array($content) && is_array($content['main_settings']) ) {
+    if ( is_array($content) && !empty($content['main_settings']) && is_array($content['main_settings']) ) {
         $editor_content = !empty($content['main_settings']['content']) ? $content['main_settings']['content'] : '';
         if ( !sek_is_json( $editor_content ) ) {
             $content['main_settings']['content'] = json_encode($editor_content);
