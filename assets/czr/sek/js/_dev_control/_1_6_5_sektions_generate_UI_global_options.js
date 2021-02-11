@@ -14,7 +14,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @return the state promise dfd
             generateUIforGlobalOptions : function( params, dfd ) {
                   var self = this,
-                      _id_ = sektionsLocalizedData.optPrefixForSektionsNotSaved + sektionsLocalizedData.optNameForGlobalOptions;
+                      _id_ = sektionsLocalizedData.prefixForSettingsNotSaved + sektionsLocalizedData.optNameForGlobalOptions;
 
                   // Is the UI currently displayed the one that is being requested ?
                   // If so, visually remind the user that a module should be dragged

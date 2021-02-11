@@ -22,7 +22,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // The content type switcher has a priority lower than the other so it's printed on top
                         // it's loaded last, because it needs to know the existence of all other
                         sek_content_type_switcher_module : {
-                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + '_sek_content_type_switcher_ui',
+                              settingControlId : sektionsLocalizedData.prefixForSettingsNotSaved + '_sek_content_type_switcher_ui',
                               module_type : 'sek_content_type_switcher_module',
                               controlLabel :  self.getRegisteredModuleProperty( 'sek_content_type_switcher_module', 'name' ),//sektionsLocalizedData.i18n['Select a content type'],
                               priority : 10,
@@ -30,7 +30,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //icon : '<i class="material-icons sek-level-option-icon">center_focus_weak</i>'
                         },
                         sek_module_picker_module : {
-                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + '_sek_draggable_modules_ui',
+                              settingControlId : sektionsLocalizedData.prefixForSettingsNotSaved + '_sek_draggable_modules_ui',
                               module_type : 'sek_module_picker_module',
                               controlLabel : self.getRegisteredModuleProperty( 'sek_module_picker_module', 'name' ),//sektionsLocalizedData.i18n['Pick a module'],
                               content_type : 'module',
@@ -41,7 +41,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // June 2020 for : https://github.com/presscustomizr/nimble-builder/issues/520
                         // and https://github.com/presscustomizr/nimble-builder/issues/713
                         sek_my_sections_sec_picker_module : {
-                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              settingControlId : sektionsLocalizedData.prefixForSettingsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                               module_type : 'sek_my_sections_sec_picker_module',
                               controlLabel :  self.getRegisteredModuleProperty( 'sek_my_sections_sec_picker_module', 'name' ),//sektionsLocalizedData.i18n['My sections'],
                               content_type : 'section',
@@ -68,7 +68,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         'sek_footer_sec_picker_module'
                   ], function( mod_type, key ) {
                         registrationParams[mod_type] = {
-                              settingControlId : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid() + '_sek_draggable_sections_ui',
+                              settingControlId : sektionsLocalizedData.prefixForSettingsNotSaved + self.guid() + '_sek_draggable_sections_ui',
                               module_type : mod_type,
                               controlLabel :  self.getRegisteredModuleProperty( mod_type, 'name' ),
                               content_type : 'section',

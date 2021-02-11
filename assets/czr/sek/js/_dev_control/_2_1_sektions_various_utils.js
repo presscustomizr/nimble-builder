@@ -314,13 +314,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             throw new Error( 'cloneLevel => missing level id');
                         }
                         // No collection, we've reach the end of a branch
-                        level_model.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
+                        level_model.id = sektionsLocalizedData.prefixForSettingsNotSaved + self.guid();
                         if ( ! _.isEmpty( level_model.collection ) ) {
                               if ( ! _.isArray( level_model.collection ) ) {
                                     throw new Error( 'cloneLevel => the collection must be an array for level id : ' + level_model.id );
                               }
                               _.each( level_model.collection, function( levelData ) {
-                                    levelData.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
+                                    levelData.id = sektionsLocalizedData.prefixForSettingsNotSaved + self.guid();
                                     newIdWalker( levelData );
                               });
                         }
@@ -420,13 +420,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //
             // // additional checkes
             // - the item does not have a level property <= makes sure we don't regenerate ids of level
-            // - the id does not start with __nimble__ ( sektionsLocalizedData.optPrefixForSektionsNotSaved ), which is the characteristic of a level
+            // - the id does not start with __nimble__ ( sektionsLocalizedData.prefixForSettingsNotSaved ), which is the characteristic of a level
             maybeGenerateNewItemIdsForCrudModules : function( data ) {
                   var self = this;
                   if ( _.isArray( data ) || _.isObject( data ) ) {
                         _.each( data, function( value ) {
                               if ( _.isArray( data ) && _.isObject( value ) && value.id && !_.has( value, 'level') ) {
-                                    if ( -1 === value.id.indexOf(sektionsLocalizedData.optPrefixForSektionsNotSaved) ) {
+                                    if ( -1 === value.id.indexOf(sektionsLocalizedData.prefixForSettingsNotSaved) ) {
                                           value.id = self.guid();
                                     }
                               } else {

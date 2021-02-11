@@ -31,7 +31,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         uiParams = {};
                                         apiParams = {
                                               action : 'sek-add-section',
-                                              id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                              id : sektionsLocalizedData.prefixForSettingsNotSaved + self.guid(),
                                               location : params.location,
                                               in_sektion : params.in_sektion,
                                               in_column : params.in_column,
@@ -66,7 +66,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         sendToPreview = true;
                                         uiParams = {};
                                         apiParams = {
-                                              id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                              id : sektionsLocalizedData.prefixForSettingsNotSaved + self.guid(),
                                               action : 'sek-add-column',
                                               in_sektion : params.in_sektion,
                                               autofocus : params.autofocus
@@ -87,7 +87,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         sendToPreview = true;
                                         uiParams = {};
                                         apiParams = {
-                                              id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                              id : sektionsLocalizedData.prefixForSettingsNotSaved + self.guid(),
                                               action : 'sek-add-module',
                                               in_sektion : params.in_sektion,
                                               in_column : params.in_column,
@@ -455,11 +455,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         uiParams = {};
                                         apiParams = params;
                                         apiParams.action = 'sek-add-content-in-new-sektion';
-                                        apiParams.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
+                                        apiParams.id = sektionsLocalizedData.prefixForSettingsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
                                         switch( params.content_type) {
                                               // When a module is dropped in a section + column structure to be generated
                                               case 'module' :
-                                                    apiParams.droppedModuleId = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
+                                                    apiParams.droppedModuleId = sektionsLocalizedData.prefixForSettingsNotSaved + self.guid();//we set the id here because it will be needed when ajaxing
                                               break;
 
                                               // When a preset section is dropped

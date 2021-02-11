@@ -431,7 +431,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // ID's
                               // the level's id have to be generated
                               // 1) root level
-                              userSectionCandidate.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
+                              userSectionCandidate.id = sektionsLocalizedData.prefixForSettingsNotSaved + self.guid();
                               // 2) children levels
                               userSectionCandidate.collection = self.setPresetOrUserSectionIds( userSectionCandidate.collection );
 
@@ -494,7 +494,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Only collection set as arrays hold columns or modules
                   if ( _.isArray( collection ) ) {
                         _.each( collection, function( levelData ) {
-                              levelData.id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
+                              levelData.id = sektionsLocalizedData.prefixForSettingsNotSaved + self.guid();
                               if ( _.isArray( levelData.collection ) ) {
                                     self.setPresetOrUserSectionIds( levelData.collection );
                               }

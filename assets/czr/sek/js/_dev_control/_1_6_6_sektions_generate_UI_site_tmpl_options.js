@@ -15,7 +15,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             generateUIforSiteTmplOptions : function( params, dfd ) {
                   var self = this,
                         // only the site_template option will be saved ( see php constant NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ) not the setting used to populate it
-                      _id_ = sektionsLocalizedData.optPrefixForSektionsNotSaved + sektionsLocalizedData.optNameForSiteTmplOptions;//__nimble__ + __site_templates__
+                      _id_ = sektionsLocalizedData.prefixForSettingsNotSaved + sektionsLocalizedData.optNameForSiteTmplOptions;//__nimble__ + __site_templates__
 
                   // Is the UI currently displayed the one that is being requested ?
                   // If so, visually remind the user that a module should be dragged

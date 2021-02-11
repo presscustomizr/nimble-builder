@@ -356,7 +356,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // double check on both the key and the value
                               // also re-generates new ids when the export has been done without replacing the ids by '__rep__me__'
                               if ( 'id' === _k && _.isString( _v ) && ( 0 === _v.indexOf( '__rep__me__' ) || 0 === _v.indexOf( '__nimble__' ) ) ) {
-                                    _data[_k] = sektionsLocalizedData.optPrefixForSektionsNotSaved + api.czr_sektions.guid();
+                                    _data[_k] = sektionsLocalizedData.prefixForSettingsNotSaved + api.czr_sektions.guid();
                               }
                         });
                   }

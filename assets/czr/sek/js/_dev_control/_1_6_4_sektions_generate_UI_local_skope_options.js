@@ -8,7 +8,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.errare( 'czr_sektions::getLocalSkopeOptionId => empty skope_id ');
                         return '';
                   }
-                  return sektionsLocalizedData.optPrefixForSektionsNotSaved + skope_id + '__localSkopeOptions';
+                  return sektionsLocalizedData.prefixForSettingsNotSaved + skope_id + '__localSkopeOptions';
             },
             // @params = {
             //    action : 'sek-generate-module-ui' / 'sek-generate-level-options-ui'

@@ -58,7 +58,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     id : params.id,
                                     level : 'section',
                                     collection : [{
-                                          id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                          id : sektionsLocalizedData.prefixForSettingsNotSaved + self.guid(),
                                           level : 'column',
                                           collection : [],
                                           ver_ini : sektionsLocalizedData.nimbleVersion
@@ -91,7 +91,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     id : params.id,
                                     level : 'section',
                                     collection : [{
-                                          id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                          id : sektionsLocalizedData.prefixForSettingsNotSaved + self.guid(),
                                           level : 'column',
                                           collection : [],
                                           ver_ini : sektionsLocalizedData.nimbleVersion

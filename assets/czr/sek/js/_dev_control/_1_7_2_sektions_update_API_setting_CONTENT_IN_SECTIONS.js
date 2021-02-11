@@ -58,7 +58,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     level : 'section',
                                     collection : [
                                           {
-                                                id : sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid(),
+                                                id : sektionsLocalizedData.prefixForSettingsNotSaved + self.guid(),
                                                 level : 'column',
                                                 collection : [
                                                       {
@@ -101,7 +101,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // The following param "collection_of_preset_section_id" has been introduced when implementing support for multi-section pre-build sections
                                     // @see https://github.com/presscustomizr/nimble-builder/issues/489
                                     // It is sent to the preview with ::reactToPreviewMsg, see bottom of the method.
-                                    var injected_section_id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
+                                    var injected_section_id = sektionsLocalizedData.prefixForSettingsNotSaved + self.guid();
                                     params.collection_of_preset_section_id = params.collection_of_preset_section_id || [];
                                     params.collection_of_preset_section_id.push( injected_section_id );
 
@@ -275,7 +275,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // The following param "collection_of_preset_section_id" has been introduced when implementing support for multi-section pre-build sections
                                           // @see https://github.com/presscustomizr/nimble-builder/issues/489
                                           // It is sent to the preview with ::reactToPreviewMsg, see bottom of the method.
-                                          var injected_section_id = sektionsLocalizedData.optPrefixForSektionsNotSaved + self.guid();
+                                          var injected_section_id = sektionsLocalizedData.prefixForSettingsNotSaved + self.guid();
                                           params.collection_of_preset_section_id = params.collection_of_preset_section_id || [];
                                           params.collection_of_preset_section_id.push( injected_section_id );
 

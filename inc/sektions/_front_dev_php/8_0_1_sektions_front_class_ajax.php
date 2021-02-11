@@ -107,7 +107,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                 $exported_setting_validities = array();
                 foreach( $raw_exported_setting_validities as $setting_id => $validity ) {
                     // don't consider the not Nimble UI settings, not starting with __nimble__
-                    if ( false === strpos( $setting_id , NIMBLE_OPT_PREFIX_FOR_LEVEL_UI ) )
+                    if ( false === strpos( $setting_id , NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED ) )
                       continue;
                     $exported_setting_validities[ $setting_id ] = $validity;
                 }

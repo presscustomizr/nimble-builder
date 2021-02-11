@@ -44,7 +44,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     'sanitize_callback' => 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ? array( $this, 'sektion_collection_sanitize_cb' ) : null
                     //'validate_callback'    => array( $this, 'validate_callback' )
                 );
-            } else if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_LEVEL_UI ) ) {
+            } else if ( 0 === strpos( $setting_id, NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED ) ) {
                 //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',

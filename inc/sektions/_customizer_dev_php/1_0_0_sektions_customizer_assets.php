@@ -136,7 +136,7 @@ function sek_enqueue_controls_js_css() {
                 'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'nimble___'
                 'optNameForGlobalOptions' => NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS,//'nimble___'
                 'optNameForSiteTmplOptions' => NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS,// __site_templates__
-                'optPrefixForSektionsNotSaved' => NIMBLE_OPT_PREFIX_FOR_LEVEL_UI,//"__nimble__"
+                'prefixForSettingsNotSaved' => NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED,//"__nimble__"
 
                 'globalOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ),// '__nimble_options__'
                 'siteTmplOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ),// '__site_templates__
