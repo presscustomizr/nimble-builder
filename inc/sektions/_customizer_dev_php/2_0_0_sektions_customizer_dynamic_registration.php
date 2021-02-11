@@ -48,7 +48,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                 //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',
-                    'type' => '_nimble_ui_',//won't be saved as is,
+                        'type' => '_nimble_ui_',//won't be saved as is,
                     'default' => array(),
                     //'sanitize_callback' => array( $this, 'sanitize_callback' ),
                     //'validate_callback' => array( $this, 'validate_callback' )
@@ -86,7 +86,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                         }
                     } else {
                         foreach( $setting_data as $k => $data ) {
-                            $setting_data[$k] = $this->sanitize_callback($data, $setting_instance);
+                            $setting_data[$k] = $this->sektion_collection_sanitize_cb($data, $setting_instance);
                         }
                     }
                 }
