@@ -56,7 +56,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( ! api.has( optionData.settingControlId ) ) {
                                     var doUpdate = function( to, from, args ) {
                                           try { self.updateAPISettingAndExecutePreviewActions({
-                                                isGlobalOptions : true,//<= indicates that we won't update the local skope setting id
+                                                isSiteTemplateOptions : true,//<= indicates that we won't update the local skope setting id
                                                 defaultPreviewAction : 'refresh_preview',
                                                 uiParams : params,
                                                 options_type : optionType,

@@ -19,8 +19,9 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'home' => array(
                     'input_type'  => 'simpleselect',
                     'title'       => __('Template for home', 'text_doma'),
-                    'default'     => 'inherit',
+                    'default'     => '_no_site_tmpl_',
                     'choices'     => [
+                        '_no_site_tmpl_' => 'Default theme template',
                         'nb_tmpl_home-page-template' => 'Home page template',
                         'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
                     ],
@@ -32,8 +33,9 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'pages' => array(
                     'input_type'  => 'simpleselect',
                     'title'       => __('Template for pages', 'text_doma'),
-                    'default'     => 'inherit',
+                    'default'     => '_no_site_tmpl_',
                     'choices'     => [
+                        '_no_site_tmpl_' => 'Default theme template',
                         'nb_tmpl_home-page-template' => 'Home page template',
                         'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
                     ],
@@ -45,8 +47,12 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'posts' => array(
                     'input_type'  => 'simpleselect',
                     'title'       => __('Template for posts', 'text_doma'),
-                    'default'     => 'inherit',
-                    'choices'     => [],
+                    'default'     => '_no_site_tmpl_',
+                    'choices'     => [
+                        '_no_site_tmpl_' => 'Default theme template',
+                        'nb_tmpl_home-page-template' => 'Home page template',
+                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
+                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -55,8 +61,12 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'categories' => array(
                     'input_type'  => 'simpleselect',
                     'title'       => __('Template for categories', 'text_doma'),
-                    'default'     => 'inherit',
-                    'choices'     => [],
+                    'default'     => '_no_site_tmpl_',
+                    'choices'     => [
+                        '_no_site_tmpl_' => 'Default theme template',
+                        'nb_tmpl_home-page-template' => 'Home page template',
+                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
+                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -65,8 +75,12 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'tags' => array(
                     'input_type'  => 'simpleselect',
                     'title'       => __('Template for tags', 'text_doma'),
-                    'default'     => 'inherit',
-                    'choices'     => [],
+                    'default'     => '_no_site_tmpl_',
+                    'choices'     => [
+                        '_no_site_tmpl_' => 'Default theme template',
+                        'nb_tmpl_home-page-template' => 'Home page template',
+                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
+                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -75,8 +89,12 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'authors' => array(
                     'input_type'  => 'simpleselect',
                     'title'       => __('Template for authors', 'text_doma'),
-                    'default'     => 'inherit',
-                    'choices'     => [],
+                    'default'     => '_no_site_tmpl_',
+                    'choices'     => [
+                        '_no_site_tmpl_' => 'Default theme template',
+                        'nb_tmpl_home-page-template' => 'Home page template',
+                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
+                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -85,8 +103,12 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'search' => array(
                     'input_type'  => 'simpleselect',
                     'title'       => __('Template for search page', 'text_doma'),
-                    'default'     => 'inherit',
-                    'choices'     => [],
+                    'default'     => '_no_site_tmpl_',
+                    'choices'     => [
+                        '_no_site_tmpl_' => 'Default theme template',
+                        'nb_tmpl_home-page-template' => 'Home page template',
+                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
+                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -95,8 +117,12 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 '404' => array(
                     'input_type'  => 'simpleselect',
                     'title'       => __('Template for 404 error page', 'text_doma'),
-                    'default'     => 'inherit',
-                    'choices'     => [],
+                    'default'     => '_no_site_tmpl_',
+                    'choices'     => [
+                        '_no_site_tmpl_' => 'Default theme template',
+                        'nb_tmpl_home-page-template' => 'Home page template',
+                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
+                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,

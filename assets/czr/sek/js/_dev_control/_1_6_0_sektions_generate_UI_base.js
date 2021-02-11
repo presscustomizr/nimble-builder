@@ -222,7 +222,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   var _doUpdateWithRequestedAction = function() {
-                        // GLOBAL OPTIONS CASE => SITE WIDE => WRITING IN A SPECIFIC OPTION, SEPARATE FROM THE SEKTION
+                        // GLOBAL OPTIONS CASE => SITE WIDE => WRITING IN A SPECIFIC OPTION, SEPARATE FROM THE SEKTION COLLECTION
                         if ( true === params.isGlobalOptions ) {
                               if ( _.isEmpty( params.options_type ) ) {
                                     api.errare( 'updateAPISettingAndExecutePreviewActions => error when updating the global options => missing options_type');
@@ -272,6 +272,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
                                           location_skope_id : sektionsLocalizedData.globalSkopeId
                                     });
+                              }
+                        } else if ( true === params.isSiteTemplateOptions ) {
+                              // SITE TEMPLATES OPTIONS CASE => SITE WIDE => WRITING IN A SPECIFIC OPTION, SEPARATE FROM THE SEKTION COLLECTION
+                              if ( _.isEmpty( params.options_type ) ) {
+                                    api.errare( 'updateAPISettingAndExecutePreviewActions => error when updating the site template options => missing options_type');
+                                    return;
+                              }
+                              //api( sektionsLocalizedData.optNameForSiteTmplOptions )() is registered on ::initialize();
+                              var rawSiteTmplOpts = api( sektionsLocalizedData.optNameForSiteTmplOptions )(),
+                                  cloneSiteTmplOpts = $.extend( true, {}, _.isObject( rawSiteTmplOpts ) ? rawSiteTmplOpts : {} ),
+                                  _valCandidate = {};
+
+                              // consider only the non empty settings for db
+                              // booleans should bypass this check
+                              _.each( moduleValueCandidate || {}, function( _val_, _key_ ) {
+                                    // Note : _.isEmpty( 5 ) returns true when checking an integer,
+                                    // that's why we need to cast the _val_ to a string when using _.isEmpty()
+                                    if ( !_.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
+                                      return;
+                                    _valCandidate[ _key_ ] = _val_;
+                              });
+
+                              cloneSiteTmplOpts[ params.options_type ] = _valCandidate;
+
+                              // Set it
+                              api( sektionsLocalizedData.optNameForSiteTmplOptions )( cloneSiteTmplOpts );
+
+                              // REFRESH THE PREVIEW ?
+                              if ( false !== refresh_preview ) {
+                                    api.previewer.refresh();
                               }
                         } else {
                               // LEVEL OPTION CASE => LOCAL

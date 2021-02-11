@@ -726,7 +726,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
 
                                     // Schedule the accordion behaviour
-                                    self.scheduleModuleAccordion.call( _section_ );
+                                    self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
                               });
                         });
                   }//isSiteTemplateEnabled

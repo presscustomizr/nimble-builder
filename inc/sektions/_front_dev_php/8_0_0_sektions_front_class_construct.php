@@ -153,7 +153,10 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
           'sek_global_revisions',
           'sek_global_reset',
           'sek_global_imp_exp',
-          'sek_global_beta_features'
+          'sek_global_beta_features',
+
+          // site template options module
+          'sek_site_tmpl_pickers'
         ];
 
         // Is merged with front module when sek_is_header_footer_enabled() === true
