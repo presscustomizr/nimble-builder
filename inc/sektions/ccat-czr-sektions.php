@@ -135,9 +135,11 @@ function sek_enqueue_controls_js_css() {
 
                 'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'nimble___'
                 'optNameForGlobalOptions' => NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS,//'nimble___'
-                'optPrefixForSektionsNotSaved' => NIMBLE_OPT_PREFIX_FOR_LEVEL_UI,//"__nimble__"
+                'optNameForSiteTmplOptions' => NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS,// __site_templates__
+                'prefixForSettingsNotSaved' => NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED,//"__nimble__"
 
                 'globalOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ),// '__nimble_options__'
+                'siteTmplOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ),// '__site_templates__
 
                 'defaultLocationModel' => Nimble_Manager()->default_location_model,
                 'defaultLocalSektionSettingValue' => sek_get_default_location_model(),
@@ -174,6 +176,7 @@ function sek_enqueue_controls_js_css() {
 
                 'globalOptionsMap' => SEK_Front_Construct::$global_options_map,
                 'localOptionsMap' => SEK_Front_Construct::$local_options_map,
+                'siteTmplOptionsMap' => SEK_Front_Construct::$site_tmpl_options_map,
 
                 'registeredLocations' => sek_get_locations(),
                 // added for the module tree #359
@@ -214,7 +217,10 @@ function sek_enqueue_controls_js_css() {
                 'useAPItemplates' => defined('NIMBLE_USE_API_TMPL') && NIMBLE_USE_API_TMPL,
                 // Dec 2020
                 // When developing locally, allow a local template api request
-                'templateAPIUrl' => NIMBLE_DATA_API_URL_V2
+                'templateAPIUrl' => NIMBLE_DATA_API_URL_V2,
+
+                // Feb 2021, for #478
+                'isSiteTemplateEnabled' => sek_is_site_tmpl_enabled()
             )
         )
     );//wp_localize_script()
@@ -559,10 +565,9 @@ function nimble_add_i18n_localized_control_params( $params ) {
             // DEPRECATED
             'Options for the sections of the current page' => __( 'Options for the sections of the current page', 'text_doma'),
             'General options applied for the sections site wide' => __( 'General options applied for the sections site wide', 'text_doma'),
-            //
 
             'Site wide options' => __( 'Site wide options', 'text_doma'),
-
+            'Site templates' => __('Site templates', 'text_doma'),
 
             // Levels
             'location' => __('location', 'text_doma'),
@@ -670,8 +675,21 @@ function nimble_add_i18n_localized_control_params( $params ) {
 }//'nimble_add_i18n_localized_control_params'
 
 
-
-
+// Feb 2021 added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
+function sek_prepare_seks_data_for_customizer( $seks_data ) {
+    if ( is_array( $seks_data ) ) {
+        foreach( $seks_data as $key => $data ) {
+            if ( is_array( $data ) ) {
+                $seks_data[$key] = sek_prepare_seks_data_for_customizer( $data );
+            } else {
+                if ( is_string($data) ) {
+                    $seks_data[$key] = sek_maybe_decode_json( $data );
+                }
+            }
+        }
+    }
+    return $seks_data;
+}
 
 
 
@@ -696,8 +714,13 @@ function add_sektion_values_to_skope_export( $skopes ) {
             continue;
         }
         $skope_id = 'global' === $skp_data['skope'] ? NIMBLE_GLOBAL_SKOPE_ID : skp_get_skope_id( $skp_data['skope'] );
+        $seks_data = sek_get_skoped_seks( $skope_id );
+
+        // Feb 2021 added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
+        $seks_data = sek_prepare_seks_data_for_customizer( $seks_data );
+
         $skp_data[ 'sektions' ] = array(
-            'db_values' => sek_get_skoped_seks( $skope_id ),
+            'db_values' => $seks_data,
             'setting_id' => sek_get_seks_setting_id( $skope_id )//nimble___loop_start[skp__post_page_home], nimble___custom_location_id[skp__global]
         );
         // foreach( [
@@ -2063,20 +2086,25 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         //@filter 'customize_dynamic_setting_args'
         function set_dyn_setting_args( $setting_args, $setting_id ) {
             // shall start with "nimble___" or "__nimble_options__"
-            if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) ) {
+            // those are the setting that will actually be saved in DB : 
+            // - sektion collections ( local and global skope )
+            // - global options
+            // - site template options
+            if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ) ) {
                 //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',
                     'type' => 'option',
                     'default' => array(),
-                    'sanitize_callback'    => array( $this, 'sanitize_callback' )
+                    // Only the section collections are sanitized on save
+                    'sanitize_callback' => 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ? array( $this, 'sektion_collection_sanitize_cb' ) : null
                     //'validate_callback'    => array( $this, 'validate_callback' )
                 );
-            } else if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_LEVEL_UI ) ) {
+            } else if ( 0 === strpos( $setting_id, NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED ) ) {
                 //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',
-                    'type' => '_nimble_ui_',//won't be saved as is,
+                        'type' => '_nimble_ui_',//won't be saved as is,
                     'default' => array(),
                     //'sanitize_callback' => array( $this, 'sanitize_callback' ),
                     //'validate_callback' => array( $this, 'validate_callback' )
@@ -2088,6 +2116,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
 
         //@filter 'customize_dynamic_setting_class'
+        // We use a custom setting class only for the section collections ( local and global ), not for global options and site template options
         function set_dyn_setting_class( $class, $setting_id, $args ) {
             // shall start with 'nimble___'
             if ( 0 !== strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
@@ -2099,7 +2128,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
         // Uses the sanitize_callback function specified on module registration if any
         // Recursively loop on the local or global main NB collection and fire the sanitize callback
-        function sanitize_callback( $setting_data, $setting_instance ) {
+        function sektion_collection_sanitize_cb( $setting_data, $setting_instance ) {
             if ( !is_array( $setting_data ) ) {
                 return $setting_data;
             } else {
@@ -2113,7 +2142,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                         }
                     } else {
                         foreach( $setting_data as $k => $data ) {
-                            $setting_data[$k] = $this->sanitize_callback($data, $setting_instance);
+                            $setting_data[$k] = $this->sektion_collection_sanitize_cb($data, $setting_instance);
                         }
                     }
                 }

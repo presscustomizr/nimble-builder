@@ -33,6 +33,9 @@ if ( !defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_
 if ( !defined( 'NIMBLE_GLOBAL_SKOPE_ID' ) ) { define( 'NIMBLE_GLOBAL_SKOPE_ID' , 'skp__global' ); }
 
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' , '__nimble_options__' ); }
+
+if ( !defined( 'NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS' , '__site_templates__' ); }
+
 //if ( !defined( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' , 'nimble_saved_sektions' ); } //<= June 2020 to be removed
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS' , 'nimble_most_used_fonts' ); }
 if ( !defined( 'NIMBLE_OPT_FOR_GLOBAL_CSS' ) ) { define( 'NIMBLE_OPT_FOR_GLOBAL_CSS' , 'nimble_global_css' ); }
@@ -41,7 +44,7 @@ if ( !defined( 'NIMBLE_OPT_NAME_FOR_SECTION_JSON' ) ) { define( 'NIMBLE_OPT_NAME
 
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES' ) ) { define( 'NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES' , 'nb_backward_fixes' ); }
 
-if ( !defined( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_LEVEL_UI' , '__nimble__' ); }
+if ( !defined( 'NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED' ) ) { define( 'NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED' , '__nimble__' ); }
 if ( !defined( 'NIMBLE_WIDGET_PREFIX' ) ) { define( 'NIMBLE_WIDGET_PREFIX' , 'nimble-widget-area-' ); }
 if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) { define( 'NIMBLE_ASSETS_VERSION', sek_is_dev_mode() ? time() : NIMBLE_VERSION ); }
 if ( !defined( 'NIMBLE_MODULE_ICON_PATH' ) ) { define( 'NIMBLE_MODULE_ICON_PATH' , NIMBLE_BASE_URL . '/assets/czr/sek/icons/modules/' ); }
@@ -2902,6 +2905,9 @@ function sek_maybe_decode_json( $string ){
 
   $json_decoded_candidate = json_decode($string, true);
   if ( json_last_error() == JSON_ERROR_NONE ) {
+      // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
+      // added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
+      $json_decoded_candidate = html_entity_decode($json_decoded_candidate);
       return $json_decoded_candidate;
   }
   return $string;
@@ -2913,11 +2919,21 @@ function sek_maybe_json_encode( $string ){
     return $string;
   // only encode if not already encoded
   if ( !sek_is_json($string) ) {
-    $string = json_encode($string);
+      // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
+      // added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
+      $string = htmlentities($string);//reversed with html_entity_decode
+      $string = json_encode($string);
   }
   return $string;
 }
 
+
+
+// Feb 2021 : site templates exploration
+// see https://github.com/presscustomizr/nimble-builder/issues/478
+function sek_is_site_tmpl_enabled() {
+    return defined('NIMBLE_SITE_TEMPLATES_ENABLED') && NIMBLE_SITE_TEMPLATES_ENABLED;
+}
 ?><?php
 // /* ------------------------------------------------------------------------- *
 // *  NIMBLE API

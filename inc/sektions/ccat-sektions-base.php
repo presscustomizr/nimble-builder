@@ -2157,7 +2157,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             'beta_features' => 'sek_global_beta_features'
         ];
         // option key as saved in db => module_type
-        // is used in _1_6_4_sektions_generate_UI_local_skope_options.js and when normalizing the global option in sek_normalize_global_options_with_defaults()
+        // is used in _1_6_4_sektions_generate_UI_local_skope_options.js and when normalizing the global option in sek_normalize_local_options_with_defaults()
         public static $local_options_map = [
             'template' => 'sek_local_template',
             'local_header_footer' => 'sek_local_header_footer',
@@ -2168,6 +2168,12 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             'import_export' => 'sek_local_imp_exp',
             'local_revisions' => 'sek_local_revisions'
         ];
+
+        // is used in _1_6_6_sektions_generate_UI_site_tmpl_options.js
+        public static $site_tmpl_options_map = [
+            'site_templates' => 'sek_site_tmpl_pickers'
+        ];
+
         // introduced when implementing import/export feature
         // @see https://github.com/presscustomizr/nimble-builder/issues/411
         public $img_import_errors = [];
@@ -2230,7 +2236,10 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
           'sek_global_revisions',
           'sek_global_reset',
           'sek_global_imp_exp',
-          'sek_global_beta_features'
+          'sek_global_beta_features',
+
+          // site template options module
+          'sek_site_tmpl_pickers'
         ];
 
         // Is merged with front module when sek_is_header_footer_enabled() === true
@@ -2580,7 +2589,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                 $exported_setting_validities = array();
                 foreach( $raw_exported_setting_validities as $setting_id => $validity ) {
                     // don't consider the not Nimble UI settings, not starting with __nimble__
-                    if ( false === strpos( $setting_id , NIMBLE_OPT_PREFIX_FOR_LEVEL_UI ) )
+                    if ( false === strpos( $setting_id , NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED ) )
                       continue;
                     $exported_setting_validities[ $setting_id ] = $validity;
                 }
