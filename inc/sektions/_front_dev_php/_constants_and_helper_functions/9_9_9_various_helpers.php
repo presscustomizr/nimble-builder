@@ -420,4 +420,11 @@ function sek_maybe_json_encode( $string ){
   return $string;
 }
 
+
+
+// Feb 2021 : site templates exploration
+// see https://github.com/presscustomizr/nimble-builder/issues/478
+function sek_is_site_tmpl_enabled() {
+    return defined('NIMBLE_SITE_TEMPLATES_ENABLED') && NIMBLE_SITE_TEMPLATES_ENABLED;
+}
 ?>

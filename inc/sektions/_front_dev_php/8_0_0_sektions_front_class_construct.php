@@ -74,7 +74,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             'beta_features' => 'sek_global_beta_features'
         ];
         // option key as saved in db => module_type
-        // is used in _1_6_4_sektions_generate_UI_local_skope_options.js and when normalizing the global option in sek_normalize_global_options_with_defaults()
+        // is used in _1_6_4_sektions_generate_UI_local_skope_options.js and when normalizing the global option in sek_normalize_local_options_with_defaults()
         public static $local_options_map = [
             'template' => 'sek_local_template',
             'local_header_footer' => 'sek_local_header_footer',
@@ -85,6 +85,12 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             'import_export' => 'sek_local_imp_exp',
             'local_revisions' => 'sek_local_revisions'
         ];
+
+        // is used in _1_6_6_sektions_generate_UI_site_tmpl_options.js
+        public static $site_tmpl_options_map = [
+            'site_templates' => 'sek_site_tmpl_pickers'
+        ];
+
         // introduced when implementing import/export feature
         // @see https://github.com/presscustomizr/nimble-builder/issues/411
         public $img_import_errors = [];

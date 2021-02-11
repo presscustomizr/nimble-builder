@@ -30,13 +30,18 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         //@filter 'customize_dynamic_setting_args'
         function set_dyn_setting_args( $setting_args, $setting_id ) {
             // shall start with "nimble___" or "__nimble_options__"
-            if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) ) {
+            // those are the setting that will actually be saved in DB : 
+            // - sektion collections ( local and global skope )
+            // - global options
+            // - site template options
+            if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ) ) {
                 //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',
                     'type' => 'option',
                     'default' => array(),
-                    'sanitize_callback'    => array( $this, 'sanitize_callback' )
+                    // Only the section collections are sanitized on save
+                    'sanitize_callback' => 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ? array( $this, 'sektion_collection_sanitize_cb' ) : null
                     //'validate_callback'    => array( $this, 'validate_callback' )
                 );
             } else if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_LEVEL_UI ) ) {
@@ -55,6 +60,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
 
         //@filter 'customize_dynamic_setting_class'
+        // We use a custom setting class only for the section collections ( local and global ), not for global options and site template options
         function set_dyn_setting_class( $class, $setting_id, $args ) {
             // shall start with 'nimble___'
             if ( 0 !== strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
@@ -66,7 +72,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
         // Uses the sanitize_callback function specified on module registration if any
         // Recursively loop on the local or global main NB collection and fire the sanitize callback
-        function sanitize_callback( $setting_data, $setting_instance ) {
+        function sektion_collection_sanitize_cb( $setting_data, $setting_instance ) {
             if ( !is_array( $setting_data ) ) {
                 return $setting_data;
             } else {

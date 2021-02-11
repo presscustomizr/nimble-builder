@@ -63,6 +63,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         break;
 
                         // Fired in ::initialize()
+                        case 'sek-generate-site-tmpl-options-ui' :
+                              // Clean previously generated UI elements
+                              self.cleanRegistered();
+                              try{ dfd = self.generateUIforSiteTmplOptions( params, dfd ); } catch( er ) {
+                                    api.errare( '::generateUI() => error', er );
+                                    dfd = $.Deferred();
+                              }
+                        break;
+
+                        // Fired in ::initialize()
                         case 'sek-generate-global-options-ui' :
                               // Clean previously generated UI elements
                               self.cleanRegistered();

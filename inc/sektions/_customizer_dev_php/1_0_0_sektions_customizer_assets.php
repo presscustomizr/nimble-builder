@@ -135,9 +135,11 @@ function sek_enqueue_controls_js_css() {
 
                 'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'nimble___'
                 'optNameForGlobalOptions' => NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS,//'nimble___'
+                'optNameForSiteTmplOptions' => NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS,// __site_templates__
                 'optPrefixForSektionsNotSaved' => NIMBLE_OPT_PREFIX_FOR_LEVEL_UI,//"__nimble__"
 
                 'globalOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ),// '__nimble_options__'
+                'siteTmplOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ),// '__site_templates__
 
                 'defaultLocationModel' => Nimble_Manager()->default_location_model,
                 'defaultLocalSektionSettingValue' => sek_get_default_location_model(),
@@ -174,6 +176,7 @@ function sek_enqueue_controls_js_css() {
 
                 'globalOptionsMap' => SEK_Front_Construct::$global_options_map,
                 'localOptionsMap' => SEK_Front_Construct::$local_options_map,
+                'siteTmplOptionsMap' => SEK_Front_Construct::$site_tmpl_options_map,
 
                 'registeredLocations' => sek_get_locations(),
                 // added for the module tree #359
@@ -214,7 +217,10 @@ function sek_enqueue_controls_js_css() {
                 'useAPItemplates' => defined('NIMBLE_USE_API_TMPL') && NIMBLE_USE_API_TMPL,
                 // Dec 2020
                 // When developing locally, allow a local template api request
-                'templateAPIUrl' => NIMBLE_DATA_API_URL_V2
+                'templateAPIUrl' => NIMBLE_DATA_API_URL_V2,
+
+                // Feb 2021, for #478
+                'isSiteTemplateEnabled' => sek_is_site_tmpl_enabled()
             )
         )
     );//wp_localize_script()
@@ -559,10 +565,9 @@ function nimble_add_i18n_localized_control_params( $params ) {
             // DEPRECATED
             'Options for the sections of the current page' => __( 'Options for the sections of the current page', 'text_doma'),
             'General options applied for the sections site wide' => __( 'General options applied for the sections site wide', 'text_doma'),
-            //
 
             'Site wide options' => __( 'Site wide options', 'text_doma'),
-
+            'Site templates' => __('Site templates', 'text_doma'),
 
             // Levels
             'location' => __('location', 'text_doma'),

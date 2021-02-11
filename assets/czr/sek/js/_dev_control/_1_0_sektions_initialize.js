@@ -23,6 +23,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // SECTION ID FOR THE CONTENT PICKER
                   self.SECTION_ID_FOR_CONTENT_PICKER = '__content_picker__';
 
+                  // Feb 2021 : site templates
+                  self.SECTION_ID_FOR_SITE_TMPL = '__siteTmplSection';
+
                   // Max possible number of columns in a section
                   self.MAX_NUMBER_OF_COLUMNS = 12;
 
@@ -142,10 +145,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // POPULATE THE MAIN SETTING ID NOW
                   // + GENERATE UI FOR THE LOCAL SKOPE OPTIONS
                   // + GENERATE UI FOR THE GLOBAL OPTIONS
+                  // + GENERATE UI FOR SITE TEMPLATES
                   var doSkopeDependantActions = function( newSkopes, previousSkopes ) {
                         self.setContextualCollectionSettingIdWhenSkopeSet( newSkopes, previousSkopes );
 
-                        // Generate UI for the local skope options and the global options
+                        // Generate UI for the local skope options
                         api.section( self.SECTION_ID_FOR_LOCAL_OPTIONS, function( _section_ ) {
                               _section_.deferred.embedded.done( function() {
                                     if( true === _section_.boundForLocalOptionGeneration )
@@ -159,6 +163,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                               });
                         });
+                        
+                        // Generate UI for the site templates
+                        if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
+                              api.section( self.SECTION_ID_FOR_SITE_TMPL, function( _section_ ) {
+                                    _section_.deferred.embedded.done( function() {
+                                          if( true === _section_.siteTmplOptionsGenerated )
+                                          return;
+                                          // Defer the UI generation when the section is expanded
+                                          _section_.siteTmplOptionsGenerated = true;
+                                          _section_.expanded.bind( function( expanded ) {
+                                                if ( true === expanded ) {
+                                                      self.generateUI({ action : 'sek-generate-site-tmpl-options-ui'});
+                                                }
+                                          });
+                                    });
+                              });
+                        }
+
 
                         // The UI of the global option must be generated only once.
                         // We don't want to re-generate on each skope change
@@ -169,6 +191,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.generateUI({ action : 'sek-generate-global-options-ui'});
                               _section_.nimbleGlobalOptionGenerated = true;
                         });
+                        
                         ////////////////////////////////////////////////////////////////////////////////
                         ///////////////////////////////////////////////////////////////////////////////////
                         ///////////////////////////////////////////////////////////////////////////////////
@@ -203,7 +226,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };//doSkopeDependantActions()
 
                   // populate the setting ids now if skopes are set
-                  if ( ! _.isEmpty( api.czr_activeSkopes().local ) ) {
+                  if ( !_.isEmpty( api.czr_activeSkopes().local ) ) {
                         doSkopeDependantActions();
                   }
                   // ON SKOPE READY
@@ -578,7 +601,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         constructWith : api.Section.extend({
                               //attachEvents : function () {},
                               // Always make the section active, event if we have no control in it
-                              isContextuallyActive : function () {
+                              isContextuallyActive : function() {
                                 return this.active();
                               },
                               _toggleActive : function(){ return true; }
@@ -619,6 +642,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         type : 'option'
                   });
 
+                  // SITE TEMPLATE OPTIONS SETTING
+                  // Will Be updated in ::generateUIforGlobalOptions()
+                  // has no control.
+                  api.CZR_Helpers.register( {
+                        origin : 'nimble',
+                        //level : params.level,
+                        what : 'setting',
+                        id : sektionsLocalizedData.optNameForSiteTmplOptions,
+                        dirty : false,
+                        value : sektionsLocalizedData.siteTmplOptionDBValues,
+                        transport : 'postMessage',//'refresh',//// ,
+                        type : 'option'
+                  });
 
                   // CONTENT PICKER SECTION
                   api.CZR_Helpers.register({
@@ -632,7 +668,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         constructWith : api.Section.extend({
                               //attachEvents : function () {},
                               // Always make the section active, event if we have no control in it
-                              isContextuallyActive : function () {
+                              isContextuallyActive : function() {
                                 return this.active();
                               },
                               _toggleActive : function(){ return true; }
@@ -653,6 +689,48 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                   });
+
+
+                  // Feb 2021, Site templates
+                  if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
+                        api.CZR_Helpers.register({
+                              origin : 'nimble',
+                              what : 'section',
+                              id : self.SECTION_ID_FOR_SITE_TMPL,//<= the section id doesn't need to be skope dependant. Only the control id is skope dependant.
+                              title: sektionsLocalizedData.i18n['Site templates'],
+                              panel : sektionsLocalizedData.sektionsPanelId,
+                              priority : 10,
+                              track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
+                              constructWith : api.Section.extend({
+                                    //attachEvents : function () {},
+                                    // Always make the section active, event if we have no control in it
+                                    isContextuallyActive : function() {
+                                    return this.active();
+                                    },
+                                    _toggleActive : function(){ return true; }
+                              })
+                        }).done( function() {
+                              api.section( self.SECTION_ID_FOR_SITE_TMPL, function( _section_ ) {
+                                    // Style the section title
+                                    var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
+                                    $panelTitleEl = _section_.container.find('.customize-section-title h3');
+
+                                    // The default title looks like this : Title <span class="screen-reader-text">Press return or enter to open this section</span>
+                                    if ( 0 < $sectionTitleEl.length ) {
+                                          $sectionTitleEl.prepend( '<i class="fas fa-map-marker-alt sek-level-option-icon"></i>' );
+                                    }
+
+                                    // The default title looks like this : <span class="customize-action">Customizing</span> Title
+                                    if ( 0 < $panelTitleEl.length ) {
+                                          $panelTitleEl.find('.customize-action').after( '<i class="fas fa-map-marker-alt sek-level-option-icon"></i>' );
+                                    }
+
+                                    // Schedule the accordion behaviour
+                                    self.scheduleModuleAccordion.call( _section_ );
+                              });
+                        });
+                  }//isSiteTemplateEnabled
+
             },//registerAndSetupDefaultPanelSectionOptions()
 
 
