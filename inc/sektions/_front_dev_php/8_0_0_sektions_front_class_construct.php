@@ -49,6 +49,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // store the local and global options
         public $local_options = '_not_cached_yet_';
         public $global_nimble_options = '_not_cached_yet_';
+        public $site_template_options = '_not_cached_yet_';
 
         public $img_smartload_enabled = 'not_cached';
         public $video_bg_lazyload_enabled = 'not_cached';//<= for https://github.com/presscustomizr/nimble-builder/issues/287

@@ -433,4 +433,12 @@ function sek_maybe_json_encode( $string ){
 function sek_is_site_tmpl_enabled() {
     return defined('NIMBLE_SITE_TEMPLATES_ENABLED') && NIMBLE_SITE_TEMPLATES_ENABLED;
 }
+
+// inspired from https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string-for-use-in-a-secret-l
+// equivalent of js customizer method CZRSeksPrototype::guid()
+// introduced feb 2021 for https://github.com/presscustomizr/nimble-builder/issues/478
+// used when generating id server side for a site template
+function sek_generate_level_guid() {
+    return NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED . substr( strval( md5( uniqid( rand(), true) ) ),0, 12 );//__nimble__4cdf8be5ce8f
+}
 ?>

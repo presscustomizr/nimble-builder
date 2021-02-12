@@ -7,7 +7,9 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
 
             // Print global option inline CSS
             add_action( 'wp_head', array( $this, 'sek_print_global_css' ), 1000 );
+            
         }
+
 
         // Can be fired :
         // 1) on wp_enqueue_scripts or wp_head
@@ -35,9 +37,12 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
             }
             // in a front normal context, the css is enqueued from the already written file.
             else {
-                $local_skope_id = skp_build_skope_id();
+                $local_skope_id = apply_filters( 'nb_set_skope_id_before_generating_local_front_css', skp_build_skope_id() );
+
+                //sek_error_log('alors local skope id for CSS GENERATION ?', $local_skope_id );
+
                 // LOCAL SECTIONS STYLESHEET
-                $this->_instantiate_css_handler( array( 'skope_id' => skp_build_skope_id() ) );
+                $this->_instantiate_css_handler( array( 'skope_id' => $local_skope_id ) );
                 // GLOBAL SECTIONS STYLESHEET
                 // Can hold rules for global sections and global styling
                 $this->_instantiate_css_handler( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) );
@@ -70,8 +75,8 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
                 }
             }
 
-            if ( defined( 'DOING_AJAX' ) && DOING_AJAX && empty( $skope_id ) ) {
-                sek_error_log(  __CLASS__ . '::' . __FUNCTION__ . ' =>the skope_id should not be empty' );
+            if ( defined( 'DOING_AJAX' ) && DOING_AJAX && empty( $local_skope_id ) ) {
+                sek_error_log(  __CLASS__ . '::' . __FUNCTION__ . ' => the skope_id should not be empty' );
             }
         }//print_or_enqueue_seks_style
 
@@ -183,7 +188,7 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
             if ( 'not_set' !== Nimble_Manager()->google_fonts_print_candidates )
               return Nimble_Manager()->google_fonts_print_candidates;
 
-            $local_skope_id = is_null( $local_skope_id ) ? skp_build_skope_id() : $local_skope_id;
+            $local_skope_id = is_null( $local_skope_id ) ? apply_filters( 'maybe_set_skope_id_for_site_template_css', skp_build_skope_id() ) : $local_skope_id;
             // local sections
             $local_seks = sek_get_skoped_seks( $local_skope_id );
             // global sections

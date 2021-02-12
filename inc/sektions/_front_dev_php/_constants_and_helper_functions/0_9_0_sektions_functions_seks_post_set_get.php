@@ -111,6 +111,67 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
 }
 
 
+function sek_set_ids( $collection ) {
+    if ( is_array( $collection ) ) {
+        // if ( array_key_exists('level', $collection ) && in_array( $collection['level'], ['section', 'column', 'module'] ) && array_key_exists('id', $collection ) ) {
+        //     $collection['id'] = sek_generate_level_guid();
+        // }
+        foreach( $collection as $key => $data ) {
+            if ( '__rep__me__' === $data && 'id' === $key ) {
+                $collection[$key] = sek_generate_level_guid();
+            } else if ( is_array( $data ) ) {
+                $collection[$key] = sek_set_ids($data);
+            }
+        }
+    }
+    return $collection;
+}
+
+
+// Feb 2021 => experimental for https://github.com/presscustomizr/nimble-builder/issues/478
+// filter declared in inc\sektions\_front_dev_php\_constants_and_helper_functions\0_9_0_sektions_functions_seks_post_set_get.php
+add_filter('nb_set_skope_id_before_caching_local_sektions', function( $skope_id ) {
+    if ( !defined('NIMBLE_SITE_TEMPLATES_ENABLED') || !NIMBLE_SITE_TEMPLATES_ENABLED )
+        return $skope_id;
+
+    $group_skope = skp_get_skope_id( 'group' );
+    sek_error_log('GROUP SKOPE ?' . skp_get_skope_id( 'group' ) );
+    if ( 'skp__all_page' === $group_skope ) {
+        $skope_id = $group_skope;
+        $tmpl_post_name = sek_get_site_tmpl_for_skope( $group_skope );
+        if ( !is_null($tmpl_post_name) && is_string($tmpl_post_name ) ) {
+            $current_tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
+            if ( $current_tmpl_post ) {
+                //sek_error_log( 'TEMPLATE POST ?', $current_tmpl_post );
+                $current_tmpl_data = maybe_unserialize( $current_tmpl_post->post_content );
+                if ( is_array($current_tmpl_data) && isset($current_tmpl_data['data']) && is_array($current_tmpl_data['data']) && !empty($current_tmpl_data['data']) ) {
+                    $current_tmpl_data = $current_tmpl_data['data'];
+                    //sek_error_log( 'current_tmpl_data ?', $current_tmpl_data );
+                    $current_tmpl_data = sek_set_ids( $current_tmpl_data );
+                    //sek_error_log( 'current_tmpl_data WITH IDS?', $current_tmpl_data );
+                    sek_update_sek_post( $current_tmpl_data, [ 'skope_id' => $skope_id ]);
+                }
+            }
+        }
+    }
+    return $skope_id;
+});
+
+// Feb 2021 => experimental for https://github.com/presscustomizr/nimble-builder/issues/478
+// filter declared in inc\sektions\_front_dev_php\8_4_1_sektions_front_class_render_css.php
+add_filter( 'nb_set_skope_id_before_generating_local_front_css', function( $skope_id ) {
+    if ( !defined('NIMBLE_SITE_TEMPLATES_ENABLED') || !NIMBLE_SITE_TEMPLATES_ENABLED )
+        return $skope_id;
+    
+    $group_skope = skp_get_skope_id( 'group' );
+    if ( 'skp__all_page' === $group_skope ) {
+        $skope_id = $group_skope;
+    }
+    return $skope_id;
+});
+
+
+
 /**
  * Fetch the saved collection of sektion for a given skope_id / location
  *
@@ -139,6 +200,13 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
     }
 
     if ( !$is_cached ) {
+        // Feb 2021 : filter skope id now
+        // if the current context has no local sektions set and a site template set, replace the skope id by the group skope id
+        if ( !$is_global_skope ) {
+            $skope_id = apply_filters( 'nb_set_skope_id_before_caching_local_sektions', $skope_id );
+            //sek_error_log('alors local skope id for fetching local sections ?', $skope_id );
+        }
+
         $seks_data = array();
         $post = sek_get_seks_post( $skope_id, $is_global_skope ? 'global' : 'local' );
         if ( $post ) {
@@ -152,20 +220,6 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         $seks_data = wp_parse_args( $seks_data, $default_collection );
         // Maybe add missing registered locations
         $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
-        
-        // EXPERIMENTAL
-        // Feb 2021 : for https://github.com/presscustomizr/nimble-builder/issues/478
-        if ( !$is_global_skope && defined('NIMBLE_USE_GROUP_TMPL') &&  NIMBLE_USE_GROUP_TMPL ) {
-            sek_error_log('SOOO ? seks_data for skope_id => ' . $skope_id, 'is page ? '. is_page() );
-            $post = sek_get_saved_tmpl_post( 'nb_tmpl_nimble-template-loop-start-only' );
-            if ( $post ) {
-                $new_seks_data = maybe_unserialize( $post->post_content );
-            }
-            // sek_error_log('CURRENT SEKS DATA ?', $seks_data );
-            // sek_error_log('NEW SEKS DATA ?', $new_seks_data );
-            $seks_data = $new_seks_data['data'];
-            $seks_data = is_array( $seks_data ) ? $seks_data : array(); 
-        }
 
         // cache now 
         if ( $is_global_skope ) {
@@ -224,6 +278,10 @@ function sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope ) {
 
 
 
+
+
+
+
 /**
  * Update the `nimble_post_type` post for a given "{$skope_id}"
  * Inserts a `nimble_post_type` post when one doesn't yet exist.
@@ -250,6 +308,9 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
     }
 
     $post_title = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+
+    //sek_error_log('IN UPDATE SEK_POST ?', $seks_data );
+
 
     $post_data = array(
         'post_title' => $post_title,
