@@ -135,11 +135,11 @@ function sek_enqueue_controls_js_css() {
 
                 'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'nimble___'
                 'optNameForGlobalOptions' => NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS,//'nimble___'
-                'optNameForSiteTmplOptions' => NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS,// __site_templates__
+                'optNameForSiteTmplOptions' => NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS,// nimble_site_templates
                 'prefixForSettingsNotSaved' => NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED,//"__nimble__"
 
                 'globalOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ),// '__nimble_options__'
-                'siteTmplOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ),// '__site_templates__
+                'siteTmplOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ),// 'nimble_site_templates
 
                 'defaultLocationModel' => Nimble_Manager()->default_location_model,
                 'defaultLocalSektionSettingValue' => sek_get_default_location_model(),

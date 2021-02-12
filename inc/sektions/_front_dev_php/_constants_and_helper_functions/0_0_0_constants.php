@@ -34,7 +34,7 @@ if ( !defined( 'NIMBLE_GLOBAL_SKOPE_ID' ) ) { define( 'NIMBLE_GLOBAL_SKOPE_ID' ,
 
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' , '__nimble_options__' ); }
 
-if ( !defined( 'NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS' , '__site_templates__' ); }
+if ( !defined( 'NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS' , 'nimble_site_templates' ); }
 
 //if ( !defined( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SAVED_SEKTIONS' , 'nimble_saved_sektions' ); } //<= June 2020 to be removed
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS' , 'nimble_most_used_fonts' ); }
