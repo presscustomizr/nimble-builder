@@ -93,7 +93,7 @@ function sek_get_level_skope_id( $level_id = '' ) {
         return $level_skope_id;
     }
 
-    $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
+    $local_skope_settings = sek_get_skoped_seks( $level_skope_id );
     $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
     // if the level id has not been found in the local sections, we know it's a global level.
     // In dev mode, always make sure that the level id is found in the global locations.

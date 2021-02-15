@@ -278,7 +278,6 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             ));
 
             //$is_global = sek_is_global_location( $location_id );
-            // $skope_id = skp_get_skope_id();
             // $skopeLocationCollection = array();
             // $skopeSettingValue = sek_get_skoped_seks( $skope_id );
             // if ( is_array( ) && array_key_exists('collection', search) ) {
@@ -1250,7 +1249,6 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         // fired @hook 'template_include'
         // @return template path
         function sek_maybe_set_local_nimble_template( $template ) {
-            //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
             $locale_template = sek_get_locale_template();
             if ( !empty( $locale_template ) ) {
                 $template = $locale_template;
@@ -1273,7 +1271,6 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 return;
             }
             if ( '_not_cached_yet_' === $this->has_local_header_footer || '_not_cached_yet_' === $this->has_global_header_footer ) {
-                //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
                 $local_header_footer_data = sek_get_local_option_value('local_header_footer');
                 $global_header_footer_data = sek_get_global_option_value('global_header_footer');
 
