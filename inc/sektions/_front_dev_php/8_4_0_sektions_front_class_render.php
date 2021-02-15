@@ -579,13 +579,13 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     // when for columns, we always apply the custom breakpoint defined by the user
                     // otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
                     // 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
-                    $section_custom_breakpoint =  sek_get_closest_section_custom_breakpoint( array(
+                    $section_custom_breakpoint =  intval( sek_get_closest_section_custom_breakpoint( array(
                         'searched_level_id' => $parent_model['id'],
                         'for_responsive_columns' => true
-                    ));
+                    )));
 
                     $grid_column_class = "sek-col-{$col_suffix}";
-                    if ( $section_custom_breakpoint >= 1 ) {
+                    if ( is_int($section_custom_breakpoint) && $section_custom_breakpoint >= 1 ) {
                         $grid_column_class = "sek-section-custom-breakpoint-col-{$col_suffix}";
                     } else if ( $global_custom_breakpoint >= 1 ) {
                         $grid_column_class = "sek-global-custom-breakpoint-col-{$col_suffix}";

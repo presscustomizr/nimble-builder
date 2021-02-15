@@ -75,11 +75,14 @@ function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
     // when for columns, we always apply the custom breakpoint defined by the user
     // otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
     // 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
-    $custom_breakpoint = sek_get_closest_section_custom_breakpoint( array(
+    $custom_breakpoint = intval( sek_get_closest_section_custom_breakpoint( array(
         'searched_level_id' => $section['id'],
         'for_responsive_columns' => true
-    ));
-    if ( $custom_breakpoint > 0 ) {
+    )));
+    // sek_error_log('SECTION ??', $section );
+    // sek_error_log('$custom_breakpoint??', is_int($custom_breakpoint) );
+
+    if ( is_int($custom_breakpoint) && $custom_breakpoint > 0 ) {
         $col_number = ( array_key_exists( 'collection', $section ) && is_array( $section['collection'] ) ) ? count( $section['collection'] ) : 1;
         $col_number = 12 < $col_number ? 12 : $col_number;
         $col_width_in_percent = 100/$col_number;
