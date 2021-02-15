@@ -80,6 +80,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.bind( 'save-request-params', function( query ) {
                         $.extend( query, {
                           local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                          group_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ),//<= feb 2021, added for #478
                           active_locations : api.czr_sektions.activeLocations()
                         });
                   });
