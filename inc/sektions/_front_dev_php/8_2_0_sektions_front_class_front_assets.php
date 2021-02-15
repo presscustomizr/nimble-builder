@@ -57,7 +57,9 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // see https://github.com/presscustomizr/nimble-builder/issues/586
             // we know the skope_id because 'wp' has been fired
             // October 2020
-            Nimble_Manager()->page_has_local_or_global_sections = sek_local_skope_has_nimble_sections( skp_get_skope_id() ) || sek_has_global_sections();
+            if ( 'not_set' === Nimble_Manager()->page_has_local_or_global_sections ) {
+                Nimble_Manager()->page_has_local_or_global_sections = sek_local_skope_has_nimble_sections( skp_get_skope_id() ) || sek_has_global_sections();
+            }
         }
 
 

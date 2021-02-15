@@ -5,6 +5,9 @@
 function sek_has_global_sections() {
     if ( skp_is_customizing() )
       return true;
+    if ( 'not_set' != Nimble_Manager()->page_has_global_sections )
+        return Nimble_Manager()->page_has_global_sections;
+
     $maybe_global_sek_post = sek_get_seks_post( NIMBLE_GLOBAL_SKOPE_ID, 'global' );
     $nb_section_created = 0;
     if ( is_object($maybe_global_sek_post) ) {
@@ -12,7 +15,9 @@ function sek_has_global_sections() {
         $seks_data = is_array( $seks_data ) ? $seks_data : array();
         $nb_section_created = sek_count_not_empty_sections_in_page( $seks_data );
     }
-    return $nb_section_created > 0;
+    // cache now
+    Nimble_Manager()->page_has_global_sections = $nb_section_created > 0;
+    return Nimble_Manager()->page_has_global_sections;
 }
 
 
@@ -21,19 +26,30 @@ function sek_has_global_sections() {
 // initially used to determine if a post or a page has been customized with Nimble Builder => if so, we add an edit link in the post/page list
 // when used in admin, the skope_id must be provided
 // can be used to determine if we need to render Nimble Builder assets on front. See ::sek_enqueue_front_assets()
-function sek_local_skope_has_nimble_sections( $skope_id = '' ) {
+function sek_local_skope_has_nimble_sections( $skope_id = '', $seks_data = null ) {
     if ( empty( $skope_id ) ) {
         sek_error_log( __FUNCTION__ . ' => missing skope id' );
         return false;
     }
-    $maybe_local_sek_post = sek_get_seks_post( $skope_id, 'local' );
+    if ( 'not_set' != Nimble_Manager()->page_has_local_sections )
+        return Nimble_Manager()->page_has_local_sections;
+
     $nb_section_created = 0;
-    if ( is_object($maybe_local_sek_post) ) {
-        $seks_data = maybe_unserialize($maybe_local_sek_post->post_content);
-        $seks_data = is_array( $seks_data ) ? $seks_data : array();
+
+    // When the collection is provided, use it
+    if ( is_null($seks_data) || !is_array($seks_data) ) {
+        $maybe_local_sek_post = sek_get_seks_post( $skope_id, 'local' );
+        if ( is_object($maybe_local_sek_post) ) {
+            $seks_data = maybe_unserialize($maybe_local_sek_post->post_content);
+            $seks_data = is_array( $seks_data ) ? $seks_data : array();
+        }
+    }
+    if ( is_array( $seks_data ) ) {
         $nb_section_created = sek_count_not_empty_sections_in_page( $seks_data );
     }
-    return $nb_section_created > 0;
+    // cache now
+    Nimble_Manager()->page_has_local_sections = $nb_section_created > 0;
+    return Nimble_Manager()->page_has_local_sections;
 }
 
 

@@ -201,7 +201,10 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // March 2020, for https://github.com/presscustomizr/nimble-builder/issues/649
         public $nimble_content_is_printed_on_this_page = false;//<= tells if any Nimble Content has been printed.
         // October 2020
-        public $page_has_local_or_global_sections = false;//<= set @wp_enqueue_script, used to determine if we should load css, js and fonts assets or not.
+        public $page_has_local_or_global_sections = 'not_set';//<= set @wp_enqueue_script, used to determine if we should load css, js and fonts assets or not.
+        // feb 2021, introduced for #478
+        public $page_has_local_sections = 'not_set';
+        public $page_has_global_sections = 'not_set';
 
         // April 2020 for https://github.com/presscustomizr/nimble-builder/issues/679
         public $is_content_restricted = false; //<= set at 'wp'
