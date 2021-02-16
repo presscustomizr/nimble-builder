@@ -728,6 +728,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     // Schedule the accordion behaviour
                                     self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
+
+                                    // FORCE PREVIEW URL TO HOME WHEN PICKING SITE TEMPLATES
+                                    // when picking site templates, make sure the preview loads home page
+                                    // => otherwise, for example if a page site template is applied to a page with no local sections, which is currently being previewed, the site template sections will be set as the local setting value, and therefore published as local sections, which we don't want.
+                                    var _doThingsAfterRefresh = function() {
+                                          setTimeout( function() {
+                                                _section_.expanded(true);
+                                                var _ctrl_ = _.first( _section_.controls() );
+                                                if ( _ctrl_ && _ctrl_.id ) {
+                                                      api.control( _ctrl_.id ).container.find('.customize-control-title').trigger('click');
+                                                }
+                                          }, 500 );
+                                         
+                                          api.czr_currentSkopesCollection.unbind( _doThingsAfterRefresh );
+                                    };
+                                    _section_.container.find('.accordion-section-title').first().on('click', function() {
+                                          api.czr_currentSkopesCollection.bind( _doThingsAfterRefresh );
+                                          api.previewer.previewUrl( api.settings.url.home );
+                                    });
                               });
                         });
                   }//isSiteTemplateEnabled
