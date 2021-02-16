@@ -757,6 +757,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // set the localSectionsSettingId now, and update it on skope change
                   sektionsData = api.czr_skopeBase.getSkopeProperty( 'sektions', 'local');
                   if ( sektionsLocalizedData.isDevMode ) {
+                        if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
+                              api.infoLog( 'TO DO SITE TEMPLATES => 1) PHP create a site template mapping : skope => site_template option that applies, 2) Include this mapping in the localized customizer params 3) use it on local reset to set the new value');
+                        }
                         api.infoLog( '::setContextualCollectionSettingIdWhenSkopeSet => SEKTIONS DATA ? ', sektionsData );
                   }
                   if ( _.isEmpty( sektionsData ) ) {
