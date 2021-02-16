@@ -312,10 +312,30 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Note : only the collection is set to self.getDefaultSektionSettingValue( 'local' )
             // @see php function which defines the defaults sek_get_default_location_model()
             resetCollectionSetting : function( scope ) {
-                  var self = this;
+                  var self = this, newSettingValue;
                   if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
                         throw new Error( 'resetCollectionSetting => invalid scope provided.', scope );
                   }
+
+                  if ( sektionsLocalizedData.isSiteTmplEnabled ) {
+                        // Feb 2021 : do we have group template that applies to this context ?
+                        var site_tmpl_opts = api(sektionsLocalizedData.optNameForSiteTmplOptions)(),
+                              group_skope_id = api.czr_skopeBase.getSkopeProperty( 'skope_id' ,'group'),
+                              group_skope_sektions = api.czr_skopeBase.getSkopeProperty( 'group_sektions' ,'group');
+                        
+                        console.log('ALORS ?', site_tmpl_opts, group_skope_id, group_skope_sektions );
+
+                        // FEB 2021 => TEST FOR ALL PAGE SKOPE
+                        if ( _.isObject( site_tmpl_opts ) && site_tmpl_opts.site_templates && _.isObject( site_tmpl_opts.site_templates ) && site_tmpl_opts.site_templates.pages ) {
+                              if ( 'skp__all_page' === group_skope_id ) {
+                                    if ( group_skope_sektions && group_skope_sektions.db_values ) {
+                                          console.log('SET GROUP SKOPE SEKTION ?');
+                                          newSettingValue = self.validateSettingValue( _.isObject( group_skope_sektions.db_value ) ? group_skope_sektions.db_value : self.getDefaultSektionSettingValue( 'local' ), 'local' );
+                                    }
+                              }
+                        }
+                  }
+
                   return $.extend( true, {}, self.getDefaultSektionSettingValue( scope ) );
             }
       });//$.extend()
