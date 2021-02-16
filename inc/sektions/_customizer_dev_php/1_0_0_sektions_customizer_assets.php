@@ -712,7 +712,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
             // FEB 2021 => Group site template. #478
             if ( defined('NIMBLE_SITE_TEMPLATES_ENABLED') && NIMBLE_SITE_TEMPLATES_ENABLED ) {
                 $group_skope_id = skp_get_skope_id( 'group' );
-                $seks_data = sek_get_seks_for_group_site_template($group_skope_id );
+                $seks_data = sek_maybe_get_seks_for_group_site_template($group_skope_id );
                 // Feb 2021 added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
                 $seks_data = sek_prepare_seks_data_for_customizer( $seks_data );
                 $skp_data[ 'group_sektions' ] = [
