@@ -421,7 +421,7 @@ function sek_maybe_json_encode( $string ){
       // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
       // added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
       $string = htmlentities($string);//reversed with html_entity_decode
-      $string = json_encode($string);
+      $string = wp_json_encode($string);
   }
   return $string;
 }
