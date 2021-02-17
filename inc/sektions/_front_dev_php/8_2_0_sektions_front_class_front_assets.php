@@ -595,7 +595,13 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 'contextuallyActiveModules' => sek_get_collection_of_contextually_active_modules(),
                 'fontAwesomeAlreadyEnqueued' => wp_style_is('customizr-fa', 'enqueued') || wp_style_is('hueman-font-awesome', 'enqueued'),
 
-                'partialFrontScripts' => Nimble_Manager()->partial_front_scripts
+                'partialFrontScripts' => Nimble_Manager()->partial_front_scripts,
+
+                // Debug for https://github.com/presscustomizr/nimble-builder/issues/795
+                // 'debug' => [
+                //   'nb_debug_save' => get_transient('nb_debug_save'),
+                //   'nb_debug_get' => get_transient('nb_debug_get')
+                // ]
             );
             $l10n = apply_filters( 'nimble-localized-js-front', $l10n );
 
