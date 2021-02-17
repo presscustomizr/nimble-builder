@@ -393,6 +393,8 @@ add_filter('sek_get_raw_section_registration_params', function( $collection ) {
 
 // @return bool
 function sek_is_json( $string ){
+  if ( !is_string( $string ) )
+    return false;
   json_decode($string);
   return (json_last_error() == JSON_ERROR_NONE);
 }
