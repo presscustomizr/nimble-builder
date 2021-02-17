@@ -236,7 +236,6 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // janv 2021 => will populate the modules stylesheets already concatenated, so that NB doesn't concatenate a module stylesheet twice for the local css and for the global css (if any)
         // see in inc\sektions\_front_dev_php\dyn_css_builder_and_google_fonts_printer\5_0_1_class-sek-dyn-css-builder.php
         public $concatenated_module_stylesheets = [];
-    
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>

@@ -32,14 +32,17 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
                     return;
                 }
                 $local_skope_id = $_POST['local_skope_id'];
+
+                 // Feb 2021 => for site template #478
+                $local_skope_id = apply_filters( 'nb_set_skope_id_before_generating_local_front_css', $local_skope_id );
+
                 $css_handler_instance = $this->_instantiate_css_handler( array( 'skope_id' => $skope_id, 'is_global_stylesheet' => NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) );
                 $this->sek_print_global_css();
             }
             // in a front normal context, the css is enqueued from the already written file.
             else {
+                // Feb 2021 => for site template #478
                 $local_skope_id = apply_filters( 'nb_set_skope_id_before_generating_local_front_css', skp_build_skope_id() );
-
-                //sek_error_log('alors local skope id for CSS GENERATION ?', $local_skope_id );
 
                 // LOCAL SECTIONS STYLESHEET
                 $this->_instantiate_css_handler( array( 'skope_id' => $local_skope_id ) );

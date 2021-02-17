@@ -165,11 +165,11 @@ function sek_get_site_tmpl_for_skope( $group_skope = null ) {
     $site_tmpl = null;
     $opts = sek_get_site_tmpl_options();
 
-    sek_error_log('site_templates options ?', $opts );
+    //sek_error_log('site_templates options ?', $opts );
 
     if ( is_array( $opts) && !empty( $opts['site_templates']) && is_array( $opts['site_templates'] ) ) {
-        if ( !empty( $opts['site_templates']['pages']) && 'skp__all_page' === $group_skope ) {
-            $site_tmpl = $opts['site_templates']['pages'];
+        if ( !empty( $opts['site_templates'][$group_skope] ) && '_no_site_tmpl_' != $opts['site_templates'][$group_skope] ) {
+            $site_tmpl = $opts['site_templates'][$group_skope];
         }
     }
     return $site_tmpl;
