@@ -408,7 +408,7 @@ function sek_maybe_decode_json( $string ){
   if ( json_last_error() == JSON_ERROR_NONE ) {
       // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
       // added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
-      $json_decoded_candidate = html_entity_decode($json_decoded_candidate);
+      $json_decoded_candidate = html_entity_decode($json_decoded_candidate, ENT_QUOTES, get_bloginfo( 'charset' ) );
       //sek_error_log('DECODED DECODED ?', $json_decoded_candidate );
       return $json_decoded_candidate;
   }
@@ -424,7 +424,7 @@ function sek_maybe_json_encode( $string ){
   if ( !sek_is_json($string) ) {
       // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
       // added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
-      $string = htmlentities($string);//reversed with html_entity_decode
+      $string = htmlentities($string, ENT_COMPAT, get_bloginfo( 'charset' ) );//reversed with html_entity_decode
       //$string = wp_encode_emoji( $string );
       $string = wp_json_encode($string);
       //sek_error_log('JSON ENCODED ?', $string );
