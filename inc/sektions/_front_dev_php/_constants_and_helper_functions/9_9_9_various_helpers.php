@@ -409,8 +409,10 @@ function sek_maybe_decode_json( $string ){
       // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
       // added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
       $json_decoded_candidate = html_entity_decode($json_decoded_candidate);
+      //sek_error_log('DECODED DECODED ?', $json_decoded_candidate );
       return $json_decoded_candidate;
   }
+  
   return $string;
 }
 
@@ -423,7 +425,9 @@ function sek_maybe_json_encode( $string ){
       // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
       // added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
       $string = htmlentities($string);//reversed with html_entity_decode
+      //$string = wp_encode_emoji( $string );
       $string = wp_json_encode($string);
+      //sek_error_log('JSON ENCODED ?', $string );
   }
   return $string;
 }
