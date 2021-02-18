@@ -2132,6 +2132,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // store the local and global options
         public $local_options = '_not_cached_yet_';
         public $global_nimble_options = '_not_cached_yet_';
+        public $site_template_options = '_not_cached_yet_';
 
         public $img_smartload_enabled = 'not_cached';
         public $video_bg_lazyload_enabled = 'not_cached';//<= for https://github.com/presscustomizr/nimble-builder/issues/287
@@ -2283,7 +2284,10 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // March 2020, for https://github.com/presscustomizr/nimble-builder/issues/649
         public $nimble_content_is_printed_on_this_page = false;//<= tells if any Nimble Content has been printed.
         // October 2020
-        public $page_has_local_or_global_sections = false;//<= set @wp_enqueue_script, used to determine if we should load css, js and fonts assets or not.
+        public $page_has_local_or_global_sections = 'not_set';//<= set @wp_enqueue_script, used to determine if we should load css, js and fonts assets or not.
+        // feb 2021, introduced for #478
+        public $page_has_local_sections = 'not_set';
+        public $page_has_global_sections = 'not_set';
 
         // April 2020 for https://github.com/presscustomizr/nimble-builder/issues/679
         public $is_content_restricted = false; //<= set at 'wp'
@@ -2315,7 +2319,6 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // janv 2021 => will populate the modules stylesheets already concatenated, so that NB doesn't concatenate a module stylesheet twice for the local css and for the global css (if any)
         // see in inc\sektions\_front_dev_php\dyn_css_builder_and_google_fonts_printer\5_0_1_class-sek-dyn-css-builder.php
         public $concatenated_module_stylesheets = [];
-    
 
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
@@ -2935,7 +2938,9 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // see https://github.com/presscustomizr/nimble-builder/issues/586
             // we know the skope_id because 'wp' has been fired
             // October 2020
-            Nimble_Manager()->page_has_local_or_global_sections = sek_local_skope_has_nimble_sections( skp_get_skope_id() ) || sek_has_global_sections();
+            if ( 'not_set' === Nimble_Manager()->page_has_local_or_global_sections ) {
+                Nimble_Manager()->page_has_local_or_global_sections = sek_local_skope_has_nimble_sections( skp_get_skope_id() ) || sek_has_global_sections();
+            }
         }
 
 
@@ -2957,7 +2962,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
 
             // Always load the base Nimble style when user logged in so we can display properly the button in the top admin bar.
-            if ( is_user_logged_in() || Nimble_Manager()->page_has_local_or_global_sections ) {
+            if ( is_user_logged_in() || false != Nimble_Manager()->page_has_local_or_global_sections ) {
                 $rtl_suffix = is_rtl() ? '-rtl' : '';
 
                 //wp_enqueue_style( 'google-material-icons', '//fonts.googleapis.com/icon?family=Material+Icons', array(), null, 'all' );
@@ -3471,7 +3476,13 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 'contextuallyActiveModules' => sek_get_collection_of_contextually_active_modules(),
                 'fontAwesomeAlreadyEnqueued' => wp_style_is('customizr-fa', 'enqueued') || wp_style_is('hueman-font-awesome', 'enqueued'),
 
-                'partialFrontScripts' => Nimble_Manager()->partial_front_scripts
+                'partialFrontScripts' => Nimble_Manager()->partial_front_scripts,
+
+                // Debug for https://github.com/presscustomizr/nimble-builder/issues/795
+                // 'debug' => [
+                //   'nb_debug_save' => get_transient('nb_debug_save'),
+                //   'nb_debug_get' => get_transient('nb_debug_get')
+                // ]
             );
             $l10n = apply_filters( 'nimble-localized-js-front', $l10n );
 
@@ -4227,7 +4238,6 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             ));
 
             //$is_global = sek_is_global_location( $location_id );
-            // $skope_id = skp_get_skope_id();
             // $skopeLocationCollection = array();
             // $skopeSettingValue = sek_get_skoped_seks( $skope_id );
             // if ( is_array( ) && array_key_exists('collection', search) ) {
@@ -4529,13 +4539,13 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     // when for columns, we always apply the custom breakpoint defined by the user
                     // otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
                     // 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
-                    $section_custom_breakpoint =  sek_get_closest_section_custom_breakpoint( array(
+                    $section_custom_breakpoint =  intval( sek_get_closest_section_custom_breakpoint( array(
                         'searched_level_id' => $parent_model['id'],
                         'for_responsive_columns' => true
-                    ));
+                    )));
 
                     $grid_column_class = "sek-col-{$col_suffix}";
-                    if ( $section_custom_breakpoint >= 1 ) {
+                    if ( is_int($section_custom_breakpoint) && $section_custom_breakpoint >= 1 ) {
                         $grid_column_class = "sek-section-custom-breakpoint-col-{$col_suffix}";
                     } else if ( $global_custom_breakpoint >= 1 ) {
                         $grid_column_class = "sek-global-custom-breakpoint-col-{$col_suffix}";
@@ -5199,7 +5209,6 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         // fired @hook 'template_include'
         // @return template path
         function sek_maybe_set_local_nimble_template( $template ) {
-            //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
             $locale_template = sek_get_locale_template();
             if ( !empty( $locale_template ) ) {
                 $template = $locale_template;
@@ -5222,7 +5231,6 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 return;
             }
             if ( '_not_cached_yet_' === $this->has_local_header_footer || '_not_cached_yet_' === $this->has_global_header_footer ) {
-                //sek_error_log(' SOO ?? sek_get_skoped_seks( skp_get_skope_id() ) ' . skp_get_skope_id(), sek_get_skoped_seks( skp_get_skope_id() ) );
                 $local_header_footer_data = sek_get_local_option_value('local_header_footer');
                 $global_header_footer_data = sek_get_global_option_value('global_header_footer');
 
@@ -5615,7 +5623,9 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
 
             // Print global option inline CSS
             add_action( 'wp_head', array( $this, 'sek_print_global_css' ), 1000 );
+            
         }
+
 
         // Can be fired :
         // 1) on wp_enqueue_scripts or wp_head
@@ -5638,14 +5648,20 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
                     return;
                 }
                 $local_skope_id = $_POST['local_skope_id'];
+
+                 // Feb 2021 => for site template #478
+                $local_skope_id = apply_filters( 'nb_set_skope_id_before_generating_local_front_css', $local_skope_id );
+
                 $css_handler_instance = $this->_instantiate_css_handler( array( 'skope_id' => $skope_id, 'is_global_stylesheet' => NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) );
                 $this->sek_print_global_css();
             }
             // in a front normal context, the css is enqueued from the already written file.
             else {
-                $local_skope_id = skp_build_skope_id();
+                // Feb 2021 => for site template #478
+                $local_skope_id = apply_filters( 'nb_set_skope_id_before_generating_local_front_css', skp_build_skope_id() );
+
                 // LOCAL SECTIONS STYLESHEET
-                $this->_instantiate_css_handler( array( 'skope_id' => skp_build_skope_id() ) );
+                $this->_instantiate_css_handler( array( 'skope_id' => $local_skope_id ) );
                 // GLOBAL SECTIONS STYLESHEET
                 // Can hold rules for global sections and global styling
                 $this->_instantiate_css_handler( array( 'skope_id' => NIMBLE_GLOBAL_SKOPE_ID, 'is_global_stylesheet' => true ) );
@@ -5678,8 +5694,8 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
                 }
             }
 
-            if ( defined( 'DOING_AJAX' ) && DOING_AJAX && empty( $skope_id ) ) {
-                sek_error_log(  __CLASS__ . '::' . __FUNCTION__ . ' =>the skope_id should not be empty' );
+            if ( defined( 'DOING_AJAX' ) && DOING_AJAX && empty( $local_skope_id ) ) {
+                sek_error_log(  __CLASS__ . '::' . __FUNCTION__ . ' => the skope_id should not be empty' );
             }
         }//print_or_enqueue_seks_style
 
@@ -5791,7 +5807,7 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
             if ( 'not_set' !== Nimble_Manager()->google_fonts_print_candidates )
               return Nimble_Manager()->google_fonts_print_candidates;
 
-            $local_skope_id = is_null( $local_skope_id ) ? skp_build_skope_id() : $local_skope_id;
+            $local_skope_id = is_null( $local_skope_id ) ? apply_filters( 'maybe_set_skope_id_for_site_template_css', skp_build_skope_id() ) : $local_skope_id;
             // local sections
             $local_seks = sek_get_skoped_seks( $local_skope_id );
             // global sections

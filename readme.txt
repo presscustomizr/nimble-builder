@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.6
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,12 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.2.0 : Better support for emojis/emoticons. [image module] new option to use the current post thumbnail as source of the image. [level background] new option to use the current post thumbnail as source for the background url. [template] beta version of template saving
+2.2.2 : [character encoding] fixed a problem occuring with some characters like (€ quotemarks „“, ä ü ö ß and € 😘🚀) which could break rich text editor content
 
 == Changelog ==
+= 2.2.2 February 18th, 2021 =
+* fixed : [character encoding] some characters like (€ quotemarks „“, ä ü ö ß and € 😘🚀) can break rich text editor content
+
 = 2.2.1 February 11th, 2021 =
 * fixed : regression introduced when fixing emoji encoding issue => json encoding html markup can break serialization
 * fixed : [button module] remove sanitize_text_field() action when sanitizing

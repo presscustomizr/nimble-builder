@@ -307,6 +307,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   api.bind( 'save-request-params', function( query ) {
                         $.extend( query, {
                           local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                          group_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ),//<= feb 2021, added for #478
                           active_locations : api.czr_sektions.activeLocations()
                         });
                   });
@@ -954,6 +955,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                     // Schedule the accordion behaviour
                                     self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
+
+                                    // FORCE PREVIEW URL TO HOME WHEN PICKING SITE TEMPLATES
+                                    // when picking site templates, make sure the preview loads home page
+                                    // => otherwise, for example if a page site template is applied to a page with no local sections, which is currently being previewed, the site template sections will be set as the local setting value, and therefore published as local sections, which we don't want.
+                                    var _doThingsAfterRefresh = function() {
+                                          setTimeout( function() {
+                                                _section_.expanded(true);
+                                                var _ctrl_ = _.first( _section_.controls() );
+                                                if ( _ctrl_ && _ctrl_.id ) {
+                                                      api.control( _ctrl_.id ).container.find('.customize-control-title').trigger('click');
+                                                }
+                                          }, 500 );
+                                         
+                                          api.czr_currentSkopesCollection.unbind( _doThingsAfterRefresh );
+                                    };
+                                    _section_.container.find('.accordion-section-title').first().on('click', function() {
+                                          api.czr_currentSkopesCollection.bind( _doThingsAfterRefresh );
+                                          api.previewer.previewUrl( api.settings.url.home );
+                                    });
                               });
                         });
                   }//isSiteTemplateEnabled
@@ -983,6 +1003,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // set the localSectionsSettingId now, and update it on skope change
                   sektionsData = api.czr_skopeBase.getSkopeProperty( 'sektions', 'local');
                   if ( sektionsLocalizedData.isDevMode ) {
+                        if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
+                              api.infoLog( 'TO DO SITE TEMPLATES => 1) PHP create a site template mapping : skope => site_template option that applies, 2) Include this mapping in the localized customizer params 3) use it on local reset to set the new value');
+                        }
                         api.infoLog( '::setContextualCollectionSettingIdWhenSkopeSet => SEKTIONS DATA ? ', sektionsData );
                   }
                   if ( _.isEmpty( sektionsData ) ) {
@@ -3727,10 +3750,30 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Note : only the collection is set to self.getDefaultSektionSettingValue( 'local' )
             // @see php function which defines the defaults sek_get_default_location_model()
             resetCollectionSetting : function( scope ) {
-                  var self = this;
+                  var self = this, newSettingValue;
                   if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
                         throw new Error( 'resetCollectionSetting => invalid scope provided.', scope );
                   }
+
+                  if ( sektionsLocalizedData.isSiteTmplEnabled ) {
+                        // Feb 2021 : do we have group template that applies to this context ?
+                        var site_tmpl_opts = api(sektionsLocalizedData.optNameForSiteTmplOptions)(),
+                              group_skope_id = api.czr_skopeBase.getSkopeProperty( 'skope_id' ,'group'),
+                              group_skope_sektions = api.czr_skopeBase.getSkopeProperty( 'group_sektions' ,'group');
+                        
+                        console.log('ALORS ?', site_tmpl_opts, group_skope_id, group_skope_sektions );
+
+                        // FEB 2021 => TEST FOR ALL PAGE SKOPE
+                        if ( _.isObject( site_tmpl_opts ) && site_tmpl_opts.site_templates && _.isObject( site_tmpl_opts.site_templates ) && site_tmpl_opts.site_templates.pages ) {
+                              if ( 'skp__all_page' === group_skope_id ) {
+                                    if ( group_skope_sektions && group_skope_sektions.db_values ) {
+                                          console.log('SET GROUP SKOPE SEKTION ?');
+                                          newSettingValue = self.validateSettingValue( _.isObject( group_skope_sektions.db_value ) ? group_skope_sektions.db_value : self.getDefaultSektionSettingValue( 'local' ), 'local' );
+                                    }
+                              }
+                        }
+                  }
+
                   return $.extend( true, {}, self.getDefaultSektionSettingValue( scope ) );
             }
       });//$.extend()
@@ -6670,7 +6713,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             generateUIforSiteTmplOptions : function( params, dfd ) {
                   var self = this,
                         // only the site_template option will be saved ( see php constant NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ) not the setting used to populate it
-                      _id_ = sektionsLocalizedData.prefixForSettingsNotSaved + sektionsLocalizedData.optNameForSiteTmplOptions;//__nimble__ + __site_templates__
+                      _id_ = sektionsLocalizedData.prefixForSettingsNotSaved + sektionsLocalizedData.optNameForSiteTmplOptions;//__nimble__ + nimble_site_templates
 
                   // Is the UI currently displayed the one that is being requested ?
                   // If so, visually remind the user that a module should be dragged
