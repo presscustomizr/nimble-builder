@@ -81,7 +81,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
 
 
             // Always load the base Nimble style when user logged in so we can display properly the button in the top admin bar.
-            if ( is_user_logged_in() || Nimble_Manager()->page_has_local_or_global_sections ) {
+            if ( is_user_logged_in() || false != Nimble_Manager()->page_has_local_or_global_sections ) {
                 $rtl_suffix = is_rtl() ? '-rtl' : '';
 
                 //wp_enqueue_style( 'google-material-icons', '//fonts.googleapis.com/icon?family=Material+Icons', array(), null, 'all' );
