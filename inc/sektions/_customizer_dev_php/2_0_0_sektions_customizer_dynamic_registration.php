@@ -41,8 +41,8 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                     'type' => 'option',
                     'default' => array(),
                     // Only the section collections are sanitized on save
-                    'sanitize_callback' => 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ? array( $this, 'sektion_collection_sanitize_cb' ) : null
-                    //'validate_callback'    => array( $this, 'validate_callback' )
+                    'sanitize_callback' => 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ? '\Nimble\sek_sektion_collection_sanitize_cb' : null
+                    //'validate_callback'    => '\Nimble\sek_sektion_collection_validate_cb'
                 );
             } else if ( 0 === strpos( $setting_id, NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED ) ) {
                 //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
@@ -51,7 +51,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
                         'type' => '_nimble_ui_',//won't be saved as is,
                     'default' => array(),
                     //'sanitize_callback' => array( $this, 'sanitize_callback' ),
-                    //'validate_callback' => array( $this, 'validate_callback' )
+                    //'validate_callback'    => '\Nimble\sek_sektion_collection_validate_cb'
                 );
             }
             return $setting_args;
@@ -68,70 +68,6 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
             //sek_error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
             return '\Nimble\Nimble_Customizer_Setting';
         }
-
-
-        // Uses the sanitize_callback function specified on module registration if any
-        // Recursively loop on the local or global main NB collection and fire the sanitize callback
-        function sektion_collection_sanitize_cb( $setting_data, $setting_instance ) {
-            if ( !is_array( $setting_data ) ) {
-                return $setting_data;
-            } else {
-                if ( !is_array( $setting_data ) ) {
-                    return $setting_data;
-                } else {
-                    if ( array_key_exists('module_type', $setting_data ) ) {
-                        $san_callback = sek_get_registered_module_type_property( $setting_data['module_type'], 'sanitize_callback' );
-                        if ( !empty( $san_callback ) && is_string( $san_callback ) && function_exists( $san_callback ) && array_key_exists('value', $setting_data ) ) {
-                            $setting_data['value'] = $san_callback( $setting_data['value'] );
-                        }
-                    } else {
-                        foreach( $setting_data as $k => $data ) {
-                            $setting_data[$k] = $this->sektion_collection_sanitize_cb($data, $setting_instance);
-                        }
-                    }
-                }
-            }
-            //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_doma' ), $setting_data );
-            return $setting_data;
-        }
-
-        // Uses the validate_callback function specified on module registration if any
-        // @return validity object
-        function validate_callback( $validity, $setting_data, $setting_instance ) {
-            $validated = true;
-            if ( !is_array( $setting_data ) ) {
-                return $setting_data;
-            } else {
-                if ( !is_array( $setting_data ) ) {
-                    return $setting_data;
-                } else {
-                    if ( array_key_exists('module_type', $setting_data ) ) {
-                        $validation_callback = sek_get_registered_module_type_property( $setting_data['module_type'], 'validate_callback' );
-                        if ( !empty( $validation_callback ) && is_string( $validation_callback ) && function_exists( $validation_callback ) && array_key_exists('value', $setting_data ) ) {
-                            $validated = $validation_callback( $setting_data );
-                        }
-                    } else {
-                        foreach( $setting_data as $k => $data ) {
-                            $validated = $this->validate_callback($validity, $data, $setting_instance);
-                        }
-                    }
-                }
-            }
-
-            //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_doma' ), $setting_data );
-            if ( true !== $validated ) {
-                if ( is_wp_error( $validated ) ) {
-                    $validation_msg = $validation_msg->get_error_message();
-                    $validity->add(
-                        'nimble_validation_error_in_' . $setting_instance->id ,
-                        $validation_msg
-                    );
-                }
-
-            }
-            return $validity;
-        }
-
 
  }//class
 endif;

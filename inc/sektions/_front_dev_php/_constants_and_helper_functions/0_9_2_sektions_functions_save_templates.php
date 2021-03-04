@@ -264,6 +264,9 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
         }
     }
 
+    // March 2021 : make sure text input are sanitized like in #544 #792
+    $tmpl_data = sek_sektion_collection_sanitize_cb( $tmpl_data );
+
     $new_or_updated_post_data = array(
         'post_title' => esc_attr( $tmpl_data['metas']['title'] ),
         'post_name' => $tmpl_post_name,

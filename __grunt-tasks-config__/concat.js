@@ -429,7 +429,8 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_1_sektions_functions_save_sections.php',
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_2_sektions_functions_save_templates.php',
       '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_3_sektions_cpt_vizualize_and_edit.php',
-      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_5_sektions_functions_revision_history.php'
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_5_sektions_functions_revision_history.php',
+      '<%= paths.sektions %>_front_dev_php/_constants_and_helper_functions/0_9_6_sanitization_and_validation.php'
     ],
     dest: '<%= paths.sektions %>ccat-constants-and-helper-functions.php',
   },
