@@ -48,7 +48,7 @@ function sanitize_cb__czr_img_slider_module( $value ) {
     if ( !empty($value['img_collection']) && is_array( $value['img_collection'] ) ) {
         foreach( $value['img_collection'] as $key => $data ) {
             if ( array_key_exists( 'text_content', $data ) && is_string( $data['text_content'] ) ) {
-                $value['img_collection'][$key]['text_content'] = sek_maybe_json_encode( $data['text_content'] );
+                $value['img_collection'][$key]['text_content'] = sek_maybe_encode_richtext( $data['text_content'] );
             }
         }
     }

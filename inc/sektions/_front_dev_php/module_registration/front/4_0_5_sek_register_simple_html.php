@@ -184,7 +184,7 @@ function sanitize_callback__czr_simple_html_module( $value ) {
         }
         // convert into a json to prevent emoji breaking global json data structure
         // fix for https://github.com/presscustomizr/nimble-builder/issues/544
-        $value[ 'html_content' ] = sek_maybe_json_encode( $value[ 'html_content' ] );
+        $value[ 'html_content' ] = sek_maybe_encode_richtext( $value[ 'html_content' ] );
     }
     return $value;
 }

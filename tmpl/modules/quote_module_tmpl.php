@@ -45,7 +45,7 @@ if ( !empty( $quote_content_settings['quote_text'] ) ) {
         // Feb 2021 : now saved as a json to fix emojis issues
         // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
         // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
-        $cite_text = sek_maybe_decode_json( $cite_content_settings['cite_text'] );
+        $cite_text = sek_maybe_decode_richtext( $cite_content_settings['cite_text'] );
 
         // filter added since text editor implementation https://github.com/presscustomizr/nimble-builder/issues/403
         $cite_text = apply_filters( 'the_nimble_tinymce_module_content', sek_strip_script_tags( $cite_text ) );
@@ -56,7 +56,7 @@ if ( !empty( $quote_content_settings['quote_text'] ) ) {
             // Feb 2021 : now saved as a json to fix emojis issues
             // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
             // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
-            sek_maybe_decode_json( $quote_content_settings['quote_text'] ),
+            sek_maybe_decode_richtext( $quote_content_settings['quote_text'] ),
             !empty( $cite_text ) ? sprintf( '<footer class="sek-quote-footer"><cite class="sek-cite">%1$s</cite></footer>', $cite_text ) : '',
             empty( $design_settings['quote_design'] ) || 'none' == $design_settings['quote_design'] ? '' : " sek-quote-design sek-{$design_settings['quote_design']}",
             $design_settings['quote_design']

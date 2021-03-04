@@ -332,7 +332,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                         // Feb 2021 : now saved as a json to fix emojis issues
                         // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
                         // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
-                        $user_form_composition[$field_id]['label'] = sek_maybe_decode_json( $user_form_composition[$field_id]['label'] );
+                        $user_form_composition[$field_id]['label'] = sek_maybe_decode_richtext( $user_form_composition[$field_id]['label'] );
                     }
                 break;
 
@@ -352,7 +352,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                     // Feb 2021 : now saved as a json to fix emojis issues
                     // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
                     // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
-                    $user_form_composition[$field_id]['value'] = sek_maybe_decode_json( $form_fields_options['button_text'] );
+                    $user_form_composition[$field_id]['value'] = sek_maybe_decode_richtext( $form_fields_options['button_text'] );
                 break;
                 case 'nimble_skope_id':
                     $user_form_composition[$field_id] = $field_data;

@@ -76,7 +76,7 @@ function sek_get_module_params_for_czr_shortcode_module() {
 // fix for https://github.com/presscustomizr/nimble-builder/issues/544
 function sek_sanitize_czr_shortcode_module( $content ) {
     if ( is_array($content) && !empty($content['text_content']) ) {
-        $content['text_content'] = sek_maybe_json_encode($content['text_content']);
+        $content['text_content'] = sek_maybe_encode_richtext($content['text_content']);
     }
     return $content;
 }

@@ -896,15 +896,15 @@ function sanitize_callback__czr_simple_form_module( $value ) {
     if ( array_key_exists( 'form_fields', $value ) && is_array( $value['form_fields'] ) ) {
         if ( !empty($value['form_fields']['button_text']) ) {
             $value['form_fields']['button_text'] = sanitize_text_field( $value['form_fields']['button_text'] );
-            $value['form_fields']['button_text'] = sek_maybe_json_encode($value['form_fields']['button_text']);
+            $value['form_fields']['button_text'] = sek_maybe_encode_richtext($value['form_fields']['button_text']);
         }
         if ( !empty($value['form_fields']['privacy_field_label']) ) {
-            $value['form_fields']['privacy_field_label'] = sek_maybe_json_encode($value['form_fields']['privacy_field_label']);
+            $value['form_fields']['privacy_field_label'] = sek_maybe_encode_richtext($value['form_fields']['privacy_field_label']);
         }
     }
     if ( array_key_exists( 'form_submission', $value ) && is_array( $value['form_submission'] ) ) {
         if ( !empty($value['form_submission']['email_footer']) ) {
-            $value['form_submission']['email_footer'] = sek_maybe_json_encode($value['form_submission']['email_footer']);
+            $value['form_submission']['email_footer'] = sek_maybe_encode_richtext($value['form_submission']['email_footer']);
         }
     }
     return $value;

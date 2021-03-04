@@ -24,7 +24,7 @@ if ( !function_exists( 'Nimble\sek_print_tiny_mce_text_content') ) {
             // Feb 2021 : now saved as a json to fix emojis issues
             // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
             // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
-            $content = sek_maybe_decode_json( $tiny_mce_content );
+            $content = sek_maybe_decode_richtext( $tiny_mce_content );
                 
             // Use our own content filter instead of $content = apply_filters( 'the_content', $tiny_mce_content );
             // because of potential third party plugins corrupting 'the_content' filter. https://github.com/presscustomizr/nimble-builder/issues/233

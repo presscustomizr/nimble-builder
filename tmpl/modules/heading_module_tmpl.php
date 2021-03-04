@@ -25,7 +25,7 @@ if ( !function_exists( 'Nimble\sek_print_text_heading_content' ) ) {
             // Feb 2021 : now saved as a json to fix emojis issues
             // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
             // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
-            $heading_content = sek_maybe_decode_json($heading_content);
+            $heading_content = sek_maybe_decode_richtext($heading_content);
 
             $heading_content = apply_filters( 'the_nimble_tinymce_module_content', $heading_content );
             $heading_content = sek_strip_script_tags($heading_content);
@@ -71,7 +71,7 @@ if ( array_key_exists('heading_text', $value ) ) {
     // Feb 2021 : now saved as a json to fix emojis issues
     // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
     // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
-    $heading_title = sek_maybe_decode_json( empty( $value['heading_title'] ) ? '' : $value['heading_title'] );
+    $heading_title = sek_maybe_decode_richtext( empty( $value['heading_title'] ) ? '' : $value['heading_title'] );
     if ( false === sek_booleanize_checkbox_val( $value['link-to'] ) ) {
         printf( '<%1$s %3$s class="sek-heading">%2$s</%1$s>',
             $tag,

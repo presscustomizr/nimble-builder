@@ -13,7 +13,7 @@ if ( !function_exists( 'Nimble\sek_print_shortcode_module_content' ) ) {
     // Feb 2021 : now saved as a json to fix emojis issues
     // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
     // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
-    $shortcode_mod_html_content = sek_maybe_decode_json( $value['text_content'] );
+    $shortcode_mod_html_content = sek_maybe_decode_richtext( $value['text_content'] );
 
     $shortcode_mod_html_content = sek_strip_script_tags( $shortcode_mod_html_content );
     

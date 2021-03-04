@@ -49,7 +49,7 @@ if ( isset( $design_settings['use_box_shadow'] ) && true === sek_booleanize_chec
 // Feb 2021 : now saved as a json to fix emojis issues
 // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
 // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
-$btn_text = sek_maybe_decode_json( $content_settings[ 'button_text'] );
+$btn_text = sek_maybe_decode_richtext( $content_settings[ 'button_text'] );
 $icon_html = sek_get_button_module_icon( $content_settings );
 $icon_side = empty($content_settings['icon-side']) ? 'left' : $content_settings['icon-side'];
 

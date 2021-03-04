@@ -34,8 +34,8 @@ if ( !function_exists( 'Nimble\sek_print_accordion' ) ) {
                     $item_html_content = $item['text_content'];
                     // convert into a json to prevent emoji breaking global json data structure
                     // fix for https://github.com/presscustomizr/nimble-builder/issues/544
-                    $title = sek_maybe_decode_json($title);
-                    $item_html_content = sek_maybe_decode_json($item_html_content);
+                    $title = sek_maybe_decode_richtext($title);
+                    $item_html_content = sek_maybe_decode_richtext($item_html_content);
 
                     if ( !skp_is_customizing() ) {
                         $item_html_content = apply_filters( 'nimble_parse_for_smart_load', $item_html_content );

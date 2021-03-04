@@ -122,10 +122,10 @@ function sek_sanitize_czr_heading_module( $content ) {
             }
             // convert into a json to prevent emoji breaking global json data structure
             // fix for https://github.com/presscustomizr/nimble-builder/issues/544
-            $content['main_settings']['heading_text'] = sek_maybe_json_encode($content['main_settings']['heading_text']);
+            $content['main_settings']['heading_text'] = sek_maybe_encode_richtext($content['main_settings']['heading_text']);
         }
         if ( !empty($content['main_settings']['heading_title']) ) {
-            $content['main_settings']['heading_title'] = sek_maybe_json_encode($content['main_settings']['heading_title']);
+            $content['main_settings']['heading_title'] = sek_maybe_encode_richtext($content['main_settings']['heading_title']);
         }
     }
     return $content;

@@ -685,7 +685,7 @@ function sek_prepare_seks_data_for_customizer( $seks_data ) {
                 $seks_data[$key] = sek_prepare_seks_data_for_customizer( $data );
             } else {
                 if ( is_string($data) ) {
-                    $seks_data[$key] = sek_maybe_decode_json( $data );
+                    $seks_data[$key] = sek_maybe_decode_richtext( $data );
                 }
             }
         }
