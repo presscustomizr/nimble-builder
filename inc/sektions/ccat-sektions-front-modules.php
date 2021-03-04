@@ -184,7 +184,7 @@ function sanitize_callback__czr_simple_html_module( $value ) {
         }
         // convert into a json to prevent emoji breaking global json data structure
         // fix for https://github.com/presscustomizr/nimble-builder/issues/544
-        $value[ 'html_content' ] = sek_maybe_json_encode( $value[ 'html_content' ] );
+        $value[ 'html_content' ] = sek_maybe_encode_richtext( $value[ 'html_content' ] );
     }
     return $value;
 }
@@ -232,7 +232,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
 function sek_sanitize_czr_tiny_mce_editor_module( $content ) {
     if ( is_array($content) && !empty($content['main_settings']) && is_array($content['main_settings']) ) {
         $editor_content = !empty($content['main_settings']['content']) ? $content['main_settings']['content'] : '';
-        $content['main_settings']['content'] = sek_maybe_json_encode($editor_content);
+        $content['main_settings']['content'] = sek_maybe_encode_richtext($editor_content);
     }
     //sek_error_log( 'ALORS MODULE CONTENT ?', $content );
     return $content;
@@ -1247,10 +1247,10 @@ function sek_sanitize_czr_heading_module( $content ) {
             }
             // convert into a json to prevent emoji breaking global json data structure
             // fix for https://github.com/presscustomizr/nimble-builder/issues/544
-            $content['main_settings']['heading_text'] = sek_maybe_json_encode($content['main_settings']['heading_text']);
+            $content['main_settings']['heading_text'] = sek_maybe_encode_richtext($content['main_settings']['heading_text']);
         }
         if ( !empty($content['main_settings']['heading_title']) ) {
-            $content['main_settings']['heading_title'] = sek_maybe_json_encode($content['main_settings']['heading_title']);
+            $content['main_settings']['heading_title'] = sek_maybe_encode_richtext($content['main_settings']['heading_title']);
         }
     }
     return $content;
@@ -2294,7 +2294,7 @@ function sanitize_callback__czr_quote_module( $value ) {
         }
         // convert into a json to prevent emoji breaking global json data structure
         // fix for https://github.com/presscustomizr/nimble-builder/issues/544
-        $value['quote_content']['quote_text'] = sek_maybe_json_encode($value['quote_content']['quote_text']);
+        $value['quote_content']['quote_text'] = sek_maybe_encode_richtext($value['quote_content']['quote_text']);
     }
     if ( array_key_exists( 'cite_content', $value ) && is_array( $value['cite_content'] ) && !empty($value['cite_content']['cite_text']) ) {
         //sanitize quote_text
@@ -2303,7 +2303,7 @@ function sanitize_callback__czr_quote_module( $value ) {
         }
         // convert into a json to prevent emoji breaking global json data structure
         // fix for https://github.com/presscustomizr/nimble-builder/issues/544
-        $value['cite_content']['cite_text'] = sek_maybe_json_encode($value['cite_content']['cite_text']);
+        $value['cite_content']['cite_text'] = sek_maybe_encode_richtext($value['cite_content']['cite_text']);
     }
     return $value;
 }
@@ -2627,7 +2627,7 @@ function sanitize_callback__czr_button_module( $value ) {
         //$value['content'][ 'button_text' ] = sanitize_text_field( $value['content'][ 'button_text' ] );
         // convert into a json to prevent emoji breaking global json data structure
         // fix for https://github.com/presscustomizr/nimble-builder/issues/544
-        $value['content']['button_text'] = sek_maybe_json_encode($value['content']['button_text']);
+        $value['content']['button_text'] = sek_maybe_encode_richtext($value['content']['button_text']);
     }
     return $value;
 }
@@ -3648,15 +3648,15 @@ function sanitize_callback__czr_simple_form_module( $value ) {
     if ( array_key_exists( 'form_fields', $value ) && is_array( $value['form_fields'] ) ) {
         if ( !empty($value['form_fields']['button_text']) ) {
             $value['form_fields']['button_text'] = sanitize_text_field( $value['form_fields']['button_text'] );
-            $value['form_fields']['button_text'] = sek_maybe_json_encode($value['form_fields']['button_text']);
+            $value['form_fields']['button_text'] = sek_maybe_encode_richtext($value['form_fields']['button_text']);
         }
         if ( !empty($value['form_fields']['privacy_field_label']) ) {
-            $value['form_fields']['privacy_field_label'] = sek_maybe_json_encode($value['form_fields']['privacy_field_label']);
+            $value['form_fields']['privacy_field_label'] = sek_maybe_encode_richtext($value['form_fields']['privacy_field_label']);
         }
     }
     if ( array_key_exists( 'form_submission', $value ) && is_array( $value['form_submission'] ) ) {
         if ( !empty($value['form_submission']['email_footer']) ) {
-            $value['form_submission']['email_footer'] = sek_maybe_json_encode($value['form_submission']['email_footer']);
+            $value['form_submission']['email_footer'] = sek_maybe_encode_richtext($value['form_submission']['email_footer']);
         }
     }
     return $value;
@@ -5505,7 +5505,7 @@ function sanitize_cb__czr_img_slider_module( $value ) {
     if ( !empty($value['img_collection']) && is_array( $value['img_collection'] ) ) {
         foreach( $value['img_collection'] as $key => $data ) {
             if ( array_key_exists( 'text_content', $data ) && is_string( $data['text_content'] ) ) {
-                $value['img_collection'][$key]['text_content'] = sek_maybe_json_encode( $data['text_content'] );
+                $value['img_collection'][$key]['text_content'] = sek_maybe_encode_richtext( $data['text_content'] );
             }
         }
     }
@@ -6137,10 +6137,10 @@ function sanitize_cb__czr_accordion_module( $value ) {
     if ( !empty($value['accord_collec']) && is_array( $value['accord_collec'] ) ) {
         foreach( $value['accord_collec'] as $key => $data ) {
             if ( array_key_exists( 'text_content', $data ) && is_string( $data['text_content'] ) ) {
-                $value['accord_collec'][$key]['text_content'] = sek_maybe_json_encode( $data['text_content'] );
+                $value['accord_collec'][$key]['text_content'] = sek_maybe_encode_richtext( $data['text_content'] );
             }
             if ( array_key_exists( 'title_text', $data ) && is_string( $data['title_text'] ) ) {
-                $value['accord_collec'][$key]['title_text'] = sek_maybe_json_encode( $data['title_text'] );
+                $value['accord_collec'][$key]['title_text'] = sek_maybe_encode_richtext( $data['title_text'] );
             }
         }
     }
@@ -6702,7 +6702,7 @@ function sek_get_module_params_for_czr_shortcode_module() {
 // fix for https://github.com/presscustomizr/nimble-builder/issues/544
 function sek_sanitize_czr_shortcode_module( $content ) {
     if ( is_array($content) && !empty($content['text_content']) ) {
-        $content['text_content'] = sek_maybe_json_encode($content['text_content']);
+        $content['text_content'] = sek_maybe_encode_richtext($content['text_content']);
     }
     return $content;
 }

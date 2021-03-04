@@ -1407,7 +1407,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               clickedOn = 'inactiveZone';
                         }
 
-                        if ( _.isEmpty( _location_id ) ) {
+                        if ( $hookLocation.length > 0 && _.isEmpty( _location_id ) ) {
                             self.errare( '::scheduleUiClickReactions => error location id can not be empty' );
                         }
 

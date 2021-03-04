@@ -5,8 +5,8 @@ Plugin URI: https://wordpress.org/plugins/nimble-builder/
 Tags: page builder, visual editor, customizer, drag and drop, header, footer, landing page, contact form, grid, post grid
 Requires at least: 4.7
 Requires PHP: 5.4
-Tested up to: 5.6
-Stable tag: 2.2.2
+Tested up to: 5.7
+Stable tag: 2.2.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,14 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.2.2 : [character encoding] fixed a problem occuring with some characters like (€ quotemarks „“, ä ü ö ß and € 😘🚀) which could break rich text editor content
+2.2.3 : Successfully tested with upcoming WordPress 5.7. Various customizer fixes.
 
 == Changelog ==
+= 2.2.3 March 4th, 2021 =
+* 100% compatible with WordPress 5.7 ( scheduled for March 9th 2021 )
+* fixed : [customizer] collection validation => allow setting value to be set even when there are errors + print an error message.
+* fixed : [customizer] prevent logging message of "missing location id" when click is outside a NB location
+
 = 2.2.2 February 18th, 2021 =
 * fixed : [character encoding] some characters like (€ quotemarks „“, ä ü ö ß and € 😘🚀) can break rich text editor content
 
@@ -196,127 +201,3 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 = 2.1.23 November 17th 2020 =
 * fixed : [jQuery][javascript] prepare code for WordPress 5.6+ and removal of jquery migrate
 * fixed : fixed : [CSS][default style] headings font-sizes should be styled by default when used in another module than the heading one, like in the rich text module for example
-
-= 2.1.22 November 9th 2020 =
-* fixed : [dynamic CSS] a missing input id can break building css rules
-* fixed : [global style] global font size not taking precedence over default theme rules in menu items, and ul / ol lists
-* fixed : [search form] add max-width rule to search input to reinforce Nimble CSS precedence over active theme/plugins
-* fixed : [menu module] removed buttons added with a filter by upcoming Twenty Twenty One theme to top level menu-items
-* fixed : [level background] print inline css when customizing instead of relying on data-sek-src
-* fixed : [special image][pro] added more specificity to the link CSS rules to prevent override by global link rules
-* added : [module,column,section] new z-index option in "Height" options
-* added : [links] simple default color CSS transition
-* improved : [lazy load] Disable smart load parsing when building in the customizer
-
-= 2.1.21 November 5th 2020 =
-* fixed : [Image module] custom width not taken into account if > 100% of the parent element.
-* fixed : [link picker][customizer] list of links not visible (opacity set to 0) due to "clearfix" class styled by other plugins
-
-= 2.1.20 October 22nd 2020 =
-* fixed : [javascript] replaced javascript alert when jQuery not detected by a console log
-
-= 2.1.19 October 17th 2020 =
-* fixed : [CSS] php error when user not logged in when enqueuing CSS stylesheets
-
-= 2.1.18 October 17th 2020 =
-* fixed : [javascript][performance] front javascript can break when user activates the ajax load performance option
-* added : [front assets][performance] introduction of a new property Nimble_Manager()::page_has_local_or_global_sections, set @template_redirect, which let us know if NB asset are needed on a given page. More efficitent that the previous check which was running several times a recursive walker on the section tree.
-
-= 2.1.17 October 16th 2020 =
-* fixed : [global CSS] bug : missing global style options after updating Nimble Builder to v2.1.15+
-* added : [customizer][font picker] link to Google fonts showcase
-
-= 2.1.16 October 16th 2020 =
-* fixed : [CSS] specificity too low for rules generated for modules
-* fixed : [html] attribute data-sek-lazy-bg is added to all levels even when there's no lazy backround to load
-
-= 2.1.15 October 15th, 2020 =
-* fixed : [CSS][Button module] border and text color should have more specificity to avoid being overridden by future WP default theme twentytwentyone
-* fixed : [customizer preview] some CSS rules for UI buttons are not specific enough when using a theme like twentytwentyone
-* fixed : [CSS] global stylesheet may be erased when generating local stylesheet with no global locations
-* fixed : [CSS] specificity too low for module dynamic styles, in particular for text CSS rules
-* fixed : [CSS][performance]  better performances on front for global options CSS, like text, breakpoint, sections widths
-* fixed : [menu module] added more specificity to button style to avoid inheritance of themes or plugins style ( twentytwentyone overrides buttons style )
-* added : [CSS] new selector .nb-loc to location wrappers
-* added : [CSS][performance] use a new global option to store global style to be rendered inline
-* improved : [JS][Performances] reduce main script file + defer loading of partial ones + load when needed only
-* improved : [CSS][Global options] implement a better way to print global options stylesheets with a filter 'nimble_set_global_inline_style'
-* improved : [performance] preload some front assets like Font Awesome style and fonts
-* improved : [performance][js][css] assets for magn. popup, swiper, video bg are now by default loaded by js on front.  WP enqueueing is only used when customizing for those assets.
-* improved : [CSS][Performance] implement dynamic module stylesheet concatenation + added a new folder name 'nimble_css' for new concatenated stylesheets  + clean the previous one 'nb_css' + removed global performance option 'use_partial_module_stylesheets'. Fallback on full stylesheet if concatenation broken due to permissions problems.
-* removed : [performance] option 'preload_front_scripts', now implemented by default
-* removed : [performance] removed php sniffers to detect if we need to load specific assets in favor of a js detection
-
-= 2.1.14 October 6th, 2020 =
-* fixed : [performance][Lazy loading] when rendering NB content, remove attr loading="lazy" added to images by WP
-* fixed : [scroll to anchor] + [lazyload] => avoid layout shifts problems for page with many images
-
-= 2.1.13 September 30, 2020 =
-* fixed : [module settings] horizontal alignment should be customizable without setting a custom width
-* added : [prebuilt sections] link to live demo when hovering thumbnail
-* improved : [i18n] clean unused translation strings
-
-= 2.1.12 September 28, 2020 =
-* fixed : [lazy load] background images off screen are not loaded when lazy load is disabled
-* fixed : [image module] an image with an invalid url should not be rendered
-* fixed : [shadow on levels] not refreshed when customizing
-* fixed : [scroll to anchor] when lazy loading is on, the scroll might not land to the right anchor
-* fixed : [carousel module] first image not displayed when customizing with global lazyload disabled BUT slider lazyload enabled
-* fixed : [carousel module] adapt image to carousel height broken
-* added : [carousel module] new image layout option so that images fill space and are centered without being stretched
-* improved : [scroll to anchor] implement scrollIntoView
-
-= 2.1.11 September 26, 2020 =
-* fixed : [dynamic css] css value may not be taken into account when typed fast, for example when setting an height in pixels
-* fixed : [slider module] horizontal centering broken when slider fills 100% of height
-* fixed : [slider module] improved slider image style when chosen option is to adapt image on height
-* fixed : [prebuilt sections][performances] removed the get sections action at 'nimble_front_classes_ready'
-* fixed : [img module] make sure the html has a minimum height when no image was found
-* improved : [dynamic stylesheet] always animate to level when stylesheet is generated
-* improved : [dynamic stylesheet][performance] improved the CSS rule generation for level box shadow
-* added : [fonts] new web safe font
-* added : [image module] introduction of a custom height option
-* added: [prebuilt sections] new group of sections "Team" with 2 new prebuilt sections included
-
-= 2.1.10 September 17, 2020 =
-* improved : [admin] settings links should point to "Options" tab
-* fixed : [accordion module] striping script tags should be moved before parsing video embed, leading to tiktok videos embeds not working
-
-= 2.1.9 September 11th 2020 =
-* fixed : php fatal error on front end
-
-= 2.1.8 September 11th 2020 =
-* added : [contact form module] introduction of a privacy checkbox for a better GDPR compliancy
-
-= 2.1.7 September 7 2020 =
-* improved : Maintenance release, minor admin code improvement.
-
-= 2.1.6 September 1st 2020 =
-* fixed : [customizer] fixed possible javascript error when setting a font family
-* improved : [admin] Welcome notice doesn't need to be displayed on all screens
-
-= 2.1.5 July 20th 2020 =
-* fixed : [compatibility with WP 5.5] wp_make_content_images_responsive is deprecated, replaced by wp_filter_content_tags
-* fixed : [compatibility with WP 5.5] adapt customizer color-picker script with latest version of WP 5.5
-* improved : [performance] limit the number of transients created by Nimble Builder + clean old unused transients.
-* improved : [icon module] added a default line-height of 1em to the icon wrapper
-
-= 2.1.4 July 18th 2020 =
-* fixed : [Customizer UI][device switcher] limit scenarii when preview is automatically set back to desktop, while user customizes mobile or tablet preview.
-
-= 2.1.3 July 17th 2020 =
-* fixed : [CSS generation][performances] empty stylesheets not always removed from upload sek_css folder. Introduction of a new folder 'nb_css' in /upload to store Nimble dynamic stylesheets.
-
-= 2.1.2 July 7th 2020 =
-* fixed : [performance][css] don't generate CSS for inactive locations on a page
-* fixed : [menu module] submenu items won't inherit user defined text styles
-* fixed : [menu module][mobile menu] make sure users can scroll down mobile menu items if menu wrapper is higher than vh
-* fixed : [lazy load][performances] image parsing can break srcset and sizes attributes
-* fixed : [UI][Content Picker] Fix all content type displayed in some cases + make sure the content picker is set to "section" when user creates a new section
-
-= 2.1.1 June 17th 2020 =
-* fixed : [options] prevent duplicated dismissed pointer in user_meta
-* fixed : [admin] wrong url for NB icon in options title
-* improved : [developers] allow filtering module params from a plugin
-* improved : [developers] allow filtering of NB header CSS classes
-* improved : [developers] the way section CSS classes are printed + add a way to filter from a plugin
