@@ -88,7 +88,7 @@ add_filter( 'wp_insert_post_data', function( $data, $postarr, $unsanitized_posta
             return new \WP_Error( 'db_insert_error', __('Could not insert NB template into the database : invalid JSON'), json_last_error() );
         }
     }
-    return $data;
+    return wp_slash($data);
 }, 10 , 3);
 
 ?>
