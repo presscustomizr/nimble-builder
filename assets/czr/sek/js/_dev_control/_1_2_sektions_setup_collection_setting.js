@@ -300,9 +300,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
                   _checkWalker_();
 
+                  if ( errorDetected ) {
+                        api.infoLog('error in ::validateSettingValue', valCandidate );
+                  }
                   //api.infoLog('in ::validateSettingValue', valCandidate );
                   // if null is returned, the setting value is not set @see customize-base.js
-                  return errorDetected ? null : valCandidate;
+                  return valCandidate;
             },//validateSettingValue
 
 
