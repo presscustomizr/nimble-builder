@@ -16,8 +16,7 @@ function sek_get_revision_history_from_posts( $skope_id = '', $skope_level = 'lo
     if ( defined('DOING_AJAX') && DOING_AJAX && '_skope_not_set_' === $skope_id ) {
           wp_send_json_error( __FUNCTION__ . ' => invalid skope id' );
     }
-    $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
-    $post_id = (int)get_option( $option_name );
+    $post_id = sek_get_nb_post_id_from_index($skope_id);
     $raw_revision_history = array();
     if ( -1 !== $post_id ) {
         $args = array(

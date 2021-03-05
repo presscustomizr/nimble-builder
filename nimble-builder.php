@@ -160,6 +160,8 @@ if ( nimble_passes_requirements() ) {
     // Fire the retro compatibility functions
     // Note : if fired @plugins_loaded, invoking wp_update_post() generates php notices
     //add_action( 'wp_loaded', '\Nimble\sek_maybe_do_version_mapping' );
+    // introduced for https://github.com/presscustomizr/nimble-builder/issues/799
+    add_action( 'wp_loaded', '\Nimble\sek_maybe_do_option_optimization' );
 
     // Load admin
     if ( is_admin() ) {

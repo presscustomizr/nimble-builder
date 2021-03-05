@@ -170,8 +170,6 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
       }
       $post_id = $r->ID;
 
-      $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $this->skope_id;
-
       // Cache post ID in option for performance to avoid additional DB query.
       // $seks_options = get_option( $option_name );
       // $seks_options = is_array( $seks_options ) ? $seks_options : array();
@@ -179,7 +177,7 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
       // //$seks_options[ $this->skope_id ] = $post_id;//$r is the post ID
       // $seks_options = (int)$post_id;//$r is the post ID
 
-      update_option( $option_name, (int)$post_id );
+      sek_set_nb_post_id_in_index( $this->skope_id, (int)$post_id );
       // sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => $seks_options', (int)$post_id);
 
       return $post_id;

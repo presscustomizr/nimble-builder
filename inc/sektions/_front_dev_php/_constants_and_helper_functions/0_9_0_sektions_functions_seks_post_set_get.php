@@ -29,7 +29,30 @@ register_post_type( NIMBLE_CPT , array(
     )
 ));
 
+// Returns the id of the post in which the local collection is stored
+// This option NIMBLE_OPT_SEKTION_POST_INDEX is updated when publishing in the customizer and may also be updated when getting the collection in sek_get_seks_post()
+// introduced for #799
+function sek_get_nb_post_id_from_index( $skope_id ) {
+    sek_error_log('TO DO => Maybe cache the value');
+    $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);
+    $nb_posts_index = is_array($nb_posts_index) ? $nb_posts_index : [];
+    $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+    $post_id = 0;
+    if ( array_key_exists( $option_name, $nb_posts_index ) ) {
+        $post_id = (int)$nb_posts_index[$option_name];
+    }
+    return $post_id;
+}
 
+// Associates a skope_id to a NB post id in the NB post index option
+// introduced for #799
+function sek_set_nb_post_id_in_index( $skope_id, $post_id ) {
+    $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);
+    $nb_posts_index = is_array($nb_posts_index) ? $nb_posts_index : [];
+    $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+    $nb_posts_index[$option_name] = (int)$post_id;
+    update_option( NIMBLE_OPT_SEKTION_POST_INDEX, $nb_posts_index, 'no');
+}
 
 
 
@@ -71,18 +94,16 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
 
     $post = null;
 
-    $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
-
-    $post_id = (int)get_option( $option_name );
+    $post_id = sek_get_nb_post_id_from_index( $skope_id );
     // if the options has not been set yet, it will return (int) 0
     // id #1 is already taken by the 'Hello World' post.
     if ( 1 > $post_id ) {
-        //error_log( 'sek_get_seks_post => post_id is not valid for options => ' . $option_name );
+        //error_log( 'sek_get_seks_post => post_id is not valid for options => ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id );
         return;
     }
 
     if ( !is_int( $post_id ) ) {
-        error_log( 'sek_get_seks_post => post_id !is_int() for options => ' . $option_name );
+        error_log( 'sek_get_seks_post => post_id !is_int() for options => ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id );
     }
 
     if ( is_int( $post_id ) && $post_id > 0 && get_post( $post_id ) ) {
@@ -98,7 +119,7 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
          * Cache the lookup. See sek_update_sek_post().
          * @todo This should get cleared if a skope post is added/removed.
          */
-        update_option( $option_name, (int)$post_id );
+        sek_set_nb_post_id_in_index( $skope_id, (int)$post_id );
     }
     if ( !skp_is_customizing() ) {
         $cached_seks_posts[$skope_id] = $post;
@@ -424,10 +445,9 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
     } else {
         $r = wp_insert_post( wp_slash( $post_data ), true );
         if ( !is_wp_error( $r ) ) {
-            $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
             $post_id = $r;//$r is the post ID
 
-            update_option( $option_name, (int)$post_id );
+            sek_set_nb_post_id_in_index( $skope_id, (int)$post_id ); 
 
             // Trigger creation of a revision. This should be removed once #30854 is resolved.
             if ( 0 === count( wp_get_post_revisions( $r ) ) ) {

@@ -1,4 +1,71 @@
 <?php
+// introduced for #799
+function sek_maybe_do_option_optimization() {
+    $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
+    $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
+    // If the move in post index has been done, let's update to autoload = false the previous post_id options LIKE nimble___skp__post_page_*****, nimble___skp__tax_product_cat_*****
+    // As of March 2021, event if those previous options are not used anymore, let's keep them in DB to cover potential retro-compat problems
+    // in a future release, if no regression was reported, we'll remove them forever.
+    if ( array_key_exists('move_in_post_index_0321', $bw_fixes_options ) && 'done' === $bw_fixes_options['move_in_post_index_0321'] ) {
+        if ( !array_key_exists('fix_skope_opt_autoload_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['fix_skope_opt_autoload_0321'] ) {
+            // MOVE ALL OPTIONS LIKE nimble___skp__post_page_*****, nimble___skp__tax_product_cat_***** in a new option ( NIMBLE_OPT_SEKTION_POST_INDEX ), not autoloaded
+            global $wpdb;
+            //$results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE option_id = 1", OBJECT );
+            //$results = $wpdb->get_results( "SELECT SUM(LENGTH(option_value)) as autoload_size FROM wp_options WHERE autoload='yes';" );
+            $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE autoload = 'yes' and option_name like 'nimble___skp_%'", ARRAY_A );
+            //sek_error_log('DB RESULTS?', $results );
+            if ( is_array( $results ) ) {
+                foreach( $results as $old_opt_data ) {
+                    if ( !is_array($old_opt_data) )
+                        continue;
+                    if ( empty($old_opt_data['option_name']) || empty($old_opt_data['option_value']) )
+                        continue;
+                    sek_error_log('FIX AUTOLOAD NO?', $old_opt_data['option_name'] );
+                    // update it with autoload set to "no"
+                    update_option( $old_opt_data['option_name'], (int)$old_opt_data['option_value'], 'no' );
+                }
+            }
+
+            //sek_error_log('fix_skope_opt_autoload_032 done ');
+            // flag as done
+            $bw_fixes_options['fix_skope_opt_autoload_0321'] = 'done';
+            update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options, 'no' );
+        }
+    }
+
+
+    if ( !array_key_exists('move_in_post_index_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['move_in_post_index_0321'] ) {
+        // MOVE ALL OPTIONS LIKE nimble___skp__post_page_*****, nimble___skp__tax_product_cat_***** in a new option ( NIMBLE_OPT_SEKTION_POST_INDEX ), not autoloaded
+        global $wpdb;
+        //$results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE option_id = 1", OBJECT );
+        //$results = $wpdb->get_results( "SELECT SUM(LENGTH(option_value)) as autoload_size FROM wp_options WHERE autoload='yes';" );
+        $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE autoload = 'yes' and option_name like 'nimble___skp_%'", ARRAY_A );
+        //sek_error_log('DB RESULTS?', $results );
+        if ( is_array( $results ) ) {
+            // Populate the new option ( it should not exists at this point )
+            $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);
+            $nb_posts_index = is_array($nb_posts_index) ? $nb_posts_index : [];
+            foreach( $results as $old_opt_data ) {
+                if ( !is_array($old_opt_data) )
+                    continue;
+                if ( empty($old_opt_data['option_name']) || empty($old_opt_data['option_value']) )
+                    continue;
+                
+                $nb_posts_index[ $old_opt_data['option_name'] ] = (int)$old_opt_data['option_value'];
+            }
+            //sek_error_log('$nb_posts_index?', $nb_posts_index );
+            // update it with autoload set to "no"
+            update_option( NIMBLE_OPT_SEKTION_POST_INDEX, $nb_posts_index, 'no');
+        }
+
+        //sek_error_log('move_in_post_index_0321 done ');
+        // flag as done
+        $bw_fixes_options['move_in_post_index_0321'] = 'done';
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options, 'no' );
+    }
+}
+
+
 // JULY 2020 => NOT FIRED ANYMORE ( because introduced in oct 2018 ) => DEACTIVATED IN nimble-builder.php
 // fired @wp_loaded
 // Note : if fired @plugins_loaded, invoking wp_update_post() generates php notices
