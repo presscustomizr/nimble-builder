@@ -33,7 +33,7 @@ function sek_get_nimble_api_data( $force_update = false ) {
         sek_clean_transients_like( 'nimble_api_data');
         $bw_fixes_options['api_data_transient_0720'] = 'done';
         // flag as done
-        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options, 'no' );
     }
 
     // July 2020 => new static transient name, not updated on each NB version
