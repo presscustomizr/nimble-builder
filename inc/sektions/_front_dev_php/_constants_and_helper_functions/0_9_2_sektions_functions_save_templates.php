@@ -106,7 +106,7 @@ function sek_get_all_saved_templates() {
     $sek_post_query_vars = array(
         'post_type'              => NIMBLE_TEMPLATE_CPT,
         'post_status'            => 'publish',
-        //'name'                   => sanitize_title( NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
+        //'name'                   => sanitize_title(),
         'posts_per_page'         => -1,
         'no_found_rows'          => true,
         'cache_results'          => true,
