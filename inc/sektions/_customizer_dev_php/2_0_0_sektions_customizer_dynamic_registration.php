@@ -29,7 +29,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
         //@filter 'customize_dynamic_setting_args'
         function set_dyn_setting_args( $setting_args, $setting_id ) {
-            // shall start with "nimble___" or "__nimble_options__"
+            // shall start with "nimble___" or "nimble_global_opts"
             // those are the setting that will actually be saved in DB : 
             // - sektion collections ( local and global skope )
             // - global options

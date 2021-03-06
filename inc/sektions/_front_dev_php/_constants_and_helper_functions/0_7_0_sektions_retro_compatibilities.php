@@ -3,6 +3,20 @@
 function sek_maybe_do_option_optimization() {
     $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
     $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
+
+    if ( !array_key_exists('renamed_global_opts_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['renamed_global_opts_0321'] ) {
+        $current_global_opts = get_option('__nimble_options__');
+        if ( false !== $current_global_opts ) {
+            update_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS, $current_global_opts, 'no' );
+            delete_option( '__nimble_options__' );
+        }
+        // flag as done
+        $bw_fixes_options['renamed_global_opts_0321'] = 'done';
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options, 'no' );
+    }
+
+
+
     // If the move in post index has been done, let's update to autoload = false the previous post_id options LIKE nimble___skp__post_page_*****, nimble___skp__tax_product_cat_*****
     // As of March 2021, event if those previous options are not used anymore, let's keep them in DB to cover potential retro-compat problems
     // in a future release, if no regression was reported, we'll remove them forever.

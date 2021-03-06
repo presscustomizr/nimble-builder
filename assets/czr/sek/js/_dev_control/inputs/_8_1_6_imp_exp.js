@@ -37,7 +37,7 @@
                                     // we're after setting id like
                                     // - nimble___[skp__post_post_1] <= local skope setting
                                     // - __nimble__4234ae1dc0fa__font_settings <= level setting
-                                    // - __nimble_options__ <= global options
+                                    // - nimble_global_opts <= global options
                                     // - __nimble__skp__post_post_1__localSkopeOptions__template <= local option setting
                                     hasNimbleDirties = -1 !== _setId.indexOf('nimble');
                               });
