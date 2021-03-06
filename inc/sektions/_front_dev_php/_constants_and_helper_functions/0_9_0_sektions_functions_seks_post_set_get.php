@@ -34,11 +34,17 @@ register_post_type( NIMBLE_CPT , array(
 // introduced for #799
 function sek_get_nb_post_id_from_index( $skope_id ) {
     $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);
-    $nb_posts_index = is_array($nb_posts_index) ? $nb_posts_index : [];
     $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
     $post_id = 0;
-    if ( array_key_exists( $option_name, $nb_posts_index ) ) {
-        $post_id = (int)$nb_posts_index[$option_name];
+    // Backward compat => march 2021, NB introduces a new option 'nimble_posts_index' dedicated to store the NB post_id associated to a skope_id.
+    // For previous user, a backward compatibility code is ran on each load at 'wp_loaded', to transfer all previous options to the new one.
+    // if the transfer went wrong, or if the option 'nimble_posts_index' was deleted, we can attempt to get the post_id from the previous option
+    if ( !is_array( $nb_posts_index ) ) {
+        $post_id = get_option( $option_name );
+    } else {
+        if ( array_key_exists( $option_name, $nb_posts_index ) ) {
+            $post_id = (int)$nb_posts_index[$option_name];
+        }
     }
     return $post_id;
 }
