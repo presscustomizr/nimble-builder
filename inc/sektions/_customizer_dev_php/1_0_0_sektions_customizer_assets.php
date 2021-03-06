@@ -14,7 +14,7 @@ function sek_update_most_used_gfonts( $manager ) {
     $skope_id = skp_get_skope_id();
     $all_gfonts = sek_get_all_gfonts( $skope_id );
     if ( is_array($all_gfonts) && !empty($all_gfonts) ) {
-        update_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS, $all_gfonts );
+        update_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS, $all_gfonts, 'no' );
     }
 }
 

@@ -116,7 +116,7 @@ function sek_do_compat_to_1_4_0() {
             $post_id_storing_home_page_sections = (int)get_option( $current_option_name );
             if ( $post_id_storing_home_page_sections > 0 ) {
                 $new_option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . "skp__post_page_{$home_page_id}";
-                update_option( $new_option_name, $post_id_storing_home_page_sections );
+                update_option( $new_option_name, $post_id_storing_home_page_sections, 'no' );
             }
         }
     }
@@ -132,7 +132,7 @@ function sek_do_compat_1_0_4_to_1_1_0() {
     $sek_post_query_vars = array(
         'post_type'              => NIMBLE_CPT,
         'post_status'            => get_post_stati(),
-        //'name'                   => sanitize_title( NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
+        //'name'                   => sanitize_title(),
         'posts_per_page'         => -1,
         'no_found_rows'          => true,
         'cache_results'          => true,

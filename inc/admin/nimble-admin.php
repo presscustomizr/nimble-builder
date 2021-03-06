@@ -41,18 +41,18 @@ function sek_versionning() {
     // Add Upgraded From Option + update current version if needed
     $current_version = get_option( 'nimble_version' );
     if ( $current_version != NIMBLE_VERSION ) {
-        update_option( 'nimble_version_upgraded_from', $current_version );
-        update_option( 'nimble_version', NIMBLE_VERSION );
+        update_option( 'nimble_version_upgraded_from', $current_version, 'no' );
+        update_option( 'nimble_version', NIMBLE_VERSION, 'no' );
     }
     // Write the version that the user started with.
     // Note : this has been implemented starting from v1.1.8 in October 2018. At this time 4000+ websites were already using the plugin, and therefore started with a version <= 1.1.7.
     $started_with = get_option( 'nimble_started_with_version' );
     if ( empty( $started_with ) ) {
-        update_option( 'nimble_started_with_version', $current_version );
+        update_option( 'nimble_started_with_version', $current_version, 'no' );
     }
     $start_date = get_option( 'nimble_start_date' );
     if ( empty( $start_date ) ) {
-        update_option( 'nimble_start_date', date("Y-m-d H:i:s") );
+        update_option( 'nimble_start_date', date("Y-m-d H:i:s"), 'no' );
     }
 }
 
@@ -625,7 +625,7 @@ function sek_may_be_display_update_notice() {
         // 1) initialize it => set it to the current version, displayed 0 times.
         // 2) update in db
         $last_update_notice_values = array( "version" => NIMBLE_VERSION, "display_count" => 0 );
-        update_option( 'nimble_last_update_notice', $last_update_notice_values );
+        update_option( 'nimble_last_update_notice', $last_update_notice_values, 'no' );
         // already user of the plugin ? => show the notice if
         if ( sek_user_started_before_version( NIMBLE_VERSION ) ) {
             $show_new_notice = true;
@@ -645,13 +645,13 @@ function sek_may_be_display_update_notice() {
             (int) $_db_displayed_count++;
             $last_update_notice_values["display_count"] = $_db_displayed_count;
             //updates the option val with the new count
-            update_option( 'nimble_last_update_notice', $last_update_notice_values );
+            update_option( 'nimble_last_update_notice', $last_update_notice_values, 'no' );
         }
         // CASE 2 : displayed n times => automatic dismiss
         else {
             //reset option value with new version and counter to 0
             $new_val  = array( "version" => NIMBLE_VERSION, "display_count" => 0 );
-            update_option('nimble_last_update_notice', $new_val );
+            update_option('nimble_last_update_notice', $new_val, 'no' );
         }//end else
     }//end if
 
@@ -746,7 +746,7 @@ function sek_dismiss_update_notice_action() {
     check_ajax_referer( 'dismiss-update-notice-nonce', 'dismissUpdateNoticeNonce' );
     //reset option value with new version and counter to 0
     $new_val  = array( "version" => NIMBLE_VERSION, "display_count" => 0 );
-    update_option( 'nimble_last_update_notice', $new_val );
+    update_option( 'nimble_last_update_notice', $new_val, 'no' );
     wp_die( 1 );
 }
 

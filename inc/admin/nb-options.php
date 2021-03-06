@@ -265,12 +265,12 @@ function nb_maybe_update_checkbox_option( $opt_name, $unchecked_value ) {
     $opt_value = get_option( $opt_name );
     $posted_value = array_key_exists( $opt_name, $_POST ) ? $_POST[$opt_name] : $unchecked_value;
     if ( $unchecked_value !== $posted_value ) {
-        update_option( $opt_name, esc_attr( $posted_value ) );
+        update_option( $opt_name, esc_attr( $posted_value ), 'no' );
     } else {
         // if the option was never set before, then leave it not set
         // otherwise update it to 'off'
         if ( false !== $opt_value ) {
-            update_option( $opt_name, $unchecked_value );
+            update_option( $opt_name, $unchecked_value, 'no' );
         }
     }
 }

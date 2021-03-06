@@ -218,6 +218,7 @@ function sek_get_preset_section_collection_from_json( $force_update = false ) {
         update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options, 'no' );
     }
 
+    // Try to get the collection from an option
     $json_collection = get_option( NIMBLE_OPT_NAME_FOR_SECTION_JSON );
 
     // Refresh every 30 days, unless force_update set to true
@@ -230,7 +231,7 @@ function sek_get_preset_section_collection_from_json( $force_update = false ) {
 
         $json_collection = json_decode( $json_raw, true );
         // Save now as option for faster access next time
-        update_option( NIMBLE_OPT_NAME_FOR_SECTION_JSON, $json_collection );
+        update_option( NIMBLE_OPT_NAME_FOR_SECTION_JSON, $json_collection, 'no' );
     }
     // Filter used by NB Pro to add pro sections
     return apply_filters( 'nimble_preset_sections_collection', $json_collection, $force_update );

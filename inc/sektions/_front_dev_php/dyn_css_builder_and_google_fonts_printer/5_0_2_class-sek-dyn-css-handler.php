@@ -342,7 +342,7 @@ class Sek_Dyn_CSS_Handler {
             if ( is_customize_preview() || $this->force_rewrite || $this->customizer_save ) {
                 $global_style = Nimble_Manager()->sek_build_global_options_inline_css();
                 //sek_error_log('SOO GLOBAL INLINE CSS?', $global_style );
-                update_option( NIMBLE_OPT_FOR_GLOBAL_CSS, $global_style );
+                update_option( NIMBLE_OPT_FOR_GLOBAL_CSS, $global_style, 'no' );
             }
         }
     }//__construct

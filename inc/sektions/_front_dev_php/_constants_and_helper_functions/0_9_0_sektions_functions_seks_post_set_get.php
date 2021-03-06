@@ -33,7 +33,6 @@ register_post_type( NIMBLE_CPT , array(
 // This option NIMBLE_OPT_SEKTION_POST_INDEX is updated when publishing in the customizer and may also be updated when getting the collection in sek_get_seks_post()
 // introduced for #799
 function sek_get_nb_post_id_from_index( $skope_id ) {
-    sek_error_log('TO DO => Maybe cache the value');
     $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);
     $nb_posts_index = is_array($nb_posts_index) ? $nb_posts_index : [];
     $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
