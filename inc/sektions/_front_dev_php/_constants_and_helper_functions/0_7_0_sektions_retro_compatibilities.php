@@ -24,23 +24,18 @@ function sek_maybe_do_option_optimization() {
         if ( !array_key_exists('fix_skope_opt_autoload_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['fix_skope_opt_autoload_0321'] ) {
             // MOVE ALL OPTIONS LIKE nimble___skp__post_page_*****, nimble___skp__tax_product_cat_***** in a new option ( NIMBLE_OPT_SEKTION_POST_INDEX ), not autoloaded
             global $wpdb;
-            //$results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE option_id = 1", OBJECT );
-            //$results = $wpdb->get_results( "SELECT SUM(LENGTH(option_value)) as autoload_size FROM wp_options WHERE autoload='yes';" );
             $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE autoload = 'yes' and option_name like 'nimble___skp_%'", ARRAY_A );
-            //sek_error_log('DB RESULTS?', $results );
             if ( is_array( $results ) ) {
                 foreach( $results as $old_opt_data ) {
                     if ( !is_array($old_opt_data) )
                         continue;
                     if ( empty($old_opt_data['option_name']) || empty($old_opt_data['option_value']) )
                         continue;
-                    sek_error_log('FIX AUTOLOAD NO?', $old_opt_data['option_name'] );
                     // update it with autoload set to "no"
                     update_option( $old_opt_data['option_name'], (int)$old_opt_data['option_value'], 'no' );
                 }
             }
 
-            //sek_error_log('fix_skope_opt_autoload_032 done ');
             // flag as done
             $bw_fixes_options['fix_skope_opt_autoload_0321'] = 'done';
             update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options, 'no' );
@@ -51,10 +46,7 @@ function sek_maybe_do_option_optimization() {
     if ( !array_key_exists('move_in_post_index_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['move_in_post_index_0321'] ) {
         // MOVE ALL OPTIONS LIKE nimble___skp__post_page_*****, nimble___skp__tax_product_cat_***** in a new option ( NIMBLE_OPT_SEKTION_POST_INDEX ), not autoloaded
         global $wpdb;
-        //$results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE option_id = 1", OBJECT );
-        //$results = $wpdb->get_results( "SELECT SUM(LENGTH(option_value)) as autoload_size FROM wp_options WHERE autoload='yes';" );
         $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE autoload = 'yes' and option_name like 'nimble___skp_%'", ARRAY_A );
-        //sek_error_log('DB RESULTS?', $results );
         if ( is_array( $results ) ) {
             // Populate the new option ( it should not exists at this point )
             $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);
@@ -67,12 +59,10 @@ function sek_maybe_do_option_optimization() {
                 
                 $nb_posts_index[ $old_opt_data['option_name'] ] = (int)$old_opt_data['option_value'];
             }
-            //sek_error_log('$nb_posts_index?', $nb_posts_index );
             // update it with autoload set to "no"
             update_option( NIMBLE_OPT_SEKTION_POST_INDEX, $nb_posts_index, 'no');
         }
 
-        //sek_error_log('move_in_post_index_0321 done ');
         // flag as done
         $bw_fixes_options['move_in_post_index_0321'] = 'done';
         update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options, 'no' );
