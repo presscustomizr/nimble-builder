@@ -1195,11 +1195,11 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         // updated May 2020 : prevent doing shortcode when customizing
         // fixes https://github.com/presscustomizr/nimble-builder/issues/704
         function sek_do_shortcode( $content ) {
-            $allow_shortcode_parsing_when_customizing = sek_booleanize_checkbox_val( get_option( 'nb_shortcodes_parsed_in_czr' ) );
-            if ( $allow_shortcode_parsing_when_customizing ) {
+            if ( !skp_is_customizing() ) {
                 $content = do_shortcode( $content );
             } else {
-                if ( !skp_is_customizing() ) {
+                $allow_shortcode_parsing_when_customizing = sek_booleanize_checkbox_val( get_option( 'nb_shortcodes_parsed_in_czr' ) );
+                if ( $allow_shortcode_parsing_when_customizing ) {
                     $content = do_shortcode( $content );
                 } else {
                     global $shortcode_tags;
@@ -1208,10 +1208,10 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     $tagnames = array_intersect( array_keys( $shortcode_tags ), $matches[1] );
 
                     if ( !empty( $tagnames ) ) {
-                      $content = sprintf('<div class="nimble-shortcode-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>%2$s',
-                          __('Shortcodes are not parsed by default when customizing. You can change this setting in your WP admin > Settings > Nimble Builder options.', 'text-doma'),
-                          $content
-                      );
+                    $content = sprintf('<div class="nimble-shortcode-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>%2$s',
+                        __('Shortcodes are not parsed by default when customizing. You can change this setting in your WP admin > Settings > Nimble Builder options.', 'text-doma'),
+                        $content
+                    );
                     }
                 }
             }
@@ -1222,9 +1222,14 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         // updated May 2020 : prevent doing shortcode when customizing
         // fixes https://github.com/presscustomizr/nimble-builder/issues/704
         function sek_run_shortcode( $content ) {
-            $allow_shortcode_parsing_when_customizing = sek_booleanize_checkbox_val( get_option( 'nb_shortcodes_parsed_in_czr' ) );
-            if ( skp_is_customizing() && !$allow_shortcode_parsing_when_customizing )
-              return $content;
+            // customizing => check if NB can parse the shortcode
+            if ( skp_is_customizing() ) {
+                $allow_shortcode_parsing_when_customizing = sek_booleanize_checkbox_val( get_option( 'nb_shortcodes_parsed_in_czr' ) );
+                if ( !$allow_shortcode_parsing_when_customizing ) {
+                    return $content;
+                }
+            }
+            // Not customizing always run
             if ( array_key_exists( 'wp_embed', $GLOBALS ) && $GLOBALS['wp_embed'] instanceof \WP_Embed ) {
                 $content = $GLOBALS['wp_embed']->run_shortcode( $content );
             }
