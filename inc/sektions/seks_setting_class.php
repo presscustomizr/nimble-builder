@@ -3,6 +3,33 @@ namespace Nimble;
 if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
+
+/**
+ *
+ *
+ * @see WP_Customize_Setting
+ */
+// Setting class for NB global options and Site Template options
+// Note : the backslash before WP_Customize_Setting is here to indicate the global namespace
+// otherwise "PHP Fatal error:  Class 'Nimble\WP_Customize_Setting'" not found will be triggered by the php engine
+// This Setting class has been introduced in March 2021 for #799, to set option to autoload 'no' in wp_options
+final class Nimble_Options_Setting extends \WP_Customize_Setting {
+  public function __construct( $manager, $id, $args = array() ) {
+    parent::__construct( $manager, $id, $args );
+    // Make sure NB doesn't override the wrong setting
+    if ( 0 !== strpos( $this->id_data['base'], NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) && 0 !== strpos( $this->id_data['base'],  NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ) ) {
+        throw new \Exception( 'Nimble_Options_Customizer_Setting => __construct => invalid ID base' );
+    }
+  }
+
+  // March 2021 => set autoload to "no" for #799
+  public function update( $value ) {
+    update_option( $this->id_data['base'], $value, 'no' );
+  }
+}
+
+
+
 /**
  * This handles validation, sanitization and saving of the value.
  */
@@ -12,9 +39,10 @@ if ( !defined( 'ABSPATH' ) ) {
  *
  * @see WP_Customize_Setting
  */
+// Setting class for NB sektion collections => shall start with 'nimble___'
 // Note : the backslash before WP_Customize_Setting is here to indicate the global namespace
 // otherwise "PHP Fatal error:  Class 'Nimble\WP_Customize_Setting'" not found will be triggered by the php engine
-final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
+final class Nimble_Collection_Setting extends \WP_Customize_Setting {
 
   /**
    * The setting type.
@@ -45,13 +73,13 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
     parent::__construct( $manager, $id, $args );
     // shall start with "nimble___"
     if ( 0 !== strpos( $this->id_data['base'], NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) { //$this->id_data['base'] looks like "nimble___"
-        throw new Exception( 'Nimble_Customizer_Setting => __construct => Expected ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . ' id_base.' );
+        throw new \Exception( 'Nimble_Collection_Setting => __construct => Expected ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . ' id_base.' );
     }
 
 
     //there can be only one skope_id key instantiated at a time
     if ( 1 !== count( $this->id_data['keys'] ) || empty( $this->id_data['keys'][0] ) ) {
-        throw new Exception( 'Nimble_Customizer_Setting => __construct => Expected single option key.' );
+        throw new \Exception( 'Nimble_Collection_Setting => __construct => Expected single option key.' );
     }
     $this->skope_id = $this->id_data['keys'][0];
   }
@@ -110,7 +138,7 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
     }
     $id_base = $this->id_data['base'];
 
-    //error_log('id_base in Nimble_Customizer_Setting class => ' . $this->id_data['base'] );
+    //error_log('id_base in Nimble_Collection_Setting class => ' . $this->id_data['base'] );
 
     $value = '';
     $post = sek_get_seks_post( $this->skope_id );
@@ -144,7 +172,7 @@ final class Nimble_Customizer_Setting extends \WP_Customize_Setting {
       // sek_error_log( __CLASS__. ' $seks_collection' , $seks_collection );
 
       if ( empty( $this->skope_id ) || !is_string( $this->skope_id ) ) {
-          throw new Exception( 'Nimble_Customizer_Setting => update => invalid skope id' );
+          throw new \Exception( 'Nimble_Collection_Setting => update => invalid skope id' );
       }
 
       $r = sek_update_sek_post( $seks_collection, array(

@@ -62,11 +62,17 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         //@filter 'customize_dynamic_setting_class'
         // We use a custom setting class only for the section collections ( local and global ), not for global options and site template options
         function set_dyn_setting_class( $class, $setting_id, $args ) {
-            // shall start with 'nimble___'
-            if ( 0 !== strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
-              return $class;
             //sek_error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
-            return '\Nimble\Nimble_Customizer_Setting';
+            // Setting class for NB global options and Site Template options
+            if ( 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ) ) {
+                return '\Nimble\Nimble_Options_Setting';
+            }
+            
+            // Setting class for NB sektion collections => shall start with 'nimble___'
+            if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) {
+                return '\Nimble\Nimble_Collection_Setting';
+            }
+            return $class;
         }
 
  }//class

@@ -254,7 +254,7 @@ class Sek_Dyn_CSS_Handler {
             'dep'                             => $this->dep,
             'hook'                            => '',
             'priority'                        => $this->priority,
-            'customizer_save'                 => false,//<= used when saving the customizer settins => we want to write the css file on Nimble_Customizer_Setting::update()
+            'customizer_save'                 => false,//<= used when saving the customizer settins => we want to write the css file on Nimble_Collection_Setting::update()
             'force_write'                     => $this->force_write,
             'force_rewrite'                   => $this->force_rewrite
         );
@@ -312,7 +312,7 @@ class Sek_Dyn_CSS_Handler {
         // If not, delete any previouly created stylesheet
 
         //hook setup for printing or enqueuing
-        //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Customizer_Setting::update()
+        //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Collection_Setting::update()
         if ( !$this->customizer_save ) {
             // when not customizing, we write and enqueue :
             // - if the file already exists,

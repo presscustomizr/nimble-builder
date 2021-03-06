@@ -91,7 +91,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             //in particular the 'customized' dirty values, that NB absolutely needs to dynamically register settings that have not yet been instantiated by WP_Customize_Manager
             // see WP Core => class WP_Customize_Manager, add_action( 'customize_register', array( $this, 'register_dynamic_settings' ), 11 );
             // see NB => class SEK_CZR_Dyn_Register
-            // see NB => Nimble_Customizer_Setting::filter_previewed_sek_get_skoped_seks => this is how we can get the sektions collection while customizing, see sek_get_skoped_seks()
+            // see NB => Nimble_Collection_Setting::filter_previewed_sek_get_skoped_seks => this is how we can get the sektions collection while customizing, see sek_get_skoped_seks()
             doAjax : function( queryParams ) {
                   var self = this;
                   //do we have a queryParams ?
