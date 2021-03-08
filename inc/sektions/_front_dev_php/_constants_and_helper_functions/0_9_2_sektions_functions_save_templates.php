@@ -207,7 +207,7 @@ function sek_get_all_api_templates() {
   //     )
   // );
 // @return WP_Post|WP_Error Post on success, error on failure.
-function sek_update_saved_tmpl_post( $tmpl_data ) {
+function sek_update_saved_tmpl_post( $tmpl_data, $is_edit_metas_only_case = false ) {
     if ( !is_array( $tmpl_data ) ) {
         sek_error_log( __FUNCTION__ . ' => $tmpl_data is not an array' );
         return new \WP_Error( __FUNCTION__ . ' => $tmpl_data is not an array');
@@ -234,7 +234,6 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
 
     // the template post name is provided only when updating
     $is_update_case = !is_null($tmpl_data['tmpl_post_name']);
-    $is_edit_metas_only_case = 'yes' === $tmpl_data['edit_metas_only'];
 
     // $post_name_to_update will be used when user updates an existing template
     if ( !is_null($tmpl_data['tmpl_post_name']) ) {

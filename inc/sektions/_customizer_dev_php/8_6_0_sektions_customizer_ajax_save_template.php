@@ -189,11 +189,10 @@ function sek_ajax_save_user_template() {
             'tmpl_footer_location' => isset( $_POST['tmpl_footer_location'] ) ? $_POST['tmpl_footer_location'] : '',
             'date' => date("Y-m-d"),
             'theme' => sanitize_title_with_dashes( get_stylesheet() )
-        ),
-        'edit_metas_only' => $is_edit_metas_only_case ? 'yes' : 'no'
+        )
     );
 
-    $saved_template_post = sek_update_saved_tmpl_post( $template_to_save );
+    $saved_template_post = sek_update_saved_tmpl_post( $template_to_save, $is_edit_metas_only_case );
     if ( is_wp_error( $saved_template_post ) || is_null($saved_template_post) || empty($saved_template_post) ) {
         wp_send_json_error( __FUNCTION__ . ' => error when invoking sek_update_saved_tmpl_post()' );
     } else {

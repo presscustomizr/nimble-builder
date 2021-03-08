@@ -179,7 +179,7 @@ function sek_get_all_saved_sections() {
   //     )
   // );
 // @return WP_Post|WP_Error Post on success, error on failure.
-function sek_update_saved_section_post( $section_data ) {
+function sek_update_saved_section_post( $section_data, $is_edit_metas_only_case = false ) {
     if ( !is_array( $section_data ) ) {
         sek_error_log( __FUNCTION__ . ' => $section_data is not an array' );
         return new \WP_Error( __FUNCTION__ . ' => $section_data is not an array');
@@ -206,7 +206,6 @@ function sek_update_saved_section_post( $section_data ) {
 
     // the section post name is provided only when updating
     $is_update_case = !is_null($section_data['section_post_name']);
-    $is_edit_metas_only_case = 'yes' === $section_data['edit_metas_only'];
 
     // $post_name_to_update will be used when user updates an existing section
     if ( !is_null($section_data['section_post_name']) ) {
