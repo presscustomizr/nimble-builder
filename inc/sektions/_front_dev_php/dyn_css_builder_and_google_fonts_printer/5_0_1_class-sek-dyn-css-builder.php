@@ -509,10 +509,10 @@ class Sek_Dyn_CSS_Builder {
 
         if ( $read_attempt ) {
             if ( $reading_issue ) {
-                update_option( NIMBLE_OPT_FOR_MODULE_CSS_READING_STATUS, 'failed', 'no' );
+                update_option( NIMBLE_OPT_FOR_MODULE_CSS_READING_STATUS, 'failed');
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => reading issue => impossible to concatenate module stylesheets');
             } else {
-                update_option( NIMBLE_OPT_FOR_MODULE_CSS_READING_STATUS, 'OK', 'no' );
+                update_option( NIMBLE_OPT_FOR_MODULE_CSS_READING_STATUS, 'OK');
             }
         }
         //sek_error_log('$modules_css ??', $modules_css );

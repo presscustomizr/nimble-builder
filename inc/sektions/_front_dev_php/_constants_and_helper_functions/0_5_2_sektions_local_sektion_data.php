@@ -15,7 +15,7 @@ function sek_get_sections_registration_params( $force_update = false ) {
         sek_clean_transients_like( 'section_params_transient' );
         $bw_fixes_options['clean_section_params_transient_0720'] = 'done';
         // flag as done
-        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options, 'no' );
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
     }
 
     // $section_params_transient_name = 'section_params_transient_' . NIMBLE_VERSION;
@@ -215,7 +215,7 @@ function sek_get_preset_section_collection_from_json( $force_update = false ) {
         sek_clean_transients_like( 'section_json_transient' );
         $bw_fixes_options['clean_section_json_transient_0720'] = 'done';
         // flag as done
-        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options, 'no' );
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
     }
 
     // Try to get the collection from an option
