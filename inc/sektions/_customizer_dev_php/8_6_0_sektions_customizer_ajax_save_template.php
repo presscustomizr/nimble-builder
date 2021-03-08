@@ -188,7 +188,10 @@ function sek_ajax_save_user_template() {
             'tmpl_header_location' => isset( $_POST['tmpl_header_location'] ) ? $_POST['tmpl_header_location'] : '',
             'tmpl_footer_location' => isset( $_POST['tmpl_footer_location'] ) ? $_POST['tmpl_footer_location'] : '',
             'date' => date("Y-m-d"),
-            'theme' => sanitize_title_with_dashes( get_stylesheet() )
+            'theme' => sanitize_title_with_dashes( get_stylesheet() ),
+            // for api templates
+            'is_pro_tmpl' => false,
+            'thumb_url' => ''
         )
     );
 

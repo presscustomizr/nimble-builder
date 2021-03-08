@@ -227,8 +227,13 @@ function sek_update_saved_tmpl_post( $tmpl_data, $is_edit_metas_only_case = fals
             'skope_id' => '',
             'version' => NIMBLE_VERSION,
             'tmpl_locations' => array(),
+            'tmpl_header_location' => '',
+            'tmpl_footer_location' => '',
             'date' => '',
-            'theme' => ''
+            'theme' => '',
+            // for api templates
+            'is_pro_tmpl' => false,
+            'thumb_url' => ''
         )
     ));
 

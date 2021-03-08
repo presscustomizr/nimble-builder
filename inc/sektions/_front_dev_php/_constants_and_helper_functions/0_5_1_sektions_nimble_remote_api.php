@@ -89,7 +89,7 @@ function sek_get_nimble_api_data( $force_update = false ) {
         // }
         
         if ( !empty( $info_data['lib'] ) ) {
-            if ( !empty( $info_data['lib']['templates'] ) ) {
+            if ( array_key_exists( 'templates', $info_data['lib'] ) ) {
                 //sek_error_log('UPDATE TMPL API DATA ?', $info_data['lib']['templates'] );
                 update_option( NIMBLE_API_TMPL_LIB_OPT_NAME, maybe_serialize( $info_data['lib']['templates'] ), 'no' );// opt name : nimble_api_tmpl_data
             }
