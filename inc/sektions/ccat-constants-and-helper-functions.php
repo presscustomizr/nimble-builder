@@ -29,10 +29,11 @@ if ( !defined( 'NIMBLE_DEPREC_TWO_CSS_FOLDER_NAME' ) ) { define( 'NIMBLE_DEPREC_
 if ( !defined( 'NIMBLE_CSS_FOLDER_NAME' ) ) { define( 'NIMBLE_CSS_FOLDER_NAME' , 'nimble_css' ); }
 if ( !defined( 'NIMBLE_OPT_FOR_MODULE_CSS_READING_STATUS' ) ) { define( 'NIMBLE_OPT_FOR_MODULE_CSS_READING_STATUS' , 'nimble_module_css_read_status' ); }
 
+if ( !defined( 'NIMBLE_OPT_SEKTION_POST_INDEX' ) ) { define( 'NIMBLE_OPT_SEKTION_POST_INDEX' , 'nimble_posts_index' ); }
 if ( !defined( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' ) ) { define( 'NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION' , 'nimble___' ); }
 if ( !defined( 'NIMBLE_GLOBAL_SKOPE_ID' ) ) { define( 'NIMBLE_GLOBAL_SKOPE_ID' , 'skp__global' ); }
 
-if ( !defined( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' , '__nimble_options__' ); }
+if ( !defined( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS' , 'nimble_global_opts' ); }// <= name updated in march 2021 was __nimble_options__
 
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS' , 'nimble_site_templates' ); }
 
@@ -40,7 +41,7 @@ if ( !defined( 'NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS' ) ) { define( 'NIMBLE_OPT
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS' , 'nimble_most_used_fonts' ); }
 if ( !defined( 'NIMBLE_OPT_FOR_GLOBAL_CSS' ) ) { define( 'NIMBLE_OPT_FOR_GLOBAL_CSS' , 'nimble_global_css' ); }
 
-if ( !defined( 'NIMBLE_OPT_NAME_FOR_SECTION_JSON' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SECTION_JSON' , 'nb_prebuild_section_json' ); }
+if ( !defined( 'NIMBLE_OPT_NAME_FOR_SECTION_JSON' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SECTION_JSON' , 'nimble_prebuild_sections' ); }// <= name updated in march 2021, was nb_prebuild_section_json
 
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES' ) ) { define( 'NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES' , 'nb_backward_fixes' ); }
 
@@ -2379,7 +2380,7 @@ function sek_site_has_nimble_sections_created() {
     $sek_post_query_vars = array(
         'post_type'              => NIMBLE_CPT,
         'post_status'            => get_post_stati(),
-        //'name'                   => sanitize_title( NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
+        //'name'                   => sanitize_title(),
         'posts_per_page'         => -1,
         'no_found_rows'          => true,
         'cache_results'          => true,
@@ -2445,7 +2446,7 @@ function sek_get_feedback_notif_status() {
     $sek_post_query_vars = array(
         'post_type'              => NIMBLE_CPT,
         'post_status'            => get_post_stati(),
-        //'name'                   => sanitize_title( NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
+        //'name'                   => sanitize_title(),
         'posts_per_page'         => -1,
         'no_found_rows'          => true,
         'cache_results'          => true,
@@ -3482,6 +3483,7 @@ function sek_get_preset_section_collection_from_json( $force_update = false ) {
         update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
     }
 
+    // Try to get the collection from an option
     $json_collection = get_option( NIMBLE_OPT_NAME_FOR_SECTION_JSON );
 
     // Refresh every 30 days, unless force_update set to true
@@ -3494,7 +3496,7 @@ function sek_get_preset_section_collection_from_json( $force_update = false ) {
 
         $json_collection = json_decode( $json_raw, true );
         // Save now as option for faster access next time
-        update_option( NIMBLE_OPT_NAME_FOR_SECTION_JSON, $json_collection );
+        update_option( NIMBLE_OPT_NAME_FOR_SECTION_JSON, $json_collection, 'no' );
     }
     // Filter used by NB Pro to add pro sections
     return apply_filters( 'nimble_preset_sections_collection', $json_collection, $force_update );
@@ -3648,6 +3650,81 @@ function sek_get_customize_url_for_post_id( $post_id, $return_url = '' ) {
 }
 
 ?><?php
+// introduced for #799
+function sek_maybe_optimize_options() {
+    $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
+    $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
+
+    if ( !array_key_exists('optimize_opts_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['optimize_opts_0321'] ) {
+        $current_global_opts = get_option('__nimble_options__');
+        if ( false !== $current_global_opts ) {
+            update_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS, $current_global_opts, 'no' );
+            delete_option( '__nimble_options__' );
+        }
+        // delete previous option for prebuild section json
+        // => the option will be re-created with autoload set to "no" and renamed "nimble_prebuild_sections"
+        delete_option( 'nb_prebuild_section_json' );
+
+        // flag as done
+        $bw_fixes_options['optimize_opts_0321'] = 'done';
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
+    }
+
+
+
+    // If the move in post index has been done, let's update to autoload = false the previous post_id options LIKE nimble___skp__post_page_*****, nimble___skp__tax_product_cat_*****
+    // As of March 2021, event if those previous options are not used anymore, let's keep them in DB to cover potential retro-compat problems
+    // in a future release, if no regression was reported, we'll remove them forever.
+    if ( array_key_exists('move_in_post_index_0321', $bw_fixes_options ) && 'done' === $bw_fixes_options['move_in_post_index_0321'] ) {
+        if ( !array_key_exists('fix_skope_opt_autoload_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['fix_skope_opt_autoload_0321'] ) {
+            // MOVE ALL OPTIONS LIKE nimble___skp__post_page_*****, nimble___skp__tax_product_cat_***** in a new option ( NIMBLE_OPT_SEKTION_POST_INDEX ), not autoloaded
+            global $wpdb;
+            $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE autoload = 'yes' and option_name like 'nimble___skp_%'", ARRAY_A );
+            if ( is_array( $results ) ) {
+                foreach( $results as $old_opt_data ) {
+                    if ( !is_array($old_opt_data) )
+                        continue;
+                    if ( empty($old_opt_data['option_name']) || empty($old_opt_data['option_value']) )
+                        continue;
+                    // update it with autoload set to "no"
+                    update_option( $old_opt_data['option_name'], (int)$old_opt_data['option_value'], 'no' );
+                }
+            }
+
+            // flag as done
+            $bw_fixes_options['fix_skope_opt_autoload_0321'] = 'done';
+            update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
+        }
+    }
+
+
+    if ( !array_key_exists('move_in_post_index_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['move_in_post_index_0321'] ) {
+        // MOVE ALL OPTIONS LIKE nimble___skp__post_page_*****, nimble___skp__tax_product_cat_***** in a new option ( NIMBLE_OPT_SEKTION_POST_INDEX ), not autoloaded
+        global $wpdb;
+        $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE autoload = 'yes' and option_name like 'nimble___skp_%'", ARRAY_A );
+        if ( is_array( $results ) ) {
+            // Populate the new option ( it should not exists at this point )
+            $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);
+            $nb_posts_index = is_array($nb_posts_index) ? $nb_posts_index : [];
+            foreach( $results as $old_opt_data ) {
+                if ( !is_array($old_opt_data) )
+                    continue;
+                if ( empty($old_opt_data['option_name']) || empty($old_opt_data['option_value']) )
+                    continue;
+                
+                $nb_posts_index[ $old_opt_data['option_name'] ] = (int)$old_opt_data['option_value'];
+            }
+            // update it with autoload set to "no"
+            update_option( NIMBLE_OPT_SEKTION_POST_INDEX, $nb_posts_index, 'no');
+        }
+
+        // flag as done
+        $bw_fixes_options['move_in_post_index_0321'] = 'done';
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
+    }
+}
+
+
 // JULY 2020 => NOT FIRED ANYMORE ( because introduced in oct 2018 ) => DEACTIVATED IN nimble-builder.php
 // fired @wp_loaded
 // Note : if fired @plugins_loaded, invoking wp_update_post() generates php notices
@@ -3698,7 +3775,7 @@ function sek_do_compat_to_1_4_0() {
             $post_id_storing_home_page_sections = (int)get_option( $current_option_name );
             if ( $post_id_storing_home_page_sections > 0 ) {
                 $new_option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . "skp__post_page_{$home_page_id}";
-                update_option( $new_option_name, $post_id_storing_home_page_sections );
+                update_option( $new_option_name, $post_id_storing_home_page_sections, 'no' );
             }
         }
     }
@@ -3714,7 +3791,7 @@ function sek_do_compat_1_0_4_to_1_1_0() {
     $sek_post_query_vars = array(
         'post_type'              => NIMBLE_CPT,
         'post_status'            => get_post_stati(),
-        //'name'                   => sanitize_title( NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
+        //'name'                   => sanitize_title(),
         'posts_per_page'         => -1,
         'no_found_rows'          => true,
         'cache_results'          => true,
@@ -3967,7 +4044,35 @@ register_post_type( NIMBLE_CPT , array(
     )
 ));
 
+// Returns the id of the post in which the local collection is stored
+// This option NIMBLE_OPT_SEKTION_POST_INDEX is updated when publishing in the customizer and may also be updated when getting the collection in sek_get_seks_post()
+// introduced for #799
+function sek_get_nb_post_id_from_index( $skope_id ) {
+    $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);
+    $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+    $post_id = 0;
+    // Backward compat => march 2021, NB introduces a new option 'nimble_posts_index' dedicated to store the NB post_id associated to a skope_id.
+    // For previous user, a backward compatibility code is ran on each load at 'wp_loaded', to transfer all previous options to the new one.
+    // if the transfer went wrong, or if the option 'nimble_posts_index' was deleted, we can attempt to get the post_id from the previous option
+    if ( !is_array( $nb_posts_index ) ) {
+        $post_id = get_option( $option_name );
+    } else {
+        if ( array_key_exists( $option_name, $nb_posts_index ) ) {
+            $post_id = (int)$nb_posts_index[$option_name];
+        }
+    }
+    return $post_id;
+}
 
+// Associates a skope_id to a NB post id in the NB post index option
+// introduced for #799
+function sek_set_nb_post_id_in_index( $skope_id, $post_id ) {
+    $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);
+    $nb_posts_index = is_array($nb_posts_index) ? $nb_posts_index : [];
+    $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+    $nb_posts_index[$option_name] = (int)$post_id;
+    update_option( NIMBLE_OPT_SEKTION_POST_INDEX, $nb_posts_index, 'no');
+}
 
 
 
@@ -4009,18 +4114,16 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
 
     $post = null;
 
-    $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
-
-    $post_id = (int)get_option( $option_name );
+    $post_id = sek_get_nb_post_id_from_index( $skope_id );
     // if the options has not been set yet, it will return (int) 0
     // id #1 is already taken by the 'Hello World' post.
     if ( 1 > $post_id ) {
-        //error_log( 'sek_get_seks_post => post_id is not valid for options => ' . $option_name );
+        //error_log( 'sek_get_seks_post => post_id is not valid for options => ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id );
         return;
     }
 
     if ( !is_int( $post_id ) ) {
-        error_log( 'sek_get_seks_post => post_id !is_int() for options => ' . $option_name );
+        error_log( 'sek_get_seks_post => post_id !is_int() for options => ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id );
     }
 
     if ( is_int( $post_id ) && $post_id > 0 && get_post( $post_id ) ) {
@@ -4036,7 +4139,7 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
          * Cache the lookup. See sek_update_sek_post().
          * @todo This should get cleared if a skope post is added/removed.
          */
-        update_option( $option_name, (int)$post_id );
+        sek_set_nb_post_id_in_index( $skope_id, (int)$post_id );
     }
     if ( !skp_is_customizing() ) {
         $cached_seks_posts[$skope_id] = $post;
@@ -4362,10 +4465,9 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
     } else {
         $r = wp_insert_post( wp_slash( $post_data ), true );
         if ( !is_wp_error( $r ) ) {
-            $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
             $post_id = $r;//$r is the post ID
 
-            update_option( $option_name, (int)$post_id );
+            sek_set_nb_post_id_in_index( $skope_id, (int)$post_id ); 
 
             // Trigger creation of a revision. This should be removed once #30854 is resolved.
             if ( 0 === count( wp_get_post_revisions( $r ) ) ) {
@@ -4485,7 +4587,7 @@ function sek_get_all_saved_sections() {
     $sek_post_query_vars = array(
         'post_type'              => NIMBLE_SECTION_CPT,
         'post_status'            => 'publish',
-        //'name'                   => sanitize_title( NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
+        //'name'                   => sanitize_title(),
         'posts_per_page'         => -1,
         'no_found_rows'          => true,
         'cache_results'          => true,
@@ -4757,7 +4859,7 @@ function sek_get_all_saved_templates() {
     $sek_post_query_vars = array(
         'post_type'              => NIMBLE_TEMPLATE_CPT,
         'post_status'            => 'publish',
-        //'name'                   => sanitize_title( NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
+        //'name'                   => sanitize_title(),
         'posts_per_page'         => -1,
         'no_found_rows'          => true,
         'cache_results'          => true,
@@ -5061,8 +5163,7 @@ function sek_get_revision_history_from_posts( $skope_id = '', $skope_level = 'lo
     if ( defined('DOING_AJAX') && DOING_AJAX && '_skope_not_set_' === $skope_id ) {
           wp_send_json_error( __FUNCTION__ . ' => invalid skope id' );
     }
-    $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
-    $post_id = (int)get_option( $option_name );
+    $post_id = sek_get_nb_post_id_from_index($skope_id);
     $raw_revision_history = array();
     if ( -1 !== $post_id ) {
         $args = array(

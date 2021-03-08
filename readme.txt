@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.7
-Stable tag: 2.2.3
+Stable tag: 2.2.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,12 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.2.3 : Successfully tested with upcoming WordPress 5.7. Various customizer fixes.
+2.2.4 : [performances] Nimble Builder autoloading deactivated for some options
 
 == Changelog ==
+= 2.2.4 March 8th 2021 =
+* improved : [performances] deactivate autoloading for some options
+
 = 2.2.3 March 4th, 2021 =
 * 100% compatible with WordPress 5.7 ( scheduled for March 9th 2021 )
 * fixed : [customizer] collection validation => allow setting value to be set even when there are errors + print an error message.

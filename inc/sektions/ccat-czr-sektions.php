@@ -14,7 +14,7 @@ function sek_update_most_used_gfonts( $manager ) {
     $skope_id = skp_get_skope_id();
     $all_gfonts = sek_get_all_gfonts( $skope_id );
     if ( is_array($all_gfonts) && !empty($all_gfonts) ) {
-        update_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS, $all_gfonts );
+        update_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS, $all_gfonts, 'no' );
     }
 }
 
@@ -50,7 +50,7 @@ function sek_get_all_gfonts() {
     $sek_post_query_vars = array(
         'post_type'              => NIMBLE_CPT,
         'post_status'            => get_post_stati(),
-        //'name'                   => sanitize_title( NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
+        //'name'                   => sanitize_title(),
         'posts_per_page'         => -1,
         'no_found_rows'          => true,
         'cache_results'          => true,
@@ -138,7 +138,7 @@ function sek_enqueue_controls_js_css() {
                 'optNameForSiteTmplOptions' => NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS,// nimble_site_templates
                 'prefixForSettingsNotSaved' => NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED,//"__nimble__"
 
-                'globalOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ),// '__nimble_options__'
+                'globalOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ),// 'nimble_global_opts'
                 'siteTmplOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ),// 'nimble_site_templates
 
                 'isSiteTmplEnabled' => defined('NIMBLE_SITE_TEMPLATES_ENABLED') && NIMBLE_SITE_TEMPLATES_ENABLED,
@@ -2100,7 +2100,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 
         //@filter 'customize_dynamic_setting_args'
         function set_dyn_setting_args( $setting_args, $setting_id ) {
-            // shall start with "nimble___" or "__nimble_options__"
+            // shall start with "nimble___" or "nimble_global_opts"
             // those are the setting that will actually be saved in DB : 
             // - sektion collections ( local and global skope )
             // - global options
@@ -2133,11 +2133,17 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         //@filter 'customize_dynamic_setting_class'
         // We use a custom setting class only for the section collections ( local and global ), not for global options and site template options
         function set_dyn_setting_class( $class, $setting_id, $args ) {
-            // shall start with 'nimble___'
-            if ( 0 !== strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) )
-              return $class;
             //sek_error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
-            return '\Nimble\Nimble_Customizer_Setting';
+            // Setting class for NB global options and Site Template options
+            if ( 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ) ) {
+                return '\Nimble\Nimble_Options_Setting';
+            }
+            
+            // Setting class for NB sektion collections => shall start with 'nimble___'
+            if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) {
+                return '\Nimble\Nimble_Collection_Setting';
+            }
+            return $class;
         }
 
  }//class

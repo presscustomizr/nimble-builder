@@ -509,10 +509,10 @@ class Sek_Dyn_CSS_Builder {
 
         if ( $read_attempt ) {
             if ( $reading_issue ) {
-                update_option( NIMBLE_OPT_FOR_MODULE_CSS_READING_STATUS, 'failed' );
+                update_option( NIMBLE_OPT_FOR_MODULE_CSS_READING_STATUS, 'failed');
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => reading issue => impossible to concatenate module stylesheets');
             } else {
-                update_option( NIMBLE_OPT_FOR_MODULE_CSS_READING_STATUS, 'OK' );
+                update_option( NIMBLE_OPT_FOR_MODULE_CSS_READING_STATUS, 'OK');
             }
         }
         //sek_error_log('$modules_css ??', $modules_css );
@@ -954,7 +954,7 @@ class Sek_Dyn_CSS_Handler {
             'dep'                             => $this->dep,
             'hook'                            => '',
             'priority'                        => $this->priority,
-            'customizer_save'                 => false,//<= used when saving the customizer settins => we want to write the css file on Nimble_Customizer_Setting::update()
+            'customizer_save'                 => false,//<= used when saving the customizer settins => we want to write the css file on Nimble_Collection_Setting::update()
             'force_write'                     => $this->force_write,
             'force_rewrite'                   => $this->force_rewrite
         );
@@ -1012,7 +1012,7 @@ class Sek_Dyn_CSS_Handler {
         // If not, delete any previouly created stylesheet
 
         //hook setup for printing or enqueuing
-        //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Customizer_Setting::update()
+        //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Collection_Setting::update()
         if ( !$this->customizer_save ) {
             // when not customizing, we write and enqueue :
             // - if the file already exists,
@@ -1042,7 +1042,7 @@ class Sek_Dyn_CSS_Handler {
             if ( is_customize_preview() || $this->force_rewrite || $this->customizer_save ) {
                 $global_style = Nimble_Manager()->sek_build_global_options_inline_css();
                 //sek_error_log('SOO GLOBAL INLINE CSS?', $global_style );
-                update_option( NIMBLE_OPT_FOR_GLOBAL_CSS, $global_style );
+                update_option( NIMBLE_OPT_FOR_GLOBAL_CSS, $global_style, 'no' );
             }
         }
     }//__construct
@@ -5155,11 +5155,11 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         // updated May 2020 : prevent doing shortcode when customizing
         // fixes https://github.com/presscustomizr/nimble-builder/issues/704
         function sek_do_shortcode( $content ) {
-            $allow_shortcode_parsing_when_customizing = sek_booleanize_checkbox_val( get_option( 'nb_shortcodes_parsed_in_czr' ) );
-            if ( $allow_shortcode_parsing_when_customizing ) {
+            if ( !skp_is_customizing() ) {
                 $content = do_shortcode( $content );
             } else {
-                if ( !skp_is_customizing() ) {
+                $allow_shortcode_parsing_when_customizing = sek_booleanize_checkbox_val( get_option( 'nb_shortcodes_parsed_in_czr' ) );
+                if ( $allow_shortcode_parsing_when_customizing ) {
                     $content = do_shortcode( $content );
                 } else {
                     global $shortcode_tags;
@@ -5168,10 +5168,10 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     $tagnames = array_intersect( array_keys( $shortcode_tags ), $matches[1] );
 
                     if ( !empty( $tagnames ) ) {
-                      $content = sprintf('<div class="nimble-shortcode-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>%2$s',
-                          __('Shortcodes are not parsed by default when customizing. You can change this setting in your WP admin > Settings > Nimble Builder options.', 'text-doma'),
-                          $content
-                      );
+                    $content = sprintf('<div class="nimble-shortcode-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>%2$s',
+                        __('Shortcodes are not parsed by default when customizing. You can change this setting in your WP admin > Settings > Nimble Builder options.', 'text-doma'),
+                        $content
+                    );
                     }
                 }
             }
@@ -5182,9 +5182,14 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         // updated May 2020 : prevent doing shortcode when customizing
         // fixes https://github.com/presscustomizr/nimble-builder/issues/704
         function sek_run_shortcode( $content ) {
-            $allow_shortcode_parsing_when_customizing = sek_booleanize_checkbox_val( get_option( 'nb_shortcodes_parsed_in_czr' ) );
-            if ( skp_is_customizing() && !$allow_shortcode_parsing_when_customizing )
-              return $content;
+            // customizing => check if NB can parse the shortcode
+            if ( skp_is_customizing() ) {
+                $allow_shortcode_parsing_when_customizing = sek_booleanize_checkbox_val( get_option( 'nb_shortcodes_parsed_in_czr' ) );
+                if ( !$allow_shortcode_parsing_when_customizing ) {
+                    return $content;
+                }
+            }
+            // Not customizing always run
             if ( array_key_exists( 'wp_embed', $GLOBALS ) && $GLOBALS['wp_embed'] instanceof \WP_Embed ) {
                 $content = $GLOBALS['wp_embed']->run_shortcode( $content );
             }
