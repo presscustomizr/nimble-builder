@@ -68,14 +68,14 @@ function sek_get_nimble_api_data( $force_update = false ) {
 
         if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
             // HOUR_IN_SECONDS is a default WP constant
-            set_transient( $api_data_transient_name, [], 2 * HOUR_IN_SECONDS );
+            set_transient( $api_data_transient_name, [], 24 * HOUR_IN_SECONDS );
             return false;
         }
 
         $info_data = json_decode( wp_remote_retrieve_body( $response ), true );
 
         if ( empty( $info_data ) || !is_array( $info_data ) ) {
-            set_transient( $api_data_transient_name, [], 2 * HOUR_IN_SECONDS );
+            set_transient( $api_data_transient_name, [], 24 * HOUR_IN_SECONDS );
             return false;
         }
 
@@ -91,7 +91,7 @@ function sek_get_nimble_api_data( $force_update = false ) {
         if ( !empty( $info_data['lib'] ) ) {
             if ( !empty( $info_data['lib']['templates'] ) ) {
                 //sek_error_log('UPDATE TMPL API DATA ?', $info_data['lib']['templates'] );
-                update_option( NIMBLE_API_TMPL_LIB_OPT_NAME, maybe_serialize( $info_data['lib']['templates'] ), 'no' );
+                update_option( NIMBLE_API_TMPL_LIB_OPT_NAME, maybe_serialize( $info_data['lib']['templates'] ), 'no' );// opt name : nimble_api_tmpl_data
             }
             unset( $info_data['lib'] );
         }
@@ -101,7 +101,7 @@ function sek_get_nimble_api_data( $force_update = false ) {
             unset( $info_data['latest_posts'] );
         }
         //sek_error_log('API DATA ?', $info_data );
-        set_transient( $api_data_transient_name, $info_data, 12 * HOUR_IN_SECONDS );
+        set_transient( $api_data_transient_name, $info_data, 24 * HOUR_IN_SECONDS );
     }//if ( $force_update || false === $info_data ) {
     
     wp_cache_set( 'nimble_api_data', $info_data );
@@ -119,7 +119,7 @@ function sek_get_tmpl_api_data( $force_update = false ) {
     // Let's use the data saved as options
     // Those data are updated on plugin install, plugin update( upgrader_process_complete ), theme switch
     // @see https://github.com/presscustomizr/nimble-builder/issues/441
-    $tmpl_data = maybe_unserialize( get_option( NIMBLE_API_TMPL_LIB_OPT_NAME ) );
+    $tmpl_data = maybe_unserialize( get_option( NIMBLE_API_TMPL_LIB_OPT_NAME ) );// option name 'nimble_api_tmpl_data'
     if ( $force_update || empty( $tmpl_data ) || !is_array( $tmpl_data ) ) {
         sek_get_nimble_api_data( true );//<= true for "force_update"
         $tmpl_data = maybe_unserialize( get_option( NIMBLE_API_TMPL_LIB_OPT_NAME ) );
