@@ -88,11 +88,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $('#nimble-tmpl-gallery').find('.sek-tmpl-gallery-inner').html('');
 
                   var _doPrintTmplGalleryHtml = function(params) {
-                        self.getTemplateGalleryHtml( params ).done( function( html ) {
+                        return self.getTemplateGalleryHtml( params ).done( function( html ) {
                               $tmplGalWrapper = $('#nimble-tmpl-gallery');
                               $tmplGalWrapper.find('.sek-tmpl-gallery-inner').html( html );
                         });
-                        return self.getTemplateGalleryHtml( params );
                   };
                   // Wait for the gallery to be fetched and rendered
                   _doPrintTmplGalleryHtml( params ).done( function( html ) {

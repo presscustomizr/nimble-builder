@@ -3,9 +3,6 @@
 // *  NIMBLE API
 // /* ------------------------------------------------------------------------- */
 // if ( !defined( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME" ) ) { define( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME", 'nimble_api_prebuilt_sections_data' ); } <= DEPRECATED, Now uses local json
-if ( !defined( "NIMBLE_API_TMPL_LIB_OPT_NAME" ) ) { define( "NIMBLE_API_TMPL_LIB_OPT_NAME", 'nimble_api_tmpl_data' ); }
-if ( !defined( "NIMBLE_API_NEWS_OPT_NAME" ) ) { define( "NIMBLE_API_NEWS_OPT_NAME", 'nimble_api_news_data' ); }
-
 
 // Nimble api returns a set of value structured as follow
 // return array(
@@ -26,6 +23,12 @@ if ( !defined( "NIMBLE_API_NEWS_OPT_NAME" ) ) { define( "NIMBLE_API_NEWS_OPT_NAM
 // @return array|false Info data, or false.
 // api data is refreshed on plugin update and theme switch
 function sek_get_nimble_api_data( $force_update = false ) {
+    $cached_api_data = wp_cache_get( 'nimble_api_data' );
+
+    if ( $cached_api_data && is_array($cached_api_data) && !empty($cached_api_data) ) {
+        return $cached_api_data;
+    }
+
     // July 2020 for https://github.com/presscustomizr/nimble-builder/issues/730
     $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
     $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
@@ -47,6 +50,7 @@ function sek_get_nimble_api_data( $force_update = false ) {
           sek_error_log('API is in force update mode');
     }
 
+    
     // Refresh every 12 hours, unless force_update set to true
     if ( $force_update || false === $info_data ) {
         $timeout = ( $force_update ) ? 25 : 8;
@@ -59,6 +63,8 @@ function sek_get_nimble_api_data( $force_update = false ) {
             'start_ver' => sek_get_th_start_ver( $pc_theme_name )
           ],
         ) );
+        
+        
 
         if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
             // HOUR_IN_SECONDS is a default WP constant
@@ -98,6 +104,7 @@ function sek_get_nimble_api_data( $force_update = false ) {
         set_transient( $api_data_transient_name, $info_data, 12 * HOUR_IN_SECONDS );
     }//if ( $force_update || false === $info_data ) {
     
+    wp_cache_set( 'nimble_api_data', $info_data );
     return $info_data;
 }
 
