@@ -42,17 +42,17 @@ function sek_versionning() {
     $current_version = get_option( 'nimble_version' );
     if ( $current_version != NIMBLE_VERSION ) {
         update_option( 'nimble_version_upgraded_from', $current_version, 'no' );
-        update_option( 'nimble_version', NIMBLE_VERSION, 'no' );
+        update_option( 'nimble_version', NIMBLE_VERSION );
     }
     // Write the version that the user started with.
     // Note : this has been implemented starting from v1.1.8 in October 2018. At this time 4000+ websites were already using the plugin, and therefore started with a version <= 1.1.7.
     $started_with = get_option( 'nimble_started_with_version' );
     if ( empty( $started_with ) ) {
-        update_option( 'nimble_started_with_version', $current_version, 'no' );
+        update_option( 'nimble_started_with_version', $current_version );
     }
     $start_date = get_option( 'nimble_start_date' );
     if ( empty( $start_date ) ) {
-        update_option( 'nimble_start_date', date("Y-m-d H:i:s"), 'no' );
+        update_option( 'nimble_start_date', date("Y-m-d H:i:s") );
     }
 }
 
