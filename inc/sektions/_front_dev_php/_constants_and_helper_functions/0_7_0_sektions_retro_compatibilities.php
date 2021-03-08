@@ -1,18 +1,22 @@
 <?php
 // introduced for #799
-function sek_maybe_do_option_optimization() {
+function sek_maybe_optimize_options() {
     $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
     $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
 
-    if ( !array_key_exists('renamed_global_opts_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['renamed_global_opts_0321'] ) {
+    if ( !array_key_exists('optimize_opts_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['optimize_opts_0321'] ) {
         $current_global_opts = get_option('__nimble_options__');
         if ( false !== $current_global_opts ) {
             update_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS, $current_global_opts, 'no' );
             delete_option( '__nimble_options__' );
         }
+        // delete previous option for prebuild section json
+        // => the option will be re-created with autoload set to "no" and renamed "nimble_prebuild_sections"
+        delete_option( 'nb_prebuild_section_json' );
+
         // flag as done
-        $bw_fixes_options['renamed_global_opts_0321'] = 'done';
-        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options, 'no' );
+        $bw_fixes_options['optimize_opts_0321'] = 'done';
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
     }
 
 
@@ -38,7 +42,7 @@ function sek_maybe_do_option_optimization() {
 
             // flag as done
             $bw_fixes_options['fix_skope_opt_autoload_0321'] = 'done';
-            update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options, 'no' );
+            update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
         }
     }
 
@@ -65,7 +69,7 @@ function sek_maybe_do_option_optimization() {
 
         // flag as done
         $bw_fixes_options['move_in_post_index_0321'] = 'done';
-        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options, 'no' );
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
     }
 }
 
