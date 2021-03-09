@@ -57,7 +57,9 @@ function sek_ajax_sek_get_user_section_json() {
         if ( is_array( $section_decoded ) && !empty( $section_decoded['data'] ) && is_string( $section_decoded['data'] ) ) {
             $section_decoded['data'] = json_decode( wp_unslash( $section_decoded['data'], true ) );
         }
-
+        // Make sure we decode encoded rich text before sending to the customizer
+        // see #544 and #791
+        $section_decoded['data'] = sek_prepare_seks_data_for_customizer( $section_decoded['data'] );
         wp_send_json_success( $section_decoded );
     } else {
         wp_send_json_error( __FUNCTION__ . '_section_post_not_found' );

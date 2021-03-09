@@ -78,6 +78,9 @@ function sek_ajax_sek_get_user_tmpl_json() {
             // the image import errors won't block the import
             // they are used when notifying user in the customizer
             $tmpl_decoded['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
+            // Make sure we decode encoded rich text before sending to the customizer
+            // see #544 and #791
+            $tmpl_decoded['data'] = sek_prepare_seks_data_for_customizer( $tmpl_decoded['data'] );
             wp_send_json_success( $tmpl_decoded );
         } else {
             wp_send_json_error( __FUNCTION__ . '_invalid_tmpl_post_data' );
@@ -117,6 +120,9 @@ function sek_ajax_sek_get_api_tmpl_json() {
         $tmpl_as_array = $raw_tmpl[$tmpl_name];
         $raw_tmpl[$tmpl_name]['data'] = sek_maybe_import_imgs( $raw_tmpl[$tmpl_name]['data'], $do_import_images = true );
         $raw_tmpl[$tmpl_name]['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
+        // Make sure we decode encoded rich text before sending to the customizer
+        // see #544 and #791
+        $raw_tmpl[$tmpl_name]['data'] = sek_prepare_seks_data_for_customizer( $raw_tmpl[$tmpl_name]['data'] );
         wp_send_json_success( $raw_tmpl[$tmpl_name] );
     }
     //return [];
