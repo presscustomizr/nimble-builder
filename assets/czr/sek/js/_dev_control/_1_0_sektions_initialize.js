@@ -255,7 +255,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Always set the previewed device back to desktop on ui change
                   // event 'sek-ui-removed' id triggered when cleaning the registered ui controls
-                  // @see ::cleanRegistered()
+                  // @see ::cleanRegisteredAndLargeSelectInput()
                   // July 2020 commented to fix https://github.com/presscustomizr/nimble-builder/issues/728
                   // self.bind( 'sek-ui-removed', function() {
                   //       api.previewedDevice( 'desktop' );
@@ -287,7 +287,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                   // CLEAN UI BEFORE REMOVAL
-                  // 'sek-ui-pre-removal' is triggered in ::cleanRegistered
+                  // 'sek-ui-pre-removal' is triggered in ::cleanRegisteredAndLargeSelectInput
                   // @params { what : control, id : '' }
                   self.bind( 'sek-ui-pre-removal', function( params ) {
                         // CLEAN DRAG N DROP

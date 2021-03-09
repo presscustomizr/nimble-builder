@@ -85,7 +85,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }//if
 
                   // Clean previously generated UI elements
-                  self.cleanRegistered();
+                  self.cleanRegisteredAndLargeSelectInput();
 
                   _do_register_ = function() {
                         _.each( modulesRegistrationParams, function( optionData, optionType ){

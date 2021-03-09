@@ -108,7 +108,7 @@
                   }
 
                   // Store the id of each instantiated tinyMceEditor
-                  // used in api.czrSektion::cleanRegistered
+                  // used in api.czrSektion::cleanRegisteredAndLargeSelectInput
                   api.czrActiveWPEditors = api.czrActiveWPEditors || [];
                   var currentEditors = $.extend( true, [], api.czrActiveWPEditors );
                   currentEditors.push(_id);

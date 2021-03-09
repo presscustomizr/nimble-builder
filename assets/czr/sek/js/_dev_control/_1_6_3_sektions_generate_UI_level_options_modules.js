@@ -188,7 +188,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }//if
 
                   // Clean previously generated UI elements
-                  self.cleanRegistered();
+                  self.cleanRegisteredAndLargeSelectInput();
 
 
                   // @return void()

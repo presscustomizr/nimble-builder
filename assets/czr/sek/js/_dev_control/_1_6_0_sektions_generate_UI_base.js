@@ -22,7 +22,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // REGISTER SETTING AND CONTROL
                   switch ( params.action ) {
                         // FRONT AND LEVEL MODULES UI
-                        // The registered elements are cleaned (self.cleanRegistered()) in the callbacks,
+                        // The registered elements are cleaned (self.cleanRegisteredAndLargeSelectInput()) in the callbacks,
                         // because we want to check if the requested UI is not the one already rendered, and fire a button-see-me animation if yes.
                         case 'sek-generate-module-ui' :
                               try{ dfd = self.generateUIforFrontModules( params, dfd ); } catch( er ) {
@@ -43,7 +43,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // 2) preset_section
                         case 'sek-generate-draggable-candidates-picker-ui' :
                               // Clean previously generated UI elements
-                              self.cleanRegistered();
+                              self.cleanRegisteredAndLargeSelectInput();
                               try{ dfd = self.generateUIforDraggableContent( params, dfd ); } catch( er ) {
                                     api.errare( '::generateUI() => error', er );
                                     dfd = $.Deferred();
@@ -55,7 +55,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // Fired in ::initialize()
                         case 'sek-generate-local-skope-options-ui' :
                               // Clean previously generated UI elements
-                              self.cleanRegistered();
+                              self.cleanRegisteredAndLargeSelectInput();
                               try{ dfd = self.generateUIforLocalSkopeOptions( params, dfd ); } catch( er ) {
                                     api.errare( '::generateUI() => error', er );
                                     dfd = $.Deferred();
@@ -65,7 +65,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // Fired in ::initialize()
                         case 'sek-generate-site-tmpl-options-ui' :
                               // Clean previously generated UI elements
-                              self.cleanRegistered();
+                              self.cleanRegisteredAndLargeSelectInput();
                               try{ dfd = self.generateUIforSiteTmplOptions( params, dfd ); } catch( er ) {
                                     api.errare( '::generateUI() => error', er );
                                     dfd = $.Deferred();
@@ -75,7 +75,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // Fired in ::initialize()
                         case 'sek-generate-global-options-ui' :
                               // Clean previously generated UI elements
-                              self.cleanRegistered();
+                              self.cleanRegisteredAndLargeSelectInput();
                               try{ dfd = self.generateUIforGlobalOptions( params, dfd ); } catch( er ) {
                                     api.errare( '::generateUI() => error', er );
                                     dfd = $.Deferred();

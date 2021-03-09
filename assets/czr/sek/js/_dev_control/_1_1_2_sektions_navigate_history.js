@@ -186,7 +186,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.previewer.trigger( 'sek-pick-content', {});
 
                         // Clean registered control
-                        self.cleanRegistered();//<= normal cleaning
+                        self.cleanRegisteredAndLargeSelectInput();//<= normal cleaning
                         // Clean even the level settings
                         // => otherwise the level settings won't be synchronized when regenerating their ui.
                         self.cleanRegisteredLevelSettingsAfterHistoryNavigation();// setting cleaning
