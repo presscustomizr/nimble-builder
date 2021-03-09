@@ -10,7 +10,8 @@
             // FONT AWESOME ICON PICKER
             fa_icon_picker : function() {
                   var input           = this,
-                      _selected_found = false;
+                      _selected_found = false,
+                      $selectElement = $( 'select[data-czrtype="' + input.id + '"]', input.container );
 
                   //generates the options
                   var _generateOptions = function( iconCollection ) {
@@ -25,7 +26,7 @@
                                     $.extend( _attributes, { selected : "selected" } );
                                     _selected_found = true;
                               }
-                              $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                              $selectElement.append( $('<option>', _attributes) );
                         });
 
 
@@ -47,7 +48,7 @@
                               $_placeholder = $('<option>', { selected: 'selected' } );
                         }
                         //Initialize czrSelect2
-                        $( 'select[data-czrtype]', input.container )
+                        $selectElement
                             .prepend( $_placeholder )
                             .czrSelect2({
                                   templateResult: addIcon,
@@ -93,7 +94,7 @@
                               if ( params && true === params.open_on_init ) {
                                     // let's open select2 after a delay ( because there's no 'ready' event with select2 )
                                     _.delay( function() {
-                                          try{ $( 'select[data-czrtype]', input.container ).czrSelect2('open'); }catch(er) {}
+                                          try{ $selectElement.czrSelect2('open'); }catch(er) {}
                                     }, 100 );
                               }
                         }).fail( function( _r_ ) {
@@ -103,12 +104,10 @@
                   };
 
                   // Generate options and open select2
-                  input.container.on('click', function() {
-                        _do_();
-                  });
+                  input.container.on('click', _do_ );
 
                   // schedule the iconCollectionSet after a delay
-                  _.delay( function() { _do_( { open_on_init : false } );}, 1000 );
+                  //_.delay( function() { _do_( { open_on_init : false } );}, 1000 );
 
             }
       });//$.extend( api.czrInputMap, {})
