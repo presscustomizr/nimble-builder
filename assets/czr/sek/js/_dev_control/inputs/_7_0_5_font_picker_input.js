@@ -11,7 +11,8 @@
             // FONT PICKER
             font_picker : function( input_options ) {
                   var input = this,
-                      item = input.input_parent;
+                      item = input.input_parent,
+                      $fontSelectElement = $( 'select[data-czrtype="' + input.id + '"]', input.container );
 
                   var _getFontCollections = function() {
                         var dfd = $.Deferred();
@@ -97,8 +98,7 @@
                                         return fontCollections.gfonts;
                                   }
 
-                            },
-                            $fontSelectElement = $( 'select[data-czrtype="' + input.id + '"]', input.container );
+                            };
 
                         // generates the options
                         // @param type = cfont or gfont
@@ -282,13 +282,33 @@
                         return _.isString( split[0] ) ? split[0].replace(/[+|:]/g, ' ') : '';//replaces special characters ( + ) by space
                   };
 
-                  $.when( _getFontCollections() ).done( function( fontCollections ) {
-                        _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
-                              _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
+                  // On load, simply print the current input value
+                  // the full list of font ( several thousands !! ) will be rendered on click
+                  // March 2021 => to avoid slowing down the UI, the font picker select options are cleaned in cleanRegisteredAndLargeSelectInput()
+                  var inputVal = input();
+                  $fontSelectElement.append( $('<option>', {
+                        value : inputVal,
+                        html: inputVal,
+                        selected : "selected"
+                  }));
+                  
+                  // Generate options and open select2
+                  input.container.on('click', function() {
+                        if ( true === $fontSelectElement.data('selectOptionsSet') )
+                          return;
+                        
+                        $fontSelectElement.data('selectOptionsSet', true );
+                        // reset previous default html
+                        $fontSelectElement.html('');
+                        
+                        $.when( _getFontCollections() ).done( function( fontCollections ) {
+                              _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
+                                    _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
+                              });
+                        }).fail( function( _r_ ) {
+                              api.errare( 'font_picker => fail response =>', _r_ );
                         });
-                  }).fail( function( _r_ ) {
-                        api.errare( 'font_picker => fail response =>', _r_ );
-                  });
+                   });
             }//font_picker()
       });//$.extend( api.czrInputMap, {})
 

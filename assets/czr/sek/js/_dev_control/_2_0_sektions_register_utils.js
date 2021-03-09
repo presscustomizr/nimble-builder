@@ -9,7 +9,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //
             // preserve the settings => because this is where the customizer changeset of values is persisted before publishing
             // typically fired before updating the ui. @see ::generateUI()
-            cleanRegistered : function( _id_ ) {
+            //
+            // March 2021 => also clean large select options like fontPicker which generates thousands of lines and slow down the UI dramatically if kept            
+            cleanRegisteredAndLargeSelectInput : function( _id_ ) {
                   var self = this,
                       registered = $.extend( true, [], self.registered() || [] );
 
@@ -38,6 +40,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return _reg_.what === 'setting';
                   });
                   self.registered( registered );
+
+                  // March 2021
+                  // clean font picker markup, which generates thousands of select options lines and slow down the entire UI when kept
+                  // This concerns the global options and local options for which controls are not cleaned like the one of the levels UI
+                  self.cachedElements.$body.find('[data-input-type="font_picker"]').each( function() {
+                        var currentInputVal = $(this).find('select[data-czrtype]').val();
+                        // clean select 2 instance + all select options
+                        if ( ! _.isUndefined( $(this).find('select[data-czrtype]').data('czrSelect2') ) ) {
+                              $(this).find('select[data-czrtype]').czrSelect2('destroy');
+                        }
+                        $(this).find('select[data-czrtype]').html('');
+
+                        // append the current input val
+                        $(this).find('select[data-czrtype]').html('').append( $('<option>', {
+                              value : currentInputVal,
+                              html: currentInputVal,
+                              selected : "selected"
+                        }));
+
+                        $(this).find('select[data-czrtype]').data('selectOptionsSet', false );
+                  });
+
             },
 
             // This action can be fired after an import, to update the local settings with the imported values
