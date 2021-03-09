@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.7
-Stable tag: 2.2.4
+Stable tag: 2.2.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,16 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.2.4 : [performances] Nimble Builder autoloading deactivated for some options
+2.2.5 : [customizer] Various performance improvements for a faster UI. [user sections] Fixed possible encoding issue when injecting a saved section that includes html markup
 
 == Changelog ==
+= 2.2.5 March 9th 2021 =
+* fixed : [performance][customizer] the font picker input of the global options could slow down UI
+* fixed : [performance][customizer] the list of icons is now generated only when clicking on the control
+* fixed : [sections][templates] prevent NB writing the boolean is_edit_meta in the section or template meta data
+* fixed : [user sections and templates] html encoding problem when injecting a user saved section or template that includes html markup
+* fixed : [template API] avoid hammering NB api with multiple calls at the same time
+
 = 2.2.4 March 8th 2021 =
 * improved : [performances] deactivate autoloading for some options
 

@@ -482,7 +482,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Always set the previewed device back to desktop on ui change
                   // event 'sek-ui-removed' id triggered when cleaning the registered ui controls
-                  // @see ::cleanRegistered()
+                  // @see ::cleanRegisteredAndLargeSelectInput()
                   // July 2020 commented to fix https://github.com/presscustomizr/nimble-builder/issues/728
                   // self.bind( 'sek-ui-removed', function() {
                   //       api.previewedDevice( 'desktop' );
@@ -514,7 +514,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
                   // CLEAN UI BEFORE REMOVAL
-                  // 'sek-ui-pre-removal' is triggered in ::cleanRegistered
+                  // 'sek-ui-pre-removal' is triggered in ::cleanRegisteredAndLargeSelectInput
                   // @params { what : control, id : '' }
                   self.bind( 'sek-ui-pre-removal', function( params ) {
                         // CLEAN DRAG N DROP
@@ -1403,7 +1403,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.previewer.trigger( 'sek-pick-content', {});
 
                         // Clean registered control
-                        self.cleanRegistered();//<= normal cleaning
+                        self.cleanRegisteredAndLargeSelectInput();//<= normal cleaning
                         // Clean even the level settings
                         // => otherwise the level settings won't be synchronized when regenerating their ui.
                         self.cleanRegisteredLevelSettingsAfterHistoryNavigation();// setting cleaning
@@ -4727,7 +4727,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // REGISTER SETTING AND CONTROL
                   switch ( params.action ) {
                         // FRONT AND LEVEL MODULES UI
-                        // The registered elements are cleaned (self.cleanRegistered()) in the callbacks,
+                        // The registered elements are cleaned (self.cleanRegisteredAndLargeSelectInput()) in the callbacks,
                         // because we want to check if the requested UI is not the one already rendered, and fire a button-see-me animation if yes.
                         case 'sek-generate-module-ui' :
                               try{ dfd = self.generateUIforFrontModules( params, dfd ); } catch( er ) {
@@ -4748,7 +4748,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // 2) preset_section
                         case 'sek-generate-draggable-candidates-picker-ui' :
                               // Clean previously generated UI elements
-                              self.cleanRegistered();
+                              self.cleanRegisteredAndLargeSelectInput();
                               try{ dfd = self.generateUIforDraggableContent( params, dfd ); } catch( er ) {
                                     api.errare( '::generateUI() => error', er );
                                     dfd = $.Deferred();
@@ -4760,7 +4760,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // Fired in ::initialize()
                         case 'sek-generate-local-skope-options-ui' :
                               // Clean previously generated UI elements
-                              self.cleanRegistered();
+                              self.cleanRegisteredAndLargeSelectInput();
                               try{ dfd = self.generateUIforLocalSkopeOptions( params, dfd ); } catch( er ) {
                                     api.errare( '::generateUI() => error', er );
                                     dfd = $.Deferred();
@@ -4770,7 +4770,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // Fired in ::initialize()
                         case 'sek-generate-site-tmpl-options-ui' :
                               // Clean previously generated UI elements
-                              self.cleanRegistered();
+                              self.cleanRegisteredAndLargeSelectInput();
                               try{ dfd = self.generateUIforSiteTmplOptions( params, dfd ); } catch( er ) {
                                     api.errare( '::generateUI() => error', er );
                                     dfd = $.Deferred();
@@ -4780,7 +4780,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // Fired in ::initialize()
                         case 'sek-generate-global-options-ui' :
                               // Clean previously generated UI elements
-                              self.cleanRegistered();
+                              self.cleanRegisteredAndLargeSelectInput();
                               try{ dfd = self.generateUIforGlobalOptions( params, dfd ); } catch( er ) {
                                     api.errare( '::generateUI() => error', er );
                                     dfd = $.Deferred();
@@ -5715,7 +5715,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }//if
 
                   // Clean previously generated UI elements
-                  self.cleanRegistered();
+                  self.cleanRegisteredAndLargeSelectInput();
 
                   _do_register_ = function() {
                         _.each( modulesRegistrationParams, function( optionData, optionType ){
@@ -6085,7 +6085,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }//if
 
                   // Clean previously generated UI elements
-                  self.cleanRegistered();
+                  self.cleanRegisteredAndLargeSelectInput();
 
 
                   // @return void()
@@ -9221,7 +9221,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //
             // preserve the settings => because this is where the customizer changeset of values is persisted before publishing
             // typically fired before updating the ui. @see ::generateUI()
-            cleanRegistered : function( _id_ ) {
+            //
+            // March 2021 => also clean large select options like fontPicker which generates thousands of lines and slow down the UI dramatically if kept            
+            cleanRegisteredAndLargeSelectInput : function( _id_ ) {
                   var self = this,
                       registered = $.extend( true, [], self.registered() || [] );
 
@@ -9250,6 +9252,28 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return _reg_.what === 'setting';
                   });
                   self.registered( registered );
+
+                  // March 2021
+                  // clean font picker markup, which generates thousands of select options lines and slow down the entire UI when kept
+                  // This concerns the global options and local options for which controls are not cleaned like the one of the levels UI
+                  self.cachedElements.$body.find('[data-input-type="font_picker"]').each( function() {
+                        var currentInputVal = $(this).find('select[data-czrtype]').val();
+                        // clean select 2 instance + all select options
+                        if ( ! _.isUndefined( $(this).find('select[data-czrtype]').data('czrSelect2') ) ) {
+                              $(this).find('select[data-czrtype]').czrSelect2('destroy');
+                        }
+                        $(this).find('select[data-czrtype]').html('');
+
+                        // append the current input val
+                        $(this).find('select[data-czrtype]').html('').append( $('<option>', {
+                              value : currentInputVal,
+                              html: currentInputVal,
+                              selected : "selected"
+                        }));
+
+                        $(this).find('select[data-czrtype]').data('selectOptionsSet', false );
+                  });
+
             },
 
             // This action can be fired after an import, to update the local settings with the imported values
@@ -12360,11 +12384,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $('#nimble-tmpl-gallery').find('.sek-tmpl-gallery-inner').html('');
 
                   var _doPrintTmplGalleryHtml = function(params) {
-                        self.getTemplateGalleryHtml( params ).done( function( html ) {
+                        return self.getTemplateGalleryHtml( params ).done( function( html ) {
                               $tmplGalWrapper = $('#nimble-tmpl-gallery');
                               $tmplGalWrapper.find('.sek-tmpl-gallery-inner').html( html );
                         });
-                        return self.getTemplateGalleryHtml( params );
                   };
                   // Wait for the gallery to be fetched and rendered
                   _doPrintTmplGalleryHtml( params ).done( function( html ) {
@@ -13304,7 +13327,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // FONT PICKER
             font_picker : function( input_options ) {
                   var input = this,
-                      item = input.input_parent;
+                      item = input.input_parent,
+                      $fontSelectElement = $( 'select[data-czrtype="' + input.id + '"]', input.container );
 
                   var _getFontCollections = function() {
                         var dfd = $.Deferred();
@@ -13390,8 +13414,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         return fontCollections.gfonts;
                                   }
 
-                            },
-                            $fontSelectElement = $( 'select[data-czrtype="' + input.id + '"]', input.container );
+                            };
 
                         // generates the options
                         // @param type = cfont or gfont
@@ -13575,13 +13598,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return _.isString( split[0] ) ? split[0].replace(/[+|:]/g, ' ') : '';//replaces special characters ( + ) by space
                   };
 
-                  $.when( _getFontCollections() ).done( function( fontCollections ) {
-                        _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
-                              _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
+                  // On load, simply print the current input value
+                  // the full list of font ( several thousands !! ) will be rendered on click
+                  // March 2021 => to avoid slowing down the UI, the font picker select options are cleaned in cleanRegisteredAndLargeSelectInput()
+                  var inputVal = input();
+                  $fontSelectElement.append( $('<option>', {
+                        value : inputVal,
+                        html: inputVal,
+                        selected : "selected"
+                  }));
+                  
+                  // Generate options and open select2
+                  input.container.on('click', function() {
+                        if ( true === $fontSelectElement.data('selectOptionsSet') )
+                          return;
+                        
+                        $fontSelectElement.data('selectOptionsSet', true );
+                        // reset previous default html
+                        $fontSelectElement.html('');
+                        
+                        $.when( _getFontCollections() ).done( function( fontCollections ) {
+                              _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
+                                    _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
+                              });
+                        }).fail( function( _r_ ) {
+                              api.errare( 'font_picker => fail response =>', _r_ );
                         });
-                  }).fail( function( _r_ ) {
-                        api.errare( 'font_picker => fail response =>', _r_ );
-                  });
+                   });
             }//font_picker()
       });//$.extend( api.czrInputMap, {})
 
@@ -13598,7 +13641,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // FONT AWESOME ICON PICKER
             fa_icon_picker : function() {
                   var input           = this,
-                      _selected_found = false;
+                      _selected_found = false,
+                      $selectElement = $( 'select[data-czrtype="' + input.id + '"]', input.container );
 
                   //generates the options
                   var _generateOptions = function( iconCollection ) {
@@ -13613,7 +13657,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     $.extend( _attributes, { selected : "selected" } );
                                     _selected_found = true;
                               }
-                              $( 'select[data-czrtype]', input.container ).append( $('<option>', _attributes) );
+                              $selectElement.append( $('<option>', _attributes) );
                         });
 
 
@@ -13635,7 +13679,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               $_placeholder = $('<option>', { selected: 'selected' } );
                         }
                         //Initialize czrSelect2
-                        $( 'select[data-czrtype]', input.container )
+                        $selectElement
                             .prepend( $_placeholder )
                             .czrSelect2({
                                   templateResult: addIcon,
@@ -13681,7 +13725,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( params && true === params.open_on_init ) {
                                     // let's open select2 after a delay ( because there's no 'ready' event with select2 )
                                     _.delay( function() {
-                                          try{ $( 'select[data-czrtype]', input.container ).czrSelect2('open'); }catch(er) {}
+                                          try{ $selectElement.czrSelect2('open'); }catch(er) {}
                                     }, 100 );
                               }
                         }).fail( function( _r_ ) {
@@ -13691,12 +13735,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };
 
                   // Generate options and open select2
-                  input.container.on('click', function() {
-                        _do_();
-                  });
+                  input.container.on('click', _do_ );
 
                   // schedule the iconCollectionSet after a delay
-                  _.delay( function() { _do_( { open_on_init : false } );}, 1000 );
+                  //_.delay( function() { _do_( { open_on_init : false } );}, 1000 );
 
             }
       });//$.extend( api.czrInputMap, {})
@@ -15250,7 +15292,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   // Store the id of each instantiated tinyMceEditor
-                  // used in api.czrSektion::cleanRegistered
+                  // used in api.czrSektion::cleanRegisteredAndLargeSelectInput
                   api.czrActiveWPEditors = api.czrActiveWPEditors || [];
                   var currentEditors = $.extend( true, [], api.czrActiveWPEditors );
                   currentEditors.push(_id);

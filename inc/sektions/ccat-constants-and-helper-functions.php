@@ -68,6 +68,8 @@ if ( !defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) ) { define ( 'NIMBLE_TEMPLATE
 if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2",
   ( defined('NIMBLE_FETCH_API_TMPL_LOCALLY') && NIMBLE_FETCH_API_TMPL_LOCALLY ) ? 'http://customizr-dev.test/wp-json/nimble/v2/cravan' : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
 ); }
+if ( !defined( "NIMBLE_API_TMPL_LIB_OPT_NAME" ) ) { define( "NIMBLE_API_TMPL_LIB_OPT_NAME", 'nimble_api_tmpl_data' ); }
+if ( !defined( "NIMBLE_API_NEWS_OPT_NAME" ) ) { define( "NIMBLE_API_NEWS_OPT_NAME", 'nimble_api_news_data' ); }
 
 ?><?php
 /* ------------------------------------------------------------------------- *
@@ -998,6 +1000,23 @@ function sek_get_module_collection() {
 }
 
 
+
+
+// September 2020 : filter the collection of modules
+// Removes pro upsell modules if NIMBLE_PRO_UPSELL_ON is false
+// filter declared in inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php
+add_filter('sek_get_module_collection', function( $collection ) {
+    if ( defined('NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON )
+      return $collection;
+
+    $filtered = [];
+    foreach ($collection as $mod => $mod_data) {
+        if ( array_key_exists('is_pro', $mod_data) && $mod_data['is_pro'] )
+          continue;
+        $filtered[] = $mod_data;
+    }
+    return $filtered;
+});
 
 
 // @return void()
@@ -2955,22 +2974,6 @@ function sek_get_pro_notice_for_czr_input( $features = '' ) {
 }
 
 
-// September 2020 : filter the collection of modules
-// Removes pro upsell modules if NIMBLE_PRO_UPSELL_ON is false
-// filter declared in inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php
-add_filter('sek_get_module_collection', function( $collection ) {
-    if ( defined('NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON )
-      return $collection;
-
-    $filtered = [];
-    foreach ($collection as $mod => $mod_data) {
-        if ( array_key_exists('is_pro', $mod_data) && $mod_data['is_pro'] )
-          continue;
-        $filtered[] = $mod_data;
-    }
-    return $filtered;
-});
-
 // September 2020 : filter the collection of pre-built sections
 // Removes pro upsell modules if NIMBLE_PRO_UPSELL_ON is false
 // filter declared in _front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php
@@ -2992,48 +2995,6 @@ add_filter('sek_get_raw_section_registration_params', function( $collection ) {
     return $filtered;
 });
 
-// @return bool
-function sek_is_json( $string ){
-  if ( !is_string( $string ) )
-    return false;
-  json_decode($string);
-  return (json_last_error() == JSON_ERROR_NONE);
-}
-
-// @return string
-function sek_maybe_decode_richtext( $string ){
-  if ( !is_string($string) )
-    return $string;
-
-  $json_decoded_candidate = json_decode($string, true);
-  if ( json_last_error() == JSON_ERROR_NONE ) {
-      // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
-      // added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
-      $json_decoded_candidate = html_entity_decode($json_decoded_candidate, ENT_QUOTES, get_bloginfo( 'charset' ) );
-      //sek_error_log('DECODED DECODED ?', $json_decoded_candidate );
-      return $json_decoded_candidate;
-  }
-  
-  return $string;
-}
-
-// @return string
-function sek_maybe_encode_richtext( $string ){
-  if ( !is_string($string) )
-    return $string;
-  // only encode if not already encoded
-  if ( !sek_is_json($string) ) {
-      // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
-      // added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
-      $string = htmlentities($string, ENT_COMPAT, get_bloginfo( 'charset' ) );//reversed with html_entity_decode
-      //$string = wp_encode_emoji( $string );
-      $string = wp_json_encode($string);
-      //sek_error_log('JSON ENCODED ?', $string );
-  }
-  return $string;
-}
-
-
 
 // Feb 2021 : site templates exploration
 // see https://github.com/presscustomizr/nimble-builder/issues/478
@@ -3053,9 +3014,6 @@ function sek_generate_level_guid() {
 // *  NIMBLE API
 // /* ------------------------------------------------------------------------- */
 // if ( !defined( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME" ) ) { define( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME", 'nimble_api_prebuilt_sections_data' ); } <= DEPRECATED, Now uses local json
-if ( !defined( "NIMBLE_API_TMPL_LIB_OPT_NAME" ) ) { define( "NIMBLE_API_TMPL_LIB_OPT_NAME", 'nimble_api_tmpl_data' ); }
-if ( !defined( "NIMBLE_API_NEWS_OPT_NAME" ) ) { define( "NIMBLE_API_NEWS_OPT_NAME", 'nimble_api_news_data' ); }
-
 
 // Nimble api returns a set of value structured as follow
 // return array(
@@ -3076,6 +3034,12 @@ if ( !defined( "NIMBLE_API_NEWS_OPT_NAME" ) ) { define( "NIMBLE_API_NEWS_OPT_NAM
 // @return array|false Info data, or false.
 // api data is refreshed on plugin update and theme switch
 function sek_get_nimble_api_data( $force_update = false ) {
+    $cached_api_data = wp_cache_get( 'nimble_api_data' );
+
+    if ( $cached_api_data && is_array($cached_api_data) && !empty($cached_api_data) ) {
+        return $cached_api_data;
+    }
+
     // July 2020 for https://github.com/presscustomizr/nimble-builder/issues/730
     $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
     $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
@@ -3097,6 +3061,7 @@ function sek_get_nimble_api_data( $force_update = false ) {
           sek_error_log('API is in force update mode');
     }
 
+    
     // Refresh every 12 hours, unless force_update set to true
     if ( $force_update || false === $info_data ) {
         $timeout = ( $force_update ) ? 25 : 8;
@@ -3109,17 +3074,19 @@ function sek_get_nimble_api_data( $force_update = false ) {
             'start_ver' => sek_get_th_start_ver( $pc_theme_name )
           ],
         ) );
+        
+        
 
         if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
             // HOUR_IN_SECONDS is a default WP constant
-            set_transient( $api_data_transient_name, [], 2 * HOUR_IN_SECONDS );
+            set_transient( $api_data_transient_name, [], 24 * HOUR_IN_SECONDS );
             return false;
         }
 
         $info_data = json_decode( wp_remote_retrieve_body( $response ), true );
 
         if ( empty( $info_data ) || !is_array( $info_data ) ) {
-            set_transient( $api_data_transient_name, [], 2 * HOUR_IN_SECONDS );
+            set_transient( $api_data_transient_name, [], 24 * HOUR_IN_SECONDS );
             return false;
         }
 
@@ -3133,9 +3100,9 @@ function sek_get_nimble_api_data( $force_update = false ) {
         // }
         
         if ( !empty( $info_data['lib'] ) ) {
-            if ( !empty( $info_data['lib']['templates'] ) ) {
+            if ( array_key_exists( 'templates', $info_data['lib'] ) ) {
                 //sek_error_log('UPDATE TMPL API DATA ?', $info_data['lib']['templates'] );
-                update_option( NIMBLE_API_TMPL_LIB_OPT_NAME, maybe_serialize( $info_data['lib']['templates'] ), 'no' );
+                update_option( NIMBLE_API_TMPL_LIB_OPT_NAME, maybe_serialize( $info_data['lib']['templates'] ), 'no' );// opt name : nimble_api_tmpl_data
             }
             unset( $info_data['lib'] );
         }
@@ -3145,9 +3112,10 @@ function sek_get_nimble_api_data( $force_update = false ) {
             unset( $info_data['latest_posts'] );
         }
         //sek_error_log('API DATA ?', $info_data );
-        set_transient( $api_data_transient_name, $info_data, 12 * HOUR_IN_SECONDS );
+        set_transient( $api_data_transient_name, $info_data, 24 * HOUR_IN_SECONDS );
     }//if ( $force_update || false === $info_data ) {
     
+    wp_cache_set( 'nimble_api_data', $info_data );
     return $info_data;
 }
 
@@ -3162,7 +3130,7 @@ function sek_get_tmpl_api_data( $force_update = false ) {
     // Let's use the data saved as options
     // Those data are updated on plugin install, plugin update( upgrader_process_complete ), theme switch
     // @see https://github.com/presscustomizr/nimble-builder/issues/441
-    $tmpl_data = maybe_unserialize( get_option( NIMBLE_API_TMPL_LIB_OPT_NAME ) );
+    $tmpl_data = maybe_unserialize( get_option( NIMBLE_API_TMPL_LIB_OPT_NAME ) );// option name 'nimble_api_tmpl_data'
     if ( $force_update || empty( $tmpl_data ) || !is_array( $tmpl_data ) ) {
         sek_get_nimble_api_data( true );//<= true for "force_update"
         $tmpl_data = maybe_unserialize( get_option( NIMBLE_API_TMPL_LIB_OPT_NAME ) );
@@ -4663,7 +4631,7 @@ function sek_get_all_saved_sections() {
   //     )
   // );
 // @return WP_Post|WP_Error Post on success, error on failure.
-function sek_update_saved_section_post( $section_data ) {
+function sek_update_saved_section_post( $section_data, $is_edit_metas_only_case = false ) {
     if ( !is_array( $section_data ) ) {
         sek_error_log( __FUNCTION__ . ' => $section_data is not an array' );
         return new \WP_Error( __FUNCTION__ . ' => $section_data is not an array');
@@ -4690,7 +4658,6 @@ function sek_update_saved_section_post( $section_data ) {
 
     // the section post name is provided only when updating
     $is_update_case = !is_null($section_data['section_post_name']);
-    $is_edit_metas_only_case = 'yes' === $section_data['edit_metas_only'];
 
     // $post_name_to_update will be used when user updates an existing section
     if ( !is_null($section_data['section_post_name']) ) {
@@ -4960,7 +4927,7 @@ function sek_get_all_api_templates() {
   //     )
   // );
 // @return WP_Post|WP_Error Post on success, error on failure.
-function sek_update_saved_tmpl_post( $tmpl_data ) {
+function sek_update_saved_tmpl_post( $tmpl_data, $is_edit_metas_only_case = false ) {
     if ( !is_array( $tmpl_data ) ) {
         sek_error_log( __FUNCTION__ . ' => $tmpl_data is not an array' );
         return new \WP_Error( __FUNCTION__ . ' => $tmpl_data is not an array');
@@ -4980,14 +4947,18 @@ function sek_update_saved_tmpl_post( $tmpl_data ) {
             'skope_id' => '',
             'version' => NIMBLE_VERSION,
             'tmpl_locations' => array(),
+            'tmpl_header_location' => '',
+            'tmpl_footer_location' => '',
             'date' => '',
-            'theme' => ''
+            'theme' => '',
+            // for api templates
+            'is_pro_tmpl' => false,
+            'thumb_url' => ''
         )
     ));
 
     // the template post name is provided only when updating
     $is_update_case = !is_null($tmpl_data['tmpl_post_name']);
-    $is_edit_metas_only_case = 'yes' === $tmpl_data['edit_metas_only'];
 
     // $post_name_to_update will be used when user updates an existing template
     if ( !is_null($tmpl_data['tmpl_post_name']) ) {
@@ -5272,5 +5243,51 @@ function sek_sektion_collection_validate_cb( $validity, $setting_data, $setting_
     }
     return $validity;
 }
+
+
+
+
+// @return bool
+function sek_is_json( $string ){
+    if ( !is_string( $string ) )
+      return false;
+    json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
+  }
+  
+  // @return string
+  function sek_maybe_decode_richtext( $string ){
+    if ( !is_string($string) )
+      return $string;
+  
+    $json_decoded_candidate = json_decode($string, true);
+    if ( json_last_error() == JSON_ERROR_NONE ) {
+        // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
+        // added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
+        $json_decoded_candidate = html_entity_decode($json_decoded_candidate, ENT_QUOTES, get_bloginfo( 'charset' ) );
+        //sek_error_log('DECODED DECODED ?', $json_decoded_candidate );
+        return $json_decoded_candidate;
+    }
+    
+    return $string;
+  }
+  
+  // @return string
+  function sek_maybe_encode_richtext( $string ){
+    if ( !is_string($string) )
+      return $string;
+    // only encode if not already encoded
+    if ( !sek_is_json($string) ) {
+        // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
+        // added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
+        $string = htmlentities($string, ENT_COMPAT, get_bloginfo( 'charset' ) );//reversed with html_entity_decode
+        //$string = wp_encode_emoji( $string );
+        $string = wp_json_encode($string);
+        //sek_error_log('JSON ENCODED ?', $string );
+    }
+    return $string;
+  }
+
+
 
 ?>

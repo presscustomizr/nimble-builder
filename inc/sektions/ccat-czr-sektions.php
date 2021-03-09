@@ -4591,6 +4591,8 @@ function sek_maybe_import_imgs( $seks_data, $do_import_images = true ) {
                         $value = $id;
                     }
                 }
+            } else if ( is_string( $value ) && false !== strpos( $value, '__default_img_medium__' ) ) {
+                $value = NIMBLE_BASE_URL . '/assets/img/default-img.png';
             }
             $new_seks_data[$key] = $value;
         }
@@ -4688,6 +4690,9 @@ function sek_ajax_sek_get_user_tmpl_json() {
             // the image import errors won't block the import
             // they are used when notifying user in the customizer
             $tmpl_decoded['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
+            // Make sure we decode encoded rich text before sending to the customizer
+            // see #544 and #791
+            $tmpl_decoded['data'] = sek_prepare_seks_data_for_customizer( $tmpl_decoded['data'] );
             wp_send_json_success( $tmpl_decoded );
         } else {
             wp_send_json_error( __FUNCTION__ . '_invalid_tmpl_post_data' );
@@ -4727,6 +4732,9 @@ function sek_ajax_sek_get_api_tmpl_json() {
         $tmpl_as_array = $raw_tmpl[$tmpl_name];
         $raw_tmpl[$tmpl_name]['data'] = sek_maybe_import_imgs( $raw_tmpl[$tmpl_name]['data'], $do_import_images = true );
         $raw_tmpl[$tmpl_name]['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
+        // Make sure we decode encoded rich text before sending to the customizer
+        // see #544 and #791
+        $raw_tmpl[$tmpl_name]['data'] = sek_prepare_seks_data_for_customizer( $raw_tmpl[$tmpl_name]['data'] );
         wp_send_json_success( $raw_tmpl[$tmpl_name] );
     }
     //return [];
@@ -4798,12 +4806,14 @@ function sek_ajax_save_user_template() {
             'tmpl_header_location' => isset( $_POST['tmpl_header_location'] ) ? $_POST['tmpl_header_location'] : '',
             'tmpl_footer_location' => isset( $_POST['tmpl_footer_location'] ) ? $_POST['tmpl_footer_location'] : '',
             'date' => date("Y-m-d"),
-            'theme' => sanitize_title_with_dashes( get_stylesheet() )
-        ),
-        'edit_metas_only' => $is_edit_metas_only_case ? 'yes' : 'no'
+            'theme' => sanitize_title_with_dashes( get_stylesheet() ),
+            // for api templates
+            'is_pro_tmpl' => false,
+            'thumb_url' => ''
+        )
     );
 
-    $saved_template_post = sek_update_saved_tmpl_post( $template_to_save );
+    $saved_template_post = sek_update_saved_tmpl_post( $template_to_save, $is_edit_metas_only_case );
     if ( is_wp_error( $saved_template_post ) || is_null($saved_template_post) || empty($saved_template_post) ) {
         wp_send_json_error( __FUNCTION__ . ' => error when invoking sek_update_saved_tmpl_post()' );
     } else {
@@ -4947,7 +4957,9 @@ function sek_ajax_sek_get_user_section_json() {
         if ( is_array( $section_decoded ) && !empty( $section_decoded['data'] ) && is_string( $section_decoded['data'] ) ) {
             $section_decoded['data'] = json_decode( wp_unslash( $section_decoded['data'], true ) );
         }
-
+        // Make sure we decode encoded rich text before sending to the customizer
+        // see #544 and #791
+        $section_decoded['data'] = sek_prepare_seks_data_for_customizer( $section_decoded['data'] );
         wp_send_json_success( $section_decoded );
     } else {
         wp_send_json_error( __FUNCTION__ . '_section_post_not_found' );
@@ -5017,11 +5029,10 @@ function sek_ajax_save_user_section() {
             //'active_locations' => is_array( $_POST['active_locations'] ) ? $_POST['active_locations'] : array(),
             'date' => date("Y-m-d"),
             'theme' => sanitize_title_with_dashes( get_stylesheet() )
-        ),
-        'edit_metas_only' => $is_edit_metas_only_case ? 'yes' : 'no'
+        )
     );
 
-    $saved_section_post = sek_update_saved_section_post( $section_to_save );
+    $saved_section_post = sek_update_saved_section_post( $section_to_save, $is_edit_metas_only_case );
     if ( is_wp_error( $saved_section_post ) || is_null($saved_section_post) || empty($saved_section_post) ) {
         wp_send_json_error( __FUNCTION__ . ' => error when invoking sek_update_saved_section_post()' );
     } else {
