@@ -354,22 +354,6 @@ function sek_get_pro_notice_for_czr_input( $features = '' ) {
 }
 
 
-// September 2020 : filter the collection of modules
-// Removes pro upsell modules if NIMBLE_PRO_UPSELL_ON is false
-// filter declared in inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php
-add_filter('sek_get_module_collection', function( $collection ) {
-    if ( defined('NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON )
-      return $collection;
-
-    $filtered = [];
-    foreach ($collection as $mod => $mod_data) {
-        if ( array_key_exists('is_pro', $mod_data) && $mod_data['is_pro'] )
-          continue;
-        $filtered[] = $mod_data;
-    }
-    return $filtered;
-});
-
 // September 2020 : filter the collection of pre-built sections
 // Removes pro upsell modules if NIMBLE_PRO_UPSELL_ON is false
 // filter declared in _front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php
@@ -390,48 +374,6 @@ add_filter('sek_get_raw_section_registration_params', function( $collection ) {
     }
     return $filtered;
 });
-
-// @return bool
-function sek_is_json( $string ){
-  if ( !is_string( $string ) )
-    return false;
-  json_decode($string);
-  return (json_last_error() == JSON_ERROR_NONE);
-}
-
-// @return string
-function sek_maybe_decode_richtext( $string ){
-  if ( !is_string($string) )
-    return $string;
-
-  $json_decoded_candidate = json_decode($string, true);
-  if ( json_last_error() == JSON_ERROR_NONE ) {
-      // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
-      // added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
-      $json_decoded_candidate = html_entity_decode($json_decoded_candidate, ENT_QUOTES, get_bloginfo( 'charset' ) );
-      //sek_error_log('DECODED DECODED ?', $json_decoded_candidate );
-      return $json_decoded_candidate;
-  }
-  
-  return $string;
-}
-
-// @return string
-function sek_maybe_encode_richtext( $string ){
-  if ( !is_string($string) )
-    return $string;
-  // only encode if not already encoded
-  if ( !sek_is_json($string) ) {
-      // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
-      // added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
-      $string = htmlentities($string, ENT_COMPAT, get_bloginfo( 'charset' ) );//reversed with html_entity_decode
-      //$string = wp_encode_emoji( $string );
-      $string = wp_json_encode($string);
-      //sek_error_log('JSON ENCODED ?', $string );
-  }
-  return $string;
-}
-
 
 
 // Feb 2021 : site templates exploration
