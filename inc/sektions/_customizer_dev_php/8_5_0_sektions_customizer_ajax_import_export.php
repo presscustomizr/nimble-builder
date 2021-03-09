@@ -298,6 +298,8 @@ function sek_maybe_import_imgs( $seks_data, $do_import_images = true ) {
                         $value = $id;
                     }
                 }
+            } else if ( is_string( $value ) && false !== strpos( $value, '__default_img_medium__' ) ) {
+                $value = NIMBLE_BASE_URL . '/assets/img/default-img.png';
             }
             $new_seks_data[$key] = $value;
         }
