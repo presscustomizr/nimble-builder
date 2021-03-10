@@ -47,7 +47,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.cachedElements.$body.find('[data-input-type="font_picker"]').each( function() {
                         var currentInputVal = $(this).find('select[data-czrtype]').val();
                         // clean select 2 instance + all select options
-                        if ( ! _.isUndefined( $(this).find('select[data-czrtype]').data('czrSelect2') ) ) {
+                        if ( !_.isUndefined( $(this).find('select[data-czrtype]').data('czrSelect2') ) ) {
                               $(this).find('select[data-czrtype]').czrSelect2('destroy');
                         }
                         $(this).find('select[data-czrtype]').html('');

@@ -304,6 +304,9 @@
                         $.when( _getFontCollections() ).done( function( fontCollections ) {
                               _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
                                     _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
+                                    if ( !_.isUndefined( input.container.find('select[data-czrtype]').data('czrSelect2') ) ) {
+                                          input.container.find('select[data-czrtype]').czrSelect2('open');
+                                    }
                               });
                         }).fail( function( _r_ ) {
                               api.errare( 'font_picker => fail response =>', _r_ );

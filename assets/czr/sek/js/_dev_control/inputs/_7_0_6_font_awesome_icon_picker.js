@@ -86,16 +86,13 @@
                   };//_getIconsCollections
 
                   // do
-                  var _do_ = function( params ) {
+                  var _do_ = function() {
                         if ( true === input.iconCollectionSet )
                           return;
                         $.when( _getIconsCollections() ).done( function( iconCollection ) {
                               _generateOptions( iconCollection );
-                              if ( params && true === params.open_on_init ) {
-                                    // let's open select2 after a delay ( because there's no 'ready' event with select2 )
-                                    _.delay( function() {
-                                          try{ $selectElement.czrSelect2('open'); }catch(er) {}
-                                    }, 100 );
+                              if ( !_.isUndefined( input.container.find('select[data-czrtype]').data('czrSelect2') ) ) {
+                                    input.container.find('select[data-czrtype]').czrSelect2('open');
                               }
                         }).fail( function( _r_ ) {
                               api.errare( 'fa_icon_picker => fail response =>', _r_ );
