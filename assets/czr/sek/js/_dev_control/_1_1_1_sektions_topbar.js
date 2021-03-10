@@ -133,9 +133,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // });
                   });
 
-                  $('.sek-nimble-doc', self.topBarId).on( 'click', function(evt) {
+                  $('.sek-nimble-doc, .sek-notifications', self.topBarId).on( 'click', function(evt) {
                         evt.preventDefault();
-                        window.open($(this).data('doc-href'), '_blank');
+                        if ( $(this).data('doc-href') ) {
+                              window.open($(this).data('doc-href'), '_blank');
+                        }
                   });
 
                   $('.sek-tmpl-saving', self.topBarId ).on( 'click', function(evt) {
@@ -155,10 +157,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( $(self.topBarId).length < 1 || sektionsLocalizedData.isDebugMode )
                           return;
                         if ( _.isObject( templateSettingValue ) && templateSettingValue.local_template && 'default' !== templateSettingValue.local_template ) {
-                              $(self.topBarId).find('.sek-notifications').html([
-                                    '<span class="fas fa-info-circle"></span>',
-                                    sektionsLocalizedData.i18n['This page uses a custom template.']
-                              ].join(' '));
+                              $(self.topBarId).find('.sek-notifications')
+                                    .html([
+                                          '<span class="fas fa-info-circle"></span>',
+                                          sektionsLocalizedData.i18n['This page uses Nimble Builder template.']
+                                    ].join(' '))
+                                    .attr('data-doc-href', 'https://docs.presscustomizr.com/article/339-changing-the-page-template');
                         } else {
                               $(self.topBarId).find('.sek-notifications').html('');
                         }
