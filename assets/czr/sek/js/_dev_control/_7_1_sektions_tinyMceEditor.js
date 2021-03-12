@@ -71,7 +71,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // REACT TO EDITOR VISIBILITY
                   api.sekEditorExpanded.bind( function ( expanded, from, params ) {
-                        mayBeAwakeTinyMceEditor();
+                        try{ mayBeAwakeTinyMceEditor(); } catch(er) {
+                              if ( window.console ) {
+                                    console.log('Error in mayBeAwakeTinyMceEditor ', er );
+                              }
+                        }
                         //api.infoLog('in api.sekEditorExpanded', expanded );
                         if ( expanded && api.sekTinyMceEditor ) {
                               api.sekTinyMceEditor.focus();

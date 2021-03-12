@@ -22,6 +22,9 @@
                   if ( _.isNull( _id ) ) {
                         throw new Error( 'api.czrInputMap.nimble_tinymce_editor => missing textarea for module :' + input.module.id );
                   }
+                  if ( !window.tinyMCE ) {
+                        throw new Error( 'api.czrInputMap.nimble_tinymce_editor => tinyMCE not defined.');
+                  }
                   if ( tinyMCE.get( _id ) ) {
                         throw new Error( 'api.czrInputMap.nimble_tinymce_editor => duplicate editor id.');
                   }
@@ -101,7 +104,6 @@
                   wp.editor.initialize( _id, init_settings );
                   // Note that an easy way to instantiate a basic editor would be to use :
                   // wp.editor.initialize( _id, { tinymce : { forced_root_block : "", wpautop: false }, quicktags : true });
-
                   var _editor = tinyMCE.get( _id );
                   if ( ! _editor ) {
                         throw new Error( 'setupTinyMceEditor => missing editor instance for module :' + input.module.id );
@@ -260,9 +262,15 @@
                   init_settings.toolbar1 = sektionsLocalizedData.defaultToolbarBtns;
                   init_settings.toolbar2 = "";
 
+                  if ( window.tinymce ) {
+                        window.tinymce.init( init_settings );
+                        window.QTags.getInstance( _id );
+                  } else {
+                        if ( window.console ) {
+                              console.log('Error in ::detached_tinymce_editor => window.tinymce not defined ');
+                        }
+                  }
 
-                  window.tinymce.init( init_settings );
-                  window.QTags.getInstance( _id );
                   // wp.editor.initialize( _id, {
                   //       //tinymce : true,
                   //       tinymce: nimbleTinyMCEPreInit.mceInit[_id],
@@ -270,9 +278,14 @@
                   //       mediaButtons: true
                   // });
 
-                  var _editor = tinyMCE.get( _id );
-                  if ( ! _editor ) {
-                        throw new Error( 'setupDetachedTinyMceEditor => missing editor instance for module :' + input.module.id );
+                  var _editor;
+                  if ( window.tinyMCE ) {
+                        _editor = tinyMCE.get( _id );
+                        //throw new Error( 'api.czrInputMap.detached_tinymce_editor => tinyMCE not defined.');
+                  } else {
+                        if ( window.console ) {
+                              console.log('Error in ::detached_tinymce_editor => window.tinyMCE not defined ');
+                        }
                   }
 
                   // Let's set the input() value when the editor is ready
@@ -300,17 +313,21 @@
                         // trigger a resize to adjust height on init https://github.com/presscustomizr/nimble-builder/issues/409
                         $(window).trigger('resize');
                   };
-                  if ( _editor.initialized ) {
-                        _doOnInit();
-                  } else {
-                        _editor.on( 'init', _doOnInit );
-                  }
 
-                  // bind events
-                  _editor.on( 'input change keyup keydown click SetContent BeforeSetContent', function( evt ) {
-                        //$textarea.trigger( 'change', {current_input : input} );
-                        input( isAutoPEnabled() ? _editor.getContent() : wp.editor.removep( _editor.getContent() ) );
-                  });
+                  // if we have an editor, let's go
+                  if ( _editor ) {
+                        if ( _editor.initialized ) {
+                              _doOnInit();
+                        } else {
+                              _editor.on( 'init', _doOnInit );
+                        }
+
+                        // bind events
+                        _editor.on( 'input change keyup keydown click SetContent BeforeSetContent', function( evt ) {
+                              //$textarea.trigger( 'change', {current_input : input} );
+                              input( isAutoPEnabled() ? _editor.getContent() : wp.editor.removep( _editor.getContent() ) );
+                        });
+                  }
 
                   // store the current input now, so we'll always get the right one when textarea changes
                   api.sekCurrentDetachedTinyMceInput = input;
