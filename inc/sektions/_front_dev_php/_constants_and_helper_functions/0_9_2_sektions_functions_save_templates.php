@@ -171,9 +171,17 @@ function sek_get_all_saved_templates() {
 function sek_get_all_api_templates() {
     $raw_tmpl = sek_get_tmpl_api_data();
     $collection = [];
+
     if( !is_array( $raw_tmpl) )
         return $collection;
+        
     foreach ( $raw_tmpl as $tmpl_cpt_post_name => $tmpl_data ) {
+        if ( !is_array( $tmpl_data ) )
+            continue;
+
+        if ( !array_key_exists( 'metas', $tmpl_data ) )
+            continue;
+
         $metas = !is_array( $tmpl_data['metas'] ) ? [] : $tmpl_data['metas'];
         if ( empty($metas) )
             continue;
