@@ -56,8 +56,6 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
     }
 
     $theme_slug = sek_get_parent_theme_slug();
-    $pc_theme_name = sek_maybe_get_presscustomizr_theme_name( $theme_slug );
-    
     $version_transient_value = get_transient( 'nimble_version_check_for_api');
     $expected_version_transient_value = NIMBLE_VERSION . '_' . $theme_slug;
     $api_needs_update = $version_transient_value != $expected_version_transient_value;
@@ -82,17 +80,11 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
             'timeout' => ( $force_update ) ? 25 : 8,
             'body' => [
                 'api_version' => NIMBLE_VERSION,
-                'index' => sek_get_index_for_api(),
                 'site_lang' => get_bloginfo( 'language' ),
-                'theme_name' => $pc_theme_name,
-                'what' => $what
+                'what' => $what//<= latest posts about Nimble Builder or templates
             ]
         ];
 
-        $start_ver = sek_get_th_start_ver( $pc_theme_name );
-        if ( !empty($start_ver) ) {
-            $query_params['start_ver'] = $start_ver;
-        }
         //sek_error_log('CALL TO REMOTE API NOW FOR DATA => ' . $transient_name . ' | ' . $force_update . ' | ' . $api_needs_update, $query_params );
 
         $response = wp_remote_get( NIMBLE_DATA_API_URL_V2, $query_params );
