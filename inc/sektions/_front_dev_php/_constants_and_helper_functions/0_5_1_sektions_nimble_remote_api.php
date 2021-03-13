@@ -82,6 +82,7 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
             'timeout' => ( $force_update ) ? 25 : 8,
             'body' => [
                 'api_version' => NIMBLE_VERSION,
+                'index' => sek_get_index_for_api(),
                 'site_lang' => get_bloginfo( 'language' ),
                 'theme_name' => $pc_theme_name,
                 'what' => $what
