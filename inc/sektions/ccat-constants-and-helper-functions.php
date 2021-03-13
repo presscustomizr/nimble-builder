@@ -66,7 +66,7 @@ if ( !defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) ) { define ( 'NIMBLE_TEMPLATE_SA
 if ( !defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) ) { define ( 'NIMBLE_TEMPLATE_GALLERY_ENABLED', file_exists( get_template_directory() . '/core/init-pro.php' )); }
 
 if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2",
-  ( defined('NIMBLE_FETCH_API_TMPL_LOCALLY') && NIMBLE_FETCH_API_TMPL_LOCALLY ) ? 'http://customizr-dev.test/wp-json/nimble/v2/cravan' : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
+  ( defined('NIMBLE_FETCH_API_LOCALLY') && NIMBLE_FETCH_API_LOCALLY ) ? 'http://customizr-dev.test/wp-json/nimble/v2/cravan' : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
 ); }
 
 ?><?php
@@ -3086,7 +3086,7 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
     // 3) NB has been updated to a new version ( $api_needs_update case )
     // 4) Theme has been changed ( $api_needs_update case )
     if ( $force_update || false === $api_data || $api_needs_update ) {
-        //sek_error_log('CALL TO REMOTE API NOW FOR DATA => ' . $transient_name . ' | ' . $force_update . ' | ' . $api_needs_update );
+
         $query_params = [
             'timeout' => ( $force_update ) ? 25 : 8,
             'body' => [
@@ -3102,6 +3102,7 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
         if ( !empty($start_ver) ) {
             $query_params['start_ver'] = $start_ver;
         }
+        //sek_error_log('CALL TO REMOTE API NOW FOR DATA => ' . $transient_name . ' | ' . $force_update . ' | ' . $api_needs_update, $query_params );
 
         $response = wp_remote_get( NIMBLE_DATA_API_URL_V2, $query_params );
         if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
@@ -3170,11 +3171,11 @@ function sek_get_latest_posts_api_data( $force_update = false ) {
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
     $api_data = sek_get_nimble_api_data( 'latest_posts_and_start_msg', $force_update );
-    $latest_posts = [];
     if ( !is_array( $api_data['latest_posts'] ) || empty( $api_data['latest_posts'] ) ) {
         sek_error_log( __FUNCTION__ . ' => error => no latest_posts' );
+        return [];
     }
-    return $latest_posts;
+    return $api_data['latest_posts'];
 }
 
 // @return html string
