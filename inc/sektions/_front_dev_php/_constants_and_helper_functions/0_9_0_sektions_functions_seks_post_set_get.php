@@ -100,15 +100,15 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
     $post = null;
 
     $post_id = sek_get_nb_post_id_from_index( $skope_id );
+    
+    if ( !is_int( $post_id ) ) {
+        error_log( 'sek_get_seks_post => post_id !is_int() for options => ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id );
+    }
     // if the options has not been set yet, it will return (int) 0
     // id #1 is already taken by the 'Hello World' post.
     if ( 1 > $post_id ) {
         //error_log( 'sek_get_seks_post => post_id is not valid for options => ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id );
         return;
-    }
-
-    if ( !is_int( $post_id ) ) {
-        error_log( 'sek_get_seks_post => post_id !is_int() for options => ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id );
     }
 
     if ( is_int( $post_id ) && $post_id > 0 && get_post( $post_id ) ) {
