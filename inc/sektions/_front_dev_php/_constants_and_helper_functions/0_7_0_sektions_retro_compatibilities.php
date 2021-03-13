@@ -4,6 +4,16 @@ function sek_maybe_optimize_options() {
     $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
     $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
 
+    // March 13th 2021 => removed previous option used to store api post news, now handled with a transient.
+    if ( !array_key_exists('optimize_opts_0321_2', $bw_fixes_options ) || 'done' != $bw_fixes_options['optimize_opts_0321_2'] ) {
+        delete_option( 'nimble_api_news_data' );
+
+        // flag as done
+        $bw_fixes_options['optimize_opts_0321_2'] = 'done';
+        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
+    }
+
+
     if ( !array_key_exists('optimize_opts_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['optimize_opts_0321'] ) {
         $current_global_opts = get_option('__nimble_options__');
         if ( false !== $current_global_opts ) {

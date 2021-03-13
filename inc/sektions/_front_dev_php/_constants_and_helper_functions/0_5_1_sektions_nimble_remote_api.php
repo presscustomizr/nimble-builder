@@ -22,90 +22,110 @@
 // );
 // @return array|false Info data, or false.
 // api data is refreshed on plugin update and theme switch
-function sek_get_nimble_api_data( $force_update = false ) {
-    $cached_api_data = wp_cache_get( 'nimble_api_data' );
+// @$what param can be 'latest_posts_and_start_msg', 'templates'
+function sek_get_nimble_api_data( $what = null, $force_update = false ) {
+    if ( is_null( $what ) || !is_string($what) ) {
+        sek_error_log( __FUNCTION__ . ' => error => $what param not set');
+        return false;
+    }
+
+    $cached_api_data = wp_cache_get( 'nimble_api_data_'.$what );
 
     if ( $cached_api_data && is_array($cached_api_data) && !empty($cached_api_data) ) {
         return $cached_api_data;
     }
 
-    // July 2020 for https://github.com/presscustomizr/nimble-builder/issues/730
-    $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
-    $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
-    if ( !array_key_exists('api_data_transient_0720', $bw_fixes_options ) || 'done' != $bw_fixes_options['api_data_transient_0720'] ) {
-        sek_clean_transients_like( 'nimble_api_data');
-        $bw_fixes_options['api_data_transient_0720'] = 'done';
-        // flag as done
-        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
+    $transient_name = '';
+    $transient_duration = 24 * HOUR_IN_SECONDS;
+
+    switch ( $what ) {
+        case 'latest_posts_and_start_msg':
+            $transient_name = 'nimble_api_posts';
+            $transient_duration = 48 * HOUR_IN_SECONDS;
+        break;
+        case 'templates':
+            $transient_name = 'nimble_api_templates';
+        break;
+        default:
+            sek_error_log( __FUNCTION__ . ' => error => invalid $what param => ' . $what );
+        break;
     }
 
-    // July 2020 => new static transient name, not updated on each NB version
-    $api_data_transient_name = 'nimble_data_api';
-    $info_data = get_transient( $api_data_transient_name );
+    if ( empty( $transient_name ) ) {
+        return false;
+    }
+
     $theme_slug = sek_get_parent_theme_slug();
     $pc_theme_name = sek_maybe_get_presscustomizr_theme_name( $theme_slug );
+    
+    $version_transient_value = get_transient( 'nimble_version_check_for_api');
+    $expected_version_transient_value = NIMBLE_VERSION . '_' . $theme_slug;
+    $api_needs_update = $version_transient_value != $expected_version_transient_value;
+
+    $api_data = maybe_unserialize( get_transient( $transient_name ) );
+
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
-    if ( true === $force_update && sek_is_dev_mode() ) {
-          sek_error_log('API is in force update mode');
+    if ( true === $force_update ) {
+          sek_error_log( __FUNCTION__ . ' API is in force update mode. API data requested => ' . $transient_name );
     }
 
-    
-    // Refresh every 12 hours, unless force_update set to true
-    if ( $force_update || false === $info_data ) {
-        $timeout = ( $force_update ) ? 25 : 8;
-        $response = wp_remote_get( NIMBLE_DATA_API_URL_V2, array(
-          'timeout' => $timeout,
-          'body' => [
-            'api_version' => NIMBLE_VERSION,
-            'site_lang' => get_bloginfo( 'language' ),
-            'theme_name' => $pc_theme_name,
-            'start_ver' => sek_get_th_start_ver( $pc_theme_name )
-          ],
-        ) );
-        
-        
 
+    // Connect to remote NB api when :
+    // 1) api data transient is not set or has expired ( false === $api_data )
+    // 2) force_update param is true
+    // 3) NB has been updated to a new version ( $api_needs_update case )
+    // 4) Theme has been changed ( $api_needs_update case )
+    if ( $force_update || false === $api_data || $api_needs_update ) {
+        //sek_error_log('CALL TO REMOTE API NOW FOR DATA => ' . $transient_name . ' | ' . $force_update . ' | ' . $api_needs_update );
+        $query_params = [
+            'timeout' => ( $force_update ) ? 25 : 8,
+            'body' => [
+                'api_version' => NIMBLE_VERSION,
+                'site_lang' => get_bloginfo( 'language' ),
+                'theme_name' => $pc_theme_name,
+                'what' => $what
+            ]
+        ];
+
+        $start_ver = sek_get_th_start_ver( $pc_theme_name );
+        if ( !empty($start_ver) ) {
+            $query_params['start_ver'] = $start_ver;
+        }
+
+        $response = wp_remote_get( NIMBLE_DATA_API_URL_V2, $query_params );
         if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
-            // HOUR_IN_SECONDS is a default WP constant
-            set_transient( $api_data_transient_name, [], 24 * HOUR_IN_SECONDS );
-            return false;
+            // set the transient to '_api_error_', so that we don't hammer the api if not reachable. next call will be done after transient expiration
+            $api_data = '_api_error_';
+            sek_error_log( __FUNCTION__ . ' invalid api response');
         }
 
-        $info_data = json_decode( wp_remote_retrieve_body( $response ), true );
+        $api_data = json_decode( wp_remote_retrieve_body( $response ), true );
 
-        if ( empty( $info_data ) || !is_array( $info_data ) ) {
-            set_transient( $api_data_transient_name, [], 24 * HOUR_IN_SECONDS );
-            return false;
+        if ( empty( $api_data ) || !is_array( $api_data ) ) {
+            // set the transient to '_api_error_', so that we don't hammer the api if not reachable. next call will be done after transient expiration
+            $api_data = '_api_error_';
+            sek_error_log( __FUNCTION__ . ' invalid api data after json decode');
         }
 
-        // on May 21st 2019 => back to the local data for preset sections
-        // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
-        // if ( !empty( $info_data['library'] ) ) {
-        //     if ( !empty( $info_data['library']['sections'] ) ) {
-        //         update_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME, $info_data['library']['sections'], 'no' );
-        //     }
-        //     unset( $info_data['library'] );
-        // }
-        
-        if ( !empty( $info_data['lib'] ) ) {
-            if ( array_key_exists( 'templates', $info_data['lib'] ) ) {
-                //sek_error_log('UPDATE TMPL API DATA ?', $info_data['lib']['templates'] );
-                update_option( NIMBLE_API_TMPL_LIB_OPT_NAME, maybe_serialize( $info_data['lib']['templates'] ), 'no' );// opt name : nimble_api_tmpl_data
-            }
-            unset( $info_data['lib'] );
-        }
-
-        if ( isset( $info_data['latest_posts'] ) ) {
-            update_option( NIMBLE_API_NEWS_OPT_NAME, $info_data['latest_posts'], 'no' );
-            unset( $info_data['latest_posts'] );
-        }
-        //sek_error_log('API DATA ?', $info_data );
-        set_transient( $api_data_transient_name, $info_data, 24 * HOUR_IN_SECONDS );
-    }//if ( $force_update || false === $info_data ) {
+        //sek_error_log('API DATA ?', $api_data );
+        set_transient( $transient_name, $api_data, $transient_duration );
+        // The api data will be refreshed on next plugin update, or next theme switch. Or if $transient_name has expired.
+        // $expected_version_transient_value = NIMBLE_VERSION . '_' . $theme_slug;
+        set_transient( 'nimble_version_check_for_api', $expected_version_transient_value, 100 * DAY_IN_SECONDS );
+    }//if ( $force_update || false === $api_data )
     
-    wp_cache_set( 'nimble_api_data', $info_data );
-    return $info_data;
+    // if api_error a new api call will be done when the relevant transient will expire
+    if ( '_api_error_' === $api_data ) {
+        sek_error_log( __FUNCTION__ . ' API data value is _api_error_ for transient data : ' . $transient_name );
+    }
+
+    $api_data = '_api_error_' === $api_data ? null : $api_data;
+    wp_cache_set( 'nimble_api_data_'. $what , $api_data );
+
+    //sek_error_log('API DATA for ' . $transient_name, $api_data );
+
+    return $api_data;
 }
 
 
@@ -119,19 +139,17 @@ function sek_get_tmpl_api_data( $force_update = false ) {
     // Let's use the data saved as options
     // Those data are updated on plugin install, plugin update( upgrader_process_complete ), theme switch
     // @see https://github.com/presscustomizr/nimble-builder/issues/441
-    $tmpl_data = maybe_unserialize( get_option( NIMBLE_API_TMPL_LIB_OPT_NAME ) );// option name 'nimble_api_tmpl_data'
-    if ( $force_update || empty( $tmpl_data ) || !is_array( $tmpl_data ) ) {
-        sek_get_nimble_api_data( true );//<= true for "force_update"
-        $tmpl_data = maybe_unserialize( get_option( NIMBLE_API_TMPL_LIB_OPT_NAME ) );
-    }
+    $api_data = sek_get_nimble_api_data( 'templates', $force_update );
+    $api_data = is_array( $api_data ) ? $api_data : [];
+
     //sek_error_log('TMPL DATA ?', $tmpl_data);
-    if ( empty( $tmpl_data ) || !is_array( $tmpl_data ) ) {
+    if ( empty($api_data) || !array_key_exists('lib', $api_data) || !is_array($api_data['lib']) || empty($api_data['lib']['templates']) || !is_array($api_data['lib']['templates']) ) {
         sek_error_log( __FUNCTION__ . ' => error => no json_collection' );
         return array();
     }
    
     //return [];
-    return maybe_unserialize( $tmpl_data );
+    return maybe_unserialize( $api_data['lib']['templates'] );
 }
 
 
@@ -141,12 +159,10 @@ function sek_get_tmpl_api_data( $force_update = false ) {
 function sek_get_latest_posts_api_data( $force_update = false ) {
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
-
-    sek_get_nimble_api_data( $force_update );
-    $latest_posts = get_option( NIMBLE_API_NEWS_OPT_NAME );
-    if ( empty( $latest_posts ) ) {
+    $api_data = sek_get_nimble_api_data( 'latest_posts_and_start_msg', $force_update );
+    $latest_posts = [];
+    if ( !is_array( $api_data['latest_posts'] ) || empty( $api_data['latest_posts'] ) ) {
         sek_error_log( __FUNCTION__ . ' => error => no latest_posts' );
-        return array();
     }
     return $latest_posts;
 }
@@ -156,12 +172,13 @@ function sek_start_msg_from_api( $theme_name, $force_update = false ) {
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
 
-    $info_data = sek_get_nimble_api_data( $force_update );
-    if ( !sek_is_presscustomizr_theme( $theme_name ) || !is_array( $info_data ) ) {
+    $api_data = sek_get_nimble_api_data( 'latest_posts_and_start_msg', $force_update );
+    if ( !sek_is_presscustomizr_theme( $theme_name ) || !is_array( $api_data ) ) {
         return '';
     }
     $msg = '';
-    $api_msg = isset( $info_data['start_msg'] ) ? $info_data['start_msg'] : null;
+    $api_data = is_array($api_data) ? $api_data : [];
+    $api_msg = isset( $api_data['start_msg'] ) ? $api_data['start_msg'] : null;
 
     if ( !is_null($api_msg) && is_string($api_msg) ) {
         $msg = $api_msg;
@@ -170,13 +187,13 @@ function sek_start_msg_from_api( $theme_name, $force_update = false ) {
 }
 
 // Refresh the api data on plugin update and theme switch
-add_action( 'after_switch_theme', '\Nimble\sek_refresh_nimble_api_data');
-add_action( 'upgrader_process_complete', '\Nimble\sek_refresh_nimble_api_data');
-function sek_refresh_nimble_api_data() {
-    // Refresh data on theme switch
-    // => so the posts and message are up to date
-    sek_get_nimble_api_data($force_update = true);
-}
+// add_action( 'after_switch_theme', '\Nimble\sek_refresh_nimble_api_data');
+// add_action( 'upgrader_process_complete', '\Nimble\sek_refresh_nimble_api_data');
+// function sek_refresh_nimble_api_data() {
+//     // Refresh data on theme switch
+//     // => so the posts and message are up to date
+//     sek_get_nimble_api_data( 'all_data', $force_update = true );
+// }
 
 
 //////////////////////////////////////////////////
