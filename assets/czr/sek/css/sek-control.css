@@ -1506,6 +1506,10 @@ body.nimble-top-bar-visible #nimble-top-bar {
   /* flex-direction: column; */
   flex: 0 0 100%;
   max-width: 100%;
+  font-size: 12px;
+}
+#nimble-top-bar .sek-nimble-doc .sek-pointer {
+  text-decoration: underline;
 }
 .rtl #nimble-top-bar .sek-nimble-doc {
   left:10px;
@@ -1528,6 +1532,10 @@ body.nimble-top-bar-visible #nimble-top-bar {
 #nimble-top-bar .sek-notifications {
   max-width: 410px;
   overflow: hidden;
+  padding: 0 10px;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 /* May 2020 : debug mode notification */

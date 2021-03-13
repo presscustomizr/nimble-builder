@@ -1153,9 +1153,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // });
                   });
 
-                  $('.sek-nimble-doc', self.topBarId).on( 'click', function(evt) {
+                  $('.sek-nimble-doc, .sek-notifications', self.topBarId).on( 'click', function(evt) {
                         evt.preventDefault();
-                        window.open($(this).data('doc-href'), '_blank');
+                        if ( $(this).data('doc-href') ) {
+                              window.open($(this).data('doc-href'), '_blank');
+                        }
                   });
 
                   $('.sek-tmpl-saving', self.topBarId ).on( 'click', function(evt) {
@@ -1175,10 +1177,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( $(self.topBarId).length < 1 || sektionsLocalizedData.isDebugMode )
                           return;
                         if ( _.isObject( templateSettingValue ) && templateSettingValue.local_template && 'default' !== templateSettingValue.local_template ) {
-                              $(self.topBarId).find('.sek-notifications').html([
-                                    '<span class="fas fa-info-circle"></span>',
-                                    sektionsLocalizedData.i18n['This page uses a custom template.']
-                              ].join(' '));
+                              $(self.topBarId).find('.sek-notifications')
+                                    .html([
+                                          '<span class="fas fa-info-circle"></span>',
+                                          sektionsLocalizedData.i18n['This page uses Nimble Builder template.']
+                                    ].join(' '))
+                                    .attr('data-doc-href', 'https://docs.presscustomizr.com/article/339-changing-the-page-template');
                         } else {
                               $(self.topBarId).find('.sek-notifications').html('');
                         }
@@ -9259,7 +9263,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   self.cachedElements.$body.find('[data-input-type="font_picker"]').each( function() {
                         var currentInputVal = $(this).find('select[data-czrtype]').val();
                         // clean select 2 instance + all select options
-                        if ( ! _.isUndefined( $(this).find('select[data-czrtype]').data('czrSelect2') ) ) {
+                        if ( !_.isUndefined( $(this).find('select[data-czrtype]').data('czrSelect2') ) ) {
                               $(this).find('select[data-czrtype]').czrSelect2('destroy');
                         }
                         $(this).find('select[data-czrtype]').html('');
@@ -11501,7 +11505,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // REACT TO EDITOR VISIBILITY
                   api.sekEditorExpanded.bind( function ( expanded, from, params ) {
-                        mayBeAwakeTinyMceEditor();
+                        try{ mayBeAwakeTinyMceEditor(); } catch(er) {
+                              if ( window.console ) {
+                                    console.log('Error in mayBeAwakeTinyMceEditor ', er );
+                              }
+                        }
                         //api.infoLog('in api.sekEditorExpanded', expanded );
                         if ( expanded && api.sekTinyMceEditor ) {
                               api.sekTinyMceEditor.focus();
@@ -13620,6 +13628,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         $.when( _getFontCollections() ).done( function( fontCollections ) {
                               _preprocessSelect2ForFontFamily().done( function( customResultsAdapter ) {
                                     _setupSelectForFontFamilySelector( customResultsAdapter, fontCollections );
+                                    if ( !_.isUndefined( input.container.find('select[data-czrtype]').data('czrSelect2') ) ) {
+                                          input.container.find('select[data-czrtype]').czrSelect2('open');
+                                    }
                               });
                         }).fail( function( _r_ ) {
                               api.errare( 'font_picker => fail response =>', _r_ );
@@ -13717,16 +13728,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   };//_getIconsCollections
 
                   // do
-                  var _do_ = function( params ) {
+                  var _do_ = function() {
                         if ( true === input.iconCollectionSet )
                           return;
                         $.when( _getIconsCollections() ).done( function( iconCollection ) {
                               _generateOptions( iconCollection );
-                              if ( params && true === params.open_on_init ) {
-                                    // let's open select2 after a delay ( because there's no 'ready' event with select2 )
-                                    _.delay( function() {
-                                          try{ $selectElement.czrSelect2('open'); }catch(er) {}
-                                    }, 100 );
+                              if ( !_.isUndefined( input.container.find('select[data-czrtype]').data('czrSelect2') ) ) {
+                                    input.container.find('select[data-czrtype]').czrSelect2('open');
                               }
                         }).fail( function( _r_ ) {
                               api.errare( 'fa_icon_picker => fail response =>', _r_ );
@@ -15206,6 +15214,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isNull( _id ) ) {
                         throw new Error( 'api.czrInputMap.nimble_tinymce_editor => missing textarea for module :' + input.module.id );
                   }
+                  if ( !window.tinyMCE ) {
+                        throw new Error( 'api.czrInputMap.nimble_tinymce_editor => tinyMCE not defined.');
+                  }
                   if ( tinyMCE.get( _id ) ) {
                         throw new Error( 'api.czrInputMap.nimble_tinymce_editor => duplicate editor id.');
                   }
@@ -15285,7 +15296,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   wp.editor.initialize( _id, init_settings );
                   // Note that an easy way to instantiate a basic editor would be to use :
                   // wp.editor.initialize( _id, { tinymce : { forced_root_block : "", wpautop: false }, quicktags : true });
-
                   var _editor = tinyMCE.get( _id );
                   if ( ! _editor ) {
                         throw new Error( 'setupTinyMceEditor => missing editor instance for module :' + input.module.id );
@@ -15444,9 +15454,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   init_settings.toolbar1 = sektionsLocalizedData.defaultToolbarBtns;
                   init_settings.toolbar2 = "";
 
+                  if ( window.tinymce ) {
+                        window.tinymce.init( init_settings );
+                        window.QTags.getInstance( _id );
+                  } else {
+                        if ( window.console ) {
+                              console.log('Error in ::detached_tinymce_editor => window.tinymce not defined ');
+                        }
+                  }
 
-                  window.tinymce.init( init_settings );
-                  window.QTags.getInstance( _id );
                   // wp.editor.initialize( _id, {
                   //       //tinymce : true,
                   //       tinymce: nimbleTinyMCEPreInit.mceInit[_id],
@@ -15454,9 +15470,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //       mediaButtons: true
                   // });
 
-                  var _editor = tinyMCE.get( _id );
-                  if ( ! _editor ) {
-                        throw new Error( 'setupDetachedTinyMceEditor => missing editor instance for module :' + input.module.id );
+                  var _editor;
+                  if ( window.tinyMCE ) {
+                        _editor = tinyMCE.get( _id );
+                        //throw new Error( 'api.czrInputMap.detached_tinymce_editor => tinyMCE not defined.');
+                  } else {
+                        if ( window.console ) {
+                              console.log('Error in ::detached_tinymce_editor => window.tinyMCE not defined ');
+                        }
                   }
 
                   // Let's set the input() value when the editor is ready
@@ -15484,17 +15505,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // trigger a resize to adjust height on init https://github.com/presscustomizr/nimble-builder/issues/409
                         $(window).trigger('resize');
                   };
-                  if ( _editor.initialized ) {
-                        _doOnInit();
-                  } else {
-                        _editor.on( 'init', _doOnInit );
-                  }
 
-                  // bind events
-                  _editor.on( 'input change keyup keydown click SetContent BeforeSetContent', function( evt ) {
-                        //$textarea.trigger( 'change', {current_input : input} );
-                        input( isAutoPEnabled() ? _editor.getContent() : wp.editor.removep( _editor.getContent() ) );
-                  });
+                  // if we have an editor, let's go
+                  if ( _editor ) {
+                        if ( _editor.initialized ) {
+                              _doOnInit();
+                        } else {
+                              _editor.on( 'init', _doOnInit );
+                        }
+
+                        // bind events
+                        _editor.on( 'input change keyup keydown click SetContent BeforeSetContent', function( evt ) {
+                              //$textarea.trigger( 'change', {current_input : input} );
+                              input( isAutoPEnabled() ? _editor.getContent() : wp.editor.removep( _editor.getContent() ) );
+                        });
+                  }
 
                   // store the current input now, so we'll always get the right one when textarea changes
                   api.sekCurrentDetachedTinyMceInput = input;

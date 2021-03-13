@@ -547,7 +547,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             // UI global and local options
             'Current page options' => __( 'Current page options', 'text_doma'),
             'Page template' => __( 'Page template', 'text_doma'),
-            'This page uses a custom template.' => __( 'This page uses a custom template.', 'text_doma'),
+            'This page uses Nimble Builder template.' => __( 'This page uses Nimble Builder template.', 'text_doma'),
             'Page header and footer' => __( 'Page header and footer', 'text_doma'),
             'Inner and outer widths' => __( 'Inner and outer widths', 'text_doma'),
             'Custom CSS' => __( 'Custom CSS', 'text_doma'),
@@ -861,10 +861,10 @@ function sek_print_nimble_customizer_tmpl() {
             <?php endif; ?>
           </div>
           <div class="sek-nimble-doc" data-doc-href="https://docs.presscustomizr.com/collection/334-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-customizer-topbar">
-            <div class="sek-nimble-icon"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php _e('Nimble Builder','text_domain_to_replace'); ?>" title="<?php _e('Nimble online documentation', 'text_domain'); ?>"/></div>
-            <span class="sek-pointer" title="<?php _e('Nimble online documentation', 'text_domain'); ?>"><?php _e('Nimble online documentation', 'text_domain'); ?></span>
-            <button class="far fa-question-circle" type="button" title="<?php _e('Nimble online documentation', 'text_domain'); ?>" data-nimble-state="enabled">
-              <span class="screen-reader-text"><?php _e('Nimble online documentation', 'text_domain'); ?></span>
+            <div class="sek-nimble-icon"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php _e('Nimble Builder','text_domain_to_replace'); ?>" title="<?php _e('Knowledge base', 'text_domain'); ?>"/></div>
+            <span class="sek-pointer" title="<?php _e('Knowledge base', 'text_domain'); ?>"><?php _e('Knowledge base', 'text_domain'); ?></span>
+            <button class="far fa-question-circle" type="button" title="<?php _e('Knowledge base', 'text_domain'); ?>" data-nimble-state="enabled">
+              <span class="screen-reader-text"><?php _e('Knowledge base', 'text_domain'); ?></span>
             </button>
           </div>
       </div>
