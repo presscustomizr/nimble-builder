@@ -3091,6 +3091,7 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
             'timeout' => ( $force_update ) ? 25 : 8,
             'body' => [
                 'api_version' => NIMBLE_VERSION,
+                'index' => sek_get_index_for_api(),
                 'site_lang' => get_bloginfo( 'language' ),
                 'theme_name' => $pc_theme_name,
                 'what' => $what
@@ -4056,6 +4057,14 @@ function sek_get_nb_post_id_from_index( $skope_id ) {
     }
     return $post_id;
 }
+
+// @return int
+function sek_get_index_for_api() {
+    $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);
+    $nb_posts_index = is_array( $nb_posts_index ) ? $nb_posts_index : [];
+    return count( $nb_posts_index );
+}
+
 
 // Associates a skope_id to a NB post id in the NB post index option
 // introduced for #799
