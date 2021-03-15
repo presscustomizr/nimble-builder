@@ -100,7 +100,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     if ( $el.parent('.sek-dyn-ui-icons').length > 0 )
                                       return;
 
-                                    self._send_( $el, { action : 'pick-content', content_type : 'module', level : _level , id : _id } );
+                                    self._send_( $el, {
+                                          action : 'edit-options',
+                                          location : _location_id,
+                                          level : _level,
+                                          id : _id
+                                    });
+                                    //self._send_( $el, { action : 'pick-content', content_type : 'module', level : _level , id : _id } );
                               break;
                               case 'columnOutsideModules' :
                               case 'sectionOutsideColumns' :
