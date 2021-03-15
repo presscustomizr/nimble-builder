@@ -57,5 +57,5 @@ function render_test_logs( $query = null ) {
     do_action('nimble_logs_rendered');
 }
 //add_action('loop_end', '\Nimble\render_test_logs', 50 );
-add_action('sek_after_location_loop_end', '\Nimble\render_test_logs', 50 );
-add_action('nimble_template_after_content_sections', '\Nimble\render_test_logs', 50 );//@see tmpl/page-templates/nimble_template.php
+// add_action('sek_after_location_loop_end', '\Nimble\render_test_logs', 50 );
+// add_action('nimble_template_after_content_sections', '\Nimble\render_test_logs', 50 );//@see tmpl/page-templates/nimble_template.php
