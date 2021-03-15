@@ -158,7 +158,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                 ),
                 'use_custom_height' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Custom image height', 'text_doma' ),
+                    'title'       => __( 'Custom image max height', 'text_doma' ),
                     'default'     => 0,
                     'refresh_stylesheet' => true
                 ),
