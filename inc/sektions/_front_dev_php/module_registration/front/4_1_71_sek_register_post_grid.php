@@ -449,7 +449,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),
                             'pt_font_size_css'       => array(
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
-                                'default'     => array( 'desktop' => '28px' ),
+                                'default'     => array( 'desktop' => '28px', 'tablet' => '22px', 'mobile' => '20px' ),
                                 'title_width' => 'width-100',
                                 'title'       => __( 'Font size', 'text_doma' ),
                                 'min' => 0,

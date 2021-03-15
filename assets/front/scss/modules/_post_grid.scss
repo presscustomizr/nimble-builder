@@ -163,6 +163,12 @@
   .sek-pg-title {
     // reset theme and plugins value for h2
     font-size: 28px;
+    @include media-breakpoint-down(md) {
+      font-size: 22px;
+    }
+    @include media-breakpoint-down(xs) {
+      font-size: 20px;
+    }
     line-height: 1.1em;
     a {
       text-decoration: none;
@@ -174,6 +180,12 @@
       word-wrap: break-word;
       &:hover {
         color: #666
+      }
+      @include media-breakpoint-down(md) {
+        font-size: 22px;
+      }
+      @include media-breakpoint-down(xs) {
+        font-size: 20px;
       }
     }
   }
