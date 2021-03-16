@@ -276,8 +276,11 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
 .sek-new-label {
     background: #ffff00;
     border: 1px solid yellow;
+    color: #000000;
     padding: 3px 4px;
     line-height: 12px;
     border-radius: 8px;
     font-size: 12px;
+    max-width: 100px;
+    display: inline-block;
 }
