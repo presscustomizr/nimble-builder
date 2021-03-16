@@ -35,6 +35,7 @@
   /* flex-direction: column; */
   flex: 0 0 100%;
   max-width: 100%;
+  overflow: hidden;
 }
 
 /* fixes https://github.com/presscustomizr/nimble-builder/issues/340 */
@@ -67,9 +68,19 @@ body.nimble-top-bar-visible #nimble-top-bar {
   color: #fff;
 }
 /* April 2020 : tmpl-saving btn added for https://github.com/presscustomizr/nimble-builder/issues/655 */
-#nimble-top-bar .sek-settings, #nimble-top-bar .sek-tmpl-saving {
-  font-size: 18px;
-  padding: 0 5px;
+#nimble-top-bar .sek-settings, #nimble-top-bar .sek-tmpl-saving, .sek-add-content, .sek-do-undo, .sek-level-tree  {
+  font-size: 16px;
+  padding: 0 4px;
+}
+
+/* vertical separators between option groups */
+.sek-level-tree:before, .sek-do-undo:before, #nimble-top-bar .sek-tmpl-saving:before, #nimble-top-bar .sek-settings:before {
+  content: '';
+  border-left: 1px solid #aaa;
+  width: 0px;
+  padding: 10px 4px;
+  height: 100%;
+  position: relative;
 }
 
 #nimble-top-bar button {
