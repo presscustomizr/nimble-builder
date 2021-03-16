@@ -468,7 +468,7 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
   position: relative;
 }
 
-.nb-loc .sek-module-inner .sek-nav-toggler {
+.nb-loc .sek-module-inner nav .sek-nav-toggler {
   -webkit-appearance: none !important;
   cursor: pointer;
   height: 40px;
@@ -477,7 +477,7 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
   vertical-align: middle;
 }
 
-.nb-loc .sek-module-inner .sek-nav-toggler, .nb-loc .sek-module-inner .sek-nav-toggler:hover, .nb-loc .sek-module-inner .sek-nav-toggler:focus {
+.nb-loc .sek-module-inner nav .sek-nav-toggler, .nb-loc .sek-module-inner nav .sek-nav-toggler:hover, .nb-loc .sek-module-inner nav .sek-nav-toggler:focus {
   background: 0 0;
   background-color: rgba(0, 0, 0, 0);
   color: black;

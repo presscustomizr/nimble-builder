@@ -142,6 +142,18 @@
   line-height: 1.1em;
 }
 
+@media (max-width: 991.98px) {
+  .nb-loc .sek-module-inner .sek-post-grid-wrapper .sek-pg-title {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nb-loc .sek-module-inner .sek-post-grid-wrapper .sek-pg-title {
+    font-size: 20px;
+  }
+}
+
 .nb-loc .sek-module-inner .sek-post-grid-wrapper .sek-pg-title a {
   text-decoration: none;
   color: #121212;
@@ -154,6 +166,18 @@
 
 .nb-loc .sek-module-inner .sek-post-grid-wrapper .sek-pg-title a:hover {
   color: #666;
+}
+
+@media (max-width: 991.98px) {
+  .nb-loc .sek-module-inner .sek-post-grid-wrapper .sek-pg-title a {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nb-loc .sek-module-inner .sek-post-grid-wrapper .sek-pg-title a {
+    font-size: 20px;
+  }
 }
 
 .nb-loc .sek-module-inner .sek-post-grid-wrapper .sek-pg-metas {

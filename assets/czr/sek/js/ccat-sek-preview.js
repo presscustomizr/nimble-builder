@@ -1462,7 +1462,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     if ( $el.parent('.sek-dyn-ui-icons').length > 0 )
                                       return;
 
-                                    self._send_( $el, { action : 'pick-content', content_type : 'module', level : _level , id : _id } );
+                                    self._send_( $el, {
+                                          action : 'edit-options',
+                                          location : _location_id,
+                                          level : _level,
+                                          id : _id
+                                    });
+                                    //self._send_( $el, { action : 'pick-content', content_type : 'module', level : _level , id : _id } );
                               break;
                               case 'columnOutsideModules' :
                               case 'sectionOutsideColumns' :
@@ -2055,13 +2061,21 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             // Sent from the panel when duplicating a section level for example
                             // focus on a level
                             'sek-animate-to-level' : function( params ) {
-                                  var $elToFocusOn = $('[data-sek-id="' + params.id + '"]' );
-                                  if ( $elToFocusOn.length > 0 ) {
-                                        //$elToFocusOn[0].scrollIntoView();
-                                        $('html, body').animate({
-                                              scrollTop : $elToFocusOn.offset().top - 100
-                                        }, 200 );
-                                  }
+                                    var $elToFocusOn = $('[data-sek-id="' + params.id + '"]' );
+                                    if ( 0 < $elToFocusOn.length && !nb_.isInScreen( $elToFocusOn[0]) ) {
+                                          $_activeElement[0].scrollIntoView({
+                                                behavior: 'auto',
+                                                block: 'center',
+                                                inline: 'center'
+                                          });
+                                    }
+                                    // if ( $elToFocusOn.length > 0 ) {
+                                    //       console.log( 'EL IN WINDOW ?', nb_.elOrFirstVisibleParentIsInWindow( $elToFocusOn ), $elToFocusOn );
+                                    //       $elToFocusOn[0].scrollIntoView();
+                                    //       $('html, body').animate({
+                                    //             scrollTop : $elToFocusOn.offset().top - 100
+                                    //       }, 200 );
+                                    // }
                             },
 
 
@@ -2229,7 +2243,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               }
                               // if user scrolled while editing an element, let's focus again
                               if ( 0 < $_activeElement.length && !nb_.isInScreen( $_activeElement[0]) ) {
-                                    $_activeElement[0].scrollIntoView();
+                                    $_activeElement[0].scrollIntoView({
+                                          behavior: 'auto',
+                                          block: 'center',
+                                          inline: 'center'
+                                    });
                               }
                         }
                   };//_apiPreviewCallback

@@ -1985,6 +1985,8 @@ function sek_get_site_tmpl_for_skope( $group_skope = null ) {
 function sek_find_pattern_match($matches) {
     $replace_values = apply_filters( 'sek_template_tags', array(
       'home_url' => 'home_url',
+      'year_now' => date("Y"),
+      'site_title' => 'get_bloginfo',
       'the_title' => 'sek_get_the_title',
       'the_content' => 'sek_get_the_content'
     ));

@@ -13742,6 +13742,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         input.iconCollectionSet = true;
                   };
 
+                  // On load, simply print the current input value
+                  // the huge full list of icons will be rendered on click
+                  // March 2021 => to avoid slowing down the UI, the font picker select options are cleaned in cleanRegisteredAndLargeSelectInput()
+                  var inputVal = input();
+                  $selectElement.append( $('<option>', {
+                        value : inputVal,
+                        html: inputVal,
+                        selected : "selected"
+                  }));
+
                   // Generate options and open select2
                   input.container.on('click', _do_ );
 
