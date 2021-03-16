@@ -130,6 +130,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               ].join('')
                         });
                   }, 30000 );
+
+                  return _promise;
             },
 
             // INJECT TEMPLATE FROM GALLERY
@@ -160,8 +162,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   /// 1) CHECK IF CONTENT IS WELL FORMED AND ELIGIBLE FOR API
                   /// 2) LET'S PROCESS THE SETTING ID'S
                   /// 3) ATTEMPT TO UPDATE THE SETTING API, LOCAL OR GLOBAL. ( always local for template inject )
-                  // fire a previewer loader removed on .always()
-                  api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
                   //console.log('inject_tmpl_from_gallery ?', params );
                   if ( !api.czr_sektions.isImportedContentEligibleForAPI( {success:true, data:params.template_data}, params ) ) {
                         api.infoLog('::inject_tmpl problem => !api.czr_sektions.isImportedContentEligibleForAPI', params );

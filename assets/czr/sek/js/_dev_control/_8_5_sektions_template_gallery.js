@@ -211,8 +211,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // @return void()
             setupTmplGalleryDOMEvents : function() {
-                  var $galWrapper = $('#nimble-tmpl-gallery');
-                  var self = this;
+                  var $galWrapper = $('#nimble-tmpl-gallery'),
+                        self = this;
+
                   $galWrapper
                         // Schedule click event with delegation
                         // PICK A TEMPLATE
@@ -232,9 +233,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     self._tmplSourceWhileImportDialog = _tmpl_source;
                                     self.tmplInjectDialogVisible(true);
                               } else {
+                                    api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
                                     //api.czr_sektions.get_gallery_tmpl_json_and_inject( $(this).data('sek-tmpl-item-id') );
                                     //api.czr_sektions.get_gallery_tmpl_json_and_inject( {tmpl_name : 'test_one', tmpl_source: 'api_tmpl'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
-                                    api.czr_sektions.get_gallery_tmpl_json_and_inject( { tmpl_name : _tmpl_id, tmpl_source: _tmpl_source });
+                                    api.czr_sektions.get_gallery_tmpl_json_and_inject( { tmpl_name : _tmpl_id, tmpl_source: _tmpl_source }).always( function() {
+                                          api.previewer.send( 'sek-clean-loader');
+                                    });
                                     self.templateGalleryExpanded(false);
                               }
                         })
@@ -255,10 +259,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errare('::setupTmplGalleryDOMEvents => error => invalid import mode');
                                     return;
                               }
+                              api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
                               api.czr_sektions.get_gallery_tmpl_json_and_inject({
                                     tmpl_name : self._tmplNameWhileImportDialog,
                                     tmpl_source: self._tmplSourceWhileImportDialog,
                                     tmpl_inject_mode: tmpl_inject_mode
+                              }).always( function() {
+                                    api.previewer.send( 'sek-clean-loader');
                               });
                               // api.czr_sektions.get_gallery_tmpl_json_and_inject({
                               //       tmpl_name : 'test_one',
