@@ -843,7 +843,7 @@ function sek_print_nimble_customizer_tmpl() {
             <?php endif; ?>
           </div>
           <div class="sek-settings">
-            <button type="button" class="fas fa-sliders-h" title="<?php _e('Global settings', 'text_domain'); ?>" data-nimble-state="enabled">
+            <button type="button" class="fas fa-sliders-h" title="<?php _e('Local and global settings', 'text_domain'); ?>" data-nimble-state="enabled">
               <span class="screen-reader-text"><?php _e('Local and global settings', 'text_domain'); ?></span>
             </button>
           </div>
