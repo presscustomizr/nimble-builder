@@ -93,6 +93,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return false;
                   }
                   $('#customize-preview').after( $( _tmpl ) );
+                  $('#customize-preview').trigger('nimble-top-bar-rendered');
 
                   // UNDO / REDO ON CTRL + Z / CTRL + Y EVENTS
                   $(document).keydown( function( evt ) {

@@ -4,15 +4,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       $.extend( CZRSeksPrototype, {
             // fired in ::setupTopBar(), at api.bind( 'ready', function() {})
             setupLevelTree : function() {
-                  var self = this;
+                  var self = this, stringifiedLTVal;
                   self.levelTree = new api.Value([]);
-                  self.levelTree.bind( function() {
+                  self.levelTree.bind( function( val ) {
                         // Refresh when the collection is being modified from the tree
                         if ( self.levelTreeExpanded() ) {
                               self.renderOrRefreshTree();
                         }
                   });
 
+                  // March 2021 => highlight level tree button in blue if NB levels already inserted.
+                  var maybeHighlightCtrlButton = function( val ) {
+                        try { stringifiedLTVal = JSON.stringify( val ); } catch(er) {
+                              api.errorLog('::setupLevelTree => error when JSON.stringify Level Tree');
+                        }
+                        if ( !_.isString( stringifiedLTVal ) )
+                              return;
+                        // look for a NB level id starting looking like __nimble__986b1c3921fe
+                        if ( -1 !== stringifiedLTVal.indexOf('__nimble__') ) {
+                              $('.sek-level-tree button', self.topBarId).css('color', '#46d2ff' );
+                        } else {
+                              $('.sek-level-tree button', self.topBarId).css('color', '' );
+                        }
+                  };
+                  self.levelTree.bind( _.debounce( function(val) {
+                        maybeHighlightCtrlButton( val );
+                  }, 1000 ));
+                  // Initial Button state based on the current tree value
+                  $('#customize-preview').one('nimble-top-bar-rendered', function() {
+                        maybeHighlightCtrlButton( self.setLevelTreeValue() );
+                  });
 
                   // SETUP AND REACT TO LEVEL TREE EXPANSION
                   self.levelTreeExpanded = new api.Value(false);
@@ -242,6 +263,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Store it now
                   self.levelTree( orderedCollection );
+                  return orderedCollection;
             },
 
 
