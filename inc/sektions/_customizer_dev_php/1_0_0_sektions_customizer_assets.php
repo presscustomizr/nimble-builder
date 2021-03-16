@@ -844,7 +844,7 @@ function sek_print_nimble_customizer_tmpl() {
           </div>
           <div class="sek-settings">
             <button type="button" class="fas fa-sliders-h" title="<?php _e('Global settings', 'text_domain'); ?>" data-nimble-state="enabled">
-              <span class="screen-reader-text"><?php _e('Global settings', 'text_domain'); ?></span>
+              <span class="screen-reader-text"><?php _e('Local and global settings', 'text_domain'); ?></span>
             </button>
           </div>
           <?php // April 2020 => added for https://github.com/presscustomizr/nimble-builder/issues/655 ?>
