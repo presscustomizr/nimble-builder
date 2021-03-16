@@ -520,7 +520,7 @@ function sek_print_nimble_input_templates() {
                 <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a section', 'text_doma'); ?>" data-sek-content-type="section"><?php _e('Pick a section', 'text_doma'); ?></button>
                 <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a module', 'text_doma'); ?>" data-sek-content-type="module"><?php _e('Pick a module', 'text_doma'); ?></button>
                 <?php if ( defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) && NIMBLE_TEMPLATE_GALLERY_ENABLED ) : ?>
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a template', 'text_doma'); ?>" data-sek-content-type="template"><?php _e('Pick a template', 'text_doma'); ?></button>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a template', 'text_doma'); ?>" data-sek-content-type="template"><?php _e('Pick a template', 'text_doma'); ?>&nbsp;<span class="sek-new-label"><?php _e('New!', 'text_doma'); ?></span></button>
                 <?php endif; ?>
             </div>
         </div>
