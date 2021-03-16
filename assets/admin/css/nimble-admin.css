@@ -315,6 +315,12 @@ body .block-editor .sek-nimble-mobile-admin-bar-title { display: none; }
 /* WELCOME NOTICE */
 .wrap .nimble-welcome-notice {
   padding: 10px 20px;
+  display: flex;
+  /* flex-wrap: wrap; */
+}
+.wrap .nimble-welcome-content {
+  flex: 0 0 60%;
+  max-width: 60%;
 }
 .nimble-welcome-notice p, .nimble-welcome-content p {
   font-weight: bold;
@@ -323,10 +329,22 @@ body .block-editor .sek-nimble-mobile-admin-bar-title { display: none; }
   line-height: 44px;
 }
 .nimble-welcome-icon-holder {
-  width: 500px;
-  height: 200px;
-  float: left;
+  /* width: 500px;
+  height: 200px; */
+  flex: 0 0 40%;
+  max-width: 40%;
   margin: 0 38px 38px 0;
+}
+
+@media (max-width: 960px) {
+  .nimble-welcome-icon-holder, .wrap .nimble-welcome-content {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  
+  .wrap .nimble-welcome-notice {
+    flex-wrap: wrap;
+  }
 }
 .nimble-welcome-icon {
   width: 100%;

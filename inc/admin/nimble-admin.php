@@ -815,14 +815,15 @@ function sek_render_welcome_notice() {
     $notice_id = NIMBLE_WELCOME_NOTICE_ID;
     ?>
     <div class="nimble-welcome-notice notice notice-info is-dismissible" id="<?php echo esc_attr( $notice_id ); ?>">
-      <div class="notice-dismiss"></div>
       <?php sek_get_welcome_block(); ?>
     </div>
 
     <script>
     jQuery( function( $ ) {
       // On dismissing the notice, make a POST request to store this notice with the dismissed WP pointers so it doesn't display again.
+      // .notice-dismiss button markup is added by WP
       $( <?php echo wp_json_encode( "#$notice_id" ); ?> ).on( 'click', '.notice-dismiss', function() {
+        $(this).closest('.is-dismissible').slideUp('fast');//<= this line is not mandatory since WP has its own way to remove the is-dismissible block
         $.post( ajaxurl, {
           pointer: <?php echo wp_json_encode( $notice_id ); ?>,
           action: 'dismiss-wp-pointer'
@@ -841,7 +842,8 @@ function sek_get_welcome_block() {
   <div class="nimble-welcome-icon-holder">
     <img class="nimble-welcome-icon" src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_banner.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php esc_html_e( 'Nimble Builder', 'nimble' ); ?>" />
   </div>
-  <h1><?php echo apply_filters( 'nimble_parse_admin_text', __('Welcome to Nimble Builder for WordPress :D', 'nimble' ) ); ?></h1>
+  <div class="nimble-welcome-content">
+    <h1><?php echo apply_filters( 'nimble_parse_admin_text', __('Welcome to Nimble Builder for WordPress :D', 'nimble' ) ); ?></h1>
 
     <p><?php _e( 'Nimble allows you to drag and drop content modules, or pre-built section templates, into <u>any context</u> of your site, including search results or 404 pages. You can edit your pages in <i>real time</i> from the live customizer, and then publish when you are happy of the result, or save for later.', 'nimble' ); ?></p>
     <p><?php _e( 'The plugin automatically creates fluid and responsive sections for a pixel-perfect rendering on smartphones and tablets, without the need to add complex code.', 'nimble' ); ?></p>
@@ -869,6 +871,7 @@ function sek_get_welcome_block() {
           __( 'read the getting started guide', 'nimble' )
       ); ?>
     </div>
+  </div>
 
   <?php
 }
