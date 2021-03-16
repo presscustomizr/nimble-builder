@@ -82,6 +82,14 @@ body.nimble-top-bar-visible #nimble-top-bar {
   height: 100%;
   position: relative;
 }
+#nimble-top-bar .sek-tmpl-saving:after {
+  content: '';
+  border-right: 1px solid #aaa;
+  width: 0px;
+  padding: 10px 5px;
+  height: 100%;
+  position: relative;
+}
 
 #nimble-top-bar button {
   background: none;
@@ -119,6 +127,9 @@ body.nimble-top-bar-visible #nimble-top-bar {
 }
 #nimble-top-bar .sek-add-content button {
   padding-top: 3px;
+  padding-left: 13px;
+  padding-right: 10px;
+  /* font-size: 28px; */
 }
 #nimble-top-bar .sek-nimble-doc {
   position: absolute;
