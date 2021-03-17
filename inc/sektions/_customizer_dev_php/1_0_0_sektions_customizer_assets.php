@@ -663,6 +663,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Error when processing templates' => __('Error when processing templates', 'text_dom'),
             'Last modified' => __('Last modified', 'text_dom'),
             'You did not save any template yet.' => __('You did not save any template yet.', 'text_dom'),
+            'Live demo' => __('Live demo', 'text_dom'),
 
             // Section Save
             'You did not save any section yet.' => __('You did not save any section yet.', 'text_dom')
@@ -1009,7 +1010,7 @@ function sek_print_nimble_customizer_tmpl() {
           <div id="sek-tmpl-source-switcher">
             <div aria-label="" class="sek-ui-button-group" role="group">
                 <button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="<?php _e('Nimble Builder templates', 'text_domain'); ?>" data-sek-tmpl-source="api_tmpl"><span><?php _e('Nimble Builder templates', 'text_domain'); ?></span></button>
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('My templates', 'text_domain'); ?>" data-sek-tmpl-source="user_tmpl"><span><?php _e('My templates', 'text_domain'); ?></span></button>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('My templates', 'text_domain'); ?>" data-sek-tmpl-source="user_tmpl"><span><?php _e('My templates', 'text_domain'); ?>&nbsp;<span class="sek-new-label"><?php _e('New!', 'text_doma'); ?></span></span></button>
             </div>
           </div>
           <div class="sek-tmpl-filter-wrapper">

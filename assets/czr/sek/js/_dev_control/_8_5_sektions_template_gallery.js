@@ -162,9 +162,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       //_html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
                                       _html += '<div class="sek-tmpl-thumb" style="background-image:url('+ _thumbUrl +')"></div>';
                                       _html += '<div class="sek-tmpl-info" title="'+ _titleAttr +'">';
-                                        _html += '<h3 class="tmpl-title">' + _data.title + '</h3>';
-                                        _html += '<p class="tmpl-date"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', _data.last_modified_date ].join(' ') + '</i></p>';
-                                        _html += '<p class="tmpl-desc">' + _data.description + '</p>';
+                                        _html += '<h3 class="tmpl-title tmpl-api-hide">' + _data.title + '</h3>';
+                                        _html += '<p class="tmpl-date tmpl-api-hide"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', _data.last_modified_date ].join(' ') + '</i></p>';
+                                        _html += '<p class="tmpl-desc tmpl-api-hide">' + _data.description + '</p>';
                                         _html += '<i class="material-icons use-tmpl" title="'+ sektionsLocalizedData.i18n['Use this template'] +'">add_circle_outline</i>';
                                         if ( 'user_tmpl' === params.tmpl_source ) {
                                           _html += '<i class="material-icons edit-tmpl" title="'+ sektionsLocalizedData.i18n['Edit this template'] +'">edit</i>';
@@ -172,6 +172,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         }
                                         if ( "true" == _data.is_pro_tmpl ) {
                                           _html += '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
+                                        }
+
+                                        if ( 'user_tmpl' != params.tmpl_source && _data.demo_url && -1 != _data.demo_url.indexOf('http') ) {
+                                          _html += '<div class="sek-tmpl-demo-link tmpl-api-hide"><a href="' + _data.demo_url + '?utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=tmpl_demos" target="_blank" rel="noopener noreferrer">' + sektionsLocalizedData.i18n['Live demo'] + ' <i class="fas fa-external-link-alt"></i></a></div>';
                                         }
                                       _html += '</div>';
                                     _html += '</div>';
