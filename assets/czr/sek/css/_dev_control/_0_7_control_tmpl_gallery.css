@@ -310,3 +310,10 @@ input.sek-filter-tmpl {
 .sek-tmpl-gallery-inner [data-sek-tmpl-item-source="api_tmpl"] .sek-tmpl-thumb::after {
   opacity: 0.10;
 }
+.sek-tmpl-coming-soon p {
+  text-transform: uppercase;
+  font-style: italic;
+  font-weight: bold;
+  font-size: 18px;
+  color: #555;
+}

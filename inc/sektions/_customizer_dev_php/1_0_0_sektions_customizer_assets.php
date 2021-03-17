@@ -664,6 +664,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Last modified' => __('Last modified', 'text_dom'),
             'You did not save any template yet.' => __('You did not save any template yet.', 'text_dom'),
             'Live demo' => __('Live demo', 'text_dom'),
+            'More templates coming...🍥' => __('More templates coming...🍥', 'text_doma'),
 
             // Section Save
             'You did not save any section yet.' => __('You did not save any section yet.', 'text_dom')

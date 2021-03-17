@@ -174,12 +174,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           _html += '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
                                         }
 
-                                        if ( 'user_tmpl' != params.tmpl_source && _data.demo_url && -1 != _data.demo_url.indexOf('http') ) {
+                                        if ( 'api_tmpl' === params.tmpl_source && _data.demo_url && -1 != _data.demo_url.indexOf('http') ) {
                                           _html += '<div class="sek-tmpl-demo-link tmpl-api-hide"><a href="' + _data.demo_url + '?utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=tmpl_demos" target="_blank" rel="noopener noreferrer">' + sektionsLocalizedData.i18n['Live demo'] + ' <i class="fas fa-external-link-alt"></i></a></div>';
                                         }
                                       _html += '</div>';
                                     _html += '</div>';
                               });
+                              if ( 'api_tmpl' === params.tmpl_source ) {
+                                    _html += '<div class="sek-tmpl-coming-soon">';
+                                          _html += '<p>' + sektionsLocalizedData.i18n['More templates coming...🍥'] + '</p>';
+                                    _html += '</div>';
+                              }
                         }
                         
                         
