@@ -20,7 +20,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                             'sek-maybe-print-loader' : function( params ) {
                                   try { self.mayBePrintLoader( params ); } catch( er ) {
-                                        api.errare( 'sek-clean-loader => error', er );
+                                        api.errare( 'sek-print-loader => error', er );
                                   }
                             },
                             'sek-clean-loader' : function( params ) {
