@@ -7,7 +7,6 @@
 // Nimble api returns a set of value structured as follow
 // return array(
 //     'timestamp' => time(),
-//     'upgrade_notice' => array(),
 //     'library' => array(
 //         'sections' => array(
 //             'registration_params' => sek_get_sections_registration_params(),
@@ -23,13 +22,31 @@
 // @return array|false Info data, or false.
 // api data is refreshed on plugin update and theme switch
 // @$what param can be 'latest_posts_and_start_msg', 'templates'
-function sek_get_nimble_api_data( $what = null, $force_update = false ) {
-    if ( is_null( $what ) || !is_string($what) ) {
+function sek_get_nimble_api_data( $params ) {
+    $params = is_array($params) ? $params : [];
+    $params = wp_parse_args( $params, [
+        'what' => '',
+        'tmpl_name' => '',
+        'force_update' => false
+    ]);
+    $what = $params['what'];
+    $tmpl_name = $params['tmpl_name'];
+    $force_update = $params['force_update'];
+    $wp_cache_key = 'nimble_api_data_'. $what . $tmpl_name;
+    
+    // We must have a "what"
+    if ( is_null($what) || !is_string($what) ) {
         sek_error_log( __FUNCTION__ . ' => error => $what param not set');
         return false;
     }
 
-    $cached_api_data = wp_cache_get( 'nimble_api_data_'.$what );
+    // If a single template is requested, a valid template name must be provided
+    if ( 'single_tmpl' === $what && ( empty($tmpl_name) || !is_string($tmpl_name) ) ) {
+        sek_error_log( __FUNCTION__ . ' => error => invalid $tmpl_name param');
+        return false;
+    }
+
+    $cached_api_data = wp_cache_get( $wp_cache_key  );
 
     if ( $cached_api_data && is_array($cached_api_data) && !empty($cached_api_data) ) {
         return $cached_api_data;
@@ -43,8 +60,11 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
             $transient_name = 'nimble_api_posts';
             $transient_duration = 48 * HOUR_IN_SECONDS;
         break;
-        case 'templates':
-            $transient_name = 'nimble_api_templates';
+        case 'all_tmpl':
+            $transient_name = 'nimble_api_all_tmpl';
+        break;
+        case 'single_tmpl':
+            $transient_name = 'nimble_api_tmpl_' . $tmpl_name;
         break;
         default:
             sek_error_log( __FUNCTION__ . ' => error => invalid $what param => ' . $what );
@@ -60,7 +80,7 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
     $expected_version_transient_value = NIMBLE_VERSION . '_' . $theme_slug;
     $api_needs_update = $version_transient_value != $expected_version_transient_value;
 
-    $api_data = maybe_unserialize( get_transient( $transient_name ) );
+    $api_transient_data = maybe_unserialize( get_transient( $transient_name ) );
 
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
@@ -68,20 +88,20 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
           sek_error_log( __FUNCTION__ . ' API is in force update mode. API data requested => ' . $transient_name );
     }
 
-
+    $api_data = false;
     // Connect to remote NB api when :
-    // 1) api data transient is not set or has expired ( false === $api_data )
+    // 1) api data transient is not set or has expired ( false === $api_transient_data )
     // 2) force_update param is true
     // 3) NB has been updated to a new version ( $api_needs_update case )
     // 4) Theme has been changed ( $api_needs_update case )
-    if ( $force_update || false === $api_data || $api_needs_update ) {
-
+    if ( $force_update || false === $api_transient_data || $api_needs_update ) {
         $query_params = [
             'timeout' => ( $force_update ) ? 25 : 8,
             'body' => [
                 'api_version' => NIMBLE_VERSION,
                 'site_lang' => get_bloginfo( 'language' ),
-                'what' => $what//<= latest posts about Nimble Builder or templates
+                'what' => $what,// 'single_tmpl', 'all_tmpl', 'latest_posts_and_start_msg'
+                'tmpl_name' => $tmpl_name
             ]
         ];
 
@@ -115,7 +135,7 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
     }
 
     $api_data = '_api_error_' === $api_data ? null : $api_data;
-    wp_cache_set( 'nimble_api_data_'. $what , $api_data );
+    wp_cache_set( $wp_cache_key  , $api_data );
 
     //sek_error_log('API DATA for ' . $transient_name, $api_data );
 
@@ -125,7 +145,7 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
 
 //////////////////////////////////////////////////
 /// TEMPLATE DATA
-function sek_get_tmpl_api_data( $force_update = false ) {
+function sek_get_all_tmpl_api_data( $force_update = false ) {
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
 
@@ -133,7 +153,11 @@ function sek_get_tmpl_api_data( $force_update = false ) {
     // Let's use the data saved as options
     // Those data are updated on plugin install, plugin update( upgrader_process_complete ), theme switch
     // @see https://github.com/presscustomizr/nimble-builder/issues/441
-    $api_data = sek_get_nimble_api_data( 'templates', $force_update );
+    $api_data = sek_get_nimble_api_data([
+        'what' => 'all_tmpl',
+        'force_update' => $force_update
+    ]);
+
     $api_data = is_array( $api_data ) ? $api_data : [];
 
     //sek_error_log('TMPL DATA ?', $tmpl_data);
@@ -147,13 +171,55 @@ function sek_get_tmpl_api_data( $force_update = false ) {
 }
 
 
+function sek_get_single_tmpl_api_data( $tmpl_name, $force_update = false ) {
+    // set this constant in wp_config.php
+    $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
+
+    // To avoid a possible refresh, hence a reconnection to the api when opening the customizer
+    // Let's use the data saved as options
+    // Those data are updated on plugin install, plugin update( upgrader_process_complete ), theme switch
+    // @see https://github.com/presscustomizr/nimble-builder/issues/441
+    $api_data = sek_get_nimble_api_data([
+        'what' => 'single_tmpl',
+        'tmpl_name' => $tmpl_name,
+        'force_update' => $force_update
+    ]);
+
+    $api_data = is_array( $api_data ) ? $api_data : [];
+    $api_data = wp_parse_args( $api_data, [
+        'timestamp' => '',
+        'single_tmpl' => null
+    ]);
+    //sek_error_log('TMPL DATA ?', $tmpl_data);
+    if ( empty($api_data['single_tmpl']) ) {
+        sek_error_log( __FUNCTION__ . ' => error => empty template for ' . $tmpl_name );
+        return array();
+    }
+    
+    if ( !array_key_exists( 'data', $api_data['single_tmpl'] ) || !array_key_exists( 'metas',$api_data['single_tmpl'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => error => invalid template data for ' . $tmpl_name );
+        return array();
+    }
+    //return [];
+    return maybe_unserialize( $api_data['single_tmpl'] );
+}
+
+
 //////////////////////////////////////////////////
 /// LATESTS POSTS
 // @return array of posts
 function sek_get_latest_posts_api_data( $force_update = false ) {
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
-    $api_data = sek_get_nimble_api_data( 'latest_posts_and_start_msg', $force_update );
+    $api_data = sek_get_nimble_api_data([
+        'what' => 'latest_posts_and_start_msg',
+        'force_update' => $force_update
+    ]);
+    $api_data = is_array( $api_data ) ? $api_data : [];
+    $api_data = wp_parse_args( $api_data, [
+        'timestamp' => '',
+        'latest_posts' => null
+    ]);
     if ( !is_array( $api_data['latest_posts'] ) || empty( $api_data['latest_posts'] ) ) {
         sek_error_log( __FUNCTION__ . ' => error => no latest_posts' );
         return [];
@@ -163,15 +229,23 @@ function sek_get_latest_posts_api_data( $force_update = false ) {
 
 // @return html string
 function sek_start_msg_from_api( $theme_name, $force_update = false ) {
+    if ( !sek_is_presscustomizr_theme( $theme_name ) ) {
+        return '';
+    }
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
 
-    $api_data = sek_get_nimble_api_data( 'latest_posts_and_start_msg', $force_update );
-    if ( !sek_is_presscustomizr_theme( $theme_name ) || !is_array( $api_data ) ) {
-        return '';
-    }
+    $api_data = sek_get_nimble_api_data( [
+        'what' => 'latest_posts_and_start_msg',
+        'force_update' => $force_update
+    ]);
+    $api_data = is_array( $api_data ) ? $api_data : [];
+    $api_data = wp_parse_args( $api_data, [
+        'timestamp' => '',
+        'start_msg' => null
+    ]);
+
     $msg = '';
-    $api_data = is_array($api_data) ? $api_data : [];
     $api_msg = isset( $api_data['start_msg'] ) ? $api_data['start_msg'] : null;
 
     if ( !is_null($api_msg) && is_string($api_msg) ) {

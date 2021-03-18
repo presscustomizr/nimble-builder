@@ -102,28 +102,24 @@ function sek_ajax_sek_get_api_tmpl_json() {
         wp_send_json_error( __FUNCTION__ . '_missing_tmpl_post_name' );
     }
     $tmpl_name = $_POST['api_tmpl_name'];
-    $raw_tmpl = sek_get_tmpl_api_data();// <= returns an unserialized array, in which the template['data'] is NOT a JSON, unlike for user saved templates
-    if( !is_array( $raw_tmpl) || empty( $raw_tmpl ) ) {
-        sek_error_log( __FUNCTION__ . ' problem => no api template collection available when getting template : ' . $tmpl_name );
-        wp_send_json_error( __FUNCTION__ . '_empty_api_template_collection' );
+    $raw_tmpl_data = sek_get_single_tmpl_api_data( $tmpl_name );// <= returns an unserialized array, in which the template['data'] is NOT a JSON, unlike for user saved templates
+    if( !is_array( $raw_tmpl_data) || empty( $raw_tmpl_data ) ) {
+        sek_error_log( __FUNCTION__ . ' problem when getting template : ' . $tmpl_name );
+        wp_send_json_error( __FUNCTION__ . '_invalid_template_'. $tmpl_name );
     }
-    //sek_error_log( __FUNCTION__ . ' api template collection', $raw_tmpl[$tmpl_name] );
-    if ( empty( $raw_tmpl[$tmpl_name] ) ) {
-        sek_error_log( __FUNCTION__ . ' problem => template not found in api template collection : ' . $tmpl_name );
-        wp_send_json_error( __FUNCTION__ . '_api_template_not_found' );
-    // Note that $raw_tmpl[$tmpl_name]['data'] is saved as a json
-    } else if ( !isset($raw_tmpl[$tmpl_name]['data'] ) || empty( $raw_tmpl[$tmpl_name]['data'] ) ) {
-        sek_error_log( __FUNCTION__ . ' problem => missing or invalid data property for template : ' . $tmpl_name, $raw_tmpl[$tmpl_name] );
-        wp_send_json_error( __FUNCTION__ . '_missing_data_property' );
+    //sek_error_log( __FUNCTION__ . ' api template collection', $raw_tmpl_data );
+    if ( !isset($raw_tmpl_data['data'] ) || empty( $raw_tmpl_data['data'] ) ) {
+        sek_error_log( __FUNCTION__ . ' problem => missing or invalid data property for template : ' . $tmpl_name, $raw_tmpl_data );
+        wp_send_json_error( __FUNCTION__ . '_missing_data_property_for_template_' . $tmpl_name );
     } else {
-        // $tmpl_decoded = $raw_tmpl[$tmpl_name];
-        $tmpl_as_array = $raw_tmpl[$tmpl_name];
-        $raw_tmpl[$tmpl_name]['data'] = sek_maybe_import_imgs( $raw_tmpl[$tmpl_name]['data'], $do_import_images = true );
-        $raw_tmpl[$tmpl_name]['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
+        // $tmpl_decoded = $raw_tmpl_data;
+        $tmpl_as_array = $raw_tmpl_data;
+        $raw_tmpl_data['data'] = sek_maybe_import_imgs( $raw_tmpl_data['data'], $do_import_images = true );
+        $raw_tmpl_data['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
         // Make sure we decode encoded rich text before sending to the customizer
         // see #544 and #791
-        $raw_tmpl[$tmpl_name]['data'] = sek_prepare_seks_data_for_customizer( $raw_tmpl[$tmpl_name]['data'] );
-        wp_send_json_success( $raw_tmpl[$tmpl_name] );
+        $raw_tmpl_data['data'] = sek_prepare_seks_data_for_customizer( $raw_tmpl_data['data'] );
+        wp_send_json_success( $raw_tmpl_data );
     }
     //return [];
 }

@@ -169,22 +169,24 @@ function sek_get_all_saved_templates() {
 // invoked on 'wp_ajax_sek_get_all_api_tmpl'
 // @return an unserialized array of api templates
 function sek_get_all_api_templates() {
-    $raw_tmpl = sek_get_tmpl_api_data();
+    $raw_tmpl = sek_get_all_tmpl_api_data();
     $collection = [];
 
     if( !is_array( $raw_tmpl) )
         return $collection;
         
-    foreach ( $raw_tmpl as $tmpl_cpt_post_name => $tmpl_data ) {
-        if ( !is_array( $tmpl_data ) )
+    foreach ( $raw_tmpl as $tmpl_cpt_post_name => $metas) {
+        if ( !is_array( $metas ) || empty($metas) )
             continue;
 
-        if ( !array_key_exists( 'metas', $tmpl_data ) )
-            continue;
-
-        $metas = !is_array( $tmpl_data['metas'] ) ? [] : $tmpl_data['metas'];
-        if ( empty($metas) )
-            continue;
+        $metas = wp_parse_args( $metas, [
+            'title' => '',
+            'description' => '',
+            'last_modified_date' => '',
+            'thumb_url' => '',
+            'is_pro_tmpl' => false,
+            'demo_url' => false
+        ]);
 
         $collection[$tmpl_cpt_post_name] = [
             'title' => $metas['title'],
