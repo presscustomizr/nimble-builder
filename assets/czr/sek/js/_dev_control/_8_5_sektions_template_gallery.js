@@ -144,7 +144,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     doc_url = 'https://docs.presscustomizr.com/article/426-how-to-save-and-reuse-templates-with-nimble-builder';
 
                               _html += '<div class="sek-tmpl-empty-collection">';
-                                    _html += '<p>' + sektionsLocalizedData.i18n['You did not save any template yet.'] + '</p>';
+                                    _html += '<p>' + sektionsLocalizedData.i18n['You did not save any templates yet.'] + '</p>';
                                     _html += '<img src="'+ _placeholdImgUrl +'" />';
                                     _html += '<br/><a href="'+ doc_url +'" target="_blank" rel="noreferrer nofollow">'+ doc_url +'</a>';
                               _html += '</div>';
