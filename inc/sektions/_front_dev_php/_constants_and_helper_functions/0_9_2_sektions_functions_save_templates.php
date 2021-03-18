@@ -182,7 +182,7 @@ function sek_get_all_api_templates() {
         $metas = wp_parse_args( $metas, [
             'title' => '',
             'description' => '',
-            'last_modified_date' => '',
+            'date' => '',
             'thumb_url' => '',
             'is_pro_tmpl' => false,
             'demo_url' => false
