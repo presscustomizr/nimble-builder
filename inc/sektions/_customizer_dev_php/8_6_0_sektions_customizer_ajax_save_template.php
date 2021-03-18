@@ -129,7 +129,6 @@ function sek_ajax_sek_get_api_tmpl_json() {
 ////////////////////////////////////////////////////////////////
 // TEMPLATE SAVE
 // introduced in april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
-// ENABLED WHEN CONSTANT NIMBLE_TEMPLATE_SAVE_ENABLED === true
 add_action( 'wp_ajax_sek_save_user_template', '\Nimble\sek_ajax_save_user_template' );
 /////////////////////////////////////////////////////////////////
 // hook : wp_ajax_sek_save_user_template
@@ -243,7 +242,6 @@ function sek_template_save_clean_id( $tmpl_data = array() ) {
 ////////////////////////////////////////////////////////////////
 // TEMPLATE REMOVE
 // introduced in may 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
-// ENABLED WHEN CONSTANT NIMBLE_TEMPLATE_SAVE_ENABLED === true
 add_action( 'wp_ajax_sek_remove_user_template', '\Nimble\sek_ajax_remove_user_template' );
 /////////////////////////////////////////////////////////////////
 // hook : wp_ajax_sek_remove_user_template

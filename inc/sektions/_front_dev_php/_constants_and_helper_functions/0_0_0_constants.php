@@ -61,9 +61,6 @@ if ( !defined( 'NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID' ) ) { define ( 'NIMBLE_GLOB
 if ( !defined( 'NIMBLE_JQUERY_ID' ) ) { define ( 'NIMBLE_JQUERY_ID', 'nb-jquery' ); }
 if ( !defined( 'NIMBLE_JQUERY_LATEST_CDN_URL' ) ) { define ( 'NIMBLE_JQUERY_LATEST_CDN_URL', 'https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js' ); }
 if ( !defined( 'NIMBLE_JQUERY_MIGRATE_URL' ) ) { define ( 'NIMBLE_JQUERY_MIGRATE_URL', site_url() . '/wp-includes/js/jquery/jquery-migrate.min.js' ); }
-// Feb 2021 : Template deployed only for Customizr Pro users
-if ( !defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) ) { define ( 'NIMBLE_TEMPLATE_SAVE_ENABLED', file_exists( get_template_directory() . '/core/init-pro.php' )); }
-if ( !defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) ) { define ( 'NIMBLE_TEMPLATE_GALLERY_ENABLED', file_exists( get_template_directory() . '/core/init-pro.php' )); }
 
 if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2",
   ( defined('NIMBLE_FETCH_API_LOCALLY') && NIMBLE_FETCH_API_LOCALLY && defined('NIMBLE_LOCAL_API_URL') ) ? NIMBLE_LOCAL_API_URL : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'

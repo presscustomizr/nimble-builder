@@ -613,7 +613,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( '_not_populated_' !== self.allApiTemplates() ) {
                         dfd.resolve( self.allApiTemplates() );
                   } else {
-                        // Feb 2021 : for the moment, api templates are fetched when define( 'NIMBLE_USE_API_TMPL', true );
                         if ( !sektionsLocalizedData.useAPItemplates ) {
                               self.allApiTemplates([]);
                               dfd.resolve([]);

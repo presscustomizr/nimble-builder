@@ -213,10 +213,10 @@ function sek_enqueue_controls_js_css() {
                 //     '[gfont]Covered+By+Your+Grace:regular'
                 // ),
                 'alreadyUsedFonts' => get_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS ),
-                'isTemplateGalleryEnabled' => defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) && NIMBLE_TEMPLATE_GALLERY_ENABLED, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/651
-                'isTemplateSaveEnabled' => defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) && NIMBLE_TEMPLATE_SAVE_ENABLED, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/655
+                'isTemplateGalleryEnabled' => true, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/651
+                'isTemplateSaveEnabled' => true, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/655
                 
-                'useAPItemplates' => defined('NIMBLE_USE_API_TMPL') && NIMBLE_USE_API_TMPL,
+                'useAPItemplates' => true,// March 2021 deployed in v3.0.0
                 // Dec 2020
                 // When developing locally, allow a local template api request
                 'templateAPIUrl' => NIMBLE_DATA_API_URL_V2,
@@ -662,7 +662,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Template removed' => __('Template removed', 'text_dom'),
             'Error when processing templates' => __('Error when processing templates', 'text_dom'),
             'Last modified' => __('Last modified', 'text_dom'),
-            'You did not save any template yet.' => __('You did not save any template yet.', 'text_dom'),
+            'You did not save any templates yet.' => __('You did not save any templates yet.', 'text_dom'),
             'Live demo' => __('Live demo', 'text_dom'),
             '🍥 More templates coming...' => __('🍥 More templates coming...', 'text_doma'),
 
@@ -849,14 +849,11 @@ function sek_print_nimble_customizer_tmpl() {
               <span class="screen-reader-text"><?php _e('Local and global settings', 'text_domain'); ?></span>
             </button>
           </div>
-          <?php // April 2020 => added for https://github.com/presscustomizr/nimble-builder/issues/655 ?>
-          <?php if ( defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) && NIMBLE_TEMPLATE_SAVE_ENABLED ) : ?>
           <div class="sek-tmpl-saving">
-            <button type="button" class="far fa-save" title="<?php _e('Save as a template', 'text_domain'); ?>" data-nimble-state="enabled">
-              <span class="screen-reader-text"><?php _e('Save as a template', 'text_domain'); ?></span>
+            <button type="button" class="far fa-save" title="<?php _e('Save as template', 'text_domain'); ?>" data-nimble-state="enabled">
+              <span class="screen-reader-text"><?php _e('Save as template', 'text_domain'); ?></span>
             </button>
           </div>
-          <?php endif; ?>
           <div class="sek-notifications">
             <?php if ( sek_is_debug_mode() ) : ?>
                 <span class="debug-mode-notif"><span class="fas fa-info-circle">&nbsp;<?php _e('Debug mode active ( WP admin > Settings > Nimble Builder options )', 'text_domain'); ?></span></span>
