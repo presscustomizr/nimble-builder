@@ -62,6 +62,7 @@ function sek_get_nimble_api_data( $params ) {
         break;
         case 'all_tmpl':
             $transient_name = 'nimble_api_all_tmpl';
+            $transient_duration = 5 * DAY_IN_SECONDS;
         break;
         case 'single_tmpl':
             $transient_name = 'nimble_api_tmpl_' . $tmpl_name;
@@ -254,14 +255,13 @@ function sek_start_msg_from_api( $theme_name, $force_update = false ) {
     return $msg;
 }
 
-// Refresh the api data on plugin update and theme switch
-// add_action( 'after_switch_theme', '\Nimble\sek_refresh_nimble_api_data');
-// add_action( 'upgrader_process_complete', '\Nimble\sek_refresh_nimble_api_data');
-// function sek_refresh_nimble_api_data() {
-//     // Refresh data on theme switch
-//     // => so the posts and message are up to date
-//     sek_get_nimble_api_data( 'all_data', $force_update = true );
-// }
+// Attempt to refresh the api template data => will store in a transient if not done yet, to make it faster to render in the customizer
+add_action( 'wp_head', '\Nimble\sek_maybe_refresh_nimble_api_tmpl_data');
+function sek_maybe_refresh_nimble_api_tmpl_data() {
+    if ( skp_is_customizing() || false !== get_transient( 'nimble_api_all_tmpl' ) )
+        return;
+    sek_get_nimble_api_data(['what' => 'all_tmpl']);
+}
 
 
 //////////////////////////////////////////////////
