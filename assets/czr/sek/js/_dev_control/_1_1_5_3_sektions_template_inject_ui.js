@@ -25,7 +25,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             duration : 10000,
                             message : [
                                   '<span style="font-size:0.95em">',
-                                    '<strong>error when fetching the template</strong>',
+                                    '<strong>Error when fetching the template</strong>',
                                   '</span>'
                             ].join('')
                         });
@@ -52,7 +52,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             duration : 10000,
                             message : [
                                   '<span style="font-size:0.95em">',
-                                    '<strong>error when fetching the template</strong>',
+                                    '<strong>Error when fetching the template</strong>',
                                   '</span>'
                             ].join('')
                         });
@@ -101,7 +101,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //  }
                   // }
                   _promise.done( function( response ) {
-                        //console.log('get_gallery_tmpl_json_and_inject ??', params, response );
                         if ( response.success ) {
                               //console.log('INJECT NIMBLE TEMPLATE', response.lib.templates[tmpl_name] );
                               self.inject_tmpl_from_gallery({
