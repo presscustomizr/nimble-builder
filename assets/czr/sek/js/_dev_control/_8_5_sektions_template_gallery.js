@@ -180,9 +180,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       _html += '</div>';
                                     _html += '</div>';
                               });
-                              if ( 'api_tmpl' === params.tmpl_source ) {
+                              if ( 'api_tmpl' === params.tmpl_source && !_.isEmpty(_html) ) {
                                     _html += '<div class="sek-tmpl-coming-soon">';
-                                          _html += '<p>' + sektionsLocalizedData.i18n['More templates coming...🍥'] + '</p>';
+                                          _html += '<p>' + sektionsLocalizedData.i18n['🍥 More templates coming...'] + '</p>';
                                     _html += '</div>';
                               }
                         }
@@ -274,7 +274,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     tmpl_source: self._tmplSourceWhileImportDialog,
                                     tmpl_inject_mode: tmpl_inject_mode
                               }).always( function() {
-                                    api.previewer.send( 'sek-clean-loader');
+                                    api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
                               });
                               // api.czr_sektions.get_gallery_tmpl_json_and_inject({
                               //       tmpl_name : 'test_one',
