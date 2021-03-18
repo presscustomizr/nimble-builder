@@ -113,8 +113,8 @@ function sek_ajax_save_user_section() {
     }
 
     // make sure description and title are clean before DB
-    $sec_title = wp_strip_all_tags( $_POST['section_title'] );
-    $sec_description = wp_strip_all_tags( $_POST['section_description'] );
+    $sec_title = sek_maybe_encode_richtext( $_POST['section_title'] );
+    $sec_description = sek_maybe_encode_richtext( $_POST['section_description'] );
 
     $section_to_save = array(
         'data' => $seks_data,//<= json stringified

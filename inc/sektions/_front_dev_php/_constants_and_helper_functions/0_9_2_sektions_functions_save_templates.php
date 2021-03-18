@@ -156,8 +156,8 @@ function sek_get_all_saved_templates() {
 
         // When updating a template, we only need to return title and description
         $collection[$post_object->post_name] = array(
-            'title' => !empty($content['metas']['title']) ? $content['metas']['title'] : '',
-            'description' => !empty($content['metas']['description']) ? $content['metas']['description'] : '',
+            'title' => !empty($content['metas']['title']) ? sek_maybe_decode_richtext( $content['metas']['title'] ) : '',
+            'description' => !empty($content['metas']['description']) ? sek_maybe_decode_richtext( $content['metas']['description'] ) : '',
             'last_modified_date' => mysql2date( 'Y-m-d H:i:s', $post_object->post_modified )
         );
     }
@@ -189,8 +189,8 @@ function sek_get_all_api_templates() {
         ]);
 
         $collection[$tmpl_cpt_post_name] = [
-            'title' => $metas['title'],
-            'description' => $metas['description'],
+            'title' => sek_maybe_decode_richtext( $metas['title'] ),
+            'description' => sek_maybe_decode_richtext( $metas['description'] ),
             'last_modified_date' => mysql2date( 'Y-m-d', $metas['date'] ),
             'thumb_url' => !empty( $metas['thumb_url'] ) ? $metas['thumb_url'] : '',
             'is_pro_tmpl' => !empty( $metas['is_pro_tmpl'] ) ? $metas['is_pro_tmpl'] : false,
@@ -283,7 +283,7 @@ function sek_update_saved_tmpl_post( $tmpl_data, $is_edit_metas_only_case = fals
     $tmpl_data = sek_sektion_collection_sanitize_cb( $tmpl_data );
 
     $new_or_updated_post_data = array(
-        'post_title' => esc_attr( $tmpl_data['metas']['title'] ),
+        'post_title' => $tmpl_post_name,
         'post_name' => $tmpl_post_name,
         'post_type' => NIMBLE_TEMPLATE_CPT,
         'post_status' => 'publish',

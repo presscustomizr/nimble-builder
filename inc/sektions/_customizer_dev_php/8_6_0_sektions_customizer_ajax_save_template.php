@@ -171,8 +171,8 @@ function sek_ajax_save_user_template() {
     }
     
     // make sure description and title are clean before DB
-    $tmpl_title = wp_strip_all_tags( $_POST['tmpl_title'] );
-    $tmpl_description = wp_strip_all_tags( $_POST['tmpl_description'] );
+    $tmpl_title = sek_maybe_encode_richtext( $_POST['tmpl_title'] );
+    $tmpl_description = sek_maybe_encode_richtext( $_POST['tmpl_description'] );
 
     //sek_error_log(__FUNCTION__ .  '$_POST?', $_POST );
 

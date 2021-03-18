@@ -151,8 +151,8 @@ function sek_get_all_saved_sections() {
 
         // When updating a section, we only need to return title and description
         $collection[$post_object->post_name] = array(
-            'title' => !empty($content['metas']['title']) ? $content['metas']['title'] : '',
-            'description' => !empty($content['metas']['description']) ? $content['metas']['description'] : '',
+            'title' => !empty($content['metas']['title']) ? sek_maybe_decode_richtext( $content['metas']['title'] ) : '',
+            'description' => !empty($content['metas']['description']) ? sek_maybe_decode_richtext( $content['metas']['description'] ) : '',
             'last_modified_date' => mysql2date( 'Y-m-d H:i:s', $post_object->post_modified )
         );
     }
@@ -237,7 +237,7 @@ function sek_update_saved_section_post( $section_data, $is_edit_metas_only_case 
     $section_data = sek_sektion_collection_sanitize_cb( $section_data );
 
     $new_or_updated_post_data = array(
-        'post_title' => esc_attr( $section_data['metas']['title'] ),
+        'post_title' => $section_post_name,
         'post_name' => $section_post_name,
         'post_type' => NIMBLE_SECTION_CPT,
         'post_status' => 'publish',

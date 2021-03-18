@@ -78,13 +78,13 @@ function sek_is_json( $string ){
       return false;
     json_decode($string);
     return (json_last_error() == JSON_ERROR_NONE);
-  }
+}
   
-  // @return string
-  function sek_maybe_decode_richtext( $string ){
+// @return string
+function sek_maybe_decode_richtext( $string ){
     if ( !is_string($string) )
-      return $string;
-  
+    return $string;
+
     $json_decoded_candidate = json_decode($string, true);
     if ( json_last_error() == JSON_ERROR_NONE ) {
         // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
@@ -95,12 +95,12 @@ function sek_is_json( $string ){
     }
     
     return $string;
-  }
-  
-  // @return string
-  function sek_maybe_encode_richtext( $string ){
+}
+
+// @return string
+function sek_maybe_encode_richtext( $string ){
     if ( !is_string($string) )
-      return $string;
+    return $string;
     // only encode if not already encoded
     if ( !sek_is_json($string) ) {
         // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
@@ -111,7 +111,7 @@ function sek_is_json( $string ){
         //sek_error_log('JSON ENCODED ?', $string );
     }
     return $string;
-  }
+}
 
 
 
