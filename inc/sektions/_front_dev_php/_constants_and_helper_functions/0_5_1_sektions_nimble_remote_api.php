@@ -89,13 +89,13 @@ function sek_get_nimble_api_data( $params ) {
           sek_error_log( __FUNCTION__ . ' API is in force update mode. API data requested => ' . $transient_name );
     }
 
-    $api_data = false;
+    $api_data = $api_transient_data;
     // Connect to remote NB api when :
     // 1) api data transient is not set or has expired ( false === $api_transient_data )
     // 2) force_update param is true
     // 3) NB has been updated to a new version ( $api_needs_update case )
     // 4) Theme has been changed ( $api_needs_update case )
-    if ( $force_update || false === $api_transient_data || $api_needs_update ) {
+    if ( $force_update || false === $api_data || $api_needs_update ) {
         $query_params = [
             'timeout' => ( $force_update ) ? 25 : 8,
             'body' => [
