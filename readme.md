@@ -1,4 +1,4 @@
-# Nimble Builder v2.2.7-beta [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+# Nimble Builder v3.0.0 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 ![Nimble Builder](/nimble.jpg)
 
 > Simple and smart companion that allows you to insert sections into any existing page, create landing pages or entire websites including header and footer.

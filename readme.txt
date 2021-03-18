@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.7
-Stable tag: 2.2.7-beta
+Stable tag: 3.0.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,23 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-2.2.6 : fixed [customizer][font-picker and icon picker] automatically opens the select options after first click + various minor improvements
+3.3.0 : Introduction of a template system allowing users to pick pre-designed templates, or save and reuse templates. Various UI design improvements.
 
 == Changelog ==
+= 3.0.0 March 18th 2021 =
+* fixed : [Font Awesome picker] the initial value is not displayed
+* fixed : [UI][preview] when clicking on a column outside any module, the column UI should open, even when the column has no module.
+* fixed : [menu module] increased specificity for hamburger menu button to fix collision with TT1 core theme
+* fixed : [admin] welcome notice not removed on click + breaking home dashboard and media library layout
+* improved : [post grid module] add new default font size values for post title depending on the device
+* improved : [UI] when a level is modified, no need to animate to it if already in screen
+* improved : [UI] style of template switcher button + use template button in light blue
+* improved : [UI][customizer topbar] added vertical separators between option groups
+* improved : [UI][level tree] highlight the level tree icon in light blue when the current page includes at least one NB level ( local or global )
+* improved : [UI][topbar] added more space around "+" add content icon
+* added : [template tags] {{year_now}} to print the current year. {{site_title}} which prints the site title
+* added : [templates] new user interface allowing users to pick pre-designed templates, or save and reuse templates
+
 = 2.2.6 March 13th 2021 =
 * fixed : [tiny MCE editor][customizer] make sure window.tinyMCE global is declared
 * improved : [customizer][font-picker and icon picker] automatically opens the select options after first click

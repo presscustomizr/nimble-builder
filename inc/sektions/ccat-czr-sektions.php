@@ -213,10 +213,10 @@ function sek_enqueue_controls_js_css() {
                 //     '[gfont]Covered+By+Your+Grace:regular'
                 // ),
                 'alreadyUsedFonts' => get_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS ),
-                'isTemplateGalleryEnabled' => defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) && NIMBLE_TEMPLATE_GALLERY_ENABLED, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/651
-                'isTemplateSaveEnabled' => defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) && NIMBLE_TEMPLATE_SAVE_ENABLED, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/655
+                'isTemplateGalleryEnabled' => true, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/651
+                'isTemplateSaveEnabled' => true, //<= APRIL 2020 : for https://github.com/presscustomizr/nimble-builder/issues/655
                 
-                'useAPItemplates' => defined('NIMBLE_USE_API_TMPL') && NIMBLE_USE_API_TMPL,
+                'useAPItemplates' => true,// March 2021 deployed in v3.0.0
                 // Dec 2020
                 // When developing locally, allow a local template api request
                 'templateAPIUrl' => NIMBLE_DATA_API_URL_V2,
@@ -662,7 +662,9 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Template removed' => __('Template removed', 'text_dom'),
             'Error when processing templates' => __('Error when processing templates', 'text_dom'),
             'Last modified' => __('Last modified', 'text_dom'),
-            'You did not save any template yet.' => __('You did not save any template yet.', 'text_dom'),
+            'You did not save any templates yet.' => __('You did not save any templates yet.', 'text_dom'),
+            'Live demo' => __('Live demo', 'text_dom'),
+            '🍥 More templates coming...' => __('🍥 More templates coming...', 'text_doma'),
 
             // Section Save
             'You did not save any section yet.' => __('You did not save any section yet.', 'text_dom')
@@ -843,18 +845,15 @@ function sek_print_nimble_customizer_tmpl() {
             <?php endif; ?>
           </div>
           <div class="sek-settings">
-            <button type="button" class="fas fa-sliders-h" title="<?php _e('Global settings', 'text_domain'); ?>" data-nimble-state="enabled">
-              <span class="screen-reader-text"><?php _e('Global settings', 'text_domain'); ?></span>
+            <button type="button" class="fas fa-sliders-h" title="<?php _e('Local and global settings', 'text_domain'); ?>" data-nimble-state="enabled">
+              <span class="screen-reader-text"><?php _e('Local and global settings', 'text_domain'); ?></span>
             </button>
           </div>
-          <?php // April 2020 => added for https://github.com/presscustomizr/nimble-builder/issues/655 ?>
-          <?php if ( defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) && NIMBLE_TEMPLATE_SAVE_ENABLED ) : ?>
           <div class="sek-tmpl-saving">
-            <button type="button" class="far fa-save" title="<?php _e('Save as a template', 'text_domain'); ?>" data-nimble-state="enabled">
-              <span class="screen-reader-text"><?php _e('Save as a template', 'text_domain'); ?></span>
+            <button type="button" class="far fa-save" title="<?php _e('Save as template', 'text_domain'); ?>" data-nimble-state="enabled">
+              <span class="screen-reader-text"><?php _e('Save as template', 'text_domain'); ?></span>
             </button>
           </div>
-          <?php endif; ?>
           <div class="sek-notifications">
             <?php if ( sek_is_debug_mode() ) : ?>
                 <span class="debug-mode-notif"><span class="fas fa-info-circle">&nbsp;<?php _e('Debug mode active ( WP admin > Settings > Nimble Builder options )', 'text_domain'); ?></span></span>
@@ -1009,7 +1008,7 @@ function sek_print_nimble_customizer_tmpl() {
           <div id="sek-tmpl-source-switcher">
             <div aria-label="" class="sek-ui-button-group" role="group">
                 <button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="<?php _e('Nimble Builder templates', 'text_domain'); ?>" data-sek-tmpl-source="api_tmpl"><span><?php _e('Nimble Builder templates', 'text_domain'); ?></span></button>
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('My templates', 'text_domain'); ?>" data-sek-tmpl-source="user_tmpl"><span><?php _e('My templates', 'text_domain'); ?></span></button>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('My templates', 'text_domain'); ?>" data-sek-tmpl-source="user_tmpl"><span><?php _e('My templates', 'text_domain'); ?>&nbsp;<span class="sek-new-label"><?php _e('New!', 'text_doma'); ?></span></span></button>
             </div>
           </div>
           <div class="sek-tmpl-filter-wrapper">
@@ -1680,9 +1679,7 @@ function sek_print_nimble_input_templates() {
             <div aria-label="<?php _e('Content type', 'text_doma'); ?>" class="sek-ui-button-group" role="group">
                 <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a section', 'text_doma'); ?>" data-sek-content-type="section"><?php _e('Pick a section', 'text_doma'); ?></button>
                 <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a module', 'text_doma'); ?>" data-sek-content-type="module"><?php _e('Pick a module', 'text_doma'); ?></button>
-                <?php if ( defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) && NIMBLE_TEMPLATE_GALLERY_ENABLED ) : ?>
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a template', 'text_doma'); ?>" data-sek-content-type="template"><?php _e('Pick a template', 'text_doma'); ?></button>
-                <?php endif; ?>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('Pick a template', 'text_doma'); ?>" data-sek-content-type="template"><?php _e('Pick a template', 'text_doma'); ?>&nbsp;<span class="sek-new-label"><?php _e('New!', 'text_doma'); ?></span></button>
             </div>
         </div>
       </script>
@@ -4714,28 +4711,24 @@ function sek_ajax_sek_get_api_tmpl_json() {
         wp_send_json_error( __FUNCTION__ . '_missing_tmpl_post_name' );
     }
     $tmpl_name = $_POST['api_tmpl_name'];
-    $raw_tmpl = sek_get_tmpl_api_data();// <= returns an unserialized array, in which the template['data'] is NOT a JSON, unlike for user saved templates
-    if( !is_array( $raw_tmpl) || empty( $raw_tmpl ) ) {
-        sek_error_log( __FUNCTION__ . ' problem => no api template collection available when getting template : ' . $tmpl_name );
-        wp_send_json_error( __FUNCTION__ . '_empty_api_template_collection' );
+    $raw_tmpl_data = sek_get_single_tmpl_api_data( $tmpl_name );// <= returns an unserialized array, in which the template['data'] is NOT a JSON, unlike for user saved templates
+    if( !is_array( $raw_tmpl_data) || empty( $raw_tmpl_data ) ) {
+        sek_error_log( __FUNCTION__ . ' problem when getting template : ' . $tmpl_name );
+        wp_send_json_error( __FUNCTION__ . '_invalid_template_'. $tmpl_name );
     }
-    //sek_error_log( __FUNCTION__ . ' api template collection', $raw_tmpl[$tmpl_name] );
-    if ( empty( $raw_tmpl[$tmpl_name] ) ) {
-        sek_error_log( __FUNCTION__ . ' problem => template not found in api template collection : ' . $tmpl_name );
-        wp_send_json_error( __FUNCTION__ . '_api_template_not_found' );
-    // Note that $raw_tmpl[$tmpl_name]['data'] is saved as a json
-    } else if ( !isset($raw_tmpl[$tmpl_name]['data'] ) || empty( $raw_tmpl[$tmpl_name]['data'] ) ) {
-        sek_error_log( __FUNCTION__ . ' problem => missing or invalid data property for template : ' . $tmpl_name, $raw_tmpl[$tmpl_name] );
-        wp_send_json_error( __FUNCTION__ . '_missing_data_property' );
+    //sek_error_log( __FUNCTION__ . ' api template collection', $raw_tmpl_data );
+    if ( !isset($raw_tmpl_data['data'] ) || empty( $raw_tmpl_data['data'] ) ) {
+        sek_error_log( __FUNCTION__ . ' problem => missing or invalid data property for template : ' . $tmpl_name, $raw_tmpl_data );
+        wp_send_json_error( __FUNCTION__ . '_missing_data_property_for_template_' . $tmpl_name );
     } else {
-        // $tmpl_decoded = $raw_tmpl[$tmpl_name];
-        $tmpl_as_array = $raw_tmpl[$tmpl_name];
-        $raw_tmpl[$tmpl_name]['data'] = sek_maybe_import_imgs( $raw_tmpl[$tmpl_name]['data'], $do_import_images = true );
-        $raw_tmpl[$tmpl_name]['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
+        // $tmpl_decoded = $raw_tmpl_data;
+        $tmpl_as_array = $raw_tmpl_data;
+        $raw_tmpl_data['data'] = sek_maybe_import_imgs( $raw_tmpl_data['data'], $do_import_images = true );
+        $raw_tmpl_data['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
         // Make sure we decode encoded rich text before sending to the customizer
         // see #544 and #791
-        $raw_tmpl[$tmpl_name]['data'] = sek_prepare_seks_data_for_customizer( $raw_tmpl[$tmpl_name]['data'] );
-        wp_send_json_success( $raw_tmpl[$tmpl_name] );
+        $raw_tmpl_data['data'] = sek_prepare_seks_data_for_customizer( $raw_tmpl_data['data'] );
+        wp_send_json_success( $raw_tmpl_data );
     }
     //return [];
 }
@@ -4745,7 +4738,6 @@ function sek_ajax_sek_get_api_tmpl_json() {
 ////////////////////////////////////////////////////////////////
 // TEMPLATE SAVE
 // introduced in april 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
-// ENABLED WHEN CONSTANT NIMBLE_TEMPLATE_SAVE_ENABLED === true
 add_action( 'wp_ajax_sek_save_user_template', '\Nimble\sek_ajax_save_user_template' );
 /////////////////////////////////////////////////////////////////
 // hook : wp_ajax_sek_save_user_template
@@ -4787,8 +4779,8 @@ function sek_ajax_save_user_template() {
     }
     
     // make sure description and title are clean before DB
-    $tmpl_title = wp_strip_all_tags( $_POST['tmpl_title'] );
-    $tmpl_description = wp_strip_all_tags( $_POST['tmpl_description'] );
+    $tmpl_title = sek_maybe_encode_richtext( $_POST['tmpl_title'] );
+    $tmpl_description = sek_maybe_encode_richtext( $_POST['tmpl_description'] );
 
     //sek_error_log(__FUNCTION__ .  '$_POST?', $_POST );
 
@@ -4859,7 +4851,6 @@ function sek_template_save_clean_id( $tmpl_data = array() ) {
 ////////////////////////////////////////////////////////////////
 // TEMPLATE REMOVE
 // introduced in may 2020 for https://github.com/presscustomizr/nimble-builder/issues/655
-// ENABLED WHEN CONSTANT NIMBLE_TEMPLATE_SAVE_ENABLED === true
 add_action( 'wp_ajax_sek_remove_user_template', '\Nimble\sek_ajax_remove_user_template' );
 /////////////////////////////////////////////////////////////////
 // hook : wp_ajax_sek_remove_user_template
@@ -5013,8 +5004,8 @@ function sek_ajax_save_user_section() {
     }
 
     // make sure description and title are clean before DB
-    $sec_title = wp_strip_all_tags( $_POST['section_title'] );
-    $sec_description = wp_strip_all_tags( $_POST['section_description'] );
+    $sec_title = sek_maybe_encode_richtext( $_POST['section_title'] );
+    $sec_description = sek_maybe_encode_richtext( $_POST['section_description'] );
 
     $section_to_save = array(
         'data' => $seks_data,//<= json stringified

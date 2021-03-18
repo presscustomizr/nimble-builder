@@ -1113,6 +1113,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return false;
                   }
                   $('#customize-preview').after( $( _tmpl ) );
+                  $('#customize-preview').trigger('nimble-top-bar-rendered');
 
                   // UNDO / REDO ON CTRL + Z / CTRL + Y EVENTS
                   $(document).keydown( function( evt ) {
@@ -1457,15 +1458,36 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       $.extend( CZRSeksPrototype, {
             // fired in ::setupTopBar(), at api.bind( 'ready', function() {})
             setupLevelTree : function() {
-                  var self = this;
+                  var self = this, stringifiedLTVal;
                   self.levelTree = new api.Value([]);
-                  self.levelTree.bind( function() {
+                  self.levelTree.bind( function( val ) {
                         // Refresh when the collection is being modified from the tree
                         if ( self.levelTreeExpanded() ) {
                               self.renderOrRefreshTree();
                         }
                   });
 
+                  // March 2021 => highlight level tree button in blue if NB levels already inserted.
+                  var maybeHighlightCtrlButton = function( val ) {
+                        try { stringifiedLTVal = JSON.stringify( val ); } catch(er) {
+                              api.errorLog('::setupLevelTree => error when JSON.stringify Level Tree');
+                        }
+                        if ( !_.isString( stringifiedLTVal ) )
+                              return;
+                        // look for a NB level id starting looking like __nimble__986b1c3921fe
+                        if ( -1 !== stringifiedLTVal.indexOf('__nimble__') ) {
+                              $('.sek-level-tree button', self.topBarId).css('color', '#46d2ff' );
+                        } else {
+                              $('.sek-level-tree button', self.topBarId).css('color', '' );
+                        }
+                  };
+                  self.levelTree.bind( _.debounce( function(val) {
+                        maybeHighlightCtrlButton( val );
+                  }, 1000 ));
+                  // Initial Button state based on the current tree value
+                  $('#customize-preview').one('nimble-top-bar-rendered', function() {
+                        maybeHighlightCtrlButton( self.setLevelTreeValue() );
+                  });
 
                   // SETUP AND REACT TO LEVEL TREE EXPANSION
                   self.levelTreeExpanded = new api.Value(false);
@@ -1695,6 +1717,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Store it now
                   self.levelTree( orderedCollection );
+                  return orderedCollection;
             },
 
 
@@ -3079,7 +3102,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( '_not_populated_' !== self.allApiTemplates() ) {
                         dfd.resolve( self.allApiTemplates() );
                   } else {
-                        // Feb 2021 : for the moment, api templates are fetched when define( 'NIMBLE_USE_API_TMPL', true );
                         if ( !sektionsLocalizedData.useAPItemplates ) {
                               self.allApiTemplates([]);
                               dfd.resolve([]);
@@ -3144,7 +3166,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             duration : 10000,
                             message : [
                                   '<span style="font-size:0.95em">',
-                                    '<strong>error when fetching the template</strong>',
+                                    '<strong>Error when fetching the template</strong>',
                                   '</span>'
                             ].join('')
                         });
@@ -3171,7 +3193,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             duration : 10000,
                             message : [
                                   '<span style="font-size:0.95em">',
-                                    '<strong>error when fetching the template</strong>',
+                                    '<strong>Error when fetching the template</strong>',
                                   '</span>'
                             ].join('')
                         });
@@ -3220,7 +3242,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   //  }
                   // }
                   _promise.done( function( response ) {
-                        //console.log('get_gallery_tmpl_json_and_inject ??', params, response );
                         if ( response.success ) {
                               //console.log('INJECT NIMBLE TEMPLATE', response.lib.templates[tmpl_name] );
                               self.inject_tmpl_from_gallery({
@@ -3249,6 +3270,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               ].join('')
                         });
                   }, 30000 );
+
+                  return _promise;
             },
 
             // INJECT TEMPLATE FROM GALLERY
@@ -3279,8 +3302,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   /// 1) CHECK IF CONTENT IS WELL FORMED AND ELIGIBLE FOR API
                   /// 2) LET'S PROCESS THE SETTING ID'S
                   /// 3) ATTEMPT TO UPDATE THE SETTING API, LOCAL OR GLOBAL. ( always local for template inject )
-                  // fire a previewer loader removed on .always()
-                  api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
                   //console.log('inject_tmpl_from_gallery ?', params );
                   if ( !api.czr_sektions.isImportedContentEligibleForAPI( {success:true, data:params.template_data}, params ) ) {
                         api.infoLog('::inject_tmpl problem => !api.czr_sektions.isImportedContentEligibleForAPI', params );
@@ -8844,7 +8865,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   params = self.updAPISetParams.params;
 
-                  api.infoLog( 'api update params for sek-inject-tmpl-from-gallery', params );
+                  //api.infoLog( 'api update params for sek-inject-tmpl-from-gallery', params );
 
                   // DO WE HAVE PROPER CONTENT DO INJECT ?
                   if ( _.isUndefined( params.injected_content.data ) || _.isUndefined( params.injected_content.metas ) ) {
@@ -12448,7 +12469,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     doc_url = 'https://docs.presscustomizr.com/article/426-how-to-save-and-reuse-templates-with-nimble-builder';
 
                               _html += '<div class="sek-tmpl-empty-collection">';
-                                    _html += '<p>' + sektionsLocalizedData.i18n['You did not save any template yet.'] + '</p>';
+                                    _html += '<p>' + sektionsLocalizedData.i18n['You did not save any templates yet.'] + '</p>';
                                     _html += '<img src="'+ _placeholdImgUrl +'" />';
                                     _html += '<br/><a href="'+ doc_url +'" target="_blank" rel="noreferrer nofollow">'+ doc_url +'</a>';
                               _html += '</div>';
@@ -12466,9 +12487,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                       //_html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
                                       _html += '<div class="sek-tmpl-thumb" style="background-image:url('+ _thumbUrl +')"></div>';
                                       _html += '<div class="sek-tmpl-info" title="'+ _titleAttr +'">';
-                                        _html += '<h3 class="tmpl-title">' + _data.title + '</h3>';
-                                        _html += '<p class="tmpl-date"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', _data.last_modified_date ].join(' ') + '</i></p>';
-                                        _html += '<p class="tmpl-desc">' + _data.description + '</p>';
+                                        _html += '<h3 class="tmpl-title tmpl-api-hide">' + _data.title + '</h3>';
+                                        _html += '<p class="tmpl-date tmpl-api-hide"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', _data.last_modified_date ].join(' ') + '</i></p>';
+                                        _html += '<p class="tmpl-desc tmpl-api-hide">' + _data.description + '</p>';
                                         _html += '<i class="material-icons use-tmpl" title="'+ sektionsLocalizedData.i18n['Use this template'] +'">add_circle_outline</i>';
                                         if ( 'user_tmpl' === params.tmpl_source ) {
                                           _html += '<i class="material-icons edit-tmpl" title="'+ sektionsLocalizedData.i18n['Edit this template'] +'">edit</i>';
@@ -12477,9 +12498,18 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         if ( "true" == _data.is_pro_tmpl ) {
                                           _html += '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
                                         }
+
+                                        if ( 'api_tmpl' === params.tmpl_source && _data.demo_url && -1 != _data.demo_url.indexOf('http') ) {
+                                          _html += '<div class="sek-tmpl-demo-link tmpl-api-hide"><a href="' + _data.demo_url + '?utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=tmpl_demos" target="_blank" rel="noopener noreferrer">' + sektionsLocalizedData.i18n['Live demo'] + ' <i class="fas fa-external-link-alt"></i></a></div>';
+                                        }
                                       _html += '</div>';
                                     _html += '</div>';
                               });
+                              if ( 'api_tmpl' === params.tmpl_source && !_.isEmpty(_html) ) {
+                                    _html += '<div class="sek-tmpl-coming-soon">';
+                                          _html += '<p>' + sektionsLocalizedData.i18n['🍥 More templates coming...'] + '</p>';
+                                    _html += '</div>';
+                              }
                         }
                         
                         
@@ -12515,8 +12545,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             // @return void()
             setupTmplGalleryDOMEvents : function() {
-                  var $galWrapper = $('#nimble-tmpl-gallery');
-                  var self = this;
+                  var $galWrapper = $('#nimble-tmpl-gallery'),
+                        self = this;
+
                   $galWrapper
                         // Schedule click event with delegation
                         // PICK A TEMPLATE
@@ -12536,9 +12567,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     self._tmplSourceWhileImportDialog = _tmpl_source;
                                     self.tmplInjectDialogVisible(true);
                               } else {
+                                    api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
                                     //api.czr_sektions.get_gallery_tmpl_json_and_inject( $(this).data('sek-tmpl-item-id') );
                                     //api.czr_sektions.get_gallery_tmpl_json_and_inject( {tmpl_name : 'test_one', tmpl_source: 'api_tmpl'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
-                                    api.czr_sektions.get_gallery_tmpl_json_and_inject( { tmpl_name : _tmpl_id, tmpl_source: _tmpl_source });
+                                    api.czr_sektions.get_gallery_tmpl_json_and_inject( { tmpl_name : _tmpl_id, tmpl_source: _tmpl_source }).always( function() {
+                                          api.previewer.send( 'sek-clean-loader');
+                                    });
                                     self.templateGalleryExpanded(false);
                               }
                         })
@@ -12559,10 +12593,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     api.errare('::setupTmplGalleryDOMEvents => error => invalid import mode');
                                     return;
                               }
+                              api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
                               api.czr_sektions.get_gallery_tmpl_json_and_inject({
                                     tmpl_name : self._tmplNameWhileImportDialog,
                                     tmpl_source: self._tmplSourceWhileImportDialog,
                                     tmpl_inject_mode: tmpl_inject_mode
+                              }).always( function() {
+                                    api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
                               });
                               // api.czr_sektions.get_gallery_tmpl_json_and_inject({
                               //       tmpl_name : 'test_one',

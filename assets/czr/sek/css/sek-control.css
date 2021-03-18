@@ -383,10 +383,13 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
 .sek-new-label {
     background: #ffff00;
     border: 1px solid yellow;
+    color: #000000;
     padding: 3px 4px;
     line-height: 12px;
     border-radius: 8px;
-    font-size: 12px;
+    font-size: 11px;
+    max-width: 100px;
+    display: inline-block;
 }/* ACCORDION MODULE */
 .sek-accord-title {
   color: #4b4a4a;
@@ -1419,6 +1422,7 @@ credits : Gutenberg team @wordpress */
   /* flex-direction: column; */
   flex: 0 0 100%;
   max-width: 100%;
+  overflow: hidden;
 }
 
 /* fixes https://github.com/presscustomizr/nimble-builder/issues/340 */
@@ -1451,9 +1455,27 @@ body.nimble-top-bar-visible #nimble-top-bar {
   color: #fff;
 }
 /* April 2020 : tmpl-saving btn added for https://github.com/presscustomizr/nimble-builder/issues/655 */
-#nimble-top-bar .sek-settings, #nimble-top-bar .sek-tmpl-saving {
-  font-size: 18px;
-  padding: 0 5px;
+#nimble-top-bar .sek-settings, #nimble-top-bar .sek-tmpl-saving, .sek-add-content, .sek-do-undo, .sek-level-tree  {
+  font-size: 16px;
+  padding: 0 4px;
+}
+
+/* vertical separators between option groups */
+.sek-level-tree:before, .sek-do-undo:before, #nimble-top-bar .sek-tmpl-saving:before, #nimble-top-bar .sek-settings:before {
+  content: '';
+  border-left: 1px solid #aaa;
+  width: 0px;
+  padding: 10px 4px;
+  height: 100%;
+  position: relative;
+}
+#nimble-top-bar .sek-tmpl-saving:after {
+  content: '';
+  border-right: 1px solid #aaa;
+  width: 0px;
+  padding: 10px 5px;
+  height: 100%;
+  position: relative;
 }
 
 #nimble-top-bar button {
@@ -1492,6 +1514,9 @@ body.nimble-top-bar-visible #nimble-top-bar {
 }
 #nimble-top-bar .sek-add-content button {
   padding-top: 3px;
+  padding-left: 13px;
+  padding-right: 10px;
+  /* font-size: 28px; */
 }
 #nimble-top-bar .sek-nimble-doc {
   position: absolute;
@@ -1852,7 +1877,10 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
 .sek-tmpl-dialog-expanded #nimble-tmpl-gallery .sek-tmpl-gal-inject-dialog {
   top: 0px;
 }
-
+/* Hide template gallery while dialog is open. Otherwise the dialog might not be visible if a template has been clicked too low in the page */
+.sek-tmpl-dialog-expanded #nimble-tmpl-gallery .sek-tmpl-gallery-inner {
+  display: none;
+}
 
 
 #nimble-tmpl-gallery .sek-tmpl-gallery-inner {
@@ -1864,16 +1892,18 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
   width: 100%;
   margin-right: -10px;
   margin-left: -10px;
+  margin-top: 8px;
 }
 #nimble-tmpl-gallery .sek-tmpl-gallery-inner *, #nimble-tmpl-gallery .sek-tmpl-gallery-inner *:after, #nimble-tmpl-gallery .sek-tmpl-gallery-inner *:before{
   box-sizing: border-box;
 }
 /* TMPL ITEM  */
 .sek-tmpl-gallery-inner .sek-tmpl-item {
-  -ms-flex: 0 0 25%;
-  flex: 0 0 25%;
-  max-width: 25%;
-  padding: 5px 10px;
+  -ms-flex: 0 0 calc(25% - 24px);
+  flex: 0 0 calc(25% - 24px);
+  max-width: calc(25% - 24px);
+  padding: 0px;
+  margin: 12px;
   width: 100%;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1881,20 +1911,23 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
   -ms-flex-align: center;
   align-items: center;
   position: relative;
-  cursor: pointer;
+  /* cursor: pointer; */
+  -webkit-box-shadow: rgb(0 0 0 / 25%) 0px 3px 11px 0px;
+    -moz-box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 11px 0px;
+    box-shadow: rgb(0 0 0 / 25%) 0px 3px 11px 0;
 }
 @media (max-width: 1300px) {
   .sek-tmpl-gallery-inner .sek-tmpl-item {
-    -ms-flex: 0 0 33.333%;
-    flex: 0 0 33.333%;
-    max-width: 33.333%;
+    -ms-flex: 0 0 calc(33.333% - 24px);
+    flex: 0 0 calc(33.333% - 24px);
+    max-width: calc(33.333% - 24px);
   }
 }
 @media (max-width: 1000px) {
   .sek-tmpl-gallery-inner .sek-tmpl-item {
-    -ms-flex: 0 0 50%;
-    flex: 0 0 50%;
-    max-width: 50%;
+    -ms-flex: 0 0 calc(50% - 24px);
+    flex: 0 0 calc(50% - 24px);
+    max-width: calc(50% - 24px);
   }
 }
 
@@ -1902,8 +1935,8 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: calc(100% - 20px);
-  max-height: calc(100% - 20px);
+  width: 100%;
+  max-height: 100%;
   padding: 10px;
   overflow: hidden;
 }
@@ -1923,13 +1956,13 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
 /* USE TMPL BUTTON */
 .sek-tmpl-info > .use-tmpl {
     cursor: pointer;
-    font-size: 25px;
+    font-size: 21px;
     width: 50px;
     height: 50px;
-    color: #535353;
-    background: rgba(255, 255, 255, 0.7);
+    color: #ffffff;
+    background: #33b3db;
     border-radius: 30px;
-    opacity: 0;
+    opacity: 0.2;
     -webkit-box-shadow: 0 2px 6px rgba(0,0,0,.2);
     box-shadow: 0 2px 6px rgba(0,0,0,.2);
     -webkit-transition: all .20s ease;
@@ -1949,7 +1982,7 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
     left: calc(50% - 25px);
 }
 .sek-tmpl-info:hover > .use-tmpl {
-  opacity: 0.7;
+  opacity: 0.5;
 }
 .sek-tmpl-info > .use-tmpl:hover {
   opacity: 0.95;
@@ -2001,17 +2034,30 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
   color: #000000;
 }
 
+.sek-tmpl-demo-link {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+.sek-tmpl-demo-link a {
+  color: #ffffff;
+}
+.sek-tmpl-demo-link a:hover, .sek-tmpl-demo-link a:visited {
+  color: #ffffff;
+}
 /*.sek-tmpl-gallery-inner .sek-tmpl-item:after, .sek-tmpl-gallery-inner .sek-tmpl-item:before {
     box-sizing: inherit;
 }*/
 .sek-tmpl-gallery-inner .sek-tmpl-thumb {
-    cursor: pointer;
+    /* cursor: pointer; */
     position: relative;
     height: 380px;
     width: 100%;
     background-size: cover;
     background-repeat: no-repeat;
-    background-position: center;
+    background-position:top;
 }
 .sek-tmpl-thumb img { max-width: 100%; }
 .sek-tmpl-gallery-inner .sek-tmpl-thumb::after {
@@ -2023,7 +2069,7 @@ body.sek-save-section-ui-visible #nimble-top-section-save-ui {
     right: 0;
     bottom: 0;
     background-color: #000000;
-    opacity: 0.45;
+    opacity: 0.40;
     -webkit-transition: opacity 0.3s ease-in-out;
     -moz-transition: opacity 0.3s ease-in-out;
     -ms-transition: opacity 0.3s ease-in-out;
@@ -2083,6 +2129,28 @@ input.sek-filter-tmpl {
   /* flex-direction: column; */
   flex: 0 0 100%;
   max-width: 100%;
+}
+#sek-tmpl-source-switcher .sek-ui-button[aria-pressed="true"] {
+  background: #33b3db;
+  border-color: #33b3db;
+  box-shadow: inset 0 -1px 0 #2271b1;
+}
+
+[data-sek-tmpl-item-source="api_tmpl"] .sek-tmpl-info .tmpl-api-hide {
+  opacity: 0;
+}
+.sek-tmpl-gallery-inner [data-sek-tmpl-item-source="api_tmpl"]:hover .sek-tmpl-info .tmpl-api-hide{
+  opacity: 1;
+}
+.sek-tmpl-gallery-inner [data-sek-tmpl-item-source="api_tmpl"] .sek-tmpl-thumb::after {
+  opacity: 0.10;
+}
+.sek-tmpl-coming-soon p {
+  text-transform: uppercase;
+  font-style: italic;
+  font-weight: bold;
+  font-size: 18px;
+  color: #555;
 }/* LEVEL TREE */
 #nimble-level-tree {
   -webkit-transition: top 0.3s ease-in-out;

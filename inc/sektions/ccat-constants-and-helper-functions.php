@@ -61,12 +61,9 @@ if ( !defined( 'NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID' ) ) { define ( 'NIMBLE_GLOB
 if ( !defined( 'NIMBLE_JQUERY_ID' ) ) { define ( 'NIMBLE_JQUERY_ID', 'nb-jquery' ); }
 if ( !defined( 'NIMBLE_JQUERY_LATEST_CDN_URL' ) ) { define ( 'NIMBLE_JQUERY_LATEST_CDN_URL', 'https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js' ); }
 if ( !defined( 'NIMBLE_JQUERY_MIGRATE_URL' ) ) { define ( 'NIMBLE_JQUERY_MIGRATE_URL', site_url() . '/wp-includes/js/jquery/jquery-migrate.min.js' ); }
-// Feb 2021 : Template deployed only for Customizr Pro users
-if ( !defined( 'NIMBLE_TEMPLATE_SAVE_ENABLED' ) ) { define ( 'NIMBLE_TEMPLATE_SAVE_ENABLED', file_exists( get_template_directory() . '/core/init-pro.php' )); }
-if ( !defined( 'NIMBLE_TEMPLATE_GALLERY_ENABLED' ) ) { define ( 'NIMBLE_TEMPLATE_GALLERY_ENABLED', file_exists( get_template_directory() . '/core/init-pro.php' )); }
 
 if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2",
-  ( defined('NIMBLE_FETCH_API_LOCALLY') && NIMBLE_FETCH_API_LOCALLY ) ? 'http://customizr-dev.test/wp-json/nimble/v2/cravan' : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
+  ( defined('NIMBLE_FETCH_API_LOCALLY') && NIMBLE_FETCH_API_LOCALLY && defined('NIMBLE_LOCAL_API_URL') ) ? NIMBLE_LOCAL_API_URL : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
 ); }
 
 ?><?php
@@ -3018,7 +3015,6 @@ function sek_generate_level_guid() {
 // Nimble api returns a set of value structured as follow
 // return array(
 //     'timestamp' => time(),
-//     'upgrade_notice' => array(),
 //     'library' => array(
 //         'sections' => array(
 //             'registration_params' => sek_get_sections_registration_params(),
@@ -3034,13 +3030,31 @@ function sek_generate_level_guid() {
 // @return array|false Info data, or false.
 // api data is refreshed on plugin update and theme switch
 // @$what param can be 'latest_posts_and_start_msg', 'templates'
-function sek_get_nimble_api_data( $what = null, $force_update = false ) {
-    if ( is_null( $what ) || !is_string($what) ) {
+function sek_get_nimble_api_data( $params ) {
+    $params = is_array($params) ? $params : [];
+    $params = wp_parse_args( $params, [
+        'what' => '',
+        'tmpl_name' => '',
+        'force_update' => false
+    ]);
+    $what = $params['what'];
+    $tmpl_name = $params['tmpl_name'];
+    $force_update = $params['force_update'];
+    $wp_cache_key = 'nimble_api_data_'. $what . $tmpl_name;
+    
+    // We must have a "what"
+    if ( is_null($what) || !is_string($what) ) {
         sek_error_log( __FUNCTION__ . ' => error => $what param not set');
         return false;
     }
 
-    $cached_api_data = wp_cache_get( 'nimble_api_data_'.$what );
+    // If a single template is requested, a valid template name must be provided
+    if ( 'single_tmpl' === $what && ( empty($tmpl_name) || !is_string($tmpl_name) ) ) {
+        sek_error_log( __FUNCTION__ . ' => error => invalid $tmpl_name param');
+        return false;
+    }
+
+    $cached_api_data = wp_cache_get( $wp_cache_key  );
 
     if ( $cached_api_data && is_array($cached_api_data) && !empty($cached_api_data) ) {
         return $cached_api_data;
@@ -3054,8 +3068,12 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
             $transient_name = 'nimble_api_posts';
             $transient_duration = 48 * HOUR_IN_SECONDS;
         break;
-        case 'templates':
-            $transient_name = 'nimble_api_templates';
+        case 'all_tmpl':
+            $transient_name = 'nimble_api_all_tmpl';
+            $transient_duration = 5 * DAY_IN_SECONDS;
+        break;
+        case 'single_tmpl':
+            $transient_name = 'nimble_api_tmpl_' . $tmpl_name;
         break;
         default:
             sek_error_log( __FUNCTION__ . ' => error => invalid $what param => ' . $what );
@@ -3071,7 +3089,7 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
     $expected_version_transient_value = NIMBLE_VERSION . '_' . $theme_slug;
     $api_needs_update = $version_transient_value != $expected_version_transient_value;
 
-    $api_data = maybe_unserialize( get_transient( $transient_name ) );
+    $api_transient_data = maybe_unserialize( get_transient( $transient_name ) );
 
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
@@ -3079,20 +3097,20 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
           sek_error_log( __FUNCTION__ . ' API is in force update mode. API data requested => ' . $transient_name );
     }
 
-
+    $api_data = $api_transient_data;
     // Connect to remote NB api when :
-    // 1) api data transient is not set or has expired ( false === $api_data )
+    // 1) api data transient is not set or has expired ( false === $api_transient_data )
     // 2) force_update param is true
     // 3) NB has been updated to a new version ( $api_needs_update case )
     // 4) Theme has been changed ( $api_needs_update case )
     if ( $force_update || false === $api_data || $api_needs_update ) {
-
         $query_params = [
             'timeout' => ( $force_update ) ? 25 : 8,
             'body' => [
                 'api_version' => NIMBLE_VERSION,
                 'site_lang' => get_bloginfo( 'language' ),
-                'what' => $what//<= latest posts about Nimble Builder or templates
+                'what' => $what,// 'single_tmpl', 'all_tmpl', 'latest_posts_and_start_msg'
+                'tmpl_name' => $tmpl_name
             ]
         ];
 
@@ -3126,7 +3144,7 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
     }
 
     $api_data = '_api_error_' === $api_data ? null : $api_data;
-    wp_cache_set( 'nimble_api_data_'. $what , $api_data );
+    wp_cache_set( $wp_cache_key  , $api_data );
 
     //sek_error_log('API DATA for ' . $transient_name, $api_data );
 
@@ -3136,7 +3154,7 @@ function sek_get_nimble_api_data( $what = null, $force_update = false ) {
 
 //////////////////////////////////////////////////
 /// TEMPLATE DATA
-function sek_get_tmpl_api_data( $force_update = false ) {
+function sek_get_all_tmpl_api_data( $force_update = false ) {
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
 
@@ -3144,7 +3162,11 @@ function sek_get_tmpl_api_data( $force_update = false ) {
     // Let's use the data saved as options
     // Those data are updated on plugin install, plugin update( upgrader_process_complete ), theme switch
     // @see https://github.com/presscustomizr/nimble-builder/issues/441
-    $api_data = sek_get_nimble_api_data( 'templates', $force_update );
+    $api_data = sek_get_nimble_api_data([
+        'what' => 'all_tmpl',
+        'force_update' => $force_update
+    ]);
+
     $api_data = is_array( $api_data ) ? $api_data : [];
 
     //sek_error_log('TMPL DATA ?', $tmpl_data);
@@ -3158,13 +3180,55 @@ function sek_get_tmpl_api_data( $force_update = false ) {
 }
 
 
+function sek_get_single_tmpl_api_data( $tmpl_name, $force_update = false ) {
+    // set this constant in wp_config.php
+    $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
+
+    // To avoid a possible refresh, hence a reconnection to the api when opening the customizer
+    // Let's use the data saved as options
+    // Those data are updated on plugin install, plugin update( upgrader_process_complete ), theme switch
+    // @see https://github.com/presscustomizr/nimble-builder/issues/441
+    $api_data = sek_get_nimble_api_data([
+        'what' => 'single_tmpl',
+        'tmpl_name' => $tmpl_name,
+        'force_update' => $force_update
+    ]);
+
+    $api_data = is_array( $api_data ) ? $api_data : [];
+    $api_data = wp_parse_args( $api_data, [
+        'timestamp' => '',
+        'single_tmpl' => null
+    ]);
+    //sek_error_log('TMPL DATA ?', $tmpl_data);
+    if ( empty($api_data['single_tmpl']) ) {
+        sek_error_log( __FUNCTION__ . ' => error => empty template for ' . $tmpl_name );
+        return array();
+    }
+    
+    if ( !array_key_exists( 'data', $api_data['single_tmpl'] ) || !array_key_exists( 'metas',$api_data['single_tmpl'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => error => invalid template data for ' . $tmpl_name );
+        return array();
+    }
+    //return [];
+    return maybe_unserialize( $api_data['single_tmpl'] );
+}
+
+
 //////////////////////////////////////////////////
 /// LATESTS POSTS
 // @return array of posts
 function sek_get_latest_posts_api_data( $force_update = false ) {
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
-    $api_data = sek_get_nimble_api_data( 'latest_posts_and_start_msg', $force_update );
+    $api_data = sek_get_nimble_api_data([
+        'what' => 'latest_posts_and_start_msg',
+        'force_update' => $force_update
+    ]);
+    $api_data = is_array( $api_data ) ? $api_data : [];
+    $api_data = wp_parse_args( $api_data, [
+        'timestamp' => '',
+        'latest_posts' => null
+    ]);
     if ( !is_array( $api_data['latest_posts'] ) || empty( $api_data['latest_posts'] ) ) {
         sek_error_log( __FUNCTION__ . ' => error => no latest_posts' );
         return [];
@@ -3174,15 +3238,23 @@ function sek_get_latest_posts_api_data( $force_update = false ) {
 
 // @return html string
 function sek_start_msg_from_api( $theme_name, $force_update = false ) {
+    if ( !sek_is_presscustomizr_theme( $theme_name ) ) {
+        return '';
+    }
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
 
-    $api_data = sek_get_nimble_api_data( 'latest_posts_and_start_msg', $force_update );
-    if ( !sek_is_presscustomizr_theme( $theme_name ) || !is_array( $api_data ) ) {
-        return '';
-    }
+    $api_data = sek_get_nimble_api_data( [
+        'what' => 'latest_posts_and_start_msg',
+        'force_update' => $force_update
+    ]);
+    $api_data = is_array( $api_data ) ? $api_data : [];
+    $api_data = wp_parse_args( $api_data, [
+        'timestamp' => '',
+        'start_msg' => null
+    ]);
+
     $msg = '';
-    $api_data = is_array($api_data) ? $api_data : [];
     $api_msg = isset( $api_data['start_msg'] ) ? $api_data['start_msg'] : null;
 
     if ( !is_null($api_msg) && is_string($api_msg) ) {
@@ -3191,14 +3263,13 @@ function sek_start_msg_from_api( $theme_name, $force_update = false ) {
     return $msg;
 }
 
-// Refresh the api data on plugin update and theme switch
-// add_action( 'after_switch_theme', '\Nimble\sek_refresh_nimble_api_data');
-// add_action( 'upgrader_process_complete', '\Nimble\sek_refresh_nimble_api_data');
-// function sek_refresh_nimble_api_data() {
-//     // Refresh data on theme switch
-//     // => so the posts and message are up to date
-//     sek_get_nimble_api_data( 'all_data', $force_update = true );
-// }
+// Attempt to refresh the api template data => will store in a transient if not done yet, to make it faster to render in the customizer
+add_action( 'wp_head', '\Nimble\sek_maybe_refresh_nimble_api_tmpl_data');
+function sek_maybe_refresh_nimble_api_tmpl_data() {
+    if ( skp_is_customizing() || false !== get_transient( 'nimble_api_all_tmpl' ) )
+        return;
+    sek_get_nimble_api_data(['what' => 'all_tmpl']);
+}
 
 
 //////////////////////////////////////////////////
@@ -4632,8 +4703,8 @@ function sek_get_all_saved_sections() {
 
         // When updating a section, we only need to return title and description
         $collection[$post_object->post_name] = array(
-            'title' => !empty($content['metas']['title']) ? $content['metas']['title'] : '',
-            'description' => !empty($content['metas']['description']) ? $content['metas']['description'] : '',
+            'title' => !empty($content['metas']['title']) ? sek_maybe_decode_richtext( $content['metas']['title'] ) : '',
+            'description' => !empty($content['metas']['description']) ? sek_maybe_decode_richtext( $content['metas']['description'] ) : '',
             'last_modified_date' => mysql2date( 'Y-m-d H:i:s', $post_object->post_modified )
         );
     }
@@ -4718,7 +4789,7 @@ function sek_update_saved_section_post( $section_data, $is_edit_metas_only_case 
     $section_data = sek_sektion_collection_sanitize_cb( $section_data );
 
     $new_or_updated_post_data = array(
-        'post_title' => esc_attr( $section_data['metas']['title'] ),
+        'post_title' => $section_post_name,
         'post_name' => $section_post_name,
         'post_type' => NIMBLE_SECTION_CPT,
         'post_status' => 'publish',
@@ -4905,8 +4976,8 @@ function sek_get_all_saved_templates() {
 
         // When updating a template, we only need to return title and description
         $collection[$post_object->post_name] = array(
-            'title' => !empty($content['metas']['title']) ? $content['metas']['title'] : '',
-            'description' => !empty($content['metas']['description']) ? $content['metas']['description'] : '',
+            'title' => !empty($content['metas']['title']) ? sek_maybe_decode_richtext( $content['metas']['title'] ) : '',
+            'description' => !empty($content['metas']['description']) ? sek_maybe_decode_richtext( $content['metas']['description'] ) : '',
             'last_modified_date' => mysql2date( 'Y-m-d H:i:s', $post_object->post_modified )
         );
     }
@@ -4918,29 +4989,32 @@ function sek_get_all_saved_templates() {
 // invoked on 'wp_ajax_sek_get_all_api_tmpl'
 // @return an unserialized array of api templates
 function sek_get_all_api_templates() {
-    $raw_tmpl = sek_get_tmpl_api_data();
+    $raw_tmpl = sek_get_all_tmpl_api_data();
     $collection = [];
 
     if( !is_array( $raw_tmpl) )
         return $collection;
         
-    foreach ( $raw_tmpl as $tmpl_cpt_post_name => $tmpl_data ) {
-        if ( !is_array( $tmpl_data ) )
+    foreach ( $raw_tmpl as $tmpl_cpt_post_name => $metas) {
+        if ( !is_array( $metas ) || empty($metas) )
             continue;
 
-        if ( !array_key_exists( 'metas', $tmpl_data ) )
-            continue;
-
-        $metas = !is_array( $tmpl_data['metas'] ) ? [] : $tmpl_data['metas'];
-        if ( empty($metas) )
-            continue;
+        $metas = wp_parse_args( $metas, [
+            'title' => '',
+            'description' => '',
+            'date' => '',
+            'thumb_url' => '',
+            'is_pro_tmpl' => false,
+            'demo_url' => false
+        ]);
 
         $collection[$tmpl_cpt_post_name] = [
-            'title' => $metas['title'],
-            'description' => $metas['description'],
+            'title' => sek_maybe_decode_richtext( $metas['title'] ),
+            'description' => sek_maybe_decode_richtext( $metas['description'] ),
             'last_modified_date' => mysql2date( 'Y-m-d', $metas['date'] ),
             'thumb_url' => !empty( $metas['thumb_url'] ) ? $metas['thumb_url'] : '',
-            'is_pro_tmpl' => !empty( $metas['is_pro_tmpl'] ) ? $metas['is_pro_tmpl'] : false
+            'is_pro_tmpl' => !empty( $metas['is_pro_tmpl'] ) ? $metas['is_pro_tmpl'] : false,
+            'demo_url' => !empty( $metas['demo_url'] ) ? $metas['demo_url'] : false,
         ];
     }
     return $collection;
@@ -5029,7 +5103,7 @@ function sek_update_saved_tmpl_post( $tmpl_data, $is_edit_metas_only_case = fals
     $tmpl_data = sek_sektion_collection_sanitize_cb( $tmpl_data );
 
     $new_or_updated_post_data = array(
-        'post_title' => esc_attr( $tmpl_data['metas']['title'] ),
+        'post_title' => $tmpl_post_name,
         'post_name' => $tmpl_post_name,
         'post_type' => NIMBLE_TEMPLATE_CPT,
         'post_status' => 'publish',
@@ -5290,13 +5364,13 @@ function sek_is_json( $string ){
       return false;
     json_decode($string);
     return (json_last_error() == JSON_ERROR_NONE);
-  }
+}
   
-  // @return string
-  function sek_maybe_decode_richtext( $string ){
+// @return string
+function sek_maybe_decode_richtext( $string ){
     if ( !is_string($string) )
-      return $string;
-  
+    return $string;
+
     $json_decoded_candidate = json_decode($string, true);
     if ( json_last_error() == JSON_ERROR_NONE ) {
         // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
@@ -5307,12 +5381,12 @@ function sek_is_json( $string ){
     }
     
     return $string;
-  }
-  
-  // @return string
-  function sek_maybe_encode_richtext( $string ){
+}
+
+// @return string
+function sek_maybe_encode_richtext( $string ){
     if ( !is_string($string) )
-      return $string;
+    return $string;
     // only encode if not already encoded
     if ( !sek_is_json($string) ) {
         // https://stackoverflow.com/questions/6465263/how-to-reverse-htmlentities
@@ -5323,7 +5397,7 @@ function sek_is_json( $string ){
         //sek_error_log('JSON ENCODED ?', $string );
     }
     return $string;
-  }
+}
 
 
 
