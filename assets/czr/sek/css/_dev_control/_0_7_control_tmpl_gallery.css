@@ -45,7 +45,10 @@
 .sek-tmpl-dialog-expanded #nimble-tmpl-gallery .sek-tmpl-gal-inject-dialog {
   top: 0px;
 }
-
+/* Hide template gallery while dialog is open. Otherwise the dialog might not be visible if a template has been clicked too low in the page */
+.sek-tmpl-dialog-expanded #nimble-tmpl-gallery .sek-tmpl-gallery-inner {
+  display: none;
+}
 
 
 #nimble-tmpl-gallery .sek-tmpl-gallery-inner {
