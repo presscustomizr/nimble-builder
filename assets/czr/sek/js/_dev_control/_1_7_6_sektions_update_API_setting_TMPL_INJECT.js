@@ -27,7 +27,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   params = self.updAPISetParams.params;
 
-                  api.infoLog( 'api update params for sek-inject-tmpl-from-gallery', params );
+                  //api.infoLog( 'api update params for sek-inject-tmpl-from-gallery', params );
 
                   // DO WE HAVE PROPER CONTENT DO INJECT ?
                   if ( _.isUndefined( params.injected_content.data ) || _.isUndefined( params.injected_content.metas ) ) {
