@@ -353,6 +353,17 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                                 'input_width' => 'width-20',
                                 'notice_after' => __('Lazy loading images improves page load performances.', 'text_doma' ),
                             ),
+                            'bg_color_css' => array(
+                                'input_type'  => 'wp_color_alpha',
+                                'title'       => __( 'Background color', 'text_doma' ),
+                                'width-100'   => true,
+                                'title_width' => 'width-100',
+                                'default'    => '',
+                                'refresh_markup' => false,
+                                'refresh_stylesheet' => true,
+                                'css_identifier' => 'background_color',
+                                'css_selectors'=> '.swiper-slide'
+                            )
                         )//inputs
                     ),
                     array(
