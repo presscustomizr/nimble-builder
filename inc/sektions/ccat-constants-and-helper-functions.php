@@ -3264,12 +3264,12 @@ function sek_start_msg_from_api( $theme_name, $force_update = false ) {
 }
 
 // Attempt to refresh the api template data => will store in a transient if not done yet, to make it faster to render in the customizer
-add_action( 'wp_head', '\Nimble\sek_maybe_refresh_nimble_api_tmpl_data');
-function sek_maybe_refresh_nimble_api_tmpl_data() {
-    if ( skp_is_customizing() || false !== get_transient( 'nimble_api_all_tmpl' ) )
-        return;
-    sek_get_nimble_api_data(['what' => 'all_tmpl']);
-}
+// add_action( 'wp_head', '\Nimble\sek_maybe_refresh_nimble_api_tmpl_data');
+// function sek_maybe_refresh_nimble_api_tmpl_data() {
+//     if ( skp_is_customizing() || false !== get_transient( 'nimble_api_all_tmpl' ) )
+//         return;
+//     sek_get_nimble_api_data(['what' => 'all_tmpl']);
+// }
 
 
 //////////////////////////////////////////////////

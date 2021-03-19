@@ -88,7 +88,6 @@
 [data-sek-module-type="czr_img_slider_module"] .swiper-slide {
   text-align: center;
   font-size: 18px;
-  background: #fff;
   /* Center slide image vertically */
   display: -ms-flexbox;
   display: flex;
