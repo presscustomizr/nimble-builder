@@ -125,10 +125,22 @@ body.nimble-top-bar-visible #nimble-top-bar {
       -ms-transform: rotate(45deg);
           transform: rotate(45deg);
 }
+#nimble-top-bar .sek-add-content {
+  width: 34px;
+}
 #nimble-top-bar .sek-add-content button {
-  padding-top: 3px;
-  padding-left: 13px;
-  padding-right: 10px;
+  padding-top: 2px;
+  padding-left: 5px;
+  margin: 0px 4px;
+  font-size: 21px;
+  width: 30px;
+  height: 30px;
+  color: #ffffff;
+  background: #33b3db;
+  border-radius: 30px;
+  position: absolute;
+  left: 5px;
+  top: 3px;
   /* font-size: 28px; */
 }
 #nimble-top-bar .sek-nimble-doc {
