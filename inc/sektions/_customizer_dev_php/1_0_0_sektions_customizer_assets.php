@@ -141,7 +141,8 @@ function sek_enqueue_controls_js_css() {
                 'globalOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ),// 'nimble_global_opts'
                 'siteTmplOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ),// 'nimble_site_templates
 
-                'isSiteTmplEnabled' => defined('NIMBLE_SITE_TEMPLATES_ENABLED') && NIMBLE_SITE_TEMPLATES_ENABLED,
+                // Feb 2021, for #478
+                'isSiteTemplateEnabled' => sek_is_site_tmpl_enabled(),
 
                 'defaultLocationModel' => Nimble_Manager()->default_location_model,
                 'defaultLocalSektionSettingValue' => sek_get_default_location_model(),
@@ -219,10 +220,7 @@ function sek_enqueue_controls_js_css() {
                 'useAPItemplates' => true,// March 2021 deployed in v3.0.0
                 // Dec 2020
                 // When developing locally, allow a local template api request
-                'templateAPIUrl' => NIMBLE_DATA_API_URL_V2,
-
-                // Feb 2021, for #478
-                'isSiteTemplateEnabled' => sek_is_site_tmpl_enabled()
+                'templateAPIUrl' => NIMBLE_DATA_API_URL_V2
             )
         )
     );//wp_localize_script()

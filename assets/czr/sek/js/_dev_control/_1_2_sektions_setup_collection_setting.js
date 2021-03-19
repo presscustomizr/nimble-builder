@@ -320,7 +320,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         throw new Error( 'resetCollectionSetting => invalid scope provided.', scope );
                   }
 
-                  if ( sektionsLocalizedData.isSiteTmplEnabled ) {
+                  if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
                         // Feb 2021 : do we have group template that applies to this context ?
                         var site_tmpl_opts = api(sektionsLocalizedData.optNameForSiteTmplOptions)(),
                               group_skope_id = api.czr_skopeBase.getSkopeProperty( 'skope_id' ,'group'),
