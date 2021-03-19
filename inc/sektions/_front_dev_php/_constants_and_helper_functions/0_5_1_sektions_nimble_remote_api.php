@@ -109,10 +109,11 @@ function sek_get_nimble_api_data( $params ) {
         //sek_error_log('CALL TO REMOTE API NOW FOR DATA => ' . $transient_name . ' | ' . $force_update . ' | ' . $api_needs_update, $query_params );
 
         $response = wp_remote_get( NIMBLE_DATA_API_URL_V2, $query_params );
+
         if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
             // set the transient to '_api_error_', so that we don't hammer the api if not reachable. next call will be done after transient expiration
             $api_data = '_api_error_';
-            sek_error_log( __FUNCTION__ . ' invalid api response');
+            sek_error_log( __FUNCTION__ . ' error with api response');
         }
 
         $api_data = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -123,8 +124,8 @@ function sek_get_nimble_api_data( $params ) {
             sek_error_log( __FUNCTION__ . ' invalid api data after json decode');
         }
 
-        //sek_error_log('API DATA ?', $api_data );
-        set_transient( $transient_name, $api_data, $transient_duration );
+        // if the api could not be reached, let's retry in 30 minutes with a short transient duration
+        set_transient( $transient_name, $api_data, '_api_error_' === $api_data ? 30 * MINUTE_IN_SECONDS : $transient_duration );
         // The api data will be refreshed on next plugin update, or next theme switch. Or if $transient_name has expired.
         // $expected_version_transient_value = NIMBLE_VERSION . '_' . $theme_slug;
         set_transient( 'nimble_version_check_for_api', $expected_version_transient_value, 100 * DAY_IN_SECONDS );
