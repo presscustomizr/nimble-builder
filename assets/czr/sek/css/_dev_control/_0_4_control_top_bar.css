@@ -129,7 +129,7 @@ body.nimble-top-bar-visible #nimble-top-bar {
   width: 34px;
 }
 #nimble-top-bar .sek-add-content button {
-  padding-top: 2px;
+  padding-top: 1px;
   padding-left: 5px;
   margin: 0px 4px;
   font-size: 21px;
