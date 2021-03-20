@@ -44,7 +44,8 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
-                    'title_width' => 'width-100'
+                    'title_width' => 'width-100',
+                    'refresh_preview' => false
                 ),
                 'skp__all_post' => array(
                     'input_type'  => 'simpleselect',
@@ -58,7 +59,8 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
-                    'title_width' => 'width-100'
+                    'title_width' => 'width-100',
+                    'refresh_preview' => false
                 ),
                 'skp__all_category' => array(
                     'input_type'  => 'simpleselect',
@@ -72,7 +74,8 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
-                    'title_width' => 'width-100'
+                    'title_width' => 'width-100',
+                    'refresh_preview' => false
                 ),
                 'skp__all_post_tag' => array(
                     'input_type'  => 'simpleselect',
@@ -86,7 +89,8 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
-                    'title_width' => 'width-100'
+                    'title_width' => 'width-100',
+                    'refresh_preview' => false
                 ),
                 'skp__all_author' => array(
                     'input_type'  => 'simpleselect',
@@ -100,7 +104,8 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
-                    'title_width' => 'width-100'
+                    'title_width' => 'width-100',
+                    'refresh_preview' => false
                 ),
                 'skp__search' => array(
                     'input_type'  => 'simpleselect',
@@ -114,7 +119,8 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
-                    'title_width' => 'width-100'
+                    'title_width' => 'width-100',
+                    'refresh_preview' => false
                 ),
                 'skp__404' => array(
                     'input_type'  => 'simpleselect',
@@ -129,7 +135,8 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'notice_before_title' => '',
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                    'html_after' => $pro_text
+                    'html_after' => $pro_text,
+                    'refresh_preview' => false
                 )
             )
         )//tmpl
