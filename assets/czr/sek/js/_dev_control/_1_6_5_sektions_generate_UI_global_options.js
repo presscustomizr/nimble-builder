@@ -41,6 +41,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               // Header and footer have been beta tested during 5 months and released in June 2019, in version 1.8.0
+                              case 'global_header_footer':
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__header_footer',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
+                                          icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                                    };
+                              break;
                               case 'global_text' :
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__global_text',
@@ -66,15 +74,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">devices</i>'
                                     };
                               break;
-                              case 'global_header_footer':
-                                    registrationParams[ opt_name ] = {
-                                          settingControlId : _id_ + '__header_footer',
-                                          module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
-                                          icon : '<i class="material-icons sek-level-option-icon">web</i>'
-                                    };
-                              break;
-
                               case 'performances' :
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__performances',

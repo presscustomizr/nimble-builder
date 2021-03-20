@@ -49,7 +49,6 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // store the local and global options
         public $local_options = '_not_cached_yet_';
         public $global_nimble_options = '_not_cached_yet_';
-        public $site_template_options = '_not_cached_yet_';
 
         public $img_smartload_enabled = 'not_cached';
         public $video_bg_lazyload_enabled = 'not_cached';//<= for https://github.com/presscustomizr/nimble-builder/issues/287
@@ -64,10 +63,10 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // is used in _1_6_5_sektions_generate_UI_global_options.js and when normalizing the global option in sek_normalize_global_options_with_defaults()
         public static $global_options_map = [
             'site_templates' => 'sek_site_tmpl_pickers',
+            'global_header_footer' => 'sek_global_header_footer',
             'global_text' => 'sek_global_text',
             'widths' => 'sek_global_widths',
             'breakpoint' => 'sek_global_breakpoint',
-            'global_header_footer' => 'sek_global_header_footer',
             'performances' => 'sek_global_performances',
             'recaptcha' => 'sek_global_recaptcha',
             'global_revisions' => 'sek_global_revisions',
