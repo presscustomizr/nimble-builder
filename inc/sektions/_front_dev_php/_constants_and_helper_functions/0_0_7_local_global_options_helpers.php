@@ -133,49 +133,6 @@ function sek_normalize_global_options_with_defaults( $option_name, $raw_module_v
 
 
 
-/* ------------------------------------------------------------------------- *
- *  SITE TEMPLATES OPTIONS HELPERS
-/* ------------------------------------------------------------------------- */
-// @param $option_name = string
-// 'nimble_front_classes_ready' is fired when Nimble_Manager() is instanciated
-function sek_get_site_tmpl_options( $option_name = '' ) {
-    // if ( empty($option_name) ) {
-    //     sek_error_log( __FUNCTION__ . ' => invalid option name' );
-    //     return array();
-    // }
-    if ( !skp_is_customizing() && did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->site_template_options ) {
-        $site_template_options = Nimble_Manager()->site_template_options;
-    } else {
-        $site_template_options = get_option( NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS );
-        //sek_error_log(' SOOO OPTIONS ?', $site_template_options );
-        // cache when nimble is ready
-        // this hook is fired when Nimble_Manager() is instanciated
-        // never cache when doing ajax
-        if ( did_action('nimble_front_classes_ready') && !defined('DOING_AJAX') ) {
-            Nimble_Manager()->site_template_options = $site_template_options;
-        }
-    }
-    return is_array( $site_template_options ) ? $site_template_options : [];
-}
-
-
-function sek_get_site_tmpl_for_skope( $group_skope = null ) {
-    if ( is_null($group_skope) || !is_string($group_skope) || empty($group_skope) )
-        return;
-    $site_tmpl = null;
-    $opts = sek_get_site_tmpl_options();
-
-    //sek_error_log('site_templates options ?', $opts );
-
-    if ( is_array( $opts) && !empty( $opts['site_templates']) && is_array( $opts['site_templates'] ) ) {
-        if ( !empty( $opts['site_templates'][$group_skope] ) && '_no_site_tmpl_' != $opts['site_templates'][$group_skope] ) {
-            $site_tmpl = $opts['site_templates'][$group_skope];
-        }
-    }
-    return $site_tmpl;
-}
-
-
 
 
 // // @see _1_6_5_sektions_generate_UI_site_tmpl_options.js
