@@ -7,41 +7,16 @@
 /* ------------------------------------------------------------------------- *
  *  SITE TEMPLATES OPTIONS HELPERS
 /* ------------------------------------------------------------------------- */
-// @param $option_name = string
-// 'nimble_front_classes_ready' is fired when Nimble_Manager() is instanciated
-function sek_get_site_tmpl_options( $option_name = '' ) {
-    // if ( empty($option_name) ) {
-    //     sek_error_log( __FUNCTION__ . ' => invalid option name' );
-    //     return array();
-    // }
-    if ( !skp_is_customizing() && did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->site_template_options ) {
-        $site_template_options = Nimble_Manager()->site_template_options;
-    } else {
-        $site_template_options = get_option( NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS );
-        //sek_error_log(' SOOO OPTIONS ?', $site_template_options );
-        // cache when nimble is ready
-        // this hook is fired when Nimble_Manager() is instanciated
-        // never cache when doing ajax
-        if ( did_action('nimble_front_classes_ready') && !defined('DOING_AJAX') ) {
-            Nimble_Manager()->site_template_options = $site_template_options;
-        }
-    }
-    return is_array( $site_template_options ) ? $site_template_options : [];
-}
-
-
 function sek_get_site_tmpl_for_skope( $group_skope = null ) {
     if ( is_null($group_skope) || !is_string($group_skope) || empty($group_skope) )
         return;
     $site_tmpl = null;
-    $opts = sek_get_site_tmpl_options();
+    $opts = sek_get_global_option_value( 'site_templates' );
 
     //sek_error_log('site_templates options ?', $opts );
 
-    if ( is_array( $opts) && !empty( $opts['site_templates']) && is_array( $opts['site_templates'] ) ) {
-        if ( !empty( $opts['site_templates'][$group_skope] ) && '_no_site_tmpl_' != $opts['site_templates'][$group_skope] ) {
-            $site_tmpl = $opts['site_templates'][$group_skope];
-        }
+    if ( is_array( $opts) && !empty( $opts[$group_skope] ) && '_no_site_tmpl_' != $opts[$group_skope] ) {
+        $site_tmpl = $opts[$group_skope];
     }
     return $site_tmpl;
 }
@@ -55,7 +30,7 @@ add_filter( 'nb_set_skope_id_before_generating_local_front_css', function( $skop
     if ( !sek_local_skope_has_nimble_sections( $skope_id ) ) {
         $group_skope = skp_get_skope_id( 'group' );
         $tmpl_post_name = sek_get_site_tmpl_for_skope( $group_skope );
-        sek_error_log('group skope id for CSS GENERATION ?', $group_skope );
+        //sek_error_log('group skope id for CSS GENERATION ?', $group_skope );
         //sek_error_log('SITE template for skope ' . $group_skope . ' => ' . $tmpl_post_name );
 
         if ( !is_null( $tmpl_post_name ) && is_string( $tmpl_post_name ) ) {
@@ -134,5 +109,11 @@ function sek_maybe_get_seks_for_group_site_template( $group_skope = null ) {
 
     return $seks_data;      
 }
+
+// Action declared in class Nimble_Options_Setting
+add_action('nb_on_customizer_global_options_update', function( $opt_name, $value ) {
+    sek_error_log('on nb_on_customizer_global_options_update => CURRENT OPTION VAL ?' . $opt_name , get_option( $opt_name ) );
+    sek_error_log('on nb_on_customizer_global_options_update => NEW OPTION VAL ?' . $opt_name , $value );
+}, 10, 2);
 
 ?>
