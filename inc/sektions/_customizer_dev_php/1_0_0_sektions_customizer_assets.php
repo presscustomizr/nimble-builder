@@ -135,11 +135,9 @@ function sek_enqueue_controls_js_css() {
 
                 'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'nimble___'
                 'optNameForGlobalOptions' => NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS,//'nimble___'
-                'optNameForSiteTmplOptions' => NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS,// nimble_site_templates
                 'prefixForSettingsNotSaved' => NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED,//"__nimble__"
 
                 'globalOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ),// 'nimble_global_opts'
-                'siteTmplOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ),// 'nimble_site_templates
 
                 // Feb 2021, for #478
                 'isSiteTemplateEnabled' => sek_is_site_tmpl_enabled(),

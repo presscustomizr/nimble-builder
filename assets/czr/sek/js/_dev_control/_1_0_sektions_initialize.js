@@ -623,20 +623,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         type : 'option'
                   });
 
-                  // SITE TEMPLATE OPTIONS SETTING
-                  // Will Be updated in ::generateUIforGlobalOptions()
-                  // has no control.
-                  api.CZR_Helpers.register( {
-                        origin : 'nimble',
-                        //level : params.level,
-                        what : 'setting',
-                        id : sektionsLocalizedData.optNameForSiteTmplOptions,
-                        dirty : false,
-                        value : sektionsLocalizedData.siteTmplOptionDBValues,
-                        transport : 'postMessage',//'refresh',//// ,
-                        type : 'option'
-                  });
-
                   // CONTENT PICKER SECTION
                   api.CZR_Helpers.register({
                         origin : 'nimble',

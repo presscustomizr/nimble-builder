@@ -34,7 +34,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
             // - sektion collections ( local and global skope )
             // - global options
             // - site template options
-            if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ) ) {
+            if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) ) {
                 //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',
@@ -64,7 +64,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         function set_dyn_setting_class( $class, $setting_id, $args ) {
             //sek_error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
             // Setting class for NB global options and Site Template options
-            if ( 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ) ) {
+            if ( 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) ) {
                 return '\Nimble\Nimble_Options_Setting';
             }
             
