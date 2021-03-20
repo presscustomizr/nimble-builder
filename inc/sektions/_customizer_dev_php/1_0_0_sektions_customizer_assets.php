@@ -179,7 +179,6 @@ function sek_enqueue_controls_js_css() {
 
                 'globalOptionsMap' => SEK_Front_Construct::$global_options_map,
                 'localOptionsMap' => SEK_Front_Construct::$local_options_map,
-                'siteTmplOptionsMap' => SEK_Front_Construct::$site_tmpl_options_map,
 
                 'registeredLocations' => sek_get_locations(),
                 // added for the module tree #359
@@ -710,7 +709,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
 
         if ( 'group' == $skp_data['skope'] ) {
             // FEB 2021 => Group site template. #478
-            if ( defined('NIMBLE_SITE_TEMPLATES_ENABLED') && NIMBLE_SITE_TEMPLATES_ENABLED ) {
+            if ( sek_is_site_tmpl_enabled() ) {
                 $group_skope_id = skp_get_skope_id( 'group' );
                 $seks_data = sek_maybe_get_seks_for_group_site_template($group_skope_id );
                 // Feb 2021 added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791

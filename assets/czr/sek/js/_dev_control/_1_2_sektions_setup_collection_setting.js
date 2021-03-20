@@ -326,7 +326,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               group_skope_id = api.czr_skopeBase.getSkopeProperty( 'skope_id' ,'group'),
                               group_skope_sektions = api.czr_skopeBase.getSkopeProperty( 'group_sektions' ,'group');
                         
-                        console.log('ALORS ?', site_tmpl_opts, group_skope_id, group_skope_sektions );
+                        console.log('ALORS SITE TMPL ?', site_tmpl_opts, group_skope_id, group_skope_sektions );
 
                         // FEB 2021 => TEST FOR ALL PAGE SKOPE
                         if ( _.isObject( site_tmpl_opts ) && site_tmpl_opts.site_templates && _.isObject( site_tmpl_opts.site_templates ) && site_tmpl_opts.site_templates.pages ) {

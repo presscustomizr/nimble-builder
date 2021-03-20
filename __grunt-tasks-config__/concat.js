@@ -250,7 +250,6 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_3_sektions_generate_UI_level_options_modules.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_4_sektions_generate_UI_local_skope_options.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_5_sektions_generate_UI_global_options.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/_1_6_6_sektions_generate_UI_site_tmpl_options.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_7_0_sektions_update_API_setting.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/_1_7_1_sektions_update_API_setting_SECTIONS.js',
@@ -332,8 +331,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_7_UI_global_reset.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_8_UI_global_imp_exp.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_1_9_UI_global_beta_features.js',
-
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_4_site_tmpl/_9_2_0_UI_site_tmpl_pickers.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_3_global/_9_2_0_UI_site_tmpl_pickers.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_0_FRONT_image.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/front/_9_1_1_FRONT_tiny_mce_editor.js',
@@ -484,8 +482,7 @@ module.exports = {
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_7_sek_register_global_imp_exp.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_8_sek_register_global_revisions.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_1_9_sek_register_beta_features.php',
-
-      '<%= paths.sektions %>_front_dev_php/module_registration/ui/_4_site_tmpl/0_0_sek_register_site_tmpl_pickers.php'
+      '<%= paths.sektions %>_front_dev_php/module_registration/ui/_3_global/4_2_0_sek_register_site_tmpl_pickers.php'
     ],
     dest: '<%= paths.sektions %>ccat-sektions-ui-modules.php',
   },

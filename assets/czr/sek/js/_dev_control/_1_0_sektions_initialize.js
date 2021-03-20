@@ -23,9 +23,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // SECTION ID FOR THE CONTENT PICKER
                   self.SECTION_ID_FOR_CONTENT_PICKER = '__content_picker__';
 
-                  // Feb 2021 : site templates
-                  self.SECTION_ID_FOR_SITE_TMPL = '__siteTmplSection';
-
                   // Max possible number of columns in a section
                   self.MAX_NUMBER_OF_COLUMNS = 12;
 
@@ -165,23 +162,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         });
                         
-                        // Generate UI for the site templates
-                        if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
-                              api.section( self.SECTION_ID_FOR_SITE_TMPL, function( _section_ ) {
-                                    _section_.deferred.embedded.done( function() {
-                                          if( true === _section_.siteTmplOptionsGenerated )
-                                          return;
-                                          // Defer the UI generation when the section is expanded
-                                          _section_.siteTmplOptionsGenerated = true;
-                                          _section_.expanded.bind( function( expanded ) {
-                                                if ( true === expanded ) {
-                                                      self.generateUI({ action : 'sek-generate-site-tmpl-options-ui'});
-                                                }
-                                          });
-                                    });
-                              });
-                        }
-
 
                         // The UI of the global option must be generated only once.
                         // We don't want to re-generate on each skope change
@@ -690,67 +670,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                   });
-
-
-                  // Feb 2021, Site templates
-                  if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
-                        api.CZR_Helpers.register({
-                              origin : 'nimble',
-                              what : 'section',
-                              id : self.SECTION_ID_FOR_SITE_TMPL,//<= the section id doesn't need to be skope dependant. Only the control id is skope dependant.
-                              title: sektionsLocalizedData.i18n['Site templates'],
-                              panel : sektionsLocalizedData.sektionsPanelId,
-                              priority : 10,
-                              track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
-                              constructWith : api.Section.extend({
-                                    //attachEvents : function () {},
-                                    // Always make the section active, event if we have no control in it
-                                    isContextuallyActive : function() {
-                                    return this.active();
-                                    },
-                                    _toggleActive : function(){ return true; }
-                              })
-                        }).done( function() {
-                              api.section( self.SECTION_ID_FOR_SITE_TMPL, function( _section_ ) {
-                                    // Style the section title
-                                    var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
-                                    $panelTitleEl = _section_.container.find('.customize-section-title h3');
-
-                                    // The default title looks like this : Title <span class="screen-reader-text">Press return or enter to open this section</span>
-                                    if ( 0 < $sectionTitleEl.length ) {
-                                          $sectionTitleEl.prepend( '<i class="fas fa-map-marker-alt sek-level-option-icon"></i>' );
-                                    }
-
-                                    // The default title looks like this : <span class="customize-action">Customizing</span> Title
-                                    if ( 0 < $panelTitleEl.length ) {
-                                          $panelTitleEl.find('.customize-action').after( '<i class="fas fa-map-marker-alt sek-level-option-icon"></i>' );
-                                    }
-
-                                    // Schedule the accordion behaviour
-                                    self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
-
-                                    // FORCE PREVIEW URL TO HOME WHEN PICKING SITE TEMPLATES
-                                    // when picking site templates, make sure the preview loads home page
-                                    // => otherwise, for example if a page site template is applied to a page with no local sections, which is currently being previewed, the site template sections will be set as the local setting value, and therefore published as local sections, which we don't want.
-                                    var _doThingsAfterRefresh = function() {
-                                          setTimeout( function() {
-                                                _section_.expanded(true);
-                                                var _ctrl_ = _.first( _section_.controls() );
-                                                if ( _ctrl_ && _ctrl_.id ) {
-                                                      api.control( _ctrl_.id ).container.find('.customize-control-title').trigger('click');
-                                                }
-                                          }, 500 );
-                                         
-                                          api.czr_currentSkopesCollection.unbind( _doThingsAfterRefresh );
-                                    };
-                                    _section_.container.find('.accordion-section-title').first().on('click', function() {
-                                          api.czr_currentSkopesCollection.bind( _doThingsAfterRefresh );
-                                          api.previewer.previewUrl( api.settings.url.home );
-                                    });
-                              });
-                        });
-                  }//isSiteTemplateEnabled
-
             },//registerAndSetupDefaultPanelSectionOptions()
 
 

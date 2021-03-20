@@ -63,6 +63,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // option key as saved in db => module_type
         // is used in _1_6_5_sektions_generate_UI_global_options.js and when normalizing the global option in sek_normalize_global_options_with_defaults()
         public static $global_options_map = [
+            'site_templates' => 'sek_site_tmpl_pickers',
             'global_text' => 'sek_global_text',
             'widths' => 'sek_global_widths',
             'breakpoint' => 'sek_global_breakpoint',
@@ -85,11 +86,6 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             'local_reset' => 'sek_local_reset',
             'import_export' => 'sek_local_imp_exp',
             'local_revisions' => 'sek_local_revisions'
-        ];
-
-        // is used in _1_6_6_sektions_generate_UI_site_tmpl_options.js
-        public static $site_tmpl_options_map = [
-            'site_templates' => 'sek_site_tmpl_pickers'
         ];
 
         // introduced when implementing import/export feature
