@@ -17,13 +17,14 @@ final class Nimble_Options_Setting extends \WP_Customize_Setting {
   public function __construct( $manager, $id, $args = array() ) {
     parent::__construct( $manager, $id, $args );
     // Make sure NB doesn't override the wrong setting
-    if ( 0 !== strpos( $this->id_data['base'], NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) && 0 !== strpos( $this->id_data['base'],  NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ) ) {
+    if ( 0 !== strpos( $this->id_data['base'], NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) ) {
         throw new \Exception( 'Nimble_Options_Customizer_Setting => __construct => invalid ID base' );
     }
   }
 
   // March 2021 => set autoload to "no" for #799
   public function update( $value ) {
+    do_action('nb_on_customizer_global_options_update', $this->id_data['base'], $value );
     update_option( $this->id_data['base'], $value, 'no' );
   }
 }
