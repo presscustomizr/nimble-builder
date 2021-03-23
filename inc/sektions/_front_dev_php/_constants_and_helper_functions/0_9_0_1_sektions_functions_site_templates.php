@@ -67,47 +67,73 @@ function sek_maybe_get_seks_for_group_site_template( $seks_data ) {
     if ( is_null( $tmpl_post_name ) || !is_string( $tmpl_post_name ) )
         return $seks_data;
 
+    // $seks_data = [];
+    // if ( skp_is_customizing() ) {
+    //     $current_tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
+    //     if ( $current_tmpl_post ) {
+    //         $current_tmpl_data = maybe_unserialize( $current_tmpl_post->post_content );
+    //         if ( is_array($current_tmpl_data) && isset($current_tmpl_data['data']) && is_array($current_tmpl_data['data']) && !empty($current_tmpl_data['data']) ) {
+    //             $current_tmpl_data = $current_tmpl_data['data'];
+    //             $current_tmpl_data = sek_set_ids( $current_tmpl_data );
+    //             //sek_error_log( 'CUSTOMIZING SEKS DATA FROM TEMPLATE => ' . $tmpl_post_name );
+    //             $seks_data = $current_tmpl_data;
+    //         }
+    //     }
+    // } else {
+    //     // Is this group template already saved ?
+    //     // For example, for pages, there should be a nimble CPT post named nimble___skp__all_page
+    //     $post = sek_get_seks_post( $group_skope );
+
+    //     //sek_error_log('POST ??' . $tmpl_post_name, $post );
+    //     // if not, let's insert it
+    //     if ( !$post ) {
+    //         $current_tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
+    //         if ( $current_tmpl_post ) {
+    //             //sek_error_log( 'TEMPLATE POST ?', $current_tmpl_post );
+    //             $current_tmpl_data = maybe_unserialize( $current_tmpl_post->post_content );
+    //             if ( is_array($current_tmpl_data) && isset($current_tmpl_data['data']) && is_array($current_tmpl_data['data']) && !empty($current_tmpl_data['data']) ) {
+    //                 $current_tmpl_data = $current_tmpl_data['data'];
+    //                 //sek_error_log( 'current_tmpl_data ?', $current_tmpl_data );
+    //                 $current_tmpl_data = sek_set_ids( $current_tmpl_data );
+    //                 sek_error_log( 'sek_update_sek_post => ' . $tmpl_post_name );
+    //                 $post = sek_update_sek_post( $current_tmpl_data, [ 'skope_id' => $group_skope ]);
+    //                 //sek_error_log('POST DATA ?', maybe_unserialize( $post->post_content ) );
+                
+    //             }
+    //         }
+    //     }
+        
+    //     if ( $post ) {
+    //         $seks_data = maybe_unserialize( $post->post_content );
+    //     }
+    // }
+
     $seks_data = [];
-    if ( skp_is_customizing() ) {
+    // Is this group template already saved ?
+    // For example, for pages, there should be a nimble CPT post named nimble___skp__all_page
+    $post = sek_get_seks_post( $group_skope );
+
+    //sek_error_log('POST ??' . $tmpl_post_name, $post );
+    // if not, let's insert it
+    if ( !$post ) {
         $current_tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
         if ( $current_tmpl_post ) {
+            //sek_error_log( 'TEMPLATE POST ?', $current_tmpl_post );
             $current_tmpl_data = maybe_unserialize( $current_tmpl_post->post_content );
             if ( is_array($current_tmpl_data) && isset($current_tmpl_data['data']) && is_array($current_tmpl_data['data']) && !empty($current_tmpl_data['data']) ) {
                 $current_tmpl_data = $current_tmpl_data['data'];
+                //sek_error_log( 'current_tmpl_data ?', $current_tmpl_data );
                 $current_tmpl_data = sek_set_ids( $current_tmpl_data );
-                //sek_error_log( 'CUSTOMIZING SEKS DATA FROM TEMPLATE => ' . $tmpl_post_name );
-                $seks_data = $current_tmpl_data;
+                sek_error_log( 'sek_update_sek_post => ' . $tmpl_post_name );
+                $post = sek_update_sek_post( $current_tmpl_data, [ 'skope_id' => $group_skope ]);
+                //sek_error_log('POST DATA ?', maybe_unserialize( $post->post_content ) );
+            
             }
-        }
-    } else {
-        // Is this group template already saved ?
-        // For example, for pages, there should be a nimble CPT post named nimble___skp__all_page
-        $post = sek_get_seks_post( $group_skope );
-
-        sek_error_log('POST ??' . $tmpl_post_name, $post );
-        // if not, let's insert it
-        if ( !$post ) {
-            $current_tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
-            if ( $current_tmpl_post ) {
-                //sek_error_log( 'TEMPLATE POST ?', $current_tmpl_post );
-                $current_tmpl_data = maybe_unserialize( $current_tmpl_post->post_content );
-                if ( is_array($current_tmpl_data) && isset($current_tmpl_data['data']) && is_array($current_tmpl_data['data']) && !empty($current_tmpl_data['data']) ) {
-                    $current_tmpl_data = $current_tmpl_data['data'];
-                    //sek_error_log( 'current_tmpl_data ?', $current_tmpl_data );
-                    $current_tmpl_data = sek_set_ids( $current_tmpl_data );
-                    sek_error_log( 'sek_update_sek_post => ' . $tmpl_post_name );
-                    $post = sek_update_sek_post( $current_tmpl_data, [ 'skope_id' => $group_skope ]);
-                    //sek_error_log('POST DATA ?', maybe_unserialize( $post->post_content ) );
-                
-                }
-            }
-        }
-
-        if ( $post ) {
-            $seks_data = maybe_unserialize( $post->post_content );
         }
     }
-    
+    if ( $post ) {
+        $seks_data = maybe_unserialize( $post->post_content );
+    }
 
     return $seks_data;      
 }

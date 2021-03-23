@@ -169,17 +169,32 @@ final class Nimble_Collection_Setting extends \WP_Customize_Setting {
       if ( !is_array( $seks_collection ) ) {
           $seks_collection = array();
       }
-      // sek_error_log( __CLASS__. ' in update => ' . $this->skope_id );
-      // sek_error_log( __CLASS__. ' $seks_collection' , $seks_collection );
+
 
       if ( empty( $this->skope_id ) || !is_string( $this->skope_id ) ) {
           throw new \Exception( 'Nimble_Collection_Setting => update => invalid skope id' );
       }
 
+      // Added march 2021 for #478
+      if ( sek_is_site_tmpl_enabled() && NIMBLE_GLOBAL_SKOPE_ID !== $this->skope_id ) {
+        if ( array_key_exists( '__inherit_group_skope__', $seks_collection ) && $seks_collection['__inherit_group_skope__'] ) {
+          sek_remove_seks_post( $this->skope_id  );
+          sek_error_log( __CLASS__. ' => NOT SAVING LOCAL SETTING BECAUSE INHERITED FROM GROUP SKOPE + REMOVED SKOPED POST');
+          return;
+        }
+      }
+
+      // Added march 2021 for #478
+      if ( array_key_exists( '__inherit_group_skope__', $seks_collection ) ) {
+          unset( $seks_collection['__inherit_group_skope__'] );
+      }
+      
       $r = sek_update_sek_post( $seks_collection, array(
           'skope_id' => $this->skope_id
-      ) );
-
+      ));
+      //sek_error_log( __CLASS__. ' $_POST' , $_POST );
+      sek_error_log( __CLASS__. ' in update => ' . $this->skope_id );
+      sek_error_log( __CLASS__. ' AFTER $seks_collection' , $seks_collection );
       // Write the local stylesheet
       if ( NIMBLE_GLOBAL_SKOPE_ID !== $this->skope_id ) {
           // Try to write the CSS
@@ -207,7 +222,7 @@ final class Nimble_Collection_Setting extends \WP_Customize_Setting {
       // $seks_options = (int)$post_id;//$r is the post ID
 
       sek_set_nb_post_id_in_index( $this->skope_id, (int)$post_id );
-      // sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => $seks_options', (int)$post_id);
+      sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => $seks_options', (int)$post_id);
 
       return $post_id;
   }

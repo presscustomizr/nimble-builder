@@ -299,6 +299,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           self.updAPISetParams.promise.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
                                           if ( null !== self.validateSettingValue( self.updAPISetParams.newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
+                                                if ( sektionsLocalizedData.isSiteTemplateEnabled && !params.is_global_location ) {
+                                                      console.log('SOOO on setting update ???', self.updAPISetParams.newSetValue );
+                                                      self.updAPISetParams.newSetValue.__inherit_group_skope__ = false;
+                                                }
                                                 api( _collectionSettingId_ )( self.updAPISetParams.newSetValue, params );
                                                 // Add the cloneId to the params when we resolve
                                                 // the cloneId is only needed in the duplication scenarii

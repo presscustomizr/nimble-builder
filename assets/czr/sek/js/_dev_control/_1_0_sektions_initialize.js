@@ -75,10 +75,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Example of use of $_POST['local_skope_id'] => @see sek_get_parent_level_model()
                   // Helps fixing : https://github.com/presscustomizr/nimble-builder/issues/242, for which sek_add_css_rules_for_spacing() couldn't be set for columns margins
                   api.bind( 'save-request-params', function( query ) {
+                        console.log('BEFORE SAVE REQUEST PARAM SET');
                         $.extend( query, {
-                          local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
-                          group_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ),//<= feb 2021, added for #478
-                          active_locations : api.czr_sektions.activeLocations()
+                              local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                              group_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ),//<= feb 2021, added for #478
+                              active_locations : api.czr_sektions.activeLocations(),
+                              inherit_group_template : true
                         });
                   });
 
@@ -441,6 +443,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // April 2020. For https://github.com/presscustomizr/nimble-builder/issues/651
                   self.setupTemplateGallery();
 
+                  // March 2021. For #478. 'czr-new-skopes-synced' is sent by preview on each refresh
+                  api.previewer.bind( 'czr-new-skopes-synced', function( skope_server_data ) {
+                        console.log('SKOPED SYNCED');
+                        var localSektionsData = api.czr_skopeBase.getSkopeProperty( 'sektions', 'local');
+                        if ( sektionsLocalizedData.isDevMode ) {
+                              api.infoLog( '::czr-new-skopes-synced => SEKTIONS DATA ? ', localSektionsData );
+                        }
+                        if ( _.isEmpty( localSektionsData ) ) {
+                              api.errare('::czr-new-skopes-synced => no sektionsData');
+                        }
+                        if ( _.isEmpty( localSektionsData.setting_id ) ) {
+                              api.errare('::czr-new-skopes-synced => missing setting_id');
+                        }
+
+                  });
             },//doSektionThinksOnApiReady
 
 
