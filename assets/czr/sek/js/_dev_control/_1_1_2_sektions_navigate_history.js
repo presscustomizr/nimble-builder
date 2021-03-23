@@ -189,7 +189,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.cleanRegisteredAndLargeSelectInput();//<= normal cleaning
                         // Clean even the level settings
                         // => otherwise the level settings won't be synchronized when regenerating their ui.
-                        self.cleanRegisteredLevelSettingsAfterHistoryNavigation();// setting cleaning
+                        self.cleanRegisteredLevelSettings();// setting cleaning
                   }
 
                   // UPDATE THE HISTORY LOG

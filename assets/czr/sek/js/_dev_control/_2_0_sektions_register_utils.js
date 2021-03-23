@@ -64,6 +64,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             },
 
+
             // This action can be fired after an import, to update the local settings with the imported values
             cleanRegisteredLocalOptionSettings : function() {
                   var self = this,
@@ -85,7 +86,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Keep only the settings for global option, local options, content picker
             // Remove all the other
             // The level ( section, column module ) settings can be identified because they are registered with a level property
-            cleanRegisteredLevelSettingsAfterHistoryNavigation : function() {
+            cleanRegisteredLevelSettings : function() {
                   var self = this,
                       registered = $.extend( true, [], self.registered() || [] );
 
