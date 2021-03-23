@@ -162,9 +162,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       setTimeout( function() {
                                                             api.control( optionData.settingControlId ).focus();
                                                       }, 500 );
-                                                      api.czr_currentSkopesCollection.unbind( _doThingsAfterRefresh );
+                                                      api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                                                 };
-                                                api.czr_currentSkopesCollection.bind( _doThingsAfterRefresh );
+                                                api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                                                 _setting_.bind( function( to ) {
                                                       console.log('REFRESH PREVIEW TO HOME', to );
                                                       api.previewer.previewUrl( api.settings.url.home );
