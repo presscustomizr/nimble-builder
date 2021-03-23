@@ -49,14 +49,6 @@ function sek_get_nb_post_id_from_index( $skope_id ) {
     return $post_id;
 }
 
-// @return int
-function sek_get_index_for_api() {
-    $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);
-    $nb_posts_index = is_array( $nb_posts_index ) ? $nb_posts_index : [];
-    return count( $nb_posts_index );
-}
-
-
 // Associates a skope_id to a NB post id in the NB post index option
 // introduced for #799
 function sek_set_nb_post_id_in_index( $skope_id, $post_id ) {
@@ -65,9 +57,30 @@ function sek_set_nb_post_id_in_index( $skope_id, $post_id ) {
     $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
     $nb_posts_index[$option_name] = (int)$post_id;
     update_option( NIMBLE_OPT_SEKTION_POST_INDEX, $nb_posts_index, 'no');
+    sek_error_log('IN SET INDEX ?', $nb_posts_index );
+}
+
+// Associates a skope_id to a NB post id in the NB post index option
+// introduced for #799
+function sek_remove_nb_post_id_in_index( $skope_id ) {
+    $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);
+    $nb_posts_index = is_array($nb_posts_index) ? $nb_posts_index : [];
+    $option_name = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+    sek_error_log('BEFORE IN REMOVE FROM INDEX AFTER ?', $nb_posts_index );
+    if ( array_key_exists( $option_name, $nb_posts_index ) ) {
+        unset( $nb_posts_index[$option_name] );
+    }
+    sek_error_log('IN REMOVE FROM INDEX AFTER ?', $nb_posts_index );
+    update_option( NIMBLE_OPT_SEKTION_POST_INDEX, $nb_posts_index, 'no');
 }
 
 
+// @return int
+function sek_get_index_for_api() {
+    $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);
+    $nb_posts_index = is_array( $nb_posts_index ) ? $nb_posts_index : [];
+    return count( $nb_posts_index );
+}
 
 /**
  * Fetch the `nimble_post_type` post for a given {skope_id}
@@ -95,7 +108,7 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
 
     $sek_post_query_vars = array(
         'post_type'              => NIMBLE_CPT,
-        'post_status'            => get_post_stati(),
+        'post_status'            => get_post_stati(),//'publish'
         'name'                   => sanitize_title( NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id ),
         'posts_per_page'         => 1,
         'no_found_rows'          => true,
@@ -107,8 +120,12 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
 
     $post = null;
 
+    // First attempt to query the post with its ID stored in the index
+    // If no results or post has been trashed, NB will try to get it with a query by name + update the index of skoped post ids
     $post_id = sek_get_nb_post_id_from_index( $skope_id );
-    
+
+    sek_error_log( __FUNCTION__ . ' post id => ' . $post_id . ' | skope id =>' . $skope_id);
+
     if ( !is_int( $post_id ) ) {
         error_log( 'sek_get_seks_post => post_id !is_int() for options => ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id );
     }
@@ -118,13 +135,16 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
         //error_log( 'sek_get_seks_post => post_id is not valid for options => ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id );
         return;
     }
-
-    if ( is_int( $post_id ) && $post_id > 0 && get_post( $post_id ) ) {
+    
+    if ( is_int( $post_id ) && $post_id > 0 ) {
         $post = get_post( $post_id );
     }
 
+    $no_post_found = !$post && -1 !== $post_id;
+    $post_trashed = !empty($post) && is_object($post) && 'trash' === $post->post_status;
+
     // `-1` indicates no post exists; no query necessary.
-    if ( !$post && -1 !== $post_id ) {
+    if ( $no_post_found || $post_trashed ) {
         $query = new \WP_Query( $sek_post_query_vars );
         $post = $query->post;
         $post_id = $post ? $post->ID : -1;
@@ -238,8 +258,10 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         // - ! global skope
         // - no local skoped sections
         // - a site template is defined for this "group" skope
-        if ( sek_is_site_tmpl_enabled() && !$is_global_skope && !sek_local_skope_has_nimble_sections( $skope_id, $seks_data ) ) {
-            $seks_data = sek_maybe_get_seks_for_group_site_template();
+        if ( 'local' === $skope_level ) {
+            if ( sek_is_site_tmpl_enabled() && !$is_global_skope && !sek_local_skope_has_nimble_sections( $skope_id, $seks_data ) ) {
+                $seks_data = sek_maybe_get_seks_for_group_site_template( $seks_data );
+            }
         }
 
         // normalizes
@@ -255,10 +277,11 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         } else {
             Nimble_Manager()->local_seks = $seks_data;
         }
-
+        //sek_error_log('/////////////////////////// CACHED for skope ' . $skope_id);
     }//end if
 
     if ( skp_is_customizing() ) {
+        //sek_error_log('SEK IS CUSTOMIZING');
         // when customizing, let us filter the value with the 'customized' ones
         $seks_data = apply_filters(
             'sek_get_skoped_seks',
@@ -266,10 +289,17 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             $skope_id,
             $location_id
         );
+
+        if ( sek_is_site_tmpl_enabled() && !$is_global_skope && !sek_local_skope_has_nimble_sections( $skope_id, $seks_data ) ) {
+            $seks_data = sek_maybe_get_seks_for_group_site_template( $seks_data );
+        }
+        $default_collection = sek_get_default_location_model( $skope_id );
+        $seks_data = wp_parse_args( $seks_data, $default_collection );
         // Maybe add missing registered locations when customizing
         // December 2020 => needed when importing an entire template
         $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
 
+        
         // if ( !$is_global_skope ) {
         //     $seks_data  = apply_filters( 'nb_set_local_collection_before_caching', $seks_data, $skope_id );
         // }
@@ -284,6 +314,8 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             $seks_data = sek_get_level_model( $location_id, $seks_data['collection'] );
         }
     }
+
+    //sek_error_log( __FUNCTION__ . ' THEERE !');
 
     return 'no_match' === $seks_data ? Nimble_Manager()->default_location_model : $seks_data;
 }
@@ -359,6 +391,7 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
         $post_data['ID'] = $post->ID;
         $r = wp_update_post( wp_slash( $post_data ), true );
     } else {
+        sek_error_log('IINSERT NEW POST ', $post_title );
         $r = wp_insert_post( wp_slash( $post_data ), true );
         if ( !is_wp_error( $r ) ) {
             $post_id = $r;//$r is the post ID
@@ -376,6 +409,42 @@ function sek_update_sek_post( $seks_data, $args = array() ) {
         return $r;
     }
     return get_post( $r );
+}
+
+// Introduced March 2021 for #478
+function sek_remove_seks_post( $skope_id = null ) {
+    if ( is_null( $skope_id ) || empty( $skope_id ) ) {
+        sek_error_log( __FUNCTION__  . ' => error => empty skope_id' );
+        return new \WP_Error( 'sek_update_sek_post => empty skope_id');
+    }
+
+    //$post_title = NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id;
+    $tmpl_post_to_remove = sek_get_seks_post( $skope_id );
+
+    sek_error_log( __FUNCTION__ . ' => so $tmpl_post_to_remove => ' . $skope_id, $tmpl_post_to_remove );
+    // Remove the associated post id in the skope index
+    sek_remove_nb_post_id_in_index( $skope_id );
+
+    // Remove the post in DB
+    if ( $tmpl_post_to_remove && is_object( $tmpl_post_to_remove ) ) {
+        // the CPT is permanently deleted instead of moved to Trash when using wp_trash_post()
+        $r = wp_delete_post( $tmpl_post_to_remove->ID );
+        if ( is_wp_error( $r ) ) {
+            sek_error_log( __FUNCTION__ . '=> _removal_error' );
+        } else {
+            sek_error_log( __FUNCTION__ . '=> _removal_success' );
+        }
+    } else {
+        sek_error_log( __FUNCTION__ . '=> _tmpl_post_not_found' );
+    }
+
+    // Remove the corresponding stylesheet
+    $css_handler_instance = new Sek_Dyn_CSS_Handler( array(
+        'id'             => $skope_id,
+        'skope_id'       => $skope_id,
+        'mode'           => 'delete'
+    ));
+    $css_handler_instance->sek_dyn_css_delete_file();
 }
 
 ?>
