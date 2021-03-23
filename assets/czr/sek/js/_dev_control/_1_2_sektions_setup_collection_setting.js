@@ -26,6 +26,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // => register it and bind it
                         // => ensure that it will be bound only once, because the setting are never unregistered
                         if ( ! api.has( settingData.collectionSettingId ) ) {
+                              console.log('REGISTER SETTING NOW => ' + localOrGlobal, settingData.collectionSettingId );
                               var __collectionSettingInstance__ = api.CZR_Helpers.register({
                                     what : 'setting',
                                     id : settingData.collectionSettingId,
@@ -36,7 +37,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     origin : 'nimble'
                               });
 
-
+                              console.log('SETTING VAL ?' + settingData.collectionSettingId , api( settingData.collectionSettingId )() );
                               //if ( sektionsLocalizedData.isDevMode ) {}
                               api( settingData.collectionSettingId, function( sektionSetInstance ) {
 
@@ -339,7 +340,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //       }
                         // }
                   }
-
                   return $.extend( true, {}, self.getDefaultSektionSettingValue( scope ) );
             }
       });//$.extend()
