@@ -158,15 +158,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // Added March 2021 for #478
                                           if ( 'site_templates' === optionType ) {
                                                 var _doThingsAfterRefresh = function() {
-                                                      console.log('DO THINGS AFTER REFRESH');
+                                                      console.log('DO THINGS AFTER REFRESH', api.control( optionData.settingControlId ) );
                                                       setTimeout( function() {
                                                             api.control( optionData.settingControlId ).focus();
                                                       }, 500 );
                                                       api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                                                 };
-                                                api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
+                                                
                                                 _setting_.bind( function( to ) {
                                                       console.log('REFRESH PREVIEW TO HOME', to );
+                                                      api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                                                       api.previewer.previewUrl( api.settings.url.home );
                                                 });
                                           }
