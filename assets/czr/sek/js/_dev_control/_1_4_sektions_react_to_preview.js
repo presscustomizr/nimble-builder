@@ -753,32 +753,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },
 
 
-                            // RESET
-                            'sek-reset-collection' : {
-                                  callback : function( params ) {
-                                        sendToPreview = false;//<= when the level is refreshed when complete, we don't need to send to preview.
-                                        uiParams = {};
-                                        apiParams = params;
-                                        apiParams.action = 'sek-reset-collection';
-                                        apiParams.scope = params.scope;
-                                        return self.updateAPISetting( apiParams );
-                                  },
-                                  complete : function( params ) {
-                                        api.previewer.refresh();
-                                        api.previewer.trigger('sek-notify', {
-                                              notif_id : 'reset-success',
-                                              type : 'success',
-                                              duration : 8000,
-                                              message : [
-                                                    '<span>',
-                                                      '<strong>',
-                                                      sektionsLocalizedData.i18n['Reset complete'],
-                                                      '</strong>',
-                                                    '</span>'
-                                              ].join('')
-                                        });
-                                  }
-                            },
+                              // RESET
+                              'sek-reset-collection' : {
+                                    callback : function( params ) {
+                                          sendToPreview = false;//<= when the level is refreshed when complete, we don't need to send to preview.
+                                          uiParams = {};
+                                          apiParams = params;
+                                          apiParams.action = 'sek-reset-collection';
+                                          apiParams.scope = params.scope;
+                                          return self.updateAPISetting( apiParams );
+                                    },
+                                    complete : function( params ) {
+                                          // api.previewer.refresh();
+                                          // api.previewer.trigger('sek-notify', {
+                                          //       notif_id : 'reset-success',
+                                          //       type : 'success',
+                                          //       duration : 8000,
+                                          //       message : [
+                                          //             '<span>',
+                                          //                   '<strong>',
+                                          //                   sektionsLocalizedData.i18n['Reset complete'],
+                                          //                   '</strong>',
+                                          //             '</span>'
+                                          //       ].join('')
+                                          // });
+                                    }
+                              },
                       };//msgCollection
 
                   // Schedule the reactions
