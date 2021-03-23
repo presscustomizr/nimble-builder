@@ -36,7 +36,7 @@ function sek_local_skope_has_nimble_sections( $skope_id = '', $seks_data = null 
 
     $nb_section_created = 0;
 
-    // When the collection is provided, use it
+    // When the collection is provided, use it otherwise get it
     if ( is_null($seks_data) || !is_array($seks_data) ) {
         $maybe_local_sek_post = sek_get_seks_post( $skope_id, 'local' );
         if ( is_object($maybe_local_sek_post) ) {
