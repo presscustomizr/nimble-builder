@@ -280,71 +280,74 @@ class Sek_Dyn_CSS_Handler {
         //build no parameterized properties
         $this->_sek_dyn_css_set_properties();
 
-        // Possible scenarii :
-        // 1) customizing :
-        //    the css is always printed inline. If there's already an existing css file for this skope_id, it's not enqueued.
-        // 2) saving in the customizer :
-        //    the css file is written in a "force_rewrite" mode, meaning that any existing css file gets re-written.
-        //    There's no enqueing scheduled, 'customizer_save' mode.
-        // 3) front, user logged in + 'customize' capabilities :
-        //    the css file is re-written on each page load + enqueued. If writing a css file is not possible, we fallback on inline printing.
-        // 4) front, user not logged in :
-        //    the default behavior is that the css file is enqueued.
-        //    It should have been written when saving in the customizer. If no file available, we try to write it. If writing a css file is not possible, we fallback on inline printing.
-        if ( is_customize_preview() || !$this->_sek_dyn_css_file_exists_is_readable_and_has_content() || $this->force_rewrite || $this->customizer_save ) {
-            $this->sek_model = sek_get_skoped_seks( $this->skope_id );
+        // Introduced March 2021 for #478
+        if ( 'delete' !==  $this->mode ) {
+            // Possible scenarii :
+            // 1) customizing :
+            //    the css is always printed inline. If there's already an existing css file for this skope_id, it's not enqueued.
+            // 2) saving in the customizer :
+            //    the css file is written in a "force_rewrite" mode, meaning that any existing css file gets re-written.
+            //    There's no enqueing scheduled, 'customizer_save' mode.
+            // 3) front, user logged in + 'customize' capabilities :
+            //    the css file is re-written on each page load + enqueued. If writing a css file is not possible, we fallback on inline printing.
+            // 4) front, user not logged in :
+            //    the default behavior is that the css file is enqueued.
+            //    It should have been written when saving in the customizer. If no file available, we try to write it. If writing a css file is not possible, we fallback on inline printing.
+            if ( is_customize_preview() || !$this->_sek_dyn_css_file_exists_is_readable_and_has_content() || $this->force_rewrite || $this->customizer_save ) {
+                $this->sek_model = sek_get_skoped_seks( $this->skope_id );
 
-            //  on front, when no stylesheet is available, the fallback hook must be set to wp_head, because the hook property might be empty
-            // fixes https://github.com/presscustomizr/nimble-builder/issues/328
-            if ( !is_customize_preview() && !$this->_sek_dyn_css_file_exists_is_readable_and_has_content() ) {
-                $this->hook = 'wp_head';
+                //  on front, when no stylesheet is available, the fallback hook must be set to wp_head, because the hook property might be empty
+                // fixes https://github.com/presscustomizr/nimble-builder/issues/328
+                if ( !is_customize_preview() && !$this->_sek_dyn_css_file_exists_is_readable_and_has_content() ) {
+                    $this->hook = 'wp_head';
+                }
+
+                //build stylesheet
+                $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model, $this->is_global_stylesheet );
+
+                // now that the stylesheet is ready let's cache it
+                $this->css_string_to_enqueue_or_print = (string)$this->builder->get_stylesheet();
             }
 
-            //build stylesheet
-            $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model, $this->is_global_stylesheet );
+            // Do we have any rules to print / enqueue ?
+            // If yes, print in the dom or enqueue depending on the current context ( customization or front )
+            // If not, delete any previouly created stylesheet
 
-            // now that the stylesheet is ready let's cache it
-            $this->css_string_to_enqueue_or_print = (string)$this->builder->get_stylesheet();
-        }
-
-        // Do we have any rules to print / enqueue ?
-        // If yes, print in the dom or enqueue depending on the current context ( customization or front )
-        // If not, delete any previouly created stylesheet
-
-        //hook setup for printing or enqueuing
-        //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Collection_Setting::update()
-        if ( !$this->customizer_save ) {
-            // when not customizing, we write and enqueue :
-            // - if the file already exists,
-            // - or if we just have generated the CSS because the file had been deleted
-            if ( !empty($this->css_string_to_enqueue_or_print) || $this->_sek_dyn_css_file_exists_is_readable_and_has_content() ) {
-                $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
+            //hook setup for printing or enqueuing
+            //bail if "customizer_save" == true, typically when saving the customizer settings @see Nimble_Collection_Setting::update()
+            if ( !$this->customizer_save ) {
+                // when not customizing, we write and enqueue :
+                // - if the file already exists,
+                // - or if we just have generated the CSS because the file had been deleted
+                if ( !empty($this->css_string_to_enqueue_or_print) || $this->_sek_dyn_css_file_exists_is_readable_and_has_content() ) {
+                    $this->_schedule_css_and_fonts_enqueuing_or_printing_maybe_on_custom_hook();
+                } else {
+                    $this->sek_dyn_css_delete_file_if_empty();
+                }
             } else {
-                $this->sek_dyn_css_delete_file_if_empty();
+                //sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' ?? => $this->css_string_to_enqueue_or_print => ', $this->css_string_to_enqueue_or_print );
+                if ( !empty($this->css_string_to_enqueue_or_print) ) {
+                    $this->sek_dyn_css_maybe_write_css_file();
+                } else {
+                    // When customizing, the stylesheet is always generated.
+                    // So if it is empty, it means we have to delete it
+                    $this->sek_dyn_css_delete_file();
+                }
             }
-        } else {
-            //sek_error_log( __CLASS__ . '::' . __FUNCTION__ .' ?? => $this->css_string_to_enqueue_or_print => ', $this->css_string_to_enqueue_or_print );
-            if ( !empty($this->css_string_to_enqueue_or_print) ) {
-                $this->sek_dyn_css_maybe_write_css_file();
-            } else {
-                // When customizing, the stylesheet is always generated.
-                // So if it is empty, it means we have to delete it
-                $this->sek_dyn_css_delete_file();
-            }
-        }
 
-        // Maybe update global inline style now with a filter
-        // This CSS is the one generated by global options like global text, global width, global breakpoint
-        // It is printed @wp_head inline
-        // for better performances on front, NB only wants to re-generate this style when customizing, and we user is logged in ( force_rewrite )
-        // see https://github.com/presscustomizr/nimble-builder/issues/750
-        if ( $this->is_global_stylesheet ) {
-            if ( is_customize_preview() || $this->force_rewrite || $this->customizer_save ) {
-                $global_style = Nimble_Manager()->sek_build_global_options_inline_css();
-                //sek_error_log('SOO GLOBAL INLINE CSS?', $global_style );
-                update_option( NIMBLE_OPT_FOR_GLOBAL_CSS, $global_style, 'no' );
+            // Maybe update global inline style now with a filter
+            // This CSS is the one generated by global options like global text, global width, global breakpoint
+            // It is printed @wp_head inline
+            // for better performances on front, NB only wants to re-generate this style when customizing, and we user is logged in ( force_rewrite )
+            // see https://github.com/presscustomizr/nimble-builder/issues/750
+            if ( $this->is_global_stylesheet ) {
+                if ( is_customize_preview() || $this->force_rewrite || $this->customizer_save ) {
+                    $global_style = Nimble_Manager()->sek_build_global_options_inline_css();
+                    //sek_error_log('SOO GLOBAL INLINE CSS?', $global_style );
+                    update_option( NIMBLE_OPT_FOR_GLOBAL_CSS, $global_style, 'no' );
+                }
             }
-        }
+        }//if 'delete' !==  $this->mode
     }//__construct
 
 
@@ -602,6 +605,7 @@ class Sek_Dyn_CSS_Handler {
         global $wp_filesystem;
         if ( $this->file_exists ) {
             $this->file_exists != $wp_filesystem->delete( $this->uri );
+            sek_error_log('CSS HANDLER => REMOVE FILE => ' . $this->uri);
             return !$this->file_exists;
         }
         return !$this->file_exists;
@@ -654,6 +658,7 @@ class Sek_Dyn_CSS_Handler {
         if ( !isset( $this->base_uri ) ) {
             $this->_sek_dyn_css_build_base_uri();
         }
+        sek_error_log('///////////////////ALORS CSS FILE NAME ??', $this->id );
         return wp_normalize_path( trailingslashit( $this->base_uri ) . "{$this->id}.css" );
     }
 
