@@ -155,6 +155,22 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // They need to be kept in order to keep track of the changes in the customizer.
                                     // => that's why we check if ! api.has( ... )
                                     api( optionData.settingControlId, function( _setting_ ) {
+                                          // Added March 2021 for #478
+                                          if ( 'site_templates' === optionType ) {
+                                                var _doThingsAfterRefresh = function() {
+                                                      console.log('DO THINGS AFTER REFRESH');
+                                                      setTimeout( function() {
+                                                            api.control( optionData.settingControlId ).focus();
+                                                      }, 500 );
+                                                      api.czr_currentSkopesCollection.unbind( _doThingsAfterRefresh );
+                                                };
+                                                api.czr_currentSkopesCollection.bind( _doThingsAfterRefresh );
+                                                _setting_.bind( function( to ) {
+                                                      console.log('REFRESH PREVIEW TO HOME', to );
+                                                      api.previewer.previewUrl( api.settings.url.home );
+                                                });
+                                          }
+
                                           _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
 
