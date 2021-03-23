@@ -212,7 +212,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       args : args
                                                 }
                                           }); } catch( er ) {
-                                                api.errare( '::generateUIforLevelOptions => Error in updateAPISettingAndExecutePreviewActions', er );
+                                                api.errare( '::_do_register_ => Error in updateAPISettingAndExecutePreviewActions', er );
                                           }
                                     };
 
