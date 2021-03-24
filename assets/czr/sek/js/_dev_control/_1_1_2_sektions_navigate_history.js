@@ -135,12 +135,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   // set the new setting Value
-                  if( ! _.isUndefined( newSettingValue ) ) {
-                        if ( ! _.isEmpty( newSettingValue.local ) ) {
+                  if( !_.isUndefined( newSettingValue ) ) {
+                        if ( !_.isEmpty( newSettingValue.local ) ) {
                               api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue.local, 'local' ), { navigatingHistoryLogs : true } );
 
                               // Clean and regenerate the local option setting
-                              // Note that we also do it after a local import.
+                              // Note that we also do it after a local import, tmpl injection or local reset
                               //
                               // Settings are normally registered once and never cleaned, unlike controls.
                               // Updating the setting value will refresh the sections
@@ -151,10 +151,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // __nimble__skp__home__localSkopeOptions__custom_css
                               api.czr_sektions.generateUI({
                                     action : 'sek-generate-local-skope-options-ui',
-                                    clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
+                                    clean_settings_and_controls_first : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
                               });
                         }
-                        if ( ! _.isEmpty( newSettingValue.global ) ) {
+                        if ( !_.isEmpty( newSettingValue.global ) ) {
                               api( self.getGlobalSectionsSettingId() )( self.validateSettingValue( newSettingValue.global, 'global' ), { navigatingHistoryLogs : true } );
                         }
                         // If the information is available, refresh only the relevant sections

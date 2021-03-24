@@ -116,7 +116,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       authorized_local_option_groups = ['collection', 'local_options', 'fonts' ];
                   
                   if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
-                        authorized_local_option_groups.push('__inherit_group_skope__');
+                        authorized_local_option_groups.push('__inherits_group_skope__');
                   }
 
                   // walk the collections tree and verify it passes the various consistency checks

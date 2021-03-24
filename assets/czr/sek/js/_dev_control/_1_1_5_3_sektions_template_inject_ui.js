@@ -208,10 +208,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // After the inject, updating the setting value will refresh the sections
                         // but the local options, persisted in separate settings, won't be updated if the settings are not cleaned
                         if ( 'local' === _scope ) {
-                              api.czr_sektions.generateUI({
-                                    action : 'sek-generate-local-skope-options-ui',
-                                    clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
-                              });
+                              var _doThingsAfterRefresh = function() {
+                                    // Removes and RE-register local settings and controls
+                                    api.czr_sektions.generateUI({
+                                          action : 'sek-generate-local-skope-options-ui',
+                                          clean_settings_and_controls_first : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
+                                    });
+                                    api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
+                              };
+                              // 'czr-new-skopes-synced' is always sent on a previewer.refresh()
+                              api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                         }
 
                         //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );

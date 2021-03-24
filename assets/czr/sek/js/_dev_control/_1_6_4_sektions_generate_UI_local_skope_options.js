@@ -37,9 +37,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   // remove settings when requested
-                  // Happens when importing a file
-                  if ( true === params.clean_settings ) {
-                        self.cleanRegisteredLocalOptionSettings();
+                  // Happens when 
+                  // - importing a file
+                  // - after a local reset
+                  // - after a template injection
+                  // - a history navigation action
+                  if ( true === params.clean_settings_and_controls_first ) {
+                        self.cleanRegisteredLocalOptionSettingsAndControls();
                   }
 
 
@@ -136,7 +140,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   optionTypeValue = _.isObject( currentAllLocalOptionsValue[ optionType ] ) ? currentAllLocalOptionsValue[ optionType ]: {},
                                   initialModuleValues = optionTypeValue;
 
-                              if ( ! api.has( optionData.settingControlId ) ) {
+                              // SETTING
+                              if ( !api.has( optionData.settingControlId ) ) {
                                     var doUpdate = function( to, from, args ) {
                                           try { self.updateAPISettingAndExecutePreviewActions({
                                                 defaultPreviewAction : 'refresh_preview',
@@ -180,49 +185,52 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                               }//if ( ! api.has( optionData.settingControlId ) )
 
-                              api.CZR_Helpers.register({
-                                    origin : 'nimble',
-                                    level : params.level,
-                                    what : 'control',
-                                    id : optionData.settingControlId,
-                                    label : optionData.controlLabel,
-                                    type : 'czr_module',//sekData.controlType,
-                                    module_type : optionData.module_type,
-                                    section : self.SECTION_ID_FOR_LOCAL_OPTIONS,
-                                    priority : 10,
-                                    settings : { default : optionData.settingControlId },
-                                    //track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
-                              }).done( function() {
 
-                                    // if ( true === optionData.expandAndFocusOnInit ) {
-                                    //       api.control( optionData.settingControlId ).focus({
-                                    //             completeCallback : function() {}
-                                    //       });
-                                    // }
+                              // CONTROL
+                              if ( !api.control.has( optionData.settingControlId ) ) {
+                                    api.CZR_Helpers.register({
+                                          origin : 'nimble',
+                                          level : params.level,
+                                          what : 'control',
+                                          id : optionData.settingControlId,
+                                          label : optionData.controlLabel,
+                                          type : 'czr_module',//sekData.controlType,
+                                          module_type : optionData.module_type,
+                                          section : self.SECTION_ID_FOR_LOCAL_OPTIONS,
+                                          priority : 10,
+                                          settings : { default : optionData.settingControlId },
+                                          track : true//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
+                                    }).done( function() {
 
-                                    // Implement the animated arrow markup, and the initial state of the module visibility
-                                    api.control( optionData.settingControlId, function( _control_ ) {
-                                          // Hide the item wrapper
-                                          // @see css
-                                          _control_.container.attr('data-sek-expanded', "false" );
-                                          var $title = _control_.container.find('label > .customize-control-title'),
-                                              _titleContent = $title.html();
-                                          // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
-                                          $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
+                                          // if ( true === optionData.expandAndFocusOnInit ) {
+                                          //       api.control( optionData.settingControlId ).focus({
+                                          //             completeCallback : function() {}
+                                          //       });
+                                          // }
+                                          // Implement the animated arrow markup, and the initial state of the module visibility
+                                          api.control( optionData.settingControlId, function( _control_ ) {
+                                                // Hide the item wrapper
+                                                // @see css
+                                                _control_.container.attr('data-sek-expanded', "false" );
+                                                var $title = _control_.container.find('label > .customize-control-title').first(),
+                                                _titleContent = $title.html();
+                                                // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
+                                                $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
 
-                                          // if this level has an icon, let's prepend it to the title
-                                          if ( ! _.isUndefined( optionData.icon ) ) {
-                                                $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
-                                          }
-                                          // prepend the animated arrow
-                                          $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
-                                          // setup the initial state + initial click
-                                          _control_.container.attr('data-sek-expanded', "false" );
-                                          if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
-                                                $title.trigger('click');
-                                          }
+                                                // if this level has an icon, let's prepend it to the title
+                                                if ( ! _.isUndefined( optionData.icon ) ) {
+                                                      $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
+                                                }
+                                                // prepend the animated arrow
+                                                $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
+                                                // setup the initial state + initial click
+                                                _control_.container.attr('data-sek-expanded', "false" );
+                                                if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
+                                                      $title.trigger('click');
+                                                }
+                                          });
                                     });
-                              });
+                              }
                         });//_.each()
                   };//_do_register()
 

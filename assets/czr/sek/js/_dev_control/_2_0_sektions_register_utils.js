@@ -66,7 +66,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             // This action can be fired after an import, to update the local settings with the imported values
-            cleanRegisteredLocalOptionSettings : function() {
+            cleanRegisteredLocalOptionSettingsAndControls : function() {
                   var self = this,
                       localOptionPrefix = self.getLocalSkopeOptionId(),
                       registered = $.extend( true, [], self.registered() || [] );
@@ -75,6 +75,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // Remove the local setting
                         if ( _reg_.id && -1 !== _reg_.id.indexOf( localOptionPrefix ) && api.has( _reg_.id ) ) {
                                api.remove( _reg_.id );
+                        }
+                        // Remove the local control
+                        if ( _reg_.id && -1 !== _reg_.id.indexOf( localOptionPrefix ) && api.control.has( _reg_.id ) ) {
+                              $.when( api.control( _reg_.id ).container.remove() ).done( function() {
+                                    // remove control, section, panel
+                                    api.control.remove( _reg_.id );
+                              });
                         }
                         // keep only the setting not local
                         return _reg_.id && -1 === _reg_.id.indexOf( localOptionPrefix );
