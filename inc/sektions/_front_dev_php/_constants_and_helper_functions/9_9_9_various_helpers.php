@@ -201,15 +201,26 @@ function sek_get_parent_theme_slug() {
 
 
 function sek_error_log( $title, $content = null ) {
+    // Know in which function sek_error_log() was called
+    $backtrace = debug_backtrace();
+    $content = is_null( $content ) ? '' : $content;
     if ( !sek_is_dev_mode() )
       return;
-    if ( is_null( $content ) ) {
-        error_log( '<' . $title . '>' );
-    } else {
-        error_log( '<' . $title . '>' );
-        error_log( print_r( $content, true ) );
-        error_log( '</' . $title . '>' );
+
+    if ( is_array($backtrace) && isset($backtrace[1]) ) {
+        if ( !empty( $backtrace[1]['file'] ) && !empty( $backtrace[1]['line'] ) ) {
+            $content = $content . "\n ====> " . $backtrace[1]['file'] . '#' . $backtrace[1]['line'];
+        }
+        if ( !empty( $backtrace[1]['class'] ) && !empty( $backtrace[1]['function'] ) ) {
+            $content = $content . "\n ====> " . $backtrace[1]['class'] . '::' . $backtrace[1]['function'];
+        } else if ( !empty( $backtrace[1]['function']) ) {
+            $content = $content . "\n ====> " . $backtrace[1]['function'];
+        }
     }
+
+    error_log( '<' . $title . '>' );
+    error_log( print_r( $content, true ) );
+    error_log( '</' . $title . '>' );
 }
 
 
