@@ -658,7 +658,7 @@ class Sek_Dyn_CSS_Handler {
         if ( !isset( $this->base_uri ) ) {
             $this->_sek_dyn_css_build_base_uri();
         }
-        sek_error_log('///////////////////ALORS CSS FILE NAME ??', $this->id );
+        //sek_error_log('///////////////////ALORS CSS FILE NAME ??', $this->id );
         return wp_normalize_path( trailingslashit( $this->base_uri ) . "{$this->id}.css" );
     }
 

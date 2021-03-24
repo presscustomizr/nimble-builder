@@ -62,7 +62,7 @@ function sek_maybe_get_seks_for_group_site_template( $seks_data ) {
     // For example is skp__all_page assigned to template 'nb_tmpl_nimble-template-loop-start-only'
     $tmpl_post_name = sek_get_site_tmpl_for_skope( $group_skope );
 
-    sek_error_log('SITE template for skope ' . $group_skope . ' => ' . $tmpl_post_name );
+    //sek_error_log('SITE template for skope ' . $group_skope . ' => ' . $tmpl_post_name );
 
     if ( is_null( $tmpl_post_name ) || !is_string( $tmpl_post_name ) )
         return $seks_data;
