@@ -203,24 +203,36 @@ function sek_get_parent_theme_slug() {
 function sek_error_log( $title, $content = null ) {
     // Know in which function sek_error_log() was called
     $backtrace = debug_backtrace();
+    //error_log( print_r( $backtrace, true ) );
     $content = is_null( $content ) ? '' : $content;
     if ( !sek_is_dev_mode() )
       return;
 
+    $btrace = '';
     if ( is_array($backtrace) && isset($backtrace[1]) ) {
         if ( !empty( $backtrace[1]['file'] ) && !empty( $backtrace[1]['line'] ) ) {
-            $content = $content . "\n ====> " . $backtrace[1]['file'] . '#' . $backtrace[1]['line'];
+            $btrace = $btrace . "\n ====> " . $backtrace[1]['file'] . '#' . $backtrace[1]['line'];
         }
         if ( !empty( $backtrace[1]['class'] ) && !empty( $backtrace[1]['function'] ) ) {
-            $content = $content . "\n ====> " . $backtrace[1]['class'] . '::' . $backtrace[1]['function'];
+            $btrace = $btrace . "\n ====> " . $backtrace[1]['class'] . '::' . $backtrace[1]['function'];
         } else if ( !empty( $backtrace[1]['function']) ) {
-            $content = $content . "\n ====> " . $backtrace[1]['function'];
+            $btrace = $btrace . "\n ====> " . $backtrace[1]['function'];
         }
     }
-
-    error_log( '<' . $title . '>' );
-    error_log( print_r( $content, true ) );
-    error_log( '</' . $title . '>' );
+    if ( is_null( $content ) ) {
+        error_log( '<' . $title . '>' );
+        if ( !empty($btrace) ) {
+          error_log( '// backtrace :' . $btrace . '//' );
+        }
+    } else {
+        error_log( '<' . $title . '>' );
+        error_log( print_r( $content, true ) );
+        if ( !empty($btrace) ) {
+          error_log( '// backtrace :' . $btrace . '//' );
+        }
+        error_log( '</' . $title . '>' );
+    }
+    
 }
 
 
