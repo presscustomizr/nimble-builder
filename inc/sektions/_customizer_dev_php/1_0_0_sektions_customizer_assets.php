@@ -707,15 +707,15 @@ function add_sektion_values_to_skope_export( $skopes ) {
 
         if ( 'group' == $skp_data['skope'] ) {
             // FEB 2021 => Group site template. #478
-            if ( sek_is_site_tmpl_enabled() ) {
-                //$group_skope_id = skp_get_skope_id( 'group' );
-                $seks_data = sek_get_skoped_seks( $skope_id, $location_id = '', $skope_level = 'group' );
-                // Feb 2021 added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
-                $seks_data = sek_prepare_seks_data_for_customizer( $seks_data );
-                $skp_data[ 'group_sektions' ] = [
-                  'db_values' => $seks_data,
-                ];
-            }
+            // if ( sek_is_site_tmpl_enabled() ) {
+            //     //$group_skope_id = skp_get_skope_id( 'group' );
+            //     $seks_data = sek_get_skoped_seks( $skope_id, $location_id = '', $skope_level = 'group' );
+            //     // Feb 2021 added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
+            //     $seks_data = sek_prepare_seks_data_for_customizer( $seks_data );
+            //     $skp_data[ 'group_sektions' ] = [
+            //       'db_values' => $seks_data,
+            //     ];
+            // }
             $new_skopes[] = $skp_data;
             continue;
         }
@@ -738,7 +738,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
 
         // March 2021 for #478
         if ( sek_is_site_tmpl_enabled() && 'local' === $skp_data['skope'] ) {
-            $skp_data[ 'sektions' ]['db_values']['__inherit_group_skope__'] = !sek_local_skope_has_nimble_sections( $skope_id ) && !empty( sek_get_site_tmpl_for_skope( skp_get_skope_id( 'group' ) ) );
+            $skp_data[ 'sektions' ]['db_values']['__inherits_group_skope__'] = !sek_local_skope_has_nimble_sections( $skope_id ) && !empty( sek_get_site_tmpl_for_skope( skp_get_skope_id( 'group' ) ) );
             sek_error_log('ALORS ??? ',  !sek_local_skope_has_nimble_sections( $skope_id ) && !empty( sek_get_site_tmpl_for_skope( skp_get_skope_id( 'group' ) ) ) );
         }
 

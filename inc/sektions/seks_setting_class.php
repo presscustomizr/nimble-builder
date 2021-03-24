@@ -177,7 +177,7 @@ final class Nimble_Collection_Setting extends \WP_Customize_Setting {
 
       // Added march 2021 for #478
       if ( sek_is_site_tmpl_enabled() && NIMBLE_GLOBAL_SKOPE_ID !== $this->skope_id ) {
-        if ( array_key_exists( '__inherit_group_skope__', $seks_collection ) && $seks_collection['__inherit_group_skope__'] ) {
+        if ( array_key_exists( '__inherits_group_skope__', $seks_collection ) && $seks_collection['__inherits_group_skope__'] ) {
           sek_remove_seks_post( $this->skope_id  );
           sek_error_log( __CLASS__. ' => NOT SAVING LOCAL SETTING BECAUSE INHERITED FROM GROUP SKOPE + REMOVED SKOPED POST');
           return;
@@ -185,8 +185,8 @@ final class Nimble_Collection_Setting extends \WP_Customize_Setting {
       }
 
       // Added march 2021 for #478
-      if ( array_key_exists( '__inherit_group_skope__', $seks_collection ) ) {
-          unset( $seks_collection['__inherit_group_skope__'] );
+      if ( array_key_exists( '__inherits_group_skope__', $seks_collection ) ) {
+          unset( $seks_collection['__inherits_group_skope__'] );
       }
       
       $r = sek_update_sek_post( $seks_collection, array(
