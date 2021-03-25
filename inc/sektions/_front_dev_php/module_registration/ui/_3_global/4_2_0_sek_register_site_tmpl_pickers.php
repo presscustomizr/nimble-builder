@@ -21,7 +21,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 //     'title'       => __('Template for home', 'text_doma'),
                 //     'default'     => '_no_site_tmpl_',
                 //     'choices'     => [
-                //         '_no_site_tmpl_' => 'Default theme template',
+                //         '_no_site_tmpl_' => 'No template',
                 //         'nb_tmpl_page-template' => 'Page template',
                 //         'nb_tmpl_home-page-template' => 'Home page template',
                 //         'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
@@ -36,7 +36,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'title'       => __('Template for pages', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
                     'choices'     => [
-                        '_no_site_tmpl_' => 'Default theme template',
+                        '_no_site_tmpl_' => 'No template',
                         'nb_tmpl_page-template' => 'Page template',
                         'nb_tmpl_home-page-template' => 'Home page template',
                         'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
@@ -52,7 +52,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'title'       => __('Template for posts', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
                     'choices'     => [
-                        '_no_site_tmpl_' => 'Default theme template',
+                        '_no_site_tmpl_' => 'No template',
                         'nb_tmpl_home-page-template' => 'Home page template',
                         'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
                     ],
@@ -67,7 +67,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'title'       => __('Template for categories', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
                     'choices'     => [
-                        '_no_site_tmpl_' => 'Default theme template',
+                        '_no_site_tmpl_' => 'No template',
                         'nb_tmpl_home-page-template' => 'Home page template',
                         'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
                     ],
@@ -82,7 +82,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'title'       => __('Template for tags', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
                     'choices'     => [
-                        '_no_site_tmpl_' => 'Default theme template',
+                        '_no_site_tmpl_' => 'No template',
                         'nb_tmpl_home-page-template' => 'Home page template',
                         'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
                     ],
@@ -97,7 +97,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'title'       => __('Template for authors', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
                     'choices'     => [
-                        '_no_site_tmpl_' => 'Default theme template',
+                        '_no_site_tmpl_' => 'No template',
                         'nb_tmpl_home-page-template' => 'Home page template',
                         'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
                     ],
@@ -112,7 +112,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'title'       => __('Template for search page', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
                     'choices'     => [
-                        '_no_site_tmpl_' => 'Default theme template',
+                        '_no_site_tmpl_' => 'No template',
                         'nb_tmpl_home-page-template' => 'Home page template',
                         'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
                     ],
@@ -127,7 +127,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'title'       => __('Template for 404 error page', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
                     'choices'     => [
-                        '_no_site_tmpl_' => 'Default theme template',
+                        '_no_site_tmpl_' => 'No template',
                         'nb_tmpl_home-page-template' => 'Home page template',
                         'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
                     ],
