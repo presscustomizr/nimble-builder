@@ -414,6 +414,9 @@ function sek_current_user_can_edit( $post_id = 0 ) {
 // introduced in sept 2019 for https://github.com/presscustomizr/nimble-builder/issues/436
 add_filter( 'display_post_states', '\Nimble\sek_add_nimble_post_state', 10, 2 );
 function sek_add_nimble_post_state( $post_states, $post ) {
+    // Not relevant when customizing
+    if ( skp_is_customizing() )
+      return $post_states;
     if ( !sek_current_user_can_access_nb_ui() )
       return $post_states;
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
