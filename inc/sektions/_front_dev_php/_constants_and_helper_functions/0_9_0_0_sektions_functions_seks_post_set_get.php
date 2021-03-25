@@ -124,7 +124,7 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
     // If no results or post has been trashed, NB will try to get it with a query by name + update the index of skoped post ids
     $post_id = sek_get_nb_post_id_from_index( $skope_id );
 
-    sek_error_log( __FUNCTION__ . ' post id => ' . $post_id . ' | skope id =>' . $skope_id);
+    //sek_error_log( __FUNCTION__ . ' post id => ' . $post_id . ' | skope id =>' . $skope_id);
 
     if ( !is_int( $post_id ) ) {
         error_log( 'sek_get_seks_post => post_id !is_int() for options => ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id );
@@ -211,6 +211,10 @@ function sek_set_ids( $collection ) {
 // });
 
 
+
+
+
+
 /**
  * Fetch the saved collection of sektion for a given skope_id / location
  *
@@ -290,8 +294,16 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             $location_id
         );
 
-        if ( sek_is_site_tmpl_enabled() && !$is_global_skope && !sek_local_skope_has_nimble_sections( $skope_id, $seks_data ) ) {
-            $seks_data = sek_maybe_get_seks_for_group_site_template( $seks_data );
+        // if ( !$is_global_skope ) {
+        //     sek_error_log('Nimble_Manager()->page_has_local_sections  ?? ' . Nimble_Manager()->page_has_local_sections );
+        //     sek_error_log('sek_local_skope_has_nimble_sections ?? ' . $skope_id . ' | count => ' . sek_count_not_empty_sections_in_page( $seks_data ) , sek_local_skope_has_nimble_sections( $skope_id, $seks_data ) );
+        // }
+
+        if ( sek_is_site_tmpl_enabled() && !$is_global_skope ) {
+            $has_local_sections = is_array( $seks_data ) ? ( sek_count_not_empty_sections_in_page( $seks_data ) > 0 ): false;
+            if ( !$has_local_sections ) {
+                $seks_data = sek_maybe_get_seks_for_group_site_template( $seks_data );
+            }
         }
         $default_collection = sek_get_default_location_model( $skope_id );
         $seks_data = wp_parse_args( $seks_data, $default_collection );

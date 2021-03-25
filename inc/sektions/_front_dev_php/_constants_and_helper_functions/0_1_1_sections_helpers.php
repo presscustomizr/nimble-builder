@@ -26,11 +26,22 @@ function sek_has_global_sections() {
 // initially used to determine if a post or a page has been customized with Nimble Builder => if so, we add an edit link in the post/page list
 // when used in admin, the skope_id must be provided
 // can be used to determine if we need to render Nimble Builder assets on front. See ::sek_enqueue_front_assets()
+// March 2021 => fixed : function sek_local_skope_has_nimble_sections() => seks_data param should be provided after being filtered with customized values when customzing
 function sek_local_skope_has_nimble_sections( $skope_id = '', $seks_data = null ) {
     if ( empty( $skope_id ) ) {
         sek_error_log( __FUNCTION__ . ' => missing skope id' );
         return false;
     }
+
+    if ( skp_is_customizing() ) {
+        if ( is_null($seks_data) || !is_array($seks_data) ) {
+            sek_error_log( 'Warning => this function should not be used without providing seks_data when customizing' );
+            return true;
+        } else {
+            return sek_count_not_empty_sections_in_page( $seks_data ) > 0;
+        }
+    }
+
     if ( 'not_set' != Nimble_Manager()->page_has_local_sections )
         return Nimble_Manager()->page_has_local_sections;
 
