@@ -202,6 +202,7 @@ function sek_get_parent_theme_slug() {
 
 function sek_error_log( $title, $content = null ) {
     // Know in which function sek_error_log() was called
+    // debug_backtrace()[1]['function'];
     $backtrace = debug_backtrace();
     //error_log( print_r( $backtrace, true ) );
     $content = is_null( $content ) ? '' : $content;
