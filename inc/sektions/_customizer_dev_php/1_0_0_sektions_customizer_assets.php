@@ -738,10 +738,19 @@ function add_sektion_values_to_skope_export( $skopes ) {
 
         // March 2021 for #478
         if ( sek_is_site_tmpl_enabled() && 'local' === $skp_data['skope'] ) {
-            $skp_data[ 'sektions' ]['db_values']['__inherits_group_skope__'] = sek_count_not_empty_sections_in_page( $seks_data ) < 1 && !empty( sek_get_site_tmpl_for_skope( skp_get_skope_id( 'group' ) ) );
-            //sek_error_log('ALORS ??? ' . (!sek_local_skope_has_nimble_sections( $skope_id ) && !empty( sek_get_site_tmpl_for_skope( skp_get_skope_id( 'group' ) ) ) ), sek_count_not_empty_sections_in_page( $seks_data ) );
-            // sek_error_log('CUSTOMIZED ???', $_POST );
-            // sek_error_log('DATA ???', $seks_data );
+            // We need to filter with the customized data here in order to asses if the local skope can inherit group skope
+            // Because the $seks_data get with sek_get_skoped_seks() already inherit the group skope
+            // By filtering with the customized data, we make sure we use the real local values.
+            // This is for example needed when reseting a local skope.
+            $customized_seks_data = apply_filters(
+              'sek_get_skoped_seks',
+              $seks_data,
+              $skope_id,
+              $location_id = ''
+            );
+            $group_site_tmpl_data = sek_get_group_site_template_data();//<= is cached when called
+            $has_group_skope_template_data = !$group_site_tmpl_data || empty($group_site_tmpl_data);
+            $skp_data[ 'sektions' ]['db_values']['__inherits_group_skope__'] = ( sek_count_not_empty_sections_in_page( $customized_seks_data ) < 1 ) && $has_group_skope_template_data;
         }
 
         // foreach( [
