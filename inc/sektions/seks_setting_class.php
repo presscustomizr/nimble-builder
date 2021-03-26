@@ -112,7 +112,7 @@ final class Nimble_Collection_Setting extends \WP_Customize_Setting {
    * @param string $location Current location.
    * @return array of skope settings
    */
-  public function filter_previewed_sek_get_skoped_seks( $seks_collection, $skope_id, $location ) {
+  public function filter_previewed_sek_get_skoped_seks( $seks_collection, $skope_id, $location = '' ) {
     if ( $skope_id === $this->skope_id ) {
         $customized_value = $this->post_value( null );
         if ( !is_null( $customized_value ) ) {
