@@ -308,6 +308,9 @@ function sek_update_saved_tmpl_post( $tmpl_data, $is_edit_metas_only_case = fals
         }
     }
 
+    // Added March 2021 for stie templates #478
+    do_action('nb_on_update_saved_tmpl_post', $tmpl_post_name );
+
     if ( is_wp_error( $r ) ) {
         return $r;
     }

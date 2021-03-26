@@ -155,20 +155,41 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // They need to be kept in order to keep track of the changes in the customizer.
                                     // => that's why we check if ! api.has( ... )
                                     api( optionData.settingControlId, function( _setting_ ) {
+                                          // SITE TEMPLATE STUFFS
                                           // Added March 2021 for #478
                                           if ( 'site_templates' === optionType ) {
                                                 var _doThingsAfterRefresh = function() {
-                                                      console.log('DO THINGS AFTER REFRESH', api.control( optionData.settingControlId ) );
                                                       setTimeout( function() {
                                                             api.control( optionData.settingControlId ).focus();
-                                                      }, 500 );
+                                                      }, 300 );
                                                       api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                                                 };
                                                 
                                                 _setting_.bind( function( to ) {
-                                                      console.log('REFRESH PREVIEW TO HOME', to );
+                                                      //console.log('REFRESH PREVIEW TO HOME', to );
                                                       api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                                                       api.previewer.previewUrl( api.settings.url.home );
+                                                });
+                                          }
+
+                                          // SITE TEMPLATE : ajax action fired each time a site template is being modified
+                                          // Solves the problem of template synchronization between the group skope post ( in which the chosen template is saved with permanent level ids ), and the current state of the template
+                                          // Solution => each time a template is updated, NB removes all group skope posts ( along with their option indexes and the css stylesheets )
+                                          // 
+                                          // When will the removed skope posts be re-inserted ?
+                                          // next time the group skope will be printed ( for example skp__all_page in a single page ), NB checks if a template is assigned to this group skope, and tries to get the skope post.
+                                          // If the group skope post is not found, NB attempts to re-insert it
+                                          if ( 'site_templates' === optionType ) {
+                                                _setting_.bind( function( to ) {
+                                                      wp.ajax.post( 'sek_reset_site_template', {
+                                                            nonce: api.settings.nonce.save,
+                                                            site_template_opts : to 
+                                                      })
+                                                      .done( function(r) {
+                                                            console.log('SITE TEMPLATE RESET DONE', r );
+                                                            //api.previewer.refresh();
+                                                      })
+                                                      .fail( function(r) { console.log('SITE TEMPLATE RESET FAILED', r ); } );
                                                 });
                                           }
 
