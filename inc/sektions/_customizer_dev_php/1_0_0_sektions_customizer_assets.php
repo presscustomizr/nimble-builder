@@ -748,8 +748,9 @@ function add_sektion_values_to_skope_export( $skopes ) {
               $skope_id,
               $location_id = ''
             );
+            
             $group_site_tmpl_data = sek_get_group_site_template_data();//<= is cached when called
-            $has_group_skope_template_data = !$group_site_tmpl_data || empty($group_site_tmpl_data);
+            $has_group_skope_template_data = !( !$group_site_tmpl_data || empty($group_site_tmpl_data) );
             $skp_data[ 'sektions' ]['db_values']['__inherits_group_skope__'] = ( sek_count_not_empty_sections_in_page( $customized_seks_data ) < 1 ) && $has_group_skope_template_data;
         }
 
