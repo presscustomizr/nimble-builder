@@ -24,7 +24,7 @@ final class Nimble_Options_Setting extends \WP_Customize_Setting {
 
   // March 2021 => set autoload to "no" for #799
   public function update( $value ) {
-    do_action('nb_on_customizer_global_options_update', $this->id_data['base'], $value );
+    do_action('nb_on_save_customizer_global_options', $this->id_data['base'], $value );
     update_option( $this->id_data['base'], $value, 'no' );
   }
 }

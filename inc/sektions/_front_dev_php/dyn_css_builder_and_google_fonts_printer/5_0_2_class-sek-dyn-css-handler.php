@@ -605,7 +605,7 @@ class Sek_Dyn_CSS_Handler {
         global $wp_filesystem;
         if ( $this->file_exists ) {
             $this->file_exists != $wp_filesystem->delete( $this->uri );
-            sek_error_log('CSS HANDLER => REMOVE FILE => ' . $this->uri);
+            //sek_error_log('CSS HANDLER => REMOVE FILE => ' . $this->uri);
             return !$this->file_exists;
         }
         return !$this->file_exists;

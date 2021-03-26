@@ -196,26 +196,10 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
                 $last_nested_section_breakpoint_found = 0;//reset last nested breakpoint
                 $last_regular_section_breakpoint_found = $section_maybe_custom_breakpoint;
             }
-
-           //sek_error_log('SECTION ID AND BREAKPOINT ' . $level_data['level'] . ' | ' . $level_data['id'] , $last_section_breakpoint_found );
-
-            // sek_error_log('ALORS ???', compact(
-            //     'searched_level_id_found',
-            //     'last_section_breakpoint_found',
-            //     'last_regular_section_breakpoint_found',
-            //     'last_nested_section_breakpoint_found'
-            // ) );
         }
 
         if ( array_key_exists( 'id', $level_data ) && $searched_level_id == $level_data['id'] ) {
             //match found, break this loop
-            // sek_error_log('MATCH FOUND!=> ' . $last_section_breakpoint_found );
-            // sek_error_log('MATCH FOUND => ALORS ???', compact(
-            //     'searched_level_id_found',
-            //     'last_section_breakpoint_found',
-            //     'last_regular_section_breakpoint_found',
-            //     'last_nested_section_breakpoint_found'
-            // ) );
             if ( $last_nested_section_breakpoint_found >= 1 ) {
                 $last_section_breakpoint_found = $last_nested_section_breakpoint_found;
             } else if ( $last_regular_section_breakpoint_found >= 1 ) {

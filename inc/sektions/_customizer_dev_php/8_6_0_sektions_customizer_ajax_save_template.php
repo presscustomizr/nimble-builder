@@ -133,8 +133,6 @@ add_action( 'wp_ajax_sek_save_user_template', '\Nimble\sek_ajax_save_user_templa
 /////////////////////////////////////////////////////////////////
 // hook : wp_ajax_sek_save_user_template
 function sek_ajax_save_user_template() {
-    //sek_error_log( __FUNCTION__ . ' ALORS ??', $_POST );
-
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
     $is_edit_metas_only_case = isset( $_POST['edit_metas_only'] ) && 'yes' === $_POST['edit_metas_only'];
 
