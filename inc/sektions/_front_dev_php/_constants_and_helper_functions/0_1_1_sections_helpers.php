@@ -32,14 +32,9 @@ function sek_local_skope_has_nimble_sections( $skope_id = '', $seks_data = null 
         sek_error_log( __FUNCTION__ . ' => missing skope id' );
         return false;
     }
-
-    if ( skp_is_customizing() ) {
-        if ( is_null($seks_data) || !is_array($seks_data) ) {
-            sek_error_log( 'Warning => this function should not be used without providing seks_data when customizing' );
-            return true;
-        } else {
-            return sek_count_not_empty_sections_in_page( $seks_data ) > 0;
-        }
+    if ( NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) {
+        sek_error_log( __FUNCTION__ . ' => error => function should not be used with global skope id' );
+        return false;
     }
 
     if ( 'not_set' != Nimble_Manager()->page_has_local_sections )
@@ -47,13 +42,9 @@ function sek_local_skope_has_nimble_sections( $skope_id = '', $seks_data = null 
 
     $nb_section_created = 0;
 
-    // When the collection is provided, use it otherwise get it
+    // When the collection is provided use it otherwise get it
     if ( is_null($seks_data) || !is_array($seks_data) ) {
-        $maybe_local_sek_post = sek_get_seks_post( $skope_id, 'local' );
-        if ( is_object($maybe_local_sek_post) ) {
-            $seks_data = maybe_unserialize($maybe_local_sek_post->post_content);
-            $seks_data = is_array( $seks_data ) ? $seks_data : array();
-        }
+        $seks_data = sek_get_skoped_seks( $skope_id );
     }
     if ( is_array( $seks_data ) ) {
         $nb_section_created = sek_count_not_empty_sections_in_page( $seks_data );

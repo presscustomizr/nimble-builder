@@ -181,38 +181,6 @@ function sek_set_ids( $collection ) {
 }
 
 
-// Feb 2021 => experimental for https://github.com/presscustomizr/nimble-builder/issues/478
-// filter declared in inc\sektions\_front_dev_php\_constants_and_helper_functions\0_9_0_sektions_functions_seks_post_set_get.php
-// add_filter('nb_set_skope_id_before_caching_local_sektions', function( $skope_id ) {
-//     if ( !sek_is_site_tmpl_enabled() )
-//         return $skope_id;
-
-//     $group_skope = skp_get_skope_id( 'group' );
-//     sek_error_log('GROUP SKOPE ?' . skp_get_skope_id( 'group' ) );
-//     if ( 'skp__all_page' === $group_skope ) {
-//         $skope_id = $group_skope;
-//         $tmpl_post_name = sek_get_site_tmpl_for_skope( $group_skope );
-//         if ( !is_null($tmpl_post_name) && is_string($tmpl_post_name ) ) {
-//             $current_tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
-//             if ( $current_tmpl_post ) {
-//                 //sek_error_log( 'TEMPLATE POST ?', $current_tmpl_post );
-//                 $current_tmpl_data = maybe_unserialize( $current_tmpl_post->post_content );
-//                 if ( is_array($current_tmpl_data) && isset($current_tmpl_data['data']) && is_array($current_tmpl_data['data']) && !empty($current_tmpl_data['data']) ) {
-//                     $current_tmpl_data = $current_tmpl_data['data'];
-//                     //sek_error_log( 'current_tmpl_data ?', $current_tmpl_data );
-//                     $current_tmpl_data = sek_set_ids( $current_tmpl_data );
-//                     //sek_error_log( 'current_tmpl_data WITH IDS?', $current_tmpl_data );
-//                     sek_update_sek_post( $current_tmpl_data, [ 'skope_id' => $skope_id ]);
-//                 }
-//             }
-//         }
-//     }
-//     return $skope_id;
-// });
-
-
-
-
 
 
 /**
@@ -262,10 +230,8 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         // - ! global skope
         // - no local skoped sections
         // - a site template is defined for this "group" skope
-        if ( 'local' === $skope_level ) {
-            if ( sek_is_site_tmpl_enabled() && !$is_global_skope && !sek_local_skope_has_nimble_sections( $skope_id, $seks_data ) ) {
-                $seks_data = sek_maybe_get_seks_for_group_site_template( $seks_data );
-            }
+        if ( 'local' === $skope_level && !$is_global_skope ) {
+            $seks_data = sek_maybe_get_seks_for_group_site_template( $skope_id, $seks_data );
         }
 
         // normalizes
@@ -285,7 +251,6 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
     }//end if
 
     if ( skp_is_customizing() ) {
-        //sek_error_log('SEK IS CUSTOMIZING');
         // when customizing, let us filter the value with the 'customized' ones
         $seks_data = apply_filters(
             'sek_get_skoped_seks',
@@ -293,28 +258,14 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             $skope_id,
             $location_id
         );
-
-        // if ( !$is_global_skope ) {
-        //     sek_error_log('Nimble_Manager()->page_has_local_sections  ?? ' . Nimble_Manager()->page_has_local_sections );
-        //     sek_error_log('sek_local_skope_has_nimble_sections ?? ' . $skope_id . ' | count => ' . sek_count_not_empty_sections_in_page( $seks_data ) , sek_local_skope_has_nimble_sections( $skope_id, $seks_data ) );
-        // }
-
-        if ( sek_is_site_tmpl_enabled() && !$is_global_skope ) {
-            $has_local_sections = is_array( $seks_data ) ? ( sek_count_not_empty_sections_in_page( $seks_data ) > 0 ): false;
-            if ( !$has_local_sections ) {
-                $seks_data = sek_maybe_get_seks_for_group_site_template( $seks_data );
-            }
+        if ( 'local' === $skope_level && !$is_global_skope ) {
+            $seks_data = sek_maybe_get_seks_for_group_site_template( $skope_id, $seks_data );
         }
         $default_collection = sek_get_default_location_model( $skope_id );
         $seks_data = wp_parse_args( $seks_data, $default_collection );
         // Maybe add missing registered locations when customizing
         // December 2020 => needed when importing an entire template
         $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
-
-        
-        // if ( !$is_global_skope ) {
-        //     $seks_data  = apply_filters( 'nb_set_local_collection_before_caching', $seks_data, $skope_id );
-        // }
     }
 
     // if a location is specified, return specifically the sections of this location
