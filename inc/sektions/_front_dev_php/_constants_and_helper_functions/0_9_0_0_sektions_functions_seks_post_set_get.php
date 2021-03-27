@@ -215,7 +215,6 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         //     $skope_id = apply_filters( 'nb_set_skope_id_before_caching_local_sektions', $skope_id );
         //     //sek_error_log('alors local skope id for fetching local sections ?', $skope_id );
         // }
-
         $seks_data = sek_get_seks_without_group_inheritance( $skope_id );
 
         // March 2021 : added for site templates #478
@@ -223,8 +222,10 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         // - ! global skope
         // - no local skoped sections
         // - a site template is defined for this "group" skope
-        if ( 'local' === $skope_level && !$is_global_skope ) {
+        if ( sek_is_site_tmpl_enabled() && 'local' === $skope_level && !$is_global_skope ) {
             $seks_data = sek_maybe_get_seks_for_group_site_template( $skope_id, $seks_data );
+            $has_local_sections_without_inheritance = is_array( $seks_data ) ? ( sek_count_not_empty_sections_in_page( $seks_data ) > 0 ) : false;
+            $seks_data['__inherits_group_skope__'] = !$has_local_sections_without_inheritance && sek_has_group_site_template_data();
         }
 
         // normalizes
@@ -251,9 +252,16 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             $skope_id,
             $location_id
         );
-        if ( 'local' === $skope_level && !$is_global_skope ) {
+
+        if ( sek_is_site_tmpl_enabled() && 'local' === $skope_level && !$is_global_skope ) {
+            $has_local_customize_sektions = is_array( $seks_data ) ? ( sek_count_not_empty_sections_in_page( $seks_data ) > 0 ) : false;
             $seks_data = sek_maybe_get_seks_for_group_site_template( $skope_id, $seks_data );
+            // When sektions have been reset, let's set the value of property '__inherits_group_skope__'
+            if ( !$has_local_customize_sektions  ) {
+                $seks_data['__inherits_group_skope__'] = sek_has_group_site_template_data();
+            }
         }
+
         $default_collection = sek_get_default_location_model( $skope_id );
         $seks_data = wp_parse_args( $seks_data, $default_collection );
         // Maybe add missing registered locations when customizing
