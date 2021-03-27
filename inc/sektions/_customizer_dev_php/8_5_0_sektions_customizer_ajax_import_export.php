@@ -43,6 +43,10 @@ function sek_maybe_export() {
     // replace image id by the absolute url
     // clean level ids and replace them with a placeholder string
     $seks_data = apply_filters( 'nimble_pre_export', $seks_data );
+
+    // March 2021 : make sure text input are sanitized like in #544 #792
+    //$seks_data = sek_sektion_collection_sanitize_cb( $seks_data );
+
     $theme_name = sanitize_title_with_dashes( get_stylesheet() );
 
     //sek_error_log('EXPORT AFTER FILTER ?', $seks_data );
@@ -249,6 +253,10 @@ function sek_ajax_get_manually_imported_file_content() {
     if ( array_key_exists( 'import_img', $_POST ) && false === sek_booleanize_checkbox_val( $_POST['import_img'] ) ) {
         $maybe_import_images = false;
     }
+
+    // Make sure NB decodes encoded rich text before sending to the customizer
+    // see #544 and #791
+    $raw_unserialized_data['data'] = sek_prepare_seks_data_for_customizer( $raw_unserialized_data['data'] );
 
     $imported_content = array(
         //'data' => apply_filters( 'nimble_pre_import', $raw_unserialized_data['data'], $do_import_images ),
