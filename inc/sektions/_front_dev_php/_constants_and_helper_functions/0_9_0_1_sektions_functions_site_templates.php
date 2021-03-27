@@ -118,7 +118,6 @@ function sek_has_group_site_template_data() {
     
     $group_site_tmpl_data = sek_get_group_site_template_data();//<= is cached when called
     $has_group_skope_template_data = !( !$group_site_tmpl_data || empty($group_site_tmpl_data) );
-    sek_error_log('sek_has_group_site_template_data() ???', $has_group_skope_template_data );
     wp_cache_set('nimble_has_group_site_template_data', $has_group_skope_template_data  ? 'yes' : 'no' );
     return $has_group_skope_template_data;
 }
