@@ -58,7 +58,7 @@ if ( !function_exists( 'Nimble\sek_slider_parse_template_tags') ) {
 
 if ( !function_exists('Nimble\sek_maybe_parse_slider_img_html_for_lazyload') ) {
     // @return html string
-    function sek_maybe_parse_slider_img_html_for_lazyload( $attachment_id, $size = 'thumbnail', $is_first_img, $lazy_load_on ) {
+    function sek_maybe_parse_slider_img_html_for_lazyload( $attachment_id, $is_first_img, $lazy_load_on, $size = 'thumbnail' ) {
         // Skip when :
         // - is customizing
         // - slider lazy loading is not active
@@ -174,9 +174,9 @@ if ( !function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
 
             $html = sek_maybe_parse_slider_img_html_for_lazyload(
               $item['img'],
-              empty( $item['img-size'] ) ? 'large' : $item['img-size'],
               $is_first_img,//<= // when lazy load is active, we want to lazy load the first image of the slider if offscreen by adding 'data-sek-src' attribute
-              $lazy_load_on
+              $lazy_load_on,
+              empty( $item['img-size'] ) ? 'large' : $item['img-size']
             );
             if ( $lazy_load_on && !$is_first_img ) {
                 $html .= '<div class="swiper-lazy-preloader"></div>';//this element is removed by swiper.js once the image is loaded @see https://swiperjs.com/api/#lazy

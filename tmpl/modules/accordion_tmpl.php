@@ -6,7 +6,7 @@ if ( !defined( 'ABSPATH' ) ) {
 }
 
 if ( !function_exists( 'Nimble\sek_print_accordion' ) ) {
-  function sek_print_accordion( $accord_collec = array(), $accord_opts, $model ) {
+  function sek_print_accordion( $accord_opts, $model, $accord_collec = array() ) {
       $accord_collec = is_array( $accord_collec ) ? $accord_collec : array();
 
       $is_accordion_multi_item = count( $accord_collec ) > 1;
@@ -75,7 +75,7 @@ $accord_collec = !empty($value['accord_collec']) ? $value['accord_collec'] : arr
 $accord_opts = !empty($value['accord_opts']) ? $value['accord_opts'] : array();
 
 if ( !empty( $accord_collec ) ) {
-    sek_print_accordion( $accord_collec, $accord_opts, $model );
+    sek_print_accordion( $accord_opts, $model, $accord_collec );
     sek_emit_js_event('nb-needs-accordion');
 } else {
     if ( skp_is_customizing() ) {
