@@ -24,6 +24,9 @@ final class Nimble_Options_Setting extends \WP_Customize_Setting {
 
   // March 2021 => set autoload to "no" for #799
   public function update( $value ) {
+    // When a site template is modified, the following action allows NB to remove the skoped post + removes the corresponding CSS stylesheet
+    // For example, when the page site template is changed, we need to remove the associated skoped post named 'nimble___skp__all_page'
+    // This post has been inserted when running sek_maybe_get_seks_for_group_site_template(), fired from sek_get_skoped_seks()
     do_action('nb_on_save_customizer_global_options', $this->id_data['base'], $value );
     update_option( $this->id_data['base'], $value, 'no' );
   }
@@ -193,8 +196,8 @@ final class Nimble_Collection_Setting extends \WP_Customize_Setting {
           'skope_id' => $this->skope_id
       ));
       //sek_error_log( __CLASS__. ' $_POST' , $_POST );
-      sek_error_log( __CLASS__. ' in update => ' . $this->skope_id );
-      sek_error_log( __CLASS__. ' AFTER $seks_collection' , $seks_collection );
+      // sek_error_log( __CLASS__. ' in update => ' . $this->skope_id );
+      // sek_error_log( __CLASS__. ' AFTER $seks_collection' , $seks_collection );
       // Write the local stylesheet
       if ( NIMBLE_GLOBAL_SKOPE_ID !== $this->skope_id ) {
           // Try to write the CSS
