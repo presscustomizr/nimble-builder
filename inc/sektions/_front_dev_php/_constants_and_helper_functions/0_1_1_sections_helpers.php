@@ -5,7 +5,7 @@
 function sek_has_global_sections() {
     if ( skp_is_customizing() )
       return true;
-    if ( 'not_set' != Nimble_Manager()->page_has_global_sections )
+    if ( 'not_set' !== Nimble_Manager()->page_has_global_sections )
         return Nimble_Manager()->page_has_global_sections;
 
     $maybe_global_sek_post = sek_get_seks_post( NIMBLE_GLOBAL_SKOPE_ID, 'global' );
@@ -28,20 +28,18 @@ function sek_has_global_sections() {
 // can be used to determine if we need to render Nimble Builder assets on front. See ::sek_enqueue_front_assets()
 // March 2021 => fixed : function sek_local_skope_has_nimble_sections() => when customzing => seks_data param should be provided after being filtered with customized values
 function sek_local_skope_has_nimble_sections( $skope_id = '', $seks_data = null ) {
-    if ( empty( $skope_id ) ) {
-        sek_error_log( __FUNCTION__ . ' => missing skope id' );
-        return false;
-    }
+    $skope_id = empty( $skope_id ) ? skp_get_skope_id() : $skope_id;
+
     if ( NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) {
         sek_error_log( __FUNCTION__ . ' => error => function should not be used with global skope id' );
         return false;
     }
 
-    if ( 'not_set' != Nimble_Manager()->page_has_local_sections )
+    if ( 'not_set' !== Nimble_Manager()->page_has_local_sections )
         return Nimble_Manager()->page_has_local_sections;
 
     $nb_section_created = 0;
-
+    
     // When the collection is provided use it otherwise get it
     if ( is_null($seks_data) || !is_array($seks_data) ) {
         $seks_data = sek_get_seks_without_group_inheritance( $skope_id );

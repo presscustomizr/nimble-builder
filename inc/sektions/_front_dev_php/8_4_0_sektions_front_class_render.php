@@ -39,10 +39,31 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             // INCLUDE NIMBLE CONTENT IN SEARCH RESULTS
             add_action( 'wp_head', array( $this, 'sek_maybe_include_nimble_content_in_search_results' ) );
 
+            add_filter( 'body_class', array( $this, 'sek_add_front_body_class') );
+
             // PASSWORD FORM AND CONTENT RESTRICTION ( PLUGINS )
             $this->sek_schedule_content_restriction_actions();
         }//_schedule_front_rendering()
 
+
+        // @'body_class'
+        function sek_add_front_body_class( $classes ) {
+            $classes = is_array($classes) ? $classes : array();
+            $classes[] = sek_is_pro() ? 'nimble-builder-pro-' . str_replace('.', '-', NB_PRO_VERSION ) : 'nimble-builder-' . str_replace('.', '-', NIMBLE_VERSION );
+
+            // Check whether we're in the customizer preview.
+            if ( is_customize_preview() ) {
+                $classes[] = 'customizer-preview';
+            }
+            if ( sek_is_site_tmpl_enabled() && !is_customize_preview() ) {
+                if ( sek_has_group_site_template_data() ) {
+                    $classes[] = 'nb-has-site-template-' . skp_get_skope_id('group');
+                    $classes[] = !sek_local_skope_has_nimble_sections() ? 'nb-inherits-site-tmpl' : 'nb-no-site-template-inheritance';
+                }
+            }
+
+            return $classes;
+        }
 
         // Encapsulate the singular post / page content so we can generate a dynamic ui around it when customizing
         // @filter the_content::NIMBLE_WP_CONTENT_WRAP_FILTER_PRIORITY
