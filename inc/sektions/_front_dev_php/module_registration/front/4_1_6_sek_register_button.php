@@ -213,6 +213,8 @@ function sek_get_module_params_for_czr_btn_design_child() {
                         'padding-bottom' => .5,
                         'padding-right'  => 1,
                         'padding-left'   => 1,
+                        'margin-top'    => .5,
+                        'margin-bottom' => .5,
                         'unit' => 'em'
                     ),
                     'width-100'   => true,
