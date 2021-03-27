@@ -1254,6 +1254,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
+            //-------------------------------------------------------------------------------------------------
+            //-- SITE TEMPLATE HELPERS
+            //-------------------------------------------------------------------------------------------------
+            localSektionsInheritGroupSkope : function() {
+                  var localCollSetId = this.localSectionsSettingId(),
+                        localColSetValue = api(localCollSetId)();
+                  return localColSetValue && localColSetValue.__inherits_group_skope__;
+            },
 
             //-------------------------------------------------------------------------------------------------
             //-- VARIOUS
