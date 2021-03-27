@@ -178,7 +178,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
  *  SANITIZATION
 /* ------------------------------------------------------------------------- */
 function sanitize_callback__czr_simple_html_module( $value ) {
-    if ( array_key_exists( 'html_content', $value ) && is_string( $value[ 'html_content' ] ) ) {
+    if ( is_array($value) && array_key_exists( 'html_content', $value ) && is_string( $value[ 'html_content' ] ) ) {
         if ( !current_user_can( 'unfiltered_html' ) ) {
             $value[ 'html_content' ] = wp_kses_post( $value[ 'html_content' ] );
         }
