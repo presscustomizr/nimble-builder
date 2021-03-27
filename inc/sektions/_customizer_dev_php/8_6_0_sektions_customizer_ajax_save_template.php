@@ -81,6 +81,12 @@ function sek_ajax_sek_get_user_tmpl_json() {
             // Make sure we decode encoded rich text before sending to the customizer
             // see #544 and #791
             $tmpl_decoded['data'] = sek_prepare_seks_data_for_customizer( $tmpl_decoded['data'] );
+
+            // added March 2021 for site templates #478
+            // If property '__inherits_group_skope__' has been saved by mistake in the template, make sure it's unset now
+            if ( array_key_exists('__inherits_group_skope__', $tmpl_decoded['data'] ) ) {
+                unset( $tmpl_decoded['data']['__inherits_group_skope__'] );
+            }
             wp_send_json_success( $tmpl_decoded );
         } else {
             wp_send_json_error( __FUNCTION__ . '_invalid_tmpl_post_data' );
@@ -119,6 +125,12 @@ function sek_ajax_sek_get_api_tmpl_json() {
         // Make sure we decode encoded rich text before sending to the customizer
         // see #544 and #791
         $raw_tmpl_data['data'] = sek_prepare_seks_data_for_customizer( $raw_tmpl_data['data'] );
+        
+        // added March 2021 for site templates #478
+        // If property '__inherits_group_skope__' has been saved by mistake in the template, make sure it's unset now
+        if ( array_key_exists('__inherits_group_skope__', $raw_tmpl_data['data'] ) ) {
+            unset( $raw_tmpl_data['data']['__inherits_group_skope__'] );
+        }
         wp_send_json_success( $raw_tmpl_data );
     }
     //return [];
@@ -165,6 +177,12 @@ function sek_ajax_save_user_template() {
         // clean level ids and replace them with a placeholder string
         $tmpl_data = json_decode( wp_unslash( $_POST['tmpl_data'] ), true );
         $tmpl_data = sek_template_save_clean_id( $tmpl_data );
+        
+        // added March 2021 for site templates #478
+        // If property '__inherits_group_skope__' has been set to the template, make sure it's unset now
+        if ( array_key_exists('__inherits_group_skope__', $tmpl_data ) ) {
+            unset( $tmpl_data['__inherits_group_skope__'] );
+        }
     }
     
     // make sure description and title are clean before DB
