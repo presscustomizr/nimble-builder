@@ -902,6 +902,19 @@ function sek_print_nimble_input_templates() {
         <input data-czrtype="{{data.input_id}}" type="hidden"/>
       </script>
       <?php
+
+      /* ------------------------------------------------------------------------- *
+       *  SITE TMPL PICKER
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___site_tmpl_picker">
+        <div class="sek-button-choice-wrapper">
+          <input data-czrtype="{{data.input_id}}" type="hidden"/>
+          <button type="button" aria-pressed="false" class="sek-ui-button sek-float-right" title="<?php _e('Reset', 'text_doma'); ?>" data-sek-reset-scope="{{data.input_data.scope}}"><?php _e('Reset', 'text_doma'); ?></button>
+        </div>
+      </script>
+
+      <?php
 }//sek_print_nimble_input_templates() @hook 'customize_controls_print_footer_scripts'
 
 
