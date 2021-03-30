@@ -225,7 +225,7 @@ final class Nimble_Collection_Setting extends \WP_Customize_Setting {
       // $seks_options = (int)$post_id;//$r is the post ID
 
       sek_set_nb_post_id_in_index( $this->skope_id, (int)$post_id );
-      sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => $seks_options', (int)$post_id);
+      //sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => $seks_options', (int)$post_id);
 
       return $post_id;
   }

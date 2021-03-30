@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.7
-Stable tag: 3.0.1
+Stable tag: 3.0.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -120,9 +120,17 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-3.0.1 : Introduction of a template system allowing users to pick pre-designed templates, or save and reuse templates. [slider module] new option to set the slide's background + remove default white default background
+3.0.2 : [PHP 8] compatibility bug fix + various minor improvements. [Site templates] first stones for the upcoming site template options.
 
 == Changelog ==
+= 3.0.2 March 30th 2021 =
+* fixed : [PHP 8.0+][slider module][accordion module] fix "Deprecated: Required parameter $... follows optional parameter ".
+* fixed : [local options] make sure they are reset when : importing a file, after a local reset, after a template injection, a history navigation action
+* fixed : [performance] better caching for Nimble_Manager properties page_has_global_sections and page_has_local_sections
+* fixed : [export/import] make sure that rich text is properly sanitized
+* fixed : [button module] add a default top/bottom margin of 0.5em
+* added : [site templates] first stones for integrating a site template options in "Site wide options" group
+
 = 3.0.1 March 19th 2021 =
 * fixed : [templates][api] prevent hammering server by fetching templates too often
 * improved : [UI] style of the "add content" button

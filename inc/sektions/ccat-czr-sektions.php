@@ -135,13 +135,12 @@ function sek_enqueue_controls_js_css() {
 
                 'optPrefixForSektionSetting' => NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION,//'nimble___'
                 'optNameForGlobalOptions' => NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS,//'nimble___'
-                'optNameForSiteTmplOptions' => NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS,// nimble_site_templates
                 'prefixForSettingsNotSaved' => NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED,//"__nimble__"
 
                 'globalOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ),// 'nimble_global_opts'
-                'siteTmplOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ),// 'nimble_site_templates
 
-                'isSiteTmplEnabled' => defined('NIMBLE_SITE_TEMPLATES_ENABLED') && NIMBLE_SITE_TEMPLATES_ENABLED,
+                // Feb 2021, for #478
+                'isSiteTemplateEnabled' => sek_is_site_tmpl_enabled(),
 
                 'defaultLocationModel' => Nimble_Manager()->default_location_model,
                 'defaultLocalSektionSettingValue' => sek_get_default_location_model(),
@@ -178,7 +177,6 @@ function sek_enqueue_controls_js_css() {
 
                 'globalOptionsMap' => SEK_Front_Construct::$global_options_map,
                 'localOptionsMap' => SEK_Front_Construct::$local_options_map,
-                'siteTmplOptionsMap' => SEK_Front_Construct::$site_tmpl_options_map,
 
                 'registeredLocations' => sek_get_locations(),
                 // added for the module tree #359
@@ -219,10 +217,7 @@ function sek_enqueue_controls_js_css() {
                 'useAPItemplates' => true,// March 2021 deployed in v3.0.0
                 // Dec 2020
                 // When developing locally, allow a local template api request
-                'templateAPIUrl' => NIMBLE_DATA_API_URL_V2,
-
-                // Feb 2021, for #478
-                'isSiteTemplateEnabled' => sek_is_site_tmpl_enabled()
+                'templateAPIUrl' => NIMBLE_DATA_API_URL_V2
             )
         )
     );//wp_localize_script()
@@ -712,15 +707,15 @@ function add_sektion_values_to_skope_export( $skopes ) {
 
         if ( 'group' == $skp_data['skope'] ) {
             // FEB 2021 => Group site template. #478
-            if ( defined('NIMBLE_SITE_TEMPLATES_ENABLED') && NIMBLE_SITE_TEMPLATES_ENABLED ) {
-                $group_skope_id = skp_get_skope_id( 'group' );
-                $seks_data = sek_maybe_get_seks_for_group_site_template($group_skope_id );
-                // Feb 2021 added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
-                $seks_data = sek_prepare_seks_data_for_customizer( $seks_data );
-                $skp_data[ 'group_sektions' ] = [
-                  'db_values' => $seks_data,
-                ];
-            }
+            // if ( sek_is_site_tmpl_enabled() ) {
+            //     //$group_skope_id = skp_get_skope_id( 'group' );
+            //     $seks_data = sek_get_skoped_seks( $skope_id, $location_id = '', $skope_level = 'group' );
+            //     // Feb 2021 added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
+            //     $seks_data = sek_prepare_seks_data_for_customizer( $seks_data );
+            //     $skp_data[ 'group_sektions' ] = [
+            //       'db_values' => $seks_data,
+            //     ];
+            // }
             $new_skopes[] = $skp_data;
             continue;
         }
@@ -738,8 +733,9 @@ function add_sektion_values_to_skope_export( $skopes ) {
 
         $skp_data[ 'sektions' ] = array(
             'db_values' => $seks_data,
-            'setting_id' => sek_get_seks_setting_id( $skope_id )//nimble___loop_start[skp__post_page_home], nimble___custom_location_id[skp__global]
+            'setting_id' => sek_get_seks_setting_id( $skope_id ),//nimble___loop_start[skp__post_page_home], nimble___custom_location_id[skp__global]
         );
+
         // foreach( [
         //     'loop_start',
         //     'loop_end',
@@ -2062,6 +2058,19 @@ function sek_print_nimble_input_templates() {
         <input data-czrtype="{{data.input_id}}" type="hidden"/>
       </script>
       <?php
+
+      /* ------------------------------------------------------------------------- *
+       *  SITE TMPL PICKER
+      /* ------------------------------------------------------------------------- */
+      ?>
+      <script type="text/html" id="tmpl-nimble-input___site_tmpl_picker">
+        <div class="sek-button-choice-wrapper">
+          <input data-czrtype="{{data.input_id}}" type="hidden"/>
+          <button type="button" aria-pressed="false" class="sek-ui-button sek-float-right" title="<?php _e('Reset', 'text_doma'); ?>" data-sek-reset-scope="{{data.input_data.scope}}"><?php _e('Reset', 'text_doma'); ?></button>
+        </div>
+      </script>
+
+      <?php
 }//sek_print_nimble_input_templates() @hook 'customize_controls_print_footer_scripts'
 
 
@@ -2102,7 +2111,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
             // - sektion collections ( local and global skope )
             // - global options
             // - site template options
-            if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ) ) {
+            if ( 0 === strpos( $setting_id, NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) ) {
                 //sek_error_log( 'DYNAMICALLY REGISTERING SEK SETTING => ' . $setting_id,  $setting_args);
                 return array(
                     'transport' => 'refresh',
@@ -2132,7 +2141,7 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
         function set_dyn_setting_class( $class, $setting_id, $args ) {
             //sek_error_log( 'REGISTERING CLASS DYNAMICALLY for setting =>' . $setting_id );
             // Setting class for NB global options and Site Template options
-            if ( 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) || 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ) ) {
+            if ( 0 === strpos( $setting_id, NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ) ) {
                 return '\Nimble\Nimble_Options_Setting';
             }
             
@@ -4333,6 +4342,10 @@ function sek_maybe_export() {
     // replace image id by the absolute url
     // clean level ids and replace them with a placeholder string
     $seks_data = apply_filters( 'nimble_pre_export', $seks_data );
+
+    // March 2021 : make sure text input are sanitized like in #544 #792
+    //$seks_data = sek_sektion_collection_sanitize_cb( $seks_data );
+
     $theme_name = sanitize_title_with_dashes( get_stylesheet() );
 
     //sek_error_log('EXPORT AFTER FILTER ?', $seks_data );
@@ -4540,6 +4553,10 @@ function sek_ajax_get_manually_imported_file_content() {
         $maybe_import_images = false;
     }
 
+    // Make sure NB decodes encoded rich text before sending to the customizer
+    // see #544 and #791
+    $raw_unserialized_data['data'] = sek_prepare_seks_data_for_customizer( $raw_unserialized_data['data'] );
+
     $imported_content = array(
         //'data' => apply_filters( 'nimble_pre_import', $raw_unserialized_data['data'], $do_import_images ),
         'data' => sek_maybe_import_imgs( $raw_unserialized_data['data'], $maybe_import_images ),
@@ -4690,6 +4707,12 @@ function sek_ajax_sek_get_user_tmpl_json() {
             // Make sure we decode encoded rich text before sending to the customizer
             // see #544 and #791
             $tmpl_decoded['data'] = sek_prepare_seks_data_for_customizer( $tmpl_decoded['data'] );
+
+            // added March 2021 for site templates #478
+            // If property '__inherits_group_skope__' has been saved by mistake in the template, make sure it's unset now
+            if ( array_key_exists('__inherits_group_skope__', $tmpl_decoded['data'] ) ) {
+                unset( $tmpl_decoded['data']['__inherits_group_skope__'] );
+            }
             wp_send_json_success( $tmpl_decoded );
         } else {
             wp_send_json_error( __FUNCTION__ . '_invalid_tmpl_post_data' );
@@ -4728,6 +4751,12 @@ function sek_ajax_sek_get_api_tmpl_json() {
         // Make sure we decode encoded rich text before sending to the customizer
         // see #544 and #791
         $raw_tmpl_data['data'] = sek_prepare_seks_data_for_customizer( $raw_tmpl_data['data'] );
+        
+        // added March 2021 for site templates #478
+        // If property '__inherits_group_skope__' has been saved by mistake in the template, make sure it's unset now
+        if ( array_key_exists('__inherits_group_skope__', $raw_tmpl_data['data'] ) ) {
+            unset( $raw_tmpl_data['data']['__inherits_group_skope__'] );
+        }
         wp_send_json_success( $raw_tmpl_data );
     }
     //return [];
@@ -4742,8 +4771,6 @@ add_action( 'wp_ajax_sek_save_user_template', '\Nimble\sek_ajax_save_user_templa
 /////////////////////////////////////////////////////////////////
 // hook : wp_ajax_sek_save_user_template
 function sek_ajax_save_user_template() {
-    //sek_error_log( __FUNCTION__ . ' ALORS ??', $_POST );
-
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
     $is_edit_metas_only_case = isset( $_POST['edit_metas_only'] ) && 'yes' === $_POST['edit_metas_only'];
 
@@ -4776,6 +4803,12 @@ function sek_ajax_save_user_template() {
         // clean level ids and replace them with a placeholder string
         $tmpl_data = json_decode( wp_unslash( $_POST['tmpl_data'] ), true );
         $tmpl_data = sek_template_save_clean_id( $tmpl_data );
+        
+        // added March 2021 for site templates #478
+        // If property '__inherits_group_skope__' has been set to the template, make sure it's unset now
+        if ( array_key_exists('__inherits_group_skope__', $tmpl_data ) ) {
+            unset( $tmpl_data['__inherits_group_skope__'] );
+        }
     }
     
     // make sure description and title are clean before DB

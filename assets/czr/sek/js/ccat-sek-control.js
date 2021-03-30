@@ -250,9 +250,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // SECTION ID FOR THE CONTENT PICKER
                   self.SECTION_ID_FOR_CONTENT_PICKER = '__content_picker__';
 
-                  // Feb 2021 : site templates
-                  self.SECTION_ID_FOR_SITE_TMPL = '__siteTmplSection';
-
                   // Max possible number of columns in a section
                   self.MAX_NUMBER_OF_COLUMNS = 12;
 
@@ -306,9 +303,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Helps fixing : https://github.com/presscustomizr/nimble-builder/issues/242, for which sek_add_css_rules_for_spacing() couldn't be set for columns margins
                   api.bind( 'save-request-params', function( query ) {
                         $.extend( query, {
-                          local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
-                          group_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ),//<= feb 2021, added for #478
-                          active_locations : api.czr_sektions.activeLocations()
+                              local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                              group_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ),//<= feb 2021, added for #478
+                              active_locations : api.czr_sektions.activeLocations(),
+                              inherit_group_template : true
                         });
                   });
 
@@ -392,23 +390,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               });
                         });
                         
-                        // Generate UI for the site templates
-                        if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
-                              api.section( self.SECTION_ID_FOR_SITE_TMPL, function( _section_ ) {
-                                    _section_.deferred.embedded.done( function() {
-                                          if( true === _section_.siteTmplOptionsGenerated )
-                                          return;
-                                          // Defer the UI generation when the section is expanded
-                                          _section_.siteTmplOptionsGenerated = true;
-                                          _section_.expanded.bind( function( expanded ) {
-                                                if ( true === expanded ) {
-                                                      self.generateUI({ action : 'sek-generate-site-tmpl-options-ui'});
-                                                }
-                                          });
-                                    });
-                              });
-                        }
-
 
                         // The UI of the global option must be generated only once.
                         // We don't want to re-generate on each skope change
@@ -688,6 +669,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // April 2020. For https://github.com/presscustomizr/nimble-builder/issues/651
                   self.setupTemplateGallery();
 
+                  // March 2021. For #478. 'czr-new-skopes-synced' is sent by preview on each refresh
+                  api.previewer.bind( 'czr-new-skopes-synced', function( skope_server_data ) {
+                        //console.log('SKOPED SYNCED');
+                        var localSektionsData = api.czr_skopeBase.getSkopeProperty( 'sektions', 'local');
+                        if ( sektionsLocalizedData.isDevMode ) {
+                              api.infoLog( '::czr-new-skopes-synced => SEKTIONS DATA ? ', localSektionsData );
+                        }
+                        if ( _.isEmpty( localSektionsData ) ) {
+                              api.errare('::czr-new-skopes-synced => no sektionsData');
+                        }
+                        if ( _.isEmpty( localSektionsData.setting_id ) ) {
+                              api.errare('::czr-new-skopes-synced => missing setting_id');
+                        }
+
+                  });
             },//doSektionThinksOnApiReady
 
 
@@ -870,20 +866,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         type : 'option'
                   });
 
-                  // SITE TEMPLATE OPTIONS SETTING
-                  // Will Be updated in ::generateUIforGlobalOptions()
-                  // has no control.
-                  api.CZR_Helpers.register( {
-                        origin : 'nimble',
-                        //level : params.level,
-                        what : 'setting',
-                        id : sektionsLocalizedData.optNameForSiteTmplOptions,
-                        dirty : false,
-                        value : sektionsLocalizedData.siteTmplOptionDBValues,
-                        transport : 'postMessage',//'refresh',//// ,
-                        type : 'option'
-                  });
-
                   // CONTENT PICKER SECTION
                   api.CZR_Helpers.register({
                         origin : 'nimble',
@@ -917,67 +899,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                   });
-
-
-                  // Feb 2021, Site templates
-                  if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
-                        api.CZR_Helpers.register({
-                              origin : 'nimble',
-                              what : 'section',
-                              id : self.SECTION_ID_FOR_SITE_TMPL,//<= the section id doesn't need to be skope dependant. Only the control id is skope dependant.
-                              title: sektionsLocalizedData.i18n['Site templates'],
-                              panel : sektionsLocalizedData.sektionsPanelId,
-                              priority : 10,
-                              track : false,//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
-                              constructWith : api.Section.extend({
-                                    //attachEvents : function () {},
-                                    // Always make the section active, event if we have no control in it
-                                    isContextuallyActive : function() {
-                                    return this.active();
-                                    },
-                                    _toggleActive : function(){ return true; }
-                              })
-                        }).done( function() {
-                              api.section( self.SECTION_ID_FOR_SITE_TMPL, function( _section_ ) {
-                                    // Style the section title
-                                    var $sectionTitleEl = _section_.container.find('.accordion-section-title'),
-                                    $panelTitleEl = _section_.container.find('.customize-section-title h3');
-
-                                    // The default title looks like this : Title <span class="screen-reader-text">Press return or enter to open this section</span>
-                                    if ( 0 < $sectionTitleEl.length ) {
-                                          $sectionTitleEl.prepend( '<i class="fas fa-map-marker-alt sek-level-option-icon"></i>' );
-                                    }
-
-                                    // The default title looks like this : <span class="customize-action">Customizing</span> Title
-                                    if ( 0 < $panelTitleEl.length ) {
-                                          $panelTitleEl.find('.customize-action').after( '<i class="fas fa-map-marker-alt sek-level-option-icon"></i>' );
-                                    }
-
-                                    // Schedule the accordion behaviour
-                                    self.scheduleModuleAccordion.call( _section_, { expand_first_control : true } );
-
-                                    // FORCE PREVIEW URL TO HOME WHEN PICKING SITE TEMPLATES
-                                    // when picking site templates, make sure the preview loads home page
-                                    // => otherwise, for example if a page site template is applied to a page with no local sections, which is currently being previewed, the site template sections will be set as the local setting value, and therefore published as local sections, which we don't want.
-                                    var _doThingsAfterRefresh = function() {
-                                          setTimeout( function() {
-                                                _section_.expanded(true);
-                                                var _ctrl_ = _.first( _section_.controls() );
-                                                if ( _ctrl_ && _ctrl_.id ) {
-                                                      api.control( _ctrl_.id ).container.find('.customize-control-title').trigger('click');
-                                                }
-                                          }, 500 );
-                                         
-                                          api.czr_currentSkopesCollection.unbind( _doThingsAfterRefresh );
-                                    };
-                                    _section_.container.find('.accordion-section-title').first().on('click', function() {
-                                          api.czr_currentSkopesCollection.bind( _doThingsAfterRefresh );
-                                          api.previewer.previewUrl( api.settings.url.home );
-                                    });
-                              });
-                        });
-                  }//isSiteTemplateEnabled
-
             },//registerAndSetupDefaultPanelSectionOptions()
 
 
@@ -1003,9 +924,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // set the localSectionsSettingId now, and update it on skope change
                   sektionsData = api.czr_skopeBase.getSkopeProperty( 'sektions', 'local');
                   if ( sektionsLocalizedData.isDevMode ) {
-                        if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
-                              api.infoLog( 'TO DO SITE TEMPLATES => 1) PHP create a site template mapping : skope => site_template option that applies, 2) Include this mapping in the localized customizer params 3) use it on local reset to set the new value');
-                        }
                         api.infoLog( '::setContextualCollectionSettingIdWhenSkopeSet => SEKTIONS DATA ? ', sektionsData );
                   }
                   if ( _.isEmpty( sektionsData ) ) {
@@ -1357,12 +1275,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   // set the new setting Value
-                  if( ! _.isUndefined( newSettingValue ) ) {
-                        if ( ! _.isEmpty( newSettingValue.local ) ) {
+                  if( !_.isUndefined( newSettingValue ) ) {
+                        if ( !_.isEmpty( newSettingValue.local ) ) {
                               api( self.localSectionsSettingId() )( self.validateSettingValue( newSettingValue.local, 'local' ), { navigatingHistoryLogs : true } );
 
                               // Clean and regenerate the local option setting
-                              // Note that we also do it after a local import.
+                              // Note that we also do it after a local import, tmpl injection or local reset
                               //
                               // Settings are normally registered once and never cleaned, unlike controls.
                               // Updating the setting value will refresh the sections
@@ -1373,10 +1291,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // __nimble__skp__home__localSkopeOptions__custom_css
                               api.czr_sektions.generateUI({
                                     action : 'sek-generate-local-skope-options-ui',
-                                    clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
+                                    clean_settings_and_controls_first : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
                               });
                         }
-                        if ( ! _.isEmpty( newSettingValue.global ) ) {
+                        if ( !_.isEmpty( newSettingValue.global ) ) {
                               api( self.getGlobalSectionsSettingId() )( self.validateSettingValue( newSettingValue.global, 'global' ), { navigatingHistoryLogs : true } );
                         }
                         // If the information is available, refresh only the relevant sections
@@ -1411,7 +1329,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.cleanRegisteredAndLargeSelectInput();//<= normal cleaning
                         // Clean even the level settings
                         // => otherwise the level settings won't be synchronized when regenerating their ui.
-                        self.cleanRegisteredLevelSettingsAfterHistoryNavigation();// setting cleaning
+                        self.cleanRegisteredLevelSettings();// setting cleaning
                   }
 
                   // UPDATE THE HISTORY LOG
@@ -3349,10 +3267,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // After the inject, updating the setting value will refresh the sections
                         // but the local options, persisted in separate settings, won't be updated if the settings are not cleaned
                         if ( 'local' === _scope ) {
-                              api.czr_sektions.generateUI({
-                                    action : 'sek-generate-local-skope-options-ui',
-                                    clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
-                              });
+                              var _doThingsAfterRefresh = function() {
+                                    // Removes and RE-register local settings and controls
+                                    api.czr_sektions.generateUI({
+                                          action : 'sek-generate-local-skope-options-ui',
+                                          clean_settings_and_controls_first : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
+                                    });
+                                    api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
+                              };
+                              // 'czr-new-skopes-synced' is always sent on a previewer.refresh()
+                              api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                         }
 
                         //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
@@ -3470,9 +3394,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // 2) validate that the setting is well formed before being changed
             // 3) schedule reactions on change ?
             // @return void()
-            setupSettingsToBeSaved : function() {
+            setupSettingsToBeSaved : function( params ) {
                   var self = this,
                       serverCollection;
+
+                  params = params || { dirty : false };
 
                   // maybe register the sektion_collection settings
                   var _settingsToRegister_ = {
@@ -3496,9 +3422,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     transport : 'postMessage',//'refresh'
                                     type : 'option',
                                     track : false,//don't register in the self.registered()
-                                    origin : 'nimble'
+                                    origin : 'nimble',
+                                    dirty : params.dirty
                               });
-
 
                               //if ( sektionsLocalizedData.isDevMode ) {}
                               api( settingData.collectionSettingId, function( sektionSetInstance ) {
@@ -3571,7 +3497,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   var parentLevel = {},
                       errorDetected = false,
-                      levelIds = [];
+                      levelIds = [],
+                      authorized_local_option_groups = ['collection', 'local_options', 'fonts' ];
+                  
+                  if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
+                        authorized_local_option_groups.push('__inherits_group_skope__');
+                  }
+
                   // walk the collections tree and verify it passes the various consistency checks
                   var _errorDetected_ = function( msg ) {
                         api.errare( msg , valCandidate );
@@ -3632,7 +3564,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   _.each( level, function( _opts, _opt_group_name) {
                                         switch( scope ) {
                                               case 'local' :
-                                                    if( !_.contains( ['collection', 'local_options', 'fonts' ] , _opt_group_name ) ) {
+                                                    if( !_.contains( authorized_local_option_groups , _opt_group_name ) ) {
                                                           _errorDetected_( 'validation error => unauthorized option group for local setting value => ' + _opt_group_name );
                                                           return;
                                                     }
@@ -3782,26 +3714,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
                         throw new Error( 'resetCollectionSetting => invalid scope provided.', scope );
                   }
-
-                  if ( sektionsLocalizedData.isSiteTmplEnabled ) {
-                        // Feb 2021 : do we have group template that applies to this context ?
-                        var site_tmpl_opts = api(sektionsLocalizedData.optNameForSiteTmplOptions)(),
-                              group_skope_id = api.czr_skopeBase.getSkopeProperty( 'skope_id' ,'group'),
-                              group_skope_sektions = api.czr_skopeBase.getSkopeProperty( 'group_sektions' ,'group');
-                        
-                        console.log('ALORS ?', site_tmpl_opts, group_skope_id, group_skope_sektions );
-
-                        // FEB 2021 => TEST FOR ALL PAGE SKOPE
-                        if ( _.isObject( site_tmpl_opts ) && site_tmpl_opts.site_templates && _.isObject( site_tmpl_opts.site_templates ) && site_tmpl_opts.site_templates.pages ) {
-                              if ( 'skp__all_page' === group_skope_id ) {
-                                    if ( group_skope_sektions && group_skope_sektions.db_values ) {
-                                          console.log('SET GROUP SKOPE SEKTION ?');
-                                          newSettingValue = self.validateSettingValue( _.isObject( group_skope_sektions.db_value ) ? group_skope_sektions.db_value : self.getDefaultSektionSettingValue( 'local' ), 'local' );
-                                    }
-                              }
-                        }
-                  }
-
                   return $.extend( true, {}, self.getDefaultSektionSettingValue( scope ) );
             }
       });//$.extend()
@@ -4560,32 +4472,96 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             },
 
 
-                            // RESET
-                            'sek-reset-collection' : {
-                                  callback : function( params ) {
-                                        sendToPreview = false;//<= when the level is refreshed when complete, we don't need to send to preview.
-                                        uiParams = {};
-                                        apiParams = params;
-                                        apiParams.action = 'sek-reset-collection';
-                                        apiParams.scope = params.scope;
-                                        return self.updateAPISetting( apiParams );
-                                  },
-                                  complete : function( params ) {
-                                        api.previewer.refresh();
-                                        api.previewer.trigger('sek-notify', {
-                                              notif_id : 'reset-success',
-                                              type : 'success',
-                                              duration : 8000,
-                                              message : [
-                                                    '<span>',
-                                                      '<strong>',
-                                                      sektionsLocalizedData.i18n['Reset complete'],
-                                                      '</strong>',
-                                                    '</span>'
-                                              ].join('')
-                                        });
-                                  }
-                            },
+                              // RESET
+                              'sek-reset-collection' : {
+                                    callback : function( params ) {
+                                          sendToPreview = false;//<= when the level is refreshed when complete, we don't need to send to preview.
+                                          uiParams = {};
+                                          apiParams = params;
+                                          apiParams.action = 'sek-reset-collection';
+                                          apiParams.scope = params.scope;
+                                          var _dfd_ = self.updateAPISetting( apiParams )
+                                                .done( function( resp) {
+                                                      api.previewer.refresh();
+                                                      api.previewer.trigger('sek-notify', {
+                                                            notif_id : 'reset-success',
+                                                            type : 'success',
+                                                            duration : 8000,
+                                                            message : [
+                                                                  '<span>',
+                                                                  '<strong>',
+                                                                  sektionsLocalizedData.i18n['Reset complete'],
+                                                                  '</strong>',
+                                                                  '</span>'
+                                                            ].join('')
+                                                      });
+                                                      if ( sektionsLocalizedData.isSiteTemplateEnabled && 'local' === params.scope ) {
+                                                            var _doThingsAfterRefresh = function() {
+                                                                  //api.infoLog('RESET MAIN LOCAL SETTING ON NEW SKOPES SYNCED', self.localSectionsSettingId() );
+                                                                  // Keep only the settings for global option, local options, content picker
+                                                                  // Remove all the others
+                                                                  // ( local options are removed below )
+                                                                  self.cleanRegisteredLevelSettings();
+
+                                                                  // Removes the local sektions setting
+                                                                  api.remove( self.localSectionsSettingId() );
+
+                                                                  // RE-register the local sektions setting with values sent from the server
+                                                                  // If the local page inherits a group skope, those will be set as local
+                                                                  // To prevent saving server sets property __inherits_group_skope__ = true
+                                                                  // set the param { dirty : true } => because otherwise, if user saves right after a reset, local option won't be ::updated() server side.
+                                                                  // Which means that the page will keep its previous aspect
+                                                                  try { self.setupSettingsToBeSaved( { dirty : true } ); } catch( er ) {
+                                                                        api.errare( 'Error in self.localSectionsSettingId.callbacks => self.setupSettingsToBeSaved()' , er );
+                                                                  }
+
+                                                                  // Removes and RE-register local settings and controls
+                                                                  self.generateUI({
+                                                                        action : 'sek-generate-local-skope-options-ui',
+                                                                        clean_settings_and_controls_first : true//<= see self.generateUIforLocalSkopeOptions()
+                                                                  });
+                                                                  // 'czr-new-skopes-synced' is always sent on a previewer.refresh()
+                                                                  api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
+                                                            };
+                                                            api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
+                                                      }//if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
+                                                })
+                                                .fail( function( response ) {
+                                                      api.errare( 'reset_button input => error when firing ::updateAPISetting', response );
+                                                      api.previewer.trigger('sek-notify', {
+                                                            notif_id : 'reset-failed',
+                                                            type : 'error',
+                                                            duration : 8000,
+                                                            message : [
+                                                                  '<span>',
+                                                                  '<strong>',
+                                                                  sektionsLocalizedData.i18n['Reset failed'],
+                                                                  '<br/>',
+                                                                  '<i>' + response + '</i>',
+                                                                  '</strong>',
+                                                                  '</span>'
+                                                            ].join('')
+                                                      });
+                                                });
+
+                                          return _dfd_;
+                                    },
+                                    complete : function( params ) {
+                                          // api.previewer.refresh();
+                                          // api.previewer.trigger('sek-notify', {
+                                          //       notif_id : 'reset-success',
+                                          //       type : 'success',
+                                          //       duration : 8000,
+                                          //       message : [
+                                          //             '<span>',
+                                          //                   '<strong>',
+                                          //                   sektionsLocalizedData.i18n['Reset complete'],
+                                          //                   '</strong>',
+                                          //             '</span>'
+                                          //       ].join('')
+                                          // });
+                                    }
+                              },
                       };//msgCollection
 
                   // Schedule the reactions
@@ -4793,16 +4769,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         break;
 
                         // Fired in ::initialize()
-                        case 'sek-generate-site-tmpl-options-ui' :
-                              // Clean previously generated UI elements
-                              self.cleanRegisteredAndLargeSelectInput();
-                              try{ dfd = self.generateUIforSiteTmplOptions( params, dfd ); } catch( er ) {
-                                    api.errare( '::generateUI() => error', er );
-                                    dfd = $.Deferred();
-                              }
-                        break;
-
-                        // Fired in ::initialize()
                         case 'sek-generate-global-options-ui' :
                               // Clean previously generated UI elements
                               self.cleanRegisteredAndLargeSelectInput();
@@ -5002,36 +4968,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
                                           location_skope_id : sektionsLocalizedData.globalSkopeId
                                     });
-                              }
-                        } else if ( true === params.isSiteTemplateOptions ) {
-                              // SITE TEMPLATES OPTIONS CASE => SITE WIDE => WRITING IN A SPECIFIC OPTION, SEPARATE FROM THE SEKTION COLLECTION
-                              if ( _.isEmpty( params.options_type ) ) {
-                                    api.errare( 'updateAPISettingAndExecutePreviewActions => error when updating the site template options => missing options_type');
-                                    return;
-                              }
-                              //api( sektionsLocalizedData.optNameForSiteTmplOptions )() is registered on ::initialize();
-                              var rawSiteTmplOpts = api( sektionsLocalizedData.optNameForSiteTmplOptions )(),
-                                  cloneSiteTmplOpts = $.extend( true, {}, _.isObject( rawSiteTmplOpts ) ? rawSiteTmplOpts : {} ),
-                                  _valCandidate = {};
-
-                              // consider only the non empty settings for db
-                              // booleans should bypass this check
-                              _.each( moduleValueCandidate || {}, function( _val_, _key_ ) {
-                                    // Note : _.isEmpty( 5 ) returns true when checking an integer,
-                                    // that's why we need to cast the _val_ to a string when using _.isEmpty()
-                                    if ( !_.isBoolean( _val_ ) && _.isEmpty( _val_ + "" ) )
-                                      return;
-                                    _valCandidate[ _key_ ] = _val_;
-                              });
-
-                              cloneSiteTmplOpts[ params.options_type ] = _valCandidate;
-
-                              // Set it
-                              api( sektionsLocalizedData.optNameForSiteTmplOptions )( cloneSiteTmplOpts );
-
-                              // REFRESH THE PREVIEW ?
-                              if ( false !== refresh_preview ) {
-                                    api.previewer.refresh();
                               }
                         } else {
                               // LEVEL OPTION CASE => LOCAL
@@ -6134,7 +6070,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       args : args
                                                 }
                                           }); } catch( er ) {
-                                                api.errare( '::generateUIforLevelOptions => Error in updateAPISettingAndExecutePreviewActions', er );
+                                                api.errare( '::_do_register_ => Error in updateAPISettingAndExecutePreviewActions', er );
                                           }
                                     };
 
@@ -6303,9 +6239,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   // remove settings when requested
-                  // Happens when importing a file
-                  if ( true === params.clean_settings ) {
-                        self.cleanRegisteredLocalOptionSettings();
+                  // Happens when 
+                  // - importing a file
+                  // - after a local reset
+                  // - after a template injection
+                  // - a history navigation action
+                  if ( true === params.clean_settings_and_controls_first ) {
+                        self.cleanRegisteredLocalOptionSettingsAndControls();
                   }
 
 
@@ -6402,7 +6342,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                   optionTypeValue = _.isObject( currentAllLocalOptionsValue[ optionType ] ) ? currentAllLocalOptionsValue[ optionType ]: {},
                                   initialModuleValues = optionTypeValue;
 
-                              if ( ! api.has( optionData.settingControlId ) ) {
+                              // SETTING
+                              if ( !api.has( optionData.settingControlId ) ) {
                                     var doUpdate = function( to, from, args ) {
                                           try { self.updateAPISettingAndExecutePreviewActions({
                                                 defaultPreviewAction : 'refresh_preview',
@@ -6446,49 +6387,52 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     });
                               }//if ( ! api.has( optionData.settingControlId ) )
 
-                              api.CZR_Helpers.register({
-                                    origin : 'nimble',
-                                    level : params.level,
-                                    what : 'control',
-                                    id : optionData.settingControlId,
-                                    label : optionData.controlLabel,
-                                    type : 'czr_module',//sekData.controlType,
-                                    module_type : optionData.module_type,
-                                    section : self.SECTION_ID_FOR_LOCAL_OPTIONS,
-                                    priority : 10,
-                                    settings : { default : optionData.settingControlId },
-                                    //track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
-                              }).done( function() {
 
-                                    // if ( true === optionData.expandAndFocusOnInit ) {
-                                    //       api.control( optionData.settingControlId ).focus({
-                                    //             completeCallback : function() {}
-                                    //       });
-                                    // }
+                              // CONTROL
+                              if ( !api.control.has( optionData.settingControlId ) ) {
+                                    api.CZR_Helpers.register({
+                                          origin : 'nimble',
+                                          level : params.level,
+                                          what : 'control',
+                                          id : optionData.settingControlId,
+                                          label : optionData.controlLabel,
+                                          type : 'czr_module',//sekData.controlType,
+                                          module_type : optionData.module_type,
+                                          section : self.SECTION_ID_FOR_LOCAL_OPTIONS,
+                                          priority : 10,
+                                          settings : { default : optionData.settingControlId },
+                                          track : true//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
+                                    }).done( function() {
 
-                                    // Implement the animated arrow markup, and the initial state of the module visibility
-                                    api.control( optionData.settingControlId, function( _control_ ) {
-                                          // Hide the item wrapper
-                                          // @see css
-                                          _control_.container.attr('data-sek-expanded', "false" );
-                                          var $title = _control_.container.find('label > .customize-control-title'),
-                                              _titleContent = $title.html();
-                                          // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
-                                          $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
+                                          // if ( true === optionData.expandAndFocusOnInit ) {
+                                          //       api.control( optionData.settingControlId ).focus({
+                                          //             completeCallback : function() {}
+                                          //       });
+                                          // }
+                                          // Implement the animated arrow markup, and the initial state of the module visibility
+                                          api.control( optionData.settingControlId, function( _control_ ) {
+                                                // Hide the item wrapper
+                                                // @see css
+                                                _control_.container.attr('data-sek-expanded', "false" );
+                                                var $title = _control_.container.find('label > .customize-control-title').first(),
+                                                _titleContent = $title.html();
+                                                // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
+                                                $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
 
-                                          // if this level has an icon, let's prepend it to the title
-                                          if ( ! _.isUndefined( optionData.icon ) ) {
-                                                $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
-                                          }
-                                          // prepend the animated arrow
-                                          $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
-                                          // setup the initial state + initial click
-                                          _control_.container.attr('data-sek-expanded', "false" );
-                                          if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
-                                                $title.trigger('click');
-                                          }
+                                                // if this level has an icon, let's prepend it to the title
+                                                if ( ! _.isUndefined( optionData.icon ) ) {
+                                                      $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
+                                                }
+                                                // prepend the animated arrow
+                                                $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
+                                                // setup the initial state + initial click
+                                                _control_.container.attr('data-sek-expanded', "false" );
+                                                if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
+                                                      $title.trigger('click');
+                                                }
+                                          });
                                     });
-                              });
+                              }
                         });//_.each()
                   };//_do_register()
 
@@ -6532,7 +6476,23 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Populate the registration params
                   _.each( sektionsLocalizedData.globalOptionsMap, function( mod_type, opt_name ) {
                         switch( opt_name ) {
+                              case 'site_templates' :
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__site_templates',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Site templates'],
+                                          icon : '<i class="material-icons sek-level-option-icon">devices</i>'
+                                    };
+                              break;
                               // Header and footer have been beta tested during 5 months and released in June 2019, in version 1.8.0
+                              case 'global_header_footer':
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__header_footer',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
+                                          icon : '<i class="material-icons sek-level-option-icon">web</i>'
+                                    };
+                              break;
                               case 'global_text' :
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__global_text',
@@ -6558,15 +6518,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           icon : '<i class="material-icons sek-level-option-icon">devices</i>'
                                     };
                               break;
-                              case 'global_header_footer':
-                                    registrationParams[ opt_name ] = {
-                                          settingControlId : _id_ + '__header_footer',
-                                          module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Site wide header and footer'],
-                                          icon : '<i class="material-icons sek-level-option-icon">web</i>'
-                                    };
-                              break;
-
                               case 'performances' :
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__performances',
@@ -6648,6 +6599,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // They need to be kept in order to keep track of the changes in the customizer.
                                     // => that's why we check if ! api.has( ... )
                                     api( optionData.settingControlId, function( _setting_ ) {
+                                          // SITE TEMPLATE STUFFS
+                                          // Added March 2021 for #478
+                                          // Force preview to home when modifying the site templates
+                                          if ( 'site_templates' === optionType ) {
+                                                var _doThingsAfterRefresh = function() {
+                                                      setTimeout( function() {
+                                                            api.control( optionData.settingControlId ).focus();
+                                                      }, 300 );
+                                                      api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
+                                                };
+                                                
+                                                _setting_.bind( function( to ) {
+                                                      //console.log('REFRESH PREVIEW TO HOME', to );
+                                                      api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
+                                                      api.previewer.previewUrl( api.settings.url.home );
+                                                });
+                                          }
+
                                           _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
                                     });//api( Id, function( _setting_ ) {})
 
@@ -6682,159 +6651,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     type : 'czr_module',//sekData.controlType,
                                     module_type : optionData.module_type,
                                     section : self.SECTION_ID_FOR_GLOBAL_OPTIONS,//registered in ::initialize()
-                                    priority : 20,
-                                    settings : { default : optionData.settingControlId },
-                                    track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
-                              }).done( function() {
-                                    // if ( true === optionData.expandAndFocusOnInit ) {
-                                    //       api.control( optionData.settingControlId ).focus({
-                                    //             completeCallback : function() {}
-                                    //       });
-                                    // }
-
-                                    // Implement the animated arrow markup, and the initial state of the module visibility
-                                    api.control( optionData.settingControlId, function( _control_ ) {
-                                          // Hide the item wrapper
-                                          // @see css
-                                          _control_.container.attr('data-sek-expanded', "false" );
-                                          var $title = _control_.container.find('label > .customize-control-title'),
-                                              _titleContent = $title.html();
-                                          // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
-                                          $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
-
-                                          // if this level has an icon, let's prepend it to the title
-                                          if ( ! _.isUndefined( optionData.icon ) ) {
-                                                $title.addClass('sek-flex-vertical-center').prepend( optionData.icon );
-                                          }
-                                          // prepend the animated arrow
-                                          $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
-                                          // setup the initial state + initial click
-                                          _control_.container.attr('data-sek-expanded', "false" );
-                                          if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
-                                                $title.trigger('click');
-                                          }
-                                    });
-                              });
-                        });//_.each();
-                  };//do register
-
-                  // The parent section has already been added in ::initialize()
-                  _do_register_();
-
-                  return dfd;
-            }
-      });//$.extend()
-})( wp.customize, jQuery );//global sektionsLocalizedData
-var CZRSeksPrototype = CZRSeksPrototype || {};
-(function ( api, $ ) {
-      $.extend( CZRSeksPrototype, {
-            // @params = {
-            //    action : 'sek-generate-site-tmpl-options-ui'
-            //    level : params.level,
-            //    id : params.id,
-            //    in_sektion : params.in_sektion,
-            //    in_column : params.in_column,
-            //    options : params.options || []
-            // }
-            // @dfd = $.Deferred()
-            // @return the state promise dfd
-            generateUIforSiteTmplOptions : function( params, dfd ) {
-                  var self = this,
-                        // only the site_template option will be saved ( see php constant NIMBLE_OPT_NAME_FOR_SITE_TMPL_OPTIONS ) not the setting used to populate it
-                      _id_ = sektionsLocalizedData.prefixForSettingsNotSaved + sektionsLocalizedData.optNameForSiteTmplOptions;//__nimble__ + nimble_site_templates
-
-                  // Is the UI currently displayed the one that is being requested ?
-                  // If so, visually remind the user that a module should be dragged
-                  if ( self.isUIControlAlreadyRegistered( _id_ ) ) {
-                        return dfd;
-                  }
-
-                  // Prepare the module map to register
-                  var registrationParams = {};
-                  if ( _.isUndefined( sektionsLocalizedData.siteTmplOptionsMap ) || ! _.isObject( sektionsLocalizedData.siteTmplOptionsMap ) ) {
-                        api.errare( '::generateUIforSiteTmplOptions => missing or invalid siteTmplOptionsMap');
-                        return dfd;
-                  }
-
-                  // Populate the registration params
-                  _.each( sektionsLocalizedData.siteTmplOptionsMap, function( mod_type, opt_name ) {
-                        switch( opt_name ) {
-                              // Header and footer have been beta tested during 5 months and released in June 2019, in version 1.8.0
-                              case 'site_templates' :
-                                    registrationParams[ opt_name ] = {
-                                          settingControlId : _id_ + '__site_templates',
-                                          module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Site templates'],
-                                          icon : ''//'<i class="material-icons sek-level-option-icon">text_format</i>'
-                                    };
-                              break;
-                              default :
-                                    api.errare('::generateUIforSiteTmplOptions => an option group could not be registered => ' + mod_type, opt_name );
-                              break;
-                        }//switch
-                  });//_.each
-
-                  // Let assign the global options to a var
-                  var siteTmplOptionDBValues = sektionsLocalizedData.siteTmplOptionDBValues;
-
-                  _do_register_ = function() {
-                        _.each( registrationParams, function( optionData, optionType ){
-                              if ( ! api.has( optionData.settingControlId ) ) {
-                                    var doUpdate = function( to, from, args ) {
-                                          try { self.updateAPISettingAndExecutePreviewActions({
-                                                isSiteTemplateOptions : true,//<= indicates that we won't update the local skope setting id
-                                                defaultPreviewAction : 'refresh_preview',
-                                                uiParams : params,
-                                                options_type : optionType,
-                                                settingParams : {
-                                                      to : to,
-                                                      from : from,
-                                                      args : args
-                                                }
-                                          }); } catch( er ) {
-                                                api.errare( '::generateUIforSiteTmplOptions => Error in updateAPISettingAndExecutePreviewActions', er );
-                                          }
-                                    };
-
-                                    // Schedule the binding to synchronize the options with the main collection setting
-                                    // Note 1 : unlike control or sections, the setting are not getting cleaned up on each ui generation.
-                                    // They need to be kept in order to keep track of the changes in the customizer.
-                                    // => that's why we check if ! api.has( ... )
-                                    api( optionData.settingControlId, function( _setting_ ) {
-                                          _setting_.bind( _.debounce( doUpdate, self.SETTING_UPDATE_BUFFER ) );//_setting_.bind( _.debounce( function( to, from, args ) {}
-                                    });//api( Id, function( _setting_ ) {})
-
-                                    // Let's add the starting values if provided when registrating the module
-                                    var startingModuleValue = self.getModuleStartingValue( optionData.module_type ),
-                                        initialModuleValues = ( _.isObject( siteTmplOptionDBValues ) && ! _.isEmpty( siteTmplOptionDBValues[ optionType ] ) ) ? siteTmplOptionDBValues[ optionType ] : {};
-
-                                    if ( 'no_starting_value' !== startingModuleValue && _.isObject( startingModuleValue ) ) {
-                                          // make sure the starting values are deeped clone now, before being extended
-                                          var clonedStartingModuleValue = $.extend( true, {}, startingModuleValue );
-                                          initialModuleValues = $.extend( clonedStartingModuleValue, initialModuleValues );
-                                    }
-
-                                    api.CZR_Helpers.register( {
-                                          origin : 'nimble',
-                                          level : params.level,
-                                          what : 'setting',
-                                          id : optionData.settingControlId,
-                                          dirty : false,
-                                          value : initialModuleValues,
-                                          transport : 'postMessage',//'refresh',//// ,
-                                          type : '_nimble_ui_'//will be dynamically registered but not saved in db as option// columnData.settingType
-                                    });
-                              }
-
-                              api.CZR_Helpers.register( {
-                                    origin : 'nimble',
-                                    level : params.level,
-                                    what : 'control',
-                                    id : optionData.settingControlId,
-                                    label : optionData.controlLabel,
-                                    type : 'czr_module',//sekData.controlType,
-                                    module_type : optionData.module_type,
-                                    section : self.SECTION_ID_FOR_SITE_TMPL,//registered in ::initialize()
                                     priority : 20,
                                     settings : { default : optionData.settingControlId },
                                     track : false//don't register in the self.registered() => this will prevent this container to be removed when cleaning the registered
@@ -7178,6 +6994,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           self.updAPISetParams.promise.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
                                           if ( null !== self.validateSettingValue( self.updAPISetParams.newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
+                                                if ( sektionsLocalizedData.isSiteTemplateEnabled && !params.is_global_location ) {
+                                                      // Added March 2021 for #478
+                                                      // When preparing skope data for customizer server side, NB adds this property
+                                                      // This property says that this page has no local sektions + has a group template set.
+                                                      // Useful on a saving action just after a reset because it informs the server if the local skope has been modified or not.
+                                                      // Because in the customizer, after a reset NB sets the local setting value to the inherited group skope one
+                                                      // If we save, NB will "think" that the local skope has been customize, while in fact it only inherits its group skope
+                                                      // If saved, then the page won't inherit the group skope anymore, which will be difficult to detect at first because local and group will be the same at the beginning
+                                                      // If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
+                                                      self.updAPISetParams.newSetValue.__inherits_group_skope__ = false;
+                                                }
                                                 api( _collectionSettingId_ )( self.updAPISetParams.newSetValue, params );
                                                 // Add the cloneId to the params when we resolve
                                                 // the cloneId is only needed in the duplication scenarii
@@ -9301,8 +9128,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
             },
 
+
             // This action can be fired after an import, to update the local settings with the imported values
-            cleanRegisteredLocalOptionSettings : function() {
+            cleanRegisteredLocalOptionSettingsAndControls : function() {
                   var self = this,
                       localOptionPrefix = self.getLocalSkopeOptionId(),
                       registered = $.extend( true, [], self.registered() || [] );
@@ -9311,6 +9139,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // Remove the local setting
                         if ( _reg_.id && -1 !== _reg_.id.indexOf( localOptionPrefix ) && api.has( _reg_.id ) ) {
                                api.remove( _reg_.id );
+                        }
+                        // Remove the local control
+                        if ( _reg_.id && -1 !== _reg_.id.indexOf( localOptionPrefix ) && api.control.has( _reg_.id ) ) {
+                              $.when( api.control( _reg_.id ).container.remove() ).done( function() {
+                                    // remove control, section, panel
+                                    api.control.remove( _reg_.id );
+                              });
                         }
                         // keep only the setting not local
                         return _reg_.id && -1 === _reg_.id.indexOf( localOptionPrefix );
@@ -9322,7 +9157,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // Keep only the settings for global option, local options, content picker
             // Remove all the other
             // The level ( section, column module ) settings can be identified because they are registered with a level property
-            cleanRegisteredLevelSettingsAfterHistoryNavigation : function() {
+            cleanRegisteredLevelSettings : function() {
                   var self = this,
                       registered = $.extend( true, [], self.registered() || [] );
 
@@ -10597,6 +10432,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
 
+            //-------------------------------------------------------------------------------------------------
+            //-- SITE TEMPLATE HELPERS
+            //-------------------------------------------------------------------------------------------------
+            localSektionsInheritGroupSkope : function() {
+                  var localCollSetId = this.localSectionsSettingId(),
+                        localColSetValue = api(localCollSetId)();
+                  return localColSetValue && localColSetValue.__inherits_group_skope__;
+            },
 
             //-------------------------------------------------------------------------------------------------
             //-- VARIOUS
@@ -12246,10 +12089,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // After the import, updating the setting value will refresh the sections
                         // but the local options, persisted in separate settings, won't be updated if the settings are not cleaned
                         if ( 'local' === _scope ) {
-                              api.czr_sektions.generateUI({
-                                    action : 'sek-generate-local-skope-options-ui',
-                                    clean_settings : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
-                              });
+                              var _doThingsAfterRefresh = function() {
+                                    // Removes and RE-register local settings and controls
+                                    api.czr_sektions.generateUI({
+                                          action : 'sek-generate-local-skope-options-ui',
+                                          clean_settings_and_controls_first : true//<= see api.czr_sektions.generateUIforLocalSkopeOptions()
+                                    });
+                                    api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
+                              };
+                              // 'czr-new-skopes-synced' is always sent on a previewer.refresh()
+                              api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                         }
 
                         //_notify( sektionsLocalizedData.i18n['The revision has been successfully restored.'], 'success' );
@@ -15090,43 +14939,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.errare( 'reset_button input => invalid scope provided.', scope );
                               return;
                         }
-                        api.czr_sektions.updateAPISetting({
-                              action : 'sek-reset-collection',
-                              scope : scope,//<= will determine which setting will be updated,
-                              // => self.getGlobalSectionsSettingId() or self.localSectionsSettingId()
-                        })
-                        .done( function( resp) {
-                              api.previewer.refresh();
-                              api.previewer.trigger('sek-notify', {
-                                    notif_id : 'reset-success',
-                                    type : 'success',
-                                    duration : 8000,
-                                    message : [
-                                          '<span>',
-                                            '<strong>',
-                                            sektionsLocalizedData.i18n['Reset complete'],
-                                            '</strong>',
-                                          '</span>'
-                                    ].join('')
-                              });
-                        })
-                        .fail( function( response ) {
-                              api.errare( 'reset_button input => error when firing ::updateAPISetting', response );
-                              api.previewer.trigger('sek-notify', {
-                                    notif_id : 'reset-failed',
-                                    type : 'error',
-                                    duration : 8000,
-                                    message : [
-                                          '<span>',
-                                            '<strong>',
-                                            sektionsLocalizedData.i18n['Reset failed'],
-                                            '<br/>',
-                                            '<i>' + response + '</i>',
-                                            '</strong>',
-                                          '</span>'
-                                    ].join('')
-                              });
-                        });
+
+                        api.previewer.trigger('sek-reset-collection', { scope : 'local' } );
+                        
                   });//on('click')
             }
       });//$.extend( api.czrInputMap, {})

@@ -1995,6 +1995,7 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
   background: #020202;
   color: #ffffff;
   padding: 0.5em 1em;
+  margin: 0.5em;
 }
 
 .nb-loc .sek-module .sek-module-inner .sek-btn i {
