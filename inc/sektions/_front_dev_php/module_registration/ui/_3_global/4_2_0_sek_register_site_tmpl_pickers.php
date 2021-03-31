@@ -32,7 +32,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 //     'title_width' => 'width-100'
                 // ),
                 'skp__all_page' => array(
-                    'input_type'  => 'simpleselect',
+                    'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for pages', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
                     'choices'     => [

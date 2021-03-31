@@ -910,7 +910,11 @@ function sek_print_nimble_input_templates() {
       <script type="text/html" id="tmpl-nimble-input___site_tmpl_picker">
         <div class="sek-button-choice-wrapper">
           <input data-czrtype="{{data.input_id}}" type="hidden"/>
-          <button type="button" aria-pressed="false" class="sek-ui-button sek-float-right" title="<?php _e('Reset', 'text_doma'); ?>" data-sek-reset-scope="{{data.input_data.scope}}"><?php _e('Reset', 'text_doma'); ?></button>
+          <# console.log('preview : input data ???', data ); #>
+          <div class="sek-ui-button-group" role="group">
+            <button type="button" aria-pressed="false" class="sek-ui-button sek-remove-site-tmpl" title="<?php _e('Remove template', 'text_doma'); ?>"><?php _e('Remove template', 'text_doma'); ?></button>
+            <button type="button" aria-pressed="false" class="sek-ui-button button button-primary" title="<?php _e('Pick a template', 'text_doma'); ?>" data-sek-group-scope="{{data.input_id}}"><?php _e('Pick a template', 'text_doma'); ?></button>
+          </div>
         </div>
       </script>
 

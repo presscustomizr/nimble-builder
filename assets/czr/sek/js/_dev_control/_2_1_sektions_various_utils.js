@@ -1022,6 +1022,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
                         //evt.preventDefault();
                         evt.stopPropagation();
+
+                        // close various dialog UI
+                        api.czr_sektions.templateGalleryExpanded( false );
+                        api.czr_sektions.saveSectionDialogVisible(false);
+                        api.czr_sektions.tmplDialogVisible(false);
+                        api.czr_sektions.tmplInjectDialogVisible(false);
+
                         var $control = $(this).closest( '.customize-control');
 
                         if ( "no" === $control.attr( 'data-sek-accordion' ))

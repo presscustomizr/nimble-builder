@@ -320,3 +320,12 @@ input.sek-filter-tmpl {
   font-size: 18px;
   color: #555;
 }
+
+.sek-current-site-tmpl { 
+  background:#eeeeee;
+  width: calc(100% - 10px);
+  float: left;
+  padding: 10px 5px;
+  margin: 5px 0;
+  border: 1px solid #2271b1;
+}

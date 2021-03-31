@@ -230,12 +230,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               evt.preventDefault();
                               evt.stopPropagation();
                               var _tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id'),
-                                    _tmpl_source = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-source');
+                                    _tmpl_source = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-source'),
+                                    _tmpl_title = $(this).closest('.sek-tmpl-item').find('.tmpl-title').html();
                               if ( _.isEmpty(_tmpl_id) ) {
                                     api.errare('::setupTmplGalleryDOMEvents => error => invalid template id');
                                     return;
                               }
-      
+                              
+                              // Site template mode ?
+                              if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
+                                    console.log('IN TEMPL GAL EXPANDED CB => ', self._site_tmpl_scope  );
+                                    if ( self._site_tmpl_scope && !_.isEmpty( self._site_tmpl_scope ) ) {
+                                          var $siteTmplInput = $( '[data-czrtype="' + self._site_tmpl_scope +'"]' );
+                                          if ( $siteTmplInput.length > 0 ) {
+                                                console.log('SET TEMPLATE ID', _tmpl_id );
+                                                $siteTmplInput.trigger('nb-set-site-tmpl', { site_tmpl_id : _tmpl_id, site_tmpl_source : _tmpl_source, site_tmpl_title : _tmpl_title } );
+                                          }
+                                          return;
+                                    }
+                              }
+
                               // if current page has NB sections, display an import dialog, otherwise import now
                               if ( self.hasCurrentPageNBSectionsNotHeaderFooter() ) {
                                     self._tmplNameWhileImportDialog = _tmpl_id;

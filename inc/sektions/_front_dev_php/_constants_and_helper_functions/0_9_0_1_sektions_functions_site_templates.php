@@ -13,10 +13,13 @@ function sek_get_site_tmpl_for_skope( $group_skope = null ) {
     $site_tmpl = null;
     $opts = sek_get_global_option_value( 'site_templates' );
 
-    //sek_error_log('site_templates options ?', $opts );
-
     if ( is_array( $opts) && !empty( $opts[$group_skope] ) && '_no_site_tmpl_' != $opts[$group_skope] ) {
-        $site_tmpl = $opts[$group_skope];
+        if ( is_string( $opts[$group_skope] ) ) {
+            $site_tmpl = $opts[$group_skope];
+        } else if ( is_array($opts[$group_skope]) && array_key_exists('site_tmpl_id', $opts[$group_skope] ) ) {
+            $site_tmpl = $opts[$group_skope]['site_tmpl_id'];
+        }
+        sek_error_log('site_templates options ?', $opts[$group_skope] );
     }
     return $site_tmpl;
 }
@@ -76,15 +79,17 @@ function sek_maybe_get_seks_for_group_site_template( $skope_id, $local_seks_data
 // get and cache the group site template data
 function sek_get_group_site_template_data() {
     $cached = wp_cache_get('nimble_group_site_template_data');
-    if ( $cached && is_array($cached) && !empty($cached) )
+    if ( false !== $cached )
         return $cached;
 
     $group_site_tmpl_data = [];
     
     $group_skope = skp_get_skope_id( 'group' );
     $tmpl_post_name = sek_get_site_tmpl_for_skope( $group_skope );
-    if ( is_null( $tmpl_post_name ) || !is_string( $tmpl_post_name ) )
+    if ( is_null( $tmpl_post_name ) || !is_string( $tmpl_post_name ) ) {
+        sek_error_log( 'Error => invalid tmpl post name', $tmpl_post_name );
         return;
+    }
     // Is this group template already saved ?
     // For example, for pages, there should be a nimble CPT post named nimble___skp__all_page
     $post = sek_get_seks_post( $group_skope );
