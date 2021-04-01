@@ -119,7 +119,6 @@ function sek_ajax_sek_get_api_tmpl_json() {
         wp_send_json_error( __FUNCTION__ . '_missing_data_property_for_template_' . $tmpl_name );
     } else {
         // $tmpl_decoded = $raw_tmpl_data;
-        $tmpl_as_array = $raw_tmpl_data;
         $raw_tmpl_data['data'] = sek_maybe_import_imgs( $raw_tmpl_data['data'], $do_import_images = true );
         $raw_tmpl_data['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
         // Make sure we decode encoded rich text before sending to the customizer
