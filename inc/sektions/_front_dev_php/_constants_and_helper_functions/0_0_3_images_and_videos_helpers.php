@@ -241,6 +241,64 @@ function sek_sideload_img_and_return_attachment_id( $img_url ) {
     return $id;
 }
 
+
+
+
+// IMPORT IMG HELPER
+// recursive
+//add_filter( 'nimble_pre_import', '\Nimble\sek_maybe_import_imgs' );
+function sek_maybe_import_imgs( $seks_data, $do_import_images = true ) {
+    $new_seks_data = array();
+    // Reset img_import_errors
+    Nimble_Manager()->img_import_errors = [];
+    foreach ( $seks_data as $key => $value ) {
+        if ( is_array($value) ) {
+            $new_seks_data[$key] = sek_maybe_import_imgs( $value, $do_import_images );
+        } else {
+            if ( is_string( $value ) && false !== strpos( $value, '__img_url__' ) && sek_is_img_url( $value ) ) {
+                $url = str_replace( '__img_url__', '', $value );
+                // april 2020 : new option to skip importing images
+                // introduced for https://github.com/presscustomizr/nimble-builder/issues/663
+                if ( !$do_import_images ) {
+                    $value = $url;
+                } else {
+                    //sek_error_log( __FUNCTION__ . ' URL?', $url );
+                    $id = sek_sideload_img_and_return_attachment_id( $url );
+                    if ( is_wp_error( $id ) ) {
+                        $value = null;
+                        $img_errors = Nimble_Manager()->img_import_errors;
+                        $img_errors[] = $url;
+                        Nimble_Manager()->img_import_errors = $img_errors;
+                    } else {
+                        $value = $id;
+                    }
+                }
+            } else if ( is_string( $value ) && false !== strpos( $value, '__default_img_medium__' ) ) {
+                $value = NIMBLE_BASE_URL . '/assets/img/default-img.png';
+            }
+            $new_seks_data[$key] = $value;
+        }
+    }
+    return $new_seks_data;
+}
+
+// @return bool
+function sek_is_img_url( $url = '' ) {
+    if ( is_string( $url ) ) {
+      if ( preg_match( '/\.(jpg|jpeg|png|gif)/i', $url ) ) {
+        return true;
+      }
+    }
+    return false;
+}
+
+
+
+
+
+
+
+
 /* ------------------------------------------------------------------------- *
 *  REMOVE IMAGE STYLE ATTRIBUTE
 *  Used in image module, slider module, special image module
