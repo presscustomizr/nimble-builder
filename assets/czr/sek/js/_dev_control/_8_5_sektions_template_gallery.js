@@ -36,6 +36,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         } else {
                               $('#customize-preview iframe').css('z-index', '');
                               api.trigger('nb-template-gallery-closed');
+                              // When closing template gallery, make sure NB reset the possible previous tmpl scope used in a site template picking scenario
+                              self._site_tmpl_scope = null;
                         }
                   });
 
@@ -239,12 +241,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               
                               // Site template mode ?
                               if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
-                                    console.log('IN TEMPL GAL EXPANDED CB => ', self._site_tmpl_scope  );
                                     if ( self._site_tmpl_scope && !_.isEmpty( self._site_tmpl_scope ) ) {
                                           var $siteTmplInput = $( '[data-czrtype="' + self._site_tmpl_scope +'"]' );
                                           if ( $siteTmplInput.length > 0 ) {
-                                                console.log('SET TEMPLATE ID', _tmpl_id );
-                                                $siteTmplInput.trigger('nb-set-site-tmpl', { site_tmpl_id : _tmpl_id, site_tmpl_source : _tmpl_source, site_tmpl_title : _tmpl_title } );
+                                                if ( !_.contains(['user_tmpl', 'api_tmpl'], _tmpl_source ) ) {
+                                                      api.errare('Error when picking site template => invalid tmpl source');
+                                                      return;
+                                                }
+                                                $siteTmplInput.trigger('nb-set-site-tmpl', {
+                                                      site_tmpl_id : _tmpl_id,
+                                                      site_tmpl_source : _tmpl_source
+                                                });
                                           }
                                           return;
                                     }

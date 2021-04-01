@@ -67,7 +67,8 @@
                         if ( 'template' === _contentType ) {
                               var _isExpanded = api.czr_sektions.templateGalleryExpanded();
                               $(this).attr( 'aria-pressed', !_isExpanded );
-
+                              // When opening template gallery from the content type switcher, make sure NB reset the possible previous tmpl scope used in a site template picking scenario
+                              self._site_tmpl_scope = null;
                               api.czr_sektions.templateGalleryExpanded(!_isExpanded);
                         } else {
                               // always close the template picker when selecting something else

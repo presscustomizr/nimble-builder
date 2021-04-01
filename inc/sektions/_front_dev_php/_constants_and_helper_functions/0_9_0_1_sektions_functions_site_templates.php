@@ -19,7 +19,7 @@ function sek_get_site_tmpl_for_skope( $group_skope = null ) {
         } else if ( is_array($opts[$group_skope]) && array_key_exists('site_tmpl_id', $opts[$group_skope] ) ) {
             $site_tmpl = $opts[$group_skope]['site_tmpl_id'];
         }
-        sek_error_log('site_templates options ?', $opts[$group_skope] );
+        //sek_error_log('site_templates options ?', $opts[$group_skope] );
     }
     return $site_tmpl;
 }
@@ -96,16 +96,55 @@ function sek_get_group_site_template_data() {
 
     // if not, let's insert it
     if ( !$post ) {
-        $current_tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
-        if ( $current_tmpl_post ) {
-            $current_tmpl_data = maybe_unserialize( $current_tmpl_post->post_content );
-            if ( is_array($current_tmpl_data) && isset($current_tmpl_data['data']) && is_array($current_tmpl_data['data']) && !empty($current_tmpl_data['data']) ) {
-                $current_tmpl_data = $current_tmpl_data['data'];
-                $current_tmpl_data = sek_set_ids( $current_tmpl_data );
-                $post = sek_update_sek_post( $current_tmpl_data, [ 'skope_id' => $group_skope ]);
-            }
+        $tmpl_source = null;
+        // NB stores the site template id as a concatenation of template source + '___' + template name
+        // Ex : user_tmpl___landing-page-for-services
+        if ( 'user_tmpl' === substr( $tmpl_post_name, 0, 9 ) ) {
+            $tmpl_source = 'user_tmpl';
+            $tmpl_post_name = str_replace('user_tmpl___', '', $tmpl_post_name);
+        } else if ( 'api_tmpl' === substr( $tmpl_post_name, 0, 8 ) ) {
+            $tmpl_source = 'api_tmpl';
+            $tmpl_post_name = str_replace('api_tmpl___', '', $tmpl_post_name);
+        } else {
+            sek_error_log('Error => invalid site template source');
         }
-    }
+
+        $current_tmpl_post = null;
+        $current_tmpl_data = null;
+        switch ($tmpl_source) {
+            case 'user_tmpl':
+                $current_tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
+                if ( $current_tmpl_post ) {
+                    $raw_tmpl_data = maybe_unserialize( $current_tmpl_post->post_content );
+                    if ( is_array($raw_tmpl_data) && isset($raw_tmpl_data['data']) && is_array($raw_tmpl_data['data']) && !empty($raw_tmpl_data['data']) ) {
+                        $current_tmpl_data = $raw_tmpl_data['data'];
+                        $current_tmpl_data = sek_set_ids( $current_tmpl_data );
+                    }
+                }
+            break;
+
+            case 'api_tmpl':
+                $raw_tmpl_data = sek_get_single_tmpl_api_data( $tmpl_post_name );
+                if( !is_array( $raw_tmpl_data) || empty( $raw_tmpl_data ) ) {
+                    sek_error_log( ' problem when getting template : ' . $tmpl_post_name );
+                }
+                //sek_error_log( __FUNCTION__ . ' api template collection', $raw_tmpl_data );
+                if ( !isset($raw_tmpl_data['data'] ) || empty( $raw_tmpl_data['data'] ) ) {
+                    sek_error_log( __FUNCTION__ . ' problem => missing or invalid data property for template : ' .$tmpl_post_name, $raw_tmpl_data );
+                } else {
+                    // $tmpl_decoded = $raw_tmpl_data;
+                    $raw_tmpl_data['data'] = sek_maybe_import_imgs( $raw_tmpl_data['data'], $do_import_images = true );
+                    //$raw_tmpl_data['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
+                    $current_tmpl_data = sek_set_ids( $raw_tmpl_data['data'] );
+                }
+            break;
+        }
+
+        if( !is_null($current_tmpl_data) ) {
+            $post = sek_update_sek_post( $current_tmpl_data, [ 'skope_id' => $group_skope ]);
+        }
+    }//if ( !$post ) {
+
     if ( $post ) {
         $group_site_tmpl_data = maybe_unserialize( $post->post_content );
     }

@@ -321,11 +321,51 @@ input.sek-filter-tmpl {
   color: #555;
 }
 
-.sek-current-site-tmpl { 
-  background:#eeeeee;
+
+/* TMPL PICKING */
+[data-input-type="site_tmpl_picker"] {
+  margin-bottom: 20px;;
+}
+[data-input-type="site_tmpl_picker"] > .customize-control-title {
+  text-transform: uppercase;
+}
+.sek-current-site-tmpl {
   width: calc(100% - 10px);
   float: left;
   padding: 10px 5px;
   margin: 5px 0;
-  border: 1px solid #2271b1;
+  border-color: #ccc;
+  background: #f7f7f7;
+  box-shadow: inset 0 0px 6px #ccc;
+  -webkit-box-shadow:inset 0 0px 6px #ccc;
+  vertical-align: top;
+  margin-bottom: 10px;
+  font-size: 12px;
+  border-radius: 3px;
+}
+
+
+.sek-has-site-tmpl .sek-current-site-tmpl { 
+    background: #33b3db;
+    border-color: #33b3db;
+    -webkit-box-shadow: inset 1px 0px 6px #2c72ab;
+    box-shadow: inset 1px 0px 6px #2c72ab;
+    color: #ffffff;
+    font-size: 13px;
+}
+.sek-site-tmpl-picking-active .sek-ui-button-group .sek-pick-site-tmpl,
+.sek-site-tmpl-picking-active .sek-ui-button-group .sek-pick-site-tmpl:focus,
+.sek-pick-site-tmpl:hover {
+  background: #33b3db;
+  border-color: #33b3db;
+  box-shadow: inset 0 -1px 0 #2271b1;
+  color: #ffffff;
+}
+.sek-pick-site-tmpl {
+  font-weight: bold;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all  0.2s ease-in-out;
+  -ms-transition: all  0.2s ease-in-out;
+  -o-transition: all  0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }

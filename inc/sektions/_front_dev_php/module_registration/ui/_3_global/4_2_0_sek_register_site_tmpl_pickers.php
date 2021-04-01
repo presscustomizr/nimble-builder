@@ -17,7 +17,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
         'tmpl' => array(
             'item-inputs' => array(
                 // 'skp__home' => array(
-                //     'input_type'  => 'simpleselect',
+                //     'input_type'  => 'site_tmpl_picker',
                 //     'title'       => __('Template for home', 'text_doma'),
                 //     'default'     => '_no_site_tmpl_',
                 //     'choices'     => [
@@ -35,12 +35,6 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for pages', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
-                    'choices'     => [
-                        '_no_site_tmpl_' => 'No template',
-                        'nb_tmpl_page-template' => 'Page template',
-                        'nb_tmpl_home-page-template' => 'Home page template',
-                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -48,14 +42,9 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'refresh_preview' => false
                 ),
                 'skp__all_post' => array(
-                    'input_type'  => 'simpleselect',
+                    'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for posts', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
-                    'choices'     => [
-                        '_no_site_tmpl_' => 'No template',
-                        'nb_tmpl_home-page-template' => 'Home page template',
-                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -63,14 +52,9 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'refresh_preview' => false
                 ),
                 'skp__all_category' => array(
-                    'input_type'  => 'simpleselect',
+                    'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for categories', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
-                    'choices'     => [
-                        '_no_site_tmpl_' => 'No template',
-                        'nb_tmpl_home-page-template' => 'Home page template',
-                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -78,14 +62,9 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'refresh_preview' => false
                 ),
                 'skp__all_post_tag' => array(
-                    'input_type'  => 'simpleselect',
+                    'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for tags', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
-                    'choices'     => [
-                        '_no_site_tmpl_' => 'No template',
-                        'nb_tmpl_home-page-template' => 'Home page template',
-                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -93,14 +72,9 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'refresh_preview' => false
                 ),
                 'skp__all_author' => array(
-                    'input_type'  => 'simpleselect',
+                    'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for authors', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
-                    'choices'     => [
-                        '_no_site_tmpl_' => 'No template',
-                        'nb_tmpl_home-page-template' => 'Home page template',
-                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -108,14 +82,9 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'refresh_preview' => false
                 ),
                 'skp__search' => array(
-                    'input_type'  => 'simpleselect',
+                    'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for search page', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
-                    'choices'     => [
-                        '_no_site_tmpl_' => 'No template',
-                        'nb_tmpl_home-page-template' => 'Home page template',
-                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -123,14 +92,9 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'refresh_preview' => false
                 ),
                 'skp__404' => array(
-                    'input_type'  => 'simpleselect',
+                    'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for 404 error page', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
-                    'choices'     => [
-                        '_no_site_tmpl_' => 'No template',
-                        'nb_tmpl_home-page-template' => 'Home page template',
-                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
