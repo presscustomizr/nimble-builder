@@ -1024,6 +1024,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         evt.stopPropagation();
 
                         // close various dialog UI
+                        api.czr_sektions.levelTreeExpanded(false);
                         api.czr_sektions.templateGalleryExpanded( false );
                         api.czr_sektions.saveSectionDialogVisible(false);
                         api.czr_sektions.tmplDialogVisible(false);
