@@ -406,7 +406,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             'sek-animate-to-level' : function( params ) {
                                     var $elToFocusOn = $('[data-sek-id="' + params.id + '"]' );
                                     if ( 0 < $elToFocusOn.length && !nb_.isInScreen( $elToFocusOn[0]) ) {
-                                          $_activeElement[0].scrollIntoView({
+                                          $elToFocusOn[0].scrollIntoView({
                                                 behavior: 'auto',
                                                 block: 'center',
                                                 inline: 'center'
