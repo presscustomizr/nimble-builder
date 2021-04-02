@@ -227,7 +227,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           var $title = _control_.container.find('label > .customize-control-title'),
                                               _titleContent = $title.html();
                                           // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
-                                          $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
+                                          $title.html( [
+                                                '<span class="sek-ctrl-accordion-title">',
+                                                _titleContent,
+                                                'site_templates' === optionType ? '&nbsp;<span class="sek-new-label">New!</span>' : '',
+                                                '</span>'
+                                          ].join('') );
 
                                           // if this level has an icon, let's prepend it to the title
                                           if ( ! _.isUndefined( optionData.icon ) ) {
