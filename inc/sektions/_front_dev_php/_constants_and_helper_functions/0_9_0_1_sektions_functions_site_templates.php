@@ -10,7 +10,7 @@
 function sek_get_site_tmpl_for_skope( $group_skope = null ) {
     if ( is_null($group_skope) || !is_string($group_skope) || empty($group_skope) )
         return;
-    $site_tmpl = null;
+    $site_tmpl = '_no_site_tmpl_';
     $opts = sek_get_global_option_value( 'site_templates' );
 
     if ( is_array( $opts) && !empty( $opts[$group_skope] ) && '_no_site_tmpl_' != $opts[$group_skope] ) {
@@ -86,6 +86,9 @@ function sek_get_group_site_template_data() {
     
     $group_skope = skp_get_skope_id( 'group' );
     $tmpl_post_name = sek_get_site_tmpl_for_skope( $group_skope );
+    if ( '_no_site_tmpl_' === $tmpl_post_name )
+        return;
+
     if ( is_null( $tmpl_post_name ) || !is_string( $tmpl_post_name ) ) {
         sek_error_log( 'Error => invalid tmpl post name', $tmpl_post_name );
         return;
@@ -141,6 +144,7 @@ function sek_get_group_site_template_data() {
         }
 
         if( !is_null($current_tmpl_data) ) {
+            sek_error_log('SITE TEMPLATE => UPDATE OR INSERT GROUP SKOPE POST => ' .$group_skope );
             $post = sek_update_sek_post( $current_tmpl_data, [ 'skope_id' => $group_skope ]);
         }
     }//if ( !$post ) {
@@ -181,11 +185,18 @@ add_action('nb_on_save_customizer_global_options', function( $opt_name, $value )
     $current_site_tmpl = sek_get_global_option_value( 'site_templates' );
     if ( !is_array( $value ) || !is_array($current_site_tmpl) )
         return;
+    
+    // NB stores the site template id as a concatenation of template source + '___' + template name
+    // Ex : user_tmpl___landing-page-for-services
+    $updated_site_templates = isset($value['site_templates']) ? $value['site_templates'] : [];
 
-    $new_site_tmpl = isset($value['site_templates']) ? $value['site_templates'] : [];
-    foreach( $new_site_tmpl as $group_skope => $new_tmpl ) {
-        if ( array_key_exists($group_skope, $current_site_tmpl ) && $current_site_tmpl[$group_skope] != $new_tmpl ) {
-            //sek_error_log('TEMPLATE POST TO REMOVE => ' . $group_skope . ' | ' . $new_tmpl );
+    foreach( $current_site_tmpl as $group_skope => $current_tmpl_name ) {
+        if ( array_key_exists( $group_skope, $updated_site_templates ) && $updated_site_templates[$group_skope] != $current_tmpl_name ) {
+            //sek_error_log('GROUP SKOPE POST TO REMOVE BECAUSE TEMPLATE UPDATED => ' . $group_skope . ' | ' . $updated_site_templates[$group_skope] );
+            sek_remove_seks_post( $group_skope );//Removes the post id in the skope index + removes the post in DB + remove the stylesheet
+        }
+        if ( !array_key_exists( $group_skope, $updated_site_templates ) ) {
+            //sek_error_log('GROUP SKOPE POST TO REMOVE BECAUSE NO MORE TEMPLATE SET => ' . $group_skope . ' | ' . $current_tmpl_name );
             sek_remove_seks_post( $group_skope );//Removes the post id in the skope index + removes the post in DB + remove the stylesheet
         }
     }
@@ -215,9 +226,13 @@ add_action('nb_on_update_saved_tmpl_post', function( $tmpl_post_name ) {
     if ( !is_array($site_tmpl_opts) )
         return;
 
+    // NB stores the site template id as a concatenation of template source + '___' + template name
+    // Ex : user_tmpl___landing-page-for-services
+    // When updating a user template, in sek_update_saved_tmpl_post() we need to add 'user_tmpl___' prefix to match the template being currently saved
+    $normalized_tmpl_id = 'user_tmpl___' . $tmpl_post_name;
     foreach( $site_tmpl_opts as $group_skope => $tmpl_name ) {
-        if ( $tmpl_post_name === $tmpl_name ) {
-            sek_error_log('REMOVE GROUP SKOPE POST ' . $group_skope . ' for template ' . $tmpl_name );
+        if ( $normalized_tmpl_id === $tmpl_name ) {
+            //sek_error_log('REMOVE GROUP SKOPE POST ' . $group_skope . ' for template ' . $tmpl_name );
             sek_remove_seks_post( $group_skope );//Removes the post id in the skope index + removes the post in DB + remove the stylesheet
         }
     }
