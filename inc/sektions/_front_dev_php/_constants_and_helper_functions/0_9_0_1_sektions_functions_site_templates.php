@@ -24,7 +24,32 @@ function sek_get_site_tmpl_for_skope( $group_skope = null ) {
     return $site_tmpl;
 }
 
+/* ------------------------------------------------------------------------- *
+ *  SITE TEMPLATES SKOPE HELPER
+/* ------------------------------------------------------------------------- */
+function sek_get_group_skope_for_site_tmpl() {
+    $group_skope = skp_get_skope_id( 'group' );
+    if ( '_skope_not_set_' === $group_skope ) {
+        $skope_id = skp_get_skope_id();
+        if ( sek_is_no_group_skope( $skope_id ) ) {
+            $group_skope = $skope_id . '_for_site_tmpl';
+        } else {
+            sek_error_log('group skope could not be set');
+        }
+    }
+    return $group_skope;
+}
 
+// @return bool
+// no group skope are array( 'home', 'search', '404', 'date' );
+function sek_is_no_group_skope( $skope_id = null ) {
+    if ( is_null( $skope_id ) ) {
+        $skope_id = skp_get_skope_id();
+    }
+    $skope_id_without_prefix = str_replace( 'skp__', '', $skope_id );
+    $skope_with_no_group = skp_get_no_group_skope_list();
+    return in_array( $skope_id_without_prefix, $skope_with_no_group );
+}
 
 /* ------------------------------------------------------------------------- *
  *  SITE TEMPLATES CSS
@@ -38,7 +63,7 @@ add_filter( 'nb_set_skope_id_before_generating_local_front_css', function( $skop
         $group_site_tmpl_data = sek_get_group_site_template_data();//<= is cached when called
         $has_group_skope_template_data = !( !$group_site_tmpl_data || empty($group_site_tmpl_data) );
         if ( $has_group_skope_template_data ) {
-            $group_skope = skp_get_skope_id( 'group' );
+            $group_skope = sek_get_group_skope_for_site_tmpl();
             if ( !empty($group_skope) && '_skope_not_set_' !== $group_skope ) {
                 $skope_id = $group_skope;
             }
@@ -84,7 +109,8 @@ function sek_get_group_site_template_data() {
 
     $group_site_tmpl_data = [];
     
-    $group_skope = skp_get_skope_id( 'group' );
+    $group_skope = sek_get_group_skope_for_site_tmpl();
+
     $tmpl_post_name = sek_get_site_tmpl_for_skope( $group_skope );
     if ( '_no_site_tmpl_' === $tmpl_post_name )
         return;
