@@ -668,9 +668,10 @@ function nimble_add_i18n_localized_control_params( $params ) {
             //'Remove this element' => __('Remove this element', 'text_dom'),
 
             'No template set.' => __('No template set.', 'text_dom'),
-            'Active template : ' => __('Active template : ', 'text_dom')
-
-
+            'Active template : ' => __('Active template : ', 'text_dom'),
+            'This page has no NB sections' => __('This page has no NB sections', 'text_dom'),
+            'This page inherits a NB site template' => __('This page inherits a NB site template', 'text_dom'),
+            'This page has NB sections' => __('This page has NB sections', 'text_dom')
         )//array()
     )//array()
     );//array_merge
@@ -738,7 +739,9 @@ function add_sektion_values_to_skope_export( $skopes ) {
             'db_values' => $seks_data,
             'setting_id' => sek_get_seks_setting_id( $skope_id ),//nimble___loop_start[skp__post_page_home], nimble___custom_location_id[skp__global]
         );
-
+        if ( 'local' == $skp_data['skope'] ) {
+          $skp_data['has_local_sektions'] = sek_local_skope_has_nimble_sections();
+        }
         // foreach( [
         //     'loop_start',
         //     'loop_end',

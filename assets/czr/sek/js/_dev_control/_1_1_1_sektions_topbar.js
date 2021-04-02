@@ -151,41 +151,118 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.tmplDialogVisible(!self.tmplDialogVisible());// self.tmplDialogVisible() is initialized false
                   });
 
+                  $( self.topBarId ).on( 'click', '.sek-reset-local-sektions', function(evt) {
+                        // Focus on the Nimble panel
+                        // api.panel( sektionsLocalizedData.sektionsPanelId, function( _panel_ ) {
+                        //       self.rootPanelFocus();
+                        //       _panel_.focus();
+                        // });
+                        console.log('CLICK', self.getLocalSkopeOptionId(), api.control( self.getLocalSkopeOptionId() + '__local_reset') );
+                        // api.control( self.getLocalSkopeOptionId() + '__local_reset', function( _control_ ) {
+                        //       _control_.focus();
+                        //       _control_.container.find('.customize-control-title').trigger('click');
+                        // });
+                        // evt.preventDefault();
+                        // Focus on the Nimble panel
+                        api.panel( sektionsLocalizedData.sektionsPanelId, function( _panel_ ) {
+                              self.rootPanelFocus();
+                              _panel_.focus();
+                              api.section( self.SECTION_ID_FOR_LOCAL_OPTIONS, function( _section_ ) {
+                                    _section_.focus();
+                                    console.log('CLICK', self.getLocalSkopeOptionId(), api.control( self.getLocalSkopeOptionId() + '__local_reset') );
+                                    setTimeout( function() {
+                                          api.control( self.getLocalSkopeOptionId() + '__local_reset', function( _control_ ) {
+                                                _control_.focus();
+                                                _control_.container.find('.customize-control-title').trigger('click');
+                                                _control_.container.addClass('button-see-me');
+                                                _.delay( function() {
+                                                      _control_.container.removeClass('button-see-me');
+                                                }, 800 );
+                                          });
+                                    }, 500 );
+                              });
+                        });
+                  });
 
                   // NOTIFICATION WHEN USING CUSTOM TEMPLATE
                   // implemented for https://github.com/presscustomizr/nimble-builder/issues/304
-                  var maybePrintNotificationForUsageOfNimbleTemplate = function( templateSettingValue ) {
+                  var printSektionsSkopeStatus = function( args ) {
                         if ( $(self.topBarId).length < 1 || sektionsLocalizedData.isDebugMode )
-                          return;
-                        if ( _.isObject( templateSettingValue ) && templateSettingValue.local_template && 'default' !== templateSettingValue.local_template ) {
-                              $(self.topBarId).find('.sek-notifications')
-                                    .html([
-                                          '<span class="fas fa-info-circle"></span>',
-                                          sektionsLocalizedData.i18n['This page uses Nimble Builder template.']
-                                    ].join(' '))
-                                    .attr('data-doc-href', 'https://docs.presscustomizr.com/article/339-changing-the-page-template');
+                              return;
+
+                        if ( !sektionsLocalizedData.isSiteTemplateEnabled )
+                              return;
+                        var _hasLocalSektions = false;
+                        if ( args && args.on_init ) {
+                              //console.log('ON INIT : ', api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ) );
+                              _hasLocalSektions = api.czr_skopeBase.getSkopeProperty( 'has_local_sektions', 'local' );
+                        } else if ( args && args.after_reset ) {
+                              //console.log('AFTER RESET');
+                              _hasLocalSektions = false;
                         } else {
-                              $(self.topBarId).find('.sek-notifications').html('');
+                              _hasLocalSektions = self.hasLocalSektions();
                         }
+                        //console.log('GROUP SKOPE FOR SITE TEMPL', api.czr_skopeBase.getSkopeProperty( 'has_local_sektions', 'local' ) );
+                        //console.log('GLOBAL OPTIONS ', api(sektionsLocalizedData.optNameForGlobalOptions)() );
+                        var _groupSkope = api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ),
+                              _hasSiteTemplateSet = false,
+                              _inheritsSiteTemplate = false,
+                              _globOptions = api(sektionsLocalizedData.optNameForGlobalOptions)();
+
+                        if ( _.isObject(_globOptions) && _globOptions.site_templates && _.isObject(_globOptions.site_templates ) ) {
+                              _.each( _globOptions.site_templates, function( tmpl, siteTmplSkope ) {
+                                    if ( !_hasSiteTemplateSet && _groupSkope === siteTmplSkope.substring(0,_groupSkope.length) ) {
+                                          _hasSiteTemplateSet = true;
+                                    }
+                              } );
+                        }
+
+                        //console.log('HAS SITE TMPL SET ?', _hasSiteTemplateSet );
+                        _inheritsSiteTemplate = _hasSiteTemplateSet && !_hasLocalSektions;
+                        //console.log('ALORS ?', _inheritsSiteTemplate, _hasLocalSektions );
+                        var _msg = sektionsLocalizedData.i18n['This page has no NB sections'];
+                        if ( _inheritsSiteTemplate ) {
+                              _msg = sektionsLocalizedData.i18n['This page inherits a NB site template'];
+                        } else if ( _hasLocalSektions ) {
+                              _msg = sektionsLocalizedData.i18n['This page has NB sections'];
+                              _msg += '<button type="button" class="far fa-trash-alt sek-reset-local-sektions" title="Remove sektions" data-nimble-state="enabled"><span class="screen-reader-text">Remove sektions</span></button>';
+                        }
+
+                        $(self.topBarId).find('.sek-notifications')
+                              .html([
+                                    '<span class="fas fa-info-circle"></span>',
+                                    _msg
+                                    //sektionsLocalizedData.i18n['This page uses Nimble Builder template.']
+                              ].join(' '));
+                              //.attr('data-doc-href', 'https://docs.presscustomizr.com/article/339-changing-the-page-template');
+                        
+                              // if ( _.isObject( templateSettingValue ) && templateSettingValue.local_template && 'default' !== templateSettingValue.local_template ) {
+                              
+                        // } else {
+                        //       $(self.topBarId).find('.sek-notifications').html('');
+                        // }
                   };
+
+                  api.bind('nimble-update-topbar-skope-status', printSektionsSkopeStatus );
 
                   var initOnSkopeReady = function() {
                         // Schedule notification rendering on init
                         // @see ::generateUIforLocalSkopeOptions()
                         api( self.localSectionsSettingId(), function( _localSectionsSetting_ ) {
-                              var localSectionsValue = _localSectionsSetting_(),
-                                  initialLocalTemplateValue = ( _.isObject( localSectionsValue ) && localSectionsValue.local_options && localSectionsValue.local_options.template ) ? localSectionsValue.local_options.template : null;
-                              // on init
-                              maybePrintNotificationForUsageOfNimbleTemplate( initialLocalTemplateValue );
+                              // var localSectionsValue = _localSectionsSetting_(),
+                              //     initialLocalTemplateValue = ( _.isObject( localSectionsValue ) && localSectionsValue.local_options && localSectionsValue.local_options.template ) ? localSectionsValue.local_options.template : null;
+                              // // on init
+                              // printSektionsSkopeStatus( initialLocalTemplateValue );
+                              printSektionsSkopeStatus({on_init : true});
                         });
 
                         // React to template changes
                         // @see ::generateUIforLocalSkopeOptions() for the declaration of self.getLocalSkopeOptionId() + '__template'
-                        api( self.getLocalSkopeOptionId() + '__template', function( _set_ ) {
-                              _set_.bind( function( to, from ) {
-                                    maybePrintNotificationForUsageOfNimbleTemplate( to );
-                              });
-                        });
+                        // api( self.getLocalSkopeOptionId() + '__template', function( _set_ ) {
+                        //       _set_.bind( function( to, from ) {
+                        //             printSektionsSkopeStatus( to );
+                        //       });
+                        // });
                   };
 
                   // fire now

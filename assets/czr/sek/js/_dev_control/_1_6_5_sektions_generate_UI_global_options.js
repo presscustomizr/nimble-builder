@@ -165,6 +165,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       setTimeout( function() {
                                                             api.control( optionData.settingControlId ).focus();
                                                       }, 300 );
+                                                      api.trigger('nimble-update-topbar-skope-status');
                                                       api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                                                 };
                                                 
@@ -172,6 +173,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       //console.log('REFRESH PREVIEW TO HOME', to );
                                                       api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                                                       api.previewer.previewUrl( api.settings.url.home );
+                                                      api.trigger('nimble-update-topbar-skope-status');
                                                 });
                                           }
 

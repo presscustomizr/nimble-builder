@@ -63,6 +63,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 }
                                           }
 
+                                          // April 2021 : for site templates
+                                          if ( 'local' === localOrGlobal ) {
+                                                api.trigger('nimble-update-topbar-skope-status');
+                                          }
+
                                     }, 1000 ) );
                               });//api( settingData.collectionSettingId, function( sektionSetInstance ){}
                         }//if ( ! api.has( settingData.collectionSettingId ) ) {
@@ -327,6 +332,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
                         throw new Error( 'resetCollectionSetting => invalid scope provided.', scope );
                   }
+                  // April 2021, for site templates => the default local sektion model includes property __inherits_group_skope__, set to true
+                  // => when reseting locally, if a group template is defined, it will be inherited
                   return $.extend( true, {}, self.getDefaultSektionSettingValue( scope ) );
             }
       });//$.extend()

@@ -1241,8 +1241,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     _bool = false,
                     _collection,
                     localCollSetId = this.localSectionsSettingId(),
-                    localColSetValue = api(localCollSetId)(),
-                    activeLocationInfos = this.activeLocationsInfo();
+                    localColSetValue = api(localCollSetId)();
 
                 localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
                 _collection = $.extend( true, {}, localColSetValue );
@@ -1265,10 +1264,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //-------------------------------------------------------------------------------------------------
             //-- SITE TEMPLATE HELPERS
             //-------------------------------------------------------------------------------------------------
-            localSektionsInheritGroupSkope : function() {
-                  var localCollSetId = this.localSectionsSettingId(),
-                        localColSetValue = api(localCollSetId)();
-                  return localColSetValue && localColSetValue.__inherits_group_skope__;
+            // localSektionsInheritsGroupSkope : function() {
+            //       var localCollSetId = this.localSectionsSettingId(),
+            //             localColSetValue = api(localCollSetId)();
+            //       return localColSetValue && localColSetValue.__inherits_group_skope__;
+            // },
+
+            // @return bool
+            hasLocalSektions : function() {
+                  var self = this,
+                      _bool = false,
+                      _collection,
+                      localCollSetId = this.localSectionsSettingId(),
+                      localColSetValue = api(localCollSetId)();
+  
+                  localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
+                  _collection = $.extend( true, {}, localColSetValue );
+                  _collection = ! _.isEmpty( _collection.collection ) ? _collection.collection : [];
+                  _collection = _.isArray( _collection ) ? _collection : [];
+                  _.each( _collection, function( loc_data ){
+                        if ( _bool )
+                          return;
+                        if ( _.isObject(loc_data) && 'location' == loc_data.level && loc_data.collection ) {
+                              _bool = !_.isEmpty( loc_data.collection );
+                        }
+                  });
+                  return _bool;
             },
 
             //-------------------------------------------------------------------------------------------------

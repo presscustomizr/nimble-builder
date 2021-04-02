@@ -796,6 +796,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                         api.errare( 'Error in self.localSectionsSettingId.callbacks => self.setupSettingsToBeSaved()' , er );
                                                                   }
 
+                                                                  api.trigger('nimble-update-topbar-skope-status', { after_reset : true } );
+
                                                                   // Removes and RE-register local settings and controls
                                                                   self.generateUI({
                                                                         action : 'sek-generate-local-skope-options-ui',
