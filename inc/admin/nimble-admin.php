@@ -882,27 +882,6 @@ function sek_get_welcome_block() {
 
 
 
-// SEPTEMBER 2020 : added for https://github.com/presscustomizr/presscustomizr_prod/issues/39
-add_filter('hu_update_notice_after', '\Nimble\sek_write_update_notice_after_for_pc_themes', 10 );
-add_filter('czr_update_notice_after', '\Nimble\sek_write_update_notice_after_for_pc_themes', 10 );
-function sek_write_update_notice_after_for_pc_themes() {
-    $theme_slug = sek_get_parent_theme_slug();
-    $pc_theme_name = sek_maybe_get_presscustomizr_theme_name( $theme_slug );
-    if ( 'hueman' === $pc_theme_name && ( !defined('HU_IS_PRO') || !HU_IS_PRO ) ) {
-        return !HU_IS_PRO ? sprintf( '<p style="position: absolute;right: 7px;top: 4px;"><a class="button button-primary upgrade-to-pro" href="%1$s" title="%2$s" target="_blank">%2$s &raquo;</a></p>',
-          esc_url('presscustomizr.com/hueman-pro?ref=a&utm_source=usersite&utm_medium=link&utm_campaign=hueman-update-notice'),
-          'Upgrade to Hueman Pro'
-        ) : '';
-    }
-    if ( 'customizr' === $pc_theme_name && ( !defined('CZR_IS_PRO') || !CZR_IS_PRO ) ) {
-        return !CZR_IS_PRO ? sprintf( '<p style="position: absolute;right: 7px;top: 4px;"><a class="button button-primary upgrade-to-pro" href="%1$s" title="%2$s" target="_blank">%2$s &raquo;</a></p>',
-          esc_url('presscustomizr.com/customizr-pro?ref=a&utm_source=usersite&utm_medium=link&utm_campaign=customizr-update-notice'),
-          'Upgrade to Customizr Pro'
-        ) : '';
-    }
-    return '';
-}
-
 /* ------------------------------------------------------------------------- *
 *  Review link in plugin list table
 *  Nov 2020 for https://github.com/presscustomizr/nimble-builder/issues/701
