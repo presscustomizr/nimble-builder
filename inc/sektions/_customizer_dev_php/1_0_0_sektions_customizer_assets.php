@@ -662,10 +662,13 @@ function nimble_add_i18n_localized_control_params( $params ) {
             '🍥 More templates coming...' => __('🍥 More templates coming...', 'text_doma'),
 
             // Section Save
-            'You did not save any section yet.' => __('You did not save any section yet.', 'text_dom')
+            'You did not save any section yet.' => __('You did not save any section yet.', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
+
+            'No template set.' => __('No template set.', 'text_dom'),
+            'Active template : ' => __('Active template : ', 'text_dom')
 
 
         )//array()

@@ -21,10 +21,10 @@
                         var _doRender = function( site_tmpl_id, tmplTitle ) {
                               _html = '<span class="sek-current-site-tmpl">';
                                     if ( '_no_site_tmpl_' === site_tmpl_id || _.isEmpty( site_tmpl_id ) ) {
-                                          _html += '@missi18n => No template';
+                                          _html += sektionsLocalizedData.i18n['No template set.'];
                                           input.container.removeClass('sek-has-site-tmpl');
                                     } else {
-                                          _html += '@missi18n => Active template : ' +  ( _.isEmpty(tmplTitle) ? site_tmpl_id : tmplTitle );
+                                          _html += sektionsLocalizedData.i18n['Active template : '] +  ( _.isEmpty(tmplTitle) ? site_tmpl_id : tmplTitle );
                                           input.container.addClass('sek-has-site-tmpl');
                                     }
                               _html += '</span>';
