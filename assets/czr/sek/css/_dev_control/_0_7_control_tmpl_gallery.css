@@ -330,9 +330,9 @@ input.sek-filter-tmpl {
   text-transform: uppercase;
 }
 .sek-current-site-tmpl {
-  width: calc(100% - 10px);
+  width: calc(100% - 16px);
   float: left;
-  padding: 10px 5px;
+  padding: 10px 8px;
   margin: 5px 0;
   border-color: #ccc;
   background: #f7f7f7;
