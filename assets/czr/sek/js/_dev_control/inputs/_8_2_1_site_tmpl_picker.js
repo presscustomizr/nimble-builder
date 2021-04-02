@@ -17,7 +17,32 @@
                         site_tmpl_id, site_tmpl_source,
                         tmplTitle = '';
 
-                  var printCurrentTemplateVal = function() {
+                  // When a user template is being modified or removed, NB refreshes the site template input
+                  input.container.one('site-tmpl-input-rendered', function() {
+                        api.czr_sektions.allSavedTemplates.bind( function( userTmplates ) {
+                              site_tmpl_id = input();
+                              if ( _.isEmpty(site_tmpl_id) || !_.isString(site_tmpl_id) || !_.isObject(userTmplates) )
+                                    return;
+                              // Stop here if the template is not a user_tmpl. ( we don't need to reset title if _no_site_tmpl_ and api_tmpl are not editable )
+                              if ( "user_tmpl" != site_tmpl_id.substring(0,9) )
+                                    return;
+
+                              // NB stores the site template id as a concatenation of template source + '___' + template name
+                              // Ex : user_tmpl___landing-page-for-services
+                              site_tmpl_id = site_tmpl_id.replace('user_tmpl___','');
+                              if ( userTmplates[site_tmpl_id] ) {
+                                    printCurrentTemplateName();
+                              } else {
+                                    // If the template has been removed, trigger a reset
+                                    $hidInputEl.trigger('nb-set-site-tmpl', _defaultData );
+                              }
+                        });
+                  });
+
+                  // printParams : { see_me : true }
+                  var printCurrentTemplateName = function( printParams ) {
+                        printParams = $.extend( { see_me : false }, printParams || {} );
+
                         var _doRender = function( site_tmpl_id, tmplTitle ) {
                               _html = '<span class="sek-current-site-tmpl">';
                                     if ( '_no_site_tmpl_' === site_tmpl_id || _.isEmpty( site_tmpl_id ) ) {
@@ -30,6 +55,16 @@
                               _html += '</span>';
                               input.container.find('.sek-current-site-tmpl').remove();
                               input.container.find('.czr-input').prepend(_html);
+
+                              // Catch user's eye by animating the site template input
+                              if ( printParams.see_me && '_no_site_tmpl_' != site_tmpl_id ) {
+                                    input.container.addClass('button-see-me');
+                                    _.delay( function() {
+                                          input.container.removeClass('button-see-me');
+                                    }, 800 );
+                              }
+
+                              input.container.trigger('site-tmpl-input-rendered');
                         };
 
                         site_tmpl_id = input();
@@ -69,7 +104,7 @@
                                     _doRender(site_tmpl_id, tmplTitle);
                               })
                               .fail( function() {
-                                    api.errare('printCurrentTemplateVal error when getting collection promise failed', params );
+                                    api.errare('printCurrentTemplateName error when getting collection promise failed', params );
                                     _dfd_.resolve('');
                               });
                         }
@@ -119,12 +154,12 @@
                               input( siteTmplData.site_tmpl_source + '___' + siteTmplData.site_tmpl_id );
                         }
 
-                        try{ printCurrentTemplateVal(); } catch(er) { api.errare('Error when printing template val', er ); }
+                        try{ printCurrentTemplateName({ see_me : true }); } catch(er) { api.errare('Error when printing template val', er ); }
                         api.czr_sektions.templateGalleryExpanded( false );
                         $('[data-input-type="site_tmpl_picker"]').removeClass('sek-site-tmpl-picking-active');
                   });
 
-                  try{ printCurrentTemplateVal(); } catch(er) { api.errare('Error when printing template val', er ); }
+                  try{ printCurrentTemplateName(); } catch(er) { api.errare('Error when printing template val', er ); }
             }
             
       });//$.extend( api.czrInputMap, {})

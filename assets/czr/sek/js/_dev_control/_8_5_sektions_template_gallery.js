@@ -36,8 +36,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         } else {
                               $('#customize-preview iframe').css('z-index', '');
                               api.trigger('nb-template-gallery-closed');
+                              // SITE TEMPLATE PICKING
                               // When closing template gallery, make sure NB reset the possible previous tmpl scope used in a site template picking scenario
                               self._site_tmpl_scope = null;
+                              // If template gallery was closed during a site template picking scenario, make sure input state is reset
+                              $('[data-input-type="site_tmpl_picker"]').removeClass('sek-site-tmpl-picking-active');
                         }
                   });
 
