@@ -81,6 +81,16 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'title_width' => 'width-100',
                     'refresh_preview' => false
                 ),
+                'skp__all_attachment'  => array(
+                    'input_type'  => 'site_tmpl_picker',
+                    'title'       => __('Template for attachment pages', 'text_doma'),
+                    'default'     => '_no_site_tmpl_',
+                    //'refresh_preview' => true,
+                    'notice_before_title' => '',
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_preview' => false
+                ),
                 // this skope has no group skope => this is why we need to add the suffix '_for_site_tmpl' to differentiate with local sektion skope
                 // @ see skp_get_no_group_skope_list()
                 'skp__search_for_site_tmpl' => array(
