@@ -1289,7 +1289,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _bool = !_.isEmpty( loc_data.collection );
                         }
                   });
-                  return _bool;
+                  // on a reset, property __inherits_group_skope__ is set to true server side
+                  return _bool && !( localColSetValue && localColSetValue.__inherits_group_skope__ );
             },
 
             //-------------------------------------------------------------------------------------------------

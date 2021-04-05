@@ -157,7 +157,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //       self.rootPanelFocus();
                         //       _panel_.focus();
                         // });
-                        console.log('CLICK', self.getLocalSkopeOptionId(), api.control( self.getLocalSkopeOptionId() + '__local_reset') );
                         // api.control( self.getLocalSkopeOptionId() + '__local_reset', function( _control_ ) {
                         //       _control_.focus();
                         //       _control_.container.find('.customize-control-title').trigger('click');
@@ -237,7 +236,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //.attr('data-doc-href', 'https://docs.presscustomizr.com/article/339-changing-the-page-template');
                         
                               // if ( _.isObject( templateSettingValue ) && templateSettingValue.local_template && 'default' !== templateSettingValue.local_template ) {
-                              
+                              if ( _inheritsSiteTemplate ) {
+                                    $(self.topBarId).find('.sek-notifications').addClass('is-linked').data('doc-href', 'https://docs.presscustomizr.com/article/428-how-to-use-site-templates-with-nimble-builder');
+                              } else {
+                                    $(self.topBarId).find('.sek-notifications').removeClass('is-linked').data('doc-href','');
+                              }
                         // } else {
                         //       $(self.topBarId).find('.sek-notifications').html('');
                         // }

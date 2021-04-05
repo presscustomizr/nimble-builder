@@ -184,6 +184,9 @@ body.nimble-top-bar-visible #nimble-top-bar {
   overflow: hidden;
   padding: 0 10px;
   font-size: 12px;
+  text-decoration: none;
+}
+#nimble-top-bar .sek-notifications.is-linked {
   text-decoration: underline;
   cursor: pointer;
 }

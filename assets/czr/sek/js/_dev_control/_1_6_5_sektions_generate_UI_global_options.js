@@ -112,8 +112,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__global_reset',
                                           module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Reset the sections displayed in global locations'],
-                                          icon : '<i class="material-icons sek-level-option-icon">cached</i>'
+                                          controlLabel : sektionsLocalizedData.i18n['Remove the sections displayed in global locations'],
+                                          icon : '<i class="material-icons sek-level-option-icon">delete</i>'
                                     };
                               break;
                               case 'beta_features' :

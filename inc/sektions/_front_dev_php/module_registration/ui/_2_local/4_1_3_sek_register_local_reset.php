@@ -9,9 +9,9 @@ function sek_get_module_params_for_sek_local_reset() {
             'item-inputs' => array(
                 'reset_local' => array(
                     'input_type'  => 'reset_button',
-                    'title'       => __( 'Remove the Nimble sections in the current page' , 'text_doma' ),
+                    'title'       => __( 'Remove sections and Nimble Builder options of this page' , 'text_doma' ),
                     'scope'       => 'local',
-                    'notice_after' => __('This will reset the sections created for the currently previewed page only. All other sections in other contexts will be preserved.', 'text_doma'),
+                    'notice_after' => __('This will reset the options and sections created for the currently previewed page only. All other sections and options in other contexts will be preserved.', 'text_doma'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
                 )

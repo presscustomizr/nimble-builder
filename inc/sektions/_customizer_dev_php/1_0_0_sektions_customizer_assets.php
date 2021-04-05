@@ -546,8 +546,8 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Page header and footer' => __( 'Page header and footer', 'text_doma'),
             'Inner and outer widths' => __( 'Inner and outer widths', 'text_doma'),
             'Custom CSS' => __( 'Custom CSS', 'text_doma'),
-            'Reset the sections in this page' => __( 'Reset the sections in this page', 'text_doma'),
-            'Reset the sections displayed in global locations' => __( 'Reset the sections displayed in global locations', 'text_doma'),
+            'Remove sections and Nimble Builder options of this page' => __( 'Remove sections and Nimble Builder options of this page', 'text_doma'),
+            'Remove the sections displayed in global locations' => __( 'Remove the sections displayed in global locations', 'text_doma'),
             'Page speed optimizations' => __( 'Page speed optimizations', 'text_doma'),
 
             'Global text options for Nimble sections' => __('Global text options for Nimble sections', 'text_doma'),
