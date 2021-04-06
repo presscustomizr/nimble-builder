@@ -663,11 +663,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             // @params {
                             //  type : info, error, success
                             //  message : ''
-                            //  duration : in ms
+                            //  duration : in ms,
+                            //  button_see_me : true
                             // }
                             'sek-notify' : function( params ) {
                                   sendToPreview = false;
                                   var notif_id = params.notif_id || 'sek-notify';
+                                  params.button_see_me = _.isUndefined(params.button_see_me) ? true : params.button_see_me;
 
                                   // Make sure we clean the last printed notification
                                   if ( self.lastNimbleNotificationId ) {
@@ -684,6 +686,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                               self.lastNimbleNotificationId = notif_id;
 
+                                              if ( params.button_see_me && api.notifications.has( notif_id ) ) {
+                                                      api.notifications.container.addClass('button-see-me');
+                                                      _.delay( function() {
+                                                            api.notifications.container.removeClass('button-see-me');
+                                                      }, 800 );
+                                              }
                                               // Removed if not dismissed after 5 seconds
                                               _.delay( function() {
                                                     api.notifications.remove( notif_id );
