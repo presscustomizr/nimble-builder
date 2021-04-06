@@ -168,7 +168,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _panel_.focus();
                               api.section( self.SECTION_ID_FOR_LOCAL_OPTIONS, function( _section_ ) {
                                     _section_.focus();
-                                    console.log('CLICK', self.getLocalSkopeOptionId(), api.control( self.getLocalSkopeOptionId() + '__local_reset') );
                                     setTimeout( function() {
                                           api.control( self.getLocalSkopeOptionId() + '__local_reset', function( _control_ ) {
                                                 _control_.focus();
