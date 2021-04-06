@@ -135,6 +135,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   _do_register_ = function() {
                         _.each( registrationParams, function( optionData, optionType ){
+                              if ( 'site_templates' === optionType ) {
+                                    var _doThingsAfterRefresh = function() {
+                                          setTimeout( function() {
+                                                api.control( optionData.settingControlId ).focus();
+                                          }, 300 );
+                                          api.trigger('nimble-update-topbar-skope-status');
+                                          api.previewer.trigger('sek-notify', {
+                                                type : 'info',
+                                                duration : 20000,
+                                                message : [
+                                                      '<span style="">',
+                                                            //'<strong>' + sektionsLocalizedData.i18n['Template saved'] + '</strong>',
+                                                            sektionsLocalizedData.i18n['Refreshed to home page : site templates must be set when previewing home'],
+                                                      '</span>'
+                                                ].join('')
+                                          });
+                                          api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
+                                    };
+                              }
+
                               if ( ! api.has( optionData.settingControlId ) ) {
                                     var doUpdate = function( to, from, args ) {
                                           try { self.updateAPISettingAndExecutePreviewActions({
@@ -161,14 +181,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // Added March 2021 for #478
                                           // Force preview to home when modifying the site templates
                                           if ( 'site_templates' === optionType ) {
-                                                var _doThingsAfterRefresh = function() {
-                                                      setTimeout( function() {
-                                                            api.control( optionData.settingControlId ).focus();
-                                                      }, 300 );
-                                                      api.trigger('nimble-update-topbar-skope-status');
-                                                      api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
-                                                };
-                                                
                                                 _setting_.bind( function( to ) {
                                                       //console.log('REFRESH PREVIEW TO HOME', to );
                                                       api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
@@ -247,6 +259,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
                                                 $title.trigger('click');
                                           }
+
+                                          if ( 'site_templates' === optionType ) {
+                                                _control_.container.one('click', '.customize-control-title', function() {
+                                                      //console.log('REFRESH PREVIEW TO HOME', to );
+                                                      api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
+                                                      api.previewer.previewUrl( api.settings.url.home );
+                                                      api.trigger('nimble-update-topbar-skope-status');
+                                                });
+                                          }
+
                                     });
                               });
                         });//_.each();
