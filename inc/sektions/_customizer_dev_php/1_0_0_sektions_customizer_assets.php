@@ -11,8 +11,7 @@ add_action('customize_save_after', '\Nimble\sek_update_most_used_gfonts');
 function sek_update_most_used_gfonts( $manager ) {
     if ( !sek_current_user_can_access_nb_ui() )
       return;
-    $skope_id = skp_get_skope_id();
-    $all_gfonts = sek_get_all_gfonts( $skope_id );
+    $all_gfonts = sek_get_all_gfonts();
     if ( is_array($all_gfonts) && !empty($all_gfonts) ) {
         update_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS, $all_gfonts, 'no' );
     }
@@ -669,9 +668,10 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             'No template set.' => __('No template set.', 'text_dom'),
             'Active template : ' => __('Active template : ', 'text_dom'),
-            'This page has no NB sections' => __('This page has no NB sections', 'text_dom'),
+            'This page is not customized with NB' => __('This page is not customized with NB', 'text_dom'),
             'This page inherits a NB site template' => __('This page inherits a NB site template', 'text_dom'),
-            'This page has NB sections' => __('This page has NB sections', 'text_dom')
+            'This page is customized with NB' => __('This page is customized with NB', 'text_dom'),
+            'Refreshed to home page : site templates must be set when previewing home' => __('Refreshed to home page : site templates must be set when previewing home','text_dom')
         )//array()
     )//array()
     );//array_merge

@@ -218,11 +218,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //console.log('HAS SITE TMPL SET ?', _hasSiteTemplateSet );
                         _inheritsSiteTemplate = _hasSiteTemplateSet && !_hasLocalSektions;
                         //console.log('ALORS ?', _inheritsSiteTemplate, _hasLocalSektions );
-                        var _msg = sektionsLocalizedData.i18n['This page has no NB sections'];
+                        var _msg = sektionsLocalizedData.i18n['This page is not customized with NB'];
                         if ( _inheritsSiteTemplate ) {
                               _msg = sektionsLocalizedData.i18n['This page inherits a NB site template'];
                         } else if ( _hasLocalSektions ) {
-                              _msg = sektionsLocalizedData.i18n['This page has NB sections'];
+                              _msg = sektionsLocalizedData.i18n['This page is customized with NB'];
                               _msg += '<button type="button" class="far fa-trash-alt sek-reset-local-sektions" title="Remove sektions" data-nimble-state="enabled"><span class="screen-reader-text">Remove sektions</span></button>';
                         }
 
