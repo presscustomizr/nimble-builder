@@ -179,19 +179,22 @@ final class Nimble_Collection_Setting extends \WP_Customize_Setting {
       }
 
       // Added march 2021 for #478
+      // Property __inherits_group_skope__ is set to "true" on a local reset case
+
+      // How does it work ?
+      // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
+      // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
+      // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control::resetCollectionSetting )
+      // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
       if ( sek_is_site_tmpl_enabled() && NIMBLE_GLOBAL_SKOPE_ID !== $this->skope_id ) {
         if ( array_key_exists( '__inherits_group_skope__', $seks_collection ) && $seks_collection['__inherits_group_skope__'] ) {
           sek_remove_seks_post( $this->skope_id  );
-          sek_error_log( __CLASS__. ' => NOT SAVING LOCAL SETTING BECAUSE INHERITED FROM GROUP SKOPE + REMOVED SKOPED POST');
+          //sek_error_log( __CLASS__. ' => NOT SAVING LOCAL SETTING BECAUSE INHERITED FROM GROUP SKOPE + REMOVED SKOPED POST');
           return;
         }
       }
 
-      // Added march 2021 for #478
-      if ( array_key_exists( '__inherits_group_skope__', $seks_collection ) ) {
-          unset( $seks_collection['__inherits_group_skope__'] );
-      }
-      
+
       $r = sek_update_sek_post( $seks_collection, array(
           'skope_id' => $this->skope_id
       ));

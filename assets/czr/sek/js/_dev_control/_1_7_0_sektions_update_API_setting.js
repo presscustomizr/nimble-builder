@@ -301,14 +301,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           if ( null !== self.validateSettingValue( self.updAPISetParams.newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
                                                 if ( sektionsLocalizedData.isSiteTemplateEnabled && !params.is_global_location ) {
                                                       // Added March 2021 for #478
-                                                      // When preparing skope data for customizer server side, NB adds this property
-                                                      // This property says that this page has no local sektions + has a group template set.
-                                                      // Useful on a saving action just after a reset because it informs the server if the local skope has been modified or not.
-                                                      // Because in the customizer, after a reset NB sets the local setting value to the inherited group skope one
-                                                      // If we save, NB will "think" that the local skope has been customize, while in fact it only inherits its group skope
-                                                      // If saved, then the page won't inherit the group skope anymore, which will be difficult to detect at first because local and group will be the same at the beginning
-                                                      // If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
-                                                      self.updAPISetParams.newSetValue.__inherits_group_skope__ = false;
+                                                      // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
+                                                      // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
+                                                      // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control:: resetCollectionSetting )
+                                                      // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
+                                                      self.updAPISetParams.newSetValue.__inherits_group_skope__ = 'sek-reset-collection' === params.action;
                                                 }
                                                 api( _collectionSettingId_ )( self.updAPISetParams.newSetValue, params );
                                                 // Add the cloneId to the params when we resolve

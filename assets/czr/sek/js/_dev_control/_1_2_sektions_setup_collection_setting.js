@@ -53,7 +53,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // );
 
                                           // console.log('MAIN SETTING CHANGED', params );
-                                          // console.log('NEW MAIN SETTING VALUE', newSektionSettingValue );
+                                          //console.log('NEW MAIN SETTING VALUE', newSektionSettingValue );
 
 
                                           // Track changes, if not already navigating the logs
@@ -332,9 +332,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
                         throw new Error( 'resetCollectionSetting => invalid scope provided.', scope );
                   }
-                  // April 2021, for site templates => the default local sektion model includes property __inherits_group_skope__, set to true
+
+                  newSettingValue = self.getDefaultSektionSettingValue( scope );
+                  // April 2021, for site templates #478 => the default local sektion model includes property __inherits_group_skope__, set to true
                   // => when reseting locally, if a group template is defined, it will be inherited
-                  return $.extend( true, {}, self.getDefaultSektionSettingValue( scope ) );
+
+                  // How does it work?
+                  // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
+                  // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
+                  // After a reset case, NB sets __inherits_group_skope__ back to true here
+                  // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
+                  return $.extend( true, {}, newSettingValue );
             }
       });//$.extend()
 })( wp.customize, jQuery );

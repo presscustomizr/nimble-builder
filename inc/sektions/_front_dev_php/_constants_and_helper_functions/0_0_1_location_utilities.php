@@ -128,7 +128,7 @@ function sek_get_default_location_model( $skope_id = null ) {
     }
     // March 2021 for site templates #478
     if ( sek_is_site_tmpl_enabled() && !$is_global_skope ) {
-        $defaut_sektions_value['__inherits_group_skope__'] = false;
+        $defaut_sektions_value['__inherits_group_skope__'] = true;
     }
     return $defaut_sektions_value;
 }

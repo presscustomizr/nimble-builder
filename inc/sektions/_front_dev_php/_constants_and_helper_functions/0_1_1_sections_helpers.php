@@ -42,7 +42,7 @@ function sek_local_skope_has_nimble_sections( $skope_id = '', $seks_data = null 
     
     // When the collection is provided use it otherwise get it
     if ( is_null($seks_data) || !is_array($seks_data) ) {
-        $seks_data = sek_get_seks_without_group_inheritance( $skope_id );
+        $seks_data = sek_get_skoped_seks( $skope_id );
     }
     if ( is_array( $seks_data ) ) {
         $nb_section_created = sek_count_not_empty_sections_in_page( $seks_data );

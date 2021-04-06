@@ -27,6 +27,8 @@ function sek_get_site_tmpl_for_skope( $group_skope = null ) {
 /* ------------------------------------------------------------------------- *
  *  SITE TEMPLATES SKOPE HELPER
 /* ------------------------------------------------------------------------- */
+// when registering site template global options the suffix '_for_site_tmpl' is added to 'no group skope' scopes : 'skp__search_for_site_tmpl', 'skp__404_for_site_tmpl', 'skp__date_for_site_tmpl'
+// see sek_get_module_params_for_sek_site_tmpl_pickers()
 function sek_get_group_skope_for_site_tmpl() {
     $group_skope = skp_get_skope_id( 'group' );
     if ( '_skope_not_set_' === $group_skope ) {
@@ -51,6 +53,30 @@ function sek_is_no_group_skope( $skope_id = null ) {
     return in_array( $skope_id_without_prefix, $skope_with_no_group );
 }
 
+//@return bool
+function sek_local_skope_inherits_group_skope( $skope_id = '', $local_seks_data = null ) {
+    $skope_id = empty( $skope_id ) ? skp_get_skope_id() : $skope_id;
+
+    if ( NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) {
+        sek_error_log( __FUNCTION__ . ' => error => function should not be used with global skope id' );
+        return false;
+    }
+    // if is viewing front page, we don't want to inherit 'skp__all_page' scope
+    if ( is_front_page() && 'page' == get_option( 'show_on_front' ) )
+        return false;
+
+    // When the collection is provided use it otherwise get it
+    if ( is_null($local_seks_data) || !is_array($local_seks_data) ) {
+        $local_seks_data = sek_get_skoped_seks( $skope_id );
+    }
+    // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
+    // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
+    // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control::resetCollectionSetting )
+    // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
+    return is_array($local_seks_data) && array_key_exists( '__inherits_group_skope__', $local_seks_data ) && $local_seks_data['__inherits_group_skope__'];
+}
+
+
 /* ------------------------------------------------------------------------- *
  *  SITE TEMPLATES CSS
 /* ------------------------------------------------------------------------- */
@@ -59,7 +85,11 @@ add_filter( 'nb_set_skope_id_before_generating_local_front_css', function( $skop
     if ( !sek_is_site_tmpl_enabled() )
         return $skope_id;
 
-    if ( !sek_local_skope_has_nimble_sections( $skope_id ) ) {
+    // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
+    // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
+    // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control:: resetCollectionSetting )
+    // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
+    if ( sek_local_skope_inherits_group_skope( $skope_id ) ) {
         $group_site_tmpl_data = sek_get_group_site_template_data();//<= is cached when called
         $has_group_skope_template_data = !( !$group_site_tmpl_data || empty($group_site_tmpl_data) );
         if ( $has_group_skope_template_data ) {
@@ -87,10 +117,13 @@ function sek_maybe_get_seks_for_group_site_template( $skope_id, $local_seks_data
         return $local_seks_data;
     }
 
-    // If the local skoped already includes at least a section, no inheritance
-    $has_local_sections = is_array( $local_seks_data ) ? ( sek_count_not_empty_sections_in_page( $local_seks_data ) > 0 ) : false;
-    if ( $has_local_sections )
+    // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
+    // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
+    // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control:: resetCollectionSetting )
+    // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
+    if ( !sek_local_skope_inherits_group_skope($skope_id, $local_seks_data) )  {
         return $local_seks_data;
+    }
 
     $group_site_tmpl_data = sek_get_group_site_template_data();
 
