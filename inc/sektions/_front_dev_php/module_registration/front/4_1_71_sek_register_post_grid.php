@@ -371,7 +371,7 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_post_grid_metas_child',
-        'name' => __( 'Post metas : author, date, category, tags,...', 'text_doma' ),
+        'name' => __( 'Post metas : author, date, category, ...', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_doma'),
