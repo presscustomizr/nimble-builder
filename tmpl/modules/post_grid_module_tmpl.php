@@ -130,9 +130,10 @@ if ( !function_exists( 'Nimble\sek_render_post') ) {
     }
     $has_post_thumbnail = has_post_thumbnail();
     $use_post_thumb_placeholder = true === sek_booleanize_checkbox_val( $thumb_settings['use_post_thumb_placeholder'] );
-    $has_post_thumb_class = ( $show_thumb && ( $has_post_thumbnail || $use_post_thumb_placeholder ) ) ? 'sek-has-thumb' : '';
+    $post_thumb_class = ( $show_thumb && ( $has_post_thumbnail || $use_post_thumb_placeholder ) ) ? 'sek-has-thumb' : '';
+    $post_classes = get_post_class( $post_thumb_class, $post_id );
     ?>
-      <article id="sek-pg-<?php the_ID(); ?>" class="<?php echo $has_post_thumb_class; ?>">
+      <article id="sek-pg-<?php the_ID(); ?>" class="<?php echo esc_attr( implode( ' ', $post_classes ) ); ?>">
         <?php if ( $show_thumb && ( $has_post_thumbnail || $use_post_thumb_placeholder ) ) : ?>
           <figure class="sek-pg-thumbnail">
             <?php // when title is not displayed, print it as an attribute of the image ?>
@@ -300,7 +301,78 @@ $query_params = $default_query_params = [
 ];
 
 
+if ( !function_exists( 'Nimble\sek_maybe_add_sticky_posts_to_query') ) {
+  // inspired from WP core way to add sticky posts. @see class WP_Query
+  function sek_maybe_add_sticky_posts_to_query( $query, $query_params, $paged ) {
+    // Put sticky posts at the top of the posts array.
+    $sticky_posts = get_option( 'sticky_posts' );
+    if ( $paged <= 1 && is_array( $sticky_posts ) && ! empty( $sticky_posts ) && ! $query_params['ignore_sticky_posts'] ) {
+      $num_posts     = count( $query->posts );
+      $sticky_offset = 0;
+      // Loop over posts and relocate stickies to the front.
+      for ( $i = 0; $i < $num_posts; $i++ ) {
+        if ( in_array( $query->posts[ $i ], $sticky_posts, true ) ) {
+          $sticky_post = $query->posts[ $i ];
+          // Remove sticky from current position.
+          array_splice( $query->posts, $i, 1 );
+          // Move to front, after other stickies.
+          array_splice( $query->posts, $sticky_offset, 0, array( $sticky_post ) );
+          // Increment the sticky offset. The next sticky will be placed at this offset.
+          $sticky_offset++;
+          // Remove post from sticky posts array.
+          $offset = array_search( $sticky_post, $sticky_posts, true );
+          unset( $sticky_posts[ $offset ] );
+        }
+      }
+
+      // If any posts have been excluded specifically, Ignore those that are sticky.
+      if ( ! empty( $sticky_posts ) && ! empty( $query_params['post__not_in'] ) ) {
+        $sticky_posts = array_diff( $sticky_posts, $query_params['post__not_in'] );
+      }
+
+      $post_type = ( array_key_exists('post_type', $query_params ) && !empty($query_params['post_type'] ) ) ? $query_params['post_type'] : 'post';
+      // Fetch sticky posts that weren't in the query results.
+      if ( ! empty( $sticky_posts ) ) {
+        $stickies = get_posts(
+          array(
+            'post__in'    => $sticky_posts,
+            'post_type'   => $post_type,
+            'post_status' => 'publish',
+            'nopaging'    => true,
+          )
+        );
+
+        foreach ( $stickies as $sticky_post ) {
+          array_splice( $query->posts, $sticky_offset, 0, array( $sticky_post ) );
+          $sticky_offset++;
+        }
+      }
+    }
+    return $query;
+  }
+}
+
+// Shall NB use current WP query ?
+if ( array_key_exists('use_current_query', $main_settings ) && sek_booleanize_checkbox_val($main_settings['use_current_query']) ) {
+  if ( skp_is_customizing() ) {
+      $query_params = sek_get_posted_query_param_when_customizing('query_vars');
+  } else {
+      global $wp_query;
+      $query_params = $wp_query->query_vars;
+  }
+  // make sure we didn't lose the query params at this point.
+  $query_params = is_array($query_params) ? $query_params : $default_query_params;
+
+  $query_params['posts_per_page'] = $post_nb;
+  $query_params['orderby'] = $orderby;
+  $query_params['order'] = $order;
+}
+
+
 $post_collection = null;
+$paged = 1;
+$include_sticky = array_key_exists('include_sticky', $main_settings ) && sek_booleanize_checkbox_val($main_settings['include_sticky']);
+
 // may 2020 => is_front_page() was wrong to check if home was a static front page.
 // fixes https://github.com/presscustomizr/nimble-builder/issues/664
 Nimble_Manager()->is_viewing_static_front_page = is_front_page() && 'page' == get_option( 'show_on_front' );
@@ -319,21 +391,24 @@ if ( true === sek_booleanize_checkbox_val($main_settings['display_pagination']) 
   ], $default_query_params );
 }
 
-
+if ( $include_sticky ) {
+  $query_params['ignore_sticky_posts'] = 0;
+}
 
 if ( $post_nb > 0 ) {
   $query_params = apply_filters( 'nimble_post_grid_module_query_params', $query_params , Nimble_Manager()->model );
-
   if ( is_array( $query_params ) ) {
     //add_filter( 'found_posts', '\Nimble\sek_filter_found_posts', 10, 2 );
     // Query featured entries
     $post_collection = new \WP_Query($query_params);
+    if ( $include_sticky ) {
+      $post_collection = sek_maybe_add_sticky_posts_to_query( $post_collection, $query_params, $paged );
+    }
     //remove_filter( 'found_posts', '\Nimble\sek_filter_found_posts', 10, 2 );
   } else {
     sek_error_log('post_grid_module_tmpl => query params is invalid');
   }
 }
-
 
 
 

@@ -69,6 +69,23 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'input_width' => 'width-20'
                     //'html_before' => '<hr>'
                 ),
+                'include_sticky' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Include "sticky" posts', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                    //'html_before' => '<hr>'
+                ),
+                'use_current_query' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Use contextual WordPress post query', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => __('This option allows you to use the posts normally displayed by WordPress on this page.', 'text_doma')
+                    //'html_before' => '<hr>'
+                ),
                 'categories'  => array(
                     'input_type'  => 'category_picker',
                     'title'       => __( 'Filter posts by category', 'text_doma' ),

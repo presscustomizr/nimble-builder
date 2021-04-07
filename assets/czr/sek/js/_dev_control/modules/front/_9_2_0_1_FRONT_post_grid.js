@@ -47,59 +47,56 @@
                                 switch( input.id ) {
                                       case 'layout' :
                                             _.each( [ 'columns', 'img_column_width', 'has_tablet_breakpoint', 'has_mobile_breakpoint' ] , function( _inputId_ ) {
-                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        var bool = false;
-                                                        switch( _inputId_ ) {
-                                                              case 'columns' :
-                                                                    bool = 'grid' === input();
-                                                              break;
-                                                              case 'has_tablet_breakpoint' :
-                                                              case 'has_mobile_breakpoint' :
-                                                              case 'img_column_width' :
-                                                                    bool = 'list' === input();
-                                                              break;
-                                                        }
-                                                        return bool;
-                                                  }); } catch( er ) {
-                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'columns' :
+                                                                  bool = 'grid' === input();
+                                                            break;
+                                                            case 'has_tablet_breakpoint' :
+                                                            case 'has_mobile_breakpoint' :
+                                                            case 'img_column_width' :
+                                                                  bool = 'list' === input();
+                                                            break;
+                                                      }
+                                                      return bool;
+                                                });
                                             });
                                       break;
                                       case 'categories' :
                                             _.each( [ 'must_have_all_cats' ] , function( _inputId_ ) {
-                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        var input_val = input();
-                                                        return _.isArray( input_val ) && input_val.length>1;
-                                                  }); } catch( er ) {
-                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var input_val = input();
+                                                      return _.isArray( input_val ) && input_val.length>1;
+                                                });
                                             });
                                       break;
                                       case 'display_pagination' :
                                             _.each( [ 'posts_per_page', 'post_number' ] , function( _inputId_ ) {
-                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        return 'posts_per_page' === _inputId_ ? input() : !input();
-                                                  }); } catch( er ) {
-                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return 'posts_per_page' === _inputId_ ? input() : !input();
+                                                });
+                                            });
+                                      break;
+                                      case 'use_current_query' :
+                                            _.each( [ 'categories', 'must_have_all_cats'] , function( _inputId_ ) {
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return 'posts_per_page' === _inputId_ ? input() : !input();
+                                                });
                                             });
                                       break;
                                       case 'custom_grid_spaces' :
                                             _.each( [ 'column_gap', 'row_gap' ] , function( _inputId_ ) {
-                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        return input();
-                                                  }); } catch( er ) {
-                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input();
+                                                });
                                             });
                                       break;
                                       case 'show_excerpt' :
                                             _.each( [ 'excerpt_length' ] , function( _inputId_ ) {
-                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        return input();
-                                                  }); } catch( er ) {
-                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input();
+                                                });
                                             });
                                       break;
                                 }
@@ -181,29 +178,25 @@
                                 switch( input.id ) {
                                       case 'show_thumb' :
                                             _.each( [ 'img_size', 'img_has_custom_height', 'img_height', 'border_radius_css', 'use_post_thumb_placeholder' ] , function( _inputId_ ) {
-                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        var bool = false;
-                                                        switch( _inputId_ ) {
-                                                              case 'img_height' :
-                                                                    bool = input() && item.czr_Input('img_has_custom_height')();
-                                                              break;
-                                                              default :
-                                                                    bool = input();
-                                                              break;
-                                                        }
-                                                        return bool;
-                                                  }); } catch( er ) {
-                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'img_height' :
+                                                                  bool = input() && item.czr_Input('img_has_custom_height')();
+                                                            break;
+                                                            default :
+                                                                  bool = input();
+                                                            break;
+                                                      }
+                                                      return bool;
+                                                });
                                             });
                                       break;
                                       case 'img_has_custom_height' :
                                             _.each( [ 'img_height' ] , function( _inputId_ ) {
-                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        return input() && item.czr_Input('show_thumb')();
-                                                  }); } catch( er ) {
-                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input() && item.czr_Input('show_thumb')();
+                                                });
                                             });
                                       break;
                                 }
