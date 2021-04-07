@@ -618,6 +618,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
              * @param {string} content The content we want to scan for shortcodes.
              */
             htmlIncludesElementsThatNeedAnAjaxRefresh : function( content ) {
+                  if ( !_.isString( content ) )
+                        return false;
+
+                  content = content.replace(/\s+/g,'');//<= remove all spaces so that we can detect template tags and shortcodes that have spaces inside curly braces or bracket, like {{  the_tags  }}
                   var shortcodes = content.match( /\[+([\w_-])+/g ),
                       tmpl_tags = content.match( /\{\{+([\w_-])+/g ),
                       // script detection introduced for https://github.com/presscustomizr/nimble-builder/issues/710
@@ -634,6 +638,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       }
                     }
                   }
+
                   if ( tmpl_tags ) {
                     for ( var j = 0; j < tmpl_tags.length; j++ ) {
                       var _tag = tmpl_tags[ j ].replace( /^\[+/g, '' );
