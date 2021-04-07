@@ -10,6 +10,7 @@ function sek_find_pattern_match($matches) {
       'year_now' => date("Y"),
       'site_title' => 'get_bloginfo',
       'the_title' => 'sek_get_the_title',
+      'the_archive_title' => 'sek_get_the_archive_title',
       'the_content' => 'sek_get_the_content',
       'the_tags' => 'sek_get_the_tags',
       'the_categories' => 'sek_get_the_categories',
@@ -64,6 +65,20 @@ add_filter( 'nimble_parse_template_tags', '\Nimble\sek_parse_template_tags' );
 
 
 // CALLBACKS
+function sek_get_the_archive_title() {
+  if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+    $title = sek_get_posted_query_param_when_customizing( 'the_archive_title' );
+  } else {
+    add_filter('get_the_archive_title_prefix', '__return_false');
+    $title = get_the_archive_title();
+    remove_filter('get_the_archive_title_prefix', '__return_false');
+  }
+  return $title;
+}
+
+
+
+
 function sek_get_the_published_date() {
   $post_id = sek_get_post_id_on_front_and_when_customizing();
   $published_date = get_the_date( get_option('date_format'), $post_id);
