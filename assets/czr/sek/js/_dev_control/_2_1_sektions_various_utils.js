@@ -1214,10 +1214,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             scheduleVisibilityOfInputId : function( controlledInputId, visibilityCallBack ) {
                   var item = this.input_parent;
                   if ( !_.isFunction(visibilityCallBack) || _.isEmpty(controlledInputId) ) {
-                        throw new Error('::scheduleVisibilityOfInputId => error when firing for input id : ' + this.id );
+                        api.errare('::scheduleVisibilityOfInputId => error when firing for input id : ' + this.id );
+                        return;
                   }
                   if ( !item.czr_Input.has( controlledInputId ) ) {
-                        throw new Error('::scheduleVisibilityOfInputId => missing input id : ' + controlledInputId );
+                        api.errare('::scheduleVisibilityOfInputId => missing input id : ' + controlledInputId );
+                        return;
                   }
                   //Fire on init
                   item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
