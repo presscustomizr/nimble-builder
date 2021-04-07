@@ -354,7 +354,7 @@ if ( !function_exists( 'Nimble\sek_maybe_add_sticky_posts_to_query') ) {
 
 // Shall NB use current WP query ?
 if ( array_key_exists('use_current_query', $main_settings ) && sek_booleanize_checkbox_val($main_settings['use_current_query']) ) {
-  if ( skp_is_customizing() ) {
+  if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
       $query_params = sek_get_posted_query_param_when_customizing('query_vars');
   } else {
       global $wp_query;
