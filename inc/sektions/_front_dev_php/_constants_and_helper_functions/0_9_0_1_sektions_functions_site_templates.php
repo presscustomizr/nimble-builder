@@ -136,6 +136,9 @@ function sek_maybe_get_seks_for_group_site_template( $skope_id, $local_seks_data
 // @return null || array
 // get and cache the group site template data
 function sek_get_group_site_template_data() {
+    // When ajaxing while customizing, no need to get the group site template data
+    if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX )
+        return;
     $cached = wp_cache_get('nimble_group_site_template_data');
     if ( false !== $cached )
         return $cached;
