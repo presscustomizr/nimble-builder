@@ -33,7 +33,7 @@ function sek_get_module_params_for_sek_local_reset() {
                     'refresh_stylesheet' => false,
                     'refresh_preview' => false,
                     'html_before' => '<hr/>',
-                    'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> <a href="%2$s" target="_blank" rel="noopener noreferrer">%1$s</a></span><hr/>',
+                    'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> <a href="%2$s" target="_blank" rel="noopener noreferrer">%1$s</a></span>',
                         __('How to use site templates with Nimble Builder ?'),
                         'https://docs.presscustomizr.com/article/428-how-to-use-site-templates-with-nimble-builder'
                     ),
