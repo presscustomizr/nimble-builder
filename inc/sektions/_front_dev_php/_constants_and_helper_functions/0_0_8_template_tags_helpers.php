@@ -16,7 +16,8 @@ function sek_find_pattern_match($matches) {
       'the_categories' => 'sek_get_the_categories',
       'the_author' => 'sek_get_the_author',
       'the_published_date' => 'sek_get_the_published_date',
-      'the_modified_date' => 'sek_get_the_modified_date'
+      'the_modified_date' => 'sek_get_the_modified_date',
+      'the_comments' => 'sek_get_the_comments'
     ));
 
     //sek_error_log('$matches ??', $matches );
@@ -65,6 +66,26 @@ add_filter( 'nimble_parse_template_tags', '\Nimble\sek_parse_template_tags' );
 
 
 // CALLBACKS
+function sek_get_the_comments() {
+  if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+    return sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>',
+      __('Comment template can not be displayed while customizing', 'text_doma')
+    );
+  }
+
+  $tmpl_path = sek_get_templates_dir() . "/wp/comments.php";
+  if ( file_exists( $tmpl_path ) ) {
+    ob_start();
+    //load_template( $tmpl_path, false );
+    if ( comments_open() || get_comments_number() ) {
+      comments_template();
+    }
+    return ob_get_clean();
+  }
+  return null;
+}
+
+
 function sek_get_the_archive_title() {
   if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
     $title = sek_get_posted_query_param_when_customizing( 'the_archive_title' );
@@ -154,6 +175,7 @@ function sek_get_the_content() {
   }
   return null;
 }
+
 
 // @return the post id in all cases
 // when performing ajax action, we need the posted query params made available from the ajax params
