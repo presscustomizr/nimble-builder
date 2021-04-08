@@ -1495,7 +1495,7 @@ https://github.com/presscustomizr/nimble-builder/issues/317 */
 }
 
 
-.nimble-shortcode-notice-in-preview {
+.nimble-notice-in-preview {
   font-size: 16px;
   line-height: 1.5em;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
@@ -1508,11 +1508,15 @@ https://github.com/presscustomizr/nimble-builder/issues/317 */
   border-left-width: 4px;
   box-shadow: 0 1px 1px rgba(0,0,0,.04);
 }
-.nimble-shortcode-notice-in-preview > i {
+.sek-module-inner .nimble-inline-notice-in-preview {
+  display: inline;
+  line-height: calc(1.5em + 20px);
+}
+.nimble-notice-in-preview > i {
   color: #00a0d2;
 }
 @media(max-width:768px) {
-  .nimble-shortcode-notice-in-preview {
+  .nimble-notice-in-preview {
     font-size: 14px;
   }
 }
