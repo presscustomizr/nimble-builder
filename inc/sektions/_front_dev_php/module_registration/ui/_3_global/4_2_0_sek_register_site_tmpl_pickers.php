@@ -33,7 +33,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 // ),
                 'skp__all_page' => array(
                     'input_type'  => 'site_tmpl_picker',
-                    'title'       => __('Template for pages', 'text_doma'),
+                    'title'       => __('Template for single pages', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
@@ -47,7 +47,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 ),
                 'skp__all_post' => array(
                     'input_type'  => 'site_tmpl_picker',
-                    'title'       => __('Template for posts', 'text_doma'),
+                    'title'       => __('Template for single posts', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
