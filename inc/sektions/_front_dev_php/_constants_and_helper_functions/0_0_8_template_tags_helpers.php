@@ -10,14 +10,17 @@ function sek_find_pattern_match($matches) {
       'year_now' => date("Y"),
       'site_title' => 'get_bloginfo',
       'the_title' => 'sek_get_the_title',
-      'the_archive_title' => 'sek_get_the_archive_title',
+      'the_archive_title' => 'sek_get_the_archive_title',// works for authors, CPT, taxonomies
+      'the_archive_description' => 'sek_get_the_archive_description',// works for authors, CPT, taxonomies
       'the_content' => 'sek_get_the_content',
       'the_tags' => 'sek_get_the_tags',
       'the_categories' => 'sek_get_the_categories',
       'the_author' => 'sek_get_the_author',
       'the_published_date' => 'sek_get_the_published_date',
       'the_modified_date' => 'sek_get_the_modified_date',
-      'the_comments' => 'sek_get_the_comments'
+      'the_comments' => 'sek_get_the_comments',
+      'the_previous_post_link' => 'sek_get_previous_post_link',
+      'the_next_post_link' => 'sek_get_next_post_link'
     ));
 
     //sek_error_log('$matches ??', $matches );
@@ -66,6 +69,33 @@ add_filter( 'nimble_parse_template_tags', '\Nimble\sek_parse_template_tags' );
 
 
 // CALLBACKS
+function sek_get_the_archive_description() {
+  if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+    $title = sek_get_posted_query_param_when_customizing( 'the_archive_description' );
+  } else {
+    $title = get_the_archive_description();
+  }
+  return $title;
+}
+
+function sek_get_next_post_link() {
+  if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+    $title = sek_get_posted_query_param_when_customizing( 'the_next_post_link' );
+  } else {
+    $title = get_next_post_link( $format = '%link' );
+  }
+  return $title;
+}
+
+function sek_get_previous_post_link() {
+  if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+    $title = sek_get_posted_query_param_when_customizing( 'the_previous_post_link' );
+  } else {
+    $title = get_previous_post_link( $format = '%link' );
+  }
+  return $title;
+}
+
 function sek_get_the_comments() {
   if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
     return sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>',
@@ -73,16 +103,12 @@ function sek_get_the_comments() {
     );
   }
 
-  $tmpl_path = sek_get_templates_dir() . "/wp/comments.php";
-  if ( file_exists( $tmpl_path ) ) {
-    ob_start();
-    //load_template( $tmpl_path, false );
-    if ( comments_open() || get_comments_number() ) {
-      comments_template();
-    }
-    return ob_get_clean();
+  ob_start();
+  //load_template( $tmpl_path, false );
+  if ( comments_open() || get_comments_number() ) {
+    comments_template();
   }
-  return null;
+  return ob_get_clean();
 }
 
 
