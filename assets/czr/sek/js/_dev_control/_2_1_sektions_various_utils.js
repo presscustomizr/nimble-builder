@@ -1273,7 +1273,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // },
 
             // @return bool
-            hasLocalSektions : function() {
+            // hasLocalSektions : function() {
+            //       var self = this,
+            //           _bool = false,
+            //           _collection,
+            //           localCollSetId = this.localSectionsSettingId(),
+            //           localColSetValue = api(localCollSetId)();
+  
+            //       localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
+            //       _collection = $.extend( true, {}, localColSetValue );
+            //       _collection = ! _.isEmpty( _collection.collection ) ? _collection.collection : [];
+            //       _collection = _.isArray( _collection ) ? _collection : [];
+            //       _.each( _collection, function( loc_data ){
+            //             if ( _bool )
+            //               return;
+            //             if ( _.isObject(loc_data) && 'location' == loc_data.level && loc_data.collection ) {
+            //                   _bool = !_.isEmpty( loc_data.collection );
+            //             }
+            //       });
+            //       // on a reset, property __inherits_group_skope__ is set to true server side
+            //       return _bool && !( localColSetValue && localColSetValue.__inherits_group_skope__ );
+            // },
+
+            // Added April 2021 for #478
+            // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
+            // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
+            // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control:: resetCollectionSetting )
+            // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
+            hasLocalSettingBeenCustomized : function() {
                   var self = this,
                       _bool = false,
                       _collection,
@@ -1281,18 +1308,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       localColSetValue = api(localCollSetId)();
   
                   localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
-                  _collection = $.extend( true, {}, localColSetValue );
-                  _collection = ! _.isEmpty( _collection.collection ) ? _collection.collection : [];
-                  _collection = _.isArray( _collection ) ? _collection : [];
-                  _.each( _collection, function( loc_data ){
-                        if ( _bool )
-                          return;
-                        if ( _.isObject(loc_data) && 'location' == loc_data.level && loc_data.collection ) {
-                              _bool = !_.isEmpty( loc_data.collection );
-                        }
-                  });
+
                   // on a reset, property __inherits_group_skope__ is set to true server side
-                  return _bool && !( localColSetValue && localColSetValue.__inherits_group_skope__ );
+                  return !( localColSetValue && localColSetValue.__inherits_group_skope__ );
             },
 
             //-------------------------------------------------------------------------------------------------

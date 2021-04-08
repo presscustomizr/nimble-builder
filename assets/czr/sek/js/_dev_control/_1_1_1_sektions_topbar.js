@@ -193,13 +193,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         var _hasLocalSektions = false;
                         if ( args && args.on_init ) {
                               //console.log('ON INIT : ', api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ) );
-                              _hasLocalSektions = api.czr_skopeBase.getSkopeProperty( 'has_local_sektions', 'local' );
+                              _hasLocalSektions = api.czr_skopeBase.getSkopeProperty( 'has_local_sektions', 'local' );//property added server side see php:add_sektion_values_to_skope_export()
                         } else if ( args && args.after_reset ) {
                               //console.log('AFTER RESET');
                               _hasLocalSektions = false;
                         } else {
-                              _hasLocalSektions = self.hasLocalSektions();
+                              _hasLocalSektions = self.hasLocalSettingBeenCustomized();
                         }
+
                         //console.log('GROUP SKOPE FOR SITE TEMPL', api.czr_skopeBase.getSkopeProperty( 'has_local_sektions', 'local' ) );
                         //console.log('GLOBAL OPTIONS ', api(sektionsLocalizedData.optNameForGlobalOptions)() );
                         var _groupSkope = api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ),
