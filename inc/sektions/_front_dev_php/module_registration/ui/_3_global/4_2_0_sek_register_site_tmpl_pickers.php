@@ -39,7 +39,11 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'notice_before_title' => '',
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                    'refresh_preview' => false
+                    'refresh_preview' => false,
+                    'html_before' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> <a href="%2$s" target="_blank" rel="noopener noreferrer">%1$s</a></span><hr/>',
+                        __('How to use site templates with Nimble Builder ?'),
+                        'https://docs.presscustomizr.com/article/428-how-to-use-site-templates-with-nimble-builder'
+                    ),
                 ),
                 'skp__all_post' => array(
                     'input_type'  => 'site_tmpl_picker',
