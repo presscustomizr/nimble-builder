@@ -518,7 +518,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
 
 
-                  var $_activeElement;// <= will be used to cache self.activeLevelEl()
+                  var $_activeElement; // <= will be used to cache self.activeLevelEl()
+
                   var _apiPreviewCallback = function( params, callbackFn, msgId ) {
                         params = _.extend( {
                             location_skope_id : '',
@@ -570,29 +571,25 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     })
                                     .then( function() {
                                           api.preview.trigger( 'control-panel-requested-action-done', { action : msgId, args : params } );
+                                          // Focus on the edited level
+                                          self.mayBeAnimateToEditedLevel( params );
                                     });
                         } catch( _er_ ) {
                               self.errare( 'reactToPanelMsg => Error when firing the callback of ' + msgId , _er_  );
                               self.cachedElements.$body.removeClass( msgId );
                         }
 
-                        // MAY 2020 : focus on the edited element
-                        if ( params.apiParams.id ) {
+                        // set the activeElement if needed/possible
+                        if ( _.isObject( params ) && params.apiParams && params.apiParams.id ) {
                               $_activeElement = self.activeLevelEl();
-                              // set the activeElement if needed
+
                               if ( !$_activeElement || !_.isObject($_activeElement) || $_activeElement.length < 1 || self.activeLevelUI() !== params.apiParams.id ) {
                                     self.activeLevelEl( $('[data-sek-id="' + params.apiParams.id + '"]' ) );
                                     $_activeElement = self.activeLevelEl();
                               }
-                              // if user scrolled while editing an element, let's focus again
-                              if ( 0 < $_activeElement.length && !nb_.isInScreen( $_activeElement[0]) ) {
-                                    $_activeElement[0].scrollIntoView({
-                                          behavior: 'auto',
-                                          block: 'center',
-                                          inline: 'center'
-                                    });
-                              }
                         }
+                        // Focus on the edited level
+                        self.mayBeAnimateToEditedLevel( params );
                   };//_apiPreviewCallback
 
 
@@ -618,6 +615,22 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         }
 
                   });
-            }//schedulePanelMsgReactions()
+            },//schedulePanelMsgReactions()
+
+            mayBeAnimateToEditedLevel : function( params ) {
+                  var self = this;
+                  // MAY 2020 : focus on the edited element
+                  if ( _.isObject( params ) && params.apiParams && params.apiParams.id ) {
+                        $elToFocusOn = $('[data-sek-id="' + params.apiParams.id + '"]' );
+                        // if user scrolled while editing an element, let's focus again
+                        if ( 0 < $elToFocusOn.length && !nb_.isInScreen( $elToFocusOn[0]) ) {
+                              $elToFocusOn[0].scrollIntoView({
+                                    behavior: 'auto',
+                                    block: 'center',
+                                    inline: 'center'
+                              });
+                        }
+                  }
+            }
       });//$.extend()
 })( wp.customize, jQuery, _ );
