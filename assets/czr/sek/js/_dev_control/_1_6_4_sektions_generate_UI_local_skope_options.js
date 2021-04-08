@@ -96,7 +96,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_reset',
                                           module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Remove sections and Nimble Builder options of this page'],
+                                          controlLabel : sektionsLocalizedData.i18n['Remove all sections and options of this page'],
                                           icon : '<i class="material-icons sek-level-option-icon">delete</i>'
                                     };
                               break;

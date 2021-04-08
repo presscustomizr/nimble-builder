@@ -545,7 +545,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Page header and footer' => __( 'Page header and footer', 'text_doma'),
             'Inner and outer widths' => __( 'Inner and outer widths', 'text_doma'),
             'Custom CSS' => __( 'Custom CSS', 'text_doma'),
-            'Remove sections and Nimble Builder options of this page' => __( 'Remove sections and Nimble Builder options of this page', 'text_doma'),
+            'Remove all sections and options of this page' => __( 'Remove all sections and options of this page', 'text_doma'),
             'Remove the sections displayed in global locations' => __( 'Remove the sections displayed in global locations', 'text_doma'),
             'Page speed optimizations' => __( 'Page speed optimizations', 'text_doma'),
 
@@ -740,7 +740,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
             'setting_id' => sek_get_seks_setting_id( $skope_id ),//nimble___loop_start[skp__post_page_home], nimble___custom_location_id[skp__global]
         );
         if ( 'local' == $skp_data['skope'] ) {
-          $skp_data['has_local_sektions'] = sek_local_skope_has_nimble_sections();
+          $skp_data['has_local_sektions'] = sek_local_skope_has_nimble_sections();//<= used when printing skope status on init. see control::printSektionsSkopeStatus()
         }
         // foreach( [
         //     'loop_start',
