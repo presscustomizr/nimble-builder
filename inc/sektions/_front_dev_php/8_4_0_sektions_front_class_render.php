@@ -1233,7 +1233,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     $tagnames = array_intersect( array_keys( $shortcode_tags ), $matches[1] );
 
                     if ( !empty( $tagnames ) ) {
-                    $content = sprintf('<div class="nimble-shortcode-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>%2$s',
+                    $content = sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>%2$s',
                         __('Shortcodes are not parsed by default when customizing. You can change this setting in your WP admin > Settings > Nimble Builder options.', 'text-doma'),
                         $content
                     );
