@@ -194,7 +194,7 @@ function sek_get_default_location_model( $skope_id = null ) {
     }
     // March 2021 for site templates #478
     if ( sek_is_site_tmpl_enabled() && !$is_global_skope ) {
-        $defaut_sektions_value['__inherits_group_skope__'] = false;
+        $defaut_sektions_value['__inherits_group_skope__'] = true;
     }
     return $defaut_sektions_value;
 }
@@ -667,6 +667,64 @@ function sek_sideload_img_and_return_attachment_id( $img_url ) {
 
     return $id;
 }
+
+
+
+
+// IMPORT IMG HELPER
+// recursive
+//add_filter( 'nimble_pre_import', '\Nimble\sek_maybe_import_imgs' );
+function sek_maybe_import_imgs( $seks_data, $do_import_images = true ) {
+    $new_seks_data = array();
+    // Reset img_import_errors
+    Nimble_Manager()->img_import_errors = [];
+    foreach ( $seks_data as $key => $value ) {
+        if ( is_array($value) ) {
+            $new_seks_data[$key] = sek_maybe_import_imgs( $value, $do_import_images );
+        } else {
+            if ( is_string( $value ) && false !== strpos( $value, '__img_url__' ) && sek_is_img_url( $value ) ) {
+                $url = str_replace( '__img_url__', '', $value );
+                // april 2020 : new option to skip importing images
+                // introduced for https://github.com/presscustomizr/nimble-builder/issues/663
+                if ( !$do_import_images ) {
+                    $value = $url;
+                } else {
+                    //sek_error_log( __FUNCTION__ . ' URL?', $url );
+                    $id = sek_sideload_img_and_return_attachment_id( $url );
+                    if ( is_wp_error( $id ) ) {
+                        $value = null;
+                        $img_errors = Nimble_Manager()->img_import_errors;
+                        $img_errors[] = $url;
+                        Nimble_Manager()->img_import_errors = $img_errors;
+                    } else {
+                        $value = $id;
+                    }
+                }
+            } else if ( is_string( $value ) && false !== strpos( $value, '__default_img_medium__' ) ) {
+                $value = NIMBLE_BASE_URL . '/assets/img/default-img.png';
+            }
+            $new_seks_data[$key] = $value;
+        }
+    }
+    return $new_seks_data;
+}
+
+// @return bool
+function sek_is_img_url( $url = '' ) {
+    if ( is_string( $url ) ) {
+      if ( preg_match( '/\.(jpg|jpeg|png|gif)/i', $url ) ) {
+        return true;
+      }
+    }
+    return false;
+}
+
+
+
+
+
+
+
 
 /* ------------------------------------------------------------------------- *
 *  REMOVE IMAGE STYLE ATTRIBUTE
@@ -1928,11 +1986,47 @@ function sek_find_pattern_match($matches) {
       'year_now' => date("Y"),
       'site_title' => 'get_bloginfo',
       'the_title' => 'sek_get_the_title',
-      'the_content' => 'sek_get_the_content'
+      'the_archive_title' => 'sek_get_the_archive_title',// works for authors, CPT, taxonomies
+      'the_archive_description' => 'sek_get_the_archive_description',// works for authors, CPT, taxonomies
+      'the_content' => 'sek_get_the_content',
+      'the_tags' => 'sek_get_the_tags',
+      'the_categories' => 'sek_get_the_categories',
+
+      'the_author_link' => 'sek_get_the_author_link',
+      'the_author_name' => 'sek_get_the_author_name',
+      'the_author_avatar' => 'sek_get_the_author_avatar',
+      'the_author_bio' => 'sek_get_the_author_bio',
+
+      'the_published_date' => 'sek_get_the_published_date',
+      'the_modified_date' => 'sek_get_the_modified_date',
+      'the_comments' => 'sek_get_the_comments',
+      'the_previous_post_link' => 'sek_get_previous_post_link',
+      'the_next_post_link' => 'sek_get_next_post_link'
     ));
 
-    if ( array_key_exists( $matches[1], $replace_values ) ) {
-      $dyn_content = $replace_values[$matches[1]];
+    // Are we good after the filter ?
+    if ( !is_array($replace_values) )
+      return;
+
+    //sek_error_log('$matches ??', $matches );
+    if ( !is_array($matches) || empty($matches[1]) )
+      return;
+
+    //$data = html_entity_decode($matches[1], ENT_QUOTES, get_bloginfo( 'charset' ) );
+    $data = explode(' ', $matches[1] );
+
+    // Filter so that {{the_categories sep="/"}} becomes array('the_categories', 'sep="/"' ) with no empty entries
+    // => the first entry is the template tag name, the other entries are the callback arguments ( to implement April 2021 )
+    $new_data = array_filter($data, function($value) {
+        if ( !is_string($value) )
+          return false;
+      $value = ltrim($value);
+      return !is_null($value) && !empty($value) && preg_match("/[a-z]/i", $value) ;
+    });
+
+    if ( isset($new_data[0]) && array_key_exists( $new_data[0], $replace_values ) ) {
+      // @todo => authorize arguments passed as an array
+      $dyn_content = $replace_values[$new_data[0]];
       $fn_name = $dyn_content;// <= typically not namespaced if WP core function, or function added with a filter from a child theme for example
       $namespaced_fn_name = __NAMESPACE__ . '\\' . $dyn_content; // <= namespaced if Nimble Builder function, introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
       if ( function_exists( $namespaced_fn_name ) ) {
@@ -1951,36 +2045,275 @@ function sek_find_pattern_match($matches) {
 function sek_parse_template_tags( $val ) {
     //the pattern could also be '!\{\{(\w+)\}\}!', but adding \s? allows us to allow spaces around the term inside curly braces
     //see https://stackoverflow.com/questions/959017/php-regex-templating-find-all-occurrences-of-var#comment71815465_959026
-    return is_string( $val ) ? preg_replace_callback( '!\{\{\s?(\w+)\s?\}\}!', '\Nimble\sek_find_pattern_match', $val) : $val;
+    //return is_string( $val ) ? preg_replace_callback( '!\{\{\s?(\w+)\s?\}\}!', '\Nimble\sek_find_pattern_match', $val) : $val;
+    return is_string( $val ) ? preg_replace_callback( '!\{\{\s?(.*?)\s?\}\}!', '\Nimble\sek_find_pattern_match', $val) : $val;
 }
 add_filter( 'nimble_parse_template_tags', '\Nimble\sek_parse_template_tags' );
 
+
+
+
+// CALLBACKS WHEN IS_ARCHIVE()
+function sek_get_the_archive_title() {
+  $is_archive = is_archive();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_archive = sek_get_posted_query_param_when_customizing( 'is_archive' );
+  }
+  if ( !$is_archive ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_archive_title', $msg = __('It can be used in archive pages only.', 'text_doma') );
+  }
+
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $title = sek_get_posted_query_param_when_customizing( 'the_archive_title' );
+  } else {
+    add_filter('get_the_archive_title_prefix', '__return_false');
+    $title = get_the_archive_title();
+    remove_filter('get_the_archive_title_prefix', '__return_false');
+  }
+  return $title;
+}
+
+function sek_get_the_archive_description() {
+  $is_archive = is_archive();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_archive = sek_get_posted_query_param_when_customizing( 'is_archive' );
+  }
+  if ( !$is_archive ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_archive_description', $msg = __('It can be used in archive pages only.', 'text_doma') );
+  }
+
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $title = sek_get_posted_query_param_when_customizing( 'the_archive_description' );
+  } else {
+    $title = get_the_archive_description();
+  }
+  return $title;
+}
+
+
+// CALLBACKS WHEN IS_SINGULAR()
+function sek_get_next_post_link() {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( !$is_singular ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_next_post_link', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+  }
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $title = sek_get_posted_query_param_when_customizing( 'the_next_post_link' );
+  } else {
+    $title = get_next_post_link( $format = '%link' );
+  }
+  return $title;
+}
+
+function sek_get_previous_post_link() {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( !$is_singular ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_previous_post_link', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+  }
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $title = sek_get_posted_query_param_when_customizing( 'the_previous_post_link' );
+  } else {
+    $title = get_previous_post_link( $format = '%link' );
+  }
+  return $title;
+}
+
+function sek_get_the_comments() {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( !$is_singular ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_comments', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+  }
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    return sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>',
+      __('Comment template can not be displayed while customizing', 'text_doma')
+    );
+  }
+
+  ob_start();
+  //load_template( $tmpl_path, false );
+  if ( comments_open() || get_comments_number() ) {
+    comments_template();
+  }
+  return ob_get_clean();
+}
+
+function sek_get_the_published_date() {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( !$is_singular ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_published_date', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+  }
+  $post_id = sek_get_post_id_on_front_and_when_customizing();
+  $published_date = get_the_date( get_option('date_format'), $post_id);
+  $machine_readable_published_date = esc_attr( get_the_date( 'c' , $post_id ) );
+  return sprintf( '<time class="sek-published-date" datetime="%1$s">%2$s</time>',
+    $machine_readable_published_date,
+    $published_date
+  );
+}
+
+function sek_get_the_modified_date() {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( !$is_singular ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_modified_date', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+  }
+  $post_id = sek_get_post_id_on_front_and_when_customizing();
+  $modified_date = get_the_modified_date( get_option('date_format'), $post_id );
+  $machine_readable_modified_date = esc_attr( get_the_modified_date( 'c' ), $post_id );
+  return sprintf( '<time class="sek-modified-date" datetime="%1$s">%2$s</time>',
+    $machine_readable_modified_date ,
+    $modified_date
+  );
+}
+
+function sek_get_the_tags( $separator = ' &middot; ') {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( !$is_singular ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_tags', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+  }
+  return sprintf( '<span class="sek-post-tags">%1$s</span>', get_the_tag_list( $before = '', $sep = $separator, $after = '', $post_id = sek_get_post_id_on_front_and_when_customizing() ) );
+}
+
+
+function sek_get_the_categories( $separator = ' / ') {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( !$is_singular ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_categories', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+  }
+  return sprintf( '<span class="sek-post-category">%1$s</span>', get_the_category_list( $separator, '', $post_id = sek_get_post_id_on_front_and_when_customizing() ) );
+}
+
+function sek_get_the_author_link() {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( !$is_singular ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_author', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+  }
+
+  $post_id = sek_get_post_id_on_front_and_when_customizing();
+  $post_object = get_post( $post_id );
+  if ( empty( $post_object ) || !is_object( $post_object ) )
+    return null;
+  $author_id = $post_object->post_author;
+  $display_name = get_the_author_meta( 'display_name', $author_id );
+  return sprintf(
+    '<a href="%1$s" title="%2$s" rel="author">%3$s</a>',
+    esc_url( get_author_posts_url( $author_id, get_the_author_meta( 'user_nicename', $author_id ) ) ),
+    /* translators: %s: Author's display name. */
+    esc_attr( sprintf( __( 'Posts by %s' ), $display_name ) ),
+    $display_name
+  );
+}
+
+function sek_get_the_author_name() {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( !$is_singular ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_author', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+  }
+  $post_id = sek_get_post_id_on_front_and_when_customizing();
+  $post_object = get_post( $post_id );
+  if ( empty( $post_object ) || !is_object( $post_object ) )
+    return null;
+  $author_id = $post_object->post_author;
+  return get_the_author_meta( 'display_name', $author_id );
+}
+
+function sek_get_the_author_avatar() {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( !$is_singular ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_author', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+  }
+  $post_id = sek_get_post_id_on_front_and_when_customizing();
+  $post_object = get_post( $post_id );
+  if ( empty( $post_object ) || !is_object( $post_object ) )
+    return null;
+  $author_id = $post_object->post_author;
+  return get_avatar( get_the_author_meta( 'ID', $author_id ), '85' );
+}
+
+function sek_get_the_author_bio() {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( !$is_singular ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_author', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+  }
+  $post_id = sek_get_post_id_on_front_and_when_customizing();
+  $post_object = get_post( $post_id );
+  if ( empty( $post_object ) || !is_object( $post_object ) )
+    return null;
+  $author_id = $post_object->post_author;
+  return get_the_author_meta( 'description', $author_id );
+}
+
 // introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
 function sek_get_the_title() {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( !$is_singular ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_title', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+  }
   return get_the_title( sek_get_post_id_on_front_and_when_customizing() );
 }
 
 // introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
 function sek_get_the_content() {
-  if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( !$is_singular ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_content', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+  }
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
       $post_id = sek_get_posted_query_param_when_customizing( 'post_id' );
-      $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
-      if ( $is_singular && is_int($post_id) ) {
+      if ( is_int($post_id) ) {
           $post_object = get_post( $post_id );
           return !empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
       }
   } else {
-      if( is_singular() ) {
-        $post_object = get_post();
-        return !empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
-      }
+      $post_object = get_post();
+      return !empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
   }
+  return null;
 }
+
 
 // @return the post id in all cases
 // when performing ajax action, we need the posted query params made available from the ajax params
 function sek_get_post_id_on_front_and_when_customizing() {
-    if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+    if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
         $post_id = sek_get_posted_query_param_when_customizing( 'post_id' );
     } else {
         $post_id = get_the_ID();
@@ -2004,6 +2337,15 @@ function sek_get_posted_query_param_when_customizing( $param ) {
       }
   }
   return null;
+}
+
+function sek_get_tmpl_tag_error( $tag, $msg ) {
+  if ( !skp_is_customizing() )
+    return;
+  return sprintf('<div class="nimble-notice-in-preview nimble-inline-notice-in-preview"><i class="fas fa-info-circle"></i> %1$s %2$s</div>',
+    '{{' . $tag . '}} ' . __('could not be printed.', 'text_doma'),
+    $msg
+  );
 }
 
 ?><?php
@@ -2290,7 +2632,7 @@ function sek_local_skope_has_nimble_sections( $skope_id = '', $seks_data = null 
     
     // When the collection is provided use it otherwise get it
     if ( is_null($seks_data) || !is_array($seks_data) ) {
-        $seks_data = sek_get_seks_without_group_inheritance( $skope_id );
+        $seks_data = sek_get_skoped_seks( $skope_id );
     }
     if ( is_array( $seks_data ) ) {
         $nb_section_created = sek_count_not_empty_sections_in_page( $seks_data );
@@ -2857,7 +3199,7 @@ function sek_strip_script_tags_when_customizing( $html = '' ) {
           return $html;
       }
       // June 2020 => added a notice for https://github.com/presscustomizr/nimble-builder/issues/710
-      $script_notice = sprintf('<div class="nimble-shortcode-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>',
+      $script_notice = sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>',
           __('Custom javascript code is not executed when customizing.', 'text-doma')
       );
       return preg_replace('#<script(.*?)>(.*?)</script>#is', $script_notice, $html);
@@ -4252,6 +4594,8 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
 
     // If not cached get the seks data from the skoped post
     if ( !$is_cached ) {
+
+        $default_collection = sek_get_default_location_model( $skope_id );
         // Feb 2021 : filter skope id now
         // if the current context has no local sektions set and a site template set, replace the skope id by the group skope id
         // if ( !$is_global_skope ) {
@@ -4259,6 +4603,9 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         //     //sek_error_log('alors local skope id for fetching local sections ?', $skope_id );
         // }
         $seks_data = sek_get_seks_without_group_inheritance( $skope_id );
+        // normalizes
+        // [ 'collection' => [], 'local_options' => [], '__inherits_group_skope__' => true ];
+        $seks_data = wp_parse_args( $seks_data, $default_collection );
 
         // March 2021 : added for site templates #478
         // Use site template if
@@ -4267,14 +4614,8 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         // - a site template is defined for this "group" skope
         if ( sek_is_site_tmpl_enabled() && 'local' === $skope_level && !$is_global_skope ) {
             $seks_data = sek_maybe_get_seks_for_group_site_template( $skope_id, $seks_data );
-            $has_local_sections_without_inheritance = is_array( $seks_data ) ? ( sek_count_not_empty_sections_in_page( $seks_data ) > 0 ) : false;
-            $seks_data['__inherits_group_skope__'] = !$has_local_sections_without_inheritance && sek_has_group_site_template_data();
         }
 
-        // normalizes
-        // [ 'collection' => [], 'local_options' => [] ];
-        $default_collection = sek_get_default_location_model( $skope_id );
-        $seks_data = wp_parse_args( $seks_data, $default_collection );
         // Maybe add missing registered locations
         $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
 
@@ -4296,17 +4637,13 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             $location_id
         );
 
-        if ( sek_is_site_tmpl_enabled() && 'local' === $skope_level && !$is_global_skope ) {
-            $has_local_customize_sektions = is_array( $seks_data ) ? ( sek_count_not_empty_sections_in_page( $seks_data ) > 0 ) : false;
-            $seks_data = sek_maybe_get_seks_for_group_site_template( $skope_id, $seks_data );
-            // When sektions have been reset, let's set the value of property '__inherits_group_skope__'
-            if ( !$has_local_customize_sektions  ) {
-                $seks_data['__inherits_group_skope__'] = sek_has_group_site_template_data();
-            }
-        }
-
         $default_collection = sek_get_default_location_model( $skope_id );
         $seks_data = wp_parse_args( $seks_data, $default_collection );
+
+        if ( sek_is_site_tmpl_enabled() && 'local' === $skope_level && !$is_global_skope ) {
+            $seks_data = sek_maybe_get_seks_for_group_site_template( $skope_id, $seks_data );
+        }
+
         // Maybe add missing registered locations when customizing
         // December 2020 => needed when importing an entire template
         $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
@@ -4492,17 +4829,71 @@ function sek_remove_seks_post( $skope_id = null ) {
 function sek_get_site_tmpl_for_skope( $group_skope = null ) {
     if ( is_null($group_skope) || !is_string($group_skope) || empty($group_skope) )
         return;
-    $site_tmpl = null;
+    $site_tmpl = '_no_site_tmpl_';
     $opts = sek_get_global_option_value( 'site_templates' );
 
-    //sek_error_log('site_templates options ?', $opts );
-
     if ( is_array( $opts) && !empty( $opts[$group_skope] ) && '_no_site_tmpl_' != $opts[$group_skope] ) {
-        $site_tmpl = $opts[$group_skope];
+        if ( is_string( $opts[$group_skope] ) ) {
+            $site_tmpl = $opts[$group_skope];
+        } else if ( is_array($opts[$group_skope]) && array_key_exists('site_tmpl_id', $opts[$group_skope] ) ) {
+            $site_tmpl = $opts[$group_skope]['site_tmpl_id'];
+        }
+        //sek_error_log('site_templates options ?', $opts[$group_skope] );
     }
     return $site_tmpl;
 }
 
+/* ------------------------------------------------------------------------- *
+ *  SITE TEMPLATES SKOPE HELPER
+/* ------------------------------------------------------------------------- */
+// when registering site template global options the suffix '_for_site_tmpl' is added to 'no group skope' scopes : 'skp__search_for_site_tmpl', 'skp__404_for_site_tmpl', 'skp__date_for_site_tmpl'
+// see sek_get_module_params_for_sek_site_tmpl_pickers()
+function sek_get_group_skope_for_site_tmpl() {
+    $group_skope = skp_get_skope_id( 'group' );
+    if ( '_skope_not_set_' === $group_skope ) {
+        $skope_id = skp_get_skope_id();
+        if ( sek_is_no_group_skope( $skope_id ) ) {
+            $group_skope = $skope_id . '_for_site_tmpl';
+        } else {
+            sek_error_log('group skope could not be set');
+        }
+    }
+    return $group_skope;
+}
+
+// @return bool
+// no group skope are array( 'home', 'search', '404', 'date' );
+function sek_is_no_group_skope( $skope_id = null ) {
+    if ( is_null( $skope_id ) ) {
+        $skope_id = skp_get_skope_id();
+    }
+    $skope_id_without_prefix = str_replace( 'skp__', '', $skope_id );
+    $skope_with_no_group = skp_get_no_group_skope_list();
+    return in_array( $skope_id_without_prefix, $skope_with_no_group );
+}
+
+//@return bool
+function sek_local_skope_inherits_group_skope( $skope_id = '', $local_seks_data = null ) {
+    $skope_id = empty( $skope_id ) ? skp_get_skope_id() : $skope_id;
+
+    if ( NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) {
+        sek_error_log( __FUNCTION__ . ' => error => function should not be used with global skope id' );
+        return false;
+    }
+    // if is viewing front page, we don't want to inherit 'skp__all_page' scope
+    if ( is_front_page() && 'page' == get_option( 'show_on_front' ) )
+        return false;
+
+    // When the collection is provided use it otherwise get it
+    if ( is_null($local_seks_data) || !is_array($local_seks_data) ) {
+        $local_seks_data = sek_get_skoped_seks( $skope_id );
+    }
+    // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
+    // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
+    // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control::resetCollectionSetting )
+    // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
+    return is_array($local_seks_data) && array_key_exists( '__inherits_group_skope__', $local_seks_data ) && $local_seks_data['__inherits_group_skope__'];
+}
 
 
 /* ------------------------------------------------------------------------- *
@@ -4513,11 +4904,15 @@ add_filter( 'nb_set_skope_id_before_generating_local_front_css', function( $skop
     if ( !sek_is_site_tmpl_enabled() )
         return $skope_id;
 
-    if ( !sek_local_skope_has_nimble_sections( $skope_id ) ) {
+    // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
+    // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
+    // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control:: resetCollectionSetting )
+    // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
+    if ( sek_local_skope_inherits_group_skope( $skope_id ) ) {
         $group_site_tmpl_data = sek_get_group_site_template_data();//<= is cached when called
         $has_group_skope_template_data = !( !$group_site_tmpl_data || empty($group_site_tmpl_data) );
         if ( $has_group_skope_template_data ) {
-            $group_skope = skp_get_skope_id( 'group' );
+            $group_skope = sek_get_group_skope_for_site_tmpl();
             if ( !empty($group_skope) && '_skope_not_set_' !== $group_skope ) {
                 $skope_id = $group_skope;
             }
@@ -4541,10 +4936,13 @@ function sek_maybe_get_seks_for_group_site_template( $skope_id, $local_seks_data
         return $local_seks_data;
     }
 
-    // If the local skoped already includes at least a section, no inheritance
-    $has_local_sections = is_array( $local_seks_data ) ? ( sek_count_not_empty_sections_in_page( $local_seks_data ) > 0 ) : false;
-    if ( $has_local_sections )
+    // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
+    // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
+    // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control:: resetCollectionSetting )
+    // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
+    if ( !sek_local_skope_inherits_group_skope($skope_id, $local_seks_data) )  {
         return $local_seks_data;
+    }
 
     $group_site_tmpl_data = sek_get_group_site_template_data();
 
@@ -4557,32 +4955,81 @@ function sek_maybe_get_seks_for_group_site_template( $skope_id, $local_seks_data
 // @return null || array
 // get and cache the group site template data
 function sek_get_group_site_template_data() {
+    // When ajaxing while customizing, no need to get the group site template data
+    if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX )
+        return;
     $cached = wp_cache_get('nimble_group_site_template_data');
-    if ( $cached && is_array($cached) && !empty($cached) )
+    if ( false !== $cached )
         return $cached;
 
     $group_site_tmpl_data = [];
     
-    $group_skope = skp_get_skope_id( 'group' );
+    $group_skope = sek_get_group_skope_for_site_tmpl();
+
     $tmpl_post_name = sek_get_site_tmpl_for_skope( $group_skope );
-    if ( is_null( $tmpl_post_name ) || !is_string( $tmpl_post_name ) )
+    if ( '_no_site_tmpl_' === $tmpl_post_name )
         return;
+
+    if ( is_null( $tmpl_post_name ) || !is_string( $tmpl_post_name ) ) {
+        sek_error_log( 'Error => invalid tmpl post name', $tmpl_post_name );
+        return;
+    }
     // Is this group template already saved ?
     // For example, for pages, there should be a nimble CPT post named nimble___skp__all_page
     $post = sek_get_seks_post( $group_skope );
 
     // if not, let's insert it
     if ( !$post ) {
-        $current_tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
-        if ( $current_tmpl_post ) {
-            $current_tmpl_data = maybe_unserialize( $current_tmpl_post->post_content );
-            if ( is_array($current_tmpl_data) && isset($current_tmpl_data['data']) && is_array($current_tmpl_data['data']) && !empty($current_tmpl_data['data']) ) {
-                $current_tmpl_data = $current_tmpl_data['data'];
-                $current_tmpl_data = sek_set_ids( $current_tmpl_data );
-                $post = sek_update_sek_post( $current_tmpl_data, [ 'skope_id' => $group_skope ]);
-            }
+        $tmpl_source = null;
+        // NB stores the site template id as a concatenation of template source + '___' + template name
+        // Ex : user_tmpl___landing-page-for-services
+        if ( 'user_tmpl' === substr( $tmpl_post_name, 0, 9 ) ) {
+            $tmpl_source = 'user_tmpl';
+            $tmpl_post_name = str_replace('user_tmpl___', '', $tmpl_post_name);
+        } else if ( 'api_tmpl' === substr( $tmpl_post_name, 0, 8 ) ) {
+            $tmpl_source = 'api_tmpl';
+            $tmpl_post_name = str_replace('api_tmpl___', '', $tmpl_post_name);
+        } else {
+            sek_error_log('Error => invalid site template source');
         }
-    }
+
+        $current_tmpl_post = null;
+        $current_tmpl_data = null;
+        switch ($tmpl_source) {
+            case 'user_tmpl':
+                $current_tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
+                if ( $current_tmpl_post ) {
+                    $raw_tmpl_data = maybe_unserialize( $current_tmpl_post->post_content );
+                    if ( is_array($raw_tmpl_data) && isset($raw_tmpl_data['data']) && is_array($raw_tmpl_data['data']) && !empty($raw_tmpl_data['data']) ) {
+                        $current_tmpl_data = $raw_tmpl_data['data'];
+                        $current_tmpl_data = sek_set_ids( $current_tmpl_data );
+                    }
+                }
+            break;
+
+            case 'api_tmpl':
+                $raw_tmpl_data = sek_get_single_tmpl_api_data( $tmpl_post_name );
+                if( !is_array( $raw_tmpl_data) || empty( $raw_tmpl_data ) ) {
+                    sek_error_log( ' problem when getting template : ' . $tmpl_post_name );
+                }
+                //sek_error_log( __FUNCTION__ . ' api template collection', $raw_tmpl_data );
+                if ( !isset($raw_tmpl_data['data'] ) || empty( $raw_tmpl_data['data'] ) ) {
+                    sek_error_log( __FUNCTION__ . ' problem => missing or invalid data property for template : ' .$tmpl_post_name, $raw_tmpl_data );
+                } else {
+                    // $tmpl_decoded = $raw_tmpl_data;
+                    $raw_tmpl_data['data'] = sek_maybe_import_imgs( $raw_tmpl_data['data'], $do_import_images = true );
+                    //$raw_tmpl_data['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
+                    $current_tmpl_data = sek_set_ids( $raw_tmpl_data['data'] );
+                }
+            break;
+        }
+
+        if( !is_null($current_tmpl_data) ) {
+            sek_error_log('SITE TEMPLATE => UPDATE OR INSERT GROUP SKOPE POST => ' .$group_skope );
+            $post = sek_update_sek_post( $current_tmpl_data, [ 'skope_id' => $group_skope ]);
+        }
+    }//if ( !$post ) {
+
     if ( $post ) {
         $group_site_tmpl_data = maybe_unserialize( $post->post_content );
     }
@@ -4619,11 +5066,18 @@ add_action('nb_on_save_customizer_global_options', function( $opt_name, $value )
     $current_site_tmpl = sek_get_global_option_value( 'site_templates' );
     if ( !is_array( $value ) || !is_array($current_site_tmpl) )
         return;
+    
+    // NB stores the site template id as a concatenation of template source + '___' + template name
+    // Ex : user_tmpl___landing-page-for-services
+    $updated_site_templates = isset($value['site_templates']) ? $value['site_templates'] : [];
 
-    $new_site_tmpl = isset($value['site_templates']) ? $value['site_templates'] : [];
-    foreach( $new_site_tmpl as $group_skope => $new_tmpl ) {
-        if ( array_key_exists($group_skope, $current_site_tmpl ) && $current_site_tmpl[$group_skope] != $new_tmpl ) {
-            //sek_error_log('TEMPLATE POST TO REMOVE => ' . $group_skope . ' | ' . $new_tmpl );
+    foreach( $current_site_tmpl as $group_skope => $current_tmpl_name ) {
+        if ( array_key_exists( $group_skope, $updated_site_templates ) && $updated_site_templates[$group_skope] != $current_tmpl_name ) {
+            //sek_error_log('GROUP SKOPE POST TO REMOVE BECAUSE TEMPLATE UPDATED => ' . $group_skope . ' | ' . $updated_site_templates[$group_skope] );
+            sek_remove_seks_post( $group_skope );//Removes the post id in the skope index + removes the post in DB + remove the stylesheet
+        }
+        if ( !array_key_exists( $group_skope, $updated_site_templates ) ) {
+            //sek_error_log('GROUP SKOPE POST TO REMOVE BECAUSE NO MORE TEMPLATE SET => ' . $group_skope . ' | ' . $current_tmpl_name );
             sek_remove_seks_post( $group_skope );//Removes the post id in the skope index + removes the post in DB + remove the stylesheet
         }
     }
@@ -4653,9 +5107,13 @@ add_action('nb_on_update_saved_tmpl_post', function( $tmpl_post_name ) {
     if ( !is_array($site_tmpl_opts) )
         return;
 
+    // NB stores the site template id as a concatenation of template source + '___' + template name
+    // Ex : user_tmpl___landing-page-for-services
+    // When updating a user template, in sek_update_saved_tmpl_post() we need to add 'user_tmpl___' prefix to match the template being currently saved
+    $normalized_tmpl_id = 'user_tmpl___' . $tmpl_post_name;
     foreach( $site_tmpl_opts as $group_skope => $tmpl_name ) {
-        if ( $tmpl_post_name === $tmpl_name ) {
-            sek_error_log('REMOVE GROUP SKOPE POST ' . $group_skope . ' for template ' . $tmpl_name );
+        if ( $normalized_tmpl_id === $tmpl_name ) {
+            //sek_error_log('REMOVE GROUP SKOPE POST ' . $group_skope . ' for template ' . $tmpl_name );
             sek_remove_seks_post( $group_skope );//Removes the post id in the skope index + removes the post in DB + remove the stylesheet
         }
     }

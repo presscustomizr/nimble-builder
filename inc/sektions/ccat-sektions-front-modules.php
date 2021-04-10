@@ -1891,7 +1891,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 'quote_font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __( 'Font size', 'text_doma' ),
-                    'default'     => array( 'desktop' => '16px' ),
+                    'default'     => array( 'desktop' => '1.2em' ),
                     'min' => 0,
                     'max' => 100,
                     'width-100'         => true,
@@ -2236,7 +2236,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
                     'input_type'  => 'wp_color_alpha',
                     'title'       => __( 'Border Color', 'text_doma' ),
                     'width-100'   => true,
-                    'default'     => '',
+                    'default'     => 'rgba(0,0,0,0.1)',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'border_color',
@@ -3930,6 +3930,23 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'input_width' => 'width-20'
                     //'html_before' => '<hr>'
                 ),
+                'include_sticky' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Include "sticky" posts', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                    //'html_before' => '<hr>'
+                ),
+                'use_current_query' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Use contextual WordPress post query', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => __('This option allows you to use the posts normally displayed by WordPress on this page.', 'text_doma')
+                    //'html_before' => '<hr>'
+                ),
                 'categories'  => array(
                     'input_type'  => 'category_picker',
                     'title'       => __( 'Filter posts by category', 'text_doma' ),
@@ -4215,7 +4232,7 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_post_grid_metas_child',
-        'name' => __( 'Post metas : author, date, category, tags,...', 'text_doma' ),
+        'name' => __( 'Post metas : author, date, category, ...', 'text_doma' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_doma'),

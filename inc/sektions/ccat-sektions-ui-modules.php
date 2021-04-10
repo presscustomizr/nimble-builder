@@ -1820,7 +1820,7 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     //Background overlay?
     // 1) a background image or video should be set
     // 2) the option should be checked
-    if ( ( !empty( $bg_options['bg-image']) || ( sek_is_checked( $bg_options['bg-use-video'] ) && !empty( $bg_options['bg-video'] ) ) ) && !empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {
+    if ( ( !empty( $bg_options['bg-image']) || sek_is_checked( $bg_options['bg-use-post-thumb'] ) || ( sek_is_checked( $bg_options['bg-use-video'] ) && !empty( $bg_options['bg-video'] ) ) ) && !empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {
         //(needs validation: we need a sanitize hex or rgba color)
         $bg_color_overlay = isset( $bg_options[ 'bg-color-overlay' ] ) ? $bg_options[ 'bg-color-overlay' ] : null;
         if ( $bg_color_overlay ) {
@@ -3644,12 +3644,37 @@ function sek_get_module_params_for_sek_local_reset() {
             'item-inputs' => array(
                 'reset_local' => array(
                     'input_type'  => 'reset_button',
-                    'title'       => __( 'Remove the Nimble sections in the current page' , 'text_doma' ),
+                    'title'       => __( 'Remove all sections and Nimble Builder options of this page' , 'text_doma' ),
                     'scope'       => 'local',
-                    'notice_after' => __('This will reset the sections created for the currently previewed page only. All other sections in other contexts will be preserved.', 'text_doma'),
+                    'notice_after' => __('This will reset the options and sections created for the currently previewed page only. All other sections and options in other contexts will be preserved.', 'text_doma'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
-                )
+                ),
+                // Added April 2021 for #478
+                // This option is not used anywhere.
+                // Its only purpose is to make the local setting "dirty" when it is modified by the user. In other word when this options is changed the property __inherits_group_skope__, set to true by default, becomes false if not already, which breaks group scope template inheritance
+                // How does this work ?
+                // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
+                // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
+                // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control:: resetCollectionSetting )
+                // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
+                'inherit_group_scope' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Inherit the site template when specified', 'text_doma'),
+                    'default'     => 1,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => false,
+                    'refresh_preview' => false,
+                    'html_before' => '<hr/>',
+                    'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> <a href="%2$s" target="_blank" rel="noopener noreferrer">%1$s</a></span>',
+                        __('How to use site templates with Nimble Builder ?'),
+                        'https://docs.presscustomizr.com/article/428-how-to-use-site-templates-with-nimble-builder'
+                    ),
+                    'notice_after' => __('If a site template is defined for this context, this page will inherit the site template by default, unless this option is unchecked.', 'text_doma'),
+                    //'notice_after' => __( 'Check this option if you want to keep the existing sections of this page, and combine them with the imported ones.', 'text_doma'),
+                ),
             )
         )//tmpl
     );
@@ -4669,7 +4694,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
         'tmpl' => array(
             'item-inputs' => array(
                 // 'skp__home' => array(
-                //     'input_type'  => 'simpleselect',
+                //     'input_type'  => 'site_tmpl_picker',
                 //     'title'       => __('Template for home', 'text_doma'),
                 //     'default'     => '_no_site_tmpl_',
                 //     'choices'     => [
@@ -4684,30 +4709,23 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 //     'title_width' => 'width-100'
                 // ),
                 'skp__all_page' => array(
-                    'input_type'  => 'simpleselect',
-                    'title'       => __('Template for pages', 'text_doma'),
+                    'input_type'  => 'site_tmpl_picker',
+                    'title'       => __('Template for single pages', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
-                    'choices'     => [
-                        '_no_site_tmpl_' => 'No template',
-                        'nb_tmpl_page-template' => 'Page template',
-                        'nb_tmpl_home-page-template' => 'Home page template',
-                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                    'refresh_preview' => false
+                    'refresh_preview' => false,
+                    'html_before' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> <a href="%2$s" target="_blank" rel="noopener noreferrer">%1$s</a></span><hr/>',
+                        __('How to use site templates with Nimble Builder ?'),
+                        'https://docs.presscustomizr.com/article/428-how-to-use-site-templates-with-nimble-builder'
+                    ),
                 ),
                 'skp__all_post' => array(
-                    'input_type'  => 'simpleselect',
-                    'title'       => __('Template for posts', 'text_doma'),
+                    'input_type'  => 'site_tmpl_picker',
+                    'title'       => __('Template for single posts', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
-                    'choices'     => [
-                        '_no_site_tmpl_' => 'No template',
-                        'nb_tmpl_home-page-template' => 'Home page template',
-                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -4715,14 +4733,9 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'refresh_preview' => false
                 ),
                 'skp__all_category' => array(
-                    'input_type'  => 'simpleselect',
+                    'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for categories', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
-                    'choices'     => [
-                        '_no_site_tmpl_' => 'No template',
-                        'nb_tmpl_home-page-template' => 'Home page template',
-                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -4730,14 +4743,9 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'refresh_preview' => false
                 ),
                 'skp__all_post_tag' => array(
-                    'input_type'  => 'simpleselect',
+                    'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for tags', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
-                    'choices'     => [
-                        '_no_site_tmpl_' => 'No template',
-                        'nb_tmpl_home-page-template' => 'Home page template',
-                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -4745,44 +4753,56 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                     'refresh_preview' => false
                 ),
                 'skp__all_author' => array(
-                    'input_type'  => 'simpleselect',
+                    'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for authors', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
-                    'choices'     => [
-                        '_no_site_tmpl_' => 'No template',
-                        'nb_tmpl_home-page-template' => 'Home page template',
-                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'refresh_preview' => false
                 ),
-                'skp__search' => array(
-                    'input_type'  => 'simpleselect',
+                'skp__all_attachment'  => array(
+                    'input_type'  => 'site_tmpl_picker',
+                    'title'       => __('Template for attachment pages', 'text_doma'),
+                    'default'     => '_no_site_tmpl_',
+                    //'refresh_preview' => true,
+                    'notice_before_title' => '',
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_preview' => false
+                ),
+                // this skope has no group skope => this is why we need to add the suffix '_for_site_tmpl' to differentiate with local sektion skope
+                // @ see skp_get_no_group_skope_list()
+                'skp__search_for_site_tmpl' => array(
+                    'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for search page', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
-                    'choices'     => [
-                        '_no_site_tmpl_' => 'No template',
-                        'nb_tmpl_home-page-template' => 'Home page template',
-                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                    ],
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'refresh_preview' => false
                 ),
-                'skp__404' => array(
-                    'input_type'  => 'simpleselect',
+                // this skope has no group skope => this is why we need to add the suffix '_for_site_tmpl' to differentiate with local sektion skope
+                // @ see skp_get_no_group_skope_list()
+                'skp__404_for_site_tmpl' => array(
+                    'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for 404 error page', 'text_doma'),
                     'default'     => '_no_site_tmpl_',
-                    'choices'     => [
-                        '_no_site_tmpl_' => 'No template',
-                        'nb_tmpl_home-page-template' => 'Home page template',
-                        'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                    ],
+                    //'refresh_preview' => true,
+                    'notice_before_title' => '',
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'html_after' => $pro_text,
+                    'refresh_preview' => false
+                ),
+                // this skope has no group skope => this is why we need to add the suffix '_for_site_tmpl' to differentiate with local sektion skope
+                // @ see skp_get_no_group_skope_list()
+                'skp__date_for_site_tmpl' => array(
+                    'input_type'  => 'site_tmpl_picker',
+                    'title'       => __('Template for date pages', 'text_doma'),
+                    'default'     => '_no_site_tmpl_',
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,

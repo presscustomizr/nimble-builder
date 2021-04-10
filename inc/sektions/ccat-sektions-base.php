@@ -4002,10 +4002,14 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 $classes[] = 'customizer-preview';
             }
             if ( sek_is_site_tmpl_enabled() && !is_customize_preview() ) {
+                $skope_id = skp_get_skope_id();
+                $group_skope = sek_get_group_skope_for_site_tmpl();
                 if ( sek_has_group_site_template_data() ) {
-                    $classes[] = 'nb-has-site-template-' . skp_get_skope_id('group');
-                    $classes[] = !sek_local_skope_has_nimble_sections() ? 'nb-inherits-site-tmpl' : 'nb-no-site-template-inheritance';
+                    $classes[] = 'nimble-has-group-site-tmpl-' . $group_skope;
+                } else {
+                    $classes[] = 'nimble-no-group-site-tmpl-' . $group_skope;
                 }
+                $classes[] = !sek_local_skope_has_nimble_sections() ? 'nimble-no-local-sektions-' . $skope_id : 'nimble-has-local-sektions-' . $skope_id;
             }
 
             return $classes;
@@ -4699,12 +4703,16 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         sek_emit_js_event('nb-needs-parallax');
                     }
 
-                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s %5$s" %6$s %7$s %8$s %9$s %10$s %11$s>%12$s',
-                        $id,
-                        $module_type,
+                    $module_classes = [
                         $this->get_level_visibility_css_class( $model ),
                         $has_bg_img ? 'sek-has-bg' : '',
-                        $level_css_classes,
+                        $level_css_classes
+                    ];
+
+                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s" %4$s %5$s %6$s %7$s %8$s %9$s>%10$s',
+                        $id,
+                        $module_type,
+                        implode(' ', $module_classes ),
 
                         $title_attribute,
                         // add smartload + parallax attributes
@@ -5175,7 +5183,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     $tagnames = array_intersect( array_keys( $shortcode_tags ), $matches[1] );
 
                     if ( !empty( $tagnames ) ) {
-                    $content = sprintf('<div class="nimble-shortcode-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>%2$s',
+                    $content = sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>%2$s',
                         __('Shortcodes are not parsed by default when customizing. You can change this setting in your WP admin > Settings > Nimble Builder options.', 'text-doma'),
                         $content
                     );

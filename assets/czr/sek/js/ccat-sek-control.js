@@ -1089,41 +1089,121 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.tmplDialogVisible(!self.tmplDialogVisible());// self.tmplDialogVisible() is initialized false
                   });
 
+                  $( self.topBarId ).on( 'click', '.sek-reset-local-sektions', function(evt) {
+                        // Focus on the Nimble panel
+                        // api.panel( sektionsLocalizedData.sektionsPanelId, function( _panel_ ) {
+                        //       self.rootPanelFocus();
+                        //       _panel_.focus();
+                        // });
+                        // api.control( self.getLocalSkopeOptionId() + '__local_reset', function( _control_ ) {
+                        //       _control_.focus();
+                        //       _control_.container.find('.customize-control-title').trigger('click');
+                        // });
+                        // evt.preventDefault();
+                        // Focus on the Nimble panel
+                        api.panel( sektionsLocalizedData.sektionsPanelId, function( _panel_ ) {
+                              self.rootPanelFocus();
+                              _panel_.focus();
+                              api.section( self.SECTION_ID_FOR_LOCAL_OPTIONS, function( _section_ ) {
+                                    _section_.focus();
+                                    setTimeout( function() {
+                                          api.control( self.getLocalSkopeOptionId() + '__local_reset', function( _control_ ) {
+                                                _control_.focus();
+                                                _control_.container.find('.customize-control-title').trigger('click');
+                                                _control_.container.addClass('button-see-me');
+                                                _.delay( function() {
+                                                      _control_.container.removeClass('button-see-me');
+                                                }, 800 );
+                                          });
+                                    }, 500 );
+                              });
+                        });
+                  });
 
                   // NOTIFICATION WHEN USING CUSTOM TEMPLATE
                   // implemented for https://github.com/presscustomizr/nimble-builder/issues/304
-                  var maybePrintNotificationForUsageOfNimbleTemplate = function( templateSettingValue ) {
+                  var printSektionsSkopeStatus = function( args ) {
                         if ( $(self.topBarId).length < 1 || sektionsLocalizedData.isDebugMode )
-                          return;
-                        if ( _.isObject( templateSettingValue ) && templateSettingValue.local_template && 'default' !== templateSettingValue.local_template ) {
-                              $(self.topBarId).find('.sek-notifications')
-                                    .html([
-                                          '<span class="fas fa-info-circle"></span>',
-                                          sektionsLocalizedData.i18n['This page uses Nimble Builder template.']
-                                    ].join(' '))
-                                    .attr('data-doc-href', 'https://docs.presscustomizr.com/article/339-changing-the-page-template');
+                              return;
+
+                        if ( !sektionsLocalizedData.isSiteTemplateEnabled )
+                              return;
+                        var _hasLocalSektions = false;
+                        if ( args && args.on_init ) {
+                              //console.log('ON INIT : ', api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ) );
+                              _hasLocalSektions = api.czr_skopeBase.getSkopeProperty( 'has_local_sektions', 'local' );//property added server side see php:add_sektion_values_to_skope_export()
+                        } else if ( args && args.after_reset ) {
+                              //console.log('AFTER RESET');
+                              _hasLocalSektions = false;
                         } else {
-                              $(self.topBarId).find('.sek-notifications').html('');
+                              _hasLocalSektions = self.hasLocalSettingBeenCustomized();
                         }
+
+                        //console.log('GROUP SKOPE FOR SITE TEMPL', api.czr_skopeBase.getSkopeProperty( 'has_local_sektions', 'local' ) );
+                        //console.log('GLOBAL OPTIONS ', api(sektionsLocalizedData.optNameForGlobalOptions)() );
+                        var _groupSkope = api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ),
+                              _hasSiteTemplateSet = false,
+                              _inheritsSiteTemplate = false,
+                              _globOptions = api(sektionsLocalizedData.optNameForGlobalOptions)();
+
+                        if ( _.isObject(_globOptions) && _globOptions.site_templates && _.isObject(_globOptions.site_templates ) ) {
+                              _.each( _globOptions.site_templates, function( tmpl, siteTmplSkope ) {
+                                    if ( !_hasSiteTemplateSet && _groupSkope === siteTmplSkope.substring(0,_groupSkope.length) ) {
+                                          _hasSiteTemplateSet = true;
+                                    }
+                              } );
+                        }
+
+                        //console.log('HAS SITE TMPL SET ?', _hasSiteTemplateSet );
+                        _inheritsSiteTemplate = _hasSiteTemplateSet && !_hasLocalSektions;
+                        //console.log('ALORS ?', _inheritsSiteTemplate, _hasLocalSektions );
+                        var _msg = sektionsLocalizedData.i18n['This page is not customized with NB'];
+                        if ( _inheritsSiteTemplate ) {
+                              _msg = sektionsLocalizedData.i18n['This page inherits a NB site template'];
+                        } else if ( _hasLocalSektions ) {
+                              _msg = sektionsLocalizedData.i18n['This page is customized with NB'];
+                              _msg += '<button type="button" class="far fa-trash-alt sek-reset-local-sektions" title="Remove sektions" data-nimble-state="enabled"><span class="screen-reader-text">Remove sektions</span></button>';
+                        }
+
+                        $(self.topBarId).find('.sek-notifications')
+                              .html([
+                                    '<span class="fas fa-info-circle"></span>',
+                                    _msg
+                                    //sektionsLocalizedData.i18n['This page uses Nimble Builder template.']
+                              ].join(' '));
+                              //.attr('data-doc-href', 'https://docs.presscustomizr.com/article/339-changing-the-page-template');
+                        
+                              // if ( _.isObject( templateSettingValue ) && templateSettingValue.local_template && 'default' !== templateSettingValue.local_template ) {
+                              if ( _inheritsSiteTemplate ) {
+                                    $(self.topBarId).find('.sek-notifications').addClass('is-linked').data('doc-href', 'https://docs.presscustomizr.com/article/428-how-to-use-site-templates-with-nimble-builder');
+                              } else {
+                                    $(self.topBarId).find('.sek-notifications').removeClass('is-linked').data('doc-href','');
+                              }
+                        // } else {
+                        //       $(self.topBarId).find('.sek-notifications').html('');
+                        // }
                   };
+
+                  api.bind('nimble-update-topbar-skope-status', printSektionsSkopeStatus );
 
                   var initOnSkopeReady = function() {
                         // Schedule notification rendering on init
                         // @see ::generateUIforLocalSkopeOptions()
                         api( self.localSectionsSettingId(), function( _localSectionsSetting_ ) {
-                              var localSectionsValue = _localSectionsSetting_(),
-                                  initialLocalTemplateValue = ( _.isObject( localSectionsValue ) && localSectionsValue.local_options && localSectionsValue.local_options.template ) ? localSectionsValue.local_options.template : null;
-                              // on init
-                              maybePrintNotificationForUsageOfNimbleTemplate( initialLocalTemplateValue );
+                              // var localSectionsValue = _localSectionsSetting_(),
+                              //     initialLocalTemplateValue = ( _.isObject( localSectionsValue ) && localSectionsValue.local_options && localSectionsValue.local_options.template ) ? localSectionsValue.local_options.template : null;
+                              // // on init
+                              // printSektionsSkopeStatus( initialLocalTemplateValue );
+                              printSektionsSkopeStatus({on_init : true});
                         });
 
                         // React to template changes
                         // @see ::generateUIforLocalSkopeOptions() for the declaration of self.getLocalSkopeOptionId() + '__template'
-                        api( self.getLocalSkopeOptionId() + '__template', function( _set_ ) {
-                              _set_.bind( function( to, from ) {
-                                    maybePrintNotificationForUsageOfNimbleTemplate( to );
-                              });
-                        });
+                        // api( self.getLocalSkopeOptionId() + '__template', function( _set_ ) {
+                        //       _set_.bind( function( to, from ) {
+                        //             printSektionsSkopeStatus( to );
+                        //       });
+                        // });
                   };
 
                   // fire now
@@ -3440,7 +3520,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // );
 
                                           // console.log('MAIN SETTING CHANGED', params );
-                                          // console.log('NEW MAIN SETTING VALUE', newSektionSettingValue );
+                                          //console.log('NEW MAIN SETTING VALUE', newSektionSettingValue );
 
 
                                           // Track changes, if not already navigating the logs
@@ -3448,6 +3528,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 try { self.trackHistoryLog( sektionSetInstance, params ); } catch(er) {
                                                       api.errare( 'setupSettingsToBeSaved => trackHistoryLog', er );
                                                 }
+                                          }
+
+                                          // April 2021 : for site templates
+                                          if ( 'local' === localOrGlobal ) {
+                                                api.trigger('nimble-update-topbar-skope-status');
                                           }
 
                                     }, 1000 ) );
@@ -3714,7 +3799,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
                         throw new Error( 'resetCollectionSetting => invalid scope provided.', scope );
                   }
-                  return $.extend( true, {}, self.getDefaultSektionSettingValue( scope ) );
+
+                  newSettingValue = self.getDefaultSektionSettingValue( scope );
+                  // April 2021, for site templates #478 => the default local sektion model includes property __inherits_group_skope__, set to true
+                  // => when reseting locally, if a group template is defined, it will be inherited
+
+                  // How does it work?
+                  // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
+                  // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
+                  // After a reset case, NB sets __inherits_group_skope__ back to true here
+                  // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
+                  return $.extend( true, {}, newSettingValue );
             }
       });//$.extend()
 })( wp.customize, jQuery );//global sektionsLocalizedData
@@ -4382,11 +4477,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             // @params {
                             //  type : info, error, success
                             //  message : ''
-                            //  duration : in ms
+                            //  duration : in ms,
+                            //  button_see_me : true
                             // }
                             'sek-notify' : function( params ) {
                                   sendToPreview = false;
                                   var notif_id = params.notif_id || 'sek-notify';
+                                  params.button_see_me = _.isUndefined(params.button_see_me) ? true : params.button_see_me;
 
                                   // Make sure we clean the last printed notification
                                   if ( self.lastNimbleNotificationId ) {
@@ -4403,6 +4500,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                               self.lastNimbleNotificationId = notif_id;
 
+                                              if ( params.button_see_me && api.notifications.has( notif_id ) ) {
+                                                      api.notifications.container.addClass('button-see-me');
+                                                      _.delay( function() {
+                                                            api.notifications.container.removeClass('button-see-me');
+                                                      }, 800 );
+                                              }
                                               // Removed if not dismissed after 5 seconds
                                               _.delay( function() {
                                                     api.notifications.remove( notif_id );
@@ -4514,6 +4617,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                   try { self.setupSettingsToBeSaved( { dirty : true } ); } catch( er ) {
                                                                         api.errare( 'Error in self.localSectionsSettingId.callbacks => self.setupSettingsToBeSaved()' , er );
                                                                   }
+
+                                                                  api.trigger('nimble-update-topbar-skope-status', { after_reset : true } );
 
                                                                   // Removes and RE-register local settings and controls
                                                                   self.generateUI({
@@ -5324,6 +5429,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
              * @param {string} content The content we want to scan for shortcodes.
              */
             htmlIncludesElementsThatNeedAnAjaxRefresh : function( content ) {
+                  if ( !_.isString( content ) )
+                        return false;
+
+                  content = content.replace(/\s+/g,'');//<= remove all spaces so that we can detect template tags and shortcodes that have spaces inside curly braces or bracket, like {{  the_tags  }}
                   var shortcodes = content.match( /\[+([\w_-])+/g ),
                       tmpl_tags = content.match( /\{\{+([\w_-])+/g ),
                       // script detection introduced for https://github.com/presscustomizr/nimble-builder/issues/710
@@ -5340,6 +5449,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       }
                     }
                   }
+
                   if ( tmpl_tags ) {
                     for ( var j = 0; j < tmpl_tags.length; j++ ) {
                       var _tag = tmpl_tags[ j ].replace( /^\[+/g, '' );
@@ -6298,8 +6408,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     self.localOptionsRegistrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__local_reset',
                                           module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Reset the sections in this page'],
-                                          icon : '<i class="material-icons sek-level-option-icon">cached</i>'
+                                          controlLabel : sektionsLocalizedData.i18n['Remove all sections and options of this page'],
+                                          icon : '<i class="material-icons sek-level-option-icon">delete</i>'
                                     };
                               break;
                               case 'local_revisions' :
@@ -6556,8 +6666,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     registrationParams[ opt_name ] = {
                                           settingControlId : _id_ + '__global_reset',
                                           module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Reset the sections displayed in global locations'],
-                                          icon : '<i class="material-icons sek-level-option-icon">cached</i>'
+                                          controlLabel : sektionsLocalizedData.i18n['Remove the sections displayed in global locations'],
+                                          icon : '<i class="material-icons sek-level-option-icon">delete</i>'
                                     };
                               break;
                               case 'beta_features' :
@@ -6579,6 +6689,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   _do_register_ = function() {
                         _.each( registrationParams, function( optionData, optionType ){
+                              if ( 'site_templates' === optionType ) {
+                                    var _doThingsAfterRefresh = function() {
+                                          setTimeout( function() {
+                                                api.control( optionData.settingControlId ).focus();
+                                          }, 300 );
+                                          api.trigger('nimble-update-topbar-skope-status');
+                                          api.previewer.trigger('sek-notify', {
+                                                type : 'info',
+                                                duration : 20000,
+                                                message : [
+                                                      '<span style="">',
+                                                            //'<strong>' + sektionsLocalizedData.i18n['Template saved'] + '</strong>',
+                                                            sektionsLocalizedData.i18n['Refreshed to home page : site templates must be set when previewing home'],
+                                                      '</span>'
+                                                ].join('')
+                                          });
+                                          api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
+                                    };
+                              }
+
                               if ( ! api.has( optionData.settingControlId ) ) {
                                     var doUpdate = function( to, from, args ) {
                                           try { self.updateAPISettingAndExecutePreviewActions({
@@ -6605,17 +6735,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // Added March 2021 for #478
                                           // Force preview to home when modifying the site templates
                                           if ( 'site_templates' === optionType ) {
-                                                var _doThingsAfterRefresh = function() {
-                                                      setTimeout( function() {
-                                                            api.control( optionData.settingControlId ).focus();
-                                                      }, 300 );
-                                                      api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
-                                                };
-                                                
                                                 _setting_.bind( function( to ) {
                                                       //console.log('REFRESH PREVIEW TO HOME', to );
                                                       api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                                                       api.previewer.previewUrl( api.settings.url.home );
+                                                      api.trigger('nimble-update-topbar-skope-status');
                                                 });
                                           }
 
@@ -6671,7 +6795,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           var $title = _control_.container.find('label > .customize-control-title'),
                                               _titleContent = $title.html();
                                           // We wrap the original text content in this span.sek-ctrl-accordion-title in order to style it (underlined) independently ( without styling the icons next to it )
-                                          $title.html( ['<span class="sek-ctrl-accordion-title">', _titleContent, '</span>' ].join('') );
+                                          $title.html( [
+                                                '<span class="sek-ctrl-accordion-title">',
+                                                _titleContent,
+                                                'site_templates' === optionType ? '&nbsp;<span class="sek-new-label">New!</span>' : '',
+                                                '</span>'
+                                          ].join('') );
 
                                           // if this level has an icon, let's prepend it to the title
                                           if ( ! _.isUndefined( optionData.icon ) ) {
@@ -6684,6 +6813,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           if ( true === optionData.expandAndFocusOnInit && "false" == _control_.container.attr('data-sek-expanded' ) ) {
                                                 $title.trigger('click');
                                           }
+
+                                          if ( 'site_templates' === optionType ) {
+                                                _control_.container.one('click', '.customize-control-title', function() {
+                                                      //console.log('REFRESH PREVIEW TO HOME', to );
+                                                      api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
+                                                      api.previewer.previewUrl( api.settings.url.home );
+                                                      api.trigger('nimble-update-topbar-skope-status');
+                                                });
+                                          }
+
                                     });
                               });
                         });//_.each();
@@ -6998,14 +7137,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           if ( null !== self.validateSettingValue( self.updAPISetParams.newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
                                                 if ( sektionsLocalizedData.isSiteTemplateEnabled && !params.is_global_location ) {
                                                       // Added March 2021 for #478
-                                                      // When preparing skope data for customizer server side, NB adds this property
-                                                      // This property says that this page has no local sektions + has a group template set.
-                                                      // Useful on a saving action just after a reset because it informs the server if the local skope has been modified or not.
-                                                      // Because in the customizer, after a reset NB sets the local setting value to the inherited group skope one
-                                                      // If we save, NB will "think" that the local skope has been customize, while in fact it only inherits its group skope
-                                                      // If saved, then the page won't inherit the group skope anymore, which will be difficult to detect at first because local and group will be the same at the beginning
-                                                      // If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
-                                                      self.updAPISetParams.newSetValue.__inherits_group_skope__ = false;
+                                                      // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
+                                                      // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
+                                                      // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control:: resetCollectionSetting )
+                                                      // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
+                                                      self.updAPISetParams.newSetValue.__inherits_group_skope__ = 'sek-reset-collection' === params.action;
                                                 }
                                                 api( _collectionSettingId_ )( self.updAPISetParams.newSetValue, params );
                                                 // Add the cloneId to the params when we resolve
@@ -10202,6 +10338,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   $( _section_.container ).on( 'click', '.customize-control label > .customize-control-title', function( evt ) {
                         //evt.preventDefault();
                         evt.stopPropagation();
+
+                        // close various dialog UI
+                        api.czr_sektions.levelTreeExpanded(false);
+                        api.czr_sektions.templateGalleryExpanded( false );
+                        api.czr_sektions.saveSectionDialogVisible(false);
+                        api.czr_sektions.tmplDialogVisible(false);
+                        api.czr_sektions.tmplInjectDialogVisible(false);
+
                         var $control = $(this).closest( '.customize-control');
 
                         if ( "no" === $control.attr( 'data-sek-accordion' ))
@@ -10386,10 +10530,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             scheduleVisibilityOfInputId : function( controlledInputId, visibilityCallBack ) {
                   var item = this.input_parent;
                   if ( !_.isFunction(visibilityCallBack) || _.isEmpty(controlledInputId) ) {
-                        throw new Error('::scheduleVisibilityOfInputId => error when firing for input id : ' + this.id );
+                        api.errare('::scheduleVisibilityOfInputId => error when firing for input id : ' + this.id );
+                        return;
                   }
                   if ( !item.czr_Input.has( controlledInputId ) ) {
-                        throw new Error('::scheduleVisibilityOfInputId => missing input id : ' + controlledInputId );
+                        api.errare('::scheduleVisibilityOfInputId => missing input id : ' + controlledInputId );
+                        return;
                   }
                   //Fire on init
                   item.czr_Input( controlledInputId ).visible( visibilityCallBack() );
@@ -10413,8 +10559,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                     _bool = false,
                     _collection,
                     localCollSetId = this.localSectionsSettingId(),
-                    localColSetValue = api(localCollSetId)(),
-                    activeLocationInfos = this.activeLocationsInfo();
+                    localColSetValue = api(localCollSetId)();
 
                 localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
                 _collection = $.extend( true, {}, localColSetValue );
@@ -10437,10 +10582,51 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //-------------------------------------------------------------------------------------------------
             //-- SITE TEMPLATE HELPERS
             //-------------------------------------------------------------------------------------------------
-            localSektionsInheritGroupSkope : function() {
-                  var localCollSetId = this.localSectionsSettingId(),
-                        localColSetValue = api(localCollSetId)();
-                  return localColSetValue && localColSetValue.__inherits_group_skope__;
+            // localSektionsInheritsGroupSkope : function() {
+            //       var localCollSetId = this.localSectionsSettingId(),
+            //             localColSetValue = api(localCollSetId)();
+            //       return localColSetValue && localColSetValue.__inherits_group_skope__;
+            // },
+
+            // @return bool
+            // hasLocalSektions : function() {
+            //       var self = this,
+            //           _bool = false,
+            //           _collection,
+            //           localCollSetId = this.localSectionsSettingId(),
+            //           localColSetValue = api(localCollSetId)();
+  
+            //       localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
+            //       _collection = $.extend( true, {}, localColSetValue );
+            //       _collection = ! _.isEmpty( _collection.collection ) ? _collection.collection : [];
+            //       _collection = _.isArray( _collection ) ? _collection : [];
+            //       _.each( _collection, function( loc_data ){
+            //             if ( _bool )
+            //               return;
+            //             if ( _.isObject(loc_data) && 'location' == loc_data.level && loc_data.collection ) {
+            //                   _bool = !_.isEmpty( loc_data.collection );
+            //             }
+            //       });
+            //       // on a reset, property __inherits_group_skope__ is set to true server side
+            //       return _bool && !( localColSetValue && localColSetValue.__inherits_group_skope__ );
+            // },
+
+            // Added April 2021 for #478
+            // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
+            // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
+            // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control:: resetCollectionSetting )
+            // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
+            hasLocalSettingBeenCustomized : function() {
+                  var self = this,
+                      _bool = false,
+                      _collection,
+                      localCollSetId = this.localSectionsSettingId(),
+                      localColSetValue = api(localCollSetId)();
+  
+                  localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
+
+                  // on a reset, property __inherits_group_skope__ is set to true server side
+                  return !( localColSetValue && localColSetValue.__inherits_group_skope__ );
             },
 
             //-------------------------------------------------------------------------------------------------
@@ -12212,6 +12398,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         } else {
                               $('#customize-preview iframe').css('z-index', '');
                               api.trigger('nb-template-gallery-closed');
+                              // SITE TEMPLATE PICKING
+                              // When closing template gallery, make sure NB reset the possible previous tmpl scope used in a site template picking scenario
+                              self._site_tmpl_scope = null;
+                              // If template gallery was closed during a site template picking scenario, make sure input state is reset
+                              $('[data-input-type="site_tmpl_picker"]').removeClass('sek-site-tmpl-picking-active');
                         }
                   });
 
@@ -12406,12 +12597,31 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               evt.preventDefault();
                               evt.stopPropagation();
                               var _tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id'),
-                                    _tmpl_source = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-source');
+                                    _tmpl_source = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-source'),
+                                    _tmpl_title = $(this).closest('.sek-tmpl-item').find('.tmpl-title').html();
                               if ( _.isEmpty(_tmpl_id) ) {
                                     api.errare('::setupTmplGalleryDOMEvents => error => invalid template id');
                                     return;
                               }
-      
+                              
+                              // Site template mode ?
+                              if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
+                                    if ( self._site_tmpl_scope && !_.isEmpty( self._site_tmpl_scope ) ) {
+                                          var $siteTmplInput = $( '[data-czrtype="' + self._site_tmpl_scope +'"]' );
+                                          if ( $siteTmplInput.length > 0 ) {
+                                                if ( !_.contains(['user_tmpl', 'api_tmpl'], _tmpl_source ) ) {
+                                                      api.errare('Error when picking site template => invalid tmpl source');
+                                                      return;
+                                                }
+                                                $siteTmplInput.trigger('nb-set-site-tmpl', {
+                                                      site_tmpl_id : _tmpl_id,
+                                                      site_tmpl_source : _tmpl_source
+                                                });
+                                          }
+                                          return;
+                                    }
+                              }
+
                               // if current page has NB sections, display an import dialog, otherwise import now
                               if ( self.hasCurrentPageNBSectionsNotHeaderFooter() ) {
                                     self._tmplNameWhileImportDialog = _tmpl_id;
@@ -12611,7 +12821,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         if ( 'template' === _contentType ) {
                               var _isExpanded = api.czr_sektions.templateGalleryExpanded();
                               $(this).attr( 'aria-pressed', !_isExpanded );
-
+                              // When opening template gallery from the content type switcher, make sure NB reset the possible previous tmpl scope used in a site template picking scenario
+                              self._site_tmpl_scope = null;
                               api.czr_sektions.templateGalleryExpanded(!_isExpanded);
                         } else {
                               // always close the template picker when selecting something else
@@ -15850,6 +16061,171 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         api.previewer.refresh();
                   });//on('click')
             }
+      });//$.extend( api.czrInputMap, {})
+})( wp.customize, jQuery, _ );//global sektionsLocalizedData
+( function ( api, $, _ ) {
+      // all available input type as a map
+      api.czrInputMap = api.czrInputMap || {};
+
+      // input_type => callback fn to fire in the Input constructor on initialize
+      // the callback can receive specific params define in each module constructor
+      // For example, a content picker can be given params to display only taxonomies
+      // the default input_event_map can also be overriden in this callback
+      $.extend( api.czrInputMap, {
+            site_tmpl_picker : function( params ) {
+                  var input = this,
+                        _html,
+                        $hidInputEl = $( '[data-czrtype]', input.container ),
+                        _defaultData = { site_tmpl_id : '_no_site_tmpl_', site_tmpl_source : 'user_tmpl' },
+                        siteTmplData,
+                        site_tmpl_id, site_tmpl_source,
+                        tmplTitle = '';
+
+                  // When a user template is being modified or removed, NB refreshes the site template input
+                  input.container.one('site-tmpl-input-rendered', function() {
+                        api.czr_sektions.allSavedTemplates.bind( function( userTmplates ) {
+                              site_tmpl_id = input();
+                              if ( _.isEmpty(site_tmpl_id) || !_.isString(site_tmpl_id) || !_.isObject(userTmplates) )
+                                    return;
+                              // Stop here if the template is not a user_tmpl. ( we don't need to reset title if _no_site_tmpl_ and api_tmpl are not editable )
+                              if ( "user_tmpl" != site_tmpl_id.substring(0,9) )
+                                    return;
+
+                              // NB stores the site template id as a concatenation of template source + '___' + template name
+                              // Ex : user_tmpl___landing-page-for-services
+                              site_tmpl_id = site_tmpl_id.replace('user_tmpl___','');
+                              if ( userTmplates[site_tmpl_id] ) {
+                                    printCurrentTemplateName();
+                              } else {
+                                    // If the template has been removed, trigger a reset
+                                    $hidInputEl.trigger('nb-set-site-tmpl', _defaultData );
+                              }
+                        });
+                  });
+
+                  // printParams : { see_me : true }
+                  var printCurrentTemplateName = function( printParams ) {
+                        printParams = $.extend( { see_me : false }, printParams || {} );
+
+                        var _doRender = function( site_tmpl_id, tmplTitle ) {
+                              _html = '<span class="sek-current-site-tmpl">';
+                                    if ( '_no_site_tmpl_' === site_tmpl_id || _.isEmpty( site_tmpl_id ) ) {
+                                          _html += sektionsLocalizedData.i18n['No template set.'];
+                                          input.container.removeClass('sek-has-site-tmpl');
+                                    } else {
+                                          _html += sektionsLocalizedData.i18n['Active template : '] +  ( _.isEmpty(tmplTitle) ? site_tmpl_id : tmplTitle );
+                                          input.container.addClass('sek-has-site-tmpl');
+                                    }
+                              _html += '</span>';
+                              input.container.find('.sek-current-site-tmpl').remove();
+                              input.container.find('.czr-input').prepend(_html);
+
+                              // Catch user's eye by animating the site template input
+                              if ( printParams.see_me && '_no_site_tmpl_' != site_tmpl_id ) {
+                                    input.container.addClass('button-see-me');
+                                    _.delay( function() {
+                                          input.container.removeClass('button-see-me');
+                                    }, 800 );
+                              }
+
+                              input.container.trigger('site-tmpl-input-rendered');
+                        };
+
+                        site_tmpl_id = input();
+                        if ( !_.isString(site_tmpl_id) || _.isEmpty(site_tmpl_id) ) {
+                              site_tmpl_id = '_no_site_tmpl_';
+                        }
+
+                        // Get the title
+                        if ( '_no_site_tmpl_' === site_tmpl_id ) {
+                              _doRender(site_tmpl_id, tmplTitle);
+                        } else {
+                              // NB stores the site template id as a concatenation of template source + '___' + template name
+                              // Ex : user_tmpl___landing-page-for-services
+                              if ( _.isString( site_tmpl_id ) ) {
+                                    if ( 'user_tmpl' === site_tmpl_id.substring(0,9) ) {
+                                          site_tmpl_source = 'user_tmpl';
+                                          site_tmpl_id = site_tmpl_id.replace('user_tmpl___','');
+                                    } else if ( 'api_tmpl' === site_tmpl_id.substring(0,8) ) {
+                                          site_tmpl_source = 'api_tmpl';
+                                          site_tmpl_id = site_tmpl_id.replace('api_tmpl___','');
+                                    } else {
+                                          api.errare('Error => invalid site template source');
+                                          return;
+                                    }
+                              } else {
+                                    api.errare('Error => site template must be a string');
+                                    return;
+                              }
+                              _tmpl_collection_promise = 'user_tmpl' === site_tmpl_source ? api.czr_sektions.setSavedTmplCollection : api.czr_sektions.getApiTmplCollection;
+                              _tmpl_collection_promise.call(api.czr_sektions)
+                              .done( function(tmpl_collection) {
+                                    if ( _.isObject(tmpl_collection) && tmpl_collection[site_tmpl_id] && tmpl_collection[site_tmpl_id].title ) {
+                                          tmplTitle = tmpl_collection[site_tmpl_id].title;
+                                    } else {
+                                          api.errare('Error => site template not found in collection ' + site_tmpl_source );
+                                    }
+                                    _doRender(site_tmpl_id, tmplTitle);
+                              })
+                              .fail( function() {
+                                    api.errare('printCurrentTemplateName error when getting collection promise failed', params );
+                                    _dfd_.resolve('');
+                              });
+                        }
+                  };
+
+                  // Schedule events
+                  input.container.on( 'click', '[data-sek-group-scope]', function( evt, args ) {
+                        evt.stopPropagation();
+                        var scope = $(this).data( 'sek-group-scope' );
+
+                        if ( _.isEmpty( scope ) ) {
+                              api.errare( 'site_tmpl_picker input => invalid scope provided.', scope );
+                              return;
+                        }
+                        // Close picking when re-click on the button while the template gallery is already displayed
+                        if ( input.container.hasClass('sek-site-tmpl-picking-active') ) {
+                              api.czr_sektions._site_tmpl_scope = null;
+                              api.czr_sektions.templateGalleryExpanded( false );
+                              $('[data-input-type="site_tmpl_picker"]').removeClass('sek-site-tmpl-picking-active');
+                        } else {
+                              api.czr_sektions._site_tmpl_scope = input.id;
+                              api.czr_sektions.templateGalleryExpanded( true );
+                              $('[data-input-type="site_tmpl_picker"]').removeClass('sek-site-tmpl-picking-active');
+                              input.container.addClass('sek-site-tmpl-picking-active');
+                        }
+                  });//on('click')
+                  input.container.on( 'click', '.sek-remove-site-tmpl', function( evt, args ) {
+                        evt.stopPropagation();
+                        $hidInputEl.trigger('nb-set-site-tmpl', _defaultData );
+                  });//on('click')
+
+                  $hidInputEl.on('nb-set-site-tmpl', function( evt, args ) {
+                        if ( !_.isObject(args) ) {
+                              api.errare('site_tmpl_picker => error => wrong args on tmpl pick', args );
+                              return;
+                        }
+
+                        // _defaultData = { site_tmpl_id : '_no_site_tmpl_', site_tmpl_source : 'user_tmpl' }
+                        siteTmplData = $.extend( true, {}, _defaultData );
+                        siteTmplData = $.extend( siteTmplData, args );
+                        // Set input value and try to print title
+                        if ( '_no_site_tmpl_' === siteTmplData.site_tmpl_id ) {
+                              input( siteTmplData.site_tmpl_id );
+                        } else {
+                              // NB stores the site template id as a concatenation of template source + '___' + template name
+                              // Ex : user_tmpl___landing-page-for-services
+                              input( siteTmplData.site_tmpl_source + '___' + siteTmplData.site_tmpl_id );
+                        }
+
+                        try{ printCurrentTemplateName({ see_me : true }); } catch(er) { api.errare('Error when printing template val', er ); }
+                        api.czr_sektions.templateGalleryExpanded( false );
+                        $('[data-input-type="site_tmpl_picker"]').removeClass('sek-site-tmpl-picking-active');
+                  });
+
+                  try{ printCurrentTemplateName(); } catch(er) { api.errare('Error when printing template val', er ); }
+            }
+            
       });//$.extend( api.czrInputMap, {})
 })( wp.customize, jQuery, _ );//global sektionsLocalizedData, serverControlParams
 //extends api.CZRDynModule
@@ -19318,59 +19694,56 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 switch( input.id ) {
                                       case 'layout' :
                                             _.each( [ 'columns', 'img_column_width', 'has_tablet_breakpoint', 'has_mobile_breakpoint' ] , function( _inputId_ ) {
-                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        var bool = false;
-                                                        switch( _inputId_ ) {
-                                                              case 'columns' :
-                                                                    bool = 'grid' === input();
-                                                              break;
-                                                              case 'has_tablet_breakpoint' :
-                                                              case 'has_mobile_breakpoint' :
-                                                              case 'img_column_width' :
-                                                                    bool = 'list' === input();
-                                                              break;
-                                                        }
-                                                        return bool;
-                                                  }); } catch( er ) {
-                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'columns' :
+                                                                  bool = 'grid' === input();
+                                                            break;
+                                                            case 'has_tablet_breakpoint' :
+                                                            case 'has_mobile_breakpoint' :
+                                                            case 'img_column_width' :
+                                                                  bool = 'list' === input();
+                                                            break;
+                                                      }
+                                                      return bool;
+                                                });
                                             });
                                       break;
                                       case 'categories' :
                                             _.each( [ 'must_have_all_cats' ] , function( _inputId_ ) {
-                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        var input_val = input();
-                                                        return _.isArray( input_val ) && input_val.length>1;
-                                                  }); } catch( er ) {
-                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var input_val = input();
+                                                      return _.isArray( input_val ) && input_val.length>1;
+                                                });
                                             });
                                       break;
                                       case 'display_pagination' :
                                             _.each( [ 'posts_per_page', 'post_number' ] , function( _inputId_ ) {
-                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        return 'posts_per_page' === _inputId_ ? input() : !input();
-                                                  }); } catch( er ) {
-                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return 'posts_per_page' === _inputId_ ? input() : !input();
+                                                });
+                                            });
+                                      break;
+                                      case 'use_current_query' :
+                                            _.each( [ 'categories', 'must_have_all_cats'] , function( _inputId_ ) {
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return 'posts_per_page' === _inputId_ ? input() : !input();
+                                                });
                                             });
                                       break;
                                       case 'custom_grid_spaces' :
                                             _.each( [ 'column_gap', 'row_gap' ] , function( _inputId_ ) {
-                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        return input();
-                                                  }); } catch( er ) {
-                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input();
+                                                });
                                             });
                                       break;
                                       case 'show_excerpt' :
                                             _.each( [ 'excerpt_length' ] , function( _inputId_ ) {
-                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        return input();
-                                                  }); } catch( er ) {
-                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input();
+                                                });
                                             });
                                       break;
                                 }
@@ -19452,29 +19825,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 switch( input.id ) {
                                       case 'show_thumb' :
                                             _.each( [ 'img_size', 'img_has_custom_height', 'img_height', 'border_radius_css', 'use_post_thumb_placeholder' ] , function( _inputId_ ) {
-                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        var bool = false;
-                                                        switch( _inputId_ ) {
-                                                              case 'img_height' :
-                                                                    bool = input() && item.czr_Input('img_has_custom_height')();
-                                                              break;
-                                                              default :
-                                                                    bool = input();
-                                                              break;
-                                                        }
-                                                        return bool;
-                                                  }); } catch( er ) {
-                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'img_height' :
+                                                                  bool = input() && item.czr_Input('img_has_custom_height')();
+                                                            break;
+                                                            default :
+                                                                  bool = input();
+                                                            break;
+                                                      }
+                                                      return bool;
+                                                });
                                             });
                                       break;
                                       case 'img_has_custom_height' :
                                             _.each( [ 'img_height' ] , function( _inputId_ ) {
-                                                  try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                        return input() && item.czr_Input('show_thumb')();
-                                                  }); } catch( er ) {
-                                                        api.errare( module.module_type + ' => error in setInputVisibilityDeps', er );
-                                                  }
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input() && item.czr_Input('show_thumb')();
+                                                });
                                             });
                                       break;
                                 }

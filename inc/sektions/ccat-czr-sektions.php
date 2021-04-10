@@ -11,8 +11,7 @@ add_action('customize_save_after', '\Nimble\sek_update_most_used_gfonts');
 function sek_update_most_used_gfonts( $manager ) {
     if ( !sek_current_user_can_access_nb_ui() )
       return;
-    $skope_id = skp_get_skope_id();
-    $all_gfonts = sek_get_all_gfonts( $skope_id );
+    $all_gfonts = sek_get_all_gfonts();
     if ( is_array($all_gfonts) && !empty($all_gfonts) ) {
         update_option( NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS, $all_gfonts, 'no' );
     }
@@ -546,8 +545,8 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Page header and footer' => __( 'Page header and footer', 'text_doma'),
             'Inner and outer widths' => __( 'Inner and outer widths', 'text_doma'),
             'Custom CSS' => __( 'Custom CSS', 'text_doma'),
-            'Reset the sections in this page' => __( 'Reset the sections in this page', 'text_doma'),
-            'Reset the sections displayed in global locations' => __( 'Reset the sections displayed in global locations', 'text_doma'),
+            'Remove all sections and options of this page' => __( 'Remove all sections and options of this page', 'text_doma'),
+            'Remove the sections displayed in global locations' => __( 'Remove the sections displayed in global locations', 'text_doma'),
             'Page speed optimizations' => __( 'Page speed optimizations', 'text_doma'),
 
             'Global text options for Nimble sections' => __('Global text options for Nimble sections', 'text_doma'),
@@ -662,12 +661,17 @@ function nimble_add_i18n_localized_control_params( $params ) {
             '🍥 More templates coming...' => __('🍥 More templates coming...', 'text_doma'),
 
             // Section Save
-            'You did not save any section yet.' => __('You did not save any section yet.', 'text_dom')
+            'You did not save any section yet.' => __('You did not save any section yet.', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
             //'Remove this element' => __('Remove this element', 'text_dom'),
 
-
+            'No template set.' => __('No template set.', 'text_dom'),
+            'Active template : ' => __('Active template : ', 'text_dom'),
+            'This page is not customized with NB' => __('This page is not customized with NB', 'text_dom'),
+            'This page inherits a NB site template' => __('This page inherits a NB site template', 'text_dom'),
+            'This page is customized with NB' => __('This page is customized with NB', 'text_dom'),
+            'Refreshed to home page : site templates must be set when previewing home' => __('Refreshed to home page : site templates must be set when previewing home','text_dom')
         )//array()
     )//array()
     );//array_merge
@@ -735,7 +739,9 @@ function add_sektion_values_to_skope_export( $skopes ) {
             'db_values' => $seks_data,
             'setting_id' => sek_get_seks_setting_id( $skope_id ),//nimble___loop_start[skp__post_page_home], nimble___custom_location_id[skp__global]
         );
-
+        if ( 'local' == $skp_data['skope'] ) {
+          $skp_data['has_local_sektions'] = sek_local_skope_has_nimble_sections();//<= used when printing skope status on init. see control::printSektionsSkopeStatus()
+        }
         // foreach( [
         //     'loop_start',
         //     'loop_end',
@@ -2066,7 +2072,10 @@ function sek_print_nimble_input_templates() {
       <script type="text/html" id="tmpl-nimble-input___site_tmpl_picker">
         <div class="sek-button-choice-wrapper">
           <input data-czrtype="{{data.input_id}}" type="hidden"/>
-          <button type="button" aria-pressed="false" class="sek-ui-button sek-float-right" title="<?php _e('Reset', 'text_doma'); ?>" data-sek-reset-scope="{{data.input_data.scope}}"><?php _e('Reset', 'text_doma'); ?></button>
+          <div class="sek-ui-button-group" role="group">
+            <button type="button" aria-pressed="false" class="sek-ui-button sek-remove-site-tmpl" title="<?php _e('Reset to default', 'text_doma'); ?>"><?php _e('Reset to default', 'text_doma'); ?></button>
+            <button type="button" aria-pressed="false" class="sek-ui-button sek-pick-site-tmpl" title="<?php _e('Pick a template', 'text_doma'); ?>" data-sek-group-scope="{{data.input_id}}"><?php _e('Pick a template', 'text_doma'); ?></button>
+          </div>
         </div>
       </script>
 
@@ -4573,57 +4582,6 @@ function sek_ajax_get_manually_imported_file_content() {
     // Send
     wp_send_json_success( $imported_content );
 }
-
-
-
-// IMPORT IMG HELPER
-// recursive
-//add_filter( 'nimble_pre_import', '\Nimble\sek_maybe_import_imgs' );
-function sek_maybe_import_imgs( $seks_data, $do_import_images = true ) {
-    $new_seks_data = array();
-    // Reset img_import_errors
-    Nimble_Manager()->img_import_errors = [];
-    foreach ( $seks_data as $key => $value ) {
-        if ( is_array($value) ) {
-            $new_seks_data[$key] = sek_maybe_import_imgs( $value, $do_import_images );
-        } else {
-            if ( is_string( $value ) && false !== strpos( $value, '__img_url__' ) && sek_is_img_url( $value ) ) {
-                $url = str_replace( '__img_url__', '', $value );
-                // april 2020 : new option to skip importing images
-                // introduced for https://github.com/presscustomizr/nimble-builder/issues/663
-                if ( !$do_import_images ) {
-                    $value = $url;
-                } else {
-                    //sek_error_log( __FUNCTION__ . ' URL?', $url );
-                    $id = sek_sideload_img_and_return_attachment_id( $url );
-                    if ( is_wp_error( $id ) ) {
-                        $value = null;
-                        $img_errors = Nimble_Manager()->img_import_errors;
-                        $img_errors[] = $url;
-                        Nimble_Manager()->img_import_errors = $img_errors;
-                    } else {
-                        $value = $id;
-                    }
-                }
-            } else if ( is_string( $value ) && false !== strpos( $value, '__default_img_medium__' ) ) {
-                $value = NIMBLE_BASE_URL . '/assets/img/default-img.png';
-            }
-            $new_seks_data[$key] = $value;
-        }
-    }
-    return $new_seks_data;
-}
-
-// @return bool
-function sek_is_img_url( $url = '' ) {
-    if ( is_string( $url ) ) {
-      if ( preg_match( '/\.(jpg|jpeg|png|gif)/i', $url ) ) {
-        return true;
-      }
-    }
-    return false;
-}
-
 ?><?php
 ////////////////////////////////////////////////////////////////
 // Fetches the user saved templates
@@ -4745,7 +4703,6 @@ function sek_ajax_sek_get_api_tmpl_json() {
         wp_send_json_error( __FUNCTION__ . '_missing_data_property_for_template_' . $tmpl_name );
     } else {
         // $tmpl_decoded = $raw_tmpl_data;
-        $tmpl_as_array = $raw_tmpl_data;
         $raw_tmpl_data['data'] = sek_maybe_import_imgs( $raw_tmpl_data['data'], $do_import_images = true );
         $raw_tmpl_data['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
         // Make sure we decode encoded rich text before sending to the customizer
