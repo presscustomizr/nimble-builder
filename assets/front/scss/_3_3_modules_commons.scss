@@ -5,6 +5,7 @@
     h1, h2, h3, h4, h5, h6, p {
       line-height: 1.5em;
       font-weight: 400;
+      margin: 0.6em 0;
     }
     // hx font-size are inspired from the ones of the Customizr theme
     h1 {font-size: 2.48em;}
@@ -41,7 +42,7 @@
   [data-sek-module-type="czr_shortcode_module"],
   [data-sek-module-type="czr_accordion_module"],
   [data-sek-module-type="czr_simple_html_module"]{
-    .sek-module-inner a {
+    .sek-module-inner a:not(.wp-block-button__link) {
       text-decoration: underline;
     }
   }

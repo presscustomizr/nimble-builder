@@ -14,7 +14,7 @@
     &[data-sek-quote-design="none"] { border-left: none;}//<= make sure the blockquote doesn't inherit another border style from the theme or a plugin
     .#{$project-prefix}quote-content {
       font-weight: 400;
-      font-size: 16px;//as defined as default value on module registration
+      font-size: 1.2em;//as defined as default value on module registration
       line-height: 1.5em;
       color: inherit;
     }
@@ -53,11 +53,11 @@
         &.#{$project-prefix}border-before {
             @if ( true == $is_rtl ) {
               padding-right: 15px;
-              border-right: 5px solid;
+              border-right: 5px solid rgba(0,0,0,.1);;
             }
             @else {
               padding-left: 15px;
-              border-left: 5px solid;
+              border-left: 5px solid rgba(0,0,0,.1);;
             }
             .#{$project-prefix}cite {
                 clear: both;

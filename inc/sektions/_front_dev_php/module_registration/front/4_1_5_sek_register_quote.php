@@ -91,7 +91,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 'quote_font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __( 'Font size', 'text_doma' ),
-                    'default'     => array( 'desktop' => '16px' ),
+                    'default'     => array( 'desktop' => '1.2em' ),
                     'min' => 0,
                     'max' => 100,
                     'width-100'         => true,
@@ -436,7 +436,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
                     'input_type'  => 'wp_color_alpha',
                     'title'       => __( 'Border Color', 'text_doma' ),
                     'width-100'   => true,
-                    'default'     => '',
+                    'default'     => 'rgba(0,0,0,0.1)',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'border_color',

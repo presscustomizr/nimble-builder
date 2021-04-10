@@ -16,7 +16,45 @@
   figure {
     display: block;
   }
+  // Image block
+  .wp-block-image .aligncenter, .wp-block-image .alignleft, .wp-block-image .alignright {
+    display: table;
+  }
+  .wp-block-image figcaption {
+    font-size: 13px;
+    text-align: center;
+  }
+
+  // Gallery block
+  .wp-block-gallery, ul.blocks-gallery-grid {
+    @if ( true == $is_rtl ) {
+      margin-right: 0;
+    }
+    @else {
+      margin-left: 0;
+    }
+  }
+
+  // Generic block style
+  [class*="wp-block-"]:not(:last-child) {
+    margin-bottom: 1.5em;
+  }
+
+  // .alignfull {
+  //     margin-left: calc(-100vw / 2 + 100% / 2);
+  //     margin-right: calc(-100vw / 2 + 100% / 2);
+  //     max-width: 100vw;
+  //     width: auto;
+  // }
+  // .alignwide, .alignfull {
+  //     margin-left: -40px;
+  //     width: calc(100% + 80px);
+  //     max-width: calc(100% + 80px);
+  // }
+
+  // Other core WP default classes
   .aligncenter, .aligncenter img {
+    display: block;
     margin-left: auto;
     margin-right: auto;
   }
@@ -26,7 +64,7 @@
   .alignright {
     float: right;
   }
-  .alignnone, .aligncenter, .alignleft, .alignright, .alignwide {
+  .alignnone, .aligncenter, .alignleft, .alignright {
     margin-top: 1.5rem;
     margin-right: auto;
     margin-bottom: 1.5rem;

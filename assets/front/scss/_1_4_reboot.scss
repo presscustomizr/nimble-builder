@@ -33,7 +33,7 @@
     line-height: inherit;
     margin: 0;
     padding: 0;
-    text-align: inherit;
+    // text-align: inherit;<= commented for https://github.com/presscustomizr/nimble-builder/issues/816
   }
   // https://gist.github.com/DavidWells/18e73022e723037a50d6
   blockquote::before,
