@@ -28,6 +28,10 @@ function sek_find_pattern_match($matches) {
       'the_next_post_link' => 'sek_get_next_post_link'
     ));
 
+    // Are we good after the filter ?
+    if ( !is_array($replace_values) )
+      return;
+
     //sek_error_log('$matches ??', $matches );
     if ( !is_array($matches) || empty($matches[1]) )
       return;
