@@ -185,7 +185,8 @@ function sek_get_all_api_templates() {
             'date' => '',
             'thumb_url' => '',
             'is_pro_tmpl' => false,
-            'demo_url' => false
+            'demo_url' => false,
+            'is_site_tmpl' => false
         ]);
 
         $collection[$tmpl_cpt_post_name] = [
@@ -195,6 +196,7 @@ function sek_get_all_api_templates() {
             'thumb_url' => !empty( $metas['thumb_url'] ) ? $metas['thumb_url'] : '',
             'is_pro_tmpl' => !empty( $metas['is_pro_tmpl'] ) ? $metas['is_pro_tmpl'] : false,
             'demo_url' => !empty( $metas['demo_url'] ) ? $metas['demo_url'] : false,
+            'is_site_tmpl' => array_key_exists('is_site_tmpl', $metas ) && $metas['is_site_tmpl']
         ];
     }
     return $collection;

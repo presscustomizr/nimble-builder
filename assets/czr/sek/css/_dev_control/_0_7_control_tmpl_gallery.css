@@ -369,3 +369,8 @@ input.sek-filter-tmpl {
   -o-transition: all  0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
 }
+
+/* Site template picking mode */
+.sek-is-site-tmpl-mode [data-sek-api-site-tmpl="false"] {
+  display: none!important;
+}

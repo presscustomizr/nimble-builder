@@ -32,7 +32,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               self.levelTreeExpanded(false);
                               self.tmplInjectDialogVisible(false);
                               $('#customize-preview iframe').css('z-index', 1);
-                              self.renderOrRefreshTempGallery( { tmpl_source:'api_tmpl' });
+                              self.renderOrRefreshTempGallery( { tmpl_source:'api_tmpl' } );
                         } else {
                               $('#customize-preview iframe').css('z-index', '');
                               api.trigger('nb-template-gallery-closed');
@@ -78,6 +78,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             },
 
             // print and schedule dom events
+            // @params : { tmpl_source:'api_tmpl'}
             renderOrRefreshTempGallery : function( params ) {
                   params = $.extend( {tmpl_source:'api_tmpl'}, params || {} );
                   var self = this,
@@ -96,6 +97,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         return self.getTemplateGalleryHtml( params ).done( function( html ) {
                               $tmplGalWrapper = $('#nimble-tmpl-gallery');
                               $tmplGalWrapper.find('.sek-tmpl-gallery-inner').html( html );
+                              $tmplGalWrapper.removeClass('sek-is-site-tmpl-mode');
+                              // Site template picking mode => add a class in order to display only api site templates
+                              if ( 'api_tmpl' === params.tmpl_source && self._site_tmpl_scope && !_.isEmpty( self._site_tmpl_scope ) ) {
+                                    $tmplGalWrapper.addClass('sek-is-site-tmpl-mode');
+                              }
                         });
                   };
                   // Wait for the gallery to be fetched and rendered
@@ -104,7 +110,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( typeof window.console.log == 'function' ) {
                                     console.log('Nimble Builder API problem => could not fetch templates');
                               }
-                              _doPrintTmplGalleryHtml( {tmpl_source:'user_tmpl'} );
+                              _doPrintTmplGalleryHtml( {tmpl_source:'user_tmpl' } );
                         } else {
                               $tmplGalWrapper = $('#nimble-tmpl-gallery');
                               $tmplGalWrapper.find('#sek-tmpl-source-switcher').show();
@@ -130,7 +136,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // };
 
                   // _.each( _templates, function( _data, _temp_id ) {
-                  //     console.log('SO?', _temp_id );
                   //     _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '">';
                   //       _html += '<div class="sek-tmpl-thumb"><img src="'+ _data.thumb_url +'"/></div>';
                   //     _html += '</div>';
@@ -161,9 +166,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                         _titleAttr = [ _data.title, _data.last_modified_date ].join(' | ');
                                     }
       
-                                    _thumbUrl = !_.isEmpty( _data.thumb_url ) ? _data.thumb_url : _defaultThumbUrl;                        
-      
-                                    _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '" data-sek-tmpl-item-source="'+ params.tmpl_source +'">';
+                                    _thumbUrl = !_.isEmpty( _data.thumb_url ) ? _data.thumb_url : _defaultThumbUrl;
+
+                                    _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '" data-sek-tmpl-item-source="'+ params.tmpl_source +'" data-sek-api-site-tmpl="' + (_data.is_site_tmpl ? "true" : "false") +'">';
                                       //_html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
                                       _html += '<div class="sek-tmpl-thumb" style="background-image:url('+ _thumbUrl +')"></div>';
                                       _html += '<div class="sek-tmpl-info" title="'+ _titleAttr +'">';
@@ -311,7 +316,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         .on('propertychange change click keyup input paste', '.sek-filter-tmpl', _.debounce( function(evt) {
                               evt.preventDefault();
                               var _s = $(this).val();
-                              //console.log('searched string ??', _s );
                               var _reset = function() {
                                     $galWrapper.removeClass('search-active');
                                     $galWrapper.find('.sek-tmpl-item').each( function() {
