@@ -757,12 +757,16 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         sek_emit_js_event('nb-needs-parallax');
                     }
 
-                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s %4$s %5$s" %6$s %7$s %8$s %9$s %10$s %11$s>%12$s',
-                        $id,
-                        $module_type,
+                    $module_classes = [
                         $this->get_level_visibility_css_class( $model ),
                         $has_bg_img ? 'sek-has-bg' : '',
-                        $level_css_classes,
+                        $level_css_classes
+                    ];
+
+                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s" %4$s %5$s %6$s %7$s %8$s %9$s>%10$s',
+                        $id,
+                        $module_type,
+                        implode(' ', $module_classes ),
 
                         $title_attribute,
                         // add smartload + parallax attributes
