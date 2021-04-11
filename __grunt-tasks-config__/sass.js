@@ -23,6 +23,13 @@ module.exports = {
     }
 	},
 
+  // Added April 2021 for site templates
+  sek_wp_comments : {
+    files : {
+      '<%= paths.front_assets %>css/sek-wp-comments.css' : '<%= paths.front_assets %>scss/sek-wp-comments.scss'
+    }
+  },
+
   // performance => use separated stylesheets for modules
   // implemented for https://github.com/presscustomizr/nimble-builder/issues/612
   sek_module_menu: {

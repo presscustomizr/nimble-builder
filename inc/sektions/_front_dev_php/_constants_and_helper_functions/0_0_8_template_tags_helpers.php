@@ -25,7 +25,8 @@ function sek_find_pattern_match($matches) {
       'the_modified_date' => 'sek_get_the_modified_date',
       'the_comments' => 'sek_get_the_comments',
       'the_previous_post_link' => 'sek_get_previous_post_link',
-      'the_next_post_link' => 'sek_get_next_post_link'
+      'the_next_post_link' => 'sek_get_next_post_link',
+      'the_comment_number' => 'sek_get_the_comment_number'
     ));
 
     // Are we good after the filter ?
@@ -165,9 +166,21 @@ function sek_get_the_comments() {
   ob_start();
   //load_template( $tmpl_path, false );
   if ( comments_open() || get_comments_number() ) {
+    add_filter('comments_template', '\Nimble\sek_set_nb_comments_template_path');
     comments_template();
+    remove_filter('comments_template', '\Nimble\sek_set_nb_comments_template_path');
   }
   return ob_get_clean();
+}
+
+//@filter 'comments_template'
+function sek_set_nb_comments_template_path( $original_path ) {
+  //@to do => make this path overridable
+  $nb_path = sek_get_templates_dir() . "/wp/comments-template.php";
+  if ( file_exists( $nb_path ) ) {
+    return $nb_path;
+  }
+  return $original_path;
 }
 
 function sek_get_the_published_date() {
@@ -225,6 +238,17 @@ function sek_get_the_categories( $separator = ' / ') {
     return sek_get_tmpl_tag_error( $tag = 'the_categories', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
   }
   return sprintf( '<span class="sek-post-category">%1$s</span>', get_the_category_list( $separator, '', $post_id = sek_get_post_id_on_front_and_when_customizing() ) );
+}
+
+function sek_get_the_comment_number() {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( !$is_singular ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_comment_number', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+  }
+  return sprintf( '<span class="sek-post-comment-number">%1$s</span>', get_comments_number_text( $zero = false, $one = false, $more = false, $post_id = sek_get_post_id_on_front_and_when_customizing() ) );
 }
 
 function sek_get_the_author_link() {
