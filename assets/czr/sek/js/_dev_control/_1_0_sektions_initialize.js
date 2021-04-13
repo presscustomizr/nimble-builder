@@ -690,8 +690,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this;
                   previousSkopes = previousSkopes || {};
                   // Clear all previous sektions if the main panel is expanded and we're coming from a previousSkopes
-                  if ( ! _.isEmpty( previousSkopes.local ) && api.panel( sektionsLocalizedData.sektionsPanelId ).expanded() ) {
-                        api.previewer.trigger('sek-pick-content');
+                  if ( !_.isEmpty( previousSkopes.local ) && api.panel( sektionsLocalizedData.sektionsPanelId ).expanded() ) {
+                        // We don't want to change focus to content picker when setting site templates ( which forces a preview refresh on home when being opened and modified )
+                        if ( _.isUndefined(api._nimbleRefreshingPreviewHomeWhenSettingSiteTemplate) || !api._nimbleRefreshingPreviewHomeWhenSettingSiteTemplate ) {
+                              api.previewer.trigger('sek-pick-content');
+                        }
                   }
 
                   // set the localSectionsSettingId now, and update it on skope change

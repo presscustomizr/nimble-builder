@@ -137,9 +137,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _.each( registrationParams, function( optionData, optionType ){
                               if ( 'site_templates' === optionType ) {
                                     var _doThingsAfterRefresh = function() {
-                                          setTimeout( function() {
-                                                api.control( optionData.settingControlId ).focus();
-                                          }, 300 );
+                                          // setTimeout( function() {
+                                          //       api.control( optionData.settingControlId ).focus();
+                                          // }, 300 );
                                           api.trigger('nimble-update-topbar-skope-status');
                                           api.previewer.trigger('sek-notify', {
                                                 type : 'info',
@@ -152,6 +152,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 ].join('')
                                           });
                                           api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
+                                          setTimeout( function() {
+                                                // This property is used to avoid the automatic focus on content picker when forcing preview on home while modifying site templates
+                                                api._nimbleRefreshingPreviewHomeWhenSettingSiteTemplate = false;
+                                          }, 1000);
                                     };
                               }
 
@@ -182,7 +186,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           // Force preview to home when modifying the site templates
                                           if ( 'site_templates' === optionType ) {
                                                 _setting_.bind( function( to ) {
-                                                      //console.log('REFRESH PREVIEW TO HOME', to );
+                                                      // This property is used to avoid the automatic focus on content picker when forcing preview on home while modifying site templates
+                                                      api._nimbleRefreshingPreviewHomeWhenSettingSiteTemplate = true;//<= set to false in _doThingsAfterRefresh
                                                       api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                                                       api.previewer.previewUrl( api.settings.url.home );
                                                       api.trigger('nimble-update-topbar-skope-status');
@@ -262,7 +267,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                           if ( 'site_templates' === optionType ) {
                                                 _control_.container.one('click', '.customize-control-title', function() {
-                                                      //console.log('REFRESH PREVIEW TO HOME', to );
+                                                      // This property is used to avoid the automatic focus on content picker when forcing preview on home while modifying site templates
+                                                      api._nimbleRefreshingPreviewHomeWhenSettingSiteTemplate = true;//<= set to false in _doThingsAfterRefresh
                                                       api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                                                       api.previewer.previewUrl( api.settings.url.home );
                                                       api.trigger('nimble-update-topbar-skope-status');
