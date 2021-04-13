@@ -131,7 +131,8 @@ if ( !function_exists( 'Nimble\sek_render_post') ) {
     $has_post_thumbnail = has_post_thumbnail();
     $use_post_thumb_placeholder = true === sek_booleanize_checkbox_val( $thumb_settings['use_post_thumb_placeholder'] );
     $post_thumb_class = ( $show_thumb && ( $has_post_thumbnail || $use_post_thumb_placeholder ) ) ? 'sek-has-thumb' : '';
-    $post_classes = get_post_class( $post_thumb_class, $post_id );
+    $post_classes = array( $post_thumb_class );// get_post_class( $post_thumb_class, $post_id );
+    // note : not using WP generated post classes to avoid collision with theme styles often using those CSS classes to style posts
     ?>
       <article id="sek-pg-<?php the_ID(); ?>" class="<?php echo esc_attr( implode( ' ', $post_classes ) ); ?>">
         <?php if ( $show_thumb && ( $has_post_thumbnail || $use_post_thumb_placeholder ) ) : ?>
