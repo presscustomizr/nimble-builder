@@ -119,6 +119,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       authorized_local_option_groups = ['collection', 'local_options', 'fonts' ];
                   
                   if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
+                        authorized_local_option_groups.push('__inherits_group_skope__');//<= only authorized because '__inherits_group_skope_tmpl_when_exists__' was initially named like this
                         authorized_local_option_groups.push('__inherits_group_skope_tmpl_when_exists__');
                   }
 
