@@ -2215,6 +2215,11 @@ input.sek-filter-tmpl {
   -ms-transition: all  0.2s ease-in-out;
   -o-transition: all  0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
+}
+
+/* Site template picking mode */
+.sek-is-site-tmpl-mode [data-sek-api-site-tmpl="false"] {
+  display: none!important;
 }/* LEVEL TREE */
 #nimble-level-tree {
   -webkit-transition: top 0.3s ease-in-out;

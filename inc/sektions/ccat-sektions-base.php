@@ -44,6 +44,8 @@ class Sek_Dyn_CSS_Builder {
     public $sniffed_locations = [];//oct 2020 => will populate a collection of location sniffed while parsing the sek_model
     public $sniffed_modules = [];//oct 2020 => will populate a collection of modules sniffed while parsing the sek_model
 
+    private $needs_wp_comments_stylesheet = false;//April 2021 => for site templates
+
     public function __construct( $sek_model = array(), $is_global_stylesheet = false ) {
         $this->sek_model  = $sek_model;
 
@@ -381,13 +383,26 @@ class Sek_Dyn_CSS_Builder {
                       // for https://github.com/presscustomizr/nimble-builder/issues/78
                       'item_id' => $item_id // <= a multi-item module has a unique id for each item
                   ));
+              } else {
+                  // added April 2021 for site templates
+                  // sniff if we need to add the comments css => looking for {{the_comments}}
+                  if ( !$this->is_global_stylesheet && is_string($_input_val) ) {
+                    preg_replace_callback( '!\{\{\s?(.*?)\s?\}\}!', array( $this, "sek_sniff_wp_comment_template_tag" ), $_input_val);
+                  }
               }
         }
         return $rules;
     }
 
-
-
+    // added Arpil 2021 for site templates
+    public function sek_sniff_wp_comment_template_tag($matches) {
+        //sek_error_log('$matches ??', $matches );
+        if ( !is_array($matches) || empty($matches[1]) )
+            return;
+        if ( !$this->needs_wp_comments_stylesheet && is_string($matches[1] ) ) {
+            $this->needs_wp_comments_stylesheet = false !== strpos($matches[1], 'the_comments');
+        }
+    }
 
 
 
@@ -504,6 +519,28 @@ class Sek_Dyn_CSS_Builder {
             }
         }//foreach
         
+        // COMMENTS CSS
+        $comments_css = '';
+        //if ( apply_filters('include_comments_css', true ) ) {
+        if ( !$this->is_global_stylesheet && $this->needs_wp_comments_stylesheet ) {
+            $read_attempt = true;
+
+            $uri = sprintf( '%1$s%2$s%3$s',
+                NIMBLE_BASE_PATH . '/assets/front/css/',
+                'sek-wp-comments',
+                sek_is_dev_mode() ? '.css' : '.min.css'
+            );
+
+            $uri =  wp_normalize_path($uri);
+
+            //sek_error_log('$uri ??' . $module_type . $stylesheet_name, $uri );
+            if ( $wp_filesystem->exists($uri) && $wp_filesystem->is_readable($uri) ) {
+                $comments_css = $wp_filesystem->get_contents($uri);
+            } else {
+                $reading_issue = true;
+            }
+        }
+
         // update the list of concatenated module stylesheets so that NB doesn't concatenate a module stylesheet twice for the local css and for the global css
         Nimble_Manager()->concatenated_module_stylesheets = array_unique($concatenated_module_stylesheets);
 
@@ -516,6 +553,8 @@ class Sek_Dyn_CSS_Builder {
             }
         }
         //sek_error_log('$modules_css ??', $modules_css );
+
+
 
         // ORGANIZE CSS RULES BY MEDIA QUERIES
         $collection = apply_filters( 'nimble_css_rules_collection_before_printing_stylesheet', $this->collection );
@@ -535,10 +574,10 @@ class Sek_Dyn_CSS_Builder {
                 $css .= $_css;
             }
         }
-
+        
         // CONCATENATE MODULE CSS + GENERATED CSS
         return apply_filters( 'nimble_get_dynamic_stylesheet',
-            $modules_css . $css,
+            $modules_css . $comments_css . $css,
             $this->is_global_stylesheet,
             $this->sniffed_locations,
             $this->sniffed_modules
@@ -4009,7 +4048,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 } else {
                     $classes[] = 'nimble-no-group-site-tmpl-' . $group_skope;
                 }
-                $classes[] = !sek_local_skope_has_nimble_sections() ? 'nimble-no-local-sektions-' . $skope_id : 'nimble-has-local-sektions-' . $skope_id;
+                $classes[] = sek_local_skope_inherits_group_skope() ? 'nimble-no-local-sektions-' . $skope_id : 'nimble-has-local-sektions-' . $skope_id;
             }
 
             return $classes;

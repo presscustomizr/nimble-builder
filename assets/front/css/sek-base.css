@@ -985,6 +985,10 @@ button.sek-btn,
   font-size: 1em;
 }
 
+.sektion-wrapper .sek-module-inner .avatar {
+  border-radius: 50%;
+}
+
 /*************************************
 * HEADING MODULE
 *************************************/

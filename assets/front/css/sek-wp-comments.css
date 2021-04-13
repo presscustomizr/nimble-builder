@@ -102,8 +102,8 @@
 
 .sektion-wrapper .sek-module-inner .sek-commentlist .comment-body p {
   margin-bottom: 8px;
-  color: #757575;
   clear: both;
+  font-size: 0.95em;
 }
 
 .sektion-wrapper .sek-module-inner .sek-commentlist .comment-body strong {
