@@ -384,11 +384,8 @@ if ( true === sek_booleanize_checkbox_val($main_settings['display_pagination']) 
   // https://developer.wordpress.org/reference/classes/wp_query/#pagination-parameters
   $pagination_query_var = Nimble_Manager()->is_viewing_static_front_page ? 'page' :'paged';
   $paged = get_query_var($pagination_query_var);
-  $paged = $paged ? $paged : 1;
-  $query_params = wp_parse_args( [
-    'paged' => $paged,
-    'posts_per_page' => $posts_per_page,
-  ], $default_query_params );
+  $query_params['paged'] = $paged ? $paged : 1;
+  $query_params['posts_per_page'] = $posts_per_page;
 }
 
 if ( $include_sticky ) {
