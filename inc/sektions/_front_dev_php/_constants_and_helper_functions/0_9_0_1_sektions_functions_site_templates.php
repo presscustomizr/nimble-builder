@@ -54,6 +54,7 @@ function sek_is_no_group_skope( $skope_id = null ) {
 }
 
 //@return bool
+// Tells if the local NB skope has been customized
 function sek_local_skope_inherits_group_skope( $skope_id = '', $local_seks_data = null ) {
     $skope_id = empty( $skope_id ) ? skp_get_skope_id() : $skope_id;
 

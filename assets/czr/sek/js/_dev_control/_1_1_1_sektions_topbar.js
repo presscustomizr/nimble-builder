@@ -190,18 +190,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                         if ( !sektionsLocalizedData.isSiteTemplateEnabled )
                               return;
-                        var _hasLocalSektions = false;
+                        var _hasLocalNBCustomizations = false;
                         if ( args && args.on_init ) {
                               //console.log('ON INIT : ', api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ) );
-                              _hasLocalSektions = api.czr_skopeBase.getSkopeProperty( 'has_local_sektions', 'local' );//property added server side see php:add_sektion_values_to_skope_export()
+                              _hasLocalNBCustomizations = api.czr_skopeBase.getSkopeProperty( 'has_local_nimble_customizations', 'local' );//property added server side see php:add_sektion_values_to_skope_export()
                         } else if ( args && args.after_reset ) {
                               //console.log('AFTER RESET');
-                              _hasLocalSektions = false;
+                              _hasLocalNBCustomizations = false;
                         } else {
-                              _hasLocalSektions = self.hasLocalSettingBeenCustomized();
+                              _hasLocalNBCustomizations = self.hasLocalSettingBeenCustomized();
                         }
 
-                        //console.log('GROUP SKOPE FOR SITE TEMPL', api.czr_skopeBase.getSkopeProperty( 'has_local_sektions', 'local' ) );
                         //console.log('GLOBAL OPTIONS ', api(sektionsLocalizedData.optNameForGlobalOptions)() );
                         var _groupSkope = self.getGroupSkopeForSiteTemplate(),
                               _hasSiteTemplateSet = false,
@@ -221,11 +220,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               } );
                         }
 
-                        _inheritsSiteTemplate = _hasSiteTemplateSet && !_hasLocalSektions;
+                        _inheritsSiteTemplate = _hasSiteTemplateSet && !_hasLocalNBCustomizations;
                         var _msg = sektionsLocalizedData.i18n['This page is not customized with NB'];
                         if ( _inheritsSiteTemplate ) {
                               _msg = sektionsLocalizedData.i18n['This page inherits a NB site template'];
-                        } else if ( _hasLocalSektions ) {
+                        } else if ( _hasLocalNBCustomizations ) {
                               _msg = sektionsLocalizedData.i18n['This page is customized with NB'];
                               _msg += '<button type="button" class="far fa-trash-alt sek-reset-local-sektions" title="Remove sektions" data-nimble-state="enabled"><span class="screen-reader-text">Remove sektions</span></button>';
                         }

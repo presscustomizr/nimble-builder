@@ -218,9 +218,6 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         //     //sek_error_log('alors local skope id for fetching local sections ?', $skope_id );
         // }
         $seks_data = sek_get_seks_without_group_inheritance( $skope_id );
-        // normalizes
-        // [ 'collection' => [], 'local_options' => [], '__inherits_group_skope__' => true ];
-        $seks_data = wp_parse_args( $seks_data, $default_collection );
 
         // March 2021 : added for site templates #478
         // Use site template if
@@ -230,6 +227,10 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         if ( sek_is_site_tmpl_enabled() && 'local' === $skope_level && !$is_global_skope ) {
             $seks_data = sek_maybe_get_seks_for_group_site_template( $skope_id, $seks_data );
         }
+
+        // normalizes
+        // [ 'collection' => [], 'local_options' => [], "fonts": [], '__inherits_group_skope__' => true ];
+        $seks_data = wp_parse_args( $seks_data, $default_collection );
 
         // Maybe add missing registered locations
         $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
@@ -252,13 +253,12 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             $location_id
         );
 
-        $default_collection = sek_get_default_location_model( $skope_id );
-        $seks_data = wp_parse_args( $seks_data, $default_collection );
-
         if ( sek_is_site_tmpl_enabled() && 'local' === $skope_level && !$is_global_skope ) {
             $seks_data = sek_maybe_get_seks_for_group_site_template( $skope_id, $seks_data );
         }
 
+        $default_collection = sek_get_default_location_model( $skope_id );
+        $seks_data = wp_parse_args( $seks_data, $default_collection );
         // Maybe add missing registered locations when customizing
         // December 2020 => needed when importing an entire template
         $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
@@ -297,7 +297,13 @@ function sek_get_seks_without_group_inheritance( $skope_id ) {
     if ( $post ) {
         $seks_data = maybe_unserialize( $post->post_content );
     }
+
     $seks_data = is_array( $seks_data ) ? $seks_data : array();
+
+    // normalizes
+    // [ 'collection' => [], 'local_options' => [], "fonts": [], '__inherits_group_skope__' => true ];
+    $default_collection = sek_get_default_location_model( $skope_id );
+    $seks_data = wp_parse_args( $seks_data, $default_collection );
     wp_cache_set( $cache_key, $seks_data );
     return $seks_data;
 }

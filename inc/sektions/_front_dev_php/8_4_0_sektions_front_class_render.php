@@ -58,12 +58,12 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             if ( sek_is_site_tmpl_enabled() && !is_customize_preview() ) {
                 $skope_id = skp_get_skope_id();
                 $group_skope = sek_get_group_skope_for_site_tmpl();
+                $classes[] = sek_local_skope_inherits_group_skope() ? 'nimble-no-local-data-' . $skope_id : 'nimble-has-local-data-' . $skope_id;
                 if ( sek_has_group_site_template_data() ) {
                     $classes[] = 'nimble-has-group-site-tmpl-' . $group_skope;
                 } else {
                     $classes[] = 'nimble-no-group-site-tmpl-' . $group_skope;
                 }
-                $classes[] = !sek_local_skope_has_nimble_sections() ? 'nimble-no-local-sektions-' . $skope_id : 'nimble-has-local-sektions-' . $skope_id;
             }
 
             return $classes;
