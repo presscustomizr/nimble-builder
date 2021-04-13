@@ -105,8 +105,9 @@ function sek_add_css_rules_for_sections_breakpoint( $rules, $section ) {
         $breakpoint = $custom_breakpoint > 0 ? $custom_breakpoint : $default_md_breakpoint;
         $breakpoint = $breakpoint - 1;//fixes https://github.com/presscustomizr/nimble-builder/issues/559
 
+        // selector uses ">" syntax to make sure the reverse-column rule is not inherited by a nested section
         $rules[] = array(
-            'selector' => '[data-sek-id="'.$section['id'].'"] .sek-sektion-inner',
+            'selector' => '[data-sek-id="'.$section['id'].'"] > .sek-container-fluid > .sek-sektion-inner',
             'css_rules' => "-ms-flex-direction: column-reverse;flex-direction: column-reverse;",
             'mq' => "(max-width: {$breakpoint}px)"
         );
