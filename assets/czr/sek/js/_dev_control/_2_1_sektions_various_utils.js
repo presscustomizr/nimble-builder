@@ -1269,7 +1269,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // localSektionsInheritsGroupSkope : function() {
             //       var localCollSetId = this.localSectionsSettingId(),
             //             localColSetValue = api(localCollSetId)();
-            //       return localColSetValue && localColSetValue.__inherits_group_skope__;
+            //       return localColSetValue && localColSetValue.__inherits_group_skope_tmpl_when_exists__;
             // },
 
             // @return bool
@@ -1291,14 +1291,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //                   _bool = !_.isEmpty( loc_data.collection );
             //             }
             //       });
-            //       // on a reset, property __inherits_group_skope__ is set to true server side
-            //       return _bool && !( localColSetValue && localColSetValue.__inherits_group_skope__ );
+            //       // on a reset, property __inherits_group_skope_tmpl_when_exists__ is set to true server side
+            //       return _bool && !( localColSetValue && localColSetValue.__inherits_group_skope_tmpl_when_exists__ );
             // },
 
             // Added April 2021 for #478
-            // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
-            // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
-            // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control:: resetCollectionSetting )
+            // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
+            // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
+            // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control:: resetCollectionSetting )
             // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
             hasLocalSettingBeenCustomized : function() {
                   var self = this,
@@ -1309,8 +1309,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
   
                   localColSetValue = _.isObject( localColSetValue ) ? localColSetValue : {};
 
-                  // on a reset, property __inherits_group_skope__ is set to true server side
-                  return !( localColSetValue && localColSetValue.__inherits_group_skope__ );
+                  // on a reset, property __inherits_group_skope_tmpl_when_exists__ is set to true server side
+                  return !( localColSetValue && localColSetValue.__inherits_group_skope_tmpl_when_exists__ );
             },
 
             // Js version of php helper sek_get_group_skope_for_site_tmpl()

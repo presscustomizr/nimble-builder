@@ -17,11 +17,11 @@ function sek_get_module_params_for_sek_local_reset() {
                 ),
                 // Added April 2021 for #478
                 // This option is not used anywhere.
-                // Its only purpose is to make the local setting "dirty" when it is modified by the user. In other word when this options is changed the property __inherits_group_skope__, set to true by default, becomes false if not already, which breaks group scope template inheritance
+                // Its only purpose is to make the local setting "dirty" when it is modified by the user. In other word when this options is changed the property __inherits_group_skope_tmpl_when_exists__, set to true by default, becomes false if not already, which breaks group scope template inheritance
                 // How does this work ?
-                // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
-                // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
-                // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control:: resetCollectionSetting )
+                // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
+                // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
+                // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control:: resetCollectionSetting )
                 // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
                 'inherit_group_scope' => array(
                     'input_type'  => 'nimblecheck',

@@ -797,7 +797,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                                                                   // RE-register the local sektions setting with values sent from the server
                                                                   // If the local page inherits a group skope, those will be set as local
-                                                                  // To prevent saving server sets property __inherits_group_skope__ = true
+                                                                  // To prevent saving server sets property __inherits_group_skope_tmpl_when_exists__ = true
                                                                   // set the param { dirty : true } => because otherwise, if user saves right after a reset, local option won't be ::updated() server side.
                                                                   // Which means that the page will keep its previous aspect
                                                                   try { self.setupSettingsToBeSaved( { dirty : true } ); } catch( er ) {

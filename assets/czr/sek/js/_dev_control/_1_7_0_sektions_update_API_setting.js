@@ -301,11 +301,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           if ( null !== self.validateSettingValue( self.updAPISetParams.newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
                                                 if ( sektionsLocalizedData.isSiteTemplateEnabled && !params.is_global_location ) {
                                                       // Added March 2021 for #478
-                                                      // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
-                                                      // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
-                                                      // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control:: resetCollectionSetting )
+                                                      // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
+                                                      // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
+                                                      // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control:: resetCollectionSetting )
                                                       // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
-                                                      self.updAPISetParams.newSetValue.__inherits_group_skope__ = 'sek-reset-collection' === params.action;
+                                                      self.updAPISetParams.newSetValue.__inherits_group_skope_tmpl_when_exists__ = 'sek-reset-collection' === params.action;
                                                 }
                                                 api( _collectionSettingId_ )( self.updAPISetParams.newSetValue, params );
                                                 // Add the cloneId to the params when we resolve

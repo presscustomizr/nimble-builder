@@ -229,7 +229,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         }
 
         // normalizes
-        // [ 'collection' => [], 'local_options' => [], "fonts": [], '__inherits_group_skope__' => true ];
+        // [ 'collection' => [], 'local_options' => [], "fonts": [], '__inherits_group_skope_tmpl_when_exists__' => true ];
         $seks_data = wp_parse_args( $seks_data, $default_collection );
 
         // Maybe add missing registered locations
@@ -301,7 +301,7 @@ function sek_get_seks_without_group_inheritance( $skope_id ) {
     $seks_data = is_array( $seks_data ) ? $seks_data : array();
 
     // normalizes
-    // [ 'collection' => [], 'local_options' => [], "fonts": [], '__inherits_group_skope__' => true ];
+    // [ 'collection' => [], 'local_options' => [], "fonts": [], '__inherits_group_skope_tmpl_when_exists__' => true ];
     $default_collection = sek_get_default_location_model( $skope_id );
     $seks_data = wp_parse_args( $seks_data, $default_collection );
     wp_cache_set( $cache_key, $seks_data );

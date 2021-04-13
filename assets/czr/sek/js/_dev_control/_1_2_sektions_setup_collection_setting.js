@@ -119,7 +119,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                       authorized_local_option_groups = ['collection', 'local_options', 'fonts' ];
                   
                   if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
-                        authorized_local_option_groups.push('__inherits_group_skope__');
+                        authorized_local_option_groups.push('__inherits_group_skope_tmpl_when_exists__');
                   }
 
                   // walk the collections tree and verify it passes the various consistency checks
@@ -334,13 +334,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   newSettingValue = self.getDefaultSektionSettingValue( scope );
-                  // April 2021, for site templates #478 => the default local sektion model includes property __inherits_group_skope__, set to true
+                  // April 2021, for site templates #478 => the default local sektion model includes property __inherits_group_skope_tmpl_when_exists__, set to true
                   // => when reseting locally, if a group template is defined, it will be inherited
 
                   // How does it work?
-                  // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
-                  // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
-                  // After a reset case, NB sets __inherits_group_skope__ back to true here
+                  // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
+                  // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
+                  // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true here
                   // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
                   return $.extend( true, {}, newSettingValue );
             }
