@@ -26,7 +26,10 @@ function sek_find_pattern_match($matches) {
       'the_comments' => 'sek_get_the_comments',
       'the_previous_post_link' => 'sek_get_previous_post_link',
       'the_next_post_link' => 'sek_get_next_post_link',
-      'the_comment_number' => 'sek_get_the_comment_number'
+      'the_comment_number' => 'sek_get_the_comment_number',
+
+      'the_search_query' => 'sek_get_search_query',
+      'the_search_results_number' => 'sek_get_search_results_nb'
     ));
 
     // Are we good after the filter ?
@@ -123,7 +126,7 @@ function sek_get_next_post_link() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_next_post_link', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_next_post_link', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
     $title = sek_get_posted_query_param_when_customizing( 'the_next_post_link' );
@@ -139,7 +142,7 @@ function sek_get_previous_post_link() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_previous_post_link', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_previous_post_link', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
     $title = sek_get_posted_query_param_when_customizing( 'the_previous_post_link' );
@@ -155,11 +158,11 @@ function sek_get_the_comments() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_comments', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_comments', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
     return sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>',
-      __('Comment template can not be displayed while customizing', 'text_doma')
+      __('Comment template can not be refreshed while customizing', 'text_doma')
     );
   }
 
@@ -189,7 +192,7 @@ function sek_get_the_published_date() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_published_date', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_published_date', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
   }
   $post_id = sek_get_post_id_on_front_and_when_customizing();
   $published_date = get_the_date( get_option('date_format'), $post_id);
@@ -206,7 +209,7 @@ function sek_get_the_modified_date() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_modified_date', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_modified_date', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
   }
   $post_id = sek_get_post_id_on_front_and_when_customizing();
   $modified_date = get_the_modified_date( get_option('date_format'), $post_id );
@@ -223,7 +226,7 @@ function sek_get_the_tags( $separator = ' &middot; ') {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_tags', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_tags', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
   }
   return sprintf( '<span class="sek-post-tags">%1$s</span>', get_the_tag_list( $before = '', $sep = $separator, $after = '', $post_id = sek_get_post_id_on_front_and_when_customizing() ) );
 }
@@ -235,7 +238,7 @@ function sek_get_the_categories( $separator = ' / ') {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_categories', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_categories', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
   }
   return sprintf( '<span class="sek-post-category">%1$s</span>', get_the_category_list( $separator, '', $post_id = sek_get_post_id_on_front_and_when_customizing() ) );
 }
@@ -246,81 +249,51 @@ function sek_get_the_comment_number() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_comment_number', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_comment_number', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
   }
   return sprintf( '<span class="sek-post-comment-number">%1$s</span>', get_comments_number_text( $zero = false, $one = false, $more = false, $post_id = sek_get_post_id_on_front_and_when_customizing() ) );
 }
 
-function sek_get_the_author_link() {
-  $is_singular = is_singular();
-  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
-    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
-  }
-  if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_author', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
-  }
 
-  $post_id = sek_get_post_id_on_front_and_when_customizing();
-  $post_object = get_post( $post_id );
-  if ( empty( $post_object ) || !is_object( $post_object ) )
-    return null;
-  $author_id = $post_object->post_author;
-  $display_name = get_the_author_meta( 'display_name', $author_id );
-  return sprintf(
-    '<a href="%1$s" title="%2$s" rel="author">%3$s</a>',
-    esc_url( get_author_posts_url( $author_id, get_the_author_meta( 'user_nicename', $author_id ) ) ),
-    /* translators: %s: Author's display name. */
-    esc_attr( sprintf( __( 'Posts by %s' ), $display_name ) ),
-    $display_name
-  );
+// AUTHOR DATA
+// 2 CASES : singular or author archives
+function sek_get_the_author_link() {
+  $author_id = sek_get_author_id_on_front_and_when_customizing();
+  if ( $author_id ) {
+    $display_name = get_the_author_meta( 'display_name', $author_id );
+    return sprintf(
+      '<a href="%1$s" title="%2$s" class="sek-author-link" rel="author">%3$s</a>',
+      esc_url( get_author_posts_url( $author_id, get_the_author_meta( 'user_nicename', $author_id ) ) ),
+      /* translators: %s: Author's display name. */
+      esc_attr( sprintf( __( 'Posts by %s' ), $display_name ) ),
+      $display_name
+    );
+  }
+  return null;
 }
 
 function sek_get_the_author_name() {
-  $is_singular = is_singular();
-  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
-    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  $author_id = sek_get_author_id_on_front_and_when_customizing();
+  if ( $author_id ) {
+    return sprintf( '<span class="sek-author-name">%1$s</span>', get_the_author_meta( 'display_name', $author_id ) );
   }
-  if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_author', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
-  }
-  $post_id = sek_get_post_id_on_front_and_when_customizing();
-  $post_object = get_post( $post_id );
-  if ( empty( $post_object ) || !is_object( $post_object ) )
-    return null;
-  $author_id = $post_object->post_author;
-  return get_the_author_meta( 'display_name', $author_id );
+  return null;
 }
 
 function sek_get_the_author_avatar() {
-  $is_singular = is_singular();
-  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
-    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  $author_id = sek_get_author_id_on_front_and_when_customizing();
+  if ( $author_id ) {
+    return get_avatar( get_the_author_meta( 'ID', $author_id ), '85' );
   }
-  if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_author', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
-  }
-  $post_id = sek_get_post_id_on_front_and_when_customizing();
-  $post_object = get_post( $post_id );
-  if ( empty( $post_object ) || !is_object( $post_object ) )
-    return null;
-  $author_id = $post_object->post_author;
-  return get_avatar( get_the_author_meta( 'ID', $author_id ), '85' );
+  return null;
 }
 
 function sek_get_the_author_bio() {
-  $is_singular = is_singular();
-  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
-    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  $author_id = sek_get_author_id_on_front_and_when_customizing();
+  if ( $author_id ) {
+    return sprintf( '<span class="sek-author-description">%1$s</span>', get_the_author_meta( 'description', $author_id ) );
   }
-  if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_author', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
-  }
-  $post_id = sek_get_post_id_on_front_and_when_customizing();
-  $post_object = get_post( $post_id );
-  if ( empty( $post_object ) || !is_object( $post_object ) )
-    return null;
-  $author_id = $post_object->post_author;
-  return get_the_author_meta( 'description', $author_id );
+  return null;
 }
 
 // introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
@@ -330,7 +303,7 @@ function sek_get_the_title() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_title', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_title', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
   }
   return get_the_title( sek_get_post_id_on_front_and_when_customizing() );
 }
@@ -342,7 +315,7 @@ function sek_get_the_content() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_content', $msg = __('It can be used in single pages or posts only.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_content', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
       $post_id = sek_get_posted_query_param_when_customizing( 'post_id' );
@@ -357,6 +330,61 @@ function sek_get_the_content() {
   return null;
 }
 
+// CALLBACKS WHEN IS_SEARCH()
+function sek_get_search_query() {
+  $is_search = is_search();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_search = sek_get_posted_query_param_when_customizing( 'is_search' );
+    $search_query = sek_get_posted_query_param_when_customizing( 'the_search_query' );
+  } else {
+    $search_query = get_search_query();
+  }
+  if ( !$is_search ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_search_query', $msg = __('It can only be used in search results page.', 'text_doma') );
+  }
+  return sprintf( '<span class="sek-search-query">%1$s</span>', esc_html( $search_query ) );
+}
+
+function sek_get_search_results_nb() {
+  $is_search = is_search();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_search = sek_get_posted_query_param_when_customizing( 'is_search' );
+    $search_res_nb = sek_get_posted_query_param_when_customizing( 'the_search_results_nb' );
+  } else {
+    global $wp_query;
+    $search_res_nb = (int)$wp_query->found_posts;
+  }
+  if ( !$is_search ) {
+    return sek_get_tmpl_tag_error( $tag = 'the_search_results_number', $msg = __('It can only be used in search results page.', 'text_doma') );
+  }
+  return sprintf( '<span class="sek-search-results-number">%1$s</span>', esc_html( $search_res_nb ) );
+}
+
+//////////////////////////////////////////////////
+///// HELPERS
+/////////////////////////////////////////////////
+function sek_get_author_id_on_front_and_when_customizing() {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( $is_singular ) {
+    $post_id = sek_get_post_id_on_front_and_when_customizing();
+    $post_object = get_post( $post_id );
+    if ( empty( $post_object ) || !is_object( $post_object ) ) {
+      $author_id = null;
+    }
+    $author_id = $post_object->post_author;
+  } else {
+    if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+      $author_id = sek_get_posted_query_param_when_customizing( 'the_author_id' );
+    } else {
+      global $authordata;
+      $author_id = isset( $authordata->ID ) ? $authordata->ID : 0;
+    }
+  }
+  return $author_id;
+}
 
 // @return the post id in all cases
 // when performing ajax action, we need the posted query params made available from the ajax params
