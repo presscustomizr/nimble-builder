@@ -1179,11 +1179,23 @@ window.nb_.getQueryVariable = function(variable) {
 /* ------------------------------------------------------------------------- */
 // June 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/716
 nb_.listenTo('nb-docready', function() {
-    if ( window.nb_ && window.nb_.getQueryVariable ) {
-        var anchorId = window.nb_.getQueryVariable('go_to'),
-            el = document.getElementById(anchorId);
-        if( anchorId && el ) {
-              setTimeout( function() { el.scrollIntoView();}, 200 );
-        }
-    }
+      if ( window.nb_ && window.nb_.getQueryVariable ) {
+            var anchorId = window.nb_.getQueryVariable('go_to'),
+                  el = document.getElementById(anchorId);
+            if( anchorId && el ) {
+                  setTimeout( function() { el.scrollIntoView();}, 200 );
+            }
+            // Then clean the url
+            var _cleanUrl = function() {
+                  var currPathName = window.location.pathname; //get current address
+                  //1- get the part before '?go_to'
+                  var beforeQueryString = currPathName.split("?go_to")[0];
+                  window.history.replaceState({}, document.title,  beforeQueryString );
+            };
+            try{ _cleanUrl(); } catch(er) {
+                  if( window.console && window.console.log ) {
+                        console.log( 'NB => error when cleaning url "go_to" param');
+                  }
+            }
+      }
 });

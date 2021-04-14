@@ -3903,6 +3903,31 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
         'css_selectors' => array( '.sek-module-inner' ),
         'tmpl' => array(
             'item-inputs' => array(
+                'use_current_query' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Use contextual WordPress post query', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'notice_after' => __('This option allows you to use the posts normally displayed by WordPress on this page.', 'text_doma')
+                    //'html_before' => '<hr>'
+                ),
+                'replace_query' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Add custom parameters to the contextual WordPress post query', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                    //'html_before' => '<hr>'
+                ),
+                'display_pagination' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Display pagination links', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20'
+                    //'html_before' => '<hr>'
+                ),
                 'post_number'  => array(
                     'input_type'  => 'range_simple',
                     'title'       => __( 'Number of posts', 'text_doma' ),
@@ -3922,29 +3947,23 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'width-100'   => true,
                     'title_width' => 'width-100'
                 ),//0,
-                'display_pagination' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Display pagination links', 'text_doma'),
-                    'default'     => false,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20'
-                    //'html_before' => '<hr>'
-                ),
+                'order_by'  => array(
+                    'input_type'  => 'simpleselect',
+                    'title'       => __( 'Order posts by', 'text_doma' ),
+                    'default'     => 'date_desc',
+                    'choices'      => array(
+                        'date_desc' => __('Newest to oldest', 'text_doma'),
+                        'date_asc' => __('Oldest to newest', 'text_doma'),
+                        'title_asc' => __('A &rarr; Z', 'text_doma'),
+                        'title_desc' => __('Z &rarr; A', 'text_doma')
+                    )
+                ),//null,
                 'include_sticky' => array(
                     'input_type'  => 'nimblecheck',
                     'title'       => __('Include "sticky" posts', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
-                    //'html_before' => '<hr>'
-                ),
-                'use_current_query' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Use contextual WordPress post query', 'text_doma'),
-                    'default'     => false,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20',
-                    'notice_after' => __('This option allows you to use the posts normally displayed by WordPress on this page.', 'text_doma')
                     //'html_before' => '<hr>'
                 ),
                 'categories'  => array(
@@ -3964,17 +3983,6 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'input_width' => 'width-20'
                     //'html_before' => '<hr>'
                 ),
-                'order_by'  => array(
-                    'input_type'  => 'simpleselect',
-                    'title'       => __( 'Order posts by', 'text_doma' ),
-                    'default'     => 'date_desc',
-                    'choices'      => array(
-                        'date_desc' => __('Newest to oldest', 'text_doma'),
-                        'date_asc' => __('Oldest to newest', 'text_doma'),
-                        'title_asc' => __('A &rarr; Z', 'text_doma'),
-                        'title_desc' => __('Z &rarr; A', 'text_doma')
-                    )
-                ),//null,
                 'layout'  => array(
                     'input_type'  => 'grid_layout',
                     'title'       => __( 'Posts layout : list or grid', 'text_doma' ),

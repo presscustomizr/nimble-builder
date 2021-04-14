@@ -194,7 +194,7 @@ function sek_get_default_location_model( $skope_id = null ) {
     }
     // March 2021 for site templates #478
     if ( sek_is_site_tmpl_enabled() && !$is_global_skope ) {
-        $defaut_sektions_value['__inherits_group_skope__'] = true;
+        $defaut_sektions_value['__inherits_group_skope_tmpl_when_exists__'] = true;
     }
     return $defaut_sektions_value;
 }
@@ -4660,9 +4660,6 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         //     //sek_error_log('alors local skope id for fetching local sections ?', $skope_id );
         // }
         $seks_data = sek_get_seks_without_group_inheritance( $skope_id );
-        // normalizes
-        // [ 'collection' => [], 'local_options' => [], '__inherits_group_skope__' => true ];
-        $seks_data = wp_parse_args( $seks_data, $default_collection );
 
         // March 2021 : added for site templates #478
         // Use site template if
@@ -4672,6 +4669,10 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         if ( sek_is_site_tmpl_enabled() && 'local' === $skope_level && !$is_global_skope ) {
             $seks_data = sek_maybe_get_seks_for_group_site_template( $skope_id, $seks_data );
         }
+
+        // normalizes
+        // [ 'collection' => [], 'local_options' => [], "fonts": [], '__inherits_group_skope_tmpl_when_exists__' => true ];
+        $seks_data = wp_parse_args( $seks_data, $default_collection );
 
         // Maybe add missing registered locations
         $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
@@ -4694,13 +4695,12 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             $location_id
         );
 
-        $default_collection = sek_get_default_location_model( $skope_id );
-        $seks_data = wp_parse_args( $seks_data, $default_collection );
-
         if ( sek_is_site_tmpl_enabled() && 'local' === $skope_level && !$is_global_skope ) {
             $seks_data = sek_maybe_get_seks_for_group_site_template( $skope_id, $seks_data );
         }
 
+        $default_collection = sek_get_default_location_model( $skope_id );
+        $seks_data = wp_parse_args( $seks_data, $default_collection );
         // Maybe add missing registered locations when customizing
         // December 2020 => needed when importing an entire template
         $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
@@ -4739,7 +4739,13 @@ function sek_get_seks_without_group_inheritance( $skope_id ) {
     if ( $post ) {
         $seks_data = maybe_unserialize( $post->post_content );
     }
+
     $seks_data = is_array( $seks_data ) ? $seks_data : array();
+
+    // normalizes
+    // [ 'collection' => [], 'local_options' => [], "fonts": [], '__inherits_group_skope_tmpl_when_exists__' => true ];
+    $default_collection = sek_get_default_location_model( $skope_id );
+    $seks_data = wp_parse_args( $seks_data, $default_collection );
     wp_cache_set( $cache_key, $seks_data );
     return $seks_data;
 }
@@ -4930,6 +4936,7 @@ function sek_is_no_group_skope( $skope_id = null ) {
 }
 
 //@return bool
+// Tells if the local NB skope has been customized
 function sek_local_skope_inherits_group_skope( $skope_id = '', $local_seks_data = null ) {
     $skope_id = empty( $skope_id ) ? skp_get_skope_id() : $skope_id;
 
@@ -4945,11 +4952,11 @@ function sek_local_skope_inherits_group_skope( $skope_id = '', $local_seks_data 
     if ( is_null($local_seks_data) || !is_array($local_seks_data) ) {
         $local_seks_data = sek_get_skoped_seks( $skope_id );
     }
-    // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
-    // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
-    // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control::resetCollectionSetting )
+    // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
+    // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
+    // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control::resetCollectionSetting )
     // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
-    return is_array($local_seks_data) && array_key_exists( '__inherits_group_skope__', $local_seks_data ) && $local_seks_data['__inherits_group_skope__'];
+    return is_array($local_seks_data) && array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $local_seks_data ) && $local_seks_data['__inherits_group_skope_tmpl_when_exists__'];
 }
 
 
@@ -4961,9 +4968,9 @@ add_filter( 'nb_set_skope_id_before_generating_local_front_css', function( $skop
     if ( !sek_is_site_tmpl_enabled() )
         return $skope_id;
 
-    // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
-    // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
-    // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control:: resetCollectionSetting )
+    // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
+    // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
+    // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control:: resetCollectionSetting )
     // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
     if ( sek_local_skope_inherits_group_skope( $skope_id ) ) {
         $group_site_tmpl_data = sek_get_group_site_template_data();//<= is cached when called
@@ -4993,9 +5000,9 @@ function sek_maybe_get_seks_for_group_site_template( $skope_id, $local_seks_data
         return $local_seks_data;
     }
 
-    // When a page has not been locally customized, property __inherits_group_skope__ is true ( @see sek_get_default_location_model() )
-    // As soon as the main local setting id is modified, __inherits_group_skope__ is set to false ( see js control::updateAPISetting )
-    // After a reset case, NB sets __inherits_group_skope__ back to true ( see js control:: resetCollectionSetting )
+    // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
+    // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
+    // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control:: resetCollectionSetting )
     // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
     if ( !sek_local_skope_inherits_group_skope($skope_id, $local_seks_data) )  {
         return $local_seks_data;

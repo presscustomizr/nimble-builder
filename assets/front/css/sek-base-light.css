@@ -1071,6 +1071,10 @@ button.sek-btn,
   text-decoration: underline;
 }
 
+body .sektion-wrapper .sek-row [data-sek-level="module"] .sek-module-inner a:focus {
+  background: none;
+}
+
 body .sek-module-inner h1:before, body .sek-module-inner h2:before, body .sek-module-inner h3:before, body .sek-module-inner h4:before, body .sek-module-inner h5:before, body .sek-module-inner h6:before {
   content: none;
   background: none;

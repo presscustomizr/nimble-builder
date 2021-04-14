@@ -740,7 +740,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
             'setting_id' => sek_get_seks_setting_id( $skope_id ),//nimble___loop_start[skp__post_page_home], nimble___custom_location_id[skp__global]
         );
         if ( 'local' == $skp_data['skope'] ) {
-          $skp_data['has_local_sektions'] = sek_local_skope_has_nimble_sections();//<= used when printing skope status on init. see control::printSektionsSkopeStatus()
+          $skp_data['has_local_nimble_customizations'] = !sek_local_skope_inherits_group_skope($skope_id);//<= used when printing skope status on init. see control::printSektionsSkopeStatus()
         }
         // foreach( [
         //     'loop_start',
@@ -4667,9 +4667,9 @@ function sek_ajax_sek_get_user_tmpl_json() {
             $tmpl_decoded['data'] = sek_prepare_seks_data_for_customizer( $tmpl_decoded['data'] );
 
             // added March 2021 for site templates #478
-            // If property '__inherits_group_skope__' has been saved by mistake in the template, make sure it's unset now
-            if ( array_key_exists('__inherits_group_skope__', $tmpl_decoded['data'] ) ) {
-                unset( $tmpl_decoded['data']['__inherits_group_skope__'] );
+            // If property '__inherits_group_skope_tmpl_when_exists__' has been saved by mistake in the template, make sure it's unset now
+            if ( array_key_exists('__inherits_group_skope_tmpl_when_exists__', $tmpl_decoded['data'] ) ) {
+                unset( $tmpl_decoded['data']['__inherits_group_skope_tmpl_when_exists__'] );
             }
             wp_send_json_success( $tmpl_decoded );
         } else {
@@ -4710,9 +4710,9 @@ function sek_ajax_sek_get_api_tmpl_json() {
         $raw_tmpl_data['data'] = sek_prepare_seks_data_for_customizer( $raw_tmpl_data['data'] );
         
         // added March 2021 for site templates #478
-        // If property '__inherits_group_skope__' has been saved by mistake in the template, make sure it's unset now
-        if ( array_key_exists('__inherits_group_skope__', $raw_tmpl_data['data'] ) ) {
-            unset( $raw_tmpl_data['data']['__inherits_group_skope__'] );
+        // If property '__inherits_group_skope_tmpl_when_exists__' has been saved by mistake in the template, make sure it's unset now
+        if ( array_key_exists('__inherits_group_skope_tmpl_when_exists__', $raw_tmpl_data['data'] ) ) {
+            unset( $raw_tmpl_data['data']['__inherits_group_skope_tmpl_when_exists__'] );
         }
         wp_send_json_success( $raw_tmpl_data );
     }
@@ -4762,9 +4762,9 @@ function sek_ajax_save_user_template() {
         $tmpl_data = sek_template_save_clean_id( $tmpl_data );
         
         // added March 2021 for site templates #478
-        // If property '__inherits_group_skope__' has been set to the template, make sure it's unset now
-        if ( array_key_exists('__inherits_group_skope__', $tmpl_data ) ) {
-            unset( $tmpl_data['__inherits_group_skope__'] );
+        // If property '__inherits_group_skope_tmpl_when_exists__' has been set to the template, make sure it's unset now
+        if ( array_key_exists('__inherits_group_skope_tmpl_when_exists__', $tmpl_data ) ) {
+            unset( $tmpl_data['__inherits_group_skope_tmpl_when_exists__'] );
         }
     }
     
