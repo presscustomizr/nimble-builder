@@ -632,7 +632,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         empty( $collection ) ? 'data-sek-no-modules="true"' : '',
                         // add smartload + parallax attributes
                         $bg_attributes,
-                        is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+                        is_null( $custom_anchor ) ? '' : 'id="' . ltrim( $custom_anchor , '#' ) . '"',// make sure we clean the hash if user left it
 
                         $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
                         $level_custom_data_attributes,
@@ -771,7 +771,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         $title_attribute,
                         // add smartload + parallax attributes
                         $bg_attributes,
-                        is_null( $custom_anchor ) ? '' : 'id="' . $custom_anchor . '"',
+                        is_null( $custom_anchor ) ? '' : 'id="' . ltrim( $custom_anchor , '#' ) . '"',// make sure we clean the hash if user left it
 
                         $this->sek_maybe_print_preview_level_guid_html(), //<= added for #494
                         $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': '',// <= added for #532
