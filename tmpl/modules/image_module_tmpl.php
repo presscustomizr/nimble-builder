@@ -37,7 +37,15 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
 
         if ( $use_post_thumbnail ) {
             $current_post_id = sek_get_post_id_on_front_and_when_customizing();
-            $img = ( has_post_thumbnail( $current_post_id ) ) ? get_post_thumbnail_id( $current_post_id ) : $img;
+            $is_attachment = is_attachment();
+            if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+                $is_attachment = sek_get_posted_query_param_when_customizing( 'is_attachment' );
+            }
+            if ( $is_attachment ) {
+                $img = $current_post_id;
+            } else {
+                $img = ( has_post_thumbnail( $current_post_id ) ) ? get_post_thumbnail_id( $current_post_id ) : $img;
+            }
         }
 
         $img_figure_classes = '';
