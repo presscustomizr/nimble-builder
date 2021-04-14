@@ -1199,7 +1199,12 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             add_filter( 'the_nimble_tinymce_module_content', 'convert_smilies', 20 );
             add_filter( 'the_nimble_tinymce_module_content', 'wpautop' );
             add_filter( 'the_nimble_tinymce_module_content', 'shortcode_unautop' );
-            add_filter( 'the_nimble_tinymce_module_content', 'prepend_attachment' );
+
+            // april 2021 => 'prepend_attachment' is normally in the list of default-filters for the_content.
+            // it is used to Wrap attachment in paragraph tag before content. ( see wp-includes/post-templates.php )
+            // NB doesn't need it and it can break {{the_title}} template tag when used in an attachment page.
+            //add_filter( 'the_nimble_tinymce_module_content', 'prepend_attachment' );
+
             // July 2020 : compatibility with WP 5.5
             if ( function_exists('wp_filter_content_tags') ) {
                 add_filter( 'the_nimble_tinymce_module_content', 'wp_filter_content_tags' );
