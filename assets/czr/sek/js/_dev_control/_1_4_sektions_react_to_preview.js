@@ -687,10 +687,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               self.lastNimbleNotificationId = notif_id;
 
                                               if ( params.button_see_me && api.notifications.has( notif_id ) ) {
-                                                      api.notifications.container.addClass('button-see-me');
+                                                      api.notifications.container.addClass('button-see-me-twice');
                                                       _.delay( function() {
-                                                            api.notifications.container.removeClass('button-see-me');
-                                                      }, 800 );
+                                                            api.notifications.container.removeClass('button-see-me-twice');
+                                                      }, 2000 );
                                               }
                                               // Removed if not dismissed after 5 seconds
                                               _.delay( function() {
