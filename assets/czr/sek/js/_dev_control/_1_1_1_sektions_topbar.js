@@ -182,6 +182,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   });
 
+                  $( self.topBarId ).on( 'click', '.sek-goto-site-tmpl-options', function(evt) {
+                        // evt.preventDefault();
+                        // Focus on the Nimble panel
+                        api.panel( sektionsLocalizedData.sektionsPanelId, function( _panel_ ) {
+                              self.rootPanelFocus();
+                              _panel_.focus();
+                              api.section( self.SECTION_ID_FOR_GLOBAL_OPTIONS, function( _section_ ) {
+                                    _section_.focus();
+                                    setTimeout( function() {
+                                          api.control( sektionsLocalizedData.prefixForSettingsNotSaved + sektionsLocalizedData.optNameForGlobalOptions + '__site_templates', function( _control_ ) {
+                                                _control_.focus();
+                                                _control_.container.find('.customize-control-title').trigger('click');
+                                          });
+                                    }, 500 );
+                              });
+                        });
+                  });
+
                   // NOTIFICATION WHEN USING CUSTOM TEMPLATE
                   // implemented for https://github.com/presscustomizr/nimble-builder/issues/304
                   var printSektionsSkopeStatus = function( args ) {
@@ -223,7 +241,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         _inheritsSiteTemplate = _hasSiteTemplateSet && !_hasLocalNBCustomizations;
                         var _msg = sektionsLocalizedData.i18n['This page is not customized with NB'];
                         if ( _inheritsSiteTemplate ) {
-                              _msg = sektionsLocalizedData.i18n['This page inherits a NB site template'];
+                              _msg = '<span class="sek-goto-site-tmpl-options">' + sektionsLocalizedData.i18n['This page inherits a NB site template'] + '</span>';
                         } else if ( _hasLocalNBCustomizations ) {
                               _msg = sektionsLocalizedData.i18n['This page is customized with NB'];
                               _msg += '<button type="button" class="far fa-trash-alt sek-reset-local-sektions" title="Remove sektions" data-nimble-state="enabled"><span class="screen-reader-text">Remove sektions</span></button>';
@@ -238,11 +256,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //.attr('data-doc-href', 'https://docs.presscustomizr.com/article/339-changing-the-page-template');
                         
                               // if ( _.isObject( templateSettingValue ) && templateSettingValue.local_template && 'default' !== templateSettingValue.local_template ) {
-                              if ( _inheritsSiteTemplate ) {
-                                    $(self.topBarId).find('.sek-notifications').addClass('is-linked').data('doc-href', 'https://docs.presscustomizr.com/article/428-how-to-use-site-templates-with-nimble-builder');
-                              } else {
-                                    $(self.topBarId).find('.sek-notifications').removeClass('is-linked').data('doc-href','');
-                              }
+                              // if ( _inheritsSiteTemplate ) {
+                              //       $(self.topBarId).find('.sek-notifications').addClass('is-linked').data('doc-href', 'https://docs.presscustomizr.com/article/428-how-to-use-site-templates-with-nimble-builder');
+                              // } else {
+                              //       $(self.topBarId).find('.sek-notifications').removeClass('is-linked').data('doc-href','');
+                              // }
                         // } else {
                         //       $(self.topBarId).find('.sek-notifications').html('');
                         // }

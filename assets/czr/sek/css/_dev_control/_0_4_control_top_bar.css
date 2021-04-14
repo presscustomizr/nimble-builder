@@ -190,7 +190,10 @@ body.nimble-top-bar-visible #nimble-top-bar {
   text-decoration: underline;
   cursor: pointer;
 }
-
+#nimble-top-bar .sek-goto-site-tmpl-options {
+  text-decoration: underline;
+  cursor: pointer;
+}
 /* May 2020 : debug mode notification */
 #nimble-top-bar .sek-notifications .debug-mode-notif {
   color:#ff0000;
