@@ -28,7 +28,7 @@ if ( !function_exists( 'Nimble\sek_filter_pagination_nav_url') ) {
  * The template for displaying the pagination links
  */
 if ( !function_exists( 'Nimble\sek_render_post_navigation') ) {
-  function sek_render_post_navigation( $post_collection ) {
+  function sek_render_post_navigation( $post_query ) {
     $next_dir          = is_rtl() ? 'right' : 'left';
     $prev_dir          = is_rtl() ? 'left' : 'right';
     $tnext_align_class = "sek-text-{$next_dir}";
@@ -41,12 +41,12 @@ if ( !function_exists( 'Nimble\sek_render_post_navigation') ) {
     /* Generate links */
     $prev_link = get_next_posts_link(
       '<span class="sek-meta-nav"><span class="sek-meta-nav-title">' . $_older_label . '</span></span>', //label
-      $post_collection->max_num_pages //max pages
+      $post_query->max_num_pages //max pages
     );
 
     $next_link  = get_previous_posts_link(
       '<span class="sek-meta-nav"><span class="sek-meta-nav-title">' . $_newer_label . '</span></span>', //label
-        $post_collection->max_num_pages //max pages
+        $post_query->max_num_pages //max pages
     );
     remove_filter('get_pagenum_link', 'Nimble\sek_filter_pagination_nav_url' );
 
@@ -81,7 +81,7 @@ if ( !function_exists( 'Nimble\sek_render_post_navigation') ) {
                   'mid_size'  => 1,
                   'type'      => 'array',
                   'current'    => max( 1, $paged ),
-                  'total'      => $post_collection->max_num_pages
+                  'total'      => $post_query->max_num_pages
               ));
               remove_filter('paginate_links', 'Nimble\sek_filter_pagination_nav_url' );
 
@@ -289,7 +289,7 @@ $query_params = $default_query_params = [
   'update_post_meta_cache' => false,
   'update_post_term_cache' => false,
   'ignore_sticky_posts'    => 1,
-  'post_status'            => 'publish',// fixes https://github.com/presscustomizr/nimble-builder/issues/466
+  'post_status'            => 'publish',// because otherwise 'draft' posts are showing up. (wp bug) fixes https://github.com/presscustomizr/nimble-builder/issues/466
   'posts_per_page'         => $post_nb,
   //@see https://codex.wordpress.org/Class_Reference/WP_Query#Category_Parameters
   'category_name'          => $category_names,
@@ -353,10 +353,14 @@ if ( !function_exists( 'Nimble\sek_maybe_add_sticky_posts_to_query') ) {
   }
 }
 
+$use_current_query = array_key_exists('use_current_query', $main_settings ) && sek_booleanize_checkbox_val($main_settings['use_current_query']);
+$replace_current_query = true;// when user checks use_current_query, $replace_current_query is set to false
+
 // Shall NB use current WP query ?
-if ( array_key_exists('use_current_query', $main_settings ) && sek_booleanize_checkbox_val($main_settings['use_current_query']) ) {
+if ( $use_current_query ) {
   if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX ) {
       $query_params = sek_get_posted_query_param_when_customizing('query_vars');
+      $query_params['post_status'] = 'publish';// because otherwise 'draft' posts are showing up. (wp bug) fixes https://github.com/presscustomizr/nimble-builder/issues/466
   } else {
       global $wp_query;
       $query_params = $wp_query->query_vars;
@@ -364,20 +368,20 @@ if ( array_key_exists('use_current_query', $main_settings ) && sek_booleanize_ch
   // make sure we didn't lose the query params at this point.
   $query_params = is_array($query_params) ? $query_params : $default_query_params;
 
-  $query_params['posts_per_page'] = $post_nb;
-  $query_params['orderby'] = $orderby;
-  $query_params['order'] = $order;
+  // When using the current query, NB uses normally only WP query vars. Unless user checks 'replace_query' option.
+  $replace_current_query = array_key_exists('replace_query', $main_settings ) && sek_booleanize_checkbox_val($main_settings['replace_query']);
+  if ( $replace_current_query ) {
+    $query_params['posts_per_page'] = $post_nb;
+    $query_params['orderby'] = $orderby;
+    $query_params['order'] = $order;
+  }
 }
 
-
-$post_collection = null;
 $paged = 1;
-$include_sticky = array_key_exists('include_sticky', $main_settings ) && sek_booleanize_checkbox_val($main_settings['include_sticky']);
-
 // may 2020 => is_front_page() was wrong to check if home was a static front page.
 // fixes https://github.com/presscustomizr/nimble-builder/issues/664
 Nimble_Manager()->is_viewing_static_front_page = is_front_page() && 'page' == get_option( 'show_on_front' );
-if ( true === sek_booleanize_checkbox_val($main_settings['display_pagination']) ) {
+if ( !$use_current_query && $replace_current_query && true === sek_booleanize_checkbox_val($main_settings['display_pagination']) ) {
   $posts_per_page = (int)$main_settings['posts_per_page'];
   $posts_per_page = $posts_per_page <= 0 ? 1 : $posts_per_page;
   // April 2020 : fixes pagination not working on a static page used as front page
@@ -389,24 +393,35 @@ if ( true === sek_booleanize_checkbox_val($main_settings['display_pagination']) 
   $query_params['posts_per_page'] = $posts_per_page;
 }
 
-if ( $include_sticky ) {
-  $query_params['ignore_sticky_posts'] = 0;
+
+$post_query = null;
+if ( $replace_current_query && $post_nb > 0 ) {
+    // Sticky posts
+    $include_sticky = array_key_exists('include_sticky', $main_settings ) && sek_booleanize_checkbox_val($main_settings['include_sticky']);
+    if ( $include_sticky ) {
+      $query_params['ignore_sticky_posts'] = 0;
+    }
+    $query_params = apply_filters( 'nimble_post_grid_module_query_params', $query_params , Nimble_Manager()->model );
+    if ( is_array( $query_params ) ) {
+      //add_filter( 'found_posts', '\Nimble\sek_filter_found_posts', 10, 2 );
+      // Query featured entries
+      $post_query = new \WP_Query($query_params);
+      if ( $include_sticky ) {
+        $post_query = sek_maybe_add_sticky_posts_to_query( $post_query, $query_params, $paged );
+      }
+      //remove_filter( 'found_posts', '\Nimble\sek_filter_found_posts', 10, 2 );
+    } else {
+      sek_error_log('post_grid_module_tmpl => query params is invalid');
+    }
+} else if ( !$replace_current_query ) {
+    if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+      $post_query = new \WP_Query($query_params);
+    } else {
+      global $wp_query;
+      $post_query = $wp_query;
+    }
 }
 
-if ( $post_nb > 0 ) {
-  $query_params = apply_filters( 'nimble_post_grid_module_query_params', $query_params , Nimble_Manager()->model );
-  if ( is_array( $query_params ) ) {
-    //add_filter( 'found_posts', '\Nimble\sek_filter_found_posts', 10, 2 );
-    // Query featured entries
-    $post_collection = new \WP_Query($query_params);
-    if ( $include_sticky ) {
-      $post_collection = sek_maybe_add_sticky_posts_to_query( $post_collection, $query_params, $paged );
-    }
-    //remove_filter( 'found_posts', '\Nimble\sek_filter_found_posts', 10, 2 );
-  } else {
-    sek_error_log('post_grid_module_tmpl => query params is invalid');
-  }
-}
 
 
 
@@ -456,7 +471,7 @@ if ( !function_exists( 'Nimble\sek_pg_the_nimble_post') ) {
 }
 
 
-if ( is_object( $post_collection ) && $post_collection->have_posts() ) {
+if ( is_object( $post_query ) && $post_query->have_posts() ) {
   $columns_by_device = $main_settings['columns'];
   $columns_by_device = is_array( $columns_by_device ) ? $columns_by_device : array();
   $columns_by_device = wp_parse_args( $columns_by_device, array(
@@ -506,9 +521,9 @@ if ( is_object( $post_collection ) && $post_collection->have_posts() ) {
   <div class="sek-post-grid-wrapper <?php echo $grid_wrapper_classes; ?>" id="<?php echo $model['id']; ?>">
     <div class="sek-grid-items <?php echo $grid_items_classes; ?>">
       <?php
-        // $post_collection->have_posts() fires 'loop_end', which we don't want
-        while ( sek_pg_the_nimble_have_post( $post_collection ) ) {
-            sek_pg_the_nimble_post( $post_collection );// implemented to fix https://github.com/presscustomizr/nimble-builder/issues/467 because when using core $post_collection->the_post(), the action 'loop_start' is fired
+        // $post_query->have_posts() fires 'loop_end', which we don't want
+        while ( sek_pg_the_nimble_have_post( $post_query ) ) {
+            sek_pg_the_nimble_post( $post_query );// implemented to fix https://github.com/presscustomizr/nimble-builder/issues/467 because when using core $post_query->the_post(), the action 'loop_start' is fired
             sek_render_post( $main_settings, $metas_settings, $thumb_settings );
         }//while
       ?>
@@ -516,7 +531,7 @@ if ( is_object( $post_collection ) && $post_collection->have_posts() ) {
 
     <?php
     if ( true === sek_booleanize_checkbox_val($main_settings['display_pagination']) ) {
-      sek_render_post_navigation( $post_collection );
+      sek_render_post_navigation( $post_query );
     }
     ?>
     <?php
@@ -528,7 +543,7 @@ if ( is_object( $post_collection ) && $post_collection->have_posts() ) {
     ?>
   </div><?php //.sek-post-grid-wrapper ?>
   <?php
-}//if ( $post_collection->have_posts() )
+}//if ( $post_query->have_posts() )
 
 else if ( skp_is_customizing() ) {
   ?>

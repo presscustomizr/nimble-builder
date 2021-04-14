@@ -45,7 +45,60 @@
                           //Internal item dependencies
                           item.czr_Input.each( function( input ) {
                                 switch( input.id ) {
-                                      case 'layout' :
+                                    case 'use_current_query' :
+                                          _.each( [ 'replace_query', 'post_number', 'posts_per_page', 'include_sticky', 'categories', 'must_have_all_cats', 'order_by'] , function( _inputId_ ) {
+                                              api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                var bool = false;
+                                                      _replace_query = item.czr_Input('replace_query')(),
+                                                      _display_pagination = item.czr_Input('display_pagination')();
+
+                                                switch( _inputId_ ) {
+                                                      case 'replace_query' :
+                                                            bool = input();
+                                                      break;
+                                                      case 'post_number' :
+                                                            bool = ( !input() && !_display_pagination ) || ( input() && _replace_query && !_display_pagination );
+                                                      break;
+                                                      case 'posts_per_page' :
+                                                            bool = ( !input() && _display_pagination ) || ( input() && _replace_query && _display_pagination );
+                                                      break;
+                                                      case 'include_sticky' :
+                                                      case 'categories' :
+                                                      case 'must_have_all_cats' :
+                                                      case 'order_by' :
+                                                            bool = !input() || ( input() && item.czr_Input('replace_query')() );
+                                                      break;
+                                                }
+                                                return bool;
+                                              });
+                                          });
+                                    break;
+                                    case 'replace_query' :
+                                          _.each( [ 'post_number', 'posts_per_page', 'include_sticky', 'categories', 'must_have_all_cats', 'order_by'] , function( _inputId_ ) {
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                  var   _use_current_query = item.czr_Input('use_current_query')(),
+                                                        _display_pagination = item.czr_Input('display_pagination')(),
+                                                        bool = false;
+
+                                                  switch( _inputId_ ) {
+                                                        case 'post_number' :
+                                                              bool = (!_use_current_query && !_display_pagination ) || ( input() && !_display_pagination );
+                                                        break;
+                                                        case 'posts_per_page' :
+                                                              bool = (!_use_current_query && _display_pagination ) || ( input() && _display_pagination );
+                                                        break;
+                                                        case 'include_sticky' :
+                                                        case 'categories' :
+                                                        case 'must_have_all_cats' :
+                                                        case 'order_by' :
+                                                              bool = !_use_current_query || input();
+                                                        break;
+                                                  }
+                                                  return bool;
+                                                });
+                                            });
+                                    break;
+                                    case 'layout' :
                                             _.each( [ 'columns', 'img_column_width', 'has_tablet_breakpoint', 'has_mobile_breakpoint' ] , function( _inputId_ ) {
                                                 api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       var bool = false;
@@ -74,14 +127,18 @@
                                       case 'display_pagination' :
                                             _.each( [ 'posts_per_page', 'post_number' ] , function( _inputId_ ) {
                                                 api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      return 'posts_per_page' === _inputId_ ? input() : !input();
-                                                });
-                                            });
-                                      break;
-                                      case 'use_current_query' :
-                                            _.each( [ 'categories', 'must_have_all_cats'] , function( _inputId_ ) {
-                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      return 'posts_per_page' === _inputId_ ? input() : !input();
+                                                      var _replace_query = item.czr_Input('replace_query')(),
+                                                            _use_current_query = item.czr_Input('use_current_query')();
+                                                            var bool = false;
+                                                            switch( _inputId_ ) {
+                                                                  case 'posts_per_page' :
+                                                                        bool = input() && !_use_current_query || (input() && _use_current_query && _replace_query);
+                                                                  break;
+                                                                  case 'post_number' :
+                                                                        bool = !input() && !_use_current_query || (!input() && _use_current_query && _replace_query);
+                                                                  break;
+                                                            }
+                                                            return bool;
                                                 });
                                             });
                                       break;
