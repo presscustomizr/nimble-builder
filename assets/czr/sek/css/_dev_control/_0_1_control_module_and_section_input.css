@@ -284,3 +284,14 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
     max-width: 100px;
     display: inline-block;
 }
+
+/* inspired by WP core .button-see-me css class
+This button bounce twice
+*/
+.button-see-me-twice {
+  -webkit-animation: bounce .7s 2;
+  animation: bounce .7s 2;
+  -webkit-transform-origin: center bottom;
+  -ms-transform-origin: center bottom;
+  transform-origin: center bottom;
+}
