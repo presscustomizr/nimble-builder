@@ -189,7 +189,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 _html += '<div class="sek-tmpl-demo-link tmpl-api-hide"><a href="' + _data.demo_url + '?utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=tmpl_demos" target="_blank" rel="noopener noreferrer">' + sektionsLocalizedData.i18n['Live demo'] + ' <i class="fas fa-external-link-alt"></i></a></div>';
                                           }
                                           if ( _data.is_site_tmpl ) {
-                                                _html += '<div class="sek-is-site-template tmpl-api-hide">Site Template</div>';
+                                                _html += '<div class="sek-is-site-template" title="Site templates include dynamic template tags.">Site Template</div>';
                                           }
                                         }
                                       _html += '</div>';
