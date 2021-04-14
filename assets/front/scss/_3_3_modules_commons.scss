@@ -36,24 +36,29 @@
       box-shadow: none;
     }
   }
-  // Links style => should be underlined by default in most of the module
-  // fix for https://github.com/presscustomizr/nimble-builder/issues/524
-  [data-sek-module-type="czr_tiny_mce_editor_module"],
-  [data-sek-module-type="czr_shortcode_module"],
-  [data-sek-module-type="czr_accordion_module"],
-  [data-sek-module-type="czr_simple_html_module"]{
-    .sek-module-inner a:not(.wp-block-button__link) {
-      text-decoration: underline;
+// Links style => should be underlined by default in most of the module
+// fix for https://github.com/presscustomizr/nimble-builder/issues/524
+[data-sek-module-type="czr_tiny_mce_editor_module"],
+[data-sek-module-type="czr_shortcode_module"],
+[data-sek-module-type="czr_accordion_module"],
+[data-sek-module-type="czr_simple_html_module"]{
+  .sek-module-inner a:not(.wp-block-button__link) {
+    text-decoration: underline;
+  }
+}
+// No background on link focus
+// compatibility with TT1 WP default theme
+body .sektion-wrapper .sek-row [data-sek-level="module"] .sek-module-inner a:focus {
+  background: none;
+}
+
+// fix for https://github.com/presscustomizr/nimble-builder/issues/319
+// => Twenty nineteen theme heading styling, adding a border ::before Hx
+body .#{$project-prefix}module-inner {
+  h1, h2, h3, h4, h5, h6 {
+    &:before {
+      content: none;
+      background: none;
     }
   }
-  
-  // fix for https://github.com/presscustomizr/nimble-builder/issues/319
-  // => Twenty nineteen theme heading styling, adding a border ::before Hx
-  body .#{$project-prefix}module-inner {
-    h1, h2, h3, h4, h5, h6 {
-      &:before {
-        content: none;
-        background: none;
-      }
-    }
-  }
+}
