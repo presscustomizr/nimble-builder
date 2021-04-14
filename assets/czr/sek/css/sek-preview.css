@@ -1510,6 +1510,7 @@ https://github.com/presscustomizr/nimble-builder/issues/317 */
 }
 .sek-module-inner .nimble-inline-notice-in-preview {
   display: inline;
+  font-size: 13px;
   line-height: calc(1.5em + 20px);
 }
 .nimble-notice-in-preview > i {
