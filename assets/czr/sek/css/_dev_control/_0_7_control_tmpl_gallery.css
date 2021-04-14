@@ -204,8 +204,8 @@
 
 .sek-tmpl-demo-link {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
+  bottom: 5px;
+  left: 5px;
   text-transform: uppercase;
   color: #ffffff;
 }
@@ -215,6 +215,20 @@
 .sek-tmpl-demo-link a:hover, .sek-tmpl-demo-link a:visited {
   color: #ffffff;
 }
+
+.sek-is-site-template {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  text-transform: uppercase;
+  color: #1d2327;
+  font-size: 10px;
+  line-height: 1.5em;
+  background: #ffffff;
+  padding: 0 3px;
+}
+
+
 /*.sek-tmpl-gallery-inner .sek-tmpl-item:after, .sek-tmpl-gallery-inner .sek-tmpl-item:before {
     box-sizing: inherit;
 }*/
