@@ -194,22 +194,19 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
     }
     $is_global_skope = NIMBLE_GLOBAL_SKOPE_ID === $skope_id;
     $is_cached = false;
+    $cache_key = 'nimble_get_skoped_seks_' . $skope_id;
+    $cached = wp_cache_get( $cache_key );
 
     // use the cached value when available ( after did_action('wp') )
     if ( did_action('wp') ) {
-        if ( !$is_global_skope && 'not_cached' != Nimble_Manager()->local_seks ) {
+        if ( is_array( $cached ) ) {
             $is_cached = true;
-            $seks_data = Nimble_Manager()->local_seks;
-        }
-        if ( $is_global_skope && 'not_cached' != Nimble_Manager()->global_seks ) {
-            $is_cached = true;
-            $seks_data = Nimble_Manager()->global_seks;
+            $seks_data = $cached;
         }
     }
 
     // If not cached get the seks data from the skoped post
     if ( !$is_cached ) {
-
         $default_collection = sek_get_default_location_model( $skope_id );
         // Feb 2021 : filter skope id now
         // if the current context has no local sektions set and a site template set, replace the skope id by the group skope id
@@ -236,11 +233,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
 
         // cache now 
-        if ( $is_global_skope ) {
-            Nimble_Manager()->global_seks = $seks_data;
-        } else {
-            Nimble_Manager()->local_seks = $seks_data;
-        }
+        wp_cache_set( $cache_key, $seks_data );
         //sek_error_log('/////////////////////////// CACHED for skope ' . $skope_id);
     }//end if
 
@@ -254,6 +247,11 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         );
 
         if ( sek_is_site_tmpl_enabled() && 'local' === $skope_level && !$is_global_skope ) {
+            $seks_data = is_array( $seks_data ) ? $seks_data : array();
+            if ( !array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $seks_data ) ) {
+                // Retro-compat => make sure we set property '__inherits_group_skope_tmpl_when_exists__' to false if it's not set yet, because NB bases group inheritance on it
+                $seks_data['__inherits_group_skope_tmpl_when_exists__'] = false;
+            }
             $seks_data = sek_maybe_get_seks_for_group_site_template( $skope_id, $seks_data );
         }
 
@@ -286,19 +284,25 @@ function sek_get_seks_without_group_inheritance( $skope_id ) {
         sek_error_log( 'Error missing skope id');
         return [];
     }
+
     $cache_key = 'nimble_seks_data_for_skope_' . $skope_id;
     $cached = wp_cache_get( $cache_key );
     if ( is_array($cached) ) {
         return $cached;
     }
+
     $is_global_skope = NIMBLE_GLOBAL_SKOPE_ID === $skope_id;
     $seks_data = array();
     $post = sek_get_seks_post( $skope_id, $is_global_skope ? 'global' : 'local' );//Cached
+
     if ( $post ) {
         $seks_data = maybe_unserialize( $post->post_content );
+        $seks_data = is_array( $seks_data ) ? $seks_data : array();
+        if ( sek_is_site_tmpl_enabled() && !$is_global_skope && !array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $seks_data ) ) {
+            // Retro-compat => make sure we set property '__inherits_group_skope_tmpl_when_exists__' to false if it's not set yet, because NB bases group inheritance on it
+            $seks_data['__inherits_group_skope_tmpl_when_exists__'] = false;
+        }
     }
-
-    $seks_data = is_array( $seks_data ) ? $seks_data : array();
 
     // normalizes
     // [ 'collection' => [], 'local_options' => [], "fonts": [], '__inherits_group_skope_tmpl_when_exists__' => true ];
