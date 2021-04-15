@@ -37,7 +37,7 @@ function sek_get_group_skope_for_site_tmpl() {
             $group_skope = $skope_id . '_for_site_tmpl';
         } else {
             if ( defined('NIMBLE_DEV') && NIMBLE_DEV ) {
-                sek_error_log('group skope could not be set');
+                //sek_error_log('group skope could not be set');
             }
         }
     }
@@ -100,9 +100,10 @@ function sek_is_static_front_page_on_front_and_when_customizing() {
  *  SITE TEMPLATES CSS
 /* ------------------------------------------------------------------------- */
 // filter declared in inc\sektions\_front_dev_php\8_4_1_sektions_front_class_render_css.php
-add_filter( 'nb_set_skope_id_before_generating_local_front_css', function( $skope_id ) {
+//@hook 'nb_set_skope_id_before_generating_local_front_css'
+function sek_set_skope_id_before_generating_local_front_css($skope_id) {
     if ( !sek_is_site_tmpl_enabled() )
-        return $skope_id;
+    return $skope_id;
 
     if ( NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) {
         sek_error_log( __FUNCTION__ . ' => error => function should not be used with global skope id' );
@@ -127,7 +128,8 @@ add_filter( 'nb_set_skope_id_before_generating_local_front_css', function( $skop
         }
     }
     return $skope_id;
-});
+}
+add_filter( 'nb_set_skope_id_before_generating_local_front_css', '\Nimble\sek_set_skope_id_before_generating_local_front_css');
 
 
 
@@ -270,7 +272,8 @@ function sek_has_group_site_template_data() {
 // When a site template is modified, the following action removes the skoped post + removes the corresponding CSS stylesheet
 // For example, when the page site template is changed, we need to remove the associated skoped post named 'nimble___skp__all_page'
 // This post has been inserted when running sek_maybe_get_seks_for_group_site_template(), fired from sek_get_skoped_seks()
-add_action('nb_on_save_customizer_global_options', function( $opt_name, $value ) {
+//@'nb_on_save_customizer_global_options'
+function sek_on_save_customizer_global_options( $opt_name, $value ) {
     if ( !sek_is_site_tmpl_enabled() )
         return;
 
@@ -292,7 +295,8 @@ add_action('nb_on_save_customizer_global_options', function( $opt_name, $value )
             sek_remove_seks_post( $group_skope );//Removes the post id in the skope index + removes the post in DB + remove the stylesheet
         }
     }
-}, 10, 2);
+}
+add_action('nb_on_save_customizer_global_options', '\Nimble\sek_on_save_customizer_global_options', 10, 2);
 
 
 
@@ -307,7 +311,8 @@ add_action('nb_on_save_customizer_global_options', function( $opt_name, $value )
 // When will the removed skope post be re-inserted ?
 // next time the group skope will be printed ( for example skp__all_page in a single page ), NB checks if a template is assigned to this group skope, and tries to get the skope post.
 // If the group skope post is not found, NB attempts to re-insert it
-add_action('nb_on_update_saved_tmpl_post', function( $tmpl_post_name ) {
+//@hook 'nb_on_update_saved_tmpl_post'
+function sek_on_update_saved_tmpl_post( $tmpl_post_name ) {
     if ( !sek_is_site_tmpl_enabled() )
         return;
 
@@ -328,6 +333,7 @@ add_action('nb_on_update_saved_tmpl_post', function( $tmpl_post_name ) {
             sek_remove_seks_post( $group_skope );//Removes the post id in the skope index + removes the post in DB + remove the stylesheet
         }
     }
-},10, 1);
+}
+add_action('nb_on_update_saved_tmpl_post', '\Nimble\sek_on_update_saved_tmpl_post', 10, 1);
 
 ?>
