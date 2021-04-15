@@ -2138,7 +2138,7 @@ function sek_get_the_comments() {
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
     return sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>',
-      __('Comment template can not be displayed while customizing', 'text_doma')
+      __('Comment template can not be refreshed while customizing', 'text_doma')
     );
   }
 
@@ -2230,76 +2230,46 @@ function sek_get_the_comment_number() {
   return sprintf( '<span class="sek-post-comment-number">%1$s</span>', get_comments_number_text( $zero = false, $one = false, $more = false, $post_id = sek_get_post_id_on_front_and_when_customizing() ) );
 }
 
-function sek_get_the_author_link() {
-  $is_singular = is_singular();
-  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
-    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
-  }
-  if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_author', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
-  }
 
-  $post_id = sek_get_post_id_on_front_and_when_customizing();
-  $post_object = get_post( $post_id );
-  if ( empty( $post_object ) || !is_object( $post_object ) )
-    return null;
-  $author_id = $post_object->post_author;
-  $display_name = get_the_author_meta( 'display_name', $author_id );
-  return sprintf(
-    '<a href="%1$s" title="%2$s" class="sek-author-link" rel="author">%3$s</a>',
-    esc_url( get_author_posts_url( $author_id, get_the_author_meta( 'user_nicename', $author_id ) ) ),
-    /* translators: %s: Author's display name. */
-    esc_attr( sprintf( __( 'Posts by %s' ), $display_name ) ),
-    $display_name
-  );
+// AUTHOR DATA
+// 2 CASES : singular or author archives
+function sek_get_the_author_link() {
+  $author_id = sek_get_author_id_on_front_and_when_customizing();
+  if ( $author_id ) {
+    $display_name = get_the_author_meta( 'display_name', $author_id );
+    return sprintf(
+      '<a href="%1$s" title="%2$s" class="sek-author-link" rel="author">%3$s</a>',
+      esc_url( get_author_posts_url( $author_id, get_the_author_meta( 'user_nicename', $author_id ) ) ),
+      /* translators: %s: Author's display name. */
+      esc_attr( sprintf( __( 'Posts by %s' ), $display_name ) ),
+      $display_name
+    );
+  }
+  return null;
 }
 
 function sek_get_the_author_name() {
-  $is_singular = is_singular();
-  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
-    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  $author_id = sek_get_author_id_on_front_and_when_customizing();
+  if ( $author_id ) {
+    return sprintf( '<span class="sek-author-name">%1$s</span>', get_the_author_meta( 'display_name', $author_id ) );
   }
-  if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_author', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
-  }
-  $post_id = sek_get_post_id_on_front_and_when_customizing();
-  $post_object = get_post( $post_id );
-  if ( empty( $post_object ) || !is_object( $post_object ) )
-    return null;
-  $author_id = $post_object->post_author;
-  return sprintf( '<span class="sek-author-name">%1$s</span>', get_the_author_meta( 'display_name', $author_id ) );
+  return null;
 }
 
 function sek_get_the_author_avatar() {
-  $is_singular = is_singular();
-  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
-    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  $author_id = sek_get_author_id_on_front_and_when_customizing();
+  if ( $author_id ) {
+    return get_avatar( get_the_author_meta( 'ID', $author_id ), '85' );
   }
-  if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_author', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
-  }
-  $post_id = sek_get_post_id_on_front_and_when_customizing();
-  $post_object = get_post( $post_id );
-  if ( empty( $post_object ) || !is_object( $post_object ) )
-    return null;
-  $author_id = $post_object->post_author;
-  return get_avatar( get_the_author_meta( 'ID', $author_id ), '85' );
+  return null;
 }
 
 function sek_get_the_author_bio() {
-  $is_singular = is_singular();
-  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
-    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  $author_id = sek_get_author_id_on_front_and_when_customizing();
+  if ( $author_id ) {
+    return sprintf( '<span class="sek-author-description">%1$s</span>', get_the_author_meta( 'description', $author_id ) );
   }
-  if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_author', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
-  }
-  $post_id = sek_get_post_id_on_front_and_when_customizing();
-  $post_object = get_post( $post_id );
-  if ( empty( $post_object ) || !is_object( $post_object ) )
-    return null;
-  $author_id = $post_object->post_author;
-  return sprintf( '<span class="sek-author-description">%1$s</span>', get_the_author_meta( 'description', $author_id ) );
+  return null;
 }
 
 // introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
@@ -2366,6 +2336,31 @@ function sek_get_search_results_nb() {
   return sprintf( '<span class="sek-search-results-number">%1$s</span>', esc_html( $search_res_nb ) );
 }
 
+//////////////////////////////////////////////////
+///// HELPERS
+/////////////////////////////////////////////////
+function sek_get_author_id_on_front_and_when_customizing() {
+  $is_singular = is_singular();
+  if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+    $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
+  }
+  if ( $is_singular ) {
+    $post_id = sek_get_post_id_on_front_and_when_customizing();
+    $post_object = get_post( $post_id );
+    if ( empty( $post_object ) || !is_object( $post_object ) ) {
+      $author_id = null;
+    }
+    $author_id = $post_object->post_author;
+  } else {
+    if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+      $author_id = sek_get_posted_query_param_when_customizing( 'the_author_id' );
+    } else {
+      global $authordata;
+      $author_id = isset( $authordata->ID ) ? $authordata->ID : 0;
+    }
+  }
+  return $author_id;
+}
 
 // @return the post id in all cases
 // when performing ajax action, we need the posted query params made available from the ajax params
