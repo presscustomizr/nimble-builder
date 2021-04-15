@@ -4,8 +4,6 @@
 if ( !class_exists( 'SEK_Front_Construct' ) ) :
     class SEK_Front_Construct {
         static $instance;
-        public $local_seks = 'not_cached';// <= used to cache the sektions for the local skope_id
-        public $global_seks = 'not_cached';// <= used to cache the sektions for the global skope_id
         public $seks_posts = [];// <= march 2020 : used to cache the current local and global sektion posts
         public $model = array();//<= when rendering, the current level model
         public $parent_model = array();//<= when rendering, the current parent model
