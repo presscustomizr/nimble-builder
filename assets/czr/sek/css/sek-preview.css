@@ -10,9 +10,9 @@
 
 /* only when previewing */
 /* @fixed since https://github.com/presscustomizr/nimble-builder/issues/24 */
-.sek-sektion-inner{
+/* .sek-sektion-inner{*/
   /*padding: 15px;*//* <= Needed for the placement of the ui icons container revealed on hover */
-}
+/*} */
 
 .sek-column {
   position: relative;
