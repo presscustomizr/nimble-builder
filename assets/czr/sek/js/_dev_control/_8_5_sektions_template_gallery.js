@@ -169,30 +169,33 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     _thumbUrl = !_.isEmpty( _data.thumb_url ) ? _data.thumb_url : _defaultThumbUrl;
 
                                     _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '" data-sek-tmpl-item-source="'+ params.tmpl_source +'" data-sek-api-site-tmpl="' + (_data.is_site_tmpl ? "true" : "false") +'">';
-                                      //_html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
-                                      _html += '<div class="sek-tmpl-thumb" style="background-image:url('+ _thumbUrl +')"></div>';
-                                      _html += '<div class="sek-tmpl-info" title="'+ _titleAttr +'">';
-                                        _html += '<h3 class="tmpl-title tmpl-api-hide">' + _data.title + '</h3>';
-                                        _html += '<p class="tmpl-date tmpl-api-hide"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', _data.last_modified_date ].join(' ') + '</i></p>';
-                                        _html += '<p class="tmpl-desc tmpl-api-hide">' + _data.description + '</p>';
-                                        _html += '<i class="material-icons use-tmpl" title="'+ sektionsLocalizedData.i18n['Use this template'] +'">add_circle_outline</i>';
-                                        if ( 'user_tmpl' === params.tmpl_source ) {
-                                          _html += '<i class="material-icons edit-tmpl" title="'+ sektionsLocalizedData.i18n['Edit this template'] +'">edit</i>';
-                                          _html += '<i class="material-icons remove-tmpl" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>';
-                                        }
-                                        if ( "true" == _data.is_pro_tmpl ) {
-                                          _html += '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
-                                        }
+                                          //_html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
+                                          _html += '<div class="tmpl-top-title"><h3>' + _data.title + '</h3></div>';
+                                                _html += '<div class="tmpl-thumb-and-info-wrap">';
+                                                      _html += '<div class="sek-tmpl-thumb" style="background-image:url('+ _thumbUrl +')"></div>';
+                                                      _html += '<div class="sek-tmpl-info" title="'+ _titleAttr +'">';
+                                                      // _html += '<h3 class="tmpl-title tmpl-api-hide">' + _data.title + '</h3>';
+                                                      _html += '<p class="tmpl-desc tmpl-api-hide">' + _data.description + '</p>';
+                                                      _html += '<p class="tmpl-date tmpl-api-hide"><i>' + [ sektionsLocalizedData.i18n['Last modified'], ' : ', _data.last_modified_date ].join(' ') + '</i></p>';
+                                                      _html += '<i class="material-icons use-tmpl" title="'+ sektionsLocalizedData.i18n['Use this template'] +'">add_circle_outline</i>';
+                                                      if ( 'user_tmpl' === params.tmpl_source ) {
+                                                            _html += '<i class="material-icons edit-tmpl" title="'+ sektionsLocalizedData.i18n['Edit this template'] +'">edit</i>';
+                                                            _html += '<i class="material-icons remove-tmpl" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>';
+                                                      }
+                                                      if ( "true" == _data.is_pro_tmpl ) {
+                                                            _html += '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
+                                                      }
 
-                                        if ( 'api_tmpl' === params.tmpl_source ) {
-                                          if ( _data.demo_url && -1 != _data.demo_url.indexOf('http') ) {
-                                                _html += '<div class="sek-tmpl-demo-link tmpl-api-hide"><a href="' + _data.demo_url + '?utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=tmpl_demos" target="_blank" rel="noopener noreferrer">' + sektionsLocalizedData.i18n['Live demo'] + ' <i class="fas fa-external-link-alt"></i></a></div>';
-                                          }
-                                          if ( _data.is_site_tmpl ) {
-                                                _html += '<div class="sek-is-site-template" title="Site templates include dynamic template tags.">Site Template</div>';
-                                          }
-                                        }
-                                      _html += '</div>';
+                                                      if ( 'api_tmpl' === params.tmpl_source ) {
+                                                            if ( _data.demo_url && -1 != _data.demo_url.indexOf('http') ) {
+                                                                  _html += '<div class="sek-tmpl-demo-link tmpl-api-hide"><a href="' + _data.demo_url + '?utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=tmpl_demos" target="_blank" rel="noopener noreferrer">' + sektionsLocalizedData.i18n['Live demo'] + ' <i class="fas fa-external-link-alt"></i></a></div>';
+                                                            }
+                                                            if ( _data.is_site_tmpl ) {
+                                                                  _html += '<div class="sek-is-site-template" title="Site templates include dynamic template tags.">Site Template</div>';
+                                                            }
+                                                      }
+                                                _html += '</div>';
+                                          _html += '</div>';
                                     _html += '</div>';
                               });
                               if ( 'api_tmpl' === params.tmpl_source && !_.isEmpty(_html) ) {

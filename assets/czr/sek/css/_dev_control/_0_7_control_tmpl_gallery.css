@@ -73,9 +73,14 @@
   padding: 0px;
   margin: 12px;
   width: 100%;
+  height: 380px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+-webkit-box-direction: normal;
+-ms-flex-direction: column;
+        flex-direction: column;
   -ms-flex-align: center;
   align-items: center;
   position: relative;
@@ -99,6 +104,27 @@
   }
 }
 
+.tmpl-top-title {
+  padding: 10px;
+  background: #ffffff;
+  width: 100%;
+}
+.tmpl-top-title h3 {
+  padding: 0;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5em;
+  color: #555;
+}
+
+.tmpl-thumb-and-info-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+
+
 .sek-tmpl-info {
   position: absolute;
   top: 0;
@@ -108,17 +134,20 @@
   padding: 10px;
   overflow: hidden;
 }
-.sek-tmpl-info > h3, .sek-tmpl-info > p {
+.sek-tmpl-info > p {
   color: #ffffff;
   overflow: hidden;
 }
-.sek-tmpl-info > h3 {
+/* .sek-tmpl-info > .tmpl-title {
   font-size: 15px;
   margin: 0.5em 0;
-}
+} */
 .sek-tmpl-info > p {
   font-size: 13px;
   margin: 0.5em 0;
+}
+.sek-tmpl-info > p.tmpl-date {
+  font-size: 12px;
 }
 
 /* USE TMPL BUTTON */
@@ -235,7 +264,7 @@
 .sek-tmpl-gallery-inner .sek-tmpl-thumb {
     /* cursor: pointer; */
     position: relative;
-    height: 380px;
+    height: 100%;
     width: 100%;
     background-size: cover;
     background-repeat: no-repeat;
