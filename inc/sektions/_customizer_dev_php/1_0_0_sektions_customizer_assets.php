@@ -740,7 +740,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
             'setting_id' => sek_get_seks_setting_id( $skope_id ),//nimble___loop_start[skp__post_page_home], nimble___custom_location_id[skp__global]
         );
         if ( 'local' == $skp_data['skope'] ) {
-          $skp_data['has_local_nimble_customizations'] = !sek_local_skope_inherits_group_skope($skope_id);//<= used when printing skope status on init. see control::printSektionsSkopeStatus()
+          $skp_data['has_local_nimble_customizations'] = sek_local_skope_has_been_customized($skope_id);//<= used when printing skope status on init. see control::printSektionsSkopeStatus()
         }
         // foreach( [
         //     'loop_start',

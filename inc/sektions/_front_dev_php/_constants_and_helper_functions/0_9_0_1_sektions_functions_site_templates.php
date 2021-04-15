@@ -36,7 +36,9 @@ function sek_get_group_skope_for_site_tmpl() {
         if ( sek_is_no_group_skope( $skope_id ) ) {
             $group_skope = $skope_id . '_for_site_tmpl';
         } else {
-            sek_error_log('group skope could not be set');
+            if ( defined('NIMBLE_DEV') && NIMBLE_DEV ) {
+                sek_error_log('group skope could not be set');
+            }
         }
     }
     return $group_skope;
@@ -55,26 +57,42 @@ function sek_is_no_group_skope( $skope_id = null ) {
 
 //@return bool
 // Tells if the local NB skope has been customized
-function sek_local_skope_inherits_group_skope( $skope_id = '', $local_seks_data = null ) {
+function sek_local_skope_has_been_customized( $skope_id = '', $local_seks_data = null ) {
     $skope_id = empty( $skope_id ) ? skp_get_skope_id() : $skope_id;
 
     if ( NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) {
         sek_error_log( __FUNCTION__ . ' => error => function should not be used with global skope id' );
         return false;
     }
-    // if is viewing front page, we don't want to inherit 'skp__all_page' scope
-    if ( is_front_page() && 'page' == get_option( 'show_on_front' ) )
-        return false;
 
     // When the collection is provided use it otherwise get it
     if ( is_null($local_seks_data) || !is_array($local_seks_data) ) {
         $local_seks_data = sek_get_skoped_seks( $skope_id );
     }
+    // normally, we should get an array from the previous function
+    if ( !is_array( $local_seks_data ) )
+        return false;
+    // the local skoped data include property '__inherits_group_skope_tmpl_when_exists__' since site template implementation april 2021
+    // If not, it means that we may have a local customized skoped data
+    if ( is_array($local_seks_data) && !array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $local_seks_data ) ) {
+        sek_error_log( __FUNCTION__ . ' => error => missing property __inherits_group_skope_tmpl_when_exists__' );
+        return true;
+    }
     // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
     // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
     // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control::resetCollectionSetting )
     // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
-    return is_array($local_seks_data) && array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $local_seks_data ) && $local_seks_data['__inherits_group_skope_tmpl_when_exists__'];
+    return is_array($local_seks_data) && array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $local_seks_data ) && !$local_seks_data['__inherits_group_skope_tmpl_when_exists__'];
+}
+
+//@return bool
+function sek_is_static_front_page_on_front_and_when_customizing() {
+    if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+        $is_front_page = sek_get_posted_query_param_when_customizing( 'is_front_page' );
+    } else {
+        $is_front_page = is_front_page();
+    }
+    return $is_front_page && 'page' == get_option( 'show_on_front' );
 }
 
 
@@ -86,11 +104,19 @@ add_filter( 'nb_set_skope_id_before_generating_local_front_css', function( $skop
     if ( !sek_is_site_tmpl_enabled() )
         return $skope_id;
 
+    if ( NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) {
+        sek_error_log( __FUNCTION__ . ' => error => function should not be used with global skope id' );
+        return;
+    }
+    // if is viewing front page, we don't want to inherit 'skp__all_page' scope
+    if ( sek_is_static_front_page_on_front_and_when_customizing() )
+        return;
+
     // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
     // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
     // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control:: resetCollectionSetting )
     // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
-    if ( sek_local_skope_inherits_group_skope( $skope_id ) ) {
+    if ( !sek_local_skope_has_been_customized( $skope_id ) ) {
         $group_site_tmpl_data = sek_get_group_site_template_data();//<= is cached when called
         $has_group_skope_template_data = !( !$group_site_tmpl_data || empty($group_site_tmpl_data) );
         if ( $has_group_skope_template_data ) {
@@ -117,12 +143,15 @@ function sek_maybe_get_seks_for_group_site_template( $skope_id, $local_seks_data
         sek_error_log( __FUNCTION__ . ' => error => function should not be used with global skope id' );
         return $local_seks_data;
     }
+    // if is viewing front page, we don't want to inherit 'skp__all_page' scope
+    if ( sek_is_static_front_page_on_front_and_when_customizing() )
+        return $local_seks_data;
 
     // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
     // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
     // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control:: resetCollectionSetting )
     // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
-    if ( !sek_local_skope_inherits_group_skope($skope_id, $local_seks_data) )  {
+    if ( sek_local_skope_has_been_customized($skope_id, $local_seks_data) )  {
         return $local_seks_data;
     }
 

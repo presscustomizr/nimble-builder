@@ -375,7 +375,7 @@ function sek_print_nb_btn_edit_with_nimble( $editor_type ) {
       <?php //_e( 'Edit with Nimble Builder', 'text_doma' ); ?>
       <?php printf( '<span class="sek-spinner"></span><span class="sek-nimble-icon" title="%3$s"><img src="%1$s" alt="%2$s"/><span class="sek-nimble-admin-bar-title">%2$s</span><span class="sek-nimble-mobile-admin-bar-title">%3$s</span></span>',
           NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
-          apply_filters( 'nb_admin_nb_button_edit_title', sek_local_skope_has_nimble_sections( $manually_built_skope_id ) ? __('Continue building with Nimble','text_domain') : __('Build with Nimble Builder','text_domain'), $manually_built_skope_id ),
+          apply_filters( 'nb_admin_nb_button_edit_title', sek_local_skope_has_been_customized( $manually_built_skope_id ) ? __('Continue building with Nimble','text_domain') : __('Build with Nimble Builder','text_domain'), $manually_built_skope_id ),
           __('Build','text_domain'),
           __('Build sections in live preview with Nimble Builder', 'text_domain')
       ); ?>
@@ -420,7 +420,7 @@ function sek_add_nimble_post_state( $post_states, $post ) {
     if ( !sek_current_user_can_access_nb_ui() )
       return $post_states;
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
-    if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_nimble_sections( $manually_built_skope_id ) ) {
+    if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_been_customized( $manually_built_skope_id ) ) {
         $post_states['nimble'] = __( 'Nimble Builder', 'text-doma' );
     }
     return $post_states;
@@ -435,7 +435,7 @@ function sek_filter_post_row_actions( $actions, $post ) {
     if ( !sek_current_user_can_access_nb_ui() )
       return $actions;
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
-    if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_nimble_sections( $manually_built_skope_id ) ) {
+    if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_been_customized( $manually_built_skope_id ) ) {
         $actions['edit_with_nimble_builder'] = sprintf( '<a href="%1$s" title="%2$s">%2$s</a>',
             sek_get_customize_url_for_post_id( $post->ID ),
             __( 'Edit with Nimble Builder', 'text-doma' )
