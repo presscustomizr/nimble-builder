@@ -667,6 +667,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             //'Remove this element' => __('Remove this element', 'text_dom'),
 
             'No template set.' => __('No template set.', 'text_dom'),
+            'Template not found : reset or pick another one.' => __('Template not found : reset or pick another one.', 'text_dom'),
             'Active template : ' => __('Active template : ', 'text_dom'),
             'This page is not customized with NB' => __('This page is not customized with NB', 'text_dom'),
             'This page inherits a NB site template' => __('This page inherits a NB site template', 'text_dom'),

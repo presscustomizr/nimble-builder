@@ -48,9 +48,15 @@
                                     if ( '_no_site_tmpl_' === site_tmpl_id || _.isEmpty( site_tmpl_id ) ) {
                                           _html += sektionsLocalizedData.i18n['No template set.'];
                                           input.container.removeClass('sek-has-site-tmpl');
+                                          input.container.removeClass('sek-site-tmpl-not-found');
+                                    } else if ( '_tmpl_not_found_' === site_tmpl_id || _.isEmpty( site_tmpl_id ) ) {
+                                          _html += sektionsLocalizedData.i18n['Template not found : reset or pick another one.'];
+                                          input.container.removeClass('sek-has-site-tmpl');
+                                          input.container.addClass('sek-site-tmpl-not-found');
                                     } else {
                                           _html += sektionsLocalizedData.i18n['Active template : '] +  ( _.isEmpty(tmplTitle) ? site_tmpl_id : tmplTitle );
                                           input.container.addClass('sek-has-site-tmpl');
+                                          input.container.removeClass('sek-site-tmpl-not-found');
                                     }
                               _html += '</span>';
                               input.container.find('.sek-current-site-tmpl').remove();
@@ -101,8 +107,8 @@
                                     } else {
                                           api.errare('::printCurrentTemplateName => site template not found in collection => previously removed ?' + site_tmpl_source );
                                           // If tmpl id was not found in the current collection, it's been probably previously removed
-                                          // so render as a '_no_site_tmpl_'
-                                          site_tmpl_id = '_no_site_tmpl_';
+                                          // so render as a '_tmpl_not_found_'
+                                          site_tmpl_id = '_tmpl_not_found_';
                                     }
                                     _doRender(site_tmpl_id, tmplTitle);
                               })
