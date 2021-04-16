@@ -133,7 +133,11 @@ function sek_get_next_post_link() {
   } else {
     $title = get_next_post_link( $format = '%link' );
   }
-  return $title;
+  if ( empty( $title ) ) {
+    return '';
+  } else {
+    return sprintf( '<span class="sek-next-post-link">%1$s</span>', $title );
+  }
 }
 
 function sek_get_previous_post_link() {
@@ -149,7 +153,11 @@ function sek_get_previous_post_link() {
   } else {
     $title = get_previous_post_link( $format = '%link' );
   }
-  return $title;
+  if ( empty( $title ) ) {
+    return '';
+  } else {
+    return sprintf( '<span class="sek-previous-post-link">%1$s</span>', $title );
+  }
 }
 
 function sek_get_the_comments() {
