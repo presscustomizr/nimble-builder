@@ -65,7 +65,7 @@
                               }
 
                               input.container.trigger('site-tmpl-input-rendered');
-                        };
+                        };//_doRender
 
                         site_tmpl_id = input();
                         if ( !_.isString(site_tmpl_id) || _.isEmpty(site_tmpl_id) ) {
@@ -99,7 +99,10 @@
                                     if ( _.isObject(tmpl_collection) && tmpl_collection[site_tmpl_id] && tmpl_collection[site_tmpl_id].title ) {
                                           tmplTitle = tmpl_collection[site_tmpl_id].title;
                                     } else {
-                                          api.errare('Error => site template not found in collection ' + site_tmpl_source );
+                                          api.errare('Error => site template not found in collection => previously removed ?' + site_tmpl_source );
+                                          // If tmpl id was not found in the current collection, it's been probably previously removed
+                                          // so render as a '_no_site_tmpl_'
+                                          site_tmpl_id = '_no_site_tmpl_';
                                     }
                                     _doRender(site_tmpl_id, tmplTitle);
                               })
