@@ -269,10 +269,11 @@ function sek_ajax_remove_user_template() {
     if ( empty( $_POST['tmpl_post_name']) || !is_string( $_POST['tmpl_post_name'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_tmpl_post_name' );
     }
+    $tmpl_post_name = $_POST['tmpl_post_name'];
     // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
     //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
     // }
-    $tmpl_post_to_remove = sek_get_saved_tmpl_post( $_POST['tmpl_post_name'] );
+    $tmpl_post_to_remove = sek_get_saved_tmpl_post( $tmpl_post_name );
 
     //sek_error_log( __FUNCTION__ . ' => so $tmpl_post_to_remove ' . $_POST['tmpl_post_name'], $tmpl_post_to_remove );
 
@@ -293,7 +294,7 @@ function sek_ajax_remove_user_template() {
         wp_send_json_error( __FUNCTION__ . '_removal_error' );
     } else {
         // sek_error_log( 'ALORS CE POST?', $saved_template_post );
-        wp_send_json_success( [ 'tmpl_post_removed' => $_POST['tmpl_post_name'] ] );
+        wp_send_json_success( [ 'tmpl_post_removed' => $tmpl_post_name ] );
     }
     //sek_error_log( __FUNCTION__ . '$_POST' ,  $_POST);
 }
