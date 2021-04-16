@@ -278,6 +278,10 @@ function sek_on_save_customizer_global_options( $opt_name, $value ) {
         return;
 
     $current_site_tmpl = sek_get_global_option_value( 'site_templates' );
+
+    // sek_error_log('CURRENT SITE TEMPL ?', $current_site_tmpl );
+    // sek_error_log('NEW OPT VAL', $value );
+
     if ( !is_array( $value ) || !is_array($current_site_tmpl) )
         return;
     
@@ -303,7 +307,7 @@ add_action('nb_on_save_customizer_global_options', '\Nimble\sek_on_save_customiz
 /* ------------------------------------------------------------------------- *
  *  SITE TEMPLATES : UPDATED TEMPLATE IN CUSTOMIZER
 /* ------------------------------------------------------------------------- */
-// Action fired during server ajax callback sek_update_saved_tmpl_post
+// Action fired during server ajax callback sek_update_user_tmpl_post
 // Solves the problem of template synchronization between the group skope post ( in which the chosen template is saved with permanent level ids ), and the current state of the template
 // Solution => each time a template is updated, NB checks if the template is being used by a group skope
 // if so, then the group skope post is removed ( along with the index and the css stylesheet )
@@ -311,8 +315,8 @@ add_action('nb_on_save_customizer_global_options', '\Nimble\sek_on_save_customiz
 // When will the removed skope post be re-inserted ?
 // next time the group skope will be printed ( for example skp__all_page in a single page ), NB checks if a template is assigned to this group skope, and tries to get the skope post.
 // If the group skope post is not found, NB attempts to re-insert it
-//@hook 'nb_on_update_saved_tmpl_post'
-function sek_on_update_saved_tmpl_post( $tmpl_post_name ) {
+//@hook 'nb_on_update_user_tmpl_post'
+function sek_on_update_or_remove_user_tmpl_post( $tmpl_post_name ) {
     if ( !sek_is_site_tmpl_enabled() )
         return;
 
@@ -325,15 +329,16 @@ function sek_on_update_saved_tmpl_post( $tmpl_post_name ) {
 
     // NB stores the site template id as a concatenation of template source + '___' + template name
     // Ex : user_tmpl___landing-page-for-services
-    // When updating a user template, in sek_update_saved_tmpl_post() we need to add 'user_tmpl___' prefix to match the template being currently saved
+    // When updating a user template, in sek_update_user_tmpl_post() we need to add 'user_tmpl___' prefix to match the template being currently saved
     $normalized_tmpl_id = 'user_tmpl___' . $tmpl_post_name;
     foreach( $site_tmpl_opts as $group_skope => $tmpl_name ) {
         if ( $normalized_tmpl_id === $tmpl_name ) {
-            //sek_error_log('REMOVE GROUP SKOPE POST ' . $group_skope . ' for template ' . $tmpl_name );
+            sek_error_log('UPDATED TEMPLATE => REMOVE GROUP SKOPE POST ' . $group_skope . ' for template ' . $tmpl_name );
             sek_remove_seks_post( $group_skope );//Removes the post id in the skope index + removes the post in DB + remove the stylesheet
         }
     }
 }
-add_action('nb_on_update_saved_tmpl_post', '\Nimble\sek_on_update_saved_tmpl_post', 10, 1);
+add_action('nb_on_update_user_tmpl_post', '\Nimble\sek_on_update_or_remove_user_tmpl_post', 10, 1);
+add_action('nb_on_remove_saved_tmpl_post', '\Nimble\sek_on_update_or_remove_user_tmpl_post', 10, 1);
 
 ?>

@@ -211,9 +211,9 @@ function sek_ajax_save_user_template() {
         )
     );
 
-    $saved_template_post = sek_update_saved_tmpl_post( $template_to_save, $is_edit_metas_only_case );
+    $saved_template_post = sek_update_user_tmpl_post( $template_to_save, $is_edit_metas_only_case );
     if ( is_wp_error( $saved_template_post ) || is_null($saved_template_post) || empty($saved_template_post) ) {
-        wp_send_json_error( __FUNCTION__ . ' => error when invoking sek_update_saved_tmpl_post()' );
+        wp_send_json_error( __FUNCTION__ . ' => error when invoking sek_update_user_tmpl_post()' );
     } else {
         // sek_error_log( 'ALORS CE POST?', $saved_template_post );
         wp_send_json_success( [ 'tmpl_post_id' => $saved_template_post->ID ] );
@@ -282,6 +282,9 @@ function sek_ajax_remove_user_template() {
         if ( is_wp_error( $r ) ) {
             wp_send_json_error( __FUNCTION__ . '_removal_error' );
         }
+
+        // Added April 2021 for stie templates #478
+        do_action('nb_on_remove_saved_tmpl_post', $tmpl_post_name );
     } else {
         wp_send_json_error( __FUNCTION__ . '_tmpl_post_not_found' );
     }

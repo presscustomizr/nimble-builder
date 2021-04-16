@@ -220,7 +220,7 @@ function sek_get_all_api_templates() {
   //     )
   // );
 // @return WP_Post|WP_Error Post on success, error on failure.
-function sek_update_saved_tmpl_post( $tmpl_data, $is_edit_metas_only_case = false ) {
+function sek_update_user_tmpl_post( $tmpl_data, $is_edit_metas_only_case = false ) {
     if ( !is_array( $tmpl_data ) ) {
         sek_error_log( __FUNCTION__ . ' => $tmpl_data is not an array' );
         return new \WP_Error( __FUNCTION__ . ' => $tmpl_data is not an array');
@@ -311,7 +311,7 @@ function sek_update_saved_tmpl_post( $tmpl_data, $is_edit_metas_only_case = fals
     }
 
     // Added March 2021 for stie templates #478
-    do_action('nb_on_update_saved_tmpl_post', $tmpl_post_name );
+    do_action('nb_on_update_user_tmpl_post', $tmpl_post_name );
 
     if ( is_wp_error( $r ) ) {
         return $r;
