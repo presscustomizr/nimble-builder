@@ -238,7 +238,7 @@ function sek_get_group_site_template_data() {
         }
 
         if( !is_null($current_tmpl_data) ) {
-            sek_error_log('SITE TEMPLATE => UPDATE OR INSERT GROUP SKOPE POST => ' .$group_skope );
+            //sek_error_log('SITE TEMPLATE => UPDATE OR INSERT GROUP SKOPE POST => ' .$group_skope );
             $post = sek_update_sek_post( $current_tmpl_data, [ 'skope_id' => $group_skope ]);
         }
     }//if ( !$post ) {
@@ -333,7 +333,7 @@ function sek_on_update_or_remove_user_tmpl_post( $tmpl_post_name ) {
     $normalized_tmpl_id = 'user_tmpl___' . $tmpl_post_name;
     foreach( $site_tmpl_opts as $group_skope => $tmpl_name ) {
         if ( $normalized_tmpl_id === $tmpl_name ) {
-            sek_error_log('UPDATED TEMPLATE => REMOVE GROUP SKOPE POST ' . $group_skope . ' for template ' . $tmpl_name );
+            //sek_error_log('UPDATED OR REMOVED TEMPLATE => REMOVE GROUP SKOPE POST ' . $group_skope . ' for template ' . $tmpl_name );
             sek_remove_seks_post( $group_skope );//Removes the post id in the skope index + removes the post in DB + remove the stylesheet
         }
     }
