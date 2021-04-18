@@ -2250,7 +2250,7 @@ input.sek-filter-tmpl {
 }
 
 
-.sek-has-site-tmpl .sek-current-site-tmpl { 
+.sek-has-site-tmpl .sek-current-site-tmpl {
     background: #33b3db;
     border-color: #33b3db;
     -webkit-box-shadow: inset 1px 0px 6px #2c72ab;
@@ -2258,6 +2258,15 @@ input.sek-filter-tmpl {
     color: #ffffff;
     font-size: 13px;
 }
+.sek-site-tmpl-not-found .sek-current-site-tmpl {
+  background: #f49907;
+  border-color: #f49907;
+  -webkit-box-shadow: inset 1px 0px 6px #b26e01;
+  box-shadow: inset 1px 0px 6px #b26e01;
+  color: #ffffff;
+  font-size: 13px;
+}
+
 .sek-site-tmpl-picking-active .sek-ui-button-group .sek-pick-site-tmpl,
 .sek-site-tmpl-picking-active .sek-ui-button-group .sek-pick-site-tmpl:focus,
 .sek-pick-site-tmpl:hover {

@@ -667,6 +667,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             //'Remove this element' => __('Remove this element', 'text_dom'),
 
             'No template set.' => __('No template set.', 'text_dom'),
+            'Template not found : reset or pick another one.' => __('Template not found : reset or pick another one.', 'text_dom'),
             'Active template : ' => __('Active template : ', 'text_dom'),
             'This page is not customized with NB' => __('This page is not customized with NB', 'text_dom'),
             'This page inherits a NB site template' => __('This page inherits a NB site template', 'text_dom'),
@@ -740,7 +741,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
             'setting_id' => sek_get_seks_setting_id( $skope_id ),//nimble___loop_start[skp__post_page_home], nimble___custom_location_id[skp__global]
         );
         if ( 'local' == $skp_data['skope'] ) {
-          $skp_data['has_local_nimble_customizations'] = !sek_local_skope_inherits_group_skope($skope_id);//<= used when printing skope status on init. see control::printSektionsSkopeStatus()
+          $skp_data['has_local_nimble_customizations'] = sek_local_skope_has_been_customized($skope_id);//<= used when printing skope status on init. see control::printSektionsSkopeStatus()
         }
         // foreach( [
         //     'loop_start',
@@ -4795,9 +4796,9 @@ function sek_ajax_save_user_template() {
         )
     );
 
-    $saved_template_post = sek_update_saved_tmpl_post( $template_to_save, $is_edit_metas_only_case );
+    $saved_template_post = sek_update_user_tmpl_post( $template_to_save, $is_edit_metas_only_case );
     if ( is_wp_error( $saved_template_post ) || is_null($saved_template_post) || empty($saved_template_post) ) {
-        wp_send_json_error( __FUNCTION__ . ' => error when invoking sek_update_saved_tmpl_post()' );
+        wp_send_json_error( __FUNCTION__ . ' => error when invoking sek_update_user_tmpl_post()' );
     } else {
         // sek_error_log( 'ALORS CE POST?', $saved_template_post );
         wp_send_json_success( [ 'tmpl_post_id' => $saved_template_post->ID ] );
@@ -4853,10 +4854,11 @@ function sek_ajax_remove_user_template() {
     if ( empty( $_POST['tmpl_post_name']) || !is_string( $_POST['tmpl_post_name'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_tmpl_post_name' );
     }
+    $tmpl_post_name = $_POST['tmpl_post_name'];
     // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
     //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
     // }
-    $tmpl_post_to_remove = sek_get_saved_tmpl_post( $_POST['tmpl_post_name'] );
+    $tmpl_post_to_remove = sek_get_saved_tmpl_post( $tmpl_post_name );
 
     //sek_error_log( __FUNCTION__ . ' => so $tmpl_post_to_remove ' . $_POST['tmpl_post_name'], $tmpl_post_to_remove );
 
@@ -4866,6 +4868,9 @@ function sek_ajax_remove_user_template() {
         if ( is_wp_error( $r ) ) {
             wp_send_json_error( __FUNCTION__ . '_removal_error' );
         }
+
+        // Added April 2021 for stie templates #478
+        do_action('nb_on_remove_saved_tmpl_post', $tmpl_post_name );
     } else {
         wp_send_json_error( __FUNCTION__ . '_tmpl_post_not_found' );
     }
@@ -4874,7 +4879,7 @@ function sek_ajax_remove_user_template() {
         wp_send_json_error( __FUNCTION__ . '_removal_error' );
     } else {
         // sek_error_log( 'ALORS CE POST?', $saved_template_post );
-        wp_send_json_success( [ 'tmpl_post_removed' => $_POST['tmpl_post_name'] ] );
+        wp_send_json_success( [ 'tmpl_post_removed' => $tmpl_post_name ] );
     }
     //sek_error_log( __FUNCTION__ . '$_POST' ,  $_POST);
 }

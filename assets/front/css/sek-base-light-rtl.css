@@ -959,6 +959,30 @@ button.sek-btn,
   border-radius: 50%;
 }
 
+.sek-next-post-link::after, .sek-previous-post-link::before {
+  width: 15px;
+  height: 10px;
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left-color: inherit;
+  border-right-color: inherit;
+}
+
+.sek-previous-post-link::before {
+  content: '';
+  border-left: 6px solid;
+  left: 7px;
+}
+
+.sek-next-post-link::after {
+  content: '';
+  border-right: 6px solid;
+  right: 7px;
+}
+
 /*************************************
 * DIVIDER MODULE
 *************************************/

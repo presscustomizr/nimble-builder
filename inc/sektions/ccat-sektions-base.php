@@ -2131,8 +2131,6 @@ function sek_is_flagged_important( $input_id, $module_value, $registered_input_l
 if ( !class_exists( 'SEK_Front_Construct' ) ) :
     class SEK_Front_Construct {
         static $instance;
-        public $local_seks = 'not_cached';// <= used to cache the sektions for the local skope_id
-        public $global_seks = 'not_cached';// <= used to cache the sektions for the global skope_id
         public $seks_posts = [];// <= march 2020 : used to cache the current local and global sektion posts
         public $model = array();//<= when rendering, the current level model
         public $parent_model = array();//<= when rendering, the current parent model
@@ -4034,8 +4032,6 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         // @'body_class'
         function sek_add_front_body_class( $classes ) {
             $classes = is_array($classes) ? $classes : array();
-            $classes[] = sek_is_pro() ? 'nimble-builder-pro-' . str_replace('.', '-', NB_PRO_VERSION ) : 'nimble-builder-' . str_replace('.', '-', NIMBLE_VERSION );
-
             // Check whether we're in the customizer preview.
             if ( is_customize_preview() ) {
                 $classes[] = 'customizer-preview';
@@ -4043,13 +4039,24 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             if ( sek_is_site_tmpl_enabled() && !is_customize_preview() ) {
                 $skope_id = skp_get_skope_id();
                 $group_skope = sek_get_group_skope_for_site_tmpl();
-                $classes[] = sek_local_skope_inherits_group_skope() ? 'nimble-no-local-data-' . $skope_id : 'nimble-has-local-data-' . $skope_id;
+                
                 if ( sek_has_group_site_template_data() ) {
-                    $classes[] = 'nimble-has-group-site-tmpl-' . $group_skope;
+                    // Site template params are structured as follow :
+                    // [
+                    //     'site_tmpl_id' : '_no_site_tmpl_',
+                    //     'site_tmpl_source' : 'user_tmpl',
+                    //     'site_tmpl_title' : ''
+                    //];
+                    $tmpl_params = sek_get_site_tmpl_params_for_skope( $group_skope );
+                    array_unshift( $classes, 'nimble-site-tmpl__' . $tmpl_params['site_tmpl_source'] . '__' . $tmpl_params['site_tmpl_id'] );
+                    array_unshift( $classes, 'nimble-has-group-site-tmpl-' . $group_skope );
                 } else {
-                    $classes[] = 'nimble-no-group-site-tmpl-' . $group_skope;
+                    array_unshift( $classes, 'nimble-no-group-site-tmpl-' . $group_skope );
                 }
+                array_unshift( $classes, !sek_local_skope_has_been_customized() ? 'nimble-no-local-data-' . $skope_id : 'nimble-has-local-data-' . $skope_id );
             }
+
+            array_unshift( $classes, sek_is_pro() ? 'nimble-builder-pro-' . str_replace('.', '-', NB_PRO_VERSION ) : 'nimble-builder-' . str_replace('.', '-', NIMBLE_VERSION ) );
 
             return $classes;
         }

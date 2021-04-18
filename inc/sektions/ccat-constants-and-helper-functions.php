@@ -2109,7 +2109,11 @@ function sek_get_next_post_link() {
   } else {
     $title = get_next_post_link( $format = '%link' );
   }
-  return $title;
+  if ( empty( $title ) ) {
+    return '';
+  } else {
+    return sprintf( '<span class="sek-next-post-link">%1$s</span>', $title );
+  }
 }
 
 function sek_get_previous_post_link() {
@@ -2125,7 +2129,11 @@ function sek_get_previous_post_link() {
   } else {
     $title = get_previous_post_link( $format = '%link' );
   }
-  return $title;
+  if ( empty( $title ) ) {
+    return '';
+  } else {
+    return sprintf( '<span class="sek-previous-post-link">%1$s</span>', $title );
+  }
 }
 
 function sek_get_the_comments() {
@@ -4631,22 +4639,19 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
     }
     $is_global_skope = NIMBLE_GLOBAL_SKOPE_ID === $skope_id;
     $is_cached = false;
+    $cache_key = 'nimble_get_skoped_seks_' . $skope_id;
+    $cached = wp_cache_get( $cache_key );
 
     // use the cached value when available ( after did_action('wp') )
     if ( did_action('wp') ) {
-        if ( !$is_global_skope && 'not_cached' != Nimble_Manager()->local_seks ) {
+        if ( is_array( $cached ) ) {
             $is_cached = true;
-            $seks_data = Nimble_Manager()->local_seks;
-        }
-        if ( $is_global_skope && 'not_cached' != Nimble_Manager()->global_seks ) {
-            $is_cached = true;
-            $seks_data = Nimble_Manager()->global_seks;
+            $seks_data = $cached;
         }
     }
 
     // If not cached get the seks data from the skoped post
     if ( !$is_cached ) {
-
         $default_collection = sek_get_default_location_model( $skope_id );
         // Feb 2021 : filter skope id now
         // if the current context has no local sektions set and a site template set, replace the skope id by the group skope id
@@ -4673,11 +4678,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         $seks_data = sek_maybe_add_incomplete_locations( $seks_data, $is_global_skope );
 
         // cache now 
-        if ( $is_global_skope ) {
-            Nimble_Manager()->global_seks = $seks_data;
-        } else {
-            Nimble_Manager()->local_seks = $seks_data;
-        }
+        wp_cache_set( $cache_key, $seks_data );
         //sek_error_log('/////////////////////////// CACHED for skope ' . $skope_id);
     }//end if
 
@@ -4691,6 +4692,11 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         );
 
         if ( sek_is_site_tmpl_enabled() && 'local' === $skope_level && !$is_global_skope ) {
+            $seks_data = is_array( $seks_data ) ? $seks_data : array();
+            if ( !array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $seks_data ) ) {
+                // Retro-compat => make sure we set property '__inherits_group_skope_tmpl_when_exists__' to false if it's not set yet, because NB bases group inheritance on it
+                $seks_data['__inherits_group_skope_tmpl_when_exists__'] = false;
+            }
             $seks_data = sek_maybe_get_seks_for_group_site_template( $skope_id, $seks_data );
         }
 
@@ -4723,19 +4729,25 @@ function sek_get_seks_without_group_inheritance( $skope_id ) {
         sek_error_log( 'Error missing skope id');
         return [];
     }
+
     $cache_key = 'nimble_seks_data_for_skope_' . $skope_id;
     $cached = wp_cache_get( $cache_key );
     if ( is_array($cached) ) {
         return $cached;
     }
+
     $is_global_skope = NIMBLE_GLOBAL_SKOPE_ID === $skope_id;
     $seks_data = array();
     $post = sek_get_seks_post( $skope_id, $is_global_skope ? 'global' : 'local' );//Cached
+
     if ( $post ) {
         $seks_data = maybe_unserialize( $post->post_content );
+        $seks_data = is_array( $seks_data ) ? $seks_data : array();
+        if ( sek_is_site_tmpl_enabled() && !$is_global_skope && !array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $seks_data ) ) {
+            // Retro-compat => make sure we set property '__inherits_group_skope_tmpl_when_exists__' to false if it's not set yet, because NB bases group inheritance on it
+            $seks_data['__inherits_group_skope_tmpl_when_exists__'] = false;
+        }
     }
-
-    $seks_data = is_array( $seks_data ) ? $seks_data : array();
 
     // normalizes
     // [ 'collection' => [], 'local_options' => [], "fonts": [], '__inherits_group_skope_tmpl_when_exists__' => true ];
@@ -4884,21 +4896,36 @@ function sek_remove_seks_post( $skope_id = null ) {
 /* ------------------------------------------------------------------------- *
  *  SITE TEMPLATES OPTIONS HELPERS
 /* ------------------------------------------------------------------------- */
-function sek_get_site_tmpl_for_skope( $group_skope = null ) {
+// @return array of site template info for a given group skope
+function sek_get_site_tmpl_params_for_skope( $group_skope = null ) {
     if ( is_null($group_skope) || !is_string($group_skope) || empty($group_skope) )
         return;
-    $site_tmpl = '_no_site_tmpl_';
+    $default_params = [
+        'site_tmpl_id' => '_no_site_tmpl_',
+        'site_tmpl_source' => 'user_tmpl',
+        'site_tmpl_title' => ''
+    ];
     $opts = sek_get_global_option_value( 'site_templates' );
-
-    if ( is_array( $opts) && !empty( $opts[$group_skope] ) && '_no_site_tmpl_' != $opts[$group_skope] ) {
-        if ( is_string( $opts[$group_skope] ) ) {
-            $site_tmpl = $opts[$group_skope];
-        } else if ( is_array($opts[$group_skope]) && array_key_exists('site_tmpl_id', $opts[$group_skope] ) ) {
-            $site_tmpl = $opts[$group_skope]['site_tmpl_id'];
-        }
-        //sek_error_log('site_templates options ?', $opts[$group_skope] );
+    $site_tmpl_params = $default_params;
+    if ( is_array( $opts) && !empty( $opts[$group_skope] ) && is_array($opts[$group_skope]) ) {
+        $site_tmpl_params = wp_parse_args( $opts[$group_skope], $site_tmpl_params );
     }
-    return $site_tmpl;
+
+    // DO SOME CHECKS BEFORE RETURNING THE PARAMS
+    $site_tmpl_id = $site_tmpl_params['site_tmpl_id'];
+    $site_tmpl_source = $site_tmpl_params['site_tmpl_source'];
+    // Check that id is well formed
+    if ( is_null( $site_tmpl_id ) || !is_string( $site_tmpl_id ) ) {
+        sek_error_log( 'Error => invalid tmpl post id', $tmpl_params );
+        return $default_params;
+    }
+    sek_error_log('site_templates params ?' . $group_skope, $opts );
+    // Check that tmpl source is OK
+    if ( !in_array($site_tmpl_source, ['user_tmpl', 'api_tmpl'] ) ) {
+        sek_error_log( 'Error => invalid tmpl source', $tmpl_params );
+        return $default_params;
+    }
+    return $site_tmpl_params;
 }
 
 /* ------------------------------------------------------------------------- *
@@ -4913,7 +4940,9 @@ function sek_get_group_skope_for_site_tmpl() {
         if ( sek_is_no_group_skope( $skope_id ) ) {
             $group_skope = $skope_id . '_for_site_tmpl';
         } else {
-            sek_error_log('group skope could not be set');
+            if ( defined('NIMBLE_DEV') && NIMBLE_DEV ) {
+                //sek_error_log('group skope could not be set');
+            }
         }
     }
     return $group_skope;
@@ -4932,26 +4961,42 @@ function sek_is_no_group_skope( $skope_id = null ) {
 
 //@return bool
 // Tells if the local NB skope has been customized
-function sek_local_skope_inherits_group_skope( $skope_id = '', $local_seks_data = null ) {
+function sek_local_skope_has_been_customized( $skope_id = '', $local_seks_data = null ) {
     $skope_id = empty( $skope_id ) ? skp_get_skope_id() : $skope_id;
 
     if ( NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) {
         sek_error_log( __FUNCTION__ . ' => error => function should not be used with global skope id' );
         return false;
     }
-    // if is viewing front page, we don't want to inherit 'skp__all_page' scope
-    if ( is_front_page() && 'page' == get_option( 'show_on_front' ) )
-        return false;
 
     // When the collection is provided use it otherwise get it
     if ( is_null($local_seks_data) || !is_array($local_seks_data) ) {
         $local_seks_data = sek_get_skoped_seks( $skope_id );
     }
+    // normally, we should get an array from the previous function
+    if ( !is_array( $local_seks_data ) )
+        return false;
+    // the local skoped data include property '__inherits_group_skope_tmpl_when_exists__' since site template implementation april 2021
+    // If not, it means that we may have a local customized skoped data
+    if ( is_array($local_seks_data) && !array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $local_seks_data ) ) {
+        sek_error_log( __FUNCTION__ . ' => error => missing property __inherits_group_skope_tmpl_when_exists__' );
+        return true;
+    }
     // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
     // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
     // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control::resetCollectionSetting )
     // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
-    return is_array($local_seks_data) && array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $local_seks_data ) && $local_seks_data['__inherits_group_skope_tmpl_when_exists__'];
+    return is_array($local_seks_data) && array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $local_seks_data ) && !$local_seks_data['__inherits_group_skope_tmpl_when_exists__'];
+}
+
+//@return bool
+function sek_is_static_front_page_on_front_and_when_customizing() {
+    if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
+        $is_front_page = sek_get_posted_query_param_when_customizing( 'is_front_page' );
+    } else {
+        $is_front_page = is_front_page();
+    }
+    return $is_front_page && 'page' == get_option( 'show_on_front' );
 }
 
 
@@ -4959,15 +5004,24 @@ function sek_local_skope_inherits_group_skope( $skope_id = '', $local_seks_data 
  *  SITE TEMPLATES CSS
 /* ------------------------------------------------------------------------- */
 // filter declared in inc\sektions\_front_dev_php\8_4_1_sektions_front_class_render_css.php
-add_filter( 'nb_set_skope_id_before_generating_local_front_css', function( $skope_id ) {
+//@hook 'nb_set_skope_id_before_generating_local_front_css'
+function sek_set_skope_id_before_generating_local_front_css($skope_id) {
     if ( !sek_is_site_tmpl_enabled() )
-        return $skope_id;
+    return $skope_id;
+
+    if ( NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) {
+        sek_error_log( __FUNCTION__ . ' => error => function should not be used with global skope id' );
+        return;
+    }
+    // if is viewing front page, we don't want to inherit 'skp__all_page' scope
+    if ( sek_is_static_front_page_on_front_and_when_customizing() )
+        return;
 
     // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
     // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
     // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control:: resetCollectionSetting )
     // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
-    if ( sek_local_skope_inherits_group_skope( $skope_id ) ) {
+    if ( !sek_local_skope_has_been_customized( $skope_id ) ) {
         $group_site_tmpl_data = sek_get_group_site_template_data();//<= is cached when called
         $has_group_skope_template_data = !( !$group_site_tmpl_data || empty($group_site_tmpl_data) );
         if ( $has_group_skope_template_data ) {
@@ -4978,7 +5032,8 @@ add_filter( 'nb_set_skope_id_before_generating_local_front_css', function( $skop
         }
     }
     return $skope_id;
-});
+}
+add_filter( 'nb_set_skope_id_before_generating_local_front_css', '\Nimble\sek_set_skope_id_before_generating_local_front_css');
 
 
 
@@ -4994,12 +5049,15 @@ function sek_maybe_get_seks_for_group_site_template( $skope_id, $local_seks_data
         sek_error_log( __FUNCTION__ . ' => error => function should not be used with global skope id' );
         return $local_seks_data;
     }
+    // if is viewing front page, we don't want to inherit 'skp__all_page' scope
+    if ( sek_is_static_front_page_on_front_and_when_customizing() )
+        return $local_seks_data;
 
     // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
     // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
     // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control:: resetCollectionSetting )
     // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
-    if ( !sek_local_skope_inherits_group_skope($skope_id, $local_seks_data) )  {
+    if ( sek_local_skope_has_been_customized($skope_id, $local_seks_data) )  {
         return $local_seks_data;
     }
 
@@ -5025,38 +5083,30 @@ function sek_get_group_site_template_data() {
     
     $group_skope = sek_get_group_skope_for_site_tmpl();
 
-    $tmpl_post_name = sek_get_site_tmpl_for_skope( $group_skope );
-    if ( '_no_site_tmpl_' === $tmpl_post_name )
+    // Site template params are structured as follow :
+    // [
+    //     'site_tmpl_id' : '_no_site_tmpl_',
+    //     'site_tmpl_source' : 'user_tmpl',
+    //     'site_tmpl_title' : ''
+    //];
+    $tmpl_params = sek_get_site_tmpl_params_for_skope( $group_skope );
+    if ( '_no_site_tmpl_' === $tmpl_params['site_tmpl_id'] )
         return;
 
-    if ( is_null( $tmpl_post_name ) || !is_string( $tmpl_post_name ) ) {
-        sek_error_log( 'Error => invalid tmpl post name', $tmpl_post_name );
-        return;
-    }
+    $site_tmpl_id = $tmpl_params['site_tmpl_id'];
+    $site_tmpl_source = $tmpl_params['site_tmpl_source'];
+
     // Is this group template already saved ?
     // For example, for pages, there should be a nimble CPT post named nimble___skp__all_page
     $post = sek_get_seks_post( $group_skope );
 
     // if not, let's insert it
     if ( !$post ) {
-        $tmpl_source = null;
-        // NB stores the site template id as a concatenation of template source + '___' + template name
-        // Ex : user_tmpl___landing-page-for-services
-        if ( 'user_tmpl' === substr( $tmpl_post_name, 0, 9 ) ) {
-            $tmpl_source = 'user_tmpl';
-            $tmpl_post_name = str_replace('user_tmpl___', '', $tmpl_post_name);
-        } else if ( 'api_tmpl' === substr( $tmpl_post_name, 0, 8 ) ) {
-            $tmpl_source = 'api_tmpl';
-            $tmpl_post_name = str_replace('api_tmpl___', '', $tmpl_post_name);
-        } else {
-            sek_error_log('Error => invalid site template source');
-        }
-
         $current_tmpl_post = null;
         $current_tmpl_data = null;
-        switch ($tmpl_source) {
+        switch ($site_tmpl_source) {
             case 'user_tmpl':
-                $current_tmpl_post = sek_get_saved_tmpl_post( $tmpl_post_name );
+                $current_tmpl_post = sek_get_saved_tmpl_post( $site_tmpl_id );
                 if ( $current_tmpl_post ) {
                     $raw_tmpl_data = maybe_unserialize( $current_tmpl_post->post_content );
                     if ( is_array($raw_tmpl_data) && isset($raw_tmpl_data['data']) && is_array($raw_tmpl_data['data']) && !empty($raw_tmpl_data['data']) ) {
@@ -5067,13 +5117,13 @@ function sek_get_group_site_template_data() {
             break;
 
             case 'api_tmpl':
-                $raw_tmpl_data = sek_get_single_tmpl_api_data( $tmpl_post_name );
+                $raw_tmpl_data = sek_get_single_tmpl_api_data( $site_tmpl_id );
                 if( !is_array( $raw_tmpl_data) || empty( $raw_tmpl_data ) ) {
-                    sek_error_log( ' problem when getting template : ' . $tmpl_post_name );
+                    sek_error_log( ' problem when getting template : ' . $site_tmpl_id );
                 }
                 //sek_error_log( __FUNCTION__ . ' api template collection', $raw_tmpl_data );
                 if ( !isset($raw_tmpl_data['data'] ) || empty( $raw_tmpl_data['data'] ) ) {
-                    sek_error_log( __FUNCTION__ . ' problem => missing or invalid data property for template : ' .$tmpl_post_name, $raw_tmpl_data );
+                    sek_error_log( __FUNCTION__ . ' problem => missing or invalid data property for template : ' .$site_tmpl_id, $raw_tmpl_data );
                 } else {
                     // $tmpl_decoded = $raw_tmpl_data;
                     $raw_tmpl_data['data'] = sek_maybe_import_imgs( $raw_tmpl_data['data'], $do_import_images = true );
@@ -5084,7 +5134,7 @@ function sek_get_group_site_template_data() {
         }
 
         if( !is_null($current_tmpl_data) ) {
-            sek_error_log('SITE TEMPLATE => UPDATE OR INSERT GROUP SKOPE POST => ' .$group_skope );
+            //sek_error_log('SITE TEMPLATE => UPDATE OR INSERT GROUP SKOPE POST => ' .$group_skope );
             $post = sek_update_sek_post( $current_tmpl_data, [ 'skope_id' => $group_skope ]);
         }
     }//if ( !$post ) {
@@ -5118,36 +5168,48 @@ function sek_has_group_site_template_data() {
 // When a site template is modified, the following action removes the skoped post + removes the corresponding CSS stylesheet
 // For example, when the page site template is changed, we need to remove the associated skoped post named 'nimble___skp__all_page'
 // This post has been inserted when running sek_maybe_get_seks_for_group_site_template(), fired from sek_get_skoped_seks()
-add_action('nb_on_save_customizer_global_options', function( $opt_name, $value ) {
+//@'nb_on_save_customizer_global_options'
+function sek_on_save_customizer_global_options( $opt_name, $value ) {
     if ( !sek_is_site_tmpl_enabled() )
         return;
 
-    $current_site_tmpl = sek_get_global_option_value( 'site_templates' );
-    if ( !is_array( $value ) || !is_array($current_site_tmpl) )
+    $current_site_tmpl_opts = sek_get_global_option_value( 'site_templates' );
+
+    // sek_error_log('CURRENT SITE TEMPL ?', $current_site_tmpl_opts );
+    // sek_error_log('NEW OPT VAL', $value );
+
+    if ( !is_array( $value ) || !is_array($current_site_tmpl_opts) )
         return;
     
     // NB stores the site template id as a concatenation of template source + '___' + template name
     // Ex : user_tmpl___landing-page-for-services
     $updated_site_templates = isset($value['site_templates']) ? $value['site_templates'] : [];
 
-    foreach( $current_site_tmpl as $group_skope => $current_tmpl_name ) {
-        if ( array_key_exists( $group_skope, $updated_site_templates ) && $updated_site_templates[$group_skope] != $current_tmpl_name ) {
+    foreach( $current_site_tmpl_opts as $group_skope => $current_tmpl_params ) {
+        if ( !is_array($current_tmpl_params) || !array_key_exists('site_tmpl_id', $current_tmpl_params ) )
+            continue;
+        $current_tmpl_id = $current_tmpl_params['site_tmpl_id'];
+        $updated_tmpl_params = [];
+        if ( array_key_exists( $group_skope, $updated_site_templates ) ) {
+            $updated_tmpl_params = $updated_site_templates[$group_skope];
+        } else {
+            //sek_error_log('GROUP SKOPE POST TO REMOVE BECAUSE NO MORE TEMPLATE SET => ' . $group_skope . ' | ' . $current_tmpl_id );
+            sek_remove_seks_post( $group_skope );//Removes the post id in the skope index + removes the post in DB + remove the stylesheet
+        }
+        if ( is_array($updated_tmpl_params) && array_key_exists('site_tmpl_id', $updated_tmpl_params ) && $updated_tmpl_params['site_tmpl_id'] != $current_tmpl_params['site_tmpl_id'] ) {
             //sek_error_log('GROUP SKOPE POST TO REMOVE BECAUSE TEMPLATE UPDATED => ' . $group_skope . ' | ' . $updated_site_templates[$group_skope] );
             sek_remove_seks_post( $group_skope );//Removes the post id in the skope index + removes the post in DB + remove the stylesheet
         }
-        if ( !array_key_exists( $group_skope, $updated_site_templates ) ) {
-            //sek_error_log('GROUP SKOPE POST TO REMOVE BECAUSE NO MORE TEMPLATE SET => ' . $group_skope . ' | ' . $current_tmpl_name );
-            sek_remove_seks_post( $group_skope );//Removes the post id in the skope index + removes the post in DB + remove the stylesheet
-        }
     }
-}, 10, 2);
+}
+add_action('nb_on_save_customizer_global_options', '\Nimble\sek_on_save_customizer_global_options', 10, 2);
 
 
 
 /* ------------------------------------------------------------------------- *
  *  SITE TEMPLATES : UPDATED TEMPLATE IN CUSTOMIZER
 /* ------------------------------------------------------------------------- */
-// Action fired during server ajax callback sek_update_saved_tmpl_post
+// Action fired during server ajax callback sek_update_user_tmpl_post
 // Solves the problem of template synchronization between the group skope post ( in which the chosen template is saved with permanent level ids ), and the current state of the template
 // Solution => each time a template is updated, NB checks if the template is being used by a group skope
 // if so, then the group skope post is removed ( along with the index and the css stylesheet )
@@ -5155,28 +5217,30 @@ add_action('nb_on_save_customizer_global_options', function( $opt_name, $value )
 // When will the removed skope post be re-inserted ?
 // next time the group skope will be printed ( for example skp__all_page in a single page ), NB checks if a template is assigned to this group skope, and tries to get the skope post.
 // If the group skope post is not found, NB attempts to re-insert it
-add_action('nb_on_update_saved_tmpl_post', function( $tmpl_post_name ) {
+//@hook 'nb_on_update_user_tmpl_post'
+function sek_on_update_or_remove_user_tmpl_post( $site_tmpl_id ) {
     if ( !sek_is_site_tmpl_enabled() )
         return;
 
-    if ( is_null( $tmpl_post_name ) || !is_string( $tmpl_post_name ) )
+    if ( is_null( $site_tmpl_id ) || !is_string( $site_tmpl_id ) )
         return;
 
     $site_tmpl_opts = sek_get_global_option_value( 'site_templates' );
     if ( !is_array($site_tmpl_opts) )
         return;
 
-    // NB stores the site template id as a concatenation of template source + '___' + template name
-    // Ex : user_tmpl___landing-page-for-services
-    // When updating a user template, in sek_update_saved_tmpl_post() we need to add 'user_tmpl___' prefix to match the template being currently saved
-    $normalized_tmpl_id = 'user_tmpl___' . $tmpl_post_name;
-    foreach( $site_tmpl_opts as $group_skope => $tmpl_name ) {
-        if ( $normalized_tmpl_id === $tmpl_name ) {
-            //sek_error_log('REMOVE GROUP SKOPE POST ' . $group_skope . ' for template ' . $tmpl_name );
+    foreach( $site_tmpl_opts as $group_skope => $tmpl_params ) {
+        if ( !is_array($tmpl_params) || !array_key_exists('site_tmpl_id', $tmpl_params ) )
+            continue;
+
+        if ( $site_tmpl_id === $tmpl_params['site_tmpl_id'] ) {
+            //sek_error_log('UPDATED OR REMOVED TEMPLATE => REMOVE GROUP SKOPE POST ' . $group_skope . ' for template ' . $tmpl_name );
             sek_remove_seks_post( $group_skope );//Removes the post id in the skope index + removes the post in DB + remove the stylesheet
         }
     }
-},10, 1);
+}
+add_action('nb_on_update_user_tmpl_post', '\Nimble\sek_on_update_or_remove_user_tmpl_post', 10, 1);
+add_action('nb_on_remove_saved_tmpl_post', '\Nimble\sek_on_update_or_remove_user_tmpl_post', 10, 1);
 
 ?><?php
 /* ------------------------------------------------------------------------- *
@@ -5668,7 +5732,7 @@ function sek_get_all_api_templates() {
   //     )
   // );
 // @return WP_Post|WP_Error Post on success, error on failure.
-function sek_update_saved_tmpl_post( $tmpl_data, $is_edit_metas_only_case = false ) {
+function sek_update_user_tmpl_post( $tmpl_data, $is_edit_metas_only_case = false ) {
     if ( !is_array( $tmpl_data ) ) {
         sek_error_log( __FUNCTION__ . ' => $tmpl_data is not an array' );
         return new \WP_Error( __FUNCTION__ . ' => $tmpl_data is not an array');
@@ -5759,7 +5823,7 @@ function sek_update_saved_tmpl_post( $tmpl_data, $is_edit_metas_only_case = fals
     }
 
     // Added March 2021 for stie templates #478
-    do_action('nb_on_update_saved_tmpl_post', $tmpl_post_name );
+    do_action('nb_on_update_user_tmpl_post', $tmpl_post_name );
 
     if ( is_wp_error( $r ) ) {
         return $r;
