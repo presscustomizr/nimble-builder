@@ -82,7 +82,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             renderOrRefreshTempGallery : function( params ) {
                   params = $.extend( {tmpl_source:'api_tmpl'}, params || {} );
                   var self = this,
-                      _tmpl,
                       $tmplGalWrapper;
                   if( $('#nimble-tmpl-gallery').length < 1 ) {
                         $.when( self.renderTmplGalleryUI({}) ).done( function() {
@@ -249,7 +248,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               evt.stopPropagation();
                               var _tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id'),
                                     _tmpl_source = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-source'),
-                                    _tmpl_title = $(this).closest('.sek-tmpl-item').find('.tmpl-title').html();
+                                    _tmpl_title = $(this).closest('.sek-tmpl-item').find('.tmpl-top-title h3').html();
                               if ( _.isEmpty(_tmpl_id) ) {
                                     api.errare('::setupTmplGalleryDOMEvents => error => invalid template id');
                                     return;
@@ -266,7 +265,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 }
                                                 $siteTmplInput.trigger('nb-set-site-tmpl', {
                                                       site_tmpl_id : _tmpl_id,
-                                                      site_tmpl_source : _tmpl_source
+                                                      site_tmpl_source : _tmpl_source,
+                                                      site_tmpl_title : _tmpl_title
                                                 });
                                           }
                                           return;

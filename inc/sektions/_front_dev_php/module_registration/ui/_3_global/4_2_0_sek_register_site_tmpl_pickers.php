@@ -5,6 +5,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
     if ( !sek_is_pro() ) {
         $pro_text = sek_get_pro_notice_for_czr_input( __('templates for custom post types, custom taxonomies, ....', 'text-doma') );
     }
+    $default_params = [ 'site_tmpl_id' => '_no_site_tmpl_', 'site_tmpl_source' => 'user_tmpl', 'site_tmpl_title' => '' ];
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_site_tmpl_pickers',
@@ -19,13 +20,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 // 'skp__home' => array(
                 //     'input_type'  => 'site_tmpl_picker',
                 //     'title'       => __('Template for home', 'text_doma'),
-                //     'default'     => '_no_site_tmpl_',
-                //     'choices'     => [
-                //         '_no_site_tmpl_' => 'No template',
-                //         'nb_tmpl_page-template' => 'Page template',
-                //         'nb_tmpl_home-page-template' => 'Home page template',
-                //         'nb_tmpl_nimble-template-loop-start-only' => 'Nimble Template + Loop start only'
-                //     ],
+                //     'default'     => $default_params,
                 //     //'refresh_preview' => true,
                 //     'notice_before_title' => '',
                 //     'width-100'   => true,
@@ -34,7 +29,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'skp__all_page' => array(
                     'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for single pages', 'text_doma'),
-                    'default'     => '_no_site_tmpl_',
+                    'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -48,7 +43,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'skp__all_post' => array(
                     'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for single posts', 'text_doma'),
-                    'default'     => '_no_site_tmpl_',
+                    'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -58,7 +53,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'skp__all_category' => array(
                     'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for categories', 'text_doma'),
-                    'default'     => '_no_site_tmpl_',
+                    'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -68,7 +63,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'skp__all_post_tag' => array(
                     'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for tags', 'text_doma'),
-                    'default'     => '_no_site_tmpl_',
+                    'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -78,7 +73,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'skp__all_author' => array(
                     'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for authors', 'text_doma'),
-                    'default'     => '_no_site_tmpl_',
+                    'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -88,7 +83,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'skp__all_attachment'  => array(
                     'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for attachment pages', 'text_doma'),
-                    'default'     => '_no_site_tmpl_',
+                    'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -100,7 +95,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'skp__search_for_site_tmpl' => array(
                     'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for search page', 'text_doma'),
-                    'default'     => '_no_site_tmpl_',
+                    'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -112,7 +107,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'skp__404_for_site_tmpl' => array(
                     'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for 404 error page', 'text_doma'),
-                    'default'     => '_no_site_tmpl_',
+                    'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,
@@ -125,7 +120,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 'skp__date_for_site_tmpl' => array(
                     'input_type'  => 'site_tmpl_picker',
                     'title'       => __('Template for date pages', 'text_doma'),
-                    'default'     => '_no_site_tmpl_',
+                    'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
                     'width-100'   => true,

@@ -12,26 +12,36 @@
                   var input = this,
                         _html,
                         $hidInputEl = $( '[data-czrtype]', input.container ),
-                        _defaultData = { site_tmpl_id : '_no_site_tmpl_', site_tmpl_source : 'user_tmpl' },
+                        _defaultData = {
+                              site_tmpl_id : '_no_site_tmpl_',
+                              site_tmpl_source : 'user_tmpl',
+                              site_tmpl_title : ''
+                        },
                         siteTmplData,
-                        site_tmpl_id, site_tmpl_source,
-                        tmplTitle = '';
+                        siteTmplDataCandidate,
+                        site_tmpl_id, site_tmpl_source, site_tmpl_title;
 
                   // When a user template is being modified or removed, NB refreshes the site template input
                   input.container.one('site-tmpl-input-rendered', function() {
                         api.czr_sektions.allSavedTemplates.bind( function( userTmplates ) {
-                              site_tmpl_id = input();
+                              var raw_input = input();
+                              siteTmplDataCandidate = $.extend( true, {}, _.isObject(raw_input) ? raw_input : {} );
+                              if ( !_.isObject( siteTmplDataCandidate ) || _.isArray( siteTmplDataCandidate ) ) {
+                                    siteTmplDataCandidate = $.extend( true, {}, _defaultData );
+                              }
+                              //siteTmplDataCandidate = $.extend( siteTmplDataCandidate, _defaultData );
+                              site_tmpl_id = siteTmplDataCandidate.site_tmpl_id;
+                              site_tmpl_source = siteTmplDataCandidate.site_tmpl_source;
+                              site_tmpl_title = siteTmplDataCandidate.site_tmpl_title;
+
                               if ( _.isEmpty(site_tmpl_id) || !_.isString(site_tmpl_id) || !_.isObject(userTmplates) )
                                     return;
                               // Stop here if the template is not a user_tmpl. ( we don't need to reset title if _no_site_tmpl_ and api_tmpl are not editable )
-                              if ( "user_tmpl" != site_tmpl_id.substring(0,9) )
+                              if ( "user_tmpl" != site_tmpl_source )
                                     return;
 
-                              // NB stores the site template id as a concatenation of template source + '___' + template name
-                              // Ex : user_tmpl___landing-page-for-services
-                              site_tmpl_id = site_tmpl_id.replace('user_tmpl___','');
                               if ( userTmplates[site_tmpl_id] ) {
-                                    printCurrentTemplateName();
+                                    try{ printCurrentTemplateName(); } catch(er) { api.errare('Error when printing template val', er ); }
                               } else {
                                     // If the template has been removed, trigger a reset
                                     $hidInputEl.trigger('nb-set-site-tmpl', _defaultData );
@@ -43,18 +53,19 @@
                   var printCurrentTemplateName = function( printParams ) {
                         printParams = $.extend( { see_me : false }, printParams || {} );
 
-                        var _doRender = function( site_tmpl_id, tmplTitle ) {
+                        var _doRender = function( site_tmpl_id, site_tmpl_title ) {
                               _html = '<span class="sek-current-site-tmpl">';
                                     if ( '_no_site_tmpl_' === site_tmpl_id || _.isEmpty( site_tmpl_id ) ) {
                                           _html += sektionsLocalizedData.i18n['No template set.'];
                                           input.container.removeClass('sek-has-site-tmpl');
                                           input.container.removeClass('sek-site-tmpl-not-found');
+                                    // Case of a user template not found. NOT POSSIBLE WHEN API TEMPLATE SOURCE
                                     } else if ( '_tmpl_not_found_' === site_tmpl_id || _.isEmpty( site_tmpl_id ) ) {
                                           _html += sektionsLocalizedData.i18n['Template not found : reset or pick another one.'];
                                           input.container.removeClass('sek-has-site-tmpl');
                                           input.container.addClass('sek-site-tmpl-not-found');
                                     } else {
-                                          _html += sektionsLocalizedData.i18n['Active template : '] +  ( _.isEmpty(tmplTitle) ? site_tmpl_id : tmplTitle );
+                                          _html += sektionsLocalizedData.i18n['Active template : '] +  ( _.isEmpty(site_tmpl_title) ? site_tmpl_id : site_tmpl_title );
                                           input.container.addClass('sek-has-site-tmpl');
                                           input.container.removeClass('sek-site-tmpl-not-found');
                                     }
@@ -73,44 +84,48 @@
                               input.container.trigger('site-tmpl-input-rendered');
                         };//_doRender
 
-                        site_tmpl_id = input();
+
+                        //{
+                        //       site_tmpl_id : _tmpl_id,
+                        //       site_tmpl_source : _tmpl_source,
+                        //       site_tmpl_title : _tmpl_title
+                        // }
+                        var raw_input = input();
+                        siteTmplDataCandidate = $.extend( true, {}, _.isObject(raw_input) ? raw_input : {} );
+                        if ( !_.isObject( siteTmplDataCandidate ) || _.isArray( siteTmplDataCandidate ) ) {
+                              siteTmplDataCandidate = $.extend( true, {}, _defaultData );
+                        }
+                        //siteTmplDataCandidate = $.extend( siteTmplDataCandidate, _defaultData );
+
+                        site_tmpl_id = siteTmplDataCandidate.site_tmpl_id;
+                        site_tmpl_source = siteTmplDataCandidate.site_tmpl_source;
+                        site_tmpl_title = siteTmplDataCandidate.site_tmpl_title;
+
+                        //site_tmpl_id = input();
                         if ( !_.isString(site_tmpl_id) || _.isEmpty(site_tmpl_id) ) {
+                              api.errare('printCurrentTemplateName : Error => site template must be a string');
                               site_tmpl_id = '_no_site_tmpl_';
                         }
-
                         // Get the title
                         if ( '_no_site_tmpl_' === site_tmpl_id ) {
-                              _doRender(site_tmpl_id, tmplTitle);
+                              _doRender(siteTmplDataCandidate.site_tmpl_id, site_tmpl_title);
                         } else {
-                              // NB stores the site template id as a concatenation of template source + '___' + template name
-                              // Ex : user_tmpl___landing-page-for-services
-                              if ( _.isString( site_tmpl_id ) ) {
-                                    if ( 'user_tmpl' === site_tmpl_id.substring(0,9) ) {
-                                          site_tmpl_source = 'user_tmpl';
-                                          site_tmpl_id = site_tmpl_id.replace('user_tmpl___','');
-                                    } else if ( 'api_tmpl' === site_tmpl_id.substring(0,8) ) {
-                                          site_tmpl_source = 'api_tmpl';
-                                          site_tmpl_id = site_tmpl_id.replace('api_tmpl___','');
-                                    } else {
-                                          api.errare('Error => invalid site template source');
-                                          return;
-                                    }
-                              } else {
-                                    api.errare('Error => site template must be a string');
-                                    return;
-                              }
                               _tmpl_collection_promise = 'user_tmpl' === site_tmpl_source ? api.czr_sektions.setSavedTmplCollection : api.czr_sektions.getApiTmplCollection;
                               _tmpl_collection_promise.call(api.czr_sektions)
                               .done( function(tmpl_collection) {
+                                    // if the tmpl_id is found in the collection, update the site_tmpl_title with its latest value
                                     if ( _.isObject(tmpl_collection) && tmpl_collection[site_tmpl_id] && tmpl_collection[site_tmpl_id].title ) {
-                                          tmplTitle = tmpl_collection[site_tmpl_id].title;
-                                    } else {
-                                          api.errare('::printCurrentTemplateName => site template not found in collection => previously removed => id : ' + site_tmpl_id + ' | source : ' + site_tmpl_source  );
-                                          // If tmpl id was not found in the current collection, it's been probably previously removed
+                                          site_tmpl_title = tmpl_collection[site_tmpl_id].title;
+                                    } else if ( 'user_tmpl' === site_tmpl_source ) {
+                                          // If an api template is not found, NB doesn't print _tmpl_not_found_ associated message
+                                          // => because it may happen that the api is unreachable or that an api template previously selected has been removed.
+                                          //
+                                          // For user template source, if tmpl id was not found in the current collection, it's been probably previously removed
                                           // so render as a '_tmpl_not_found_'
+                                          api.errare('::printCurrentTemplateName => site template not found in collection => previously removed => id : ' + site_tmpl_id + ' | source : ' + site_tmpl_source  );
                                           site_tmpl_id = '_tmpl_not_found_';
                                     }
-                                    _doRender(site_tmpl_id, tmplTitle);
+                                    _doRender(site_tmpl_id, site_tmpl_title);
                               })
                               .fail( function() {
                                     api.errare('printCurrentTemplateName error when getting collection promise failed', params );
@@ -145,27 +160,34 @@
                         $hidInputEl.trigger('nb-set-site-tmpl', _defaultData );
                   });//on('click')
 
+                  // @args {
+                  //       site_tmpl_id : _tmpl_id,
+                  //       site_tmpl_source : _tmpl_source,
+                  //       site_tmpl_title : _tmpl_title
+                  // }
                   $hidInputEl.on('nb-set-site-tmpl', function( evt, args ) {
                         if ( !_.isObject(args) ) {
                               api.errare('site_tmpl_picker => error => wrong args on tmpl pick', args );
                               return;
                         }
-
+                        if ( !args.site_tmpl_id || !args.site_tmpl_source || !args.site_tmpl_title ) {
+                              api.errare('site_tmpl_picker => error => invalid args passed on tmpl pick', args );
+                              return;
+                        }
                         // _defaultData = { site_tmpl_id : '_no_site_tmpl_', site_tmpl_source : 'user_tmpl' }
                         siteTmplData = $.extend( true, {}, _defaultData );
                         siteTmplData = $.extend( siteTmplData, args );
-                        // Set input value and try to print title
-                        if ( '_no_site_tmpl_' === siteTmplData.site_tmpl_id ) {
-                              input( siteTmplData.site_tmpl_id );
-                        } else {
-                              // NB stores the site template id as a concatenation of template source + '___' + template name
-                              // Ex : user_tmpl___landing-page-for-services
-                              input( siteTmplData.site_tmpl_source + '___' + siteTmplData.site_tmpl_id );
-                        }
+                        input( siteTmplData );
+
 
                         try{ printCurrentTemplateName({ see_me : true }); } catch(er) { api.errare('Error when printing template val', er ); }
-                        api.czr_sektions.templateGalleryExpanded( false );
-                        $('[data-input-type="site_tmpl_picker"]').removeClass('sek-site-tmpl-picking-active');
+
+                        // Close gallery unless a reset has been triggered ( If a template has been removed )
+                        if ( '_no_site_tmpl_' !== siteTmplData.site_tmpl_id ) { 
+                              api.czr_sektions.templateGalleryExpanded( false );
+                              $('[data-input-type="site_tmpl_picker"]').removeClass('sek-site-tmpl-picking-active');
+                        }
+
                   });
 
                   try{ printCurrentTemplateName(); } catch(er) { api.errare('Error when printing template val', er ); }

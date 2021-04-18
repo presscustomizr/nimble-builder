@@ -58,8 +58,14 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 $group_skope = sek_get_group_skope_for_site_tmpl();
                 
                 if ( sek_has_group_site_template_data() ) {
-                    $tmpl_post_name = sek_get_site_tmpl_for_skope( $group_skope );
-                    array_unshift( $classes, 'nimble-site-tmpl-id__' . $tmpl_post_name );
+                    // Site template params are structured as follow :
+                    // [
+                    //     'site_tmpl_id' : '_no_site_tmpl_',
+                    //     'site_tmpl_source' : 'user_tmpl',
+                    //     'site_tmpl_title' : ''
+                    //];
+                    $tmpl_params = sek_get_site_tmpl_params_for_skope( $group_skope );
+                    array_unshift( $classes, 'nimble-site-tmpl__' . $tmpl_params['site_tmpl_source'] . '__' . $tmpl_params['site_tmpl_id'] );
                     array_unshift( $classes, 'nimble-has-group-site-tmpl-' . $group_skope );
                 } else {
                     array_unshift( $classes, 'nimble-no-group-site-tmpl-' . $group_skope );
