@@ -35,7 +35,7 @@ function sek_get_site_tmpl_params_for_skope( $group_skope = null ) {
         sek_error_log( 'Error => invalid tmpl post id', $tmpl_params );
         return $default_params;
     }
-    sek_error_log('site_templates params ?' . $group_skope, $opts );
+    //sek_error_log('site_templates params ?' . $group_skope, $opts );
     // Check that tmpl source is OK
     if ( !in_array($site_tmpl_source, ['user_tmpl', 'api_tmpl'] ) ) {
         sek_error_log( 'Error => invalid tmpl source', $tmpl_params );

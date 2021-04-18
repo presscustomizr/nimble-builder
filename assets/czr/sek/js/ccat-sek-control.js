@@ -16308,7 +16308,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.errare('site_tmpl_picker => error => wrong args on tmpl pick', args );
                               return;
                         }
-                        if ( !args.site_tmpl_id || !args.site_tmpl_source || !args.site_tmpl_title ) {
+                        if ( _.isUndefined(args.site_tmpl_id) || _.isUndefined(args.site_tmpl_source) || _.isUndefined(args.site_tmpl_title) ) {
                               api.errare('site_tmpl_picker => error => invalid args passed on tmpl pick', args );
                               return;
                         }

@@ -4900,6 +4900,11 @@ function sek_remove_seks_post( $skope_id = null ) {
 function sek_get_site_tmpl_params_for_skope( $group_skope = null ) {
     if ( is_null($group_skope) || !is_string($group_skope) || empty($group_skope) )
         return;
+    $cache_key = 'nimble_site_tmpl_params_for_skope_'.$group_skope;
+    $cached = wp_cache_get( $cache_key );
+    if ( false !== $cached )
+        return $cached;
+
     $default_params = [
         'site_tmpl_id' => '_no_site_tmpl_',
         'site_tmpl_source' => 'user_tmpl',
@@ -4919,12 +4924,13 @@ function sek_get_site_tmpl_params_for_skope( $group_skope = null ) {
         sek_error_log( 'Error => invalid tmpl post id', $tmpl_params );
         return $default_params;
     }
-    sek_error_log('site_templates params ?' . $group_skope, $opts );
+    //sek_error_log('site_templates params ?' . $group_skope, $opts );
     // Check that tmpl source is OK
     if ( !in_array($site_tmpl_source, ['user_tmpl', 'api_tmpl'] ) ) {
         sek_error_log( 'Error => invalid tmpl source', $tmpl_params );
         return $default_params;
     }
+    wp_cache_set($cache_key, $site_tmpl_params);
     return $site_tmpl_params;
 }
 
