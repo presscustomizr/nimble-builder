@@ -187,9 +187,6 @@ function sek_ajax_save_user_template() {
     // make sure description and title are clean before DB
     $tmpl_title = sek_maybe_encode_richtext( $_POST['tmpl_title'] );
     $tmpl_description = sek_maybe_encode_richtext( $_POST['tmpl_description'] );
-
-    //sek_error_log(__FUNCTION__ .  '$_POST?', $_POST );
-
     // sek_error_log('json decode ?', json_decode( wp_unslash( $_POST['sek_data'] ), true ) );
     $template_to_save = array(
         'data' => $tmpl_data,//<= array
