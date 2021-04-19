@@ -138,9 +138,6 @@ function sek_enqueue_controls_js_css() {
 
                 'globalOptionDBValues' => get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS ),// 'nimble_global_opts'
 
-                // Feb 2021, for #478
-                'isSiteTemplateEnabled' => sek_is_site_tmpl_enabled(),
-
                 'defaultLocationModel' => Nimble_Manager()->default_location_model,
                 'defaultLocalSektionSettingValue' => sek_get_default_location_model(),
                 'defaultGlobalSektionSettingValue' => sek_get_default_location_model( NIMBLE_GLOBAL_SKOPE_ID ),
@@ -711,16 +708,6 @@ function add_sektion_values_to_skope_export( $skopes ) {
         }
 
         if ( 'group' == $skp_data['skope'] ) {
-            // FEB 2021 => Group site template. #478
-            // if ( sek_is_site_tmpl_enabled() ) {
-            //     //$group_skope_id = skp_get_skope_id( 'group' );
-            //     $seks_data = sek_get_skoped_seks( $skope_id, $location_id = '', $skope_level = 'group' );
-            //     // Feb 2021 added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
-            //     $seks_data = sek_prepare_seks_data_for_customizer( $seks_data );
-            //     $skp_data[ 'group_sektions' ] = [
-            //       'db_values' => $seks_data,
-            //     ];
-            // }
             $new_skopes[] = $skp_data;
             continue;
         }

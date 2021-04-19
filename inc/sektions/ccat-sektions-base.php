@@ -4036,7 +4036,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             if ( is_customize_preview() ) {
                 $classes[] = 'customizer-preview';
             }
-            if ( sek_is_site_tmpl_enabled() && !is_customize_preview() ) {
+            if ( !is_customize_preview() ) {
                 $skope_id = skp_get_skope_id();
                 $group_skope = sek_get_group_skope_for_site_tmpl();
                 

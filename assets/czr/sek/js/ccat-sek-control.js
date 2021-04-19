@@ -1146,9 +1146,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var printSektionsSkopeStatus = function( args ) {
                         if ( $(self.topBarId).length < 1 || sektionsLocalizedData.isDebugMode )
                               return;
-
-                        if ( !sektionsLocalizedData.isSiteTemplateEnabled )
-                              return;
                         var _hasLocalNBCustomizations = false;
                         if ( args && args.on_init ) {
                               //console.log('ON INIT : ', api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ) );
@@ -3606,12 +3603,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var parentLevel = {},
                       errorDetected = false,
                       levelIds = [],
-                      authorized_local_option_groups = ['collection', 'local_options', 'fonts' ];
-                  
-                  if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
-                        authorized_local_option_groups.push('__inherits_group_skope__');//<= only authorized because '__inherits_group_skope_tmpl_when_exists__' was initially named like this
-                        authorized_local_option_groups.push('__inherits_group_skope_tmpl_when_exists__');
-                  }
+                      authorized_local_option_groups = ['collection', 'local_options', 'fonts', '__inherits_group_skope_tmpl_when_exists__' ];
 
                   // walk the collections tree and verify it passes the various consistency checks
                   var _errorDetected_ = function( msg ) {
@@ -4622,7 +4614,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                   '</span>'
                                                             ].join('')
                                                       });
-                                                      if ( sektionsLocalizedData.isSiteTemplateEnabled && 'local' === params.scope ) {
+                                                      if ( 'local' === params.scope ) {
                                                             var _doThingsAfterRefresh = function() {
                                                                   //api.infoLog('RESET MAIN LOCAL SETTING ON NEW SKOPES SYNCED', self.localSectionsSettingId() );
                                                                   // Keep only the settings for global option, local options, content picker
@@ -4653,7 +4645,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                   api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                                                             };
                                                             api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
-                                                      }//if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
+                                                      }//if ( 'local' === params.scope ) {
                                                 })
                                                 .fail( function( response ) {
                                                       api.errare( 'reset_button input => error when firing ::updateAPISetting', response );
@@ -6611,14 +6603,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   _.each( sektionsLocalizedData.globalOptionsMap, function( mod_type, opt_name ) {
                         switch( opt_name ) {
                               case 'site_templates' :
-                                    if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
-                                          registrationParams[ opt_name ] = {
-                                                settingControlId : _id_ + '__site_templates',
-                                                module_type : mod_type,
-                                                controlLabel : sektionsLocalizedData.i18n['Site templates'],
-                                                icon : '<i class="material-icons sek-level-option-icon">devices</i>'
-                                          };
-                                    }
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__site_templates',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Site templates'],
+                                          icon : '<i class="material-icons sek-level-option-icon">devices</i>'
+                                    };
                               break;
                               // Header and footer have been beta tested during 5 months and released in June 2019, in version 1.8.0
                               case 'global_header_footer':
@@ -7165,7 +7155,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           self.updAPISetParams.promise.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
                                           if ( null !== self.validateSettingValue( self.updAPISetParams.newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
-                                                if ( sektionsLocalizedData.isSiteTemplateEnabled && !params.is_global_location ) {
+                                                if ( !params.is_global_location ) {
                                                       // Added March 2021 for #478
                                                       // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
                                                       // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
@@ -12679,22 +12669,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               
                               // Site template mode ?
-                              if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
-                                    if ( self._site_tmpl_scope && !_.isEmpty( self._site_tmpl_scope ) ) {
-                                          var $siteTmplInput = $( '[data-czrtype="' + self._site_tmpl_scope +'"]' );
-                                          if ( $siteTmplInput.length > 0 ) {
-                                                if ( !_.contains(['user_tmpl', 'api_tmpl'], _tmpl_source ) ) {
-                                                      api.errare('Error when picking site template => invalid tmpl source');
-                                                      return;
-                                                }
-                                                $siteTmplInput.trigger('nb-set-site-tmpl', {
-                                                      site_tmpl_id : _tmpl_id,
-                                                      site_tmpl_source : _tmpl_source,
-                                                      site_tmpl_title : _tmpl_title
-                                                });
+                              if ( self._site_tmpl_scope && !_.isEmpty( self._site_tmpl_scope ) ) {
+                                    var $siteTmplInput = $( '[data-czrtype="' + self._site_tmpl_scope +'"]' );
+                                    if ( $siteTmplInput.length > 0 ) {
+                                          if ( !_.contains(['user_tmpl', 'api_tmpl'], _tmpl_source ) ) {
+                                                api.errare('Error when picking site template => invalid tmpl source');
+                                                return;
                                           }
-                                          return;
+                                          $siteTmplInput.trigger('nb-set-site-tmpl', {
+                                                site_tmpl_id : _tmpl_id,
+                                                site_tmpl_source : _tmpl_source,
+                                                site_tmpl_title : _tmpl_title
+                                          });
                                     }
+                                    return;
                               }
 
                               // if current page has NB sections, display an import dialog, otherwise import now
