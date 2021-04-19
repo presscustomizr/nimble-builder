@@ -123,6 +123,24 @@ If you can't troubleshoot your issue, please open a new thread in [Nimble Builde
 3.0.2 : [PHP 8] compatibility bug fix + various minor improvements. [Site templates] first stones for the upcoming site template options.
 
 == Changelog ==
+= 3.1.0 April 19th 2021 =
+* fixed : [level tree] error when trying to scroll to clicked level
+* fixed : [post grid module] remove tag from title
+* fixed : [template tags/shortcodes] remove all spaces so that we NB detect template tags and shortcodes that have spaces inside curly braces or bracket, like {{  the_tags  }}
+* fixed : [level background] overlay color not applied when using the contextual post thumbnail as background
+* fixed : [UI] focus on edited element broken after an ajax action
+* fixed : [reverse-column] make sure the reverse-column CSS rule is not inherited by a nested section
+* fixed : [link style] set background on link:focus. (compatibility with TT1 WP default theme)
+* fixed : [level][anchor] make sure NB cleans the # if user left it
+* fixed : removed 'prepend_attachment' from the list of filters for 'the_nimble_tinymce_module_content'. NB doesn't need it and it can break {{the_title}} template tag when used in an attachment page
+* improved : [post grid module] clean "go_to" param in url when navigating the post pagination
+* improved : [UI] close level tree when expanding an UI accordion
+* improved : [template gallery] display template name on top in a bar always visible
+* added : [grid module][site templates] new options to allow using the current contextual WP query instead of generating a custom one
+* added : [site templates] a set of new site template options in global options
+* added : [site templates] specific NB template for comments + its own stylesheet
+* added : [site templates] added new template tags
+
 = 3.0.2 March 30th 2021 =
 * fixed : [PHP 8.0+][slider module][accordion module] fix "Deprecated: Required parameter $... follows optional parameter ".
 * fixed : [local options] make sure they are reset when : importing a file, after a local reset, after a template injection, a history navigation action
