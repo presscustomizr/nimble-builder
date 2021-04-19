@@ -784,7 +784,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                   '</span>'
                                                             ].join('')
                                                       });
-                                                      if ( sektionsLocalizedData.isSiteTemplateEnabled && 'local' === params.scope ) {
+                                                      if ( 'local' === params.scope ) {
                                                             var _doThingsAfterRefresh = function() {
                                                                   //api.infoLog('RESET MAIN LOCAL SETTING ON NEW SKOPES SYNCED', self.localSectionsSettingId() );
                                                                   // Keep only the settings for global option, local options, content picker
@@ -815,7 +815,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                   api.previewer.unbind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
                                                             };
                                                             api.previewer.bind( 'czr-new-skopes-synced', _doThingsAfterRefresh );
-                                                      }//if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
+                                                      }//if ( 'local' === params.scope ) {
                                                 })
                                                 .fail( function( response ) {
                                                       api.errare( 'reset_button input => error when firing ::updateAPISetting', response );

@@ -123,16 +123,13 @@ function sek_is_static_front_page_on_front_and_when_customizing() {
 // filter declared in inc\sektions\_front_dev_php\8_4_1_sektions_front_class_render_css.php
 //@hook 'nb_set_skope_id_before_generating_local_front_css'
 function sek_set_skope_id_before_generating_local_front_css($skope_id) {
-    if ( !sek_is_site_tmpl_enabled() )
-    return $skope_id;
-
     if ( NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) {
         sek_error_log( __FUNCTION__ . ' => error => function should not be used with global skope id' );
-        return;
+        return $skope_id;
     }
     // if is viewing front page, we don't want to inherit 'skp__all_page' scope
     if ( sek_is_static_front_page_on_front_and_when_customizing() )
-        return;
+        return $skope_id;
 
     // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
     // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
@@ -159,8 +156,6 @@ add_filter( 'nb_set_skope_id_before_generating_local_front_css', '\Nimble\sek_se
 /* ------------------------------------------------------------------------- */
 // Called in sek_get_skoped_seks()
 function sek_maybe_get_seks_for_group_site_template( $skope_id, $local_seks_data ) {
-    if ( !sek_is_site_tmpl_enabled() )
-        return $local_seks_data;
     // NB will only inherit group skope for local sektions
     if ( NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) {
         sek_error_log( __FUNCTION__ . ' => error => function should not be used with global skope id' );
@@ -287,14 +282,7 @@ function sek_has_group_site_template_data() {
 // This post has been inserted when running sek_maybe_get_seks_for_group_site_template(), fired from sek_get_skoped_seks()
 //@'nb_on_save_customizer_global_options'
 function sek_on_save_customizer_global_options( $opt_name, $value ) {
-    if ( !sek_is_site_tmpl_enabled() )
-        return;
-
     $current_site_tmpl_opts = sek_get_global_option_value( 'site_templates' );
-
-    // sek_error_log('CURRENT SITE TEMPL ?', $current_site_tmpl_opts );
-    // sek_error_log('NEW OPT VAL', $value );
-
     if ( !is_array( $value ) || !is_array($current_site_tmpl_opts) )
         return;
     
@@ -336,9 +324,6 @@ add_action('nb_on_save_customizer_global_options', '\Nimble\sek_on_save_customiz
 // If the group skope post is not found, NB attempts to re-insert it
 //@hook 'nb_on_update_user_tmpl_post'
 function sek_on_update_or_remove_user_tmpl_post( $site_tmpl_id ) {
-    if ( !sek_is_site_tmpl_enabled() )
-        return;
-
     if ( is_null( $site_tmpl_id ) || !is_string( $site_tmpl_id ) )
         return;
 

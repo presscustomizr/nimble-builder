@@ -186,7 +186,7 @@ final class Nimble_Collection_Setting extends \WP_Customize_Setting {
       // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
       // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control::resetCollectionSetting )
       // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
-      if ( sek_is_site_tmpl_enabled() && NIMBLE_GLOBAL_SKOPE_ID !== $this->skope_id ) {
+      if ( NIMBLE_GLOBAL_SKOPE_ID !== $this->skope_id ) {
         if ( array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $seks_collection ) && $seks_collection['__inherits_group_skope_tmpl_when_exists__'] ) {
           sek_remove_seks_post( $this->skope_id  );
           //sek_error_log( __CLASS__. ' => NOT SAVING LOCAL SETTING BECAUSE INHERITED FROM GROUP SKOPE + REMOVED SKOPED POST');

@@ -399,13 +399,6 @@ add_filter('sek_get_raw_section_registration_params', function( $collection ) {
     return $filtered;
 });
 
-
-// Feb 2021 : site templates exploration
-// see https://github.com/presscustomizr/nimble-builder/issues/478
-function sek_is_site_tmpl_enabled() {
-    return defined('NIMBLE_SITE_TEMPLATES_ENABLED') && NIMBLE_SITE_TEMPLATES_ENABLED;
-}
-
 // inspired from https://stackoverflow.com/questions/1846202/php-how-to-generate-a-random-unique-alphanumeric-string-for-use-in-a-secret-l
 // equivalent of js customizer method CZRSeksPrototype::guid()
 // introduced feb 2021 for https://github.com/presscustomizr/nimble-builder/issues/478

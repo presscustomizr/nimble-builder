@@ -110,7 +110,8 @@ function sek_get_default_location_model( $skope_id = null ) {
     if ( $is_global_skope ) {
         $defaut_sektions_value = [ 'collection' => [], 'fonts' => [] ];//global_options are saved in a specific option => NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS
     } else {
-        $defaut_sektions_value = [ 'collection' => [], 'local_options' => [], 'fonts' => [] ];
+        // March 2021 property '__inherits_group_skope_tmpl_when_exists__' added for site templates #478
+        $defaut_sektions_value = [ 'collection' => [], 'local_options' => [], 'fonts' => [], '__inherits_group_skope_tmpl_when_exists__' => true ];
     }
     foreach( sek_get_locations() as $location_id => $params ) {
         $is_global_location = sek_is_global_location( $location_id );
@@ -125,10 +126,6 @@ function sek_get_default_location_model( $skope_id = null ) {
         }
 
         $defaut_sektions_value['collection'][] = $location_model;
-    }
-    // March 2021 for site templates #478
-    if ( sek_is_site_tmpl_enabled() && !$is_global_skope ) {
-        $defaut_sektions_value['__inherits_group_skope_tmpl_when_exists__'] = true;
     }
     return $defaut_sektions_value;
 }

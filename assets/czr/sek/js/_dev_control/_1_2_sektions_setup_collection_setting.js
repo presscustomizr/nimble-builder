@@ -116,12 +116,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var parentLevel = {},
                       errorDetected = false,
                       levelIds = [],
-                      authorized_local_option_groups = ['collection', 'local_options', 'fonts' ];
-                  
-                  if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
-                        authorized_local_option_groups.push('__inherits_group_skope__');//<= only authorized because '__inherits_group_skope_tmpl_when_exists__' was initially named like this
-                        authorized_local_option_groups.push('__inherits_group_skope_tmpl_when_exists__');
-                  }
+                      authorized_local_option_groups = ['collection', 'local_options', 'fonts', '__inherits_group_skope_tmpl_when_exists__' ];
 
                   // walk the collections tree and verify it passes the various consistency checks
                   var _errorDetected_ = function( msg ) {

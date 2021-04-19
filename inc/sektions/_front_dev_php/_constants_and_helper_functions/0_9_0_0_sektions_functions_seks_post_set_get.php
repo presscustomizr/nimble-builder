@@ -221,7 +221,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         // - ! global skope
         // - no local skoped sections
         // - a site template is defined for this "group" skope
-        if ( sek_is_site_tmpl_enabled() && 'local' === $skope_level && !$is_global_skope ) {
+        if ( 'local' === $skope_level && !$is_global_skope ) {
             $seks_data = sek_maybe_get_seks_for_group_site_template( $skope_id, $seks_data );
         }
 
@@ -246,7 +246,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
             $location_id
         );
 
-        if ( sek_is_site_tmpl_enabled() && 'local' === $skope_level && !$is_global_skope ) {
+        if ( 'local' === $skope_level && !$is_global_skope ) {
             $seks_data = is_array( $seks_data ) ? $seks_data : array();
             if ( !array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $seks_data ) ) {
                 // Retro-compat => make sure we set property '__inherits_group_skope_tmpl_when_exists__' to false if it's not set yet, because NB bases group inheritance on it
@@ -298,7 +298,7 @@ function sek_get_seks_without_group_inheritance( $skope_id ) {
     if ( $post ) {
         $seks_data = maybe_unserialize( $post->post_content );
         $seks_data = is_array( $seks_data ) ? $seks_data : array();
-        if ( sek_is_site_tmpl_enabled() && !$is_global_skope && !array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $seks_data ) ) {
+        if ( !$is_global_skope && !array_key_exists( '__inherits_group_skope_tmpl_when_exists__', $seks_data ) ) {
             // Retro-compat => make sure we set property '__inherits_group_skope_tmpl_when_exists__' to false if it's not set yet, because NB bases group inheritance on it
             $seks_data['__inherits_group_skope_tmpl_when_exists__'] = false;
         }

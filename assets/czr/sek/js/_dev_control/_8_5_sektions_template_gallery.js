@@ -255,22 +255,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               
                               // Site template mode ?
-                              if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
-                                    if ( self._site_tmpl_scope && !_.isEmpty( self._site_tmpl_scope ) ) {
-                                          var $siteTmplInput = $( '[data-czrtype="' + self._site_tmpl_scope +'"]' );
-                                          if ( $siteTmplInput.length > 0 ) {
-                                                if ( !_.contains(['user_tmpl', 'api_tmpl'], _tmpl_source ) ) {
-                                                      api.errare('Error when picking site template => invalid tmpl source');
-                                                      return;
-                                                }
-                                                $siteTmplInput.trigger('nb-set-site-tmpl', {
-                                                      site_tmpl_id : _tmpl_id,
-                                                      site_tmpl_source : _tmpl_source,
-                                                      site_tmpl_title : _tmpl_title
-                                                });
+                              if ( self._site_tmpl_scope && !_.isEmpty( self._site_tmpl_scope ) ) {
+                                    var $siteTmplInput = $( '[data-czrtype="' + self._site_tmpl_scope +'"]' );
+                                    if ( $siteTmplInput.length > 0 ) {
+                                          if ( !_.contains(['user_tmpl', 'api_tmpl'], _tmpl_source ) ) {
+                                                api.errare('Error when picking site template => invalid tmpl source');
+                                                return;
                                           }
-                                          return;
+                                          $siteTmplInput.trigger('nb-set-site-tmpl', {
+                                                site_tmpl_id : _tmpl_id,
+                                                site_tmpl_source : _tmpl_source,
+                                                site_tmpl_title : _tmpl_title
+                                          });
                                     }
+                                    return;
                               }
 
                               // if current page has NB sections, display an import dialog, otherwise import now

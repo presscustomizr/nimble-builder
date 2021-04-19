@@ -205,9 +205,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var printSektionsSkopeStatus = function( args ) {
                         if ( $(self.topBarId).length < 1 || sektionsLocalizedData.isDebugMode )
                               return;
-
-                        if ( !sektionsLocalizedData.isSiteTemplateEnabled )
-                              return;
                         var _hasLocalNBCustomizations = false;
                         if ( args && args.on_init ) {
                               //console.log('ON INIT : ', api.czr_skopeBase.getSkopeProperty( 'skope_id', 'group' ) );

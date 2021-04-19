@@ -299,7 +299,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           self.updAPISetParams.promise.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
                                           if ( null !== self.validateSettingValue( self.updAPISetParams.newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
-                                                if ( sektionsLocalizedData.isSiteTemplateEnabled && !params.is_global_location ) {
+                                                if ( !params.is_global_location ) {
                                                       // Added March 2021 for #478
                                                       // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
                                                       // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )

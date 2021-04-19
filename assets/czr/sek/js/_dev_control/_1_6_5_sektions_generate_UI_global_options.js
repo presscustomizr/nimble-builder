@@ -33,14 +33,12 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   _.each( sektionsLocalizedData.globalOptionsMap, function( mod_type, opt_name ) {
                         switch( opt_name ) {
                               case 'site_templates' :
-                                    if ( sektionsLocalizedData.isSiteTemplateEnabled ) {
-                                          registrationParams[ opt_name ] = {
-                                                settingControlId : _id_ + '__site_templates',
-                                                module_type : mod_type,
-                                                controlLabel : sektionsLocalizedData.i18n['Site templates'],
-                                                icon : '<i class="material-icons sek-level-option-icon">devices</i>'
-                                          };
-                                    }
+                                    registrationParams[ opt_name ] = {
+                                          settingControlId : _id_ + '__site_templates',
+                                          module_type : mod_type,
+                                          controlLabel : sektionsLocalizedData.i18n['Site templates'],
+                                          icon : '<i class="material-icons sek-level-option-icon">devices</i>'
+                                    };
                               break;
                               // Header and footer have been beta tested during 5 months and released in June 2019, in version 1.8.0
                               case 'global_header_footer':
