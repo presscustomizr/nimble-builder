@@ -669,7 +669,9 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'This page is not customized with NB' => __('This page is not customized with NB', 'text_dom'),
             'This page inherits a NB site template' => __('This page inherits a NB site template', 'text_dom'),
             'This page is customized with NB' => __('This page is customized with NB', 'text_dom'),
-            'Refreshed to home page : site templates must be set when previewing home' => __('Refreshed to home page : site templates must be set when previewing home','text_dom')
+            'Refreshed to home page : site templates must be set when previewing home' => __('Refreshed to home page : site templates must be set when previewing home','text_dom'),
+
+            'Remove all sections and options of this page' => __('Remove all sections and options of this page', 'text_dom')
         )//array()
     )//array()
     );//array_merge
