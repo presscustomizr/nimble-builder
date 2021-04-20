@@ -15,35 +15,44 @@ Simple and smart companion that allows you to insert sections into any existing 
 
 == Description ==
 = What is Nimble Page Builder ? =
-**[Nimble Page Builder](https://nimblebuilder.com/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** is a fast and agile page builder plugin for WordPress. Nimble Builder uses the live customizer which is the native and powerful WordPress interface for real-time design.
-The plugin allows you to easily drag-and-drop modules like text-editor, post grids, images, contact forms, maps, icons, or beautiful pre-built sections with a [parallax background](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link), into any page of your site. You can edit your sections in real-time, and then click "publish" when you are happy with the result, or save for later.
+**[Nimble Page Builder](https://nimblebuilder.com/)** is a fast and agile page builder plugin for WordPress. Nimble Builder uses the live customizer, native and powerful WordPress interface for real-time design.
+The plugin allows you to easily drag-and-drop modules like text-editor, post grids, images, contact forms, maps, icons, or ready-made sections and starter templates into any page of your site. You can edit your pages in real-time, and then click "publish" when you are happy with the result.
 
-Watch the video below to see how this [demo page](https://demo.presscustomizr.com/nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link) has been built !
+Watch the video below to see how this [demo page](https://demo.presscustomizr.com/nimble-builder/) has been built.
 
 [vimeo https://vimeo.com/328473405]
 
-= Works on any page of your site and with all WordPress themes =
-Nimble Builder allows you to insert sections in any context of your site : home page, single post or page, category or tag page, even search results or [404 pages](https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link). No only that, but you can also decide to [start designing from a blank page](https://docs.presscustomizr.com/article/371-how-to-start-building-from-a-blank-page-with-the-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link) on any page of your site, and even create a custom header and footer. Nimble Builder uses native WordPress action hooks, which makes it compatible with all WordPress themes.
-
 = Live demos =
-* Example of [integration with the Customizr theme](https://demo.presscustomizr.com/nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)
-* Example of [integration with the Hueman theme](https://demo-hueman.presscustomizr.com/nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)
-* Example of a [404 page created with Nimble Builder](https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link), header and footer disabled.
+* [landing page with header and footer](https://nimblebuilder.com/landing-page-with-header-and-footer/)
+* [integration with the Customizr theme](https://demo.presscustomizr.com/nimble-builder/)
+* [integration with the Hueman theme](https://demo-hueman.presscustomizr.com/nimble-builder/)
+* [404 page created with Nimble Builder](https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder/)
+
+= Works on any page of your site and with all WordPress themes =
+Nimble Builder allows you to insert sections in any context of your site : home page, single post or page, category or tag page, even search results or [404 pages](https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder/). No only that, you can also decide to [start designing from a blank page](https://docs.presscustomizr.com/article/371-how-to-start-building-from-a-blank-page-with-the-wordpress-nimble-builder/) on any page of your site, and even create a custom header and footer. Nimble Builder uses native WordPress action hooks, which makes it compatible with all WordPress themes.
 
 = Features overview =
 * **Drag and drop neatly pre-designed sections** and customize them in real-time preview.
 * **Works in any WordPress contexts** : home, pages, posts, custom post types, archives, author pages, search page, ...
 * Create content, style, move / duplicate / remove elements **in real-time preview**.
-* **Includes many content modules** : classic text editor, image, column layouts, contact form, button, icons, map, html code, WordPress widget area, menu, and more.
-* **Insert engaging [post grids](https://docs.presscustomizr.com/article/393-how-to-add-post-grids-to-any-wordpress-page-with-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** on any page, looking great on desktop and mobile devices.
-* Use **full width image or video backgrounds** for your sections, and [enable a parallax effect](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link).
-* **Easily [customize your content specifically for mobile devices](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** : change the responsive breakpoint, adapt font-size, spacing, alignment, column layouts, in real-time preview.
-* **Customize any text [with Google Fonts](https://docs.presscustomizr.com/article/364-how-to-use-google-fonts-with-the-nimble-builder/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)**.
-* Add **[custom CSS](https://docs.presscustomizr.com/article/409-how-to-add-custom-css-to-a-specific-page-of-your-wordpress-site/?utm_source=wp-org&utm_campaign=nimble-builder-page&utm_medium=link)** to any specific page of your site ( and only to this page ) : post, page, archive, 404 page, WooCommerce product, etc.
+* Save and reuse sections and templates.
+* **Site building** : define [site templates](https://docs.presscustomizr.com/article/428-how-to-use-site-templates-with-nimble-builder) for pages, posts, archives, search page, author pages, 404 page.
+* **Many content modules available** : classic text editor, image, column layouts, contact form, button, icons, map, html code, WordPress widget area, menu, and more.
+* **Insert engaging [post grids](https://docs.presscustomizr.com/article/393-how-to-add-post-grids-to-any-wordpress-page-with-nimble-builder/)** on any page, looking great on desktop and mobile devices.
+* Use **full width image or video backgrounds** for your sections, and [enable a parallax effect](https://docs.presscustomizr.com/article/380-how-to-set-a-parallax-background-for-a-section-in-wordpress-with-the-nimble-builder/).
+* **Easily [customize your content specifically for mobile devices](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder/)** : change the responsive breakpoint, adapt font-size, spacing, alignment, column layouts, in real-time preview.
+* **Customize any text [with Google Fonts](https://docs.presscustomizr.com/article/364-how-to-use-google-fonts-with-the-nimble-builder/)**.
+* Add **[custom CSS](https://docs.presscustomizr.com/article/409-how-to-add-custom-css-to-a-specific-page-of-your-wordpress-site/)** to any specific page of your site ( and only to this page ) : post, page, archive, 404 page, WooCommerce product, etc.
 * **[Export / Import](https://docs.presscustomizr.com/article/391-how-to-export-and-import-templates-with-nimble-builder)** : re-use your sections in other pages and between sites.
 * **[Embed shortcodes](https://docs.presscustomizr.com/article/350-how-to-use-shortcodes-from-other-plugins-with-the-nimble-builder-plugin/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page) from other plugins**, and see the result in real-time preview.
 * Nimble Builder automatically generates responsive HTML markup for a **pixel-perfect rendering on smartphones and tablets**.
 * Nimble Builder leverages the WordPress live customizer features for auto-drafting and schedule publishing. You can safely build and save drafts of your content before deploying in production.
+
+= Mind blowing performances 🚀 =
+Nimble Builder pages load very fast, in particular on mobile devices. With a basic cache server configuration, the plugin gets an A grade on performance tests.
+
+= Mobile first builder =
+Nimble Builder is designed **[mobile-first](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder)**. It uses a performant and lightweight flex CSS foundation which ensures perfect rendering on mobile devices. The plugin is an effective productivity tool, ideal for quickly sketching and publishing pages with sections and columns. Nimble Builder generates clean and fluid HTML markup that meets the highest SEO and accessibility standards.
 
 = Content modules =
 * Headings
@@ -120,10 +129,10 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-3.0.2 : [PHP 8] compatibility bug fix + various minor improvements. [Site templates] first stones for the upcoming site template options.
+3.1.0 : [Site templates] Introduction of a new set of options for defining site templates in global options. More details on https://docs.presscustomizr.com/article/428-how-to-use-site-templates-with-nimble-builder
 
 == Changelog ==
-= 3.1.0 April 19th 2021 =
+= 3.1.0 April 20th 2021 =
 * fixed : [level tree] error when trying to scroll to clicked level
 * fixed : [post grid module] remove tag from title
 * fixed : [template tags/shortcodes] remove all spaces so that we NB detect template tags and shortcodes that have spaces inside curly braces or bracket, like {{  the_tags  }}
