@@ -1182,7 +1182,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _msg = '<span class="sek-goto-site-tmpl-options">' + sektionsLocalizedData.i18n['This page inherits a NB site template'] + '</span>';
                         } else if ( _hasLocalNBCustomizations ) {
                               _msg = sektionsLocalizedData.i18n['This page is customized with NB'];
-                              _msg += '<button type="button" class="far fa-trash-alt sek-reset-local-sektions" title="Remove sektions" data-nimble-state="enabled"><span class="screen-reader-text">Remove sektions</span></button>';
+                              _msg += '<button type="button" class="far fa-trash-alt sek-reset-local-sektions" title="' + sektionsLocalizedData.i18n['Remove all sections and options of this page'] +'" data-nimble-state="enabled"><span class="screen-reader-text">' + sektionsLocalizedData.i18n['Remove all sections and options of this page'] +'</span></button>';
                         }
 
                         $(self.topBarId).find('.sek-notifications')

@@ -669,7 +669,9 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'This page is not customized with NB' => __('This page is not customized with NB', 'text_dom'),
             'This page inherits a NB site template' => __('This page inherits a NB site template', 'text_dom'),
             'This page is customized with NB' => __('This page is customized with NB', 'text_dom'),
-            'Refreshed to home page : site templates must be set when previewing home' => __('Refreshed to home page : site templates must be set when previewing home','text_dom')
+            'Refreshed to home page : site templates must be set when previewing home' => __('Refreshed to home page : site templates must be set when previewing home','text_dom'),
+
+            'Remove all sections and options of this page' => __('Remove all sections and options of this page', 'text_dom')
         )//array()
     )//array()
     );//array_merge
@@ -1969,13 +1971,13 @@ function sek_print_nimble_input_templates() {
 
       <?php
       /* ------------------------------------------------------------------------- *
-       *  RESET BUTTON
+       *  REMOVE BUTTON
       /* ------------------------------------------------------------------------- */
       ?>
       <script type="text/html" id="tmpl-nimble-input___reset_button">
         <div class="sek-button-choice-wrapper">
           <input data-czrtype="{{data.input_id}}" type="hidden"/>
-          <button type="button" aria-pressed="false" class="sek-ui-button sek-float-right" title="<?php _e('Reset', 'text_doma'); ?>" data-sek-reset-scope="{{data.input_data.scope}}"><?php _e('Reset', 'text_doma'); ?></button>
+          <button type="button" aria-pressed="false" class="sek-ui-button sek-float-right" title="<?php _e('Remove now', 'text_doma'); ?>" data-sek-reset-scope="{{data.input_data.scope}}"><?php _e('Remove now', 'text_doma'); ?></button>
         </div>
       </script>
 
