@@ -3,8 +3,8 @@
 
 > Simple and smart companion that allows you to insert sections into any existing page, create landing pages or entire websites including header and footer.
 
-== Description ==
-= What is Nimble Page Builder ? =
+## Description
+### What is Nimble Page Builder ?
 **[Nimble Page Builder](https://nimblebuilder.com/)** is a fast and agile page builder plugin for WordPress. Nimble Builder uses the live customizer, native and powerful WordPress interface for real-time design.
 The plugin allows you to easily drag-and-drop modules like text-editor, post grids, images, contact forms, maps, icons, or ready-made sections and starter templates into any page of your site. You can edit your pages in real-time, and then click "publish" when you are happy with the result.
 
@@ -12,16 +12,16 @@ Watch the video below to see how this [demo page](https://demo.presscustomizr.co
 
 [vimeo https://vimeo.com/328473405]
 
-= Live demos =
+### Live demos
 * [landing page with header and footer](https://nimblebuilder.com/landing-page-with-header-and-footer/)
 * [integration with the Customizr theme](https://demo.presscustomizr.com/nimble-builder/)
 * [integration with the Hueman theme](https://demo-hueman.presscustomizr.com/nimble-builder/)
 * [404 page created with Nimble Builder](https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder/)
 
-= Works on any page of your site and with all WordPress themes =
+### Works on any page of your site and with all WordPress themes
 Nimble Builder allows you to insert sections in any context of your site : home page, single post or page, category or tag page, even search results or [404 pages](https://docs.presscustomizr.com/article/372-design-your-404-page-with-the-nimble-builder/). No only that, you can also decide to [start designing from a blank page](https://docs.presscustomizr.com/article/371-how-to-start-building-from-a-blank-page-with-the-wordpress-nimble-builder/) on any page of your site, and even create a custom header and footer. Nimble Builder uses native WordPress action hooks, which makes it compatible with all WordPress themes.
 
-= Features overview =
+### Features overview
 * **Drag and drop neatly pre-designed sections** and customize them in real-time preview.
 * **Works in any WordPress contexts** : home, pages, posts, custom post types, archives, author pages, search page, ...
 * Create content, style, move / duplicate / remove elements **in real-time preview**.
@@ -38,13 +38,13 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * Nimble Builder automatically generates responsive HTML markup for a **pixel-perfect rendering on smartphones and tablets**.
 * Nimble Builder leverages the WordPress live customizer features for auto-drafting and schedule publishing. You can safely build and save drafts of your content before deploying in production.
 
-= Mind blowing performances 🚀 =
+### Mind blowing performances 🚀
 Nimble Builder pages load very fast, in particular on mobile devices. With a basic cache server configuration, the plugin gets an A grade on performance tests.
 
-= Mobile first builder =
+### Mobile first builder
 Nimble Builder is designed **[mobile-first](https://docs.presscustomizr.com/article/343-designing-for-mobile-devices-with-wordpress-nimble-builder)**. It uses a performant and lightweight flex CSS foundation which ensures perfect rendering on mobile devices. The plugin is an effective productivity tool, ideal for quickly sketching and publishing pages with sections and columns. Nimble Builder generates clean and fluid HTML markup that meets the highest SEO and accessibility standards.
 
-= Content modules =
+### Content modules
 * Headings
 * WordPress text editor ( support blocks and shortcodes )
 * [Image](https://docs.presscustomizr.com/article/381-how-to-enable-lightbox-on-your-images-with-the-nimble-builder/)
@@ -66,17 +66,17 @@ Nimble Builder is designed **[mobile-first](https://docs.presscustomizr.com/arti
 * Tabs ( coming soon )
 * ... and more to come !
 
-== Installation ==
+## Installation
 1. Install the plugin through the WordPress plugins screen. Or download the plugin, unzip the package and upload it to your /wp-content/plugins/ directory
 2. Activate the plugin through the 'Plugins' screen in WordPress
 3. Navigate to the WordPress live customizer
 4. Look for a drop zone candidate in the previewed page and click on the "+" button to start building your first section of content
 5. Drag a module from the left panel and drop it in a drop zone of the previewed page
 
-= Getting started =
+### Getting started
 Once [installed](https://docs.presscustomizr.com/article/347-installing-the-nimble-builder-plugin/), Nimble Builder can be accessed in the WordPress live customizer. You can [start creating your first section](https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin/) !
 
-== Documentation ==
+## Documentation
 You'll find a growing online knowledge base for Nimble builder here : [Nimble builder documentation](https://docs.presscustomizr.com/collection/334-nimble-builder/).
 
 * [Getting started with Nimble Page Builder for WordPress](https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin)
@@ -89,16 +89,16 @@ You'll find a growing online knowledge base for Nimble builder here : [Nimble bu
 * [How to change the page template with Nimble Builder ?](https://docs.presscustomizr.com/article/339-changing-the-page-template)
 
 
-== Frequently Asked Questions ==
-= How do I use Nimble Builder ? =
+## Frequently Asked Questions
+### How do I use Nimble Builder ?
 
 [Getting started with Nimble Page Builder for WordPress](https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin/).
 
-= Can I use Nimble Builder with any theme ? =
+### Can I use Nimble Builder with any theme ?
 
 Yes, Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
-= How to troubleshoot problems with Nimble Builder ? =
+### How to troubleshoot problems with Nimble Builder ?
 1. **Use the latest software versions** : make sure WordPress, Nimble Builder and your theme are all up to date.
 2. **Documentation** : try to find a possible solution in our [documentation pages](https://docs.presscustomizr.com/collection/334-nimble-builder/).
 3. **Search the forum** : use the search field on top of the topic list with keywords describing your issue. Another user may have had a similar problem already resolved.
