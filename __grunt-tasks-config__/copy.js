@@ -23,7 +23,7 @@ module.exports = {
       '!readme.md',
       '!npm-debug.log',
 
-      '!nimble.jpg',
+      '!nimble_banner.png',
 
       '!**/*.db',
       '!patches/**',
