@@ -56,7 +56,9 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             if ( !is_customize_preview() ) {
                 $skope_id = skp_get_skope_id();
                 $group_skope = sek_get_group_skope_for_site_tmpl();
-                
+                if ( sek_is_inheritance_locally_disabled() ) {
+                    array_unshift( $classes, 'nimble-site-tmpl-inheritance-disabled' );
+                }
                 if ( sek_has_group_site_template_data() ) {
                     // Site template params are structured as follow :
                     // [

@@ -44,7 +44,7 @@ Nimble Builder allows you to insert sections in any context of your site : home 
 * **Customize any text [with Google Fonts](https://docs.presscustomizr.com/article/364-how-to-use-google-fonts-with-the-nimble-builder/)**.
 * Add **[custom CSS](https://docs.presscustomizr.com/article/409-how-to-add-custom-css-to-a-specific-page-of-your-wordpress-site/)** to any specific page of your site ( and only to this page ) : post, page, archive, 404 page, WooCommerce product, etc.
 * **[Export / Import](https://docs.presscustomizr.com/article/391-how-to-export-and-import-templates-with-nimble-builder)** : re-use your sections in other pages and between sites.
-* **[Embed shortcodes](https://docs.presscustomizr.com/article/350-how-to-use-shortcodes-from-other-plugins-with-the-nimble-builder-plugin/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page) from other plugins**, and see the result in real-time preview.
+* **[Embed shortcodes](https://docs.presscustomizr.com/article/350-how-to-use-shortcodes-from-other-plugins-with-the-nimble-builder-plugin/) from other plugins**, and see the result in real-time preview.
 * Nimble Builder automatically generates responsive HTML markup for a **pixel-perfect rendering on smartphones and tablets**.
 * Nimble Builder leverages the WordPress live customizer features for auto-drafting and schedule publishing. You can safely build and save drafts of your content before deploying in production.
 
@@ -57,13 +57,13 @@ Nimble Builder is designed **[mobile-first](https://docs.presscustomizr.com/arti
 = Content modules =
 * Headings
 * WordPress text editor ( support blocks and shortcodes )
-* [Image](https://docs.presscustomizr.com/article/381-how-to-enable-lightbox-on-your-images-with-the-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page)
+* [Image](https://docs.presscustomizr.com/article/381-how-to-enable-lightbox-on-your-images-with-the-nimble-builder/)
 * Button
 * Icon
 * Post Grid
 * Image Carousel
-* [Contact Form](https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page)
-* [Google Map](https://docs.presscustomizr.com/article/387-how-to-insert-google-maps-in-your-wordpress-pages-with-the-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page)
+* [Contact Form](https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/)
+* [Google Map](https://docs.presscustomizr.com/article/387-how-to-insert-google-maps-in-your-wordpress-pages-with-the-nimble-builder/)
 * Menu
 * Social Profiles
 * Divider
@@ -77,10 +77,10 @@ Nimble Builder is designed **[mobile-first](https://docs.presscustomizr.com/arti
 * ... and more to come !
 
 = Getting started =
-Once [installed](https://docs.presscustomizr.com/article/347-installing-the-nimble-builder-plugin/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page), Nimble Builder can be accessed in the WordPress live customizer. You can [start creating your first section](https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page) !
+Once [installed](https://docs.presscustomizr.com/article/347-installing-the-nimble-builder-plugin/), Nimble Builder can be accessed in the WordPress live customizer. You can [start creating your first section](https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin/) !
 
 == Documentation ==
-You'll find a growing online knowledge base for Nimble builder here : [Nimble builder documentation](https://docs.presscustomizr.com/collection/334-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page).
+You'll find a growing online knowledge base for Nimble builder here : [Nimble builder documentation](https://docs.presscustomizr.com/collection/334-nimble-builder/).
 
 * [Getting started with Nimble Page Builder for WordPress](https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin)
 * [Technical requirements for Nimble Builder : server, browser, php version, WP version](https://docs.presscustomizr.com/article/355-technical-requirements-server-browser-php-version-wordpress-version)
@@ -109,7 +109,7 @@ You'll find a growing online knowledge base for Nimble builder here : [Nimble bu
 == Frequently Asked Questions ==
 = How do I use Nimble Builder ? =
 
-[Getting started with Nimble Page Builder for WordPress](https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page).
+[Getting started with Nimble Page Builder for WordPress](https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin/).
 
 = Can I use Nimble Builder with any theme ? =
 
@@ -117,14 +117,14 @@ Yes, Nimble builder works with any WordPress theme. If you experience any proble
 
 = How to troubleshoot problems with Nimble Builder ? =
 1. **Use the latest software versions** : make sure WordPress, Nimble Builder and your theme are all up to date.
-2. **Documentation** : try to find a possible solution in our [documentation pages](https://docs.presscustomizr.com/collection/334-nimble-builder/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page).
+2. **Documentation** : try to find a possible solution in our [documentation pages](https://docs.presscustomizr.com/collection/334-nimble-builder/).
 3. **Search the forum** : use the search field on top of the topic list with keywords describing your issue. Another user may have had a similar problem already resolved.
 4. **Cache plugin** : if you use a server cache or cache plugin, please clear it’s cache content and disable caching via it’s settings. It is recommended to disable your cache plugin when customizing your site.
 5. **Check for plugin conflict** : deactivate all of your plugins. If it fixes the issue, re-activate your plugins one by one, until you identify the plugin in conflict.
-6. **Browser** : [clear your browser's cache / history](https://docs.presscustomizr.com/article/309-how-to-clear-your-browsers-cache-cookies-and-history/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page). Switch to another browser if needed. Make sure you do not use a browser extension that conflicts with the plugin.
+6. **Browser** : [clear your browser's cache / history](https://docs.presscustomizr.com/article/309-how-to-clear-your-browsers-cache-cookies-and-history/). Switch to another browser if needed. Make sure you do not use a browser extension that conflicts with the plugin.
 7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
 
-We have also published a detailed [troubleshooting guide for Nimble Builder](https://docs.presscustomizr.com/article/351-nimble-troubleshooting-guide/?utm_source=wp-org&utm_medium=link&utm_campaign=nimble-builder-page).
+We have also published a detailed [troubleshooting guide for Nimble Builder](https://docs.presscustomizr.com/article/351-nimble-troubleshooting-guide/).
 
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 

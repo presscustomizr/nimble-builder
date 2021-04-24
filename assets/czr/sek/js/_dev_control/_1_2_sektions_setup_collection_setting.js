@@ -11,7 +11,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var self = this,
                       serverCollection;
 
-                  params = params || { dirty : false };
+                  params = params || { dirty : false, is_group_inheritance_enabled : true };
 
                   // maybe register the sektion_collection settings
                   var _settingsToRegister_ = {
@@ -28,10 +28,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // => register it and bind it
                         // => ensure that it will be bound only once, because the setting are never unregistered
                         if ( ! api.has( settingData.collectionSettingId ) ) {
+                              var inital_setting_value = _.isObject( serverCollection ) ? serverCollection : self.getDefaultSektionSettingValue( localOrGlobal );
+                              if ( 'local' == localOrGlobal && !params.is_group_inheritance_enabled ) {
+                                    inital_setting_value.local_options.local_reset = _.isObject( inital_setting_value.local_options.local_reset ) ? inital_setting_value.local_options.local_reset : {};
+                                    inital_setting_value.local_options.local_reset.inherit_group_scope = false;
+                              }
+
                               var __collectionSettingInstance__ = api.CZR_Helpers.register({
                                     what : 'setting',
                                     id : settingData.collectionSettingId,
-                                    value : self.validateSettingValue( _.isObject( serverCollection ) ? serverCollection : self.getDefaultSektionSettingValue( localOrGlobal ), localOrGlobal ),
+                                    value : self.validateSettingValue( inital_setting_value, localOrGlobal ),
                                     transport : 'postMessage',//'refresh'
                                     type : 'option',
                                     track : false,//don't register in the self.registered()
@@ -323,13 +329,25 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // click event is scheduled in ::initialize()
             // Note : only the collection is set to self.getDefaultSektionSettingValue( 'local' )
             // @see php function which defines the defaults sek_get_default_location_model()
-            resetCollectionSetting : function( scope ) {
+            resetCollectionSetting : function( scope, localOptions ) {
                   var self = this, newSettingValue;
                   if ( _.isEmpty( scope ) || !_.contains(['local', 'global'], scope ) ) {
                         throw new Error( 'resetCollectionSetting => invalid scope provided.', scope );
                   }
+                  // INHERITANCE
+                  // solves the problem of preventing group template inheritance after a local reset
+                  var _is_inheritance_enabled = true;
+                  if ( 'local' === scope ) {
+                        if ( localOptions && _.isObject(localOptions) && localOptions.local_reset && !_.isUndefined( localOptions.local_reset.inherit_group_scope ) ) {
+                              _is_inheritance_enabled = localOptions.local_reset.inherit_group_scope;
+                        }
+                  }
 
-                  newSettingValue = self.getDefaultSektionSettingValue( scope );
+                  newSettingValue = $.extend( true, {}, self.getDefaultSektionSettingValue( scope ) );
+
+                  if ( !_is_inheritance_enabled ) {
+                        newSettingValue.local_options.local_reset = { inherit_group_scope : false };
+                  }
                   // April 2021, for site templates #478 => the default local sektion model includes property __inherits_group_skope_tmpl_when_exists__, set to true
                   // => when reseting locally, if a group template is defined, it will be inherited
 
@@ -338,7 +356,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
                   // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true here
                   // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
-                  return $.extend( true, {}, newSettingValue );
+                  return newSettingValue;
             }
       });//$.extend()
 })( wp.customize, jQuery );

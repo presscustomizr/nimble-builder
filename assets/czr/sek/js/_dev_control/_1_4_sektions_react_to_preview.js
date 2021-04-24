@@ -786,6 +786,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                       });
                                                       if ( 'local' === params.scope ) {
                                                             var _doThingsAfterRefresh = function() {
+                                                                  // INHERITANCE
+                                                                  // solves the problem of preventing group template inheritance after a local reset
+                                                                  var _is_inheritance_enabled = true,
+                                                                        currentSetValue = api( self.localSectionsSettingId() )(),
+                                                                        localOptions = currentSetValue.local_options;
+
+                                                                  if ( localOptions && _.isObject(localOptions) && localOptions.local_reset && !_.isUndefined( localOptions.local_reset.inherit_group_scope ) ) {
+                                                                        _is_inheritance_enabled = localOptions.local_reset.inherit_group_scope;
+                                                                  }
                                                                   //api.infoLog('RESET MAIN LOCAL SETTING ON NEW SKOPES SYNCED', self.localSectionsSettingId() );
                                                                   // Keep only the settings for global option, local options, content picker
                                                                   // Remove all the others
@@ -800,7 +809,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                                   // To prevent saving server sets property __inherits_group_skope_tmpl_when_exists__ = true
                                                                   // set the param { dirty : true } => because otherwise, if user saves right after a reset, local option won't be ::updated() server side.
                                                                   // Which means that the page will keep its previous aspect
-                                                                  try { self.setupSettingsToBeSaved( { dirty : true } ); } catch( er ) {
+                                                                  try { self.setupSettingsToBeSaved( { dirty : true, is_group_inheritance_enabled : _is_inheritance_enabled } ); } catch( er ) {
                                                                         api.errare( 'Error in self.localSectionsSettingId.callbacks => self.setupSettingsToBeSaved()' , er );
                                                                   }
 

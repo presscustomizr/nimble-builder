@@ -30,6 +30,46 @@ function sek_get_local_option_value( $option_name = '', $skope_id = null ) {
     return $values;
 }
 
+// Introduced for site templates, when using function sek_is_inheritance_locally_disabled()
+// needed because we can't rely on sek_get_skoped_seks() to get current local sections data, because this function returns the inherited data
+// @param $option_name = string
+// 'nimble_front_classes_ready' is fired when Nimble_Manager() is instanciated
+function sek_get_local_option_value_without_inheritance( $option_name = '', $skope_id = null ) {
+    if ( empty($option_name) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid option name' );
+        return array();
+    }
+    if ( !skp_is_customizing() && did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->local_options ) {
+        $local_options = Nimble_Manager()->local_options;
+    } else {
+        // use the provided skope_id if in the signature
+        $skope_id = ( !empty( $skope_id ) && is_string( $skope_id ))? $skope_id : skp_get_skope_id();
+        $localSkopeNimble = sek_get_seks_without_group_inheritance( $skope_id );
+        if ( skp_is_customizing() && NIMBLE_GLOBAL_SKOPE_ID != $skope_id ) {
+            // when customizing, let us filter the value with the 'customized' ones
+            $localSkopeNimble = apply_filters(
+                'sek_get_skoped_seks',
+                $localSkopeNimble,
+                $skope_id,
+                ''
+            );
+        }
+
+        $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
+        // Cache only after 'wp' && 'nimble_front_classes_ready'
+        // never cache when doing ajax
+        if ( did_action('nimble_front_classes_ready') && did_action('wp') && !defined('DOING_AJAX') )  {
+            Nimble_Manager()->local_options = $local_options;
+        }
+    }
+    // maybe normalizes with default values
+    $values = ( !empty( $local_options ) && !empty( $local_options[ $option_name ] ) ) ? $local_options[ $option_name ] : null;
+    if ( did_action('nimble_front_classes_ready') ) {
+        $values = sek_normalize_local_options_with_defaults( $option_name, $values );
+    }
+    return $values;
+}
+
 
 // @return array() $normalized_values
 // @see _1_6_4_sektions_generate_UI_local_skope_options.js

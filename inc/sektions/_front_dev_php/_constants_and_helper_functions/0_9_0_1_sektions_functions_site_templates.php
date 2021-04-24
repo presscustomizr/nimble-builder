@@ -116,6 +116,16 @@ function sek_is_static_front_page_on_front_and_when_customizing() {
     return $is_front_page && 'page' == get_option( 'show_on_front' );
 }
 
+// @return boolean
+// solves the problem of preventing group template inheritance after a local reset
+function sek_is_inheritance_locally_disabled() {
+    $local_reset_data = sek_get_local_option_value_without_inheritance( 'local_reset' );
+    if ( is_array( $local_reset_data ) && array_key_exists( 'inherit_group_scope', $local_reset_data ) && !sek_booleanize_checkbox_val($local_reset_data['inherit_group_scope'] ) ) {
+        return true;
+    }
+    return false;
+}
+
 
 /* ------------------------------------------------------------------------- *
  *  SITE TEMPLATES CSS
@@ -130,6 +140,11 @@ function sek_set_skope_id_before_generating_local_front_css($skope_id) {
     // if is viewing front page, we don't want to inherit 'skp__all_page' scope
     if ( sek_is_static_front_page_on_front_and_when_customizing() )
         return $skope_id;
+
+    // checkbox 'inherit_group_scope' set to true by default
+    if ( sek_is_inheritance_locally_disabled() ) {
+        return $skope_id;
+    }
 
     // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
     // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
@@ -165,6 +180,10 @@ function sek_maybe_get_seks_for_group_site_template( $skope_id, $local_seks_data
     if ( sek_is_static_front_page_on_front_and_when_customizing() )
         return $local_seks_data;
 
+    // checkbox 'inherit_group_scope' set to true by default
+    if ( sek_is_inheritance_locally_disabled() ) {
+        return $local_seks_data;
+    }
     // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
     // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
     // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control:: resetCollectionSetting )

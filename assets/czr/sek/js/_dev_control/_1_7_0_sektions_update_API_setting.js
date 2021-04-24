@@ -268,7 +268,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //-------------------------------------------------------------------------------------------------
                               case 'sek-reset-collection' :
                                     //api.infoLog( 'sek-import-from-file', params );
-                                    try { self.updAPISetParams.newSetValue = api.czr_sektions.resetCollectionSetting( params.scope ); } catch( er ) {
+                                    var _localOptions;
+                                    if ( 'local' === params.scope ) {
+                                          _localOptions = $.extend( true, {}, _.isObject( self.updAPISetParams.newSetValue.local_options ) ? self.updAPISetParams.newSetValue.local_options : {} );
+                                    }
+                                    try { self.updAPISetParams.newSetValue = api.czr_sektions.resetCollectionSetting( params.scope, _localOptions ); } catch( er ) {
                                           api.errare( 'sek-reset-collection => error when firing resetCollectionSetting()', er );
                                     }
                               break;
@@ -300,14 +304,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     } else {
                                           if ( null !== self.validateSettingValue( self.updAPISetParams.newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
                                                 if ( !params.is_global_location ) {
+                                                      // INHERITANCE
+                                                      // solves the problem of preventing group template inheritance after a local reset
+                                                      // on ::resetCollectionSetting(), the setting val is being modified to add this property local_reset.inherit_group_scope 
+                                                      var _is_inheritance_enabled = true, newSetVal = self.updAPISetParams.newSetValue;
+                                                      if ( newSetVal.local_options && newSetVal.local_options.local_reset && !_.isUndefined( newSetVal.local_options.local_reset.inherit_group_scope ) ) {
+                                                            _is_inheritance_enabled = newSetVal.local_options.local_reset.inherit_group_scope;
+                                                      }
                                                       // Added March 2021 for #478
                                                       // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
                                                       // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
                                                       // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control:: resetCollectionSetting )
                                                       // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
-                                                      self.updAPISetParams.newSetValue.__inherits_group_skope_tmpl_when_exists__ = 'sek-reset-collection' === params.action;
+                                                      self.updAPISetParams.newSetValue.__inherits_group_skope_tmpl_when_exists__ = 'sek-reset-collection' === params.action && _is_inheritance_enabled;
                                                 }
                                                 api( _collectionSettingId_ )( self.updAPISetParams.newSetValue, params );
+
+                                                // April 2021 : for site templates
+                                                if ( !params.is_global_location ) {
+                                                      api.trigger('nimble-update-topbar-skope-status');
+                                                }
                                                 // Add the cloneId to the params when we resolve
                                                 // the cloneId is only needed in the duplication scenarii
                                                 params.cloneId = self.updAPISetParams.cloneId;
