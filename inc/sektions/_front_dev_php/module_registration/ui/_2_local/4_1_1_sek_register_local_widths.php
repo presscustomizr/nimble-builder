@@ -117,7 +117,7 @@ function sek_add_raw_local_widths_css( $css, $is_global_stylesheet ) {
     $user_defined_widths = array();
 
     if ( !empty( $width_options[ 'use-custom-outer-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-outer-width' ] ) ) {
-        $user_defined_widths['outer-section-width'] = '.nb-loc [data-sek-level="section"]';
+        $user_defined_widths['outer-section-width'] = '.nb-loc [data-sek-level="section"]:not([data-sek-is-nested="true"])';
     }
     if ( !empty( $width_options[ 'use-custom-inner-width' ] ) && true === sek_booleanize_checkbox_val( $width_options[ 'use-custom-inner-width' ] ) ) {
         $user_defined_widths['inner-section-width'] = '.nb-loc [data-sek-level="section"] > .sek-container-fluid > .sek-sektion-inner';
