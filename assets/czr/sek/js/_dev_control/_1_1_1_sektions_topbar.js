@@ -222,6 +222,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               _inheritsSiteTemplate = false,
                               _globOptions = api(sektionsLocalizedData.optNameForGlobalOptions)();
 
+                        var _is_inheritance_enabled_in_local_options = true,
+                              currentSetValue = api( self.localSectionsSettingId() )(),
+                              localOptions = currentSetValue.local_options;
+
+                        if ( localOptions && _.isObject(localOptions) && localOptions.local_reset && !_.isUndefined( localOptions.local_reset.inherit_group_scope ) ) {
+                              _is_inheritance_enabled_in_local_options = localOptions.local_reset.inherit_group_scope;
+                        }
+
                         if ( _.isObject(_globOptions) && _globOptions.site_templates && _.isObject(_globOptions.site_templates ) ) {
                               _.each( _globOptions.site_templates, function( tmpl, siteTmplSkope ) {
                                     // If no match found, keep sniffing
@@ -235,7 +243,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               } );
                         }
 
-                        _inheritsSiteTemplate = _hasSiteTemplateSet && !_hasLocalNBCustomizations;
+                        _inheritsSiteTemplate = _hasSiteTemplateSet && !_hasLocalNBCustomizations && _is_inheritance_enabled_in_local_options;
                         var _msg = sektionsLocalizedData.i18n['This page is not customized with NB'];
                         if ( _inheritsSiteTemplate ) {
                               _msg = '<span class="sek-goto-site-tmpl-options">' + sektionsLocalizedData.i18n['This page inherits a NB site template'] + '</span>';

@@ -336,16 +336,16 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
                   // INHERITANCE
                   // solves the problem of preventing group template inheritance after a local reset
-                  var _is_inheritance_enabled = true;
+                  var _is_inheritance_enabled_in_local_options = true;
                   if ( 'local' === scope ) {
                         if ( localOptions && _.isObject(localOptions) && localOptions.local_reset && !_.isUndefined( localOptions.local_reset.inherit_group_scope ) ) {
-                              _is_inheritance_enabled = localOptions.local_reset.inherit_group_scope;
+                              _is_inheritance_enabled_in_local_options = localOptions.local_reset.inherit_group_scope;
                         }
                   }
 
                   newSettingValue = $.extend( true, {}, self.getDefaultSektionSettingValue( scope ) );
 
-                  if ( !_is_inheritance_enabled ) {
+                  if ( !_is_inheritance_enabled_in_local_options ) {
                         newSettingValue.local_options.local_reset = { inherit_group_scope : false };
                   }
                   // April 2021, for site templates #478 => the default local sektion model includes property __inherits_group_skope_tmpl_when_exists__, set to true
