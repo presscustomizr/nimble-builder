@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.7
-Stable tag: 3.1.0
+Stable tag: 3.1.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -129,144 +129,7 @@ We have also published a detailed [troubleshooting guide for Nimble Builder](htt
 If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
-3.1.0 : [Site templates] Introduction of a new set of options for defining site templates in global options. More details on https://docs.presscustomizr.com/article/428-how-to-use-site-templates-with-nimble-builder
+Visit the [Github release page](https://github.com/presscustomizr/nimble-builder/releases).
 
 == Changelog ==
-= 3.1.0 April 20th 2021 =
-* fixed : [level tree] error when trying to scroll to clicked level
-* fixed : [post grid module] remove tag from title
-* fixed : [template tags/shortcodes] remove all spaces so that we NB detect template tags and shortcodes that have spaces inside curly braces or bracket, like {{  the_tags  }}
-* fixed : [level background] overlay color not applied when using the contextual post thumbnail as background
-* fixed : [UI] focus on edited element broken after an ajax action
-* fixed : [reverse-column] make sure the reverse-column CSS rule is not inherited by a nested section
-* fixed : [link style] set background on link:focus. (compatibility with TT1 WP default theme)
-* fixed : [level][anchor] make sure NB cleans the # if user left it
-* fixed : removed 'prepend_attachment' from the list of filters for 'the_nimble_tinymce_module_content'. NB doesn't need it and it can break {{the_title}} template tag when used in an attachment page
-* improved : [post grid module] clean "go_to" param in url when navigating the post pagination
-* improved : [UI] close level tree when expanding an UI accordion
-* improved : [template gallery] display template name on top in a bar always visible
-* added : [grid module][site templates] new options to allow using the current contextual WP query instead of generating a custom one
-* added : [site templates] a set of new site template options in global options
-* added : [site templates] specific NB template for comments + its own stylesheet
-* added : [site templates] added new template tags
-
-= 3.0.2 March 30th 2021 =
-* fixed : [PHP 8.0+][slider module][accordion module] fix "Deprecated: Required parameter $... follows optional parameter ".
-* fixed : [local options] make sure they are reset when : importing a file, after a local reset, after a template injection, a history navigation action
-* fixed : [performance] better caching for Nimble_Manager properties page_has_global_sections and page_has_local_sections
-* fixed : [export/import] make sure that rich text is properly sanitized
-* fixed : [button module] add a default top/bottom margin of 0.5em
-* added : [site templates] first stones for integrating a site template options in "Site wide options" group
-
-= 3.0.1 March 19th 2021 =
-* fixed : [templates][api] prevent hammering server by fetching templates too often
-* improved : [UI] style of the "add content" button
-* added : [slider module] new option to set the slide's background + remove default white default background
-
-= 3.0.0 March 18th 2021 =
-* fixed : [Font Awesome picker] the initial value is not displayed
-* fixed : [UI][preview] when clicking on a column outside any module, the column UI should open, even when the column has no module.
-* fixed : [menu module] increased specificity for hamburger menu button to fix collision with TT1 core theme
-* fixed : [admin] welcome notice not removed on click + breaking home dashboard and media library layout
-* improved : [post grid module] add new default font size values for post title depending on the device
-* improved : [UI] when a level is modified, no need to animate to it if already in screen
-* improved : [UI] style of template switcher button + use template button in light blue
-* improved : [UI][customizer topbar] added vertical separators between option groups
-* improved : [UI][level tree] highlight the level tree icon in light blue when the current page includes at least one NB level ( local or global )
-* improved : [UI][topbar] added more space around "+" add content icon
-* added : [template tags] {{year_now}} to print the current year. {{site_title}} which prints the site title
-* added : [templates] new user interface allowing users to pick pre-designed templates, or save and reuse templates
-
-= 2.2.6 March 13th 2021 =
-* fixed : [tiny MCE editor][customizer] make sure window.tinyMCE global is declared
-* improved : [customizer][font-picker and icon picker] automatically opens the select options after first click
-* improved : [customizer] added a link to the documentation to the template notification + various wording style improvements
-
-= 2.2.5 March 9th 2021 =
-* fixed : [performance][customizer] the font picker input of the global options could slow down UI
-* fixed : [performance][customizer] the list of icons is now generated only when clicking on the control
-* fixed : [sections][templates] prevent NB writing the boolean is_edit_meta in the section or template meta data
-* fixed : [user sections and templates] html encoding problem when injecting a user saved section or template that includes html markup
-* fixed : [template API] avoid hammering NB api with multiple calls at the same time
-
-= 2.2.4 March 8th 2021 =
-* improved : [performances] deactivate autoloading for some options
-
-= 2.2.3 March 4th, 2021 =
-* 100% compatible with WordPress 5.7 ( scheduled for March 9th 2021 )
-* fixed : [customizer] collection validation => allow setting value to be set even when there are errors + print an error message.
-* fixed : [customizer] prevent logging message of "missing location id" when click is outside a NB location
-
-= 2.2.2 February 18th, 2021 =
-* fixed : [character encoding] some characters like (€ quotemarks „“, ä ü ö ß and € 😘🚀) can break rich text editor content
-
-= 2.2.1 February 11th, 2021 =
-* fixed : regression introduced when fixing emoji encoding issue => json encoding html markup can break serialization
-* fixed : [button module] remove sanitize_text_field() action when sanitizing
-
-= 2.2.0 February 9th, 2021 =
-* fixed : inserting emojis leading to blank page
-* fixed : [html module] prevent double instantiation of the code editor
-* added : [template] beta version of template saving
-* added : [image module] new option to use the current post thumbnail as source of the image
-* added : [level background] new option to use the current post thumbnail as source for the background url
-
-= 2.1.36 February 2nd, 2021 =
-* Updated : FontAwesome icons to latest version (v5.15.2)
-
-= 2.1.35 January 29th, 2021 =
-* fixed : [form module] reCaptcha badge not displayed even when global option checked
-* improved : [performance] prevent concatenating twice the same module stylesheet if used both in local and global stylesheets
-* added : [mobile menu] collapsible sub-menu items
-
-= 2.1.34 January 25th, 2021 =
-* fixed : [Menu module] Submenu items not clickable when option "expand the menu in full width below the menu hamburger icon." is checked
-
-= 2.1.33 January 21, 2021 =
-* fixed : [menu module] clicking on a sub menu item doesn't open the link
-* added : [user sections] edit icon to modify the title and description of the section
-
-= 2.1.32 January 12, 2021 =
-* fixed : [form module] javascript may break after submitting the form when jQuery called too early
-
-= 2.1.31 December 24th, 2020 =
-* fixed : [customizer] minor possible bug when initializing NB customization interface
-
-= 2.1.30 December 23rd, 2020 =
-* fixed : [dynamic CSS] insufficient specificity when setting section style options
-* fixed : [file import] bug when trying to assign sections to missing locations if current page uses a local header/footer
-* fixed : [text editor module] line break not preserved when re-opening a text module UI
-
-= 2.1.29 December 12, 2020 =
-* fixed : [customizer] minor issue when adding a new section in an empty location
-* fixed : [customizer][pre-built sections ui] pre-opened section group is broken
-* improved : [user template] added various component to prepare introduction of reusable templates
-
-= 2.1.28 December 3rd 2020 =
-* fixed : [js] always check that window.nb_ is defined before trying to emit an event
-* fixed : [performance] removed global performance > jQuery options, replaced by PHP boolean constants: NIMBLE_LOAD_JQUERY_ASYNC and NIMBLE_USE_LATEST_JQUERY_VERSION
-
-= 2.1.27 November 24th 2020 =
-* fixed : [WP5.7][jquery-migrate] replaced deprecated shorthands and fixed wrong usage $.fn.css() method
-* fixed : [carousel module] when customizing the lazy-load preloader is not self-removed
-* fixed : [images] removes any additional style attribute added by a theme ( Twenty Twenty one ) or a plugin to the image
-* added : [slider module][performances] introduction of a new option to pick an image size
-* fixed : [lazyload][performance] Wait and trigger the dom-ready again after 1 second, so we don't miss any image initially below the viewport (can happen if the height of a page element like a slider is modified at dom ready)
-* added : [post grid module] grid layout now supports up to 12 columns
-* improved : [post grid module] the number of columns by device is now consistent with the global custom breakpoint, and the section custom breakpoint
-* improved : [post grid module] default border-radius of post thumbnail now set to 4px by default
-* improved : [grid module] adjust default font-size, line-height, color css rules for text blocks
-
-= 2.1.26 November 24th 2020 =
-* fixed : [pre-built section] link to demo should not be displayed when not specified
-* fixed : [WP 5.6] images in the image module should not be inline styled by third party themes/plugins (as new default theme Twenty Twenty One does it with a filter for example )
-* fixed : [WPML translation] compatibility issue with WPML preventing NB to build translated page
-
-= 2.1.24 November 19th 2020 =
-* fixed : [WP 5.6][admin][NB button] updated selector of the header toolbar with new in WP5.6 + implement retro-compat with previous versions
-* added : [compatibility] Implemented compatibility with the content analyzer of Rank Math SEO plugin
-* added : [button module] new options to customize width and height of the button
-
-= 2.1.23 November 17th 2020 =
-* fixed : [jQuery][javascript] prepare code for WordPress 5.6+ and removal of jquery migrate
-* fixed : fixed : [CSS][default style] headings font-sizes should be styled by default when used in another module than the heading one, like in the rich text module for example
+You'll find the latest changelog on the [Github page](https://github.com/presscustomizr/nimble-builder/releases).

@@ -4,10 +4,6 @@ if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 // @return bool
-function sek_is_debug_mode() {
-  return isset( $_GET['nimble_debug'] ) || sek_booleanize_checkbox_val( get_option( 'nb_debug_mode_active' ) );
-}
-// @return bool
 function sek_is_dev_mode() {
   return ( defined( 'NIMBLE_DEV' ) && NIMBLE_DEV ) || ( defined( 'WP_DEBUG' ) && WP_DEBUG );
 }
@@ -42,6 +38,9 @@ if ( !defined( 'NIMBLE_OPT_FOR_GLOBAL_CSS' ) ) { define( 'NIMBLE_OPT_FOR_GLOBAL_
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_SECTION_JSON' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SECTION_JSON' , 'nimble_prebuild_sections' ); }// <= name updated in march 2021, was nb_prebuild_section_json
 
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES' ) ) { define( 'NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES' , 'nb_backward_fixes' ); }
+if ( !defined( 'NIMBLE_OPT_NAME_FOR_SHORTCODE_PARSING' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SHORTCODE_PARSING' , 'nb_shortcodes_parsed_in_czr' ); }
+if ( !defined( 'NIMBLE_OPT_NAME_FOR_DEBUG_MODE' ) ) { define( 'NIMBLE_OPT_NAME_FOR_DEBUG_MODE' , 'nb_debug_mode_active' ); }
+
 
 if ( !defined( 'NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED' ) ) { define( 'NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED' , '__nimble__' ); }
 if ( !defined( 'NIMBLE_WIDGET_PREFIX' ) ) { define( 'NIMBLE_WIDGET_PREFIX' , 'nimble-widget-area-' ); }
@@ -49,9 +48,16 @@ if ( !defined( 'NIMBLE_ASSETS_VERSION' ) ) { define( 'NIMBLE_ASSETS_VERSION', se
 if ( !defined( 'NIMBLE_MODULE_ICON_PATH' ) ) { define( 'NIMBLE_MODULE_ICON_PATH' , NIMBLE_BASE_URL . '/assets/czr/sek/icons/modules/' ); }
 if ( !defined( 'NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID') ) { define( 'NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID' , 'czr-customize-content_editor' ); }
 
+// TRANSIENTS ID
 if ( !defined( 'NIMBLE_WELCOME_NOTICE_ID' ) ) { define ( 'NIMBLE_WELCOME_NOTICE_ID', 'nimble-welcome-notice-12-2018' ); }
 //mt_rand(0, 65535) . 'test-nimble-feedback-notice-04-2019'
 if ( !defined( 'NIMBLE_FEEDBACK_NOTICE_ID' ) ) { define ( 'NIMBLE_FEEDBACK_NOTICE_ID', 'nimble-feedback-notice-04-2019' ); }
+if ( !defined( 'NIMBLE_FAWESOME_TRANSIENT_ID' ) ) { define ( 'NIMBLE_FAWESOME_TRANSIENT_ID', 'sek_font_awesome_february_2020' ); }
+if ( !defined( 'NIMBLE_GFONTS_TRANSIENT_ID' ) ) { define ( 'NIMBLE_GFONTS_TRANSIENT_ID', 'sek_gfonts_march_2020' ); }
+if ( !defined( 'NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID' ) ) { define ( 'NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID', 'nimble_preset_sections_refreshed' ); }
+if ( !defined( 'NIMBLE_FEEDBACK_STATUS_TRANSIENT_ID' ) ) { define ( 'NIMBLE_FEEDBACK_STATUS_TRANSIENT_ID', 'nimble_feedback_status' ); }
+if ( !defined( 'NIMBLE_API_CHECK_TRANSIENT_ID' ) ) { define ( 'NIMBLE_API_CHECK_TRANSIENT_ID', 'nimble_version_check_for_api' ); }
+
 
 if ( !defined( 'NIMBLE_GOOGLE_FONTS_STYLESHEET_ID' ) ) { define ( 'NIMBLE_GOOGLE_FONTS_STYLESHEET_ID', 'sek-gfonts-local-and-global' ); }
 if ( !defined( 'NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID' ) ) { define ( 'NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID', 'nimble-global-inline-style' ); }
@@ -63,6 +69,11 @@ if ( !defined( 'NIMBLE_JQUERY_MIGRATE_URL' ) ) { define ( 'NIMBLE_JQUERY_MIGRATE
 if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2",
   ( defined('NIMBLE_FETCH_API_LOCALLY') && NIMBLE_FETCH_API_LOCALLY && defined('NIMBLE_LOCAL_API_URL') ) ? NIMBLE_LOCAL_API_URL : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
 ); }
+
+// @return bool
+function sek_is_debug_mode() {
+  return isset( $_GET['nimble_debug'] ) || sek_booleanize_checkbox_val( get_option( NIMBLE_OPT_NAME_FOR_DEBUG_MODE ) );
+}
 
 ?><?php
 /* ------------------------------------------------------------------------- *
@@ -1832,6 +1843,46 @@ function sek_get_local_option_value( $option_name = '', $skope_id = null ) {
     return $values;
 }
 
+// Introduced for site templates, when using function sek_is_inheritance_locally_disabled()
+// needed because we can't rely on sek_get_skoped_seks() to get current local sections data, because this function returns the inherited data
+// @param $option_name = string
+// 'nimble_front_classes_ready' is fired when Nimble_Manager() is instanciated
+function sek_get_local_option_value_without_inheritance( $option_name = '', $skope_id = null ) {
+    if ( empty($option_name) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid option name' );
+        return array();
+    }
+    if ( !skp_is_customizing() && did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->local_options ) {
+        $local_options = Nimble_Manager()->local_options;
+    } else {
+        // use the provided skope_id if in the signature
+        $skope_id = ( !empty( $skope_id ) && is_string( $skope_id ))? $skope_id : skp_get_skope_id();
+        $localSkopeNimble = sek_get_seks_without_group_inheritance( $skope_id );
+        if ( skp_is_customizing() && NIMBLE_GLOBAL_SKOPE_ID != $skope_id ) {
+            // when customizing, let us filter the value with the 'customized' ones
+            $localSkopeNimble = apply_filters(
+                'sek_get_skoped_seks',
+                $localSkopeNimble,
+                $skope_id,
+                ''
+            );
+        }
+
+        $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
+        // Cache only after 'wp' && 'nimble_front_classes_ready'
+        // never cache when doing ajax
+        if ( did_action('nimble_front_classes_ready') && did_action('wp') && !defined('DOING_AJAX') )  {
+            Nimble_Manager()->local_options = $local_options;
+        }
+    }
+    // maybe normalizes with default values
+    $values = ( !empty( $local_options ) && !empty( $local_options[ $option_name ] ) ) ? $local_options[ $option_name ] : null;
+    if ( did_action('nimble_front_classes_ready') ) {
+        $values = sek_normalize_local_options_with_defaults( $option_name, $values );
+    }
+    return $values;
+}
+
 
 // @return array() $normalized_values
 // @see _1_6_4_sektions_generate_UI_local_skope_options.js
@@ -2788,7 +2839,7 @@ function sek_get_feedback_notif_status() {
 
     // Check if we already stored the status in a transient first
 
-    $transient_name = 'nimble_feedback_status';
+    $transient_name = NIMBLE_FEEDBACK_STATUS_TRANSIENT_ID;
     $transient_value = get_transient( $transient_name );
     if ( false != $transient_value ) {
         return 'eligible' === $transient_value;
@@ -3292,6 +3343,7 @@ function sek_clean_transients_like( $transient_string ) {
     $results = $wpdb->get_results( $sql );
     $transients = array();
 
+    // TRANSIENTS
     foreach ( $results as $result ) {
         if ( 0 === strpos( $result->name, '_transient' ) ) {
             if ( 0 === strpos( $result->name, '_transient_timeout_') ) {
@@ -3317,6 +3369,37 @@ function sek_clean_transients_like( $transient_string ) {
         }
     }
 }
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  OPTIONS CLEANING
+/* ------------------------------------------------------------------------- */
+//  introduced for https://github.com/presscustomizr/nimble-builder/issues/826
+function sek_clean_options_starting_like( $opt_string ) {
+    global $wpdb;
+    $where_like = '%'.$opt_string.'%';
+    $sql = "SELECT `option_name` AS `name`, `option_value` AS `value`
+            FROM  $wpdb->options
+            WHERE `option_name` LIKE '$where_like'
+            ORDER BY `option_name`";
+
+    $results = $wpdb->get_results( $sql );
+    if ( !is_array( $results ) )
+      return;
+
+    foreach ( $results as $result ) {
+        if ( 0 === strpos( $result->name, $opt_string ) ) {
+            delete_option( $result->name );
+        }
+    }
+}
+
+
+
+
 
 
 // July 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/720
@@ -3444,7 +3527,7 @@ function sek_get_nimble_api_data( $params ) {
     }
 
     $theme_slug = sek_get_parent_theme_slug();
-    $version_transient_value = get_transient( 'nimble_version_check_for_api');
+    $version_transient_value = get_transient( NIMBLE_API_CHECK_TRANSIENT_ID );
     $expected_version_transient_value = NIMBLE_VERSION . '_' . $theme_slug;
     $api_needs_update = $version_transient_value != $expected_version_transient_value;
 
@@ -3495,7 +3578,7 @@ function sek_get_nimble_api_data( $params ) {
         set_transient( $transient_name, $api_data, '_api_error_' === $api_data ? 30 * MINUTE_IN_SECONDS : $transient_duration );
         // The api data will be refreshed on next plugin update, or next theme switch. Or if $transient_name has expired.
         // $expected_version_transient_value = NIMBLE_VERSION . '_' . $theme_slug;
-        set_transient( 'nimble_version_check_for_api', $expected_version_transient_value, 100 * DAY_IN_SECONDS );
+        set_transient( NIMBLE_API_CHECK_TRANSIENT_ID, $expected_version_transient_value, 100 * DAY_IN_SECONDS );
     }//if ( $force_update || false === $api_data )
     
     // if api_error a new api call will be done when the relevant transient will expire
@@ -3879,7 +3962,7 @@ function sek_get_raw_section_registration_params() {
 
 /////////////////////////////////////////////////////////////
 // JSON FOR PRESET SECTIONS
-// update is forced every 24 hours, see transient : 'nimble_preset_sections_refreshed'
+// update is forced every 24 hours, see transient : NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID
 // update is forced on 'upgrader_process_complete', on 'after_theme_switch'
 function sek_get_preset_section_collection_from_json( $force_update = false ) {
     // JULY 2020 => not stored in a transient anymore. For https://github.com/presscustomizr/nimble-builder/issues/730
@@ -4995,6 +5078,16 @@ function sek_is_static_front_page_on_front_and_when_customizing() {
     return $is_front_page && 'page' == get_option( 'show_on_front' );
 }
 
+// @return boolean
+// solves the problem of preventing group template inheritance after a local reset
+function sek_is_inheritance_locally_disabled() {
+    $local_reset_data = sek_get_local_option_value_without_inheritance( 'local_reset' );
+    if ( is_array( $local_reset_data ) && array_key_exists( 'inherit_group_scope', $local_reset_data ) && !sek_booleanize_checkbox_val($local_reset_data['inherit_group_scope'] ) ) {
+        return true;
+    }
+    return false;
+}
+
 
 /* ------------------------------------------------------------------------- *
  *  SITE TEMPLATES CSS
@@ -5009,6 +5102,11 @@ function sek_set_skope_id_before_generating_local_front_css($skope_id) {
     // if is viewing front page, we don't want to inherit 'skp__all_page' scope
     if ( sek_is_static_front_page_on_front_and_when_customizing() )
         return $skope_id;
+
+    // checkbox 'inherit_group_scope' set to true by default
+    if ( sek_is_inheritance_locally_disabled() ) {
+        return $skope_id;
+    }
 
     // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
     // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
@@ -5044,6 +5142,10 @@ function sek_maybe_get_seks_for_group_site_template( $skope_id, $local_seks_data
     if ( sek_is_static_front_page_on_front_and_when_customizing() )
         return $local_seks_data;
 
+    // checkbox 'inherit_group_scope' set to true by default
+    if ( sek_is_inheritance_locally_disabled() ) {
+        return $local_seks_data;
+    }
     // When a page has not been locally customized, property __inherits_group_skope_tmpl_when_exists__ is true ( @see sek_get_default_location_model() )
     // As soon as the main local setting id is modified, __inherits_group_skope_tmpl_when_exists__ is set to false ( see js control::updateAPISetting )
     // After a reset case, NB sets __inherits_group_skope_tmpl_when_exists__ back to true ( see js control:: resetCollectionSetting )
