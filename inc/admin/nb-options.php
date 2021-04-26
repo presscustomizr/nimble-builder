@@ -197,6 +197,121 @@ function print_welcome_page() {
 }
 
 /* ------------------------------------------------------------------------- *
+*  DATA CLEANING for #826
+/* ------------------------------------------------------------------------- */
+// Fired when click on button in admin options
+// introduced for https://github.com/presscustomizr/nimble-builder/issues/826
+  function sek_clean_all_nimble_data() {
+    if ( !isset( $_GET['clean_nb'] ) )
+      return;
+
+    // Do we have a nonce passed ?
+    if ( !isset( $_GET['ecnon'] ) )
+      return;
+
+    // validate the nonce and verify the user as permission to save.
+    if ( !wp_verify_nonce( wp_unslash( $_GET['ecnon'] ), 'nb-base-options' ) || !current_user_can( 'manage_options' ) )
+      return;
+
+    // Nimble CPT for skoped sections, for user templates, for user sections
+    $nb_cpt_list = [ 'NIMBLE_CPT', 'NIMBLE_TEMPLATE_CPT', 'NIMBLE_SECTION_CPT' ];
+    foreach( $nb_cpt_list as $nb_cpt ) {
+        if ( !defined( $nb_cpt ) )
+          continue;
+        $nb_cpt = constant($nb_cpt);
+        $query = new \WP_Query(
+          array(
+            'post_type'              => $nb_cpt,
+            'post_status'            => get_post_stati(),
+            'posts_per_page'         => -1,
+            'no_found_rows'          => true,
+            'cache_results'          => true,
+            'update_post_meta_cache' => false,
+            'update_post_term_cache' => false,
+            'lazy_load_term_meta'    => false,
+          )
+        );
+        if ( !is_array( $query->posts ) || empty( $query->posts ) ) {
+          continue;
+        }
+        foreach ( $query->posts as $post_object ) {
+          //permanently delete post ( unlike wp_trash_post() )
+          wp_delete_post($post_object->ID);
+        }
+    }
+
+    // Nimble options
+    $nb_opts = [
+      'NIMBLE_OPT_SEKTION_POST_INDEX',
+      'NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS',
+      'NIMBLE_OPT_FOR_MODULE_CSS_READING_STATUS',
+      'NIMBLE_OPT_NAME_FOR_MOST_USED_FONTS',
+      'NIMBLE_OPT_FOR_GLOBAL_CSS',
+      'NIMBLE_OPT_NAME_FOR_SECTION_JSON',
+      'NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES',
+      // admin options
+      'NIMBLE_OPT_NAME_FOR_SHORTCODE_PARSING',
+      'NIMBLE_OPT_NAME_FOR_DEBUG_MODE'
+    ];
+    foreach( $nb_opts as $opt_name ) {
+      if ( !defined( $opt_name ) )
+        continue;
+      $opt_name = constant($opt_name);
+      delete_option( $opt_name );
+    }
+    // clean other options like : nimble_start_date, nimble_started_with_version, nimble_version, nimble___skp__post_page_1010 ( old way to map skope_id and skoped post )
+    sek_clean_options_starting_like( 'nimble_');
+    sek_clean_options_starting_like( 'nimblebuilder_');
+
+    // Nimble transients
+    $nb_transients = [
+      'NIMBLE_FEEDBACK_NOTICE_ID',
+      'NIMBLE_FAWESOME_TRANSIENT_ID',
+      'NIMBLE_GFONTS_TRANSIENT_ID',
+      'NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID',
+      'NIMBLE_FEEDBACK_STATUS_TRANSIENT_ID',
+      'NIMBLE_API_CHECK_TRANSIENT_ID'
+    ];
+    foreach( $nb_transients as $trans_id ) {
+      if ( !defined( $trans_id ) )
+        continue;
+      $trans_id = constant($trans_id);
+      delete_transient( $trans_id );
+    }
+    // => remove all other transients
+    sek_clean_transients_like( 'nimble_' );//'nimble_api_posts', 'nimble_api_tmpl_' . $tmpl_name
+    sek_clean_transients_like( 'section_params_transient' );//old transient that may still be there
+    sek_clean_transients_like( 'section_params_transient' );//old transient that may still be there
+
+
+    // Nimble CSS stylesheets
+    $css_dir_list = [ 'NIMBLE_DEPREC_ONE_CSS_FOLDER_NAME', 'NIMBLE_DEPREC_TWO_CSS_FOLDER_NAME', 'NIMBLE_CSS_FOLDER_NAME' ];
+    global $wp_filesystem;
+    require_once ( ABSPATH . '/wp-admin/includes/file.php' );
+    WP_Filesystem();
+    $upload_dir = wp_get_upload_dir();
+
+    foreach( $css_dir_list as $css_dir ) {
+      if ( !defined( $css_dir ) )
+        continue;
+      $css_dir = constant( $css_dir );
+      if ( is_multisite() ) {
+          $site        = get_site();
+          $network_id  = $site->site_id;
+          $site_id     = $site->blog_id;
+          $css_dir     = trailingslashit( $css_dir ) . trailingslashit( $network_id ) . $site_id;
+      }
+
+      $folder_path = wp_normalize_path( trailingslashit( $upload_dir['basedir'] ) . $css_dir );
+      if ( $wp_filesystem->exists( $folder_path ) ) {
+          $wp_filesystem->rmdir( $folder_path, true );
+      }
+    }
+    return 'success';
+  }
+
+
+/* ------------------------------------------------------------------------- *
 *  OPTIONS PAGE
 /* ------------------------------------------------------------------------- */
 nb_register_option_tab([
@@ -215,7 +330,7 @@ function print_options_page() {
           <td>
             <fieldset><legend class="screen-reader-text"><span><?php _e('Shortcodes', 'text_doma'); ?></span></legend>
               <?php
-                $shortcode_opt_val = get_option( 'nb_shortcodes_parsed_in_czr' );
+                $shortcode_opt_val = get_option( NIMBLE_OPT_NAME_FOR_SHORTCODE_PARSING );
               ?>
               <label for="nb_shortcodes_parsed_in_czr"><input name="nb_shortcodes_parsed_in_czr" type="checkbox" id="nb_shortcodes_parsed_in_czr" value="on" <?php checked( $shortcode_opt_val, 'on' ); ?>>
               <?php _e('Parse shortcodes when building your pages in the customizer', 'text_doma'); ?></label>
@@ -228,7 +343,7 @@ function print_options_page() {
           <td>
             <fieldset><legend class="screen-reader-text"><span><?php _e('Debug Mode', 'text_doma'); ?></span></legend>
               <?php
-                $nb_debug_mode_opt_val = get_option( 'nb_debug_mode_active' );
+                $nb_debug_mode_opt_val = get_option( NIMBLE_OPT_NAME_FOR_DEBUG_MODE );
               ?>
               <label for="nb_debug_mode_active"><input name="nb_debug_mode_active" type="checkbox" id="nb_debug_mode_active" value="on" <?php checked( $nb_debug_mode_opt_val, 'on' ); ?>>
               <?php _e('Activate the debug mode when customizing', 'text_doma'); ?></label>
@@ -244,6 +359,60 @@ function print_options_page() {
       submit_button();
     ?>
     </form>
+    <hr/>
+    <table class="form-table" role="presentation">
+      <tbody>
+        <tr>
+          <th scope="row"><?php _e('Remove all Nimble Builder data', 'text_doma'); ?></th>
+          <td>
+            <fieldset><legend class="screen-reader-text"><span><?php _e('Remove all Nimble Builder data', 'text_doma'); ?></span></legend>
+              <?php
+                $refresh_url = add_query_arg( array( 'tab' => 'options', 'clean_nb' => 'true' ), admin_url( NIMBLE_OPTIONS_PAGE_URL ));
+              ?>
+              <script>
+                var nb_toggle_clean_button = function() {
+                  jQuery( function($) {
+                    $('.nb-clean-traces-confirm').stop().slideToggle('fast');
+                  });
+                };
+                var _nonce_value, _url
+                var nb_refresh_opt_page = function() {
+                  jQuery( function($) {
+                    _nonce_value = $('#nb-base-options-nonce').val();
+                    _url = '<?php echo $refresh_url; ?>';
+                    // add nonce as param so NB can verify it when the page reloads
+                    if ( _nonce_value ) {
+                      _url = _url + '&ecnon=' + _nonce_value;// looks like site.com/wp-admin/options-general.php?page=nb-options&tab=options&clean_nb=true&ecnon=7cc5758b65
+                    }
+                    window.location.href = _url;
+                  });
+                };
+              </script>
+
+              <?php if ( isset( $_GET['clean_nb'] ) && $_GET['clean_nb'] ) : ?>
+                  <?php $status = sek_clean_all_nimble_data(); ?>
+                    <?php if ( 'success' === $status ) : ?>
+                      <div id="message" class="updated notice">
+                        <p class="nb-clean-traces-success"><strong><?php _e('All Nimble Builder data have been successfully removed from your WordPress website.', 'text_doma'); ?></strong></p>
+                      </div>
+                    <?php else : ?>
+                      <div id="message" class="error notice">
+                        <p><strong><?php _e('Security problem when trying to remove Nimble Builder data.', 'text_doma'); ?></strong></p>
+                      </div>
+                    <?php endif; ?>
+              <?php else : ?>
+                  <p class="description"><?php _e('This will permanently remove all data created by Nimble Builder and stored in your database or as stylesheets : page customizations, custom sections, custom templates, options, CSS stylesheets.', 'text_doma'); ?></p><br/>
+                  <button class="button" onclick="window.nb_toggle_clean_button()"><?php _e('Remove now', 'text_doma'); ?></button>
+                  <div class="nb-clean-traces-confirm" style="display:none">
+                    <p class="description"><?php _e('Once you delete Nimble Builder data, there is no going back. Please be certain. ', 'text_doma'); ?></p><br/>
+                    <button class="button nb-permanent-removal-btn" onclick="window.nb_refresh_opt_page()"><?php _e('Yes I want to clean all data', 'text_doma'); ?></button>
+                  </div>
+              <?php endif; ?>
+            </fieldset>
+          </td>
+        </tr>
+      </tbody>
+    </table>
     <?php
 }
 add_action( 'nb_admin_post', '\Nimble\nb_save_base_options' );
@@ -254,9 +423,9 @@ function nb_save_base_options() {
         return;
 
     // Shortcode parsing when customizing
-    nb_maybe_update_checkbox_option( 'nb_shortcodes_parsed_in_czr', 'off' );
+    nb_maybe_update_checkbox_option( NIMBLE_OPT_NAME_FOR_SHORTCODE_PARSING, 'off' );
     // Debug mode
-    nb_maybe_update_checkbox_option( 'nb_debug_mode_active', 'off' );
+    nb_maybe_update_checkbox_option( NIMBLE_OPT_NAME_FOR_DEBUG_MODE, 'off' );
 }
 
 // helper to update a checkbox option

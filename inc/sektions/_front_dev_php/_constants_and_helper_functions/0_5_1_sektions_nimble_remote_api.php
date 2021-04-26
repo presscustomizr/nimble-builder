@@ -77,7 +77,7 @@ function sek_get_nimble_api_data( $params ) {
     }
 
     $theme_slug = sek_get_parent_theme_slug();
-    $version_transient_value = get_transient( 'nimble_version_check_for_api');
+    $version_transient_value = get_transient( NIMBLE_API_CHECK_TRANSIENT_ID );
     $expected_version_transient_value = NIMBLE_VERSION . '_' . $theme_slug;
     $api_needs_update = $version_transient_value != $expected_version_transient_value;
 
@@ -128,7 +128,7 @@ function sek_get_nimble_api_data( $params ) {
         set_transient( $transient_name, $api_data, '_api_error_' === $api_data ? 30 * MINUTE_IN_SECONDS : $transient_duration );
         // The api data will be refreshed on next plugin update, or next theme switch. Or if $transient_name has expired.
         // $expected_version_transient_value = NIMBLE_VERSION . '_' . $theme_slug;
-        set_transient( 'nimble_version_check_for_api', $expected_version_transient_value, 100 * DAY_IN_SECONDS );
+        set_transient( NIMBLE_API_CHECK_TRANSIENT_ID, $expected_version_transient_value, 100 * DAY_IN_SECONDS );
     }//if ( $force_update || false === $api_data )
     
     // if api_error a new api call will be done when the relevant transient will expire

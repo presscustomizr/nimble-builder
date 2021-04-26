@@ -204,7 +204,7 @@ function sek_get_raw_section_registration_params() {
 
 /////////////////////////////////////////////////////////////
 // JSON FOR PRESET SECTIONS
-// update is forced every 24 hours, see transient : 'nimble_preset_sections_refreshed'
+// update is forced every 24 hours, see transient : NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID
 // update is forced on 'upgrader_process_complete', on 'after_theme_switch'
 function sek_get_preset_section_collection_from_json( $force_update = false ) {
     // JULY 2020 => not stored in a transient anymore. For https://github.com/presscustomizr/nimble-builder/issues/730

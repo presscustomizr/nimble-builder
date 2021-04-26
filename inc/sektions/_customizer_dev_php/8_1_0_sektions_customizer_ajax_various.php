@@ -188,7 +188,7 @@ function sek_get_fa_icon_list_tmpl( $html, $requested_tmpl = '', $posted_params 
 function sek_retrieve_decoded_font_awesome_icons() {
     // this file must be generated with: https://github.com/presscustomizr/nimble-builder/issues/57
     $faicons_json_path      = NIMBLE_BASE_PATH . '/assets/faicons.json';
-    $faicons_transient_name = 'sek_font_awesome_february_2020';
+    $faicons_transient_name = NIMBLE_FAWESOME_TRANSIENT_ID;
     if ( false == get_transient( $faicons_transient_name ) ) {
         if ( file_exists( $faicons_json_path ) ) {
             $faicons_raw      = @file_get_contents( $faicons_json_path );
@@ -270,7 +270,7 @@ function sek_get_cfonts() {
 //
 // => The transient name is now : czr_gfonts_june_2017
 function sek_retrieve_decoded_gfonts() {
-    if ( false == get_transient( 'sek_gfonts_march_2020' ) ) {
+    if ( false == get_transient( NIMBLE_GFONTS_TRANSIENT_ID ) ) {
         $gfont_raw      = @file_get_contents( NIMBLE_BASE_PATH ."/assets/webfonts.json" );
 
         if ( $gfont_raw === false ) {
@@ -278,10 +278,10 @@ function sek_retrieve_decoded_gfonts() {
         }
 
         $gfonts_decoded   = json_decode( $gfont_raw, true );
-        set_transient( 'sek_gfonts_march_2020' , $gfonts_decoded , 60*60*24*3000 );
+        set_transient( NIMBLE_GFONTS_TRANSIENT_ID , $gfonts_decoded , 60*60*24*3000 );
     }
     else {
-      $gfonts_decoded = get_transient( 'sek_gfonts_march_2020' );
+      $gfonts_decoded = get_transient( NIMBLE_GFONTS_TRANSIENT_ID );
     }
 
     return $gfonts_decoded;
@@ -346,9 +346,9 @@ function sek_get_preset_sektions() {
     // Note that the refresh should have take place on 'upgrader_process_complete'
     // always force refresh when developing
     $force_update = false;
-    if ( false == get_transient('nimble_preset_sections_refreshed') || sek_is_dev_mode() ) {
+    if ( false == get_transient(NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID) || sek_is_dev_mode() ) {
         $force_update = true;
-        set_transient( 'nimble_preset_sections_refreshed', 'yes', 2 * DAY_IN_SECONDS );
+        set_transient( NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID, 'yes', 2 * DAY_IN_SECONDS );
     }
     $preset_sections = sek_get_preset_section_collection_from_json( $force_update );
     if ( empty( $preset_sections ) ) {

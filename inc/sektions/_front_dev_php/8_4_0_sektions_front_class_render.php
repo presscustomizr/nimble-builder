@@ -1243,7 +1243,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             if ( !skp_is_customizing() ) {
                 $content = do_shortcode( $content );
             } else {
-                $allow_shortcode_parsing_when_customizing = sek_booleanize_checkbox_val( get_option( 'nb_shortcodes_parsed_in_czr' ) );
+                $allow_shortcode_parsing_when_customizing = sek_booleanize_checkbox_val( get_option( NIMBLE_OPT_NAME_FOR_SHORTCODE_PARSING ) );
                 if ( $allow_shortcode_parsing_when_customizing ) {
                     $content = do_shortcode( $content );
                 } else {
@@ -1269,7 +1269,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         function sek_run_shortcode( $content ) {
             // customizing => check if NB can parse the shortcode
             if ( skp_is_customizing() ) {
-                $allow_shortcode_parsing_when_customizing = sek_booleanize_checkbox_val( get_option( 'nb_shortcodes_parsed_in_czr' ) );
+                $allow_shortcode_parsing_when_customizing = sek_booleanize_checkbox_val( get_option( NIMBLE_OPT_NAME_FOR_SHORTCODE_PARSING ) );
                 if ( !$allow_shortcode_parsing_when_customizing ) {
                     return $content;
                 }

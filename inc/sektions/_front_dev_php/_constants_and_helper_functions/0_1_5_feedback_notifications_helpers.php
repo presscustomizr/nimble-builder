@@ -12,7 +12,7 @@ function sek_get_feedback_notif_status() {
 
     // Check if we already stored the status in a transient first
 
-    $transient_name = 'nimble_feedback_status';
+    $transient_name = NIMBLE_FEEDBACK_STATUS_TRANSIENT_ID;
     $transient_value = get_transient( $transient_name );
     if ( false != $transient_value ) {
         return 'eligible' === $transient_value;

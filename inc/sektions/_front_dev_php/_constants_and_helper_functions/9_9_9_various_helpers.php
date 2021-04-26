@@ -333,6 +333,7 @@ function sek_clean_transients_like( $transient_string ) {
     $results = $wpdb->get_results( $sql );
     $transients = array();
 
+    // TRANSIENTS
     foreach ( $results as $result ) {
         if ( 0 === strpos( $result->name, '_transient' ) ) {
             if ( 0 === strpos( $result->name, '_transient_timeout_') ) {
@@ -358,6 +359,37 @@ function sek_clean_transients_like( $transient_string ) {
         }
     }
 }
+
+
+
+
+
+/* ------------------------------------------------------------------------- *
+ *  OPTIONS CLEANING
+/* ------------------------------------------------------------------------- */
+//  introduced for https://github.com/presscustomizr/nimble-builder/issues/826
+function sek_clean_options_starting_like( $opt_string ) {
+    global $wpdb;
+    $where_like = '%'.$opt_string.'%';
+    $sql = "SELECT `option_name` AS `name`, `option_value` AS `value`
+            FROM  $wpdb->options
+            WHERE `option_name` LIKE '$where_like'
+            ORDER BY `option_name`";
+
+    $results = $wpdb->get_results( $sql );
+    if ( !is_array( $results ) )
+      return;
+
+    foreach ( $results as $result ) {
+        if ( 0 === strpos( $result->name, $opt_string ) ) {
+            delete_option( $result->name );
+        }
+    }
+}
+
+
+
+
 
 
 // July 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/720
