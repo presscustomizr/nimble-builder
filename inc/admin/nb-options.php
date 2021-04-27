@@ -259,9 +259,22 @@ function print_welcome_page() {
       $opt_name = constant($opt_name);
       delete_option( $opt_name );
     }
-    // clean other options like : nimble_start_date, nimble_started_with_version, nimble_version, nimble___skp__post_page_1010 ( old way to map skope_id and skoped post )
-    sek_clean_options_starting_like( 'nimble_');
-    sek_clean_options_starting_like( 'nimblebuilder_');
+
+    // clean other options like : nimble_start_date, nimble_started_with_version, nimble_version,
+    foreach( [
+      'nimble_start_date',
+      'nimble_started_with_version',
+      'nimble_version_upgraded_from',
+      'nimble_version',
+      'nimble_last_update_notice',
+      '__nimble_options__'//<= deprecated option name
+    ] as $opt_name ) {
+      delete_option( $opt_name );
+    }
+
+    // clean options like nimble___skp__post_page_1010 ( old way to map skope_id and skoped post )
+    sek_clean_options_starting_like( 'nimble___');
+    sek_clean_options_starting_like( 'nimblebuilder_pro_');
 
     // Nimble transients
     $nb_transients = [
