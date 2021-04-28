@@ -2252,7 +2252,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'font_size',
-                    'css_selectors' => array( '.sek-quote.sek-quote-design.sek-quote-icon-before::before', '.sek-quote.sek-quote-design.sek-quote-icon-before' )
+                    'css_selectors' => array( '.sek-quote.sek-quote-design.sek-quote-icon-before::before' )
                 ),
                 'icon_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
@@ -2272,7 +2272,35 @@ function sek_get_module_params_for_czr_quote_design_child() {
 
 
 
+/* ------------------------------------------------------------------------- *
+ *  SCHEDULE CSS RULES FILTERING
+/* ------------------------------------------------------------------------- */
+add_filter( 'sek_add_css_rules_for_module_type___czr_quote_module', '\Nimble\sek_add_css_rules_for_czr_quote_module', 10, 2 );
+// filter documented in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker
+// Note : $complete_modul_model has been normalized
+// @return populated $rules
+function sek_add_css_rules_for_czr_quote_module( $rules, $complete_modul_model ) {
+    if ( empty( $complete_modul_model['value'] ) )
+      return $rules;
 
+    // BACKGROUND
+    $value = $complete_modul_model['value'];
+    $design_settings = $value['design'];
+
+    if ( 'quote-icon-before' === $design_settings['quote_design'] && '50px' !== $design_settings['icon_size_css'] ) {
+        if ( is_rtl() ) {
+            $css_rule = sprintf('padding-right: calc( 10px + 0.7 * %1$s )', $design_settings['icon_size_css']);
+        } else {
+            $css_rule = sprintf('padding-left: calc( 10px + 0.7 * %1$s )', $design_settings['icon_size_css']);
+        }
+        $rules[] = array(
+            'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-quote-icon-before .sek-quote-inner',
+            'css_rules' => $css_rule,
+            'mq' =>null
+        );
+    }
+    return $rules;
+}
 
 
 
