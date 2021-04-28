@@ -1,24 +1,24 @@
 /*************************************
 * QUOTE MODULE
 *************************************/
-.#{$project-prefix}quote {
+.sek-quote {
     p {
         margin: 0 0 .5em;
         padding: 0;
     }
-    .#{$project-prefix}cite {
+    .sek-cite {
         font-size: 14px;
         line-height: 1.5em;
         font-style: inherit;
     }
     &[data-sek-quote-design="none"] { border-left: none;}//<= make sure the blockquote doesn't inherit another border style from the theme or a plugin
-    .#{$project-prefix}quote-content {
+    .sek-quote-content {
       font-weight: 400;
       font-size: 1.2em;//as defined as default value on module registration
       line-height: 1.5em;
       color: inherit;
     }
-    &.#{$project-prefix}quote-design {
+    &.sek-quote-design {
         //reset
         background: none;
         font-style: inherit;
@@ -33,24 +33,26 @@
         &::before, &::after {
             display: none;
         }
-        .#{$project-prefix}cite {
+        .sek-cite {
             padding: 0;
             &::before {
                 display: none;
             }
             font-weight: normal;
         }
-        .#{$project-prefix}quote-inner {
+        .sek-quote-inner {
             color: inherit;
-            @if ( true == $is_rtl ) {
-              padding-right: calc( 10px + 0.7em );
-            }
-            @else {
-              padding-left: calc( 10px + 0.7em );
-            }
+        }
+        &.sek-quote-icon-before .sek-quote-inner{
+          @if ( true == $is_rtl ) {
+            padding-right: calc( 10px + 0.7 * 50px );//50px is the default size of the quote icon, this CSS rule is overriden in dyn CSS if user changes the font size of the icon
+          }
+          @else {
+            padding-left: calc( 10px + 0.7 * 50px );//50px is the default size of the quote icon, this CSS rule is overriden in dyn CSS if user changes the font size of the icon
+          }
         }
         //border before
-        &.#{$project-prefix}border-before {
+        &.sek-border-before {
             @if ( true == $is_rtl ) {
               padding-right: 15px;
               border-right: 5px solid rgba(0,0,0,.1);;
@@ -59,7 +61,7 @@
               padding-left: 15px;
               border-left: 5px solid rgba(0,0,0,.1);;
             }
-            .#{$project-prefix}cite {
+            .sek-cite {
                 clear: both;
                 display: block;
                 margin-top: 1.5em;
@@ -93,11 +95,10 @@
             }
         }
         //icon before
-        &.#{$project-prefix}quote-icon-before {
+        &.sek-quote-icon-before {
             position: relative;
             display: flex;
-            font-size: 50px;
-            .#{$project-prefix}quote-content *:last-child {
+            .sek-quote-content *:last-child {
                 margin-bottom: .75em;
             }
             &::before {
@@ -105,6 +106,8 @@
                 // see https://github.com/presscustomizr/nimble-builder/issues/603
                 content: "\275D";//https://unicode-table.com/en/275D/
                 font-family: "Arial Unicode MS", Code2000;//<= https://www.fileformat.info/info/unicode/char/275D/fontsupport.htm
+                font-size: 50px;
+                line-height: 1em;
                 color: #ccc;
                 font-style: normal;
                 text-align: center;
