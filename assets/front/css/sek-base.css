@@ -1993,7 +1993,10 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
 
 .sek-quote.sek-quote-design .sek-quote-inner {
   color: inherit;
-  padding-left: calc(10px + 0.7em);
+}
+
+.sek-quote.sek-quote-design.sek-quote-icon-before .sek-quote-inner {
+  padding-left: 45px;
 }
 
 .sek-quote.sek-quote-design.sek-border-before {
@@ -2026,7 +2029,6 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
   position: relative;
   display: -ms-flexbox;
   display: flex;
-  font-size: 50px;
 }
 
 .sek-quote.sek-quote-design.sek-quote-icon-before .sek-quote-content *:last-child {
@@ -2036,6 +2038,8 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
 .sek-quote.sek-quote-design.sek-quote-icon-before::before {
   content: "\275D";
   font-family: "Arial Unicode MS", Code2000;
+  font-size: 50px;
+  line-height: 1em;
   color: #ccc;
   font-style: normal;
   text-align: center;

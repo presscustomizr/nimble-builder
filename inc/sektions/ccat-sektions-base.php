@@ -2530,6 +2530,8 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
             // Returns the customize url for the edit button when using Gutenberg editor
             // implemented for https://github.com/presscustomizr/nimble-builder/issues/449
             // @see assets/admin/js/nimble-gutenberg.js
+            add_action( 'wp_ajax_sek_get_post_status_before_customizing', array( $this, 'sek_get_post_status_before_customizing' ) );
+
             add_action( 'wp_ajax_sek_get_customize_url_for_nimble_edit_button', array( $this, 'sek_get_customize_url_for_nimble_edit_button' ) );
 
             // This is the list of accepted actions
@@ -2912,6 +2914,25 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
             $return_url_after_customization = '';//"/wp-admin/post.php?post={$post_id}&action=edit";
             $customize_url = sek_get_customize_url_for_post_id( $post_id, $return_url_after_customization );
             wp_send_json_success( $customize_url );
+        }
+
+        // check post status before attempting to open the customizer. introduced for #831
+        // draft post can't be edited with Nimble Builder
+        function sek_get_post_status_before_customizing() {
+            $this->sek_do_ajax_pre_checks( array( 'check_nonce' => false ) );
+
+            if ( !isset( $_POST['nimble_edit_post_id'] ) || empty( $_POST['nimble_edit_post_id'] ) ) {
+                wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing post_id' );
+            }
+
+            $post_id = $_POST['nimble_edit_post_id'];
+            $post = get_post($post_id);
+            $post_status = 'not_set';
+
+            if ( $post && is_object($post) && isset($post->post_status)) {
+                $post_status = $post->post_status;
+            }
+            wp_send_json_success( $post_status );
         }
 
     }//class

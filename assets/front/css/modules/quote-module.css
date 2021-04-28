@@ -52,7 +52,10 @@
 
 .sek-quote.sek-quote-design .sek-quote-inner {
   color: inherit;
-  padding-left: calc( 10px + 0.7em);
+}
+
+.sek-quote.sek-quote-design.sek-quote-icon-before .sek-quote-inner {
+  padding-left: calc( 10px + 0.7 * 50px);
 }
 
 .sek-quote.sek-quote-design.sek-border-before {
@@ -84,7 +87,6 @@
 .sek-quote.sek-quote-design.sek-quote-icon-before {
   position: relative;
   display: flex;
-  font-size: 50px;
 }
 
 .sek-quote.sek-quote-design.sek-quote-icon-before .sek-quote-content *:last-child {
@@ -94,6 +96,8 @@
 .sek-quote.sek-quote-design.sek-quote-icon-before::before {
   content: "\275D";
   font-family: "Arial Unicode MS", Code2000;
+  font-size: 50px;
+  line-height: 1em;
   color: #ccc;
   font-style: normal;
   text-align: center;
