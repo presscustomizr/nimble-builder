@@ -68,7 +68,7 @@
             // check post status before attempting to open the customizer. introduced for #831
             // draft post can't be edited with Nimble Builder
             var _post = wp.data.select('core/editor').getCurrentPost();
-            if ( _post && _.isObject( _post ) && 'publish' !== _post ) {
+            if ( _post && _.isObject( _post ) && 'publish' !== _post.status ) {
                 alert(nimbleAdminLocalized.i18n['Nimble Builder can only be used on published posts. This post is not published yet.']);
                 return;
             }
