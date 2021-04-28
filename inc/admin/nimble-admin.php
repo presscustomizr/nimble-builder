@@ -261,6 +261,7 @@ function sek_enqueue_js_asset_for_gutenberg_edit_button() {
     if ( !sek_current_user_can_edit( $post->ID ) || !current_user_can( 'customize' ) ) {
       return;
     }
+
     wp_enqueue_script(
       'nb-gutenberg',
       sprintf(
@@ -271,6 +272,16 @@ function sek_enqueue_js_asset_for_gutenberg_edit_button() {
       array('jquery'),
       NIMBLE_ASSETS_VERSION,
       true
+    );
+
+    wp_localize_script(
+      'nb-gutenberg',
+      'nimbleAdminLocalized',
+      array(
+          'i18n' => array(
+              "Nimble Builder can only be used on published posts. This post is not published yet." => __( "Nimble Builder can only be used on published posts. This post is not published yet.", 'text_doma'),
+          )
+      )
     );
 }
 
@@ -309,6 +320,32 @@ function sek_print_js_for_nimble_edit_btn() {
     <?php // Only printed when Gutenberg editor is NOT enabled ?>
       <script type="text/javascript">
       (function ($) {
+          var _doRedirectToCustomizer = function( post_id, $clickedEl ) {
+              wp.ajax.post( 'sek_get_customize_url_for_nimble_edit_button', {
+                  nimble_edit_post_id : post_id
+              }).done( function( resp ) {
+                  //$clickedEl.removeClass('sek-loading-customizer');
+                  window.location.href = resp;
+              }).fail( function( resp ) {
+                  $clickedEl.removeClass('sek-loading-customizer').addClass('button-primary');
+
+                  // If the ajax request fails, let's save the draft with a Nimble Builder title, and refresh the page, so the url is generated server side on next load.
+                  // var $postTitle = $('#title');
+                  //     post_title = $postTitle.val();
+                  // if ( !post_title ) {
+                  //     $postTitle.val( 'Nimble Builder #' + post_id );
+                  // }
+                  // if (wp.autosave) {
+                  //   wp.autosave.server.triggerSave();
+                  // }
+                  _.delay(function () {
+                      // off the javascript pop up warning if post not saved yet
+                      $( window ).off( 'beforeunload' );
+                      location.href = location.href; //wp-admin/post.php?post=70&action=edit
+                  }, 300 );
+              });
+          };
+
           // Attach event listener with delegation
           $('body').on( 'click', '#sek-edit-with-nimble', function(evt) {
               evt.preventDefault();
@@ -317,34 +354,20 @@ function sek_print_js_for_nimble_edit_btn() {
               if ( _.isEmpty( _url ) ) {
                   // introduced for https://github.com/presscustomizr/nimble-builder/issues/509
                   $clickedEl.addClass('sek-loading-customizer').removeClass('button-primary');
-
                   // for new post, the url is empty, let's generate it server side with an ajax call
                   var post_id = $('#post_ID').val();
-                  wp.ajax.post( 'sek_get_customize_url_for_nimble_edit_button', {
+                  wp.ajax.post( 'sek_get_post_status_before_customizing', {
                       nimble_edit_post_id : post_id
-                  }).done( function( resp ) {
-                      //$clickedEl.removeClass('sek-loading-customizer');
-                      location.href = resp;
-                  }).fail( function( resp ) {
+                  }).done( function( status ) {
+                    if ( 'publish' === status ) {
+                        _doRedirectToCustomizer( post_id, $clickedEl );
+                    } else {
                       $clickedEl.removeClass('sek-loading-customizer').addClass('button-primary');
-
-                      // If the ajax request fails, let's save the draft with a Nimble Builder title, and refresh the page, so the url is generated server side on next load.
-                      // var $postTitle = $('#title');
-                      //     post_title = $postTitle.val();
-                      // if ( !post_title ) {
-                      //     $postTitle.val( 'Nimble Builder #' + post_id );
-                      // }
-                      // if (wp.autosave) {
-                      //   wp.autosave.server.triggerSave();
-                      // }
-                      _.delay(function () {
-                          // off the javascript pop up warning if post not saved yet
-                          $( window ).off( 'beforeunload' );
-                          location.href = location.href; //wp-admin/post.php?post=70&action=edit
-                      }, 300 );
-                  });
+                      alert('<?php _e("Nimble Builder can only be used on published posts. This post is not published yet.", "text-doma"); ?>' );
+                    }
+                  }).fail( function( resp ) { console.log('Nimble Builder Error => problem when getting post status')});
               } else {
-                  location.href = _url;
+                  window.location.href = _url;
               }
           });
       })(jQuery);

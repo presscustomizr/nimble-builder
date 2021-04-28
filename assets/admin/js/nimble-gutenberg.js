@@ -1,3 +1,4 @@
+// global nimbleAdminLocalized
 // Introduced for https://github.com/presscustomizr/nimble-builder/issues/449
 (function ($) {
     var button_printed = false,
@@ -61,11 +62,20 @@
             };
 
         if ( _.isEmpty( _url ) ) {
+            // for new post, the url is empty, let's generate it server side with an ajax call
+            var post_id = wp.data.select('core/editor').getCurrentPostId();
+
+            // check post status before attempting to open the customizer. introduced for #831
+            // draft post can't be edited with Nimble Builder
+            var _post = wp.data.select('core/editor').getCurrentPost();
+            if ( _post && _.isObject( _post ) && 'publish' !== _post ) {
+                alert(nimbleAdminLocalized.i18n['Nimble Builder can only be used on published posts. This post is not published yet.']);
+                return;
+            }
+
             // introduced for https://github.com/presscustomizr/nimble-builder/issues/509
             $clickedEl.addClass('sek-loading-customizer').removeClass('button-primary');
 
-            // for new post, the url is empty, let's generate it server side with an ajax call
-            var post_id = wp.data.select('core/editor').getCurrentPostId();
             wp.ajax.post( 'sek_get_customize_url_for_nimble_edit_button', {
                 nimble_edit_post_id : post_id
             }).done( function( resp ) {
