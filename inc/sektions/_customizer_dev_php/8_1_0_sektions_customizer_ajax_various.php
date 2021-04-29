@@ -59,10 +59,6 @@ add_filter( "ac_set_ajax_czr_tmpl___fa_icon_picker_input", '\Nimble\sek_get_fa_i
 add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", '\Nimble\sek_get_font_list_tmpl', 10, 3 );
 // </AJAX TO FETCH INPUT COMPONENTS>
 
-// Fetches the preset_sections
-add_action( 'wp_ajax_sek_get_preset_sections', '\Nimble\sek_get_preset_sektions' );
-
-
 /////////////////////////////////////////////////////////////////
 // hook : wp_ajax_sek_import_attachment
 function sek_ajax_import_attachment() {
@@ -328,34 +324,4 @@ function sek_get_gfonts( $what = null ) {
 
     return ('subsets' == $what) ? apply_filters( 'sek_font_picker_gfonts_subsets ', $subsets ) : apply_filters( 'sek_font_picker_gfonts', $gfonts )  ;
 }
-
-
-
-
-////////////////////////////////////////////////////////////////
-// PRESET SECTIONS
-// Fired in __construct()
-// hook : 'wp_ajax_sek_get_preset_sektions'
-function sek_get_preset_sektions() {
-    sek_do_ajax_pre_checks();
-    // May 21st => back to the local data
-    // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
-    //$preset_sections = sek_get_preset_sections_api_data();
-
-    // September 2020 => force update every 24 hours so users won't miss a new pre-build section
-    // Note that the refresh should have take place on 'upgrader_process_complete'
-    // always force refresh when developing
-    $force_update = false;
-    if ( false == get_transient(NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID) || sek_is_dev_mode() ) {
-        $force_update = true;
-        set_transient( NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID, 'yes', 2 * DAY_IN_SECONDS );
-    }
-    $preset_sections = sek_get_preset_section_collection_from_json( $force_update );
-    if ( empty( $preset_sections ) ) {
-        wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => no preset_sections when running sek_get_preset_sections_api_data()' );
-    }
-    wp_send_json_success( $preset_sections );
-}
-
-
 ?>

@@ -173,13 +173,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               // Try to fetch the sections from the server
                               // if sucessfull, resolve self.updAPISetParams.sectionInjectPromise.promise()
-                              self.getPresetSectionCollection({
+                              self.getPresetSectionCollectionData({
                                           is_user_section : params.is_user_section,
                                           presetSectionId : params.content_id
                                     })
                                     .fail( function( _er_ ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
-                                          self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollectionData()', _er_ );
+                                          self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollectionData()');
                                     })
                                     .done( function( presetColumnOrSectionCollection ) {
                                           if ( ! _.isObject( presetColumnOrSectionCollection ) || _.isEmpty( presetColumnOrSectionCollection ) ) {
@@ -188,7 +188,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }
                                           // OK. time to resolve self.updAPISetParams.sectionInjectPromise.promise()
                                           _doWhenPresetSectionCollectionFetched( presetColumnOrSectionCollection );
-                                    });//self.getPresetSectionCollection().done()
+                                    });//self.getPresetSectionCollectionData().done()
 
                         break;//case 'preset_section' :
                   }//switch( params.content_type)
@@ -310,13 +310,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Try to fetch the sections from the server
                   // if sucessfull, resolve self.updAPISetParams.sectionInjectPromise.promise()
-                  self.getPresetSectionCollection({
+                  self.getPresetSectionCollectionData({
                               is_user_section : params.is_user_section,
                               presetSectionId : params.content_id
                         })
                         .fail( function() {
-                              api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
-                              self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
+                              api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollectionData()', _er_ );
+                              self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollectionData()');
                         })
                         .done( function( presetColumnOrSectionCollection ) {
                               if ( ! _.isObject( presetColumnOrSectionCollection ) || _.isEmpty( presetColumnOrSectionCollection ) ) {
@@ -325,7 +325,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               // OK. time to resolve self.updAPISetParams.sectionInjectPromise.promise()
                               _doWhenPrebuiltSectionCollectionFetched( presetColumnOrSectionCollection );
-                        });//self.getPresetSectionCollection().done()
+                        });//self.getPresetSectionCollectionData().done()
             }
 
       });//$.extend()

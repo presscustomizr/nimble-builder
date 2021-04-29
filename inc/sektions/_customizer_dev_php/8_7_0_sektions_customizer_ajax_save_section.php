@@ -20,6 +20,53 @@ function sek_ajax_get_all_saved_sections() {
 
 
 
+// Fetches the preset_sections
+add_action( 'wp_ajax_sek_get_single_api_section_data', '\Nimble\sek_ajax_get_single_api_section_data' );
+////////////////////////////////////////////////////////////////
+// PRESET SECTIONS
+// Fired in __construct()
+// hook : 'wp_ajax_sek_get_preset_sektions'
+function sek_ajax_get_single_api_section_data() {
+    sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+    // May 21st => back to the local data
+    // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
+    //$preset_sections = sek_get_preset_sections_api_data();
+
+    // September 2020 => force update every 24 hours so users won't miss a new pre-build section
+    // Note that the refresh should have take place on 'upgrader_process_complete'
+    // always force refresh when developing
+    sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+
+    // We must have a api_section_id
+    if ( empty( $_POST['api_section_id']) || !is_string( $_POST['api_section_id'] ) ) {
+        wp_send_json_error( __FUNCTION__ . '_missing_api_section_id' );
+    }
+    $api_section_id = $_POST['api_section_id'];
+    $raw_api_sec_data = sek_api_get_single_section_data( $api_section_id );// <= returns an unserialized array
+    if( !is_array( $raw_api_sec_data) || empty( $raw_api_sec_data ) ) {
+        sek_error_log( __FUNCTION__ . ' problem when getting section : ' . $api_section_id );
+        wp_send_json_error( __FUNCTION__ . '_invalid_section_'. $api_section_id );
+    }
+    //sek_error_log( __FUNCTION__ . ' api section data', $raw_api_sec_data );
+    if ( !isset($raw_api_sec_data['collection'] ) || empty( $raw_api_sec_data['collection'] ) ) {
+        sek_error_log( __FUNCTION__ . ' problem => missing or invalid data property for section : ' . $api_section_id, $raw_api_sec_data );
+        wp_send_json_error( __FUNCTION__ . '_missing_data_property_for_section_' . $api_section_id );
+    } else {
+        // $tmpl_decoded = $raw_api_sec_data;
+        $raw_api_sec_data['collection'] = sek_maybe_import_imgs( $raw_api_sec_data['collection'], $do_import_images = true );
+        //$raw_api_sec_data['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
+        // Make sure we decode encoded rich text before sending to the customizer
+        // see #544 and #791
+        $raw_api_sec_data['collection'] = sek_prepare_seks_data_for_customizer( $raw_api_sec_data['collection'] );
+
+        wp_send_json_success( $raw_api_sec_data );
+    }
+}
+
+
+
+
+
 
 ////////////////////////////////////////////////////////////////
 // SECTION GET CONTENT + METAS

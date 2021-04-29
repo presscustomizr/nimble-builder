@@ -21,18 +21,20 @@
 // );
 // @return array|false Info data, or false.
 // api data is refreshed on plugin update and theme switch
-// @$what param can be 'latest_posts_and_start_msg', 'templates'
+// @$what param can be 'latest_posts_and_start_msg', 'templates', 'single_section'
 function sek_get_nimble_api_data( $params ) {
     $params = is_array($params) ? $params : [];
     $params = wp_parse_args( $params, [
         'what' => '',
         'tmpl_name' => '',
+        'section_id' => '',
         'force_update' => false
     ]);
     $what = $params['what'];
     $tmpl_name = $params['tmpl_name'];
+    $section_id =  $params['section_id'];
     $force_update = $params['force_update'];
-    $wp_cache_key = 'nimble_api_data_'. $what . $tmpl_name;
+    $wp_cache_key = 'nimble_api_data_'. $what . $tmpl_name . $section_id;
     
     // We must have a "what"
     if ( is_null($what) || !is_string($what) ) {
@@ -43,6 +45,12 @@ function sek_get_nimble_api_data( $params ) {
     // If a single template is requested, a valid template name must be provided
     if ( 'single_tmpl' === $what && ( empty($tmpl_name) || !is_string($tmpl_name) ) ) {
         sek_error_log( __FUNCTION__ . ' => error => invalid $tmpl_name param');
+        return false;
+    }
+
+    // If a single section is requested, a valid section id must be provided
+    if ( 'single_section' === $what && ( empty($section_id) || !is_string($section_id) ) ) {
+        sek_error_log( __FUNCTION__ . ' => error => invalid $section_id param');
         return false;
     }
 
@@ -66,6 +74,9 @@ function sek_get_nimble_api_data( $params ) {
         break;
         case 'single_tmpl':
             $transient_name = 'nimble_api_tmpl_' . $tmpl_name;
+        break;
+        case 'single_section':
+            $transient_name = 'nimble_api_section_' . $section_id;
         break;
         default:
             sek_error_log( __FUNCTION__ . ' => error => invalid $what param => ' . $what );
@@ -101,8 +112,9 @@ function sek_get_nimble_api_data( $params ) {
             'body' => [
                 'api_version' => NIMBLE_VERSION,
                 'site_lang' => get_bloginfo( 'language' ),
-                'what' => $what,// 'single_tmpl', 'all_tmpl', 'latest_posts_and_start_msg'
-                'tmpl_name' => $tmpl_name
+                'what' => $what,// 'single_tmpl', 'all_tmpl', 'latest_posts_and_start_msg', 'single_section'
+                'tmpl_name' => $tmpl_name,
+                'section_id' => $section_id
             ]
         ];
 
@@ -205,6 +217,44 @@ function sek_get_single_tmpl_api_data( $tmpl_name, $force_update = false ) {
     //return [];
     return maybe_unserialize( $api_data['single_tmpl'] );
 }
+
+
+
+//////////////////////////////////////////////////
+/// SINGLE PRESET SECTION DATA
+function sek_api_get_single_section_data( $api_section_id, $force_update = false ) {
+    // set this constant in wp_config.php
+    $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
+
+    // To avoid a possible refresh, hence a reconnection to the api when opening the customizer
+    // Let's use the data saved as options
+    // Those data are updated on plugin install, plugin update( upgrader_process_complete ), theme switch
+    // @see https://github.com/presscustomizr/nimble-builder/issues/441
+    $api_data = sek_get_nimble_api_data([
+        'what' => 'single_section',
+        'section_id' => $api_section_id,
+        'force_update' => $force_update
+    ]);
+
+    $api_data = is_array( $api_data ) ? $api_data : [];
+    $api_data = wp_parse_args( $api_data, [
+        'timestamp' => '',
+        'single_section' => null
+    ]);
+    //sek_error_log('SECTION DATA ?', $api_data);
+    if ( empty($api_data['single_section']) ) {
+        sek_error_log( __FUNCTION__ . ' => error => empty section data for ' . $api_section_id );
+        return array();
+    }
+
+    // if ( !array_key_exists( 'data', $api_data['single_tmpl'] ) || !array_key_exists( 'metas',$api_data['single_tmpl'] ) ) {
+    //     sek_error_log( __FUNCTION__ . ' => error => invalid section data for ' . $api_section_id );
+    //     return array();
+    // }
+    //return [];
+    return maybe_unserialize( $api_data['single_section'] );
+}
+
 
 
 //////////////////////////////////////////////////

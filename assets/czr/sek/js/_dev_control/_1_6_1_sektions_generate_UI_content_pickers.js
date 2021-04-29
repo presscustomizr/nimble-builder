@@ -226,11 +226,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.scheduleModuleAccordion.call( _section_, { expand_first_control : false } );
                         _section_.container.find('.customize-control.sek-expand-on-init').find('label > .customize-control-title').trigger('click');
                         // Fetch the presetSectionCollection from the server now, so we save a few milliseconds when injecting the first preset_section
-                        // it populates api.sek_presetSections
+                        // it populates api.nimble_ApiSections
                         //
                         // updated in v1.7.5, may 21st : performance improvements on customizer load
                         // inserting preset sections is not on all Nimble sessions => let's only fetch when user inserts the first section
-                        // self._maybeFetchSectionsFromServer();
+                        // self._getApiSingleSectionData();
                   });
                   return dfd;
             }
