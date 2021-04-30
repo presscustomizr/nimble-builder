@@ -106,7 +106,7 @@ function sek_get_nimble_api_data( $params ) {
     // 3) NB has been updated to a new version ( $api_needs_update case )
     // 4) Theme has been changed ( $api_needs_update case )
     if ( $force_update || false === $api_data || $api_needs_update ) {
-        $query_params = [
+        $query_params = apply_filters( 'nimble_api_query_params', [
             'timeout' => ( $force_update ) ? 25 : 8,
             'body' => [
                 'api_version' => NIMBLE_VERSION,
@@ -115,7 +115,7 @@ function sek_get_nimble_api_data( $params ) {
                 'tmpl_name' => $tmpl_name,
                 'section_id' => $section_id
             ]
-        ];
+        ] );
 
         //sek_error_log('CALL TO REMOTE API NOW FOR DATA => ' . $transient_name . ' | ' . $force_update . ' | ' . $api_needs_update, $query_params );
 

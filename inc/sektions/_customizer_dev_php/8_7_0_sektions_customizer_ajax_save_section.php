@@ -39,10 +39,27 @@ function sek_ajax_get_single_api_section_data() {
         wp_send_json_error( __FUNCTION__ . '_missing_api_section_id' );
     }
     $api_section_id = $_POST['api_section_id'];
+
+    $is_pro_section_id = sek_is_pro() && is_string($api_section_id) && 'pro_' === substr($api_section_id,0,4);
+
+    if ( $is_pro_section_id && 'pro_key_status_ok' !== apply_filters( 'nimble_pro_key_status_OK', 'nok' ) ) {
+        wp_send_json_error( apply_filters( 'nimble_pro_key_status_OK', 'nok' ) );
+        return;
+    }
     $raw_api_sec_data = sek_api_get_single_section_data( $api_section_id );// <= returns an unserialized array
+
+    // When injecting a pro section, NB checks the validity of the key.
+    // if the api response is not an array, there was a problem when checking the key
+    // and in this case the response is a string like : 'Expired.'
+    if ( $is_pro_section_id && is_string($raw_api_sec_data) && !empty($raw_api_sec_data) ) {
+        wp_send_json_error( $raw_api_sec_data );
+        return;
+    }
+
     if( !is_array( $raw_api_sec_data) || empty( $raw_api_sec_data ) ) {
         sek_error_log( __FUNCTION__ . ' problem when getting section : ' . $api_section_id );
         wp_send_json_error( __FUNCTION__ . '_invalid_section_'. $api_section_id );
+        return;
     }
     //sek_error_log( __FUNCTION__ . ' api section data', $raw_api_sec_data );
     if ( !isset($raw_api_sec_data['collection'] ) || empty( $raw_api_sec_data['collection'] ) ) {
