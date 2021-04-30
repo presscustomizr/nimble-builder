@@ -54,7 +54,6 @@ if ( !defined( 'NIMBLE_WELCOME_NOTICE_ID' ) ) { define ( 'NIMBLE_WELCOME_NOTICE_
 if ( !defined( 'NIMBLE_FEEDBACK_NOTICE_ID' ) ) { define ( 'NIMBLE_FEEDBACK_NOTICE_ID', 'nimble-feedback-notice-04-2019' ); }
 if ( !defined( 'NIMBLE_FAWESOME_TRANSIENT_ID' ) ) { define ( 'NIMBLE_FAWESOME_TRANSIENT_ID', 'sek_font_awesome_february_2020' ); }
 if ( !defined( 'NIMBLE_GFONTS_TRANSIENT_ID' ) ) { define ( 'NIMBLE_GFONTS_TRANSIENT_ID', 'sek_gfonts_march_2020' ); }
-if ( !defined( 'NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID' ) ) { define ( 'NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID', 'nimble_preset_sections_refreshed' ); }
 if ( !defined( 'NIMBLE_FEEDBACK_STATUS_TRANSIENT_ID' ) ) { define ( 'NIMBLE_FEEDBACK_STATUS_TRANSIENT_ID', 'nimble_feedback_status' ); }
 if ( !defined( 'NIMBLE_API_CHECK_TRANSIENT_ID' ) ) { define ( 'NIMBLE_API_CHECK_TRANSIENT_ID', 'nimble_version_check_for_api' ); }
 

@@ -57,6 +57,9 @@ module.exports = {
       '!assets/front/scss/**',
       '!assets/front/css/sek-base.css.map',
 
+      // preset_sections.json was removed for #802
+      '!assets/_deprecated_preset_sections.json',
+
       // front tests php
       '!dev_logs.php'
     ],

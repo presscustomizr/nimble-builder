@@ -2,7 +2,6 @@
 // /* ------------------------------------------------------------------------- *
 // *  NIMBLE API
 // /* ------------------------------------------------------------------------- */
-// if ( !defined( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME" ) ) { define( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME", 'nimble_api_prebuilt_sections_data' ); } <= DEPRECATED, Now uses local json
 
 // Nimble api returns a set of value structured as follow
 // return array(
@@ -313,47 +312,6 @@ function sek_start_msg_from_api( $theme_name, $force_update = false ) {
 //         return;
 //     sek_get_nimble_api_data(['what' => 'all_tmpl']);
 // }
-
-
-//////////////////////////////////////////////////
-/// SECTIONS DATA
-/// DEPRECATED, NOW USING LOCAL DATA AND JSON
-// function sek_get_sections_registration_params_api_data( $force_update = false ) {
-//     // To avoid a possible refresh, hence a reconnection to the api when opening the customizer
-//     // Let's use the data saved as options
-//     // Those data are updated on plugin install, plugin update, theme switch
-//     // @see https://github.com/presscustomizr/nimble-builder/issues/441
-//     $sections_data = get_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME );
-//     if ( empty( $sections_data ) || !is_array( $sections_data ) || empty( $sections_data['registration_params'] ) ) {
-//         sek_get_nimble_api_data( true );//<= true for "force_update"
-//         $sections_data = get_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME );
-//     }
-
-//     if ( empty( $sections_data ) || !is_array( $sections_data ) || empty( $sections_data['registration_params'] ) ) {
-//         sek_error_log( __FUNCTION__ . ' => error => no section registration params' );
-//         return array();
-//     }
-//     return $sections_data['registration_params'];
-// }
-
-// function sek_get_preset_sections_api_data( $force_update = false ) {
-//     // To avoid a possible refresh, hence a reconnection to the api when opening the customizer
-//     // Let's use the data saved as options
-//     // Those data are updated on plugin install, plugin update( upgrader_process_complete ), theme switch
-//     // @see https://github.com/presscustomizr/nimble-builder/issues/441
-//     $sections_data = get_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME );
-//     if ( empty( $sections_data ) || !is_array( $sections_data ) || empty( $sections_data['json_collection'] ) ) {
-//         sek_get_nimble_api_data( true );//<= true for "force_update"
-//         $sections_data = get_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME );
-//     }
-
-//     if ( empty( $sections_data ) || !is_array( $sections_data ) || empty( $sections_data['json_collection'] ) ) {
-//         sek_error_log( __FUNCTION__ . ' => error => no json_collection' );
-//         return array();
-//     }
-//     return $sections_data['json_collection'];
-// }
-
 
 
 ?>

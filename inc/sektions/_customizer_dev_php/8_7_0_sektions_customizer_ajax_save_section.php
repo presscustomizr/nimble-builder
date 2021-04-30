@@ -28,9 +28,6 @@ add_action( 'wp_ajax_sek_get_single_api_section_data', '\Nimble\sek_ajax_get_sin
 // hook : 'wp_ajax_sek_get_preset_sektions'
 function sek_ajax_get_single_api_section_data() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
-    // May 21st => back to the local data
-    // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
-    //$preset_sections = sek_get_preset_sections_api_data();
 
     // September 2020 => force update every 24 hours so users won't miss a new pre-build section
     // Note that the refresh should have take place on 'upgrader_process_complete'

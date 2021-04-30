@@ -145,10 +145,6 @@ function sek_enqueue_controls_js_css() {
                 'settingIdForGlobalSections' => sek_get_seks_setting_id( NIMBLE_GLOBAL_SKOPE_ID ),
                 'globalSkopeId' => NIMBLE_GLOBAL_SKOPE_ID,
 
-                //'userSavedSektions' => sek_get_all_saved_sections(),
-
-                //'presetSections' => sek_get_preset_sections_api_data(), <= fetched on demand in ajax
-
                 'registeredModules' => CZR_Fmk_Base()->registered_modules,
 
                 // Dnd

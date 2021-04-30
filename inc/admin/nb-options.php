@@ -281,7 +281,6 @@ function print_welcome_page() {
       'NIMBLE_FEEDBACK_NOTICE_ID',
       'NIMBLE_FAWESOME_TRANSIENT_ID',
       'NIMBLE_GFONTS_TRANSIENT_ID',
-      'NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID',
       'NIMBLE_FEEDBACK_STATUS_TRANSIENT_ID',
       'NIMBLE_API_CHECK_TRANSIENT_ID'
     ];
@@ -293,6 +292,7 @@ function print_welcome_page() {
     }
     // => remove all other transients
     sek_clean_transients_like( 'nimble_' );//'nimble_api_posts', 'nimble_api_tmpl_' . $tmpl_name
+    sek_clean_transients_like( 'nimble_preset_sections_' );//old transient for storing preset sections. Now fetched remotely. See #802
     sek_clean_transients_like( 'section_params_transient' );//old transient that may still be there
     sek_clean_transients_like( 'section_params_transient' );//old transient that may still be there
 
