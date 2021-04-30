@@ -485,14 +485,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                __dfd__.reject( er );
                         });
                   } else {
-                        console.log('GET API SECTION NOW ', sectionParams.presetSectionId );
                         api.nimble_ApiSections = api.nimble_ApiSections || {};
                         self._getApiSingleSectionData( sectionParams.presetSectionId )
                               .fail( function( er ) {
                                     __dfd__.reject( er );
                               })
                               .done( function( _section_data_ ) {
-                                    api.infoLog( 'API SECTION fetched', sectionParams.presetSectionId, api.nimble_ApiSections );
+                                    //api.infoLog( 'API SECTION fetched', sectionParams.presetSectionId, api.nimble_ApiSections );
                                     var presetSection,
                                         allPresets = $.extend( true, {}, _.isObject( _section_data_ ) ? _section_data_ : {} );
 
