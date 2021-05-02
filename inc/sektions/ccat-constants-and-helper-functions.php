@@ -54,7 +54,6 @@ if ( !defined( 'NIMBLE_WELCOME_NOTICE_ID' ) ) { define ( 'NIMBLE_WELCOME_NOTICE_
 if ( !defined( 'NIMBLE_FEEDBACK_NOTICE_ID' ) ) { define ( 'NIMBLE_FEEDBACK_NOTICE_ID', 'nimble-feedback-notice-04-2019' ); }
 if ( !defined( 'NIMBLE_FAWESOME_TRANSIENT_ID' ) ) { define ( 'NIMBLE_FAWESOME_TRANSIENT_ID', 'sek_font_awesome_february_2020' ); }
 if ( !defined( 'NIMBLE_GFONTS_TRANSIENT_ID' ) ) { define ( 'NIMBLE_GFONTS_TRANSIENT_ID', 'sek_gfonts_march_2020' ); }
-if ( !defined( 'NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID' ) ) { define ( 'NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID', 'nimble_preset_sections_refreshed' ); }
 if ( !defined( 'NIMBLE_FEEDBACK_STATUS_TRANSIENT_ID' ) ) { define ( 'NIMBLE_FEEDBACK_STATUS_TRANSIENT_ID', 'nimble_feedback_status' ); }
 if ( !defined( 'NIMBLE_API_CHECK_TRANSIENT_ID' ) ) { define ( 'NIMBLE_API_CHECK_TRANSIENT_ID', 'nimble_version_check_for_api' ); }
 
@@ -3452,7 +3451,6 @@ function sek_generate_level_guid() {
 // /* ------------------------------------------------------------------------- *
 // *  NIMBLE API
 // /* ------------------------------------------------------------------------- */
-// if ( !defined( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME" ) ) { define( "NIMBLE_SECTIONS_LIBRARY_OPT_NAME", 'nimble_api_prebuilt_sections_data' ); } <= DEPRECATED, Now uses local json
 
 // Nimble api returns a set of value structured as follow
 // return array(
@@ -3471,18 +3469,20 @@ function sek_generate_level_guid() {
 // );
 // @return array|false Info data, or false.
 // api data is refreshed on plugin update and theme switch
-// @$what param can be 'latest_posts_and_start_msg', 'templates'
+// @$what param can be 'latest_posts_and_start_msg', 'templates', 'single_section'
 function sek_get_nimble_api_data( $params ) {
     $params = is_array($params) ? $params : [];
     $params = wp_parse_args( $params, [
         'what' => '',
         'tmpl_name' => '',
+        'section_id' => '',
         'force_update' => false
     ]);
     $what = $params['what'];
     $tmpl_name = $params['tmpl_name'];
+    $section_id =  $params['section_id'];
     $force_update = $params['force_update'];
-    $wp_cache_key = 'nimble_api_data_'. $what . $tmpl_name;
+    $wp_cache_key = 'nimble_api_data_'. $what . $tmpl_name . $section_id;
     
     // We must have a "what"
     if ( is_null($what) || !is_string($what) ) {
@@ -3493,6 +3493,12 @@ function sek_get_nimble_api_data( $params ) {
     // If a single template is requested, a valid template name must be provided
     if ( 'single_tmpl' === $what && ( empty($tmpl_name) || !is_string($tmpl_name) ) ) {
         sek_error_log( __FUNCTION__ . ' => error => invalid $tmpl_name param');
+        return false;
+    }
+
+    // If a single section is requested, a valid section id must be provided
+    if ( 'single_section' === $what && ( empty($section_id) || !is_string($section_id) ) ) {
+        sek_error_log( __FUNCTION__ . ' => error => invalid $section_id param');
         return false;
     }
 
@@ -3516,6 +3522,9 @@ function sek_get_nimble_api_data( $params ) {
         break;
         case 'single_tmpl':
             $transient_name = 'nimble_api_tmpl_' . $tmpl_name;
+        break;
+        case 'single_section':
+            $transient_name = 'nimble_api_section_' . $section_id;
         break;
         default:
             sek_error_log( __FUNCTION__ . ' => error => invalid $what param => ' . $what );
@@ -3546,15 +3555,16 @@ function sek_get_nimble_api_data( $params ) {
     // 3) NB has been updated to a new version ( $api_needs_update case )
     // 4) Theme has been changed ( $api_needs_update case )
     if ( $force_update || false === $api_data || $api_needs_update ) {
-        $query_params = [
+        $query_params = apply_filters( 'nimble_api_query_params', [
             'timeout' => ( $force_update ) ? 25 : 8,
             'body' => [
                 'api_version' => NIMBLE_VERSION,
                 'site_lang' => get_bloginfo( 'language' ),
-                'what' => $what,// 'single_tmpl', 'all_tmpl', 'latest_posts_and_start_msg'
-                'tmpl_name' => $tmpl_name
+                'what' => $what,// 'single_tmpl', 'all_tmpl', 'latest_posts_and_start_msg', 'single_section'
+                'tmpl_name' => $tmpl_name,
+                'section_id' => $section_id
             ]
-        ];
+        ] );
 
         //sek_error_log('CALL TO REMOTE API NOW FOR DATA => ' . $transient_name . ' | ' . $force_update . ' | ' . $api_needs_update, $query_params );
 
@@ -3657,6 +3667,44 @@ function sek_get_single_tmpl_api_data( $tmpl_name, $force_update = false ) {
 }
 
 
+
+//////////////////////////////////////////////////
+/// SINGLE PRESET SECTION DATA
+function sek_api_get_single_section_data( $api_section_id, $force_update = false ) {
+    // set this constant in wp_config.php
+    $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
+
+    // To avoid a possible refresh, hence a reconnection to the api when opening the customizer
+    // Let's use the data saved as options
+    // Those data are updated on plugin install, plugin update( upgrader_process_complete ), theme switch
+    // @see https://github.com/presscustomizr/nimble-builder/issues/441
+    $api_data = sek_get_nimble_api_data([
+        'what' => 'single_section',
+        'section_id' => $api_section_id,
+        'force_update' => $force_update
+    ]);
+
+    $api_data = is_array( $api_data ) ? $api_data : [];
+    $api_data = wp_parse_args( $api_data, [
+        'timestamp' => '',
+        'single_section' => null
+    ]);
+    //sek_error_log('SECTION DATA ?', $api_data);
+    if ( empty($api_data['single_section']) ) {
+        sek_error_log( __FUNCTION__ . ' => error => empty section data for ' . $api_section_id );
+        return array();
+    }
+
+    // if ( !array_key_exists( 'data', $api_data['single_tmpl'] ) || !array_key_exists( 'metas',$api_data['single_tmpl'] ) ) {
+    //     sek_error_log( __FUNCTION__ . ' => error => invalid section data for ' . $api_section_id );
+    //     return array();
+    // }
+    //return [];
+    return maybe_unserialize( $api_data['single_section'] );
+}
+
+
+
 //////////////////////////////////////////////////
 /// LATESTS POSTS
 // @return array of posts
@@ -3713,47 +3761,6 @@ function sek_start_msg_from_api( $theme_name, $force_update = false ) {
 //         return;
 //     sek_get_nimble_api_data(['what' => 'all_tmpl']);
 // }
-
-
-//////////////////////////////////////////////////
-/// SECTIONS DATA
-/// DEPRECATED, NOW USING LOCAL DATA AND JSON
-// function sek_get_sections_registration_params_api_data( $force_update = false ) {
-//     // To avoid a possible refresh, hence a reconnection to the api when opening the customizer
-//     // Let's use the data saved as options
-//     // Those data are updated on plugin install, plugin update, theme switch
-//     // @see https://github.com/presscustomizr/nimble-builder/issues/441
-//     $sections_data = get_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME );
-//     if ( empty( $sections_data ) || !is_array( $sections_data ) || empty( $sections_data['registration_params'] ) ) {
-//         sek_get_nimble_api_data( true );//<= true for "force_update"
-//         $sections_data = get_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME );
-//     }
-
-//     if ( empty( $sections_data ) || !is_array( $sections_data ) || empty( $sections_data['registration_params'] ) ) {
-//         sek_error_log( __FUNCTION__ . ' => error => no section registration params' );
-//         return array();
-//     }
-//     return $sections_data['registration_params'];
-// }
-
-// function sek_get_preset_sections_api_data( $force_update = false ) {
-//     // To avoid a possible refresh, hence a reconnection to the api when opening the customizer
-//     // Let's use the data saved as options
-//     // Those data are updated on plugin install, plugin update( upgrader_process_complete ), theme switch
-//     // @see https://github.com/presscustomizr/nimble-builder/issues/441
-//     $sections_data = get_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME );
-//     if ( empty( $sections_data ) || !is_array( $sections_data ) || empty( $sections_data['json_collection'] ) ) {
-//         sek_get_nimble_api_data( true );//<= true for "force_update"
-//         $sections_data = get_option( NIMBLE_SECTIONS_LIBRARY_OPT_NAME );
-//     }
-
-//     if ( empty( $sections_data ) || !is_array( $sections_data ) || empty( $sections_data['json_collection'] ) ) {
-//         sek_error_log( __FUNCTION__ . ' => error => no json_collection' );
-//         return array();
-//     }
-//     return $sections_data['json_collection'];
-// }
-
 
 
 ?><?php
@@ -3959,55 +3966,6 @@ function sek_get_raw_section_registration_params() {
         ]
     ]);
 }
-
-/////////////////////////////////////////////////////////////
-// JSON FOR PRESET SECTIONS
-// update is forced every 24 hours, see transient : NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID
-// update is forced on 'upgrader_process_complete', on 'after_theme_switch'
-function sek_get_preset_section_collection_from_json( $force_update = false ) {
-    // JULY 2020 => not stored in a transient anymore. For https://github.com/presscustomizr/nimble-builder/issues/730
-    // + clean previously created transients
-    $bw_fixes_options = get_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES );
-    $bw_fixes_options = is_array( $bw_fixes_options ) ? $bw_fixes_options : array();
-    if ( !array_key_exists('clean_section_json_transient_0720', $bw_fixes_options ) || 'done' != $bw_fixes_options['clean_section_json_transient_0720'] ) {
-        sek_clean_transients_like( 'section_json_transient' );
-        $bw_fixes_options['clean_section_json_transient_0720'] = 'done';
-        // flag as done
-        update_option( NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES, $bw_fixes_options );
-    }
-
-    // Try to get the collection from an option
-    $json_collection = get_option( NIMBLE_OPT_NAME_FOR_SECTION_JSON );
-
-    // Refresh every 30 days, unless force_update set to true
-    // force update is activated on plugin update, theme_switch
-    if ( $force_update || false == $json_collection ) {
-        $json_raw = @file_get_contents( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
-        if ( $json_raw === false ) {
-            $json_raw = wp_remote_fopen( NIMBLE_BASE_PATH ."/assets/preset_sections.json" );
-        }
-
-        $json_collection = json_decode( $json_raw, true );
-        // Save now as option for faster access next time
-        update_option( NIMBLE_OPT_NAME_FOR_SECTION_JSON, $json_collection, 'no' );
-    }
-    // Filter used by NB Pro to add pro sections
-    return apply_filters( 'nimble_preset_sections_collection', $json_collection, $force_update );
-}
-
-
-// Maybe set / refresh section data
-// - theme switch
-// - nimble upgrade
-// - nimble is loaded ( only when is_admin() ) <= This makes the loading of the customizer faster on the first load, because the transient is ready.
-//add_action( 'nimble_front_classes_ready', '\Nimble\sek_refresh_preset_sections_data');
-add_action( 'after_switch_theme', '\Nimble\sek_refresh_preset_sections_data');
-add_action( 'upgrader_process_complete', '\Nimble\sek_refresh_preset_sections_data');
-function sek_refresh_preset_sections_data() {
-    // force refresh only on after_switch_theme and upgrader_process_complete actions
-    sek_get_preset_section_collection_from_json( 'nimble_front_classes_ready' != current_filter() );
-}
-
 ?><?php
 add_action( 'admin_bar_menu', '\Nimble\sek_add_customize_link', 1000 );
 function sek_add_customize_link() {

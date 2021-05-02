@@ -145,10 +145,6 @@ function sek_enqueue_controls_js_css() {
                 'settingIdForGlobalSections' => sek_get_seks_setting_id( NIMBLE_GLOBAL_SKOPE_ID ),
                 'globalSkopeId' => NIMBLE_GLOBAL_SKOPE_ID,
 
-                //'userSavedSektions' => sek_get_all_saved_sections(),
-
-                //'presetSections' => sek_get_preset_sections_api_data(), <= fetched on demand in ajax
-
                 'registeredModules' => CZR_Fmk_Base()->registered_modules,
 
                 // Dnd
@@ -3997,10 +3993,6 @@ add_filter( "ac_set_ajax_czr_tmpl___fa_icon_picker_input", '\Nimble\sek_get_fa_i
 add_filter( "ac_set_ajax_czr_tmpl___font_picker_input", '\Nimble\sek_get_font_list_tmpl', 10, 3 );
 // </AJAX TO FETCH INPUT COMPONENTS>
 
-// Fetches the preset_sections
-add_action( 'wp_ajax_sek_get_preset_sections', '\Nimble\sek_get_preset_sektions' );
-
-
 /////////////////////////////////////////////////////////////////
 // hook : wp_ajax_sek_import_attachment
 function sek_ajax_import_attachment() {
@@ -4266,36 +4258,6 @@ function sek_get_gfonts( $what = null ) {
 
     return ('subsets' == $what) ? apply_filters( 'sek_font_picker_gfonts_subsets ', $subsets ) : apply_filters( 'sek_font_picker_gfonts', $gfonts )  ;
 }
-
-
-
-
-////////////////////////////////////////////////////////////////
-// PRESET SECTIONS
-// Fired in __construct()
-// hook : 'wp_ajax_sek_get_preset_sektions'
-function sek_get_preset_sektions() {
-    sek_do_ajax_pre_checks();
-    // May 21st => back to the local data
-    // after problem was reported when fetching data remotely : https://github.com/presscustomizr/nimble-builder/issues/445
-    //$preset_sections = sek_get_preset_sections_api_data();
-
-    // September 2020 => force update every 24 hours so users won't miss a new pre-build section
-    // Note that the refresh should have take place on 'upgrader_process_complete'
-    // always force refresh when developing
-    $force_update = false;
-    if ( false == get_transient(NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID) || sek_is_dev_mode() ) {
-        $force_update = true;
-        set_transient( NIMBLE_PRESET_SECTIONS_STATUS_TRANSIENT_ID, 'yes', 2 * DAY_IN_SECONDS );
-    }
-    $preset_sections = sek_get_preset_section_collection_from_json( $force_update );
-    if ( empty( $preset_sections ) ) {
-        wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => no preset_sections when running sek_get_preset_sections_api_data()' );
-    }
-    wp_send_json_success( $preset_sections );
-}
-
-
 ?><?php
 add_action( 'customize_register', '\Nimble\sek_catch_export_action', PHP_INT_MAX );
 function sek_catch_export_action( $wp_customize ) {
@@ -4889,6 +4851,67 @@ function sek_ajax_get_all_saved_sections() {
         }
     }
 }
+
+
+
+// Fetches the preset_sections
+add_action( 'wp_ajax_sek_get_single_api_section_data', '\Nimble\sek_ajax_get_single_api_section_data' );
+////////////////////////////////////////////////////////////////
+// PRESET SECTIONS
+// Fired in __construct()
+// hook : 'wp_ajax_sek_get_preset_sektions'
+function sek_ajax_get_single_api_section_data() {
+    sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+
+    // September 2020 => force update every 24 hours so users won't miss a new pre-build section
+    // Note that the refresh should have take place on 'upgrader_process_complete'
+    // always force refresh when developing
+    sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
+
+    // We must have a api_section_id
+    if ( empty( $_POST['api_section_id']) || !is_string( $_POST['api_section_id'] ) ) {
+        wp_send_json_error( __FUNCTION__ . '_missing_api_section_id' );
+    }
+    $api_section_id = $_POST['api_section_id'];
+
+    $is_pro_section_id = sek_is_pro() && is_string($api_section_id) && 'pro_' === substr($api_section_id,0,4);
+
+    if ( $is_pro_section_id && 'pro_key_status_ok' !== apply_filters( 'nimble_pro_key_status_OK', 'nok' ) ) {
+        wp_send_json_error( apply_filters( 'nimble_pro_key_status_OK', 'nok' ) );
+        return;
+    }
+    $raw_api_sec_data = sek_api_get_single_section_data( $api_section_id );// <= returns an unserialized array
+
+    // When injecting a pro section, NB checks the validity of the key.
+    // if the api response is not an array, there was a problem when checking the key
+    // and in this case the response is a string like : 'Expired.'
+    if ( $is_pro_section_id && is_string($raw_api_sec_data) && !empty($raw_api_sec_data) ) {
+        wp_send_json_error( $raw_api_sec_data );
+        return;
+    }
+
+    if( !is_array( $raw_api_sec_data) || empty( $raw_api_sec_data ) ) {
+        sek_error_log( __FUNCTION__ . ' problem when getting section : ' . $api_section_id );
+        wp_send_json_error( __FUNCTION__ . '_invalid_section_'. $api_section_id );
+        return;
+    }
+    //sek_error_log( __FUNCTION__ . ' api section data', $raw_api_sec_data );
+    if ( !isset($raw_api_sec_data['collection'] ) || empty( $raw_api_sec_data['collection'] ) ) {
+        sek_error_log( __FUNCTION__ . ' problem => missing or invalid data property for section : ' . $api_section_id, $raw_api_sec_data );
+        wp_send_json_error( __FUNCTION__ . '_missing_data_property_for_section_' . $api_section_id );
+    } else {
+        // $tmpl_decoded = $raw_api_sec_data;
+        $raw_api_sec_data['collection'] = sek_maybe_import_imgs( $raw_api_sec_data['collection'], $do_import_images = true );
+        //$raw_api_sec_data['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
+        // Make sure we decode encoded rich text before sending to the customizer
+        // see #544 and #791
+        $raw_api_sec_data['collection'] = sek_prepare_seks_data_for_customizer( $raw_api_sec_data['collection'] );
+
+        wp_send_json_success( $raw_api_sec_data );
+    }
+}
+
+
 
 
 

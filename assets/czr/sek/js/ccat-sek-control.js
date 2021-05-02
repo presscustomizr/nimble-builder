@@ -5741,11 +5741,11 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         self.scheduleModuleAccordion.call( _section_, { expand_first_control : false } );
                         _section_.container.find('.customize-control.sek-expand-on-init').find('label > .customize-control-title').trigger('click');
                         // Fetch the presetSectionCollection from the server now, so we save a few milliseconds when injecting the first preset_section
-                        // it populates api.sek_presetSections
+                        // it populates api.nimble_ApiSections
                         //
                         // updated in v1.7.5, may 21st : performance improvements on customizer load
                         // inserting preset sections is not on all Nimble sessions => let's only fetch when user inserts the first section
-                        // self._maybeFetchSectionsFromServer();
+                        // self._getApiSingleSectionData();
                   });
                   return dfd;
             }
@@ -7280,27 +7280,44 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
 
             // @return a promise()
-            // caches the sections in api.sek_presetSections when api.section( '__content_picker__') is registered
+            // caches the api sections in api.nimble_ApiSections when api.section( '__content_picker__') is registered
             // caches the user saved sections on the first drag and drop of a user-saved section
-            _maybeFetchSectionsFromServer : function() {
+            _getApiSingleSectionData : function( presetSectionId ) {
                   var dfd = $.Deferred(),
                       _ajaxRequest_;
 
-                  if ( ! _.isEmpty( api.sek_presetSections ) ) {
-                        dfd.resolve( api.sek_presetSections );
+                  // If already cached, resolve now
+                  if ( ! _.isEmpty( api.nimble_ApiSections[presetSectionId] ) ) {
+                        dfd.resolve( api.nimble_ApiSections[presetSectionId] );
                   } else {
-                        if ( ! _.isUndefined( api.sek_fetchingPresetSections ) && 'pending' == api.sek_fetchingPresetSections.state() ) {
-                              _ajaxRequest_ = api.sek_fetchingPresetSections;
+                        if ( ! _.isUndefined( api.nimble_fetchingApiSection ) && 'pending' == api.nimble_fetchingApiSection.state() ) {
+                              _ajaxRequest_ = api.nimble_fetchingApiSection;
                         } else {
-                              _ajaxRequest_ = wp.ajax.post( 'sek_get_preset_sections', { nonce: api.settings.nonce.save } );
-                              api.sek_fetchingPresetSections = _ajaxRequest_;
+                              _ajaxRequest_ = wp.ajax.post( 'sek_get_single_api_section_data', { 
+                                    nonce: api.settings.nonce.save,
+                                    api_section_id : presetSectionId
+                              });
+                              api.nimble_fetchingApiSection = _ajaxRequest_;
                         }
-                        _ajaxRequest_.done( function( _collection_ ) {
-                              //api.sek_presetSections = JSON.parse( _collection_ );
-                              api.sek_presetSections = _collection_;
-                              dfd.resolve( api.sek_presetSections );
+                        _ajaxRequest_.done( function( _section_data_ ) {
+                              //api.nimble_ApiSections = JSON.parse( _section_data_ );
+                              api.nimble_ApiSections[presetSectionId] = _section_data_;
+                              dfd.resolve( _section_data_ );
                         }).fail( function( _r_ ) {
-                              dfd.reject( _r_ );
+                              api.errorLog( 'ajax sek_get_single_api_section_data => error', _r_ );
+                              var _msg = 'Error when fetching the section from api';
+                              if ( _.isString( _r_ ) && !_.isEmpty( _r_ ) ) {
+                                    _msg = _r_;
+                              }
+                              api.previewer.trigger('sek-notify', {
+                                    type : 'error',
+                                    duration : 40000,
+                                    message : [
+                                          '<span style="font-size:0.95em">',
+                                          '<strong>'+ _msg + '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
                         });
                   }
                   return dfd.promise();
@@ -7320,7 +7337,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //       is_user_section : bool, //<= is this section a "saved" section ?
             //       presetSectionId : params.content_id,
             // }
-            getPresetSectionCollection : function( sectionParams ) {
+            getPresetSectionCollectionData : function( sectionParams ) {
                   var self = this,
                       __dfd__ = $.Deferred();
                   if ( sectionParams.is_user_section ) {
@@ -7337,8 +7354,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               //  section_post_name : ''
                               // }
                               if ( ! _.isObject( userSection ) || _.isEmpty( userSection ) || _.isUndefined( userSection.data ) ) {
-                                    api.errare( 'getPresetSectionCollection => preset section type not found or empty : ' + sectionParams.presetSectionId, userSection );
-                                    throw new Error( 'getPresetSectionCollection => preset section type not found or empty');
+                                    api.errare( 'getPresetSectionCollectionData => preset section type not found or empty : ' + sectionParams.presetSectionId, userSection );
+                                    throw new Error( 'getPresetSectionCollectionData => preset section type not found or empty');
                               }
 
                               var userSectionCandidate = $.extend( {}, true, userSection.data );
@@ -7363,26 +7380,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                __dfd__.reject( er );
                         });
                   } else {
-                        self._maybeFetchSectionsFromServer()
+                        api.nimble_ApiSections = api.nimble_ApiSections || {};
+                        self._getApiSingleSectionData( sectionParams.presetSectionId )
                               .fail( function( er ) {
                                     __dfd__.reject( er );
                               })
-                              .done( function( _collection_ ) {
-                                    //api.infoLog( 'preset_sections fetched', api.sek_presetSections );
+                              .done( function( _section_data_ ) {
+                                    //api.infoLog( 'API SECTION fetched', sectionParams.presetSectionId, api.nimble_ApiSections );
                                     var presetSection,
-                                        allPresets = $.extend( true, {}, _.isObject( _collection_ ) ? _collection_ : {} );
+                                        allPresets = $.extend( true, {}, _.isObject( _section_data_ ) ? _section_data_ : {} );
 
-                                    if ( _.isEmpty( allPresets ) ) {
-                                          throw new Error( 'getPresetSectionCollection => Invalid collection');
+                                    if ( _.isEmpty( _section_data_ ) || !_.isObject(_section_data_) ) {
+                                          throw new Error( 'getPresetSectionCollectionData => Invalid collection');
                                     }
-                                    if ( _.isEmpty( allPresets[ sectionParams.presetSectionId ] ) ) {
-                                          throw new Error( 'getPresetSectionCollection => the preset section : "' + sectionParams.presetSectionId + '" has not been found in the collection');
-                                    }
-                                    var presetCandidate = allPresets[ sectionParams.presetSectionId ];
+                                    // if ( _.isEmpty( allPresets[ sectionParams.presetSectionId ] ) ) {
+                                    //       throw new Error( 'getPresetSectionCollectionData => the preset section : "' + sectionParams.presetSectionId + '" has not been found in the collection');
+                                    // }
+                                    var presetCandidate = $.extend( true, {}, _section_data_ );
 
                                     // Ensure we have a string that's JSON.parse-able
                                     // if ( typeof presetCandidate !== 'string' || presetCandidate[0] !== '{' ) {
-                                    //       throw new Error( 'getPresetSectionCollection => ' + sectionParams.presetSectionId + ' is not JSON.parse-able');
+                                    //       throw new Error( 'getPresetSectionCollectionData => ' + sectionParams.presetSectionId + ' is not JSON.parse-able');
                                     // }
                                     // presetCandidate = JSON.parse( presetCandidate );
 
@@ -7396,7 +7414,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // the other level's version have to be added
                                     presetCandidate.collection = self.setPresetSectionVersion( presetCandidate.collection );
                                     __dfd__.resolve( presetCandidate );
-                              });//_maybeFetchSectionsFromServer.done()
+                              });//_getApiSingleSectionData.done()
                   }
                   return __dfd__.promise();
             },
@@ -8061,13 +8079,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                               // Try to fetch the sections from the server
                               // if sucessfull, resolve self.updAPISetParams.sectionInjectPromise.promise()
-                              self.getPresetSectionCollection({
+                              self.getPresetSectionCollectionData({
                                           is_user_section : params.is_user_section,
                                           presetSectionId : params.content_id
                                     })
                                     .fail( function( _er_ ) {
-                                          api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
-                                          self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
+                                          api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollectionData()', _er_ );
+                                          self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollectionData()');
                                     })
                                     .done( function( presetColumnOrSectionCollection ) {
                                           if ( ! _.isObject( presetColumnOrSectionCollection ) || _.isEmpty( presetColumnOrSectionCollection ) ) {
@@ -8076,7 +8094,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           }
                                           // OK. time to resolve self.updAPISetParams.sectionInjectPromise.promise()
                                           _doWhenPresetSectionCollectionFetched( presetColumnOrSectionCollection );
-                                    });//self.getPresetSectionCollection().done()
+                                    });//self.getPresetSectionCollectionData().done()
 
                         break;//case 'preset_section' :
                   }//switch( params.content_type)
@@ -8198,13 +8216,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Try to fetch the sections from the server
                   // if sucessfull, resolve self.updAPISetParams.sectionInjectPromise.promise()
-                  self.getPresetSectionCollection({
+                  self.getPresetSectionCollectionData({
                               is_user_section : params.is_user_section,
                               presetSectionId : params.content_id
                         })
                         .fail( function() {
-                              api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()', _er_ );
-                              self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollection()');
+                              api.errare( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollectionData()', _er_ );
+                              self.updAPISetParams.promise.reject( 'updateAPISetting => ' + params.action + ' => Error with self.getPresetSectionCollectionData()');
                         })
                         .done( function( presetColumnOrSectionCollection ) {
                               if ( ! _.isObject( presetColumnOrSectionCollection ) || _.isEmpty( presetColumnOrSectionCollection ) ) {
@@ -8213,7 +8231,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                               // OK. time to resolve self.updAPISetParams.sectionInjectPromise.promise()
                               _doWhenPrebuiltSectionCollectionFetched( presetColumnOrSectionCollection );
-                        });//self.getPresetSectionCollection().done()
+                        });//self.getPresetSectionCollectionData().done()
             }
 
       });//$.extend()
