@@ -279,7 +279,7 @@ function sek_enqueue_js_asset_for_gutenberg_edit_button() {
       'nimbleAdminLocalized',
       array(
           'i18n' => array(
-              "Nimble Builder can only be used on published posts. This post is not published yet." => __( "Nimble Builder can only be used on published posts. This post is not published yet.", 'text_doma'),
+              "Nimble Builder can't be used on draft or scheduled posts. You can publish the post with visibility set to 'private' if you need to edit it with Nimble Builder before publishing." => __( "Nimble Builder can't be used on draft or scheduled posts. You can publish the post with visibility set to 'private' if you need to edit it with Nimble Builder before publishing.", 'text_doma'),
           )
       )
     );
@@ -359,11 +359,11 @@ function sek_print_js_for_nimble_edit_btn() {
                   wp.ajax.post( 'sek_get_post_status_before_customizing', {
                       nimble_edit_post_id : post_id
                   }).done( function( status ) {
-                    if ( 'publish' === status ) {
+                    if ( 'publish' === status || 'private' === status ) {
                         _doRedirectToCustomizer( post_id, $clickedEl );
                     } else {
                       $clickedEl.removeClass('sek-loading-customizer').addClass('button-primary');
-                      alert('<?php _e("Nimble Builder can only be used on published posts. This post is not published yet.", "text-doma"); ?>' );
+                      alert('<?php _e("Nimble Builder can\'t be used on draft or scheduled posts. You can publish the post with visibility set to \'private\' if you need to edit it with Nimble Builder before publishing.", "text-doma"); ?>' );
                     }
                   }).fail( function( resp ) { console.log('Nimble Builder Error => problem when getting post status')});
               } else {
