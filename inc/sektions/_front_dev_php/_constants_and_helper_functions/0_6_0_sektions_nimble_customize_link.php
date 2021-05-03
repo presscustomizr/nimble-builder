@@ -21,6 +21,17 @@ function sek_add_customize_link() {
         if ( is_customize_preview() && $wp_customize->changeset_post_id() && !current_user_can( get_post_type_object( 'customize_changeset' )->cap->edit_post, $wp_customize->changeset_post_id() ) ) {
           return;
         }
+        // Previewing a post ?
+        // case when previewing a draft post
+        if ( array_key_exists( 'preview', $_GET ) && $_GET['preview'] )
+            return;
+        // case when previewing a future scheduled post
+        if ( array_key_exists( 'p', $_GET ) ) {
+            $post_id = $_GET['p'];
+            $post = get_post( $post_id );
+            if ( $post && 'publish' !== $post->post_status && 'private' !== $post->post_status )
+                return;
+        }
 
         $current_url = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         if ( is_customize_preview() && $wp_customize->changeset_uuid() ) {
@@ -79,13 +90,13 @@ function sek_get_customize_url_when_is_admin( $post = null ) {
     //         $customize_url = get_permalink( $post->ID );
     //     }
     // } else
-
     if ( 'edit' == $current_screen->base
         && ( $post_type_object = get_post_type_object( $current_screen->post_type ) )
         && ( $post_type_object->public )
         && ( $post_type_object->show_in_admin_bar )
         && ( get_post_type_archive_link( $post_type_object->name ) )
-        && !( 'post' === $post_type_object->name && 'posts' === get_option( 'show_on_front' ) ) )
+        && !( 'post' === $post_type_object->name && 'posts' === get_option( 'show_on_front' ) )
+        && ( 'publish' === $post_type_object->post_status && 'private' === $post_type_object->post_status ) )
     {
         $customize_url = get_post_type_archive_link( $current_screen->post_type );
     } elseif ( 'term' == $current_screen->base

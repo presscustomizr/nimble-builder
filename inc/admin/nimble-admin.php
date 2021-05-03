@@ -442,6 +442,8 @@ function sek_add_nimble_post_state( $post_states, $post ) {
       return $post_states;
     if ( !sek_current_user_can_access_nb_ui() )
       return $post_states;
+    if ( $post && 'publish' !== $post->post_status && 'private' !== $post->post_status )
+      return $post_states;
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
     if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_been_customized( $manually_built_skope_id ) ) {
         $post_states['nimble'] = __( 'Nimble Builder', 'text-doma' );
@@ -456,6 +458,8 @@ add_filter( 'post_row_actions', '\Nimble\sek_filter_post_row_actions', 11, 2 );
 add_filter( 'page_row_actions', '\Nimble\sek_filter_post_row_actions', 11, 2 );
 function sek_filter_post_row_actions( $actions, $post ) {
     if ( !sek_current_user_can_access_nb_ui() )
+      return $actions;
+    if ( $post && 'publish' !== $post->post_status && 'private' !== $post->post_status )
       return $actions;
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
     if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_been_customized( $manually_built_skope_id ) ) {
