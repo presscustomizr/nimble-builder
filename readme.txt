@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.7
-Stable tag: 3.1.2
+Stable tag: 3.1.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -116,17 +116,15 @@ You'll find a growing online knowledge base for Nimble builder here : [Nimble bu
 Yes, Nimble builder works with any WordPress theme. If you experience any problem with a specific theme, please report it in the [plugin support forum](https://wordpress.org/support/plugin/nimble-builder).
 
 = How to troubleshoot problems with Nimble Builder ? =
-1. **Use the latest software versions** : make sure WordPress, Nimble Builder and your theme are all up to date.
-2. **Documentation** : try to find a possible solution in our [documentation pages](https://docs.presscustomizr.com/collection/334-nimble-builder/).
-3. **Search the forum** : use the search field on top of the topic list with keywords describing your issue. Another user may have had a similar problem already resolved.
-4. **Cache plugin** : if you use a server cache or cache plugin, please clear it’s cache content and disable caching via it’s settings. It is recommended to disable your cache plugin when customizing your site.
-5. **Check for plugin conflict** : deactivate all of your plugins. If it fixes the issue, re-activate your plugins one by one, until you identify the plugin in conflict.
-6. **Browser** : [clear your browser's cache / history](https://docs.presscustomizr.com/article/309-how-to-clear-your-browsers-cache-cookies-and-history/). Switch to another browser if needed. Make sure you do not use a browser extension that conflicts with the plugin.
-7. **Theme** : try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
+1. **Use the latest software versions** : make sure WordPress, your theme and plugins are **all updated to their latest versions**.
+2. **Cache plugin** : if you use a server cache or cache plugin, clear it’s cache content. It is recommended to disable your cache plugin when customizing your site.
+3. **Browser** : [clear your browser's cache / history](https://docs.presscustomizr.com/article/309-how-to-clear-your-browsers-cache-cookies-and-history/). Switch to another browser if needed. Make sure you do not use a browser extension that conflicts with the plugin.
+4. **Check for plugin conflict** : install WordPress official [Health check plugin](https://wordpress.org/plugins/health-check/). Activate the troubleshooting mode. Then deactivate all of your plugins. If it fixes the issue, re-activate your plugins one by one, until you identify the plugin in conflict.
+5. **Theme** : install WordPress official [Health check plugin](https://wordpress.org/plugins/health-check/) and try to switch to another WordPress theme, like the default WordPress theme. If you use a child theme, activate the parent theme instead.
+6. **Search the forum** : use the search field on top of the topic list with keywords describing your issue. Another user may have had a similar problem already resolved.
+7. **Documentation** : try to find a possible solution in our [documentation pages](https://docs.presscustomizr.com/collection/334-nimble-builder/).
 
-We have also published a detailed [troubleshooting guide for Nimble Builder](https://docs.presscustomizr.com/article/351-nimble-troubleshooting-guide/).
-
-If you can't troubleshoot your issue, please open a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
+You can report a problem by opening a new thread in [Nimble Builder support forum](https://wordpress.org/support/plugin/nimble-builder/).
 
 == Upgrade Notice ==
 Visit the [Github release page](https://github.com/presscustomizr/nimble-builder/releases).
