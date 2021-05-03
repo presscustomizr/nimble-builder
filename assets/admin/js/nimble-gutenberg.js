@@ -65,14 +65,6 @@
             // for new post, the url is empty, let's generate it server side with an ajax call
             var post_id = wp.data.select('core/editor').getCurrentPostId();
 
-            // check post status before attempting to open the customizer. introduced for #831
-            // draft post can't be edited with Nimble Builder
-            var _post = wp.data.select('core/editor').getCurrentPost();
-            if ( _post && _.isObject( _post ) && 'publish' !== _post.status && 'private' !== _post.status ) {
-                alert(nimbleAdminLocalized.i18n["Nimble Builder can't be used on draft or scheduled posts. You can publish the post with visibility set to 'private' if you need to edit it with Nimble Builder before publishing."]);
-                return;
-            }
-
             // introduced for https://github.com/presscustomizr/nimble-builder/issues/509
             $clickedEl.addClass('sek-loading-customizer').removeClass('button-primary');
 

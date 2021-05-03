@@ -273,16 +273,6 @@ function sek_enqueue_js_asset_for_gutenberg_edit_button() {
       NIMBLE_ASSETS_VERSION,
       true
     );
-
-    wp_localize_script(
-      'nb-gutenberg',
-      'nimbleAdminLocalized',
-      array(
-          'i18n' => array(
-              "Nimble Builder can't be used on draft or scheduled posts. You can publish the post with visibility set to 'private' if you need to edit it with Nimble Builder before publishing." => __( "Nimble Builder can't be used on draft or scheduled posts. You can publish the post with visibility set to 'private' if you need to edit it with Nimble Builder before publishing.", 'text_doma'),
-          )
-      )
-    );
 }
 
 // Handle both classic and gutenberg editors
@@ -356,16 +346,7 @@ function sek_print_js_for_nimble_edit_btn() {
                   $clickedEl.addClass('sek-loading-customizer').removeClass('button-primary');
                   // for new post, the url is empty, let's generate it server side with an ajax call
                   var post_id = $('#post_ID').val();
-                  wp.ajax.post( 'sek_get_post_status_before_customizing', {
-                      nimble_edit_post_id : post_id
-                  }).done( function( status ) {
-                    if ( 'publish' === status || 'private' === status ) {
-                        _doRedirectToCustomizer( post_id, $clickedEl );
-                    } else {
-                      $clickedEl.removeClass('sek-loading-customizer').addClass('button-primary');
-                      alert('<?php _e("Nimble Builder can\'t be used on draft or scheduled posts. You can publish the post with visibility set to \'private\' if you need to edit it with Nimble Builder before publishing.", "text-doma"); ?>' );
-                    }
-                  }).fail( function( resp ) { console.log('Nimble Builder Error => problem when getting post status')});
+                  _doRedirectToCustomizer( post_id, $clickedEl );
               } else {
                   window.location.href = _url;
               }
@@ -442,8 +423,6 @@ function sek_add_nimble_post_state( $post_states, $post ) {
       return $post_states;
     if ( !sek_current_user_can_access_nb_ui() )
       return $post_states;
-    if ( $post && 'publish' !== $post->post_status && 'private' !== $post->post_status )
-      return $post_states;
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
     if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_been_customized( $manually_built_skope_id ) ) {
         $post_states['nimble'] = __( 'Nimble Builder', 'text-doma' );
@@ -458,8 +437,6 @@ add_filter( 'post_row_actions', '\Nimble\sek_filter_post_row_actions', 11, 2 );
 add_filter( 'page_row_actions', '\Nimble\sek_filter_post_row_actions', 11, 2 );
 function sek_filter_post_row_actions( $actions, $post ) {
     if ( !sek_current_user_can_access_nb_ui() )
-      return $actions;
-    if ( $post && 'publish' !== $post->post_status && 'private' !== $post->post_status )
       return $actions;
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
     if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_been_customized( $manually_built_skope_id ) ) {
