@@ -157,9 +157,6 @@ nb_.listenTo('nb-docready', function() {
       if ( window.nb_ && window.nb_.getQueryVariable ) {
             var anchorId = window.nb_.getQueryVariable('go_to'),
                   el = document.getElementById(anchorId);
-            if( anchorId && el ) {
-                  setTimeout( function() { el.scrollIntoView();}, 200 );
-            }
             // Then clean the url
             var _cleanUrl = function() {
                   var currPathName = window.location.pathname; //get current address
@@ -167,9 +164,12 @@ nb_.listenTo('nb-docready', function() {
                   var beforeQueryString = currPathName.split("?go_to")[0];
                   window.history.replaceState({}, document.title,  beforeQueryString );
             };
-            try{ _cleanUrl(); } catch(er) {
-                  if( window.console && window.console.log ) {
-                        console.log( 'NB => error when cleaning url "go_to" param');
+            if( anchorId && el ) {
+                  setTimeout( function() { el.scrollIntoView();}, 200 );
+                  try{ _cleanUrl(); } catch(er) {
+                        if( window.console && window.console.log ) {
+                              console.log( 'NB => error when cleaning url "go_to" param');
+                        }
                   }
             }
       }
