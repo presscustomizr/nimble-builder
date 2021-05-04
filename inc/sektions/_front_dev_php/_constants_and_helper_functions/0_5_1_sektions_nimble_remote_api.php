@@ -148,7 +148,7 @@ function sek_get_nimble_api_data( $params ) {
     }
 
     $api_data = '_api_error_' === $api_data ? null : $api_data;
-    wp_cache_set( $wp_cache_key  , $api_data );
+    wp_cache_set( $wp_cache_key, $api_data );
 
     //sek_error_log('API DATA for ' . $transient_name, $api_data );
 
