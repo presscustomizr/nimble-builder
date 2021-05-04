@@ -78,6 +78,7 @@ final class Nimble_Collection_Setting extends \WP_Customize_Setting {
    */
   public function __construct( $manager, $id, $args = array() ) {
     parent::__construct( $manager, $id, $args );
+    
     // shall start with "nimble___"
     if ( 0 !== strpos( $this->id_data['base'], NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION ) ) { //$this->id_data['base'] looks like "nimble___"
         throw new \Exception( 'Nimble_Collection_Setting => __construct => Expected ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . ' id_base.' );
