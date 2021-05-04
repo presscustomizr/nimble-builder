@@ -17,7 +17,7 @@ $thumb_settings = $value['grid_thumb'];
 if ( !function_exists( 'Nimble\sek_filter_pagination_nav_url') ) {
     function sek_filter_pagination_nav_url( $result ) {
           $url = add_query_arg(
-            array('go_to' => Nimble_Manager()->model['id'] ),
+            array('nb_grid_module_go_to' => Nimble_Manager()->model['id'] ),
             $result
           );
           return $url;
@@ -396,29 +396,37 @@ if ( !$use_current_query && $replace_current_query && true === sek_booleanize_ch
 
 $post_query = null;
 if ( $replace_current_query && $post_nb > 0 ) {
-    // Sticky posts
-    $include_sticky = array_key_exists('include_sticky', $main_settings ) && sek_booleanize_checkbox_val($main_settings['include_sticky']);
-    if ( $include_sticky ) {
-      $query_params['ignore_sticky_posts'] = 0;
-    }
-    $query_params = apply_filters( 'nimble_post_grid_module_query_params', $query_params , Nimble_Manager()->model );
-    if ( is_array( $query_params ) ) {
-      //add_filter( 'found_posts', '\Nimble\sek_filter_found_posts', 10, 2 );
-      // Query featured entries
-      $post_query = new \WP_Query($query_params);
-      if ( $include_sticky ) {
-        $post_query = sek_maybe_add_sticky_posts_to_query( $post_query, $query_params, $paged );
-      }
-      //remove_filter( 'found_posts', '\Nimble\sek_filter_found_posts', 10, 2 );
+    $cache_key = 'nb_post_q_' . $model['id'];
+    $cache_group = 'nb_post_queries';
+    $cached = wp_cache_get( $cache_key, $cache_group );
+    if ( false !== $cached ) {
+        $post_query = $cached;
     } else {
-      sek_error_log('post_grid_module_tmpl => query params is invalid');
+        // Sticky posts
+        $include_sticky = array_key_exists('include_sticky', $main_settings ) && sek_booleanize_checkbox_val($main_settings['include_sticky']);
+        if ( $include_sticky ) {
+          $query_params['ignore_sticky_posts'] = 0;
+        }
+        $query_params = apply_filters( 'nimble_post_grid_module_query_params', $query_params , Nimble_Manager()->model );
+        if ( is_array( $query_params ) ) {
+          //add_filter( 'found_posts', '\Nimble\sek_filter_found_posts', 10, 2 );
+          // Query featured entries
+          $post_query = new \WP_Query($query_params);
+          if ( $include_sticky ) {
+            $post_query = sek_maybe_add_sticky_posts_to_query( $post_query, $query_params, $paged );
+          }
+          //remove_filter( 'found_posts', '\Nimble\sek_filter_found_posts', 10, 2 );
+        } else {
+          sek_error_log('post_grid_module_tmpl => query params is invalid');
+        }
+        wp_cache_set( $cache_key, $post_query, $cache_group );
     }
 } else if ( !$replace_current_query ) {
     if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
-      $post_query = new \WP_Query($query_params);
+        $post_query = new \WP_Query($query_params);
     } else {
-      global $wp_query;
-      $post_query = $wp_query;
+        global $wp_query;
+        $post_query = $wp_query;
     }
 }
 
