@@ -202,18 +202,19 @@ function sek_maybe_get_seks_for_group_site_template( $skope_id, $local_seks_data
 
 // @return null || array
 // get and cache the group site template data
-function sek_get_group_site_template_data() {
+function sek_get_group_site_template_data( $group_skope = null ) {
     // When ajaxing while customizing, no need to get the group site template data
     if ( skp_is_customizing() && defined( 'DOING_AJAX' ) && DOING_AJAX )
         return;
-    $cached = wp_cache_get('nimble_group_site_template_data');
-    if ( false !== $cached )
-        return $cached;
-
     $group_site_tmpl_data = [];
-    
-    $group_skope = sek_get_group_skope_for_site_tmpl();
-
+    if ( is_null( $group_skope ) ) {
+        $group_skope = sek_get_group_skope_for_site_tmpl();
+    }
+    $cache_key = 'nimble_group_site_template_data_' . $group_skope;
+    $cached = wp_cache_get( $cache_key );
+    if ( false !== $cached ) {
+        return $cached;
+    }
     // Site template params are structured as follow :
     // [
     //     'site_tmpl_id' : '_no_site_tmpl_',
@@ -221,8 +222,10 @@ function sek_get_group_site_template_data() {
     //     'site_tmpl_title' : ''
     //];
     $tmpl_params = sek_get_site_tmpl_params_for_skope( $group_skope );
-    if ( '_no_site_tmpl_' === $tmpl_params['site_tmpl_id'] )
+    if ( '_no_site_tmpl_' === $tmpl_params['site_tmpl_id'] ) {
+        wp_cache_set( $cache_key, $group_site_tmpl_data );
         return;
+    }
 
     $site_tmpl_id = $tmpl_params['site_tmpl_id'];
     $site_tmpl_source = $tmpl_params['site_tmpl_source'];
@@ -273,21 +276,23 @@ function sek_get_group_site_template_data() {
     if ( $post ) {
         $group_site_tmpl_data = maybe_unserialize( $post->post_content );
     }
-    wp_cache_set('nimble_group_site_template_data', $group_site_tmpl_data );
+    wp_cache_set( $cache_key, $group_site_tmpl_data );
     return $group_site_tmpl_data;
 }
 
 
 // @return bool
 function sek_has_group_site_template_data() {
-    $cached = wp_cache_get('nimble_has_group_site_template_data');
+    $group_skope = sek_get_group_skope_for_site_tmpl();
+    $cache_key = 'nimble_has_group_site_template_' . $group_skope;
+    $cached = wp_cache_get($cache_key);
     if (  'yes' === $cached || 'no' === $cached ) {
         return 'yes' === $cached;
     }
     
     $group_site_tmpl_data = sek_get_group_site_template_data();//<= is cached when called
     $has_group_skope_template_data = !( !$group_site_tmpl_data || empty($group_site_tmpl_data) );
-    wp_cache_set('nimble_has_group_site_template_data', $has_group_skope_template_data  ? 'yes' : 'no' );
+    wp_cache_set( $cache_key, $has_group_skope_template_data  ? 'yes' : 'no' );
     return $has_group_skope_template_data;
 }
 
