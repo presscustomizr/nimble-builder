@@ -3,7 +3,7 @@
 * Plugin Name: Nimble Page Builder
 * Plugin URI: https://nimblebuilder.com
 * Description: Simple and smart companion that allows you to insert sections into any existing page, create landing pages or entire websites including header and footer.
-* Version: 3.1.4
+* Version: 3.1.5-beta
 * Text Domain: nimble-builder
 * Author: Press Customizr
 * Author URI: https://nimblebuilder.com/?utm_source=wp-plugins&utm_medium=wp-dashboard&utm_campaign=author-uri
@@ -16,7 +16,7 @@ if ( !defined( 'ABSPATH' ) ) {
 /* ------------------------------------------------------------------------- *
  *  CONSTANTS
 /* ------------------------------------------------------------------------- */
-$current_version = "3.1.4";
+$current_version = "3.1.5-beta";
 
 if ( !defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version ); }
 if ( !defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
@@ -142,20 +142,7 @@ if ( nimble_passes_requirements() ) {
         load_plugin_textdomain( 'nimble-builder' );
     }
 
-    // @return void()
-    function nimble_register_location( $location, $params = array() ) {
-        if ( empty( $location ) || !is_string( $location ) )
-          return;
-        \Nimble\register_location( $location, $params );
-    }
-
-    //@param $locations. mixed type
-    //@param $options (array)$options = wp_parse_args( $options, array(
-    //     'fallback_location' => null, // Typically set as 'loop_start' in the nimble templates
-    // ));
-    function render_nimble_locations( $locations, $options = array() ) {
-        \Nimble\render_nimble_locations( $locations, $options );
-    }
+    require_once( NIMBLE_BASE_PATH . '/inc/functions.php' );
 
     // Fire the retro compatibility functions
     // Note : if fired @plugins_loaded, invoking wp_update_post() generates php notices
