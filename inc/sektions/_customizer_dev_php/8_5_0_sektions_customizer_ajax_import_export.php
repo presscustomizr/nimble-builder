@@ -256,7 +256,7 @@ function sek_ajax_get_manually_imported_file_content() {
 
     // Make sure NB decodes encoded rich text before sending to the customizer
     // see #544 and #791
-    $raw_unserialized_data['data'] = sek_prepare_seks_data_for_customizer( $raw_unserialized_data['data'] );
+    $raw_unserialized_data['data'] = sek_sniff_and_decode_richtext( $raw_unserialized_data['data'] );
 
     $imported_content = array(
         //'data' => apply_filters( 'nimble_pre_import', $raw_unserialized_data['data'], $do_import_images ),

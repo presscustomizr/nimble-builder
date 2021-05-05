@@ -438,4 +438,5 @@ add_filter('sek_get_raw_section_registration_params', function( $collection ) {
 function sek_generate_level_guid() {
     return NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED . substr( strval( md5( uniqid( rand(), true) ) ),0, 12 );//__nimble__4cdf8be5ce8f
 }
+
 ?>

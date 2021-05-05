@@ -71,7 +71,7 @@ function sek_ajax_get_single_api_section_data() {
         //$raw_api_sec_data['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
         // Make sure we decode encoded rich text before sending to the customizer
         // see #544 and #791
-        $raw_api_sec_data['collection'] = sek_prepare_seks_data_for_customizer( $raw_api_sec_data['collection'] );
+        $raw_api_sec_data['collection'] = sek_sniff_and_decode_richtext( $raw_api_sec_data['collection'] );
 
         wp_send_json_success( $raw_api_sec_data );
     }
@@ -120,7 +120,7 @@ function sek_ajax_sek_get_user_section_json() {
         }
         // Make sure we decode encoded rich text before sending to the customizer
         // see #544 and #791
-        $section_decoded['data'] = sek_prepare_seks_data_for_customizer( $section_decoded['data'] );
+        $section_decoded['data'] = sek_sniff_and_decode_richtext( $section_decoded['data'] );
         wp_send_json_success( $section_decoded );
     } else {
         wp_send_json_error( __FUNCTION__ . '_section_post_not_found' );

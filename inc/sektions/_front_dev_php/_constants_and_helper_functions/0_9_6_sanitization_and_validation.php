@@ -115,4 +115,22 @@ function sek_maybe_encode_richtext( $string ){
 
 
 
+
+// Feb 2021 added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
+// Recursive
+function sek_sniff_and_decode_richtext( $seks_data ) {
+    if ( is_array( $seks_data ) ) {
+        foreach( $seks_data as $key => $data ) {
+            if ( is_array( $data ) ) {
+                $seks_data[$key] = sek_sniff_and_decode_richtext( $data );
+            } else {
+                if ( is_string($data) ) {
+                    $seks_data[$key] = sek_maybe_decode_richtext( $data );
+                }
+            }
+        }
+    }
+    return $seks_data;
+  }
+
 ?>

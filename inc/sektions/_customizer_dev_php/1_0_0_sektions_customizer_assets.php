@@ -674,23 +674,6 @@ function nimble_add_i18n_localized_control_params( $params ) {
 }//'nimble_add_i18n_localized_control_params'
 
 
-// Feb 2021 added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
-function sek_prepare_seks_data_for_customizer( $seks_data ) {
-    if ( is_array( $seks_data ) ) {
-        foreach( $seks_data as $key => $data ) {
-            if ( is_array( $data ) ) {
-                $seks_data[$key] = sek_prepare_seks_data_for_customizer( $data );
-            } else {
-                if ( is_string($data) ) {
-                    $seks_data[$key] = sek_maybe_decode_richtext( $data );
-                }
-            }
-        }
-    }
-    return $seks_data;
-}
-
-
 
 // ADD SEKTION VALUES TO EXPORTED DATA IN THE CUSTOMIZER PREVIEW
 add_filter( 'skp_json_export_ready_skopes', '\Nimble\add_sektion_values_to_skope_export' );
@@ -719,7 +702,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
         $seks_data = sek_get_skoped_seks( $skope_id );
 
         // Feb 2021 added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
-        $seks_data = sek_prepare_seks_data_for_customizer( $seks_data );
+        $seks_data = sek_sniff_and_decode_richtext( $seks_data );
 
         $skp_data[ 'sektions' ] = array(
             'db_values' => $seks_data,

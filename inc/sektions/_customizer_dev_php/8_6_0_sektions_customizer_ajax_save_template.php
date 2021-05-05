@@ -80,7 +80,7 @@ function sek_ajax_sek_get_user_tmpl_json() {
             $tmpl_decoded['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
             // Make sure we decode encoded rich text before sending to the customizer
             // see #544 and #791
-            $tmpl_decoded['data'] = sek_prepare_seks_data_for_customizer( $tmpl_decoded['data'] );
+            $tmpl_decoded['data'] = sek_sniff_and_decode_richtext( $tmpl_decoded['data'] );
 
             // added March 2021 for site templates #478
             // If property '__inherits_group_skope_tmpl_when_exists__' has been saved by mistake in the template, make sure it's unset now
@@ -123,7 +123,7 @@ function sek_ajax_sek_get_api_tmpl_json() {
         $raw_tmpl_data['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
         // Make sure we decode encoded rich text before sending to the customizer
         // see #544 and #791
-        $raw_tmpl_data['data'] = sek_prepare_seks_data_for_customizer( $raw_tmpl_data['data'] );
+        $raw_tmpl_data['data'] = sek_sniff_and_decode_richtext( $raw_tmpl_data['data'] );
         
         // added March 2021 for site templates #478
         // If property '__inherits_group_skope_tmpl_when_exists__' has been saved by mistake in the template, make sure it's unset now
