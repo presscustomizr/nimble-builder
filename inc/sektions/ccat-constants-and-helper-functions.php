@@ -4189,7 +4189,7 @@ function sek_maybe_optimize_options() {
 // fired @wp_loaded
 // Note : if fired @plugins_loaded, invoking wp_update_post() generates php notices
 function sek_maybe_do_version_mapping() {
-    // if ( !is_user_logged_in() || !current_user_can( 'edit_theme_options' ) )
+    // if ( !is_user_logged_in() || !current_user_can( 'customize' ) )
     //   return;
     // //delete_option(NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS);
     // $global_options = get_option( NIMBLE_OPT_NAME_FOR_GLOBAL_OPTIONS );

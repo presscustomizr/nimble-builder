@@ -2589,9 +2589,6 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
             if ( !is_user_logged_in() ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
             }
-            if ( !current_user_can( 'edit_theme_options' ) ) {
-              wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
-            }
             if ( !current_user_can( 'customize' ) ) {
                 status_header( 403 );
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => customize_not_allowed' );
