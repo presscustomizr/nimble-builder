@@ -19,7 +19,7 @@ function nimble_get_content_as_json() {
     // bail now if called before skope_id is set (before @hook 'wp')
     if ( empty( $skope_id ) || '_skope_not_set_' === $skope_id )
         return '{}';
-    
+
     $global_sections = \Nimble\sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
     $local_sections = \Nimble\sek_get_skoped_seks( $skope_id );
     $raw_content = \Nimble\sek_sniff_and_decode_richtext([

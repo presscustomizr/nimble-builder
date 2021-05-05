@@ -1180,7 +1180,7 @@ window.nb_.getQueryVariable = function(variable) {
 // June 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/716
 nb_.listenTo('nb-docready', function() {
       if ( window.nb_ && window.nb_.getQueryVariable ) {
-            var anchorId = window.nb_.getQueryVariable('go_to'),
+            var anchorId = window.nb_.getQueryVariable('nb_grid_module_go_to'),
                   el = document.getElementById(anchorId);
             // Then clean the url
             var _cleanUrl = function() {

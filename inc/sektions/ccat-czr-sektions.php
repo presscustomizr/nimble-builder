@@ -674,23 +674,6 @@ function nimble_add_i18n_localized_control_params( $params ) {
 }//'nimble_add_i18n_localized_control_params'
 
 
-// Feb 2021 added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
-function sek_prepare_seks_data_for_customizer( $seks_data ) {
-    if ( is_array( $seks_data ) ) {
-        foreach( $seks_data as $key => $data ) {
-            if ( is_array( $data ) ) {
-                $seks_data[$key] = sek_prepare_seks_data_for_customizer( $data );
-            } else {
-                if ( is_string($data) ) {
-                    $seks_data[$key] = sek_maybe_decode_richtext( $data );
-                }
-            }
-        }
-    }
-    return $seks_data;
-}
-
-
 
 // ADD SEKTION VALUES TO EXPORTED DATA IN THE CUSTOMIZER PREVIEW
 add_filter( 'skp_json_export_ready_skopes', '\Nimble\add_sektion_values_to_skope_export' );
@@ -719,7 +702,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
         $seks_data = sek_get_skoped_seks( $skope_id );
 
         // Feb 2021 added to fix regression https://github.com/presscustomizr/nimble-builder/issues/791
-        $seks_data = sek_prepare_seks_data_for_customizer( $seks_data );
+        $seks_data = sek_sniff_and_decode_richtext( $seks_data );
 
         $skp_data[ 'sektions' ] = array(
             'db_values' => $seks_data,
@@ -4516,7 +4499,7 @@ function sek_ajax_get_manually_imported_file_content() {
 
     // Make sure NB decodes encoded rich text before sending to the customizer
     // see #544 and #791
-    $raw_unserialized_data['data'] = sek_prepare_seks_data_for_customizer( $raw_unserialized_data['data'] );
+    $raw_unserialized_data['data'] = sek_sniff_and_decode_richtext( $raw_unserialized_data['data'] );
 
     $imported_content = array(
         //'data' => apply_filters( 'nimble_pre_import', $raw_unserialized_data['data'], $do_import_images ),
@@ -4616,7 +4599,7 @@ function sek_ajax_sek_get_user_tmpl_json() {
             $tmpl_decoded['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
             // Make sure we decode encoded rich text before sending to the customizer
             // see #544 and #791
-            $tmpl_decoded['data'] = sek_prepare_seks_data_for_customizer( $tmpl_decoded['data'] );
+            $tmpl_decoded['data'] = sek_sniff_and_decode_richtext( $tmpl_decoded['data'] );
 
             // added March 2021 for site templates #478
             // If property '__inherits_group_skope_tmpl_when_exists__' has been saved by mistake in the template, make sure it's unset now
@@ -4659,7 +4642,7 @@ function sek_ajax_sek_get_api_tmpl_json() {
         $raw_tmpl_data['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
         // Make sure we decode encoded rich text before sending to the customizer
         // see #544 and #791
-        $raw_tmpl_data['data'] = sek_prepare_seks_data_for_customizer( $raw_tmpl_data['data'] );
+        $raw_tmpl_data['data'] = sek_sniff_and_decode_richtext( $raw_tmpl_data['data'] );
         
         // added March 2021 for site templates #478
         // If property '__inherits_group_skope_tmpl_when_exists__' has been saved by mistake in the template, make sure it's unset now
@@ -4905,7 +4888,7 @@ function sek_ajax_get_single_api_section_data() {
         //$raw_api_sec_data['img_errors'] = !empty( Nimble_Manager()->img_import_errors ) ? implode(',', Nimble_Manager()->img_import_errors) : array();
         // Make sure we decode encoded rich text before sending to the customizer
         // see #544 and #791
-        $raw_api_sec_data['collection'] = sek_prepare_seks_data_for_customizer( $raw_api_sec_data['collection'] );
+        $raw_api_sec_data['collection'] = sek_sniff_and_decode_richtext( $raw_api_sec_data['collection'] );
 
         wp_send_json_success( $raw_api_sec_data );
     }
@@ -4954,7 +4937,7 @@ function sek_ajax_sek_get_user_section_json() {
         }
         // Make sure we decode encoded rich text before sending to the customizer
         // see #544 and #791
-        $section_decoded['data'] = sek_prepare_seks_data_for_customizer( $section_decoded['data'] );
+        $section_decoded['data'] = sek_sniff_and_decode_richtext( $section_decoded['data'] );
         wp_send_json_success( $section_decoded );
     } else {
         wp_send_json_error( __FUNCTION__ . '_section_post_not_found' );

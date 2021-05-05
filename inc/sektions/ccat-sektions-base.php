@@ -2390,7 +2390,18 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
                 }
                 return $module_collection;
             });
+
+            // see #838
+            // prevents using persistent cache object systems like Memcached which override the default WP class WP_Object_Cache () which is normally refreshed on each page load )
+            add_action('init', array( $this, 'sek_clear_cached_objects_when_customizing') );
         }//__construct
+
+        public function sek_clear_cached_objects_when_customizing() {
+            if ( skp_is_customizing() ) {
+                // Make sure cached objects are cleaned
+                wp_cache_flush();
+            }
+        }
 
         // @fired @hook 'widgets_init'
         // Creates 10 widget zones
