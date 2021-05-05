@@ -17,7 +17,7 @@ function sek_do_ajax_pre_checks( $params = array() ) {
     if ( !is_user_logged_in() ) {
         wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => unauthenticated' );
     }
-    if ( !current_user_can( 'edit_theme_options' ) ) {
+    if ( !current_user_can( 'customize' ) ) {
       wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => user_cant_edit_theme_options');
     }
     if ( !current_user_can( 'customize' ) ) {

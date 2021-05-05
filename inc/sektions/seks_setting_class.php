@@ -62,7 +62,7 @@ final class Nimble_Collection_Setting extends \WP_Customize_Setting {
    * Capability required to edit this setting.
    * @var string
    */
-  public $capability = 'edit_theme_options';
+  public $capability = 'customize';
 
 
   public $skope_id = '';

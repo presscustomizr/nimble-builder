@@ -1,7 +1,7 @@
 <?php
 add_action( 'customize_register', '\Nimble\sek_catch_export_action', PHP_INT_MAX );
 function sek_catch_export_action( $wp_customize ) {
-    if ( current_user_can( 'edit_theme_options' ) ) {
+    if ( current_user_can( 'customize' ) ) {
         if ( isset( $_REQUEST['sek_export_nonce'] ) ) {
             sek_maybe_export();
         }
@@ -92,9 +92,6 @@ function sek_ajax_pre_export_checks() {
     if ( !is_user_logged_in() ) {
         wp_send_json_error( 'user_unauthenticated' );
     }
-    if ( !current_user_can( 'edit_theme_options' ) ) {
-        wp_send_json_error( 'user_cant_edit_theme_options' );
-    }
     if ( !current_user_can( 'customize' ) ) {
         status_header( 403 );
         wp_send_json_error( 'customize_not_allowed' );
@@ -161,9 +158,6 @@ function sek_ajax_get_manually_imported_file_content() {
     }
     if ( !is_user_logged_in() ) {
         wp_send_json_error( 'user_unauthenticated' );
-    }
-    if ( !current_user_can( 'edit_theme_options' ) ) {
-        wp_send_json_error( 'user_cant_edit_theme_options' );
     }
     if ( !current_user_can( 'customize' ) ) {
         status_header( 403 );
