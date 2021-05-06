@@ -662,7 +662,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             // OTHER MESSAGE TYPES
                             // @params {
                             //  type : info, error, success
-                            //  message : ''
+                            //  notif_id : '',
+                            //  is_pro_notif: '',
+                            //  message : '',
                             //  duration : in ms,
                             //  button_see_me : true
                             // }
@@ -685,13 +687,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               }));
 
                                               self.lastNimbleNotificationId = notif_id;
-
-                                              if ( params.button_see_me && api.notifications.has( notif_id ) ) {
-                                                      api.notifications.container.addClass('button-see-me-twice');
-                                                      _.delay( function() {
-                                                            api.notifications.container.removeClass('button-see-me-twice');
-                                                      }, 2000 );
-                                              }
+                                                var _doThingsWhenRendered = function() {
+                                                      if ( params.is_pro_notif ) {
+                                                            api.notifications( notif_id ).container.css('background', '#ffff88');
+                                                      }
+                                                      if ( params.button_see_me ) {
+                                                            api.notifications( notif_id ).container.addClass('button-see-me-twice');
+                                                            _.delay( function() {
+                                                                  api.notifications.container.removeClass('button-see-me-twice');
+                                                            }, 2000 );
+                                                      }
+                                                      api.notifications.unbind('rendered', _doThingsWhenRendered );
+                                                };
+                                                if ( api.notifications.has( notif_id ) ) {
+                                                      api.notifications.bind('rendered', _doThingsWhenRendered );
+                                                }
                                               // Removed if not dismissed after 5 seconds
                                               _.delay( function() {
                                                     api.notifications.remove( notif_id );

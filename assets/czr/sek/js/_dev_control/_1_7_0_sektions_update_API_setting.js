@@ -414,13 +414,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               dfd.resolve( _section_data_ );
                         }).fail( function( _r_ ) {
                               api.errorLog( 'ajax sek_get_single_api_section_data => error', _r_ );
-                              var _msg = 'Error when fetching the section from api';
+                              var _msg = 'Error when fetching the section';
                               if ( _.isString( _r_ ) && !_.isEmpty( _r_ ) ) {
                                     _msg = _r_;
                               }
                               api.previewer.trigger('sek-notify', {
                                     type : 'error',
-                                    duration : 40000,
+                                    duration : 60000,
+                                    is_pro_notif : true,
+                                    notif_id : 'pro_section_error',
                                     message : [
                                           '<span style="font-size:0.95em">',
                                           '<strong>'+ _msg + '</strong>',
