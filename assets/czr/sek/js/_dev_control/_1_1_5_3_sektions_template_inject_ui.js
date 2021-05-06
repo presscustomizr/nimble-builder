@@ -34,25 +34,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return _dfd_;
             },
 
-            getTmplJsonFromApi : function( tmpl_name ) {
+            getTmplJsonFromApi : function( tmpl_name, tmpl_is_pro ) {
                   var self = this, _dfd_ = $.Deferred();
                   wp.ajax.post( 'sek_get_api_tmpl_json', {
                         nonce: api.settings.nonce.save,
-                        api_tmpl_name: tmpl_name
+                        api_tmpl_name: tmpl_name,
+                        api_tmpl_is_pro : tmpl_is_pro ? 'yes' : 'no'
                         //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
                   })
                   .done( function( response ) {
                         _dfd_.resolve( {success:true, tmpl_json:response });
                   })
-                  .fail( function( er ) {
+                  .fail( function( _r_ ) {
                         _dfd_.resolve( {success:false});
-                        api.errorLog( 'ajax getTmplJsonFromApiTmpl => error', er );
+                        api.errorLog( 'ajax getTmplJsonFromApiTmpl => error', _r_ );
+                        var _msg = 'Error when fetching the template';
+                        if ( _.isString( _r_ ) && !_.isEmpty( _r_ ) ) {
+                              _msg = _r_;
+                        }
                         api.previewer.trigger('sek-notify', {
                             type : 'error',
-                            duration : 10000,
+                            duration : 60000,
+                            is_pro_notif : true,
+                            notif_id : 'pro_tmpl_error',
                             message : [
                                   '<span style="font-size:0.95em">',
-                                    '<strong>Error when fetching the template</strong>',
+                                    '<strong>'+ _msg + '</strong>',
                                   '</span>'
                             ].join('')
                         });
@@ -67,24 +74,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @param params {
             //    tmpl_name : string,
             //    tmpl_source : api_tmpl or user_tmpl,
-            //    tmpl_inject_mode : 3 possible import modes : replace, before, after
+            //    tmpl_inject_mode : 3 possible import modes : replace, before, after,
+            //    tmpl_is_pro: false
             // }
             get_gallery_tmpl_json_and_inject : function( params ) {
                   var self = this;
                   params = $.extend( {
                       tmpl_name : '',
                       tmpl_source  : 'user',
-                      tmpl_inject_mode : 'replace'
+                      tmpl_inject_mode : 'replace',
+                      tmpl_is_pro: false
                   }, params || {});
+
                   var tmpl_name = params.tmpl_name;
                   if ( _.isEmpty( tmpl_name ) || ! _.isString( tmpl_name ) ) {
                         api.errare('::tmpl inject => error => invalid template name');
                   }
-                  //console.log('get_gallery_tmpl_json_and_inject params ?', params );
+
                   var _promise;
                   if ( 'api_tmpl' === params.tmpl_source ) {
                         // doc : https://api.jquery.com/jQuery.getJSON/
-                        _promise = self.getTmplJsonFromApi(tmpl_name);
+                        _promise = self.getTmplJsonFromApi(tmpl_name, params.tmpl_is_pro);
                   } else {
                         _promise = self.getTmplJsonFromUserTmpl(tmpl_name);
                   }
@@ -102,13 +112,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // }
                   _promise.done( function( response ) {
                         if ( response.success ) {
-                              //console.log('INJECT NIMBLE TEMPLATE', response.lib.templates[tmpl_name] );
+                              // api.infoLog('INJECT NIMBLE TEMPLATE', params );
                               self.inject_tmpl_from_gallery({
                                     tmpl_name : tmpl_name,
                                     template_data : response.tmpl_json,
-                                    tmpl_inject_mode : params.tmpl_inject_mode
+                                    tmpl_inject_mode : params.tmpl_inject_mode,
+                                    tmpl_is_pro: params.tmpl_is_pro
                               });
+                        } else {
+                              // Clean loader if failed response
+                              api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true }); 
                         }
+                  }).fail( function() {
+                        api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
                   });
 
                   // After 30 s display a failure notification
@@ -140,9 +156,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //       tmpl_name : tmpl_name,
             //       template_data : response.tmpl_json,
             //       tmpl_inject_mode : 3 possible import modes : replace, before, after
+            //       tmpl_is_pro : false
             // }
             inject_tmpl_from_gallery : function( params ) {
-                  //console.log('inject_tmpl_from_gallery', params );
                   var self = this;
                   params = params || {};
                   // normalize params
@@ -161,7 +177,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   /// 1) CHECK IF CONTENT IS WELL FORMED AND ELIGIBLE FOR API
                   /// 2) LET'S PROCESS THE SETTING ID'S
                   /// 3) ATTEMPT TO UPDATE THE SETTING API, LOCAL OR GLOBAL. ( always local for template inject )
-                  //console.log('inject_tmpl_from_gallery ?', params );
                   if ( !api.czr_sektions.isImportedContentEligibleForAPI( {success:true, data:params.template_data}, params ) ) {
                         api.infoLog('::inject_tmpl problem => !api.czr_sektions.isImportedContentEligibleForAPI', params );
                         return;
@@ -181,9 +196,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //       tmpl_name : tmpl_name,
             //       template_data : response.tmpl_json,
             //       tmpl_inject_mode : 3 possible import modes : replace, before, after,
+            //       tmpl_is_pro : false
             // }
             doUpdateApiSettingAfter_TmplGalleryImport : function( server_resp, params ){
-                  //console.log('doUpdateApiSettingAfter_TmplGalleryImport ???', params, server_resp );
                   params = params || {};
                   if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
                         api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });

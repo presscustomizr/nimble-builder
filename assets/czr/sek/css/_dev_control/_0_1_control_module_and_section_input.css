@@ -29,6 +29,13 @@
   height: 20px;
   width: 28px;
 }
+.sek-is-pro-template {
+  position: absolute;
+  top: 0px;
+  z-index: 10;
+  right: 5px;
+  width: 40px;
+}
 [data-sek-content-type="preset_section"]:hover .sek-is-pro img, [data-sek-tmpl-item-id]:hover .sek-is-pro img {
   opacity: 0.5;
 }

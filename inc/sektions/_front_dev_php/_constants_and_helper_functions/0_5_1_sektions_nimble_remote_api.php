@@ -26,11 +26,13 @@ function sek_get_nimble_api_data( $params ) {
     $params = wp_parse_args( $params, [
         'what' => '',
         'tmpl_name' => '',
+        'is_pro_tmpl' => false,
         'section_id' => '',
         'force_update' => false
     ]);
     $what = $params['what'];
     $tmpl_name = $params['tmpl_name'];
+    $is_pro_tmpl = $params['is_pro_tmpl'];
     $section_id =  $params['section_id'];
     $force_update = $params['force_update'];
     $wp_cache_key = 'nimble_api_data_'. $what . $tmpl_name . $section_id;
@@ -113,6 +115,7 @@ function sek_get_nimble_api_data( $params ) {
                 'site_lang' => get_bloginfo( 'language' ),
                 'what' => $what,// 'single_tmpl', 'all_tmpl', 'latest_posts_and_start_msg', 'single_section'
                 'tmpl_name' => $tmpl_name,
+                'is_pro_tmpl' => $is_pro_tmpl,
                 'section_id' => $section_id
             ]
         ] );
@@ -184,7 +187,7 @@ function sek_get_all_tmpl_api_data( $force_update = false ) {
 }
 
 
-function sek_get_single_tmpl_api_data( $tmpl_name, $force_update = false ) {
+function sek_get_single_tmpl_api_data( $tmpl_name, $is_pro_tmpl = false, $force_update = false ) {
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
 
@@ -195,10 +198,20 @@ function sek_get_single_tmpl_api_data( $tmpl_name, $force_update = false ) {
     $api_data = sek_get_nimble_api_data([
         'what' => 'single_tmpl',
         'tmpl_name' => $tmpl_name,
+        'is_pro_tmpl' => $is_pro_tmpl,
         'force_update' => $force_update
     ]);
 
-    $api_data = is_array( $api_data ) ? $api_data : [];
+    // The api should return an array
+    if ( !is_array( $api_data ) || !array_key_exists( 'single_tmpl', $api_data ) ) {
+        return __('Problem when fetching template');
+    }
+
+    // If the api returned a pro license key problem, bail now and return the api string message
+    if ( $is_pro_tmpl && is_string( $api_data['single_tmpl'] ) ) {
+        return $api_data['single_tmpl'];
+    }
+
     $api_data = wp_parse_args( $api_data, [
         'timestamp' => '',
         'single_tmpl' => null

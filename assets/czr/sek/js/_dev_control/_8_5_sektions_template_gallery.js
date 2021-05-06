@@ -167,7 +167,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       
                                     _thumbUrl = !_.isEmpty( _data.thumb_url ) ? _data.thumb_url : _defaultThumbUrl;
 
-                                    _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '" data-sek-tmpl-item-source="'+ params.tmpl_source +'" data-sek-api-site-tmpl="' + (_data.is_site_tmpl ? "true" : "false") +'">';
+                                    _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '" data-sek-tmpl-item-source="'+ params.tmpl_source +'" data-sek-api-site-tmpl="' + (_data.is_site_tmpl ? "true" : "false") +'" data-sek-is-pro-tmpl="' + (_data.is_pro_tmpl ? "yes" : "no") + '">';
                                           //_html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
                                           _html += '<div class="tmpl-top-title"><h3>' + _data.title + '</h3></div>';
                                                 _html += '<div class="tmpl-thumb-and-info-wrap">';
@@ -181,8 +181,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             _html += '<i class="material-icons edit-tmpl" title="'+ sektionsLocalizedData.i18n['Edit this template'] +'">edit</i>';
                                                             _html += '<i class="material-icons remove-tmpl" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>';
                                                       }
-                                                      if ( "true" == _data.is_pro_tmpl ) {
-                                                            _html += '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
+                                                      if ( _data.is_pro_tmpl ) {
+                                                            _html += '<div class="sek-is-pro-template"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
                                                       }
 
                                                       if ( 'api_tmpl' === params.tmpl_source ) {
@@ -248,7 +248,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               evt.stopPropagation();
                               var _tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id'),
                                     _tmpl_source = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-source'),
-                                    _tmpl_title = $(this).closest('.sek-tmpl-item').find('.tmpl-top-title h3').html();
+                                    _tmpl_title = $(this).closest('.sek-tmpl-item').find('.tmpl-top-title h3').html(),
+                                    _tmpl_is_pro = 'yes' === $(this).closest('.sek-tmpl-item').data('sek-is-pro-tmpl');
                               if ( _.isEmpty(_tmpl_id) ) {
                                     api.errare('::setupTmplGalleryDOMEvents => error => invalid template id');
                                     return;
@@ -275,12 +276,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( self.hasCurrentPageNBSectionsNotHeaderFooter() ) {
                                     self._tmplNameWhileImportDialog = _tmpl_id;
                                     self._tmplSourceWhileImportDialog = _tmpl_source;
+                                    self._tmplIsProWhileImportDialog = _tmpl_is_pro;
                                     self.tmplInjectDialogVisible(true);
                               } else {
                                     api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
                                     //api.czr_sektions.get_gallery_tmpl_json_and_inject( $(this).data('sek-tmpl-item-id') );
                                     //api.czr_sektions.get_gallery_tmpl_json_and_inject( {tmpl_name : 'test_one', tmpl_source: 'api_tmpl'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
-                                    api.czr_sektions.get_gallery_tmpl_json_and_inject( { tmpl_name : _tmpl_id, tmpl_source: _tmpl_source }).always( function() {
+                                    api.czr_sektions.get_gallery_tmpl_json_and_inject( {
+                                          tmpl_name : _tmpl_id,
+                                          tmpl_source: _tmpl_source,
+                                          tmpl_is_pro: _tmpl_is_pro
+                                    }).always( function() {
                                           api.previewer.send( 'sek-clean-loader');
                                     });
                                     self.templateGalleryExpanded(false);
@@ -307,6 +313,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.czr_sektions.get_gallery_tmpl_json_and_inject({
                                     tmpl_name : self._tmplNameWhileImportDialog,
                                     tmpl_source: self._tmplSourceWhileImportDialog,
+                                    tmpl_is_pro: self._tmplIsProWhileImportDialog,
                                     tmpl_inject_mode: tmpl_inject_mode
                               }).always( function() {
                                     api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });

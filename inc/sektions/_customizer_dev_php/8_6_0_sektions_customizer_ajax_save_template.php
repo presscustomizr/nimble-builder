@@ -108,11 +108,27 @@ function sek_ajax_sek_get_api_tmpl_json() {
         wp_send_json_error( __FUNCTION__ . '_missing_tmpl_post_name' );
     }
     $tmpl_name = $_POST['api_tmpl_name'];
-    $raw_tmpl_data = sek_get_single_tmpl_api_data( $tmpl_name );// <= returns an unserialized array, in which the template['data'] is NOT a JSON, unlike for user saved templates
-    if( !is_array( $raw_tmpl_data) || empty( $raw_tmpl_data ) ) {
+
+    // Pro Template case
+    $is_pro_tmpl = array_key_exists('api_tmpl_is_pro', $_POST ) && 'yes' === $_POST['api_tmpl_is_pro'];
+    if ( $is_pro_tmpl ) {
+        $pro_key_status = apply_filters( 'nimble_pro_key_status_OK', 'nok' );
+        if ( 'pro_key_status_ok' !== $pro_key_status ) {
+            wp_send_json_error( $pro_key_status );
+            return;
+        }
+    }
+
+    $raw_tmpl_data = sek_get_single_tmpl_api_data( $tmpl_name, $is_pro_tmpl );// <= returns an unserialized array, in which the template['data'] is NOT a JSON, unlike for user saved templates
+
+    // If the api returned a pro license key problem, bail now and return the api string message
+    if ( $is_pro_tmpl && is_string( $raw_tmpl_data ) && !empty( $raw_tmpl_data ) ) {
+        wp_send_json_error( $raw_tmpl_data );
+    } else if ( !is_array( $raw_tmpl_data) || empty( $raw_tmpl_data ) ) {
         sek_error_log( __FUNCTION__ . ' problem when getting template : ' . $tmpl_name );
         wp_send_json_error( __FUNCTION__ . '_invalid_template_'. $tmpl_name );
     }
+
     //sek_error_log( __FUNCTION__ . ' api template collection', $raw_tmpl_data );
     if ( !isset($raw_tmpl_data['data'] ) || empty( $raw_tmpl_data['data'] ) ) {
         sek_error_log( __FUNCTION__ . ' problem => missing or invalid data property for template : ' . $tmpl_name, $raw_tmpl_data );

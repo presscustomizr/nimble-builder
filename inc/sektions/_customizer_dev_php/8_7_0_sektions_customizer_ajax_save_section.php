@@ -41,9 +41,9 @@ function sek_ajax_get_single_api_section_data() {
     $api_section_id = $_POST['api_section_id'];
 
     $is_pro_section_id = sek_is_pro() && is_string($api_section_id) && 'pro_' === substr($api_section_id,0,4);
-
-    if ( $is_pro_section_id && 'pro_key_status_ok' !== apply_filters( 'nimble_pro_key_status_OK', 'nok' ) ) {
-        wp_send_json_error( apply_filters( 'nimble_pro_key_status_OK', 'nok' ) );
+    $pro_key_status = apply_filters( 'nimble_pro_key_status_OK', 'nok' );
+    if ( $is_pro_section_id && 'pro_key_status_ok' !== $pro_key_status ) {
+        wp_send_json_error( $pro_key_status );
         return;
     }
     $raw_api_sec_data = sek_api_get_single_section_data( $api_section_id );// <= returns an unserialized array
