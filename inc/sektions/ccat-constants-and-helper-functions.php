@@ -3634,7 +3634,7 @@ function sek_get_all_tmpl_api_data( $force_update = false ) {
 }
 
 
-function sek_get_single_tmpl_api_data( $tmpl_name, $force_update = false ) {
+function sek_get_single_tmpl_api_data( $tmpl_name, $is_pro_tmpl = false, $force_update = false ) {
     // set this constant in wp_config.php
     $force_update = ( defined( 'NIMBLE_FORCE_UPDATE_API_DATA') && NIMBLE_FORCE_UPDATE_API_DATA ) ? true : $force_update;
 
@@ -3648,7 +3648,16 @@ function sek_get_single_tmpl_api_data( $tmpl_name, $force_update = false ) {
         'force_update' => $force_update
     ]);
 
-    $api_data = is_array( $api_data ) ? $api_data : [];
+    // The api should return an array
+    if ( !is_array( $api_data ) || !array_key_exists( 'single_tmpl', $api_data ) ) {
+        return __('Problem when fetching template');
+    }
+
+    // If the api returned a pro license key problem, bail now and return the api string message
+    if ( $is_pro_tmpl && is_string( $api_data['single_tmpl'] ) ) {
+        return $api_data['single_tmpl'];
+    }
+
     $api_data = wp_parse_args( $api_data, [
         'timestamp' => '',
         'single_tmpl' => null
@@ -3658,7 +3667,11 @@ function sek_get_single_tmpl_api_data( $tmpl_name, $force_update = false ) {
         sek_error_log( __FUNCTION__ . ' => error => empty template for ' . $tmpl_name );
         return array();
     }
-    
+    if ( !is_array( $api_data['single_tmpl'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid template for ' . $tmpl_name );
+        return array();
+    }
+
     if ( !array_key_exists( 'data', $api_data['single_tmpl'] ) || !array_key_exists( 'metas',$api_data['single_tmpl'] ) ) {
         sek_error_log( __FUNCTION__ . ' => error => invalid template data for ' . $tmpl_name );
         return array();

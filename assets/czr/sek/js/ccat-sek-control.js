@@ -3201,25 +3201,32 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   return _dfd_;
             },
 
-            getTmplJsonFromApi : function( tmpl_name ) {
+            getTmplJsonFromApi : function( tmpl_name, tmpl_is_pro ) {
                   var self = this, _dfd_ = $.Deferred();
                   wp.ajax.post( 'sek_get_api_tmpl_json', {
                         nonce: api.settings.nonce.save,
-                        api_tmpl_name: tmpl_name
+                        api_tmpl_name: tmpl_name,
+                        api_tmpl_is_pro : tmpl_is_pro ? 'yes' : 'no'
                         //skope_id: api.czr_skopeBase.getSkopeProperty( 'skope_id' )
                   })
                   .done( function( response ) {
                         _dfd_.resolve( {success:true, tmpl_json:response });
                   })
-                  .fail( function( er ) {
+                  .fail( function( _r_ ) {
                         _dfd_.resolve( {success:false});
-                        api.errorLog( 'ajax getTmplJsonFromApiTmpl => error', er );
+                        api.errorLog( 'ajax getTmplJsonFromApiTmpl => error', _r_ );
+                        var _msg = 'Error when fetching the template';
+                        if ( _.isString( _r_ ) && !_.isEmpty( _r_ ) ) {
+                              _msg = _r_;
+                        }
                         api.previewer.trigger('sek-notify', {
                             type : 'error',
-                            duration : 10000,
+                            duration : 60000,
+                            is_pro_notif : true,
+                            notif_id : 'pro_tmpl_error',
                             message : [
                                   '<span style="font-size:0.95em">',
-                                    '<strong>Error when fetching the template</strong>',
+                                    '<strong>'+ _msg + '</strong>',
                                   '</span>'
                             ].join('')
                         });
@@ -3234,24 +3241,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // @param params {
             //    tmpl_name : string,
             //    tmpl_source : api_tmpl or user_tmpl,
-            //    tmpl_inject_mode : 3 possible import modes : replace, before, after
+            //    tmpl_inject_mode : 3 possible import modes : replace, before, after,
+            //    tmpl_is_pro: false
             // }
             get_gallery_tmpl_json_and_inject : function( params ) {
                   var self = this;
                   params = $.extend( {
                       tmpl_name : '',
                       tmpl_source  : 'user',
-                      tmpl_inject_mode : 'replace'
+                      tmpl_inject_mode : 'replace',
+                      tmpl_is_pro: false
                   }, params || {});
+
                   var tmpl_name = params.tmpl_name;
                   if ( _.isEmpty( tmpl_name ) || ! _.isString( tmpl_name ) ) {
                         api.errare('::tmpl inject => error => invalid template name');
                   }
-                  //console.log('get_gallery_tmpl_json_and_inject params ?', params );
+
                   var _promise;
                   if ( 'api_tmpl' === params.tmpl_source ) {
                         // doc : https://api.jquery.com/jQuery.getJSON/
-                        _promise = self.getTmplJsonFromApi(tmpl_name);
+                        _promise = self.getTmplJsonFromApi(tmpl_name, params.tmpl_is_pro);
                   } else {
                         _promise = self.getTmplJsonFromUserTmpl(tmpl_name);
                   }
@@ -3269,13 +3279,19 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // }
                   _promise.done( function( response ) {
                         if ( response.success ) {
-                              //console.log('INJECT NIMBLE TEMPLATE', response.lib.templates[tmpl_name] );
+                              // api.infoLog('INJECT NIMBLE TEMPLATE', params );
                               self.inject_tmpl_from_gallery({
                                     tmpl_name : tmpl_name,
                                     template_data : response.tmpl_json,
-                                    tmpl_inject_mode : params.tmpl_inject_mode
+                                    tmpl_inject_mode : params.tmpl_inject_mode,
+                                    tmpl_is_pro: params.tmpl_is_pro
                               });
+                        } else {
+                              // Clean loader if failed response
+                              api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true }); 
                         }
+                  }).fail( function() {
+                        api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
                   });
 
                   // After 30 s display a failure notification
@@ -3307,9 +3323,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //       tmpl_name : tmpl_name,
             //       template_data : response.tmpl_json,
             //       tmpl_inject_mode : 3 possible import modes : replace, before, after
+            //       tmpl_is_pro : false
             // }
             inject_tmpl_from_gallery : function( params ) {
-                  //console.log('inject_tmpl_from_gallery', params );
                   var self = this;
                   params = params || {};
                   // normalize params
@@ -3328,7 +3344,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   /// 1) CHECK IF CONTENT IS WELL FORMED AND ELIGIBLE FOR API
                   /// 2) LET'S PROCESS THE SETTING ID'S
                   /// 3) ATTEMPT TO UPDATE THE SETTING API, LOCAL OR GLOBAL. ( always local for template inject )
-                  //console.log('inject_tmpl_from_gallery ?', params );
                   if ( !api.czr_sektions.isImportedContentEligibleForAPI( {success:true, data:params.template_data}, params ) ) {
                         api.infoLog('::inject_tmpl problem => !api.czr_sektions.isImportedContentEligibleForAPI', params );
                         return;
@@ -3348,9 +3363,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             //       tmpl_name : tmpl_name,
             //       template_data : response.tmpl_json,
             //       tmpl_inject_mode : 3 possible import modes : replace, before, after,
+            //       tmpl_is_pro : false
             // }
             doUpdateApiSettingAfter_TmplGalleryImport : function( server_resp, params ){
-                  //console.log('doUpdateApiSettingAfter_TmplGalleryImport ???', params, server_resp );
                   params = params || {};
                   if ( !api.czr_sektions.isImportedContentEligibleForAPI( server_resp, params ) ) {
                         api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
@@ -4518,7 +4533,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             // OTHER MESSAGE TYPES
                             // @params {
                             //  type : info, error, success
-                            //  message : ''
+                            //  notif_id : '',
+                            //  is_pro_notif: '',
+                            //  message : '',
                             //  duration : in ms,
                             //  button_see_me : true
                             // }
@@ -4541,13 +4558,21 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                               }));
 
                                               self.lastNimbleNotificationId = notif_id;
-
-                                              if ( params.button_see_me && api.notifications.has( notif_id ) ) {
-                                                      api.notifications.container.addClass('button-see-me-twice');
-                                                      _.delay( function() {
-                                                            api.notifications.container.removeClass('button-see-me-twice');
-                                                      }, 2000 );
-                                              }
+                                                var _doThingsWhenRendered = function() {
+                                                      if ( params.is_pro_notif ) {
+                                                            api.notifications( notif_id ).container.css('background', '#ffff88');
+                                                      }
+                                                      if ( params.button_see_me ) {
+                                                            api.notifications( notif_id ).container.addClass('button-see-me-twice');
+                                                            _.delay( function() {
+                                                                  api.notifications.container.removeClass('button-see-me-twice');
+                                                            }, 2000 );
+                                                      }
+                                                      api.notifications.unbind('rendered', _doThingsWhenRendered );
+                                                };
+                                                if ( api.notifications.has( notif_id ) ) {
+                                                      api.notifications.bind('rendered', _doThingsWhenRendered );
+                                                }
                                               // Removed if not dismissed after 5 seconds
                                               _.delay( function() {
                                                     api.notifications.remove( notif_id );
@@ -7305,13 +7330,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               dfd.resolve( _section_data_ );
                         }).fail( function( _r_ ) {
                               api.errorLog( 'ajax sek_get_single_api_section_data => error', _r_ );
-                              var _msg = 'Error when fetching the section from api';
+                              var _msg = 'Error when fetching the section';
                               if ( _.isString( _r_ ) && !_.isEmpty( _r_ ) ) {
                                     _msg = _r_;
                               }
                               api.previewer.trigger('sek-notify', {
                                     type : 'error',
-                                    duration : 40000,
+                                    duration : 60000,
+                                    is_pro_notif : true,
+                                    notif_id : 'pro_section_error',
                                     message : [
                                           '<span style="font-size:0.95em">',
                                           '<strong>'+ _msg + '</strong>',
@@ -12650,7 +12677,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       
                                     _thumbUrl = !_.isEmpty( _data.thumb_url ) ? _data.thumb_url : _defaultThumbUrl;
 
-                                    _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '" data-sek-tmpl-item-source="'+ params.tmpl_source +'" data-sek-api-site-tmpl="' + (_data.is_site_tmpl ? "true" : "false") +'">';
+                                    _html += '<div class="sek-tmpl-item" data-sek-tmpl-item-id="' + _temp_id + '" data-sek-tmpl-item-source="'+ params.tmpl_source +'" data-sek-api-site-tmpl="' + (_data.is_site_tmpl ? "true" : "false") +'" data-sek-is-pro-tmpl="' + (_data.is_pro_tmpl ? "yes" : "no") + '">';
                                           //_html += '<div class="sek-tmpl-thumb"><img src="'+ _thumbUrl +'"/></div>';
                                           _html += '<div class="tmpl-top-title"><h3>' + _data.title + '</h3></div>';
                                                 _html += '<div class="tmpl-thumb-and-info-wrap">';
@@ -12664,8 +12691,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             _html += '<i class="material-icons edit-tmpl" title="'+ sektionsLocalizedData.i18n['Edit this template'] +'">edit</i>';
                                                             _html += '<i class="material-icons remove-tmpl" title="'+ sektionsLocalizedData.i18n['Remove this template'] +'">delete_forever</i>';
                                                       }
-                                                      if ( "true" == _data.is_pro_tmpl ) {
-                                                            _html += '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
+                                                      if ( _data.is_pro_tmpl ) {
+                                                            _html += '<div class="sek-is-pro-template"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
                                                       }
 
                                                       if ( 'api_tmpl' === params.tmpl_source ) {
@@ -12731,7 +12758,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               evt.stopPropagation();
                               var _tmpl_id = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-id'),
                                     _tmpl_source = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-source'),
-                                    _tmpl_title = $(this).closest('.sek-tmpl-item').find('.tmpl-top-title h3').html();
+                                    _tmpl_title = $(this).closest('.sek-tmpl-item').find('.tmpl-top-title h3').html(),
+                                    _tmpl_is_pro = 'yes' === $(this).closest('.sek-tmpl-item').data('sek-is-pro-tmpl');
                               if ( _.isEmpty(_tmpl_id) ) {
                                     api.errare('::setupTmplGalleryDOMEvents => error => invalid template id');
                                     return;
@@ -12745,6 +12773,49 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 api.errare('Error when picking site template => invalid tmpl source');
                                                 return;
                                           }
+                                          if ( _tmpl_is_pro ) {
+                                                var _problemMsg;
+                                                if ( sektionsLocalizedData.isPro ) {
+                                                      // Check if :
+                                                      // 1) the license key has been entered
+                                                      // 2) the status is 'valid'
+                                                      if ( _.isEmpty( sektionsLocalizedData.pro_license_key ) ) {
+                                                            _problemMsg = sektionsLocalizedData.i18n['Missing license key'];
+                                                      } else if ( 'valid' !== sektionsLocalizedData.pro_license_status ) {
+                                                            _problemMsg = sektionsLocalizedData.i18n['Pro license problem'];
+                                                      }
+                                                      // If we have a problem msg let's print it and bail now
+                                                      if ( !_.isEmpty( _problemMsg ) ) {
+                                                            api.previewer.trigger('sek-notify', {
+                                                                  type : 'error',
+                                                                  duration : 60000,
+                                                                  is_pro_notif : true,
+                                                                  notif_id : 'pro_tmpl_error',
+                                                                  message : [
+                                                                        '<span style="font-size:0.95em">',
+                                                                        '<strong>'+ _problemMsg + '</strong>',
+                                                                        '</span>'
+                                                                  ].join('')
+                                                            });
+                                                            return;
+                                                      }
+
+                                                } else {
+                                                      api.previewer.trigger('sek-notify', {
+                                                            type : 'error',
+                                                            duration : 60000,
+                                                            is_pro_notif : true,
+                                                            notif_id : 'pro_tmpl_error',
+                                                            message : [
+                                                                  '<span style="font-size:0.95em">',
+                                                                  '<strong>'+ '@missi18n GO PRO MAN!' + '</strong>',
+                                                                  '</span>'
+                                                            ].join('')
+                                                      });
+                                                      return;
+                                                }
+                                          }//if tmpl is pro
+
                                           $siteTmplInput.trigger('nb-set-site-tmpl', {
                                                 site_tmpl_id : _tmpl_id,
                                                 site_tmpl_source : _tmpl_source,
@@ -12758,12 +12829,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               if ( self.hasCurrentPageNBSectionsNotHeaderFooter() ) {
                                     self._tmplNameWhileImportDialog = _tmpl_id;
                                     self._tmplSourceWhileImportDialog = _tmpl_source;
+                                    self._tmplIsProWhileImportDialog = _tmpl_is_pro;
                                     self.tmplInjectDialogVisible(true);
                               } else {
                                     api.previewer.send( 'sek-maybe-print-loader', { fullPageLoader : true, duration : 30000 });
                                     //api.czr_sektions.get_gallery_tmpl_json_and_inject( $(this).data('sek-tmpl-item-id') );
                                     //api.czr_sektions.get_gallery_tmpl_json_and_inject( {tmpl_name : 'test_one', tmpl_source: 'api_tmpl'});// FOR TEST PURPOSES UNTIL THE COLLECTION IS SETUP
-                                    api.czr_sektions.get_gallery_tmpl_json_and_inject( { tmpl_name : _tmpl_id, tmpl_source: _tmpl_source }).always( function() {
+                                    api.czr_sektions.get_gallery_tmpl_json_and_inject( {
+                                          tmpl_name : _tmpl_id,
+                                          tmpl_source: _tmpl_source,
+                                          tmpl_is_pro: _tmpl_is_pro
+                                    }).always( function() {
                                           api.previewer.send( 'sek-clean-loader');
                                     });
                                     self.templateGalleryExpanded(false);
@@ -12790,6 +12866,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.czr_sektions.get_gallery_tmpl_json_and_inject({
                                     tmpl_name : self._tmplNameWhileImportDialog,
                                     tmpl_source: self._tmplSourceWhileImportDialog,
+                                    tmpl_is_pro: self._tmplIsProWhileImportDialog,
                                     tmpl_inject_mode: tmpl_inject_mode
                               }).always( function() {
                                     api.previewer.send( 'sek-clean-loader', { cleanFullPageLoader : true });
