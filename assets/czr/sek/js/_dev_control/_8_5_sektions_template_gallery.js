@@ -263,6 +263,49 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 api.errare('Error when picking site template => invalid tmpl source');
                                                 return;
                                           }
+                                          if ( _tmpl_is_pro ) {
+                                                var _problemMsg;
+                                                if ( sektionsLocalizedData.isPro ) {
+                                                      // Check if :
+                                                      // 1) the license key has been entered
+                                                      // 2) the status is 'valid'
+                                                      if ( _.isEmpty( sektionsLocalizedData.pro_license_key ) ) {
+                                                            _problemMsg = sektionsLocalizedData.i18n['Missing license key'];
+                                                      } else if ( 'valid' !== sektionsLocalizedData.pro_license_status ) {
+                                                            _problemMsg = sektionsLocalizedData.i18n['Pro license problem'];
+                                                      }
+                                                      // If we have a problem msg let's print it and bail now
+                                                      if ( !_.isEmpty( _problemMsg ) ) {
+                                                            api.previewer.trigger('sek-notify', {
+                                                                  type : 'error',
+                                                                  duration : 60000,
+                                                                  is_pro_notif : true,
+                                                                  notif_id : 'pro_tmpl_error',
+                                                                  message : [
+                                                                        '<span style="font-size:0.95em">',
+                                                                        '<strong>'+ _problemMsg + '</strong>',
+                                                                        '</span>'
+                                                                  ].join('')
+                                                            });
+                                                            return;
+                                                      }
+
+                                                } else {
+                                                      api.previewer.trigger('sek-notify', {
+                                                            type : 'error',
+                                                            duration : 60000,
+                                                            is_pro_notif : true,
+                                                            notif_id : 'pro_tmpl_error',
+                                                            message : [
+                                                                  '<span style="font-size:0.95em">',
+                                                                  '<strong>'+ '@missi18n GO PRO MAN!' + '</strong>',
+                                                                  '</span>'
+                                                            ].join('')
+                                                      });
+                                                      return;
+                                                }
+                                          }//if tmpl is pro
+
                                           $siteTmplInput.trigger('nb-set-site-tmpl', {
                                                 site_tmpl_id : _tmpl_id,
                                                 site_tmpl_source : _tmpl_source,

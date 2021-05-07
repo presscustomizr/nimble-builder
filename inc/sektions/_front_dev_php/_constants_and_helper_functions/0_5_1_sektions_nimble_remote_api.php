@@ -26,13 +26,11 @@ function sek_get_nimble_api_data( $params ) {
     $params = wp_parse_args( $params, [
         'what' => '',
         'tmpl_name' => '',
-        'is_pro_tmpl' => false,
         'section_id' => '',
         'force_update' => false
     ]);
     $what = $params['what'];
     $tmpl_name = $params['tmpl_name'];
-    $is_pro_tmpl = $params['is_pro_tmpl'];
     $section_id =  $params['section_id'];
     $force_update = $params['force_update'];
     $wp_cache_key = 'nimble_api_data_'. $what . $tmpl_name . $section_id;
@@ -115,7 +113,6 @@ function sek_get_nimble_api_data( $params ) {
                 'site_lang' => get_bloginfo( 'language' ),
                 'what' => $what,// 'single_tmpl', 'all_tmpl', 'latest_posts_and_start_msg', 'single_section'
                 'tmpl_name' => $tmpl_name,
-                'is_pro_tmpl' => $is_pro_tmpl,
                 'section_id' => $section_id
             ]
         ] );
@@ -198,7 +195,6 @@ function sek_get_single_tmpl_api_data( $tmpl_name, $is_pro_tmpl = false, $force_
     $api_data = sek_get_nimble_api_data([
         'what' => 'single_tmpl',
         'tmpl_name' => $tmpl_name,
-        'is_pro_tmpl' => $is_pro_tmpl,
         'force_update' => $force_update
     ]);
 
@@ -221,7 +217,11 @@ function sek_get_single_tmpl_api_data( $tmpl_name, $is_pro_tmpl = false, $force_
         sek_error_log( __FUNCTION__ . ' => error => empty template for ' . $tmpl_name );
         return array();
     }
-    
+    if ( !is_array( $api_data['single_tmpl'] ) ) {
+        sek_error_log( __FUNCTION__ . ' => invalid template for ' . $tmpl_name );
+        return array();
+    }
+
     if ( !array_key_exists( 'data', $api_data['single_tmpl'] ) || !array_key_exists( 'metas',$api_data['single_tmpl'] ) ) {
         sek_error_log( __FUNCTION__ . ' => error => invalid template data for ' . $tmpl_name );
         return array();
