@@ -667,7 +667,8 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'This page is customized with NB' => __('This page is customized with NB', 'text_dom'),
             'Refreshed to home page : site templates must be set when previewing home' => __('Refreshed to home page : site templates must be set when previewing home','text_dom'),
 
-            'Remove all sections and options of this page' => __('Remove all sections and options of this page', 'text_dom')
+            'Remove all sections and options of this page' => __('Remove all sections and options of this page', 'text_dom'),
+            'Go pro link when click on pro tmpl or section' =>  sprintf( '<a href="%2$s" target="_blank" rel="noreferrer noopener">%1$s</a>', __('🌟 Go pro to use this element 🌟'), NIMBLE_PRO_URL )
         )//array()
     )//array()
     );//array_merge
@@ -1693,7 +1694,8 @@ function sek_print_nimble_input_templates() {
                 }
                 var title_attr = "<?php _e('Drag and drop or double-click to insert in your chosen target element.', 'text_doma'); ?>",
                     font_icon_class = !_.isEmpty( modData['font_icon'] ) ? 'is-font-icon' : '',
-                    is_draggable = true !== modData['active'] ? 'false' : 'true';
+                    is_draggable = true !== modData['active'] ? 'false' : 'true',
+                    is_pro_module = modData['is_pro'] ? 'yes' : 'no';
                 if ( true !== modData['active'] ) {
                     if ( modData['is_pro'] ) {
                         title_attr = "<?php _e('Pro feature', 'text_doma'); ?>";
@@ -1703,9 +1705,9 @@ function sek_print_nimble_input_templates() {
                 }
                 // "data-sek-eligible-for-module-dropzones" was introduced for https://github.com/presscustomizr/nimble-builder/issues/540
                 #>
-                <div draggable="{{is_draggable}}" data-sek-eligible-for-module-dropzones="true" data-sek-content-type="{{modData['content-type']}}" data-sek-content-id="{{modData['content-id']}}" title="{{title_attr}}"><div class="sek-module-icon {{font_icon_class}}"><# print(icon_img_html); #></div><div class="sek-module-title"><div class="sek-centered-module-title">{{modData['title']}}</div></div>
+                <div draggable="{{is_draggable}}" data-sek-eligible-for-module-dropzones="true" data-sek-content-type="{{modData['content-type']}}" data-sek-content-id="{{modData['content-id']}}" title="{{title_attr}}" data-sek-is-pro-module="{{is_pro_module}}"><div class="sek-module-icon {{font_icon_class}}"><# print(icon_img_html); #></div><div class="sek-module-title"><div class="sek-centered-module-title">{{modData['title']}}</div></div>
                   <#
-                  if ( modData['is_pro'] ) {
+                  if ( 'yes' === is_pro_module ) {
                     var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
                     print(pro_img_html);
                   }
@@ -1760,17 +1762,18 @@ function sek_print_nimble_input_templates() {
                 }
 
                 var thumbUrl = [ sektionsLocalizedData.baseUrl , '/assets/img/section_assets/thumbs/', secParams['thumb'] ,  '?ver=' , img_version ].join(''),
-                    styleAttr = 'background: url(' + thumbUrl  + ') 50% 50% / cover no-repeat;';
-                    is_draggable = true !== secParams['active'] ? 'false' : 'true';
+                    styleAttr = 'background: url(' + thumbUrl  + ') 50% 50% / cover no-repeat;',
+                    is_draggable = true !== secParams['active'] ? 'false' : 'true',
+                    is_pro_section = secParams['is_pro'] ? 'yes' : 'no';
 
                 if ( !_.isEmpty(secParams['height']) ) {
                     styleAttr = styleAttr + 'height:' + secParams['height'] + ';';
                 }
 
                 #>
-                <div draggable="{{is_draggable}}" data-sek-content-type="preset_section" data-sek-content-id="{{secParams['content-id']}}" style="<# print(styleAttr); #>" title="{{secParams['title']}}" data-sek-section-type="{{section_type}}"><div class="sek-overlay"></div>
+                <div draggable="{{is_draggable}}" data-sek-content-type="preset_section" data-sek-content-id="{{secParams['content-id']}}" style="<# print(styleAttr); #>" title="{{secParams['title']}}" data-sek-section-type="{{section_type}}" data-sek-is-pro-section="{{is_pro_section}}"><div class="sek-overlay"></div>
                   <#
-                  if ( secParams['is_pro'] ) {
+                  if ( 'yes' === is_pro_section ) {
                     var pro_img_html = '<div class="sek-is-pro"><img src="' + sektionsLocalizedData.czrAssetsPath + 'sek/img/pro_orange.svg" alt="Pro feature"/></div>';
                     print(pro_img_html);
                   }
@@ -4885,13 +4888,13 @@ function sek_ajax_get_single_api_section_data() {
 
     if( !is_array( $raw_api_sec_data) || empty( $raw_api_sec_data ) ) {
         sek_error_log( __FUNCTION__ . ' problem when getting section : ' . $api_section_id );
-        wp_send_json_error( __FUNCTION__ . '_invalid_section_'. $api_section_id );
+        wp_send_json_error( 'Error : empty or invalid section data : '. $api_section_id );
         return;
     }
     //sek_error_log( __FUNCTION__ . ' api section data', $raw_api_sec_data );
     if ( !isset($raw_api_sec_data['collection'] ) || empty( $raw_api_sec_data['collection'] ) ) {
         sek_error_log( __FUNCTION__ . ' problem => missing or invalid data property for section : ' . $api_section_id, $raw_api_sec_data );
-        wp_send_json_error( __FUNCTION__ . '_missing_data_property_for_section_' . $api_section_id );
+        wp_send_json_error( 'Error : missing_data_property_for_section : ' . $api_section_id );
     } else {
         // $tmpl_decoded = $raw_api_sec_data;
         $raw_api_sec_data['collection'] = sek_maybe_import_imgs( $raw_api_sec_data['collection'], $do_import_images = true );

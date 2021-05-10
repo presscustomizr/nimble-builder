@@ -68,6 +68,7 @@ if ( !defined( 'NIMBLE_JQUERY_MIGRATE_URL' ) ) { define ( 'NIMBLE_JQUERY_MIGRATE
 if ( !defined( "NIMBLE_DATA_API_URL_V2" ) ) { define( "NIMBLE_DATA_API_URL_V2",
   ( defined('NIMBLE_FETCH_API_LOCALLY') && NIMBLE_FETCH_API_LOCALLY && defined('NIMBLE_LOCAL_API_URL') ) ? NIMBLE_LOCAL_API_URL : 'https://api.nimblebuilder.com/wp-json/nimble/v2/cravan'
 ); }
+if ( !defined( 'NIMBLE_PRO_URL' ) ) { define ( 'NIMBLE_PRO_URL', 'https://presscustomizr.com/nimble-builder-pro' ); }
 
 // @return bool
 function sek_is_debug_mode() {

@@ -399,6 +399,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 return;
                               self.generateUI({ action : 'sek-generate-global-options-ui'});
                               _section_.nimbleGlobalOptionGenerated = true;
+                              // Make sure template gallery is closed when opening/closing global options panel
+                              // see https://github.com/presscustomizr/nimble-builder/issues/840
+                              _section_.expanded.bind( function() {
+                                    if ( !self.templateGalleryExpanded )
+                                          return;
+                                    self.templateGalleryExpanded(false);
+                              });
                         });
                         
                         ////////////////////////////////////////////////////////////////////////////////
@@ -6745,12 +6752,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'beta_features' :
-                                    registrationParams[ opt_name ] = {
-                                          settingControlId : _id_ + '__beta_features',
-                                          module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Beta features'],
-                                          icon : '<i class="material-icons sek-level-option-icon">widgets</i>'
-                                    };
+                                    // may 2021 not rendered anymore
+                                    // registrationParams[ opt_name ] = {
+                                    //       settingControlId : _id_ + '__beta_features',
+                                    //       module_type : mod_type,
+                                    //       controlLabel : sektionsLocalizedData.i18n['Beta features'],
+                                    //       icon : '<i class="material-icons sek-level-option-icon">widgets</i>'
+                                    // };
                               break;
                               default :
                                     api.errare('::generateUIforGlobalOptions => an option group could not be registered => ' + mod_type, opt_name );
@@ -6877,7 +6885,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           $title.html( [
                                                 '<span class="sek-ctrl-accordion-title">',
                                                 _titleContent,
-                                                'site_templates' === optionType ? '&nbsp;<span class="sek-new-label">New!</span>' : '',
+                                                //'site_templates' === optionType ? '&nbsp;<span class="sek-new-label">New!</span>' : '',
                                                 '</span>'
                                           ].join('') );
 
@@ -11002,6 +11010,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // implemented for https://github.com/presscustomizr/nimble-builder/issues/317
                               .on( 'dblclick', function( evt ) { _onDoubleClick.call( $(this), evt ); });
                   });
+
+                  // Upsell pro sections and modules
+                  $draggableWrapper.find( '[draggable="false"][data-sek-is-pro-section="yes"], [draggable="false"][data-sek-is-pro-module="yes"]' ).each( function() {
+                        $(this).on( 'mousedown', function( evt ) {
+                              // Reset the preview target
+                              // implemented for double-click insertion https://github.com/presscustomizr/nimble-builder/issues/317
+                              self.lastClickedTargetInPreview({});
+                              api.previewer.trigger('sek-notify', {
+                                    type : 'info',
+                                    duration : 60000,
+                                    //is_pro_notif : true,
+                                    notif_id : 'go_pro',
+                                    message : [
+                                          '<span style="font-size:0.95em">',
+                                          '<strong>'+ sektionsLocalizedData.i18n['Go pro link when click on pro tmpl or section'] + '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                        });
+                  });
             },//setupNimbleZones()
 
 
@@ -12760,11 +12788,55 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     _tmpl_source = $(this).closest('.sek-tmpl-item').data('sek-tmpl-item-source'),
                                     _tmpl_title = $(this).closest('.sek-tmpl-item').find('.tmpl-top-title h3').html(),
                                     _tmpl_is_pro = 'yes' === $(this).closest('.sek-tmpl-item').data('sek-is-pro-tmpl');
+
                               if ( _.isEmpty(_tmpl_id) ) {
                                     api.errare('::setupTmplGalleryDOMEvents => error => invalid template id');
                                     return;
                               }
-                              
+
+                              if ( _tmpl_is_pro ) {
+                                    var _problemMsg;
+                                    if ( sektionsLocalizedData.isPro ) {
+                                          // Check if :
+                                          // 1) the license key has been entered
+                                          // 2) the status is 'valid'
+                                          if ( _.isEmpty( sektionsLocalizedData.pro_license_key ) ) {
+                                                _problemMsg = sektionsLocalizedData.i18n['Missing license key'];
+                                          } else if ( 'valid' !== sektionsLocalizedData.pro_license_status ) {
+                                                _problemMsg = sektionsLocalizedData.i18n['Pro license problem'];
+                                          }
+                                          // If we have a problem msg let's print it and bail now
+                                          if ( !_.isEmpty( _problemMsg ) ) {
+                                                api.previewer.trigger('sek-notify', {
+                                                      type : 'error',
+                                                      duration : 60000,
+                                                      is_pro_notif : true,
+                                                      notif_id : 'pro_tmpl_error',
+                                                      message : [
+                                                            '<span style="font-size:0.95em">',
+                                                            '<strong>'+ _problemMsg + '</strong>',
+                                                            '</span>'
+                                                      ].join('')
+                                                });
+                                                return;
+                                          }
+
+                                    } else {
+                                          api.previewer.trigger('sek-notify', {
+                                                type : 'info',
+                                                duration : 60000,
+                                                //is_pro_notif : true,
+                                                notif_id : 'go_pro',
+                                                message : [
+                                                      '<span style="font-size:0.95em">',
+                                                      '<strong>'+ sektionsLocalizedData.i18n['Go pro link when click on pro tmpl or section'] + '</strong>',
+                                                      '</span>'
+                                                ].join('')
+                                          });
+                                          return;
+                                    }
+                              }//if tmpl is pro
+
                               // Site template mode ?
                               if ( self._site_tmpl_scope && !_.isEmpty( self._site_tmpl_scope ) ) {
                                     var $siteTmplInput = $( '[data-czrtype="' + self._site_tmpl_scope +'"]' );
@@ -12773,48 +12845,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 api.errare('Error when picking site template => invalid tmpl source');
                                                 return;
                                           }
-                                          if ( _tmpl_is_pro ) {
-                                                var _problemMsg;
-                                                if ( sektionsLocalizedData.isPro ) {
-                                                      // Check if :
-                                                      // 1) the license key has been entered
-                                                      // 2) the status is 'valid'
-                                                      if ( _.isEmpty( sektionsLocalizedData.pro_license_key ) ) {
-                                                            _problemMsg = sektionsLocalizedData.i18n['Missing license key'];
-                                                      } else if ( 'valid' !== sektionsLocalizedData.pro_license_status ) {
-                                                            _problemMsg = sektionsLocalizedData.i18n['Pro license problem'];
-                                                      }
-                                                      // If we have a problem msg let's print it and bail now
-                                                      if ( !_.isEmpty( _problemMsg ) ) {
-                                                            api.previewer.trigger('sek-notify', {
-                                                                  type : 'error',
-                                                                  duration : 60000,
-                                                                  is_pro_notif : true,
-                                                                  notif_id : 'pro_tmpl_error',
-                                                                  message : [
-                                                                        '<span style="font-size:0.95em">',
-                                                                        '<strong>'+ _problemMsg + '</strong>',
-                                                                        '</span>'
-                                                                  ].join('')
-                                                            });
-                                                            return;
-                                                      }
-
-                                                } else {
-                                                      api.previewer.trigger('sek-notify', {
-                                                            type : 'error',
-                                                            duration : 60000,
-                                                            is_pro_notif : true,
-                                                            notif_id : 'pro_tmpl_error',
-                                                            message : [
-                                                                  '<span style="font-size:0.95em">',
-                                                                  '<strong>'+ '@missi18n GO PRO MAN!' + '</strong>',
-                                                                  '</span>'
-                                                            ].join('')
-                                                      });
-                                                      return;
-                                                }
-                                          }//if tmpl is pro
 
                                           $siteTmplInput.trigger('nb-set-site-tmpl', {
                                                 site_tmpl_id : _tmpl_id,
