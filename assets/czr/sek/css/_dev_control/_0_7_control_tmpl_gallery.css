@@ -426,3 +426,9 @@ input.sek-filter-tmpl {
 .sek-is-site-tmpl-mode [data-sek-api-site-tmpl="false"] {
   display: none!important;
 }
+#nimble-tmpl-gallery .sek-tmpl-gallery-inner [data-sek-api-site-tmpl="true"] {display: none;}
+.sek-is-site-tmpl-mode .sek-tmpl-gallery-inner [data-sek-api-site-tmpl="true"] {
+  display: -webkit-box!important;
+  display: -ms-flexbox!important;
+  display: flex!important;
+}

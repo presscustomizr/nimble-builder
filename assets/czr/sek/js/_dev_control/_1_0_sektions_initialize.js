@@ -172,6 +172,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                 return;
                               self.generateUI({ action : 'sek-generate-global-options-ui'});
                               _section_.nimbleGlobalOptionGenerated = true;
+                              // Make sure template gallery is closed when opening/closing global options panel
+                              // see https://github.com/presscustomizr/nimble-builder/issues/840
+                              _section_.expanded.bind( function() {
+                                    if ( !self.templateGalleryExpanded )
+                                          return;
+                                    self.templateGalleryExpanded(false);
+                              });
                         });
                         
                         ////////////////////////////////////////////////////////////////////////////////
