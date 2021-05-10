@@ -211,6 +211,26 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               // implemented for https://github.com/presscustomizr/nimble-builder/issues/317
                               .on( 'dblclick', function( evt ) { _onDoubleClick.call( $(this), evt ); });
                   });
+
+                  // Upsell pro sections and modules
+                  $draggableWrapper.find( '[draggable="false"][data-sek-is-pro-section="yes"], [draggable="false"][data-sek-is-pro-module="yes"]' ).each( function() {
+                        $(this).on( 'mousedown', function( evt ) {
+                              // Reset the preview target
+                              // implemented for double-click insertion https://github.com/presscustomizr/nimble-builder/issues/317
+                              self.lastClickedTargetInPreview({});
+                              api.previewer.trigger('sek-notify', {
+                                    type : 'info',
+                                    duration : 60000,
+                                    //is_pro_notif : true,
+                                    notif_id : 'go_pro',
+                                    message : [
+                                          '<span style="font-size:0.95em">',
+                                          '<strong>'+ sektionsLocalizedData.i18n['Go pro link when click on pro tmpl or section'] + '</strong>',
+                                          '</span>'
+                                    ].join('')
+                              });
+                        });
+                  });
             },//setupNimbleZones()
 
 
