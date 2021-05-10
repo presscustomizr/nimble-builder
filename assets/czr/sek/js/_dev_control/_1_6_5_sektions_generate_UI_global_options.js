@@ -115,12 +115,13 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     };
                               break;
                               case 'beta_features' :
-                                    registrationParams[ opt_name ] = {
-                                          settingControlId : _id_ + '__beta_features',
-                                          module_type : mod_type,
-                                          controlLabel : sektionsLocalizedData.i18n['Beta features'],
-                                          icon : '<i class="material-icons sek-level-option-icon">widgets</i>'
-                                    };
+                                    // may 2021 not rendered anymore
+                                    // registrationParams[ opt_name ] = {
+                                    //       settingControlId : _id_ + '__beta_features',
+                                    //       module_type : mod_type,
+                                    //       controlLabel : sektionsLocalizedData.i18n['Beta features'],
+                                    //       icon : '<i class="material-icons sek-level-option-icon">widgets</i>'
+                                    // };
                               break;
                               default :
                                     api.errare('::generateUIforGlobalOptions => an option group could not be registered => ' + mod_type, opt_name );
@@ -247,7 +248,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           $title.html( [
                                                 '<span class="sek-ctrl-accordion-title">',
                                                 _titleContent,
-                                                'site_templates' === optionType ? '&nbsp;<span class="sek-new-label">New!</span>' : '',
+                                                //'site_templates' === optionType ? '&nbsp;<span class="sek-new-label">New!</span>' : '',
                                                 '</span>'
                                           ].join('') );
 
