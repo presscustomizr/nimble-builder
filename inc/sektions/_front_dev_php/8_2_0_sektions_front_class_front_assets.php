@@ -467,7 +467,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // FA fonts can be preloaded. the crossorigin param has to be added
         // => this removes Google Speed tests message "preload key requests"
         // important => the url of the font must be exactly the same as in font awesome stylesheet, including the query param at the end fa-brands-400.woff2?5.15.2
-        // // note that we could preload all other types available ( eot, woff, ttf, svg )
+        // note that we could preload all other types available ( eot, woff, ttf, svg )
         // but NB focus on preloading woff2 which is the type used by most recent browsers
         // see https://css-tricks.com/snippets/css/using-font-face/
         function sek_maybe_preload_fa_fonts() {

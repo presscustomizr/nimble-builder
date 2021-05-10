@@ -58,13 +58,13 @@ function sek_ajax_get_single_api_section_data() {
 
     if( !is_array( $raw_api_sec_data) || empty( $raw_api_sec_data ) ) {
         sek_error_log( __FUNCTION__ . ' problem when getting section : ' . $api_section_id );
-        wp_send_json_error( __FUNCTION__ . '_invalid_section_'. $api_section_id );
+        wp_send_json_error( 'Error : empty or invalid section data : '. $api_section_id );
         return;
     }
     //sek_error_log( __FUNCTION__ . ' api section data', $raw_api_sec_data );
     if ( !isset($raw_api_sec_data['collection'] ) || empty( $raw_api_sec_data['collection'] ) ) {
         sek_error_log( __FUNCTION__ . ' problem => missing or invalid data property for section : ' . $api_section_id, $raw_api_sec_data );
-        wp_send_json_error( __FUNCTION__ . '_missing_data_property_for_section_' . $api_section_id );
+        wp_send_json_error( 'Error : missing_data_property_for_section : ' . $api_section_id );
     } else {
         // $tmpl_decoded = $raw_api_sec_data;
         $raw_api_sec_data['collection'] = sek_maybe_import_imgs( $raw_api_sec_data['collection'], $do_import_images = true );
