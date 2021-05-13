@@ -396,7 +396,7 @@ if ( !$use_current_query && $replace_current_query && true === sek_booleanize_ch
 
 $post_query = null;
 if ( $replace_current_query && $post_nb > 0 ) {
-    $cache_key = 'nb_post_q_' . $model['id'];
+    $cache_key = 'nb_post_q_' . $model['id'] . '_paged_' . $paged;
     $cache_group = 'nb_post_queries';
     $cached = wp_cache_get( $cache_key, $cache_group );
     if ( false !== $cached ) {
