@@ -337,6 +337,6 @@
 
 // Janv 2021 : Pro header
 // default background color on scroll, consistent with default registration param in nimble-builder-pro\inc\front\nb-pro-menu.php
-.nb-scroll-down #nimble-header, .nb-scroll-up #nimble-header {
+.nb-scroll-down #nimble-header:not(.sek-header-mobile-menu-expanded), .nb-scroll-up #nimble-header:not(.sek-header-mobile-menu-expanded) {
   background-color: rgba(255,255,255,0.9);
 }

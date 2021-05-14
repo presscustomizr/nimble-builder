@@ -380,7 +380,8 @@
 
                               $(_mob_menu_selector).each( function () {
                                     var $mobMenuWrapper = $(this),
-                                          mobMenuIsExpanded = "expanded" === $mobMenuWrapper.attr('data-sek-mm-state');
+                                          mobMenuIsExpanded = "expanded" === $mobMenuWrapper.attr('data-sek-mm-state'),
+                                          $maybeHeaderParentEl = $mobMenuWrapper.closest('#nimble-header');
 
                                           // console.log('"$mobMenuWrapper ?', $mobMenuWrapper );
                                           // console.log('mobMenuIsExpanded ?', mobMenuIsExpanded );
@@ -391,9 +392,15 @@
                                                 $mobMenuWrapper.addClass(ClassName.COLLAPSING).trigger( mobMenuIsExpanded ? Event.HIDE : Event.SHOW );
                                                 if ( mobMenuIsExpanded ) {
                                                       $toggler.addClass( ClassName.COLLAPSED ).attr( 'aria-expanded', 'false' );
+                                                      if ( $maybeHeaderParentEl.length > 0 ) {
+                                                            $maybeHeaderParentEl.removeClass('sek-header-mobile-menu-expanded');
+                                                      }
                                                 } else {
                                                       $toggler.removeClass( ClassName.COLLAPSED ).attr( 'aria-expanded', 'true' );
                                                       $mobMenuWrapper.attr('data-sek-mm-state', 'expanded');
+                                                      if ( $maybeHeaderParentEl.length > 0 ) {
+                                                            $maybeHeaderParentEl.addClass('sek-header-mobile-menu-expanded');
+                                                      }
                                                 }
                                           },
                                           complete: function() {
@@ -418,7 +425,7 @@
                               });//end each
                         });//end attach click event
 
-                        // close mobile menu on resize
+                        // close mobile menu on resize event
                         nb_.cachedElements.$window.on('resize', nb_.debounce( function() {
                               $(Selector.MM_TOGGLER).each(function() {
                                     var associated_mob_menu_selector = $(this).data('target');
@@ -574,7 +581,7 @@
                                           return;
                                     evt.preventDefault();
                                     evt.stopPropagation();
-                                    _.delay( function() {
+                                    nb_.delay( function() {
                                           $(this).next('.'+Classname.DD_TOGGLE_WRAPPER).find('.'+Classname.DD_TOGGLE).trigger( Event.FOCUSOUT );
                                     }, 250 );
                               })
@@ -599,7 +606,7 @@
                                     evt.preventDefault();
 
                                     var $_this = $( this );
-                                    _.delay( function() {
+                                    nb_.delay( function() {
                                           if ( $(evt.target).length > 0 ) {
                                                 $(evt.target).removeClass( 'nb-mm-focused');
                                           }
