@@ -669,8 +669,16 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
 }
 [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=submit], [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search form input[type=submit] {
     margin: 0;
-    background: #808080;
+    background: #808080!important;
     color: #fff;
+    font-size: 16px;
+    padding: 10px 10px;
+    font-weight: normal;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
 }
 // Note that [data-sek-is-mobile-vertical-menu] value is set on page load and dynamically on window resize
 [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=search], [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search input[type=search],
@@ -687,4 +695,14 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
 }
 [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search input {
     font-size: 16px;
+}
+.nb-search-expand-inner, .nb-mobile-search {
+    input {
+        &[type="search"] {
+            color: #000000!important;
+        }
+        &[type="submit"] {
+            color: #ffffff!important;
+        }
+    }
 }
