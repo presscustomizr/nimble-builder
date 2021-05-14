@@ -466,7 +466,7 @@ do_action('nb_base_admin_options_registered');
 /* ------------------------------------------------------------------------- */
 //register option tab and print the form
 if ( sek_is_pro() || ( defined( 'NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON ) ) {
-    $restrict_users_title = __('Restrict users', 'text-doma');
+    $restrict_users_title = __('Manage authorized users', 'text-doma');
     if ( !sek_is_pro() ) {
         $restrict_users_title = sprintf( '<span class="sek-pro-icon"><img src="%1$s" alt="Pro feature"></span><span class="sek-title-after-icon">%2$s</span>',
             NIMBLE_BASE_URL.'/assets/czr/sek/img/pro_orange.svg?ver='.NIMBLE_VERSION,
@@ -476,7 +476,7 @@ if ( sek_is_pro() || ( defined( 'NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON 
     nb_register_option_tab([
         'id' => 'restrict_users',
         'title' => $restrict_users_title,
-        'page_title' => __('Restrict users', 'nimble' ),
+        'page_title' => __('Manage authorized users', 'nimble' ),
         'content' => '\Nimble\print_restrict_users_options_content',
     ]);
 
@@ -543,7 +543,7 @@ function print_doc_page() {
             <li><a target="_blank" rel="noopener noreferrer" href="https://docs.presscustomizr.com/article/383-how-to-customize-the-height-of-your-sections-and-columns-with-the-nimble-builder"><span>How to customize the height of your sections and columns with Nimble Builder ?</span></a></li>
 
           </ul>
-        <a href="https://docs.presscustomizr.com" target="_blank" class="button button-primary button-hero" rel="noopener noreferrer"><span class="dashicons dashicons-search"></span>&nbsp;<?php _e('Explore Nimble Builder knowledge base', 'text-doma'); ?></a>
+        <a href="https://docs.presscustomizr.com/collection/334-nimble-page-builder" target="_blank" class="button button-primary button-hero" rel="noopener noreferrer"><span class="dashicons dashicons-search"></span>&nbsp;<?php _e('Explore Nimble Builder knowledge base', 'text-doma'); ?></a>
       </div>
 
     <?php
