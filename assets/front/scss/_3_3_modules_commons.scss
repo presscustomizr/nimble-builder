@@ -48,7 +48,7 @@
 }
 // No background on link focus
 // compatibility with TT1 WP default theme
-body .sektion-wrapper .sek-row [data-sek-level="module"] .sek-module-inner a:not(.sek-btn):focus {
+body .sektion-wrapper .sek-row [data-sek-level="module"] .sek-module-inner a:not(.sek-btn):not(.button):focus {
   background: none;
 }
 
