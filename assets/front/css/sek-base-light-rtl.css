@@ -312,7 +312,7 @@
   overflow: hidden;
 }
 
-.nb-scroll-down #nimble-header, .nb-scroll-up #nimble-header {
+.nb-scroll-down #nimble-header:not(.sek-header-mobile-menu-expanded), .nb-scroll-up #nimble-header:not(.sek-header-mobile-menu-expanded) {
   background-color: rgba(255, 255, 255, 0.9);
 }
 
@@ -1095,7 +1095,7 @@ button.sek-btn,
   text-decoration: underline;
 }
 
-body .sektion-wrapper .sek-row [data-sek-level="module"] .sek-module-inner a:focus {
+body .sektion-wrapper .sek-row [data-sek-level="module"] .sek-module-inner a:not(.sek-btn):not(.button):focus {
   background: none;
 }
 

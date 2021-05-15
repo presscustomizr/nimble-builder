@@ -481,6 +481,7 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
   background: 0 0;
   background-color: rgba(0, 0, 0, 0);
   color: black;
+  outline: none;
   border: none;
 }
 
@@ -591,8 +592,15 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
 
 [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=submit], [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search form input[type=submit] {
   margin: 0;
-  background: #808080;
+  background: #808080 !important;
   color: #fff;
+  font-size: 16px;
+  padding: 10px 10px;
+  font-weight: normal;
+  display: inline-block;
+  border: none;
+  cursor: pointer;
+  border-radius: 3px;
 }
 
 [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=search], [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search input[type=search],
@@ -611,4 +619,12 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
 
 [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search input {
   font-size: 16px;
+}
+
+.nb-search-expand-inner input[type="search"], .nb-mobile-search input[type="search"] {
+  color: #000000 !important;
+}
+
+.nb-search-expand-inner input[type="submit"], .nb-mobile-search input[type="submit"] {
+  color: #ffffff !important;
 }

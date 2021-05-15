@@ -302,7 +302,7 @@
   overflow: hidden;
 }
 
-.nb-scroll-down #nimble-header, .nb-scroll-up #nimble-header {
+.nb-scroll-down #nimble-header:not(.sek-header-mobile-menu-expanded), .nb-scroll-up #nimble-header:not(.sek-header-mobile-menu-expanded) {
   background-color: rgba(255, 255, 255, 0.9);
 }
 
@@ -1510,6 +1510,7 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
   background: 0 0;
   background-color: rgba(0, 0, 0, 0);
   color: black;
+  outline: none;
   border: none;
 }
 
@@ -1620,8 +1621,15 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
 
 [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=submit], [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search form input[type=submit] {
   margin: 0;
-  background: #808080;
+  background: #808080 !important;
   color: #fff;
+  font-size: 16px;
+  padding: 10px 10px;
+  font-weight: normal;
+  display: inline-block;
+  border: none;
+  cursor: pointer;
+  border-radius: 3px;
 }
 
 [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner input[type=search], [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search input[type=search],
@@ -1640,6 +1648,14 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
 
 [data-sek-is-mobile-vertical-menu="yes"] .nb-mobile-search input {
   font-size: 16px;
+}
+
+.nb-search-expand-inner input[type="search"], .nb-mobile-search input[type="search"] {
+  color: #000000 !important;
+}
+
+.nb-search-expand-inner input[type="submit"], .nb-mobile-search input[type="submit"] {
+  color: #ffffff !important;
 }
 
 /*************************************
@@ -1731,7 +1747,7 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
 }
 
 /*************************************
-* SPECIAL IMAGE MODULE
+* NIMBLE IMAGE MODULE
 *************************************/
 .sek-nimble-image-wrapper {
   max-width: 100%;
@@ -2076,6 +2092,7 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
 
 .nb-loc .sek-module .sek-module-inner .sek-btn:hover, .nb-loc .sek-module .sek-module-inner .sek-btn:focus, .nb-loc .sek-module .sek-module-inner .sek-btn:active {
   color: #ffffff;
+  background-color: #282828;
   text-decoration: none;
 }
 
@@ -3087,7 +3104,7 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
   text-decoration: underline;
 }
 
-body .sektion-wrapper .sek-row [data-sek-level="module"] .sek-module-inner a:focus {
+body .sektion-wrapper .sek-row [data-sek-level="module"] .sek-module-inner a:not(.sek-btn):not(.button):focus {
   background: none;
 }
 

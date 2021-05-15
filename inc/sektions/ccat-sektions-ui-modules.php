@@ -1543,7 +1543,7 @@ function sek_get_module_params_for_sek_level_bg_module() {
                 ),
                 'bg-use-post-thumb' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Use the current post thumbnail', 'text_doma'),
+                    'title'       => __('Use the contextual post thumbnail', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => true,

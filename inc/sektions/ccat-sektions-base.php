@@ -5021,7 +5021,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     $bg_image_id_or_url = '';
                     
                     // Feb 2021
-                    // First check if user wants to use the current post thumbnail
+                    // First check if user wants to use the contextual post thumbnail
                     // Fallback on the regular image background if not
                     if ( $use_post_thumbnail_bg ) {
                         $current_post_id = sek_get_post_id_on_front_and_when_customizing();

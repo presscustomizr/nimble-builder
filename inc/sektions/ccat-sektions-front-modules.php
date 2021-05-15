@@ -348,7 +348,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                 ),
                 'use-post-thumb' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Use the current post thumbnail', 'text_doma'),
+                    'title'       => __('Use the contextual post thumbnail', 'text_doma'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => true,
@@ -2692,7 +2692,7 @@ function sek_add_css_rules_for_button_front_module( $rules, $complete_modul_mode
         }
     }
     $rules[] = array(
-        'selector' => '.nb-loc .sek-row [data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-btn:hover',
+        'selector' => '.nb-loc .sek-row [data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-btn:hover, .nb-loc .sek-row [data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-btn:focus',
         'css_rules' => 'background-color:' . $bg_color_hover . ';',
         'mq' =>null
     );

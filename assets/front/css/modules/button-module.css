@@ -18,6 +18,7 @@
 
 .nb-loc .sek-module .sek-module-inner .sek-btn:hover, .nb-loc .sek-module .sek-module-inner .sek-btn:focus, .nb-loc .sek-module .sek-module-inner .sek-btn:active {
   color: #ffffff;
+  background-color: #282828;
   text-decoration: none;
 }
 
