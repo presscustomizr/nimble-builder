@@ -668,7 +668,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Refreshed to home page : site templates must be set when previewing home' => __('Refreshed to home page : site templates must be set when previewing home','text_dom'),
 
             'Remove all sections and options of this page' => __('Remove all sections and options of this page', 'text_dom'),
-            'Go pro link when click on pro tmpl or section' =>  sprintf( '<a href="%2$s" target="_blank" rel="noreferrer noopener">%1$s</a>', __('🌟 Go pro to use this element 🌟'), NIMBLE_PRO_URL )
+            'Go pro link when click on pro tmpl or section' =>  sprintf( '<a href="%2$s" target="_blank" rel="noreferrer noopener">%1$s</a>', __('🌟 This is a Nimble Builder Pro element'), NIMBLE_PRO_URL )
         )//array()
     )//array()
     );//array_merge
