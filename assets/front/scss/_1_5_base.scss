@@ -332,7 +332,7 @@
 }
 
 // SEPT 2020 : Animate
-.sek-animate-candidate { opacity: 0;}
+.sek-animate-candidate:not(.sek-animate-displayed-before-starting) { opacity: 0;}
 .sek-overflow-hidden-while-animating { overflow: hidden;}
 
 // Janv 2021 : Pro header
