@@ -187,6 +187,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
             $exploded = explode(',', $selector);
             foreach ( $exploded as $sel ) {
                 $new_selectors[] = $sel.':hover';
+                $new_selectors[] = $sel.':focus';
             }
 
             $selector = implode(',', $new_selectors);
