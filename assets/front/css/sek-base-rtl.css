@@ -294,7 +294,7 @@
   }
 }
 
-.sek-animate-candidate {
+.sek-animate-candidate:not(.sek-animate-displayed-before-starting) {
   opacity: 0;
 }
 

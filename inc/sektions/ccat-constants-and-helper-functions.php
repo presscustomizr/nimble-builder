@@ -3566,10 +3566,10 @@ function sek_get_nimble_api_data( $params ) {
     // If a problem occured when getting a pro section or template, single_section or single_tmpl is a string, not an array
     // in this case, we need to re-connect to the api
     // see https://github.com/presscustomizr/nimble-builder-pro/issues/193
-    if ( 'single_section' === $what && array_key_exists('single_section', $api_data ) && !is_array($api_data['single_section'] ) ) {
+    if ( 'single_section' === $what && is_array( $api_data ) && array_key_exists('single_section', $api_data ) && !is_array($api_data['single_section'] ) ) {
         $invalid_transient_data = true;
     }
-    if ( 'single_tmpl' === $what && array_key_exists('single_tmpl', $api_data ) && !is_array($api_data['single_tmpl'] ) ) {
+    if ( 'single_tmpl' === $what && is_array( $api_data ) && array_key_exists('single_tmpl', $api_data ) && !is_array($api_data['single_tmpl'] ) ) {
         $invalid_transient_data = true;
     }
 
