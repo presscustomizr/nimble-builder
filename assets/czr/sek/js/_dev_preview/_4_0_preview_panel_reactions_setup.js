@@ -478,8 +478,70 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                         self.errare( 'reactToPanelMsg => sek-update-html-in-selector => missing level or target dom element', params );
                                   }
                             },
-                            // march 2020 : print confettis when displaying the review request
-                            'sek-print-confettis' : function( params ) {
+                             // introduced for CUSTOM CSS see https://github.com/presscustomizr/nimble-builder-pro/issues/201
+                            // fired when refresh_css_via_post_message = true in input registration params
+                            'sek-update-css-with-postmessage' : function( params ) {
+                                    console.log('ALORS PARAMS ?', params );
+                                    if ( _.isUndefined(params.css_content) || !_.isString(params.css_content) ) {
+                                          self.errare( 'error => sek-update-css-with-postmessage => css content is not a string' );
+                                          return;
+                                    }
+                                    var custom_css_sel = 'nb-custom-css-for-level-' + params.id,
+                                          $custom_css_el = $('#'  + custom_css_sel );
+                                    if ( $custom_css_el.length < 1 ) {
+                                          $('head').append( $('<style/>' , {
+                                                id : custom_css_sel,
+                                          }) );
+                                          $custom_css_el = $('#'  + custom_css_sel );
+                                    }
+
+                                    // Apply the same treatment made server side in sek_add_css_rules_for_level_custom_css()
+                                    var _level_selector = 'body .sektion-wrapper [data-sek-id="' + params.id +'"]',
+                                          _exploded_rules,
+                                          _rules_with_level_specificity = [],
+                                          _specific_rules = '',
+                                          _rule_selectors,
+                                          _rule_selectors_without_space,
+                                          _comma_exploded_selectors;
+
+                                    // 1) FIRST => Explode by } and add level specificity
+                                    _exploded_rules = params.css_content.split('}');
+
+                                    _.each( _exploded_rules, function( _rule ){
+                                          // remove all line breaks
+                                          _rule = _rule.replace(/\n|\r/g, "" );
+                                          if ( _.isEmpty(_rule) || -1 === _rule.indexOf('{') )
+                                                return;
+                                          _rule = _rule.replace(/.nimble-level/g, '' );
+                                          _rule_selectors = _rule.substr(0, _rule.indexOf('{'));
+                                          _rule_selectors_without_space = _rule_selectors.replace(/ /g,'');
+
+                                          _rule = _rule.replace(_rule_selectors, '' );
+                                          // If no selectors specified, simply use the level selector
+                                          if ( _.isEmpty( _rule_selectors_without_space ) ) {
+                                                _rules_with_level_specificity.push(_level_selector + _rule + '}css_delimiter');
+                                          } else {
+                                                // => handle selectors separated by commas, in this case, the previous treatment has only added specificity to the first selector of the list
+                                                _comma_exploded_selectors = _rule_selectors.split(',');
+                                                _.each( _comma_exploded_selectors, function( _sel ){
+                                                      if ( _.isEmpty(_sel) )
+                                                            return;
+                                                      _rules_with_level_specificity.push(_level_selector + ' ' + _sel + _rule + '}css_delimiter');
+                                                });
+                                          }
+                                    });
+
+                                    if ( !_.isEmpty(_rules_with_level_specificity) ) {
+                                          _specific_rules = _rules_with_level_specificity.join('css_delimiter');
+                                          _specific_rules = _specific_rules.replace(/css_delimiter/g, '' );
+                                    }
+
+                                    if ( !_.isEmpty( _specific_rules ) ) {
+                                          $custom_css_el.html( _specific_rules );
+                                    }
+                              },
+                              // march 2020 : print confettis when displaying the review request
+                              'sek-print-confettis' : function( params ) {
                                   if (!window.confetti || !window.requestAnimationFrame)
                                     return;
                                   params = params || {};

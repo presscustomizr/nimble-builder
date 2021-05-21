@@ -179,7 +179,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var refresh_stylesheet = 'refresh_stylesheet' === params.defaultPreviewAction,//<= default action for level options
                       refresh_markup = 'refresh_markup' === params.defaultPreviewAction,//<= default action for module options
                       refresh_fonts = 'refresh_fonts' === params.defaultPreviewAction,
-                      refresh_preview = 'refresh_preview' === params.defaultPreviewAction;
+                      refresh_preview = 'refresh_preview' === params.defaultPreviewAction,
+                      refresh_css_via_post_message = false;//<= introduced for pro custom css
 
                   // Maybe set the input based value
                   var input_id = params.settingParams.args.input_changed;
@@ -208,6 +209,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         if ( !_.isUndefined( inputRegistrationParams.refresh_preview ) ) {
                               refresh_preview = Boolean( inputRegistrationParams.refresh_preview );
+                        }
+                        if ( !_.isUndefined( inputRegistrationParams.refresh_css_via_post_message ) ) {
+                              refresh_css_via_post_message = Boolean( inputRegistrationParams.refresh_css_via_post_message );
                         }
                   }
 
@@ -317,13 +321,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     };
 
+                                    // NB ajaxily refreshes the markup
                                     if ( true === refresh_markup ) {
                                           _sendRequestForAjaxMarkupRefresh();
                                     }
 
+                                    // Case when NB maybe refreshes the markup via postmessage
                                     // Note : for multi-item modules, the changed item id is sent
                                     if ( refreshMarkupWhenNeededForInput() ) {
-
                                           var _html_content = params.settingParams.args.input_value;
                                           if ( !_.isString( _html_content ) ) {
                                                 throw new Error( '::updateAPISettingAndExecutePreviewActions => _doUpdateWithRequestedAction => refreshMarkupWhenNeededForInput => html content is not a string.');
@@ -348,6 +353,29 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                 });
                                           } else {
                                                 _sendRequestForAjaxMarkupRefresh();
+                                          }
+                                    }
+
+                                    if ( true === refresh_css_via_post_message ) {
+                                          var _css_content = params.settingParams.args.input_value;
+                                          if ( !_.isString( _css_content ) ) {
+                                                throw new Error( '::updateAPISettingAndExecutePreviewActions => _doUpdateWithRequestedAction => refresh css with post message => css content is not a string.');
+                                          } else {
+                                                api.previewer.send( 'sek-update-css-with-postmessage', {
+                                                      //selector : inputRegistrationParams.refresh_markup,
+                                                      changed_item_id : _changed_item_id,
+                                                      is_multi_items : isMultiItemModule,
+                                                      css_content : _css_content,
+                                                      id : params.uiParams.id,
+                                                      location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      apiParams : {
+                                                            action : 'sek-update-css-with-postmessage',
+                                                            id : params.uiParams.id,
+                                                            level : params.uiParams.level
+                                                      },
+                                                      skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                });
                                           }
                                     }
 
