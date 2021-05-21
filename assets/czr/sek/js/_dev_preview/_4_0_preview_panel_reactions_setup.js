@@ -481,13 +481,29 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                              // introduced for CUSTOM CSS see https://github.com/presscustomizr/nimble-builder-pro/issues/201
                             // fired when refresh_css_via_post_message = true in input registration params
                             'sek-update-css-with-postmessage' : function( params ) {
-                                    console.log('ALORS PARAMS ?', params );
+                                    //console.log('ALORS PARAMS ?', params );
                                     if ( _.isUndefined(params.css_content) || !_.isString(params.css_content) ) {
                                           self.errare( 'error => sek-update-css-with-postmessage => css content is not a string' );
                                           return;
                                     }
-                                    var custom_css_sel = 'nb-custom-css-for-level-' + params.id,
-                                          $custom_css_el = $('#'  + custom_css_sel );
+
+                                    // Comments removal
+                                    // see https://stackoverflow.com/questions/5989315/regex-for-match-replacing-javascript-comments-both-multiline-and-inline
+                                    params.css_content = params.css_content.replace(/\/\*.+?\*\/|\/\/.*(?=[\n\r])/g, '');
+
+                                    var custom_css_sel,
+                                          $custom_css_el,
+                                          _level_selector = 'body .sektion-wrapper [data-sek-id="' + params.id +'"]';
+
+                                    if ( params.is_current_page_custom_css ) {
+                                          custom_css_sel = 'nb-custom-css-for-local-page';
+                                          _level_selector = '';
+                                    } else {
+                                          custom_css_sel = 'nb-custom-css-for-level' + params.id;
+                                          _level_selector = 'body .sektion-wrapper [data-sek-id="' + params.id +'"]';
+                                    }
+                                    $custom_css_el = $('#'  + custom_css_sel );
+
                                     if ( $custom_css_el.length < 1 ) {
                                           $('head').append( $('<style/>' , {
                                                 id : custom_css_sel,
@@ -496,8 +512,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     }
 
                                     // Apply the same treatment made server side in sek_add_css_rules_for_level_custom_css()
-                                    var _level_selector = 'body .sektion-wrapper [data-sek-id="' + params.id +'"]',
-                                          _exploded_rules,
+                                    var _exploded_rules,
                                           _rules_with_level_specificity = [],
                                           _specific_rules = '',
                                           _rule_selectors,

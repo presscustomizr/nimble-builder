@@ -349,7 +349,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             id : params.uiParams.id,
                                                             level : params.uiParams.level
                                                       },
-                                                      skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                                 });
                                           } else {
                                                 _sendRequestForAjaxMarkupRefresh();
@@ -375,6 +375,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             level : params.uiParams.level
                                                       },
                                                       skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      is_current_page_custom_css : 'local_custom_css' === input_id
                                                 });
                                           }
                                     }

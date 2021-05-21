@@ -19,7 +19,9 @@ function sek_get_module_params_for_sek_local_custom_css() {
                     'code_type' => 'text/css',// 'text/html' //<= use 'text/css' to instantiate the code mirror as CSS editor, which by default will be an HTML editor
                     'notice_before_title' => __('The CSS code added below will only be applied to the currently previewed page, not site wide.', 'text_doma'),
                     'refresh_markup' => false,
-                    'refresh_stylesheet' => true,
+                    'refresh_stylesheet' => false,
+                    'refresh_preview' => false,
+                    'refresh_css_via_post_message' => true
                 )
             )
         )//tmpl
