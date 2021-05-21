@@ -310,7 +310,7 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_width_section.js',
       //'<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_section_layout_module.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_1_UI_spacing.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_2_UI_sek_level_custom_css_section.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_2_UI_sek_level_custom_css_levels.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_3_UI_sek_level_animation_module.js',
 
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_2_local/_9_1_0_UI_local_template.js',

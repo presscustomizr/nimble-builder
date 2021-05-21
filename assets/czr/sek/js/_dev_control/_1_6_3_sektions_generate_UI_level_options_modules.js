@@ -130,17 +130,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     icon : '<i class="material-icons sek-level-option-icon">devices</i>'
                               }
                         });
-                        if ( sektionsLocalizedData.isUpsellEnabled || sektionsLocalizedData.isPro ) {
-                              $.extend( modulesRegistrationParams, {
-                                    sec_custom_css : {
-                                          settingControlId : params.id + '__sec_custom_css',
-                                          module_type : 'sek_level_cust_css_section',
-                                          controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
-                                          icon : '<i class="material-icons sek-level-option-icon">code</i>',
-                                          isPro : true
-                                    }
-                              });
-                        }
                   }
                   if ( 'column' === params.level ) {
                         $.extend( modulesRegistrationParams, {
@@ -162,7 +151,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                   }
-
+                  if ( sektionsLocalizedData.isUpsellEnabled || sektionsLocalizedData.isPro ) {
+                        $.extend( modulesRegistrationParams, {
+                              level_cust_css : {
+                                    settingControlId : params.id + '__level_custom_css',
+                                    module_type : 'sek_level_cust_css_level',
+                                    controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
+                                    icon : '<i class="material-icons sek-level-option-icon">code</i>',
+                                    isPro : true
+                              }
+                        });
+                  }
 
                   // BAIL WITH A SEE-ME ANIMATION IF THIS UI IS CURRENTLY BEING DISPLAYED
                   // Is the UI currently displayed the one that is being requested ?
