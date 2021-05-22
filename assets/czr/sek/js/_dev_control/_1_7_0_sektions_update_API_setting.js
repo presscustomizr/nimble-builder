@@ -492,40 +492,55 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   } else {
                         api.nimble_ApiSections = api.nimble_ApiSections || {};
-                        self._getApiSingleSectionData( sectionParams.presetSectionId )
-                              .fail( function( er ) {
-                                    __dfd__.reject( er );
-                              })
-                              .done( function( _section_data_ ) {
-                                    //api.infoLog( 'API SECTION fetched', sectionParams.presetSectionId, api.nimble_ApiSections );
-                                    var presetSection,
-                                        allPresets = $.extend( true, {}, _.isObject( _section_data_ ) ? _section_data_ : {} );
+                        var _doResolveDfdWithData = function( _section_data_ ) {
+                              //api.infoLog( 'API SECTION fetched', sectionParams.presetSectionId, api.nimble_ApiSections );
+                              if ( _.isEmpty( _section_data_ ) || !_.isObject(_section_data_) ) {
+                                    throw new Error( 'getPresetSectionCollectionData => Invalid collection');
+                              }
+                              // if ( _.isEmpty( allPresets[ sectionParams.presetSectionId ] ) ) {
+                              //       throw new Error( 'getPresetSectionCollectionData => the preset section : "' + sectionParams.presetSectionId + '" has not been found in the collection');
+                              // }
+                              var presetCandidate = $.extend( true, {}, _section_data_ );
 
-                                    if ( _.isEmpty( _section_data_ ) || !_.isObject(_section_data_) ) {
-                                          throw new Error( 'getPresetSectionCollectionData => Invalid collection');
-                                    }
-                                    // if ( _.isEmpty( allPresets[ sectionParams.presetSectionId ] ) ) {
-                                    //       throw new Error( 'getPresetSectionCollectionData => the preset section : "' + sectionParams.presetSectionId + '" has not been found in the collection');
-                                    // }
-                                    var presetCandidate = $.extend( true, {}, _section_data_ );
+                              // Ensure we have a string that's JSON.parse-able
+                              // if ( typeof presetCandidate !== 'string' || presetCandidate[0] !== '{' ) {
+                              //       throw new Error( 'getPresetSectionCollectionData => ' + sectionParams.presetSectionId + ' is not JSON.parse-able');
+                              // }
+                              // presetCandidate = JSON.parse( presetCandidate );
 
-                                    // Ensure we have a string that's JSON.parse-able
-                                    // if ( typeof presetCandidate !== 'string' || presetCandidate[0] !== '{' ) {
-                                    //       throw new Error( 'getPresetSectionCollectionData => ' + sectionParams.presetSectionId + ' is not JSON.parse-able');
-                                    // }
-                                    // presetCandidate = JSON.parse( presetCandidate );
+                              // ID's
+                              // the level's id have to be generated
+                              presetCandidate.collection = self.setPresetOrUserSectionIds( presetCandidate.collection );
 
-                                    // ID's
-                                    // the level's id have to be generated
-                                    presetCandidate.collection = self.setPresetOrUserSectionIds( presetCandidate.collection );
-
-                                    // NIMBLE VERSION
-                                    // set the section version
-                                    presetCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
-                                    // the other level's version have to be added
-                                    presetCandidate.collection = self.setPresetSectionVersion( presetCandidate.collection );
-                                    __dfd__.resolve( presetCandidate );
-                              });//_getApiSingleSectionData.done()
+                              // NIMBLE VERSION
+                              // set the section version
+                              presetCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
+                              // the other level's version have to be added
+                              presetCandidate.collection = self.setPresetSectionVersion( presetCandidate.collection );
+                              __dfd__.resolve( presetCandidate );
+                        };
+                        var _collection;
+                        switch( sectionParams.presetSectionId ) {
+                              case 'two_columns' :
+                                    _collection = JSON.parse('{"collection":[{"id":"","level":"column","collection":[]},{"id":"","level":"column","collection":[]}]}');
+                                    _doResolveDfdWithData(_collection);
+                              break;
+                              case 'three_columns' :
+                                    _collection = JSON.parse('{"collection":[{"id":"","level":"column","collection":[]},{"id":"","level":"column","collection":[]},{"id":"","level":"column","collection":[]}]}');
+                                    _doResolveDfdWithData(_collection);
+                              break;
+                              case 'four_columns' :
+                                    _collection = JSON.parse('{"collection":[{"id":"","level":"column","collection":[]},{"id":"","level":"column","collection":[]},{"id":"","level":"column","collection":[]},{"id":"","level":"column","collection":[]}]}');
+                                    _doResolveDfdWithData(_collection);
+                              break;
+                              default :
+                                    self._getApiSingleSectionData( sectionParams.presetSectionId )
+                                          .fail( function( er ) {
+                                                __dfd__.reject( er );
+                                          })
+                                          .done( _doResolveDfdWithData );//_getApiSingleSectionData.done()
+                              break;
+                        }// Switch()
                   }
                   return __dfd__.promise();
             },
