@@ -551,8 +551,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           _specific_rules = _specific_rules.replace(/css_delimiter/g, '' );
                                     }
 
-                                    if ( !_.isEmpty( _specific_rules ) ) {
+                                    // If there are no rules to write, refresh the stylesheet ajaxily ( because it might contain previous CSS rules that should be cleaned up )
+                                    // + remove the custom CSS style element
+                                    if ( !_.isEmpty( _specific_rules.replace(/ /g, '' ) ) ) {
                                           $custom_css_el.html( _specific_rules );
+                                    } else {
+                                          $custom_css_el.remove();
+                                          api.preview.trigger('sek-refresh-stylesheet', params);
                                     }
                               },
                               // march 2020 : print confettis when displaying the review request
