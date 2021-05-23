@@ -23,8 +23,8 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                         // The following params have been introduced when implementing support for multi-section pre-build sections
                         // @see https://github.com/presscustomizr/nimble-builder/issues/489
-                        content_type : ( params.all_params && params.all_params.content_type ) ? params.all_params.content_type : null,
-                        collection_of_preset_section_id : ( params.all_params && params.all_params.collection_of_preset_section_id ) ? params.all_params.collection_of_preset_section_id : []
+                        content_type : ( params.apiParams && params.apiParams.content_type ) ? params.apiParams.content_type : null,
+                        collection_of_preset_section_id : ( params.apiParams && params.apiParams.collection_of_preset_section_id ) ? params.apiParams.collection_of_preset_section_id : []
                   }).done( function( _r_ ) {
                         var html_content = '';
                         //@see php SEK_Front_Ajax::sek_get_level_content_for_injection

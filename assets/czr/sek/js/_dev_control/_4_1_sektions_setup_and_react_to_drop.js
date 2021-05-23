@@ -816,7 +816,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                // this case fixes https://github.com/presscustomizr/nimble-builder/issues/139
                               case 'content-in-a-section-to-replace' :
                               case 'content-in-empty-location' :
-                                    api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
+                                    var _newParams = $.extend( true, {}, params );
+                                    api.previewer.trigger( 'sek-add-content-in-new-sektion', {
+                                          // level : _level,
+                                          // id : _id,
+                                          in_column : $dropTarget.closest('div[data-sek-level="column"]').data( 'sek-id'),
+                                          in_sektion : $dropTarget.closest('div[data-sek-level="section"]').data( 'sek-id'),
+
+                                          before_module_or_nested_section : _newParams.before_module_or_nested_section,
+                                          after_module_or_nested_section : _newParams.after_module_or_nested_section,
+
+                                          content_type : _newParams.content_type,
+                                          content_id : _newParams.content_id,
+                                          is_user_section : _newParams.is_user_section,
+                                          after_section : _newParams.after_section,
+                                          before_section : _newParams.before_section,
+                                          location : _newParams.location,
+                                          sektion_to_replace: _newParams.sektion_to_replace
+                                    } );
                               break;
 
                               case 'preset-section-in-a-nested-section-to-create' :

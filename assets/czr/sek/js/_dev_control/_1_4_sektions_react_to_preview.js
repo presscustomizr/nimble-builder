@@ -902,22 +902,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           promiseParams = promiseParams || {};
                                           // Send to the preview
                                           if ( sendToPreview ) {
-                                                api.previewer.send(
-                                                      msgId,
-                                                      {
-                                                            location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                                            local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
-                                                            apiParams : apiParams,
-                                                            uiParams : uiParams,
-                                                            cloneId : ! _.isEmpty( promiseParams.cloneId ) ? promiseParams.cloneId : false,
+                                                var messageToSend = {
+                                                      location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                                                      apiParams : apiParams,
+                                                      uiParams : uiParams,
+                                                      cloneId : ! _.isEmpty( promiseParams.cloneId ) ? promiseParams.cloneId : false
+                                                }, isError = false;
 
-                                                            // all_params has been introduced when implementing support for multi-section pre-build sections
-                                                            // it includes all_params.collection_of_preset_section_id, which is an array of section id used server side to fetch the content when rendering
-                                                            // 'collection_of_preset_section_id' is populated when updating the setting API with the preset_section actions like 'sek-add-content-in-new-sektion'
-                                                            // @see https://github.com/presscustomizr/nimble-builder/issues/489
-                                                            all_params : params
-                                                      }
-                                                );
+                                                // when using api.previewer.send, the data are sent as a JSON ( see customize-base.js::send )
+                                                // If the object message to send has a circular reference, the JSON.stringify will break ( TypeError: Converting circular structure to JSON )
+                                                // fixes https://github.com/presscustomizr/nimble-builder/issues/848
+                                                try { JSON.stringify( messageToSend ); } catch( er ) {
+                                                      api.errare( 'JSON.stringify problem when executing the callback of ' + msgId, messageToSend );
+                                                      isError = true;
+                                                }
+                                                if ( ! isError ) {
+                                                      api.previewer.send(
+                                                            msgId,
+                                                            messageToSend
+                                                      );
+                                                }
                                           } else {
                                                 // if nothing was sent to the preview, trigger the '*_done' action so we can execute the 'complete' callback
                                                 api.previewer.trigger( [ msgId, 'done' ].join('_'), { apiParams : apiParams, uiParams : uiParams } );
