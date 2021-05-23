@@ -493,7 +493,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                                     var custom_css_sel,
                                           $custom_css_el,
-                                          _level_selector = 'body .sektion-wrapper [data-sek-id="' + params.id +'"]';
+                                          _level_selector;
 
                                     if ( params.is_current_page_custom_css ) {
                                           custom_css_sel = 'nb-custom-css-for-local-page';
