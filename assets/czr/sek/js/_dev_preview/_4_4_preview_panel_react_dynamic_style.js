@@ -5,9 +5,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             ajaxRefreshStylesheet : function( params ) {
                   var self = this;
                   // will be cleaned on 'sek-module-refreshed'
-                  self.mayBePrintLoader({
-                        loader_located_in_level_id : params.apiParams.id
-                  });
+                  if ( true !== params.dont_print_loader ) {
+                        self.mayBePrintLoader({
+                              loader_located_in_level_id : params.apiParams.id
+                        });
+                  }
                   return self.doAjax( {
                         action : 'sek_get_content',
                         location_skope_id : params.location_skope_id,

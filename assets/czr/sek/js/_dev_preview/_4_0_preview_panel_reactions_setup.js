@@ -14,6 +14,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                             'sek-add-content-in-new-nested-sektion' : 'ajaxAddSektion',
                             'sek-add-column' : 'ajaxRefreshColumns',
                             'sek-add-module' : 'ajaxRefreshModulesAndNestedSections',
+                            'sek-refresh-stylesheet-in-the-background-for-custom-css' : 'ajaxRefreshStylesheet',
                             'sek-refresh-stylesheet' : 'ajaxRefreshStylesheet',
 
                             'sek-resize-columns' : 'ajaxResizeColumns',
@@ -557,8 +558,11 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           $custom_css_el.html( _specific_rules );
                                     } else {
                                           $custom_css_el.remove();
-                                          api.preview.trigger('sek-refresh-stylesheet', params);
                                     }
+                                    params = $.extend({}, true, params );
+                                    params.dont_print_loader = true;
+                                    // Let's refresh the stylesheet ajaxily in the background to make sure that previously saved rules do not override new ones
+                                    api.preview.trigger('sek-refresh-stylesheet-in-the-background-for-custom-css', params);
                               },
                               // march 2020 : print confettis when displaying the review request
                               'sek-print-confettis' : function( params ) {
@@ -690,6 +694,13 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                           api.preview.trigger('sek-animate-to-level', { id : params.apiParams.id });
                                     }
                               }, 1000 ));// api.preview.bind( msgId, function( params ) {
+                        } else if ( 'sek-refresh-stylesheet-in-the-background-for-custom-css' === msgId ) {
+                              api.preview.bind( msgId, _.debounce( function( params ) {
+                                    _apiPreviewCallback( params, callbackFn, msgId );
+                                    if ( params && params.apiParams && params.apiParams.id ) {
+                                          api.preview.trigger('sek-animate-to-level', { id : params.apiParams.id });
+                                    }
+                              }, 500 ));// api.preview.bind( msgId, function( params ) {
                         } else {
                               api.preview.bind( msgId, function( params ) {
                                     _apiPreviewCallback( params, callbackFn, msgId );
