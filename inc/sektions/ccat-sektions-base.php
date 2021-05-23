@@ -2337,8 +2337,8 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         public $current_location_is_footer = false;
 
         // September 2020 for https://github.com/presscustomizr/nimble-builder-pro/issues/67
-        public $local_sections_custom_css = '';
-        public $global_sections_custom_css = '';
+        public $local_levels_custom_css = '';
+        public $global_levels_custom_css = '';
 
         // October 2020
         public $rendering = false;//<= set to true when rendering NB content
@@ -2386,7 +2386,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             // MAYBE REGISTER PRO UPSELL MODUlES
             add_filter('nb_level_module_collection', function( $module_collection ) {
                 if ( is_array($module_collection) && ( sek_is_pro() || defined('NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON ) ) {
-                    array_push($module_collection, 'sek_level_cust_css_section' );
+                    array_push($module_collection, 'sek_level_cust_css_level' );
                     array_push($module_collection, 'sek_level_animation_module' );
                 }
                 return $module_collection;

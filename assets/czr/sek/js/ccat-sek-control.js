@@ -4780,22 +4780,27 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           promiseParams = promiseParams || {};
                                           // Send to the preview
                                           if ( sendToPreview ) {
-                                                api.previewer.send(
-                                                      msgId,
-                                                      {
-                                                            location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
-                                                            local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
-                                                            apiParams : apiParams,
-                                                            uiParams : uiParams,
-                                                            cloneId : ! _.isEmpty( promiseParams.cloneId ) ? promiseParams.cloneId : false,
+                                                var messageToSend = {
+                                                      location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),
+                                                      apiParams : apiParams,
+                                                      uiParams : uiParams,
+                                                      cloneId : ! _.isEmpty( promiseParams.cloneId ) ? promiseParams.cloneId : false
+                                                }, isError = false;
 
-                                                            // all_params has been introduced when implementing support for multi-section pre-build sections
-                                                            // it includes all_params.collection_of_preset_section_id, which is an array of section id used server side to fetch the content when rendering
-                                                            // 'collection_of_preset_section_id' is populated when updating the setting API with the preset_section actions like 'sek-add-content-in-new-sektion'
-                                                            // @see https://github.com/presscustomizr/nimble-builder/issues/489
-                                                            all_params : params
-                                                      }
-                                                );
+                                                // when using api.previewer.send, the data are sent as a JSON ( see customize-base.js::send )
+                                                // If the object message to send has a circular reference, the JSON.stringify will break ( TypeError: Converting circular structure to JSON )
+                                                // fixes https://github.com/presscustomizr/nimble-builder/issues/848
+                                                try { JSON.stringify( messageToSend ); } catch( er ) {
+                                                      api.errare( 'JSON.stringify problem when executing the callback of ' + msgId, messageToSend );
+                                                      isError = true;
+                                                }
+                                                if ( ! isError ) {
+                                                      api.previewer.send(
+                                                            msgId,
+                                                            messageToSend
+                                                      );
+                                                }
                                           } else {
                                                 // if nothing was sent to the preview, trigger the '*_done' action so we can execute the 'complete' callback
                                                 api.previewer.trigger( [ msgId, 'done' ].join('_'), { apiParams : apiParams, uiParams : uiParams } );
@@ -5073,7 +5078,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var refresh_stylesheet = 'refresh_stylesheet' === params.defaultPreviewAction,//<= default action for level options
                       refresh_markup = 'refresh_markup' === params.defaultPreviewAction,//<= default action for module options
                       refresh_fonts = 'refresh_fonts' === params.defaultPreviewAction,
-                      refresh_preview = 'refresh_preview' === params.defaultPreviewAction;
+                      refresh_preview = 'refresh_preview' === params.defaultPreviewAction,
+                      refresh_css_via_post_message = false;//<= introduced for pro custom css
 
                   // Maybe set the input based value
                   var input_id = params.settingParams.args.input_changed;
@@ -5102,6 +5108,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         }
                         if ( !_.isUndefined( inputRegistrationParams.refresh_preview ) ) {
                               refresh_preview = Boolean( inputRegistrationParams.refresh_preview );
+                        }
+                        if ( !_.isUndefined( inputRegistrationParams.refresh_css_via_post_message ) ) {
+                              refresh_css_via_post_message = Boolean( inputRegistrationParams.refresh_css_via_post_message );
                         }
                   }
 
@@ -5211,13 +5220,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                           });
                                     };
 
+                                    // NB ajaxily refreshes the markup
                                     if ( true === refresh_markup ) {
                                           _sendRequestForAjaxMarkupRefresh();
                                     }
 
+                                    // Case when NB maybe refreshes the markup via postmessage
                                     // Note : for multi-item modules, the changed item id is sent
                                     if ( refreshMarkupWhenNeededForInput() ) {
-
                                           var _html_content = params.settingParams.args.input_value;
                                           if ( !_.isString( _html_content ) ) {
                                                 throw new Error( '::updateAPISettingAndExecutePreviewActions => _doUpdateWithRequestedAction => refreshMarkupWhenNeededForInput => html content is not a string.');
@@ -5238,10 +5248,34 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                                             id : params.uiParams.id,
                                                             level : params.uiParams.level
                                                       },
-                                                      skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' )//<= send skope id to the preview so we can use it when ajaxing
                                                 });
                                           } else {
                                                 _sendRequestForAjaxMarkupRefresh();
+                                          }
+                                    }
+
+                                    if ( true === refresh_css_via_post_message ) {
+                                          var _css_content = params.settingParams.args.input_value;
+                                          if ( !_.isString( _css_content ) ) {
+                                                throw new Error( '::updateAPISettingAndExecutePreviewActions => _doUpdateWithRequestedAction => refresh css with post message => css content is not a string.');
+                                          } else {
+                                                api.previewer.send( 'sek-update-css-with-postmessage', {
+                                                      //selector : inputRegistrationParams.refresh_markup,
+                                                      changed_item_id : _changed_item_id,
+                                                      is_multi_items : isMultiItemModule,
+                                                      css_content : _css_content,
+                                                      id : params.uiParams.id,
+                                                      location_skope_id : true === promiseParams.is_global_location ? sektionsLocalizedData.globalSkopeId : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      apiParams : {
+                                                            action : 'sek-update-css-with-postmessage',
+                                                            id : params.uiParams.id,
+                                                            level : params.uiParams.level
+                                                      },
+                                                      skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ),//<= send skope id to the preview so we can use it when ajaxing
+                                                      is_current_page_custom_css : 'local_custom_css' === input_id
+                                                });
                                           }
                                     }
 
@@ -6181,17 +6215,6 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     icon : '<i class="material-icons sek-level-option-icon">devices</i>'
                               }
                         });
-                        if ( sektionsLocalizedData.isUpsellEnabled || sektionsLocalizedData.isPro ) {
-                              $.extend( modulesRegistrationParams, {
-                                    sec_custom_css : {
-                                          settingControlId : params.id + '__sec_custom_css',
-                                          module_type : 'sek_level_cust_css_section',
-                                          controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
-                                          icon : '<i class="material-icons sek-level-option-icon">code</i>',
-                                          isPro : true
-                                    }
-                              });
-                        }
                   }
                   if ( 'column' === params.level ) {
                         $.extend( modulesRegistrationParams, {
@@ -6213,7 +6236,17 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               }
                         });
                   }
-
+                  if ( sektionsLocalizedData.isUpsellEnabled || sektionsLocalizedData.isPro ) {
+                        $.extend( modulesRegistrationParams, {
+                              level_cust_css : {
+                                    settingControlId : params.id + '__level_custom_css',
+                                    module_type : 'sek_level_cust_css_level',
+                                    controlLabel : sektionsLocalizedData.i18n['Custom CSS'],
+                                    icon : '<i class="material-icons sek-level-option-icon">code</i>',
+                                    isPro : true
+                              }
+                        });
+                  }
 
                   // BAIL WITH A SEE-ME ANIMATION IF THIS UI IS CURRENTLY BEING DISPLAYED
                   // Is the UI currently displayed the one that is being requested ?
@@ -7416,40 +7449,55 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         });
                   } else {
                         api.nimble_ApiSections = api.nimble_ApiSections || {};
-                        self._getApiSingleSectionData( sectionParams.presetSectionId )
-                              .fail( function( er ) {
-                                    __dfd__.reject( er );
-                              })
-                              .done( function( _section_data_ ) {
-                                    //api.infoLog( 'API SECTION fetched', sectionParams.presetSectionId, api.nimble_ApiSections );
-                                    var presetSection,
-                                        allPresets = $.extend( true, {}, _.isObject( _section_data_ ) ? _section_data_ : {} );
+                        var _doResolveDfdWithData = function( _section_data_ ) {
+                              //api.infoLog( 'API SECTION fetched', sectionParams.presetSectionId, api.nimble_ApiSections );
+                              if ( _.isEmpty( _section_data_ ) || !_.isObject(_section_data_) ) {
+                                    throw new Error( 'getPresetSectionCollectionData => Invalid collection');
+                              }
+                              // if ( _.isEmpty( allPresets[ sectionParams.presetSectionId ] ) ) {
+                              //       throw new Error( 'getPresetSectionCollectionData => the preset section : "' + sectionParams.presetSectionId + '" has not been found in the collection');
+                              // }
+                              var presetCandidate = $.extend( true, {}, _section_data_ );
 
-                                    if ( _.isEmpty( _section_data_ ) || !_.isObject(_section_data_) ) {
-                                          throw new Error( 'getPresetSectionCollectionData => Invalid collection');
-                                    }
-                                    // if ( _.isEmpty( allPresets[ sectionParams.presetSectionId ] ) ) {
-                                    //       throw new Error( 'getPresetSectionCollectionData => the preset section : "' + sectionParams.presetSectionId + '" has not been found in the collection');
-                                    // }
-                                    var presetCandidate = $.extend( true, {}, _section_data_ );
+                              // Ensure we have a string that's JSON.parse-able
+                              // if ( typeof presetCandidate !== 'string' || presetCandidate[0] !== '{' ) {
+                              //       throw new Error( 'getPresetSectionCollectionData => ' + sectionParams.presetSectionId + ' is not JSON.parse-able');
+                              // }
+                              // presetCandidate = JSON.parse( presetCandidate );
 
-                                    // Ensure we have a string that's JSON.parse-able
-                                    // if ( typeof presetCandidate !== 'string' || presetCandidate[0] !== '{' ) {
-                                    //       throw new Error( 'getPresetSectionCollectionData => ' + sectionParams.presetSectionId + ' is not JSON.parse-able');
-                                    // }
-                                    // presetCandidate = JSON.parse( presetCandidate );
+                              // ID's
+                              // the level's id have to be generated
+                              presetCandidate.collection = self.setPresetOrUserSectionIds( presetCandidate.collection );
 
-                                    // ID's
-                                    // the level's id have to be generated
-                                    presetCandidate.collection = self.setPresetOrUserSectionIds( presetCandidate.collection );
-
-                                    // NIMBLE VERSION
-                                    // set the section version
-                                    presetCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
-                                    // the other level's version have to be added
-                                    presetCandidate.collection = self.setPresetSectionVersion( presetCandidate.collection );
-                                    __dfd__.resolve( presetCandidate );
-                              });//_getApiSingleSectionData.done()
+                              // NIMBLE VERSION
+                              // set the section version
+                              presetCandidate.ver_ini = sektionsLocalizedData.nimbleVersion;
+                              // the other level's version have to be added
+                              presetCandidate.collection = self.setPresetSectionVersion( presetCandidate.collection );
+                              __dfd__.resolve( presetCandidate );
+                        };
+                        var _collection;
+                        switch( sectionParams.presetSectionId ) {
+                              case 'two_columns' :
+                                    _collection = JSON.parse('{"collection":[{"id":"","level":"column","collection":[]},{"id":"","level":"column","collection":[]}]}');
+                                    _doResolveDfdWithData(_collection);
+                              break;
+                              case 'three_columns' :
+                                    _collection = JSON.parse('{"collection":[{"id":"","level":"column","collection":[]},{"id":"","level":"column","collection":[]},{"id":"","level":"column","collection":[]}]}');
+                                    _doResolveDfdWithData(_collection);
+                              break;
+                              case 'four_columns' :
+                                    _collection = JSON.parse('{"collection":[{"id":"","level":"column","collection":[]},{"id":"","level":"column","collection":[]},{"id":"","level":"column","collection":[]},{"id":"","level":"column","collection":[]}]}');
+                                    _doResolveDfdWithData(_collection);
+                              break;
+                              default :
+                                    self._getApiSingleSectionData( sectionParams.presetSectionId )
+                                          .fail( function( er ) {
+                                                __dfd__.reject( er );
+                                          })
+                                          .done( _doResolveDfdWithData );//_getApiSingleSectionData.done()
+                              break;
+                        }// Switch()
                   }
                   return __dfd__.promise();
             },
@@ -11615,7 +11663,24 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                // this case fixes https://github.com/presscustomizr/nimble-builder/issues/139
                               case 'content-in-a-section-to-replace' :
                               case 'content-in-empty-location' :
-                                    api.previewer.trigger( 'sek-add-content-in-new-sektion', params );
+                                    var _newParams = $.extend( true, {}, params );
+                                    api.previewer.trigger( 'sek-add-content-in-new-sektion', {
+                                          // level : _level,
+                                          // id : _id,
+                                          in_column : $dropTarget.closest('div[data-sek-level="column"]').data( 'sek-id'),
+                                          in_sektion : $dropTarget.closest('div[data-sek-level="section"]').data( 'sek-id'),
+
+                                          before_module_or_nested_section : _newParams.before_module_or_nested_section,
+                                          after_module_or_nested_section : _newParams.after_module_or_nested_section,
+
+                                          content_type : _newParams.content_type,
+                                          content_id : _newParams.content_id,
+                                          is_user_section : _newParams.is_user_section,
+                                          after_section : _newParams.after_section,
+                                          before_section : _newParams.before_section,
+                                          location : _newParams.location,
+                                          sektion_to_replace: _newParams.sektion_to_replace
+                                    } );
                               break;
 
                               case 'preset-section-in-a-nested-section-to-create' :
@@ -17741,15 +17806,15 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
       //4) some DOM behaviour. For example, a multi item shall be sortable.
       api.czrModuleMap = api.czrModuleMap || {};
       $.extend( api.czrModuleMap, {
-            sek_level_cust_css_section : {
+            sek_level_cust_css_level : {
                   //mthds : Constructor,
                   crud : false,
-                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_cust_css_section', 'name' ),
+                  name : api.czr_sektions.getRegisteredModuleProperty( 'sek_level_cust_css_level', 'name' ),
                   has_mod_opt : false,
                   ready_on_section_expanded : true,
                   defaultItemModel : _.extend(
                         { id : '', title : '' },
-                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_cust_css_section' )
+                        api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'sek_level_cust_css_level' )
                   )
             },
       });
