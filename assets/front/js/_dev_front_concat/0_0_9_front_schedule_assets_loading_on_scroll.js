@@ -201,10 +201,11 @@
             // when the plugin is loaded => it emits "nb-needs-fa" listened to by nb_.listenTo()
             var doLoad = function() {
                   //Load the style
-                  if ( $('head').find( '#czr-font-awesome' ).length < 1 ) {
+                  if ( $('head').find( '#nb-font-awesome' ).length < 1 ) {
                         var link = document.createElement('link');
                         link.setAttribute('href', sekFrontLocalized.frontAssetsPath + 'fonts/css/fontawesome-all.min.css?'+sekFrontLocalized.assetVersion );
-                        link.setAttribute('id', 'czr-font-awesome');
+                        link.setAttribute('id', 'nb-font-awesome');
+                        link.setAttribute('data-sek-injected-dynamically', 'yes');
                         link.setAttribute('rel', nb_.hasPreloadSupport() ? 'preload' : 'stylesheet' );
                         link.setAttribute('as', 'style');
                         link.onload = function() {
@@ -212,7 +213,6 @@
                             if ( nb_.hasPreloadSupport() ) {
                                 this.rel='stylesheet';
                             }
-
                         };
                         document.getElementsByTagName('head')[0].appendChild(link);
                   }
