@@ -3511,12 +3511,12 @@ function sek_get_nimble_api_data( $params ) {
     }
 
     $transient_name = '';
-    $transient_duration = 24 * HOUR_IN_SECONDS;
+    $transient_duration = 7 * DAY_IN_SECONDS;
 
     switch ( $what ) {
         case 'latest_posts_and_start_msg':
             $transient_name = 'nimble_api_posts';
-            $transient_duration = 48 * HOUR_IN_SECONDS;
+            $transient_duration = 7 * DAY_IN_SECONDS;
         break;
         case 'all_tmpl':
             $transient_name = 'nimble_api_all_tmpl';
@@ -3524,6 +3524,7 @@ function sek_get_nimble_api_data( $params ) {
         break;
         case 'single_tmpl':
             $transient_name = 'nimble_api_tmpl_' . $tmpl_name;
+            $transient_duration = 2 * DAY_IN_SECONDS;
         break;
         case 'single_section':
             $transient_name = 'nimble_api_section_' . $section_id;
