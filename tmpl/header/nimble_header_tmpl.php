@@ -28,9 +28,14 @@ if ( !defined( 'ABSPATH' ) ) {
     ?>
     <div id="nimble-page" class="">
       <a class="sek-skip-link sek-screen-reader-text" href="#nimble-page"><?php _e( 'Skip to content', 'text_domain_to_replace' ); ?></a>
-      <?php do_action('before_nimble_header'); ?>
       <header id="nimble-header" class="<?php echo $header_classes; ?>">
+        <?php do_action('before_nimble_header'); ?>
         <?php Nimble_Manager()->render_nimble_locations( true === Nimble_Manager()->has_local_header_footer ? 'nimble_local_header' :'nimble_global_header' ); ?>
       </header><!-- #nimble-header -->
-      <?php do_action('after_nimble_header'); ?>
       <div id="nimble-content" class="">
+        <?php
+          // Note : hook 'after_nimble_header' is used by Customizr theme to render NB sections located in Customizr's hook '__after_header'
+          // it must be printed inside #nimble-content because NB pro top-margin used by header visibility setting is always assigned to nimble-content
+          // see https://github.com/presscustomizr/nimble-builder/issues/854
+        ?>
+        <?php do_action('after_nimble_header'); ?>
