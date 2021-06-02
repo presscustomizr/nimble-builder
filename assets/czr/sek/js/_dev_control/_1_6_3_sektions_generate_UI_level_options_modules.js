@@ -282,8 +282,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     // prepend the animated arrow
                                     $title.prepend('<span class="sek-animated-arrow" data-name="icon-chevron-down"><span class="fa fa-chevron-down"></span></span>');
 
-                                    // if this section is pro, and we're not running NB PRo => add the icon
-                                    if ( optionData.isPro && !sektionsLocalizedData.isPro ) {
+                                    // if this section is pro => add the icon
+                                    if ( optionData.isPro ) {
                                         $title.append( [
                                             '<img class="sek-pro-icon-next-title" src="',
                                             sektionsLocalizedData.baseUrl,
