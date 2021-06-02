@@ -162,7 +162,6 @@ window.nb_ = {};
             if ( 'font' === params.as && !nb_.hasPreloadSupport() )
               return;
 
-
             link = document.createElement('link');
 
             // script without preload support
@@ -191,11 +190,15 @@ window.nb_ = {};
 
                 // watch load events
                 link.onload = function() {
-                    //console.log('LOADED ASSET => ' + params.id + ' ON EVENT ' + params.onEvent );
                     this.onload=null;
-                    // nothing left to do if this is a font. It can now be used by the stylesheet
-                    if ( 'font' === params.as )
-                      return;
+                    // if this is a font, let's only check if an event is scheduled on load
+                    if ( 'font' === params.as ) {
+                        if ( params.eventOnLoad ) {
+                            nb_.emit( params.eventOnLoad );
+                        }
+                        // nothing left to do if this is a font. It can now be used by the stylesheet
+                        return;
+                    }
 
                     if ( params.onEvent ) {
                         nb_.listenTo( params.onEvent, function() { _injectFinalAsset.call(link); });
