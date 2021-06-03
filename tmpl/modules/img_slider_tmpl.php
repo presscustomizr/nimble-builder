@@ -193,7 +193,7 @@ if ( !function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
 
 
 if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
-  function sek_print_img_slider( $img_collection = array(), $slider_options, $model ) {
+  function sek_print_img_slider( $img_collection, $slider_options, $model ) {
       $img_collection = is_array( $img_collection ) ? $img_collection : array();
       $is_multislide = count( $img_collection ) > 1;
       $autoplay = ( !skp_is_customizing() && true === sek_booleanize_checkbox_val( $slider_options['autoplay'] ) ) ? "true" : "false";
