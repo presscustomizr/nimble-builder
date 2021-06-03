@@ -192,10 +192,18 @@ function sek_get_raw_section_registration_params() {
             'name' => __('Footer sections', 'text_doma'),
             'section_collection' => array(
                 array(
+                    'content-id' => 'footer_with_social_links_one',
+                    'title' => __('footer with dynamic date, site title and social links', 'text-domain' ),
+                    'thumb' => 'footer_with_social_links_one.jpg',
+                    'section_type' => 'footer',
+                    'height' => '51px'
+                ),
+                array(
                     'content-id' => 'footer_one',
-                    'title' => __('simple footer with 3 columns and large bottom zone', 'text-domain' ),
+                    'title' => __('simple 3 columns footer', 'text-domain' ),
                     'thumb' => 'footer_one.jpg',
-                    'section_type' => 'footer'
+                    'section_type' => 'footer',
+                    'height' => '75px'
                 )
             )
         ]
