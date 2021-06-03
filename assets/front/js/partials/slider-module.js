@@ -169,6 +169,9 @@
                                   $img.attr('sizes', $img.attr('data-sek-img-sizes') );
                                   $img.removeAttr('data-sek-img-sizes');
                               }
+                              // add 'recenter' events to fix https://github.com/presscustomizr/nimble-builder/issues/855
+                              nb_.delay( function() {$(imageEl).trigger('recenter');}, 200 );
+                              nb_.delay( function() {$(imageEl).trigger('recenter');}, 500 );
                           });
                     });
 
