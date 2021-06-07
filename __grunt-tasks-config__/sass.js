@@ -87,10 +87,15 @@ module.exports = {
       '<%= paths.front_assets %>css/modules/heading-module.css' : '<%= paths.front_assets %>scss/stand-alone-module-generators/heading-module.scss'
     }
   },
-  // pro module
+  // pro modules
   sek_module_special_image: {
     files : {
       '<%= paths.front_assets %>css/modules/special-image-module.css' : '<%= paths.front_assets %>scss/stand-alone-module-generators/special-image-module.scss'
+    }
+  },
+  sek_module_advanced_list: {
+    files : {
+      '<%= paths.front_assets %>css/modules/advanced-list-module.css' : '<%= paths.front_assets %>scss/stand-alone-module-generators/advanced-list-module.scss'
     }
   }
 };

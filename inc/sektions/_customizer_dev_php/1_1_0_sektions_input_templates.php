@@ -549,17 +549,19 @@ function sek_print_nimble_input_templates() {
                   'is_pro' : false
                 },
                 modData = jQuery.extend( defaultModParams, modData );
-
+                var _assets_version = "<?php echo NIMBLE_ASSETS_VERSION; ?>";
                 if ( !_.isEmpty( modData['icon'] ) ) {
                     if ( 'http' === modData['icon'].substring(0, 4) ) {
                       icon_img_src = modData['icon'];
                     } else {
                       icon_img_src = sektionsLocalizedData.moduleIconPath + modData['icon'];
                     }
+                    icon_img_src = icon_img_src + '?v=' + _assets_version;
                     icon_img_html = '<img draggable="false" title="' + modData['title'] + '" alt="' +  modData['title'] + '" class="nimble-module-icons" src="' + icon_img_src + '"/>';
                 } else if ( !_.isEmpty( modData['font_icon'] ) ) {
                     icon_img_html = modData['font_icon'];
                 }
+
                 var title_attr = "<?php _e('Drag and drop or double-click to insert in your chosen target element.', 'text_doma'); ?>",
                     font_icon_class = !_.isEmpty( modData['font_icon'] ) ? 'is-font-icon' : '',
                     is_draggable = true !== modData['active'] ? 'false' : 'true',

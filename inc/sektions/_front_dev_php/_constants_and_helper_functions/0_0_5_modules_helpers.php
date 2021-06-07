@@ -49,6 +49,7 @@ function sek_get_module_collection() {
           'title' => __( 'Icon', 'text_doma' ),
           'icon' => 'Nimble__icon_icon.svg'
         ),
+
         array(
           'content-type' => 'module',
           'content-id' => 'czr_special_img_module',
@@ -57,6 +58,15 @@ function sek_get_module_collection() {
           'is_pro' => !sek_is_pro(),
           'active' => sek_is_pro()
         ),
+        array(
+            'content-type' => 'module',
+            'content-id' => 'czr_advanced_list_module',
+            'title' => __( 'Advanced List', 'text_doma' ),
+            'icon' => 'Nimble__advanced_list_icon.svg',
+            'is_pro' => !sek_is_pro(),
+            'active' => sek_is_pro()
+        ),
+
         array(
           'content-type' => 'module',
           'content-id' => 'czr_button_module',
