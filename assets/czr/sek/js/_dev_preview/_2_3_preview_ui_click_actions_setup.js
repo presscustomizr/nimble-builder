@@ -6,20 +6,20 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
             scheduleUiClickReactions : function() {
                   var self = this;
 
-                  self.cachedElements.$body.on('click', function( evt ) {
+                  var _reactOnClick = function( evt ) {
                         // First clean any currently highlighted target drop zone
                         // implemented for double-click insertion https://github.com/presscustomizr/nimble-builder/issues/317
                         api.preview.send( 'sek-clean-target-drop-zone' );
 
                         var clickedOn = 'inactiveZone',
-                            $el = $(evt.target),
-                            $hookLocation = $el.closest('[data-sek-level="location"][data-sek-preview-level-guid="' + sekPreviewLocalized.previewLevelGuid +'"]'),
-                            $closestLevelWrapper = $el.closest('[data-sek-preview-level-guid="' + sekPreviewLocalized.previewLevelGuid +'"]'),
-                            $closestActionIcon = $el.closest('[data-sek-click-on]'),
-                            _action,
-                            _location_id = $hookLocation.data('sek-id'),
-                            _level = $closestLevelWrapper.data('sek-level'),
-                            _id = $closestLevelWrapper.data('sek-id');
+                              $el = $(evt.target),
+                              $hookLocation = $el.closest('[data-sek-level="location"][data-sek-preview-level-guid="' + sekPreviewLocalized.previewLevelGuid +'"]'),
+                              $closestLevelWrapper = $el.closest('[data-sek-preview-level-guid="' + sekPreviewLocalized.previewLevelGuid +'"]'),
+                              $closestActionIcon = $el.closest('[data-sek-click-on]'),
+                              _action,
+                              _location_id = $hookLocation.data('sek-id'),
+                              _level = $closestLevelWrapper.data('sek-level'),
+                              _id = $closestLevelWrapper.data('sek-id');
 
                         if ( 'add-content' == $el.data('sek-click-on') || ( $el.closest('[data-sek-click-on]').length > 0 && 'add-content' == $el.closest('[data-sek-click-on]').data('sek-click-on') ) ) {
                               clickedOn = 'addContentButton';
@@ -46,10 +46,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                         }
 
                         if ( $hookLocation.length > 0 && _.isEmpty( _location_id ) ) {
-                            self.errare( '::scheduleUiClickReactions => error location id can not be empty' );
+                              self.errare( '::scheduleUiClickReactions => error location id can not be empty' );
                         }
 
-                        //console.log('ALORS CLICKED ?', clickedOn );
+                        //console.log('ALORS CLICKED ?', clickedOn, $el );
 
                         switch( clickedOn ) {
                               case 'addContentButton' :
@@ -66,15 +66,15 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               break;
                               case 'UIIcon' :
                                     if ( 1 > $closestLevelWrapper.length ) {
-                                        throw new Error( 'ERROR => sek-front-preview => No valid level dom element found' );
+                                          throw new Error( 'ERROR => sek-front-preview => No valid level dom element found' );
                                     }
                                     _action = $el.closest('[data-sek-click-on]').data('sek-click-on');
 
                                     if ( _.isEmpty( _action ) ) {
-                                        throw new Error( 'Invalid action' );
+                                          throw new Error( 'Invalid action' );
                                     }
                                     if ( _.isEmpty( _level ) || _.isEmpty( _id ) ) {
-                                        throw new Error( 'ERROR => sek-front-preview => No valid level id found' );
+                                          throw new Error( 'ERROR => sek-front-preview => No valid level id found' );
                                     }
                                     self._send_( $el, {
                                           action : _action,
@@ -87,7 +87,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               case 'moduleWrapper' :
                                     // stop here if the ui icons block was clicked
                                     if ( $el.parent('.sek-dyn-ui-icons').length > 0 )
-                                      return;
+                                          return;
 
                                     self._send_( $el, {
                                           action : 'edit-module',
@@ -98,7 +98,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               case 'noModulesColumn' :
                                     // stop here if the ui icons block was clicked
                                     if ( $el.parent('.sek-dyn-ui-icons').length > 0 )
-                                      return;
+                                          return;
 
                                     self._send_( $el, {
                                           action : 'edit-options',
@@ -111,10 +111,10 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                               case 'columnOutsideModules' :
                               case 'sectionOutsideColumns' :
                                     self._send_( $el, {
-                                        action : 'edit-options',
-                                        location : _location_id,
-                                        level : _level,
-                                        id : _id
+                                          action : 'edit-options',
+                                          location : _location_id,
+                                          level : _level,
+                                          id : _id
                                     });
                               break;
                               case 'addSektion' :
@@ -146,8 +146,9 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                                     //self._send_( $el, { action : 'pick-content' } );
                               break;
                         }
+                  };//_reactOnClick()
 
-                  });//$('body').on('click', function( evt ) {}
+                  self.cachedElements.$body.on('click',_reactOnClick );//$('body').on('click', function( evt ) {}
 
             },//scheduleUserReactions()
 
