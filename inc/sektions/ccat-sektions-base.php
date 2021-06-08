@@ -2308,7 +2308,10 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             'czr_post_grid_module' => 'post-grid-module',
             'czr_simple_form_module' => 'simple-form-module',
             'czr_image_module' => 'image-module',
+
             'czr_special_img_module' => 'special-image-module',
+            'czr_advanced_list_module' => 'advanced-list-module',
+
             'czr_social_icons_module' => 'social-icons-module',
             'czr_button_module' => 'button-module',
             'czr_heading_module' => 'heading-module'

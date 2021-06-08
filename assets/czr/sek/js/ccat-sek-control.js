@@ -11878,7 +11878,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   });
 
                   _.each( [
-                        'sek-click-on-inactive-zone',
+                        //'sek-click-on-inactive-zone', //<=commented to fix #856
                         'sek-add-section',
                         'sek-add-column',
                         'sek-add-module',
@@ -11896,7 +11896,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.previewer.bind( _evt_, function() { api.sekEditorExpanded( false ); } );
                         } else {
                               api.previewer.bind( _evt_, function( params ) {
-                                    api.sekEditorExpanded(  params.module_type === 'czr_tiny_mce_editor_module' );
+                                    if ( params && params.module_type ) {
+                                          api.sekEditorExpanded(  params.module_type === 'czr_tiny_mce_editor_module' );
+                                    }
                               });
                         }
                   });

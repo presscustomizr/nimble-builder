@@ -339,6 +339,23 @@ li[id*="sek_draggable_modules"] [data-sek-content-type="preset_section"] {
   max-height: 86px;
 }
 
+/* Specific for advanced list module */
+.sek-content-type-wrapper [data-sek-content-id="czr_advanced_list_module"] .sek-module-icon {
+  height: 66%;
+  display: flex;
+  padding: 0;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sek-content-type-wrapper [data-sek-content-id="czr_advanced_list_module"] .sek-module-icon img {
+  height: 60%;
+}
+
 /* when the module icon is a font icon */
 [data-sek-content-type] .sek-module-icon.is-font-icon {
   display: -webkit-box;

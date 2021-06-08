@@ -955,6 +955,7 @@ function sek_get_module_collection() {
           'title' => __( 'Icon', 'text_doma' ),
           'icon' => 'Nimble__icon_icon.svg'
         ),
+
         array(
           'content-type' => 'module',
           'content-id' => 'czr_special_img_module',
@@ -963,6 +964,15 @@ function sek_get_module_collection() {
           'is_pro' => !sek_is_pro(),
           'active' => sek_is_pro()
         ),
+        array(
+            'content-type' => 'module',
+            'content-id' => 'czr_advanced_list_module',
+            'title' => __( 'Advanced List', 'text_doma' ),
+            'icon' => 'Nimble__advanced_list_icon.svg',
+            'is_pro' => !sek_is_pro(),
+            'active' => sek_is_pro()
+        ),
+
         array(
           'content-type' => 'module',
           'content-id' => 'czr_button_module',
@@ -4017,10 +4027,18 @@ function sek_get_raw_section_registration_params() {
             'name' => __('Footer sections', 'text_doma'),
             'section_collection' => array(
                 array(
+                    'content-id' => 'footer_with_social_links_one',
+                    'title' => __('footer with dynamic date, site title and social links', 'text-domain' ),
+                    'thumb' => 'footer_with_social_links_one.jpg',
+                    'section_type' => 'footer',
+                    'height' => '51px'
+                ),
+                array(
                     'content-id' => 'footer_one',
-                    'title' => __('simple footer with 3 columns and large bottom zone', 'text-domain' ),
+                    'title' => __('simple 3 columns footer', 'text-domain' ),
                     'thumb' => 'footer_one.jpg',
-                    'section_type' => 'footer'
+                    'section_type' => 'footer',
+                    'height' => '75px'
                 )
             )
         ]
