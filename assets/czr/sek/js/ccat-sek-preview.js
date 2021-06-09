@@ -2126,7 +2126,12 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
 
                                   // for multi-item modules, the changed item id is passed
                                   if ( !_.isEmpty( params.changed_item_id ) ) {
-                                        $target_el = $( '[data-sek-item-id="' + params.changed_item_id + '"] ' + params.selector, $level_el);
+                                        // if a selector is provided in param 'refresh_markup'
+                                        if ( params.selector ) {
+                                          $target_el = $( '[data-sek-item-id="' + params.changed_item_id + '"] ' + params.selector, $level_el);
+                                        } else {
+                                                $target_el = $( '[data-sek-item-id="' + params.changed_item_id + '"]', $level_el);
+                                          }
                                   } else {
                                         $target_el = $(params.selector, $level_el);
                                   }

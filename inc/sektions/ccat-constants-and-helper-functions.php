@@ -964,14 +964,14 @@ function sek_get_module_collection() {
           'is_pro' => !sek_is_pro(),
           'active' => sek_is_pro()
         ),
-        array(
-            'content-type' => 'module',
-            'content-id' => 'czr_advanced_list_module',
-            'title' => __( 'Advanced List', 'text_doma' ),
-            'icon' => 'Nimble__advanced_list_icon.svg',
-            'is_pro' => !sek_is_pro(),
-            'active' => sek_is_pro()
-        ),
+        // array(
+        //     'content-type' => 'module',
+        //     'content-id' => 'czr_advanced_list_module',
+        //     'title' => __( 'Advanced List', 'text_doma' ),
+        //     'icon' => 'Nimble__advanced_list_icon.svg',
+        //     'is_pro' => !sek_is_pro(),
+        //     'active' => sek_is_pro() && defined( 'NB_PRO_BETA_ADVANCED_LIST_MODULE') && NB_PRO_BETA_ADVANCED_LIST_MODULE
+        // ),
 
         array(
           'content-type' => 'module',

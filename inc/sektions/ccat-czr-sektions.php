@@ -639,6 +639,9 @@ function nimble_add_i18n_localized_control_params( $params ) {
             // Accordion module
             'Accordion title' => __('Accordion title', 'text_dom'),
 
+            // Advanced list module
+            'List item' => __('List item', 'text_dom'),
+
             // Template gallery and save
             'Last modified' => __('Last modified', 'text_dom'),
             'Use this template' => __('Use this template', 'text_dom'),
