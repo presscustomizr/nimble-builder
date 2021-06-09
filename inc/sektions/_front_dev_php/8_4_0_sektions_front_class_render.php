@@ -181,40 +181,16 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             }
 
             $location_id = current_filter();
-            // why check if did_action( ... ) ?
-            //  => A location can be rendered only once
-            // => for loop_start and loop_end, checking with is_main_query() is not enough because the main loop might be used 2 times in the same page
-            // => for a custom location, it can be rendered by do_action() somewhere, and be rendered also with render_nimble_locations()
-            // @see issue with Twenty Seventeen here : https://github.com/presscustomizr/nimble-builder/issues/14
-            if ( did_action( "sek_before_location_{$location_id}" ) )
-              return;
-
-            do_action( "sek_before_location_{$location_id}" );
             $this->_render_seks_for_location( $location_id );
-            do_action( "sek_after_location_{$location_id}" );
         }
 
         // hook : 'the_content'::-9999
         function sek_schedule_sektion_rendering_before_content( $html ) {
-            // Disable because https://github.com/presscustomizr/nimble-builder/issues/380
-            // No regression ?
-
-            // if ( did_action( 'sek_before_location_before_content' ) )
-            //   return $html;
-
-            do_action( 'sek_before_location_before_content' );
             return $this->_filter_the_content( $html, 'before_content' );
         }
 
         // hook : 'the_content'::9999
         function sek_schedule_sektion_rendering_after_content( $html ) {
-            // Disable because https://github.com/presscustomizr/nimble-builder/issues/380
-            // No regression ?
-
-            // if ( did_action( 'sek_before_location_after_content' ) )
-            //   return $html;
-
-            do_action( 'sek_before_location_after_content' );
             return $this->_filter_the_content( $html, 'after_content' );
         }
 
@@ -238,12 +214,23 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         // the $location_data can be provided. Typically when using the function render_content_sections_for_nimble_template in the Nimble page template.
         // @param $skope_id added april 2020 for https://github.com/presscustomizr/nimble-builder/issues/657
         public function _render_seks_for_location( $location_id = '', $location_data = array(), $skope_id = '' ) {
+            // why check if did_action( ... ) ?
+            //  => A location can be rendered only once
+            // => for loop_start and loop_end, checking with is_main_query() is not enough because the main loop might be used 2 times in the same page
+            // => for a custom location, it can be rendered by do_action() somewhere, and be rendered also with render_nimble_locations()
+            // @see issue with Twenty Seventeen here : https://github.com/presscustomizr/nimble-builder/issues/14
+            if ( is_string( $location_id) && did_action( "sek_before_location_{$location_id}" ) )
+              return;
+
             $all_locations = sek_get_locations();
 
             if ( !array_key_exists( $location_id, $all_locations ) ) {
                 sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' Error => the location ' . $location_id . ' is not registered in sek_get_locations()');
                 return;
             }
+
+            do_action( "sek_before_location_{$location_id}" );
+
             $locationSettingValue = array();
             $is_global_location = sek_is_global_location( $location_id );
             if ( empty( $location_data ) ) {
@@ -280,7 +267,10 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             } else {
                 error_log( __CLASS__ . ' :: ' . __FUNCTION__ .' => sek_get_skoped_seks() should always return an array().');
             }
-        }
+
+            do_action( "sek_after_location_{$location_id}" );
+
+        }//_render_seks_for_location(
 
 
 
@@ -321,13 +311,11 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             // }
 
             //sek_error_log( __FUNCTION__ . ' sek_get_skoped_seks(  ', sek_get_skoped_seks() );
-
             foreach( $locations as $location_id ) {
                 if ( !is_string( $location_id ) || empty( $location_id ) ) {
                     sek_error_log( __FUNCTION__ . ' => error => a location_id is not valid in the provided locations', $locations );
                     continue;
                 }
-
                 // why check if did_action( ... ) ?
                 // => A location can be rendered only once
                 // => for loop_start and loop_end, checking with is_main_query() is not enough because the main loop might be used 2 times in the same page
@@ -339,20 +327,15 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 $is_global = sek_is_global_location( $location_id );
                 $skope_id = $is_global ? NIMBLE_GLOBAL_SKOPE_ID : skp_get_skope_id();
                 $locationSettingValue = sek_get_skoped_seks( $skope_id, $location_id );
-                //sek_error_log('$locationSettingValue ??? => ' . $location_id, $locationSettingValue );
                 if ( !is_null( $options[ 'fallback_location' ]) ) {
                     // We don't need to render the locations with no sections
                     // But we need at least one location : let's always render loop_start.
                     // => so if the user switches from the nimble_template to the default theme one, the loop_start section will always be rendered.
                     if ( $options[ 'fallback_location' ] === $location_id || ( is_array( $locationSettingValue ) && !empty( $locationSettingValue['collection'] ) ) ) {
-                        do_action( "sek_before_location_{$location_id}" );
                         Nimble_Manager()->_render_seks_for_location( $location_id, $locationSettingValue );
-                        do_action( "sek_after_location_{$location_id}" );
                     }
                 } else {
-                    do_action( "sek_before_location_{$location_id}" );
                     Nimble_Manager()->_render_seks_for_location( $location_id, $locationSettingValue );
-                    do_action( "sek_after_location_{$location_id}" );
                 }
 
             }//render_nimble_locations()
