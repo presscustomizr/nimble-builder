@@ -1,0 +1,5 @@
+// Advanced List Module
+.sek-module-inner {
+    [data-sek-adv-list-type="none"] > ul { list-style-type: none;}
+    [data-sek-adv-list-type="circle"] > ul { list-style-type: circle;}
+}

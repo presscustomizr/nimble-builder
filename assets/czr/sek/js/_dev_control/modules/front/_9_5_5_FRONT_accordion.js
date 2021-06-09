@@ -208,7 +208,7 @@
                         } else {
                               $itemTitleEl.html( _text );
                         }
-                  },
+                  },//writeItemViewTitle
 
 
 
