@@ -88,7 +88,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var clearActiveWPEditorsInstances = function() {
                         if ( _.isArray( api.czrActiveWPEditors ) ) {
                               _.each( api.czrActiveWPEditors, function( _id ) {
-                                    wp.editor.remove( _id );
+                                    wp.oldEditor.remove( _id );
                               });
                               api.czrActiveWPEditors = [];
                         }
