@@ -10,7 +10,6 @@ $main_settings = $value['grid_main'];
 $metas_settings = $value['grid_metas'];
 $thumb_settings = $value['grid_thumb'];
 
-
 // filter for 'get_pagenum_link' and 'paginate_links'
 // for https://github.com/presscustomizr/nimble-builder/issues/672
 // June 2020 updated for https://github.com/presscustomizr/nimble-builder/issues/716
@@ -72,7 +71,9 @@ if ( !function_exists( 'Nimble\sek_render_post_navigation') ) {
               // https://developer.wordpress.org/reference/classes/wp_query/#pagination-parameters
               $pagination_query_var = Nimble_Manager()->is_viewing_static_front_page ? 'page' :'paged';
               $paged = get_query_var($pagination_query_var);
-              $paged = $paged ? $paged : 1;
+              $model = Nimble_Manager()->model;
+              $is_current_grid_paginated = isset($_GET['nb_grid_module_go_to']) && $model['id'] === $_GET['nb_grid_module_go_to'];
+              $paged = ( $paged && $is_current_grid_paginated ) ? $paged : 1;
 
               // filter to add nimble module id ( ex : #__nimble__b4b942df40e5 ) at the end of the url so we focus on grid when navigating pagination
               add_filter('paginate_links', 'Nimble\sek_filter_pagination_nav_url' );
@@ -378,6 +379,7 @@ if ( $use_current_query ) {
 }
 
 $paged = 1;
+$is_current_grid_paginated = isset($_GET['nb_grid_module_go_to']) && $model['id'] === $_GET['nb_grid_module_go_to'];
 // may 2020 => is_front_page() was wrong to check if home was a static front page.
 // fixes https://github.com/presscustomizr/nimble-builder/issues/664
 Nimble_Manager()->is_viewing_static_front_page = is_front_page() && 'page' == get_option( 'show_on_front' );
@@ -389,7 +391,7 @@ if ( !$use_current_query && $replace_current_query && true === sek_booleanize_ch
   // https://developer.wordpress.org/reference/classes/wp_query/#pagination-parameters
   $pagination_query_var = Nimble_Manager()->is_viewing_static_front_page ? 'page' :'paged';
   $paged = get_query_var($pagination_query_var);
-  $query_params['paged'] = $paged ? $paged : 1;
+  $query_params['paged'] = ( $paged && $is_current_grid_paginated ) ? $paged : 1;
   $query_params['posts_per_page'] = $posts_per_page;
 }
 
