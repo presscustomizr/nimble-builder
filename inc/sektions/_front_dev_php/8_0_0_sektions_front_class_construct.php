@@ -46,6 +46,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
 
         // store the local and global options
         public $local_options = '_not_cached_yet_';
+        public $local_options_without_tmpl_inheritance = '_not_cached_yet_';//Introduced for site templates, when using function sek_is_inheritance_locally_disabled()
         public $global_nimble_options = '_not_cached_yet_';
 
         public $img_smartload_enabled = 'not_cached';

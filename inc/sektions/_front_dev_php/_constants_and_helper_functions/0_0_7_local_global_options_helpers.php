@@ -39,8 +39,8 @@ function sek_get_local_option_value_without_inheritance( $option_name = '', $sko
         sek_error_log( __FUNCTION__ . ' => invalid option name' );
         return array();
     }
-    if ( !skp_is_customizing() && did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->local_options ) {
-        $local_options = Nimble_Manager()->local_options;
+    if ( !skp_is_customizing() && did_action('nimble_front_classes_ready') && '_not_cached_yet_' !== Nimble_Manager()->local_options_without_tmpl_inheritance ) {
+        $local_options_without_tmpl_inheritance = Nimble_Manager()->local_options_without_tmpl_inheritance;
     } else {
         // use the provided skope_id if in the signature
         $skope_id = ( !empty( $skope_id ) && is_string( $skope_id ))? $skope_id : skp_get_skope_id();
@@ -55,15 +55,15 @@ function sek_get_local_option_value_without_inheritance( $option_name = '', $sko
             );
         }
 
-        $local_options = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
+        $local_options_without_tmpl_inheritance = ( is_array( $localSkopeNimble ) && !empty( $localSkopeNimble['local_options'] ) && is_array( $localSkopeNimble['local_options'] ) ) ? $localSkopeNimble['local_options'] : array();
         // Cache only after 'wp' && 'nimble_front_classes_ready'
         // never cache when doing ajax
         if ( did_action('nimble_front_classes_ready') && did_action('wp') && !defined('DOING_AJAX') )  {
-            Nimble_Manager()->local_options = $local_options;
+            Nimble_Manager()->local_options_without_tmpl_inheritance = $local_options_without_tmpl_inheritance;
         }
     }
     // maybe normalizes with default values
-    $values = ( !empty( $local_options ) && !empty( $local_options[ $option_name ] ) ) ? $local_options[ $option_name ] : null;
+    $values = ( !empty( $local_options_without_tmpl_inheritance ) && !empty( $local_options_without_tmpl_inheritance[ $option_name ] ) ) ? $local_options_without_tmpl_inheritance[ $option_name ] : null;
     if ( did_action('nimble_front_classes_ready') ) {
         $values = sek_normalize_local_options_with_defaults( $option_name, $values );
     }
