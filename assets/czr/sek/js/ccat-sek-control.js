@@ -315,7 +315,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   var clearActiveWPEditorsInstances = function() {
                         if ( _.isArray( api.czrActiveWPEditors ) ) {
                               _.each( api.czrActiveWPEditors, function( _id ) {
-                                    wp.editor.remove( _id );
+                                    wp.oldEditor.remove( _id );
                               });
                               api.czrActiveWPEditors = [];
                         }
@@ -15647,12 +15647,14 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                             toolbar1:getToolbarBtns(),
                             //toolbar2:"",
                             content_css:( function() {
-                                  var default_settings = wp.editor.getDefaultSettings(),
-                                      stylesheets = [ sektionsLocalizedData.tinyMceNimbleEditorStylesheetUrl ];
-                                  if ( default_settings && default_settings.tinymce && default_settings.tinymce.content_css ) {
-                                        stylesheets = _.union( default_settings.tinymce.content_css.split(','), stylesheets );
-                                  }
-                                  return stylesheets.join(',');
+                                    var stylesheets = [ sektionsLocalizedData.tinyMceNimbleEditorStylesheetUrl ];
+                                    if( !wp.oldEditor.getDefaultSetting )
+                                          return stylesheets;
+                                    var default_settings = wp.oldEditor.getDefaultSettings();
+                                    if ( default_settings && default_settings.tinymce && default_settings.tinymce.content_css ) {
+                                          stylesheets = _.union( default_settings.tinymce.content_css.split(','), stylesheets );
+                                    }
+                                    return stylesheets.join(',');
                             })(),
                             // https://www.tiny.cloud/docs/plugins/autoresize/
                             min_height :40,
@@ -15673,7 +15675,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   }
 
                   // INITIALIZE
-                  wp.editor.initialize( _id, init_settings );
+                  wp.oldEditor.initialize( _id, init_settings );
                   // Note that an easy way to instantiate a basic editor would be to use :
                   // wp.editor.initialize( _id, { tinymce : { forced_root_block : "", wpautop: false }, quicktags : true });
                   var _editor = tinyMCE.get( _id );
@@ -15801,8 +15803,10 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   // Add the nimble editor's stylesheet to the default's ones
                   init_settings.content_css = ( function() {
-                        var default_settings = wp.editor.getDefaultSettings(),
-                            stylesheets = [ sektionsLocalizedData.tinyMceNimbleEditorStylesheetUrl ];
+                        var stylesheets = [ sektionsLocalizedData.tinyMceNimbleEditorStylesheetUrl ];
+                        if( !wp.oldEditor.getDefaultSetting )
+                              return stylesheets;
+                        var default_settings = wp.oldEditor.getDefaultSettings();
                         if ( default_settings && default_settings.tinymce && default_settings.tinymce.content_css ) {
                               stylesheets = _.union( default_settings.tinymce.content_css.split(','), stylesheets );
                         }
@@ -15897,7 +15901,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // bind events
                         _editor.on( 'input change keyup keydown click SetContent BeforeSetContent', function( evt ) {
                               //$textarea.trigger( 'change', {current_input : input} );
-                              input( isAutoPEnabled() ? _editor.getContent() : wp.editor.removep( _editor.getContent() ) );
+                              input( isAutoPEnabled() ? _editor.getContent() : wp.oldEditor.removep( _editor.getContent() ) );
                         });
                   }
 
