@@ -74,8 +74,10 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 }
                 array_unshift( $classes, !sek_local_skope_has_been_customized() ? 'nimble-no-local-data-' . $skope_id : 'nimble-has-local-data-' . $skope_id );
             }
-
-            array_unshift( $classes, sek_is_pro() ? 'nimble-builder-pro-' . str_replace('.', '-', NB_PRO_VERSION ) : 'nimble-builder-' . str_replace('.', '-', NIMBLE_VERSION ) );
+            if ( sek_is_pro() ) {
+                array_unshift( $classes, 'nimble-builder-pro-' . str_replace('.', '-', NB_PRO_VERSION ) );
+            }
+            array_unshift( $classes, 'nimble-builder-' . str_replace('.', '-', NIMBLE_VERSION ) );
 
             return $classes;
         }
