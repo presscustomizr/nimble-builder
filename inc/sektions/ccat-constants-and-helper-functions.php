@@ -49,7 +49,7 @@ if ( !defined( 'NIMBLE_MODULE_ICON_PATH' ) ) { define( 'NIMBLE_MODULE_ICON_PATH'
 if ( !defined( 'NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID') ) { define( 'NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID' , 'czr-customize-content_editor' ); }
 
 // TRANSIENTS ID
-if ( !defined( 'NIMBLE_WELCOME_NOTICE_ID' ) ) { define ( 'NIMBLE_WELCOME_NOTICE_ID', 'nimble-welcome-notice-12-2018' ); }
+if ( !defined( 'NIMBLE_WELCOME_NOTICE_ID' ) ) { define ( 'NIMBLE_WELCOME_NOTICE_ID', 'nimble-welcome-notice-06-2021' ); }
 //mt_rand(0, 65535) . 'test-nimble-feedback-notice-04-2019'
 if ( !defined( 'NIMBLE_FEEDBACK_NOTICE_ID' ) ) { define ( 'NIMBLE_FEEDBACK_NOTICE_ID', 'nimble-feedback-notice-04-2019' ); }
 if ( !defined( 'NIMBLE_FAWESOME_TRANSIENT_ID' ) ) { define ( 'NIMBLE_FAWESOME_TRANSIENT_ID', 'sek_font_awesome_february_2020' ); }
@@ -2842,25 +2842,22 @@ function sek_count_not_empty_sections_in_page( $seks_data, $count = 0 ) {
 // Invoked when printing the review note in the plugin table, in the 'plugin_row_meta'
 // Since this is a quite heavy check, NB stores it in a 7 days long transient
 function sek_get_feedback_notif_status() {
-    // if ( sek_feedback_notice_is_dismissed() )
-    //   return;
-    // if ( sek_feedback_notice_is_postponed() )
-    //   return;
+    if ( sek_feedback_notice_is_dismissed() )
+      return;
 
     // Check if we already stored the status in a transient first
-
     $transient_name = NIMBLE_FEEDBACK_STATUS_TRANSIENT_ID;
     $transient_value = get_transient( $transient_name );
     if ( false != $transient_value ) {
-        return 'eligible' === $transient_value;
+        return $transient_value;
     }
 
     // If transient not set or expired, let's set it and return the feedback status
-    $start_version = get_option( 'nimble_started_with_version', NIMBLE_VERSION );
+    // $start_version = get_option( 'nimble_started_with_version', NIMBLE_VERSION );
 
     // Bail if user started after v2.1.20, October 22nd 2020 ( set on November 23th 2020 )
-    if ( !version_compare( $start_version, '2.1.20', '<=' ) )
-      return;
+    // if ( !version_compare( $start_version, '3.1.12', '<=' ) )
+    //   return;
 
     $sek_post_query_vars = array(
         'post_type'              => NIMBLE_CPT,
@@ -2926,19 +2923,6 @@ function sek_populate_list_of_modules_used( $seks_data ) {
             }
         }
     }
-}
-
-// Nov 2020 =
-function sek_feedback_notice_is_dismissed() {
-    $dismissed = get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true );
-    $dismissed_array = array_filter( explode( ',', (string) $dismissed ) );
-    return in_array( NIMBLE_FEEDBACK_NOTICE_ID, $dismissed_array );
-}
-
-// @uses get_user_meta( get_current_user_id(), 'nimble_user_transients', true );
-// populated in ajax class
-function sek_feedback_notice_is_postponed() {
-    return 'maybe_later' === get_transient( NIMBLE_FEEDBACK_NOTICE_ID );
 }
 
 ?><?php

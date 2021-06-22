@@ -417,7 +417,7 @@ nav.nb-collapsible-mobile-menu [data-sek-mm-state="expanded"] .menu-item-has-chi
 }
 
 .nb-dd-mm-toggle {
-  background: none;
+  background: none !important;
   -webkit-appearance: none;
   outline: none;
   border: none;
