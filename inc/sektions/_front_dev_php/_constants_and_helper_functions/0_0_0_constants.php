@@ -49,7 +49,7 @@ if ( !defined( 'NIMBLE_MODULE_ICON_PATH' ) ) { define( 'NIMBLE_MODULE_ICON_PATH'
 if ( !defined( 'NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID') ) { define( 'NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID' , 'czr-customize-content_editor' ); }
 
 // TRANSIENTS ID
-if ( !defined( 'NIMBLE_WELCOME_NOTICE_ID' ) ) { define ( 'NIMBLE_WELCOME_NOTICE_ID', 'nimble-welcome-notice-12-2018' ); }
+if ( !defined( 'NIMBLE_WELCOME_NOTICE_ID' ) ) { define ( 'NIMBLE_WELCOME_NOTICE_ID', 'nimble-welcome-notice-06-2021' ); }
 //mt_rand(0, 65535) . 'test-nimble-feedback-notice-04-2019'
 if ( !defined( 'NIMBLE_FEEDBACK_NOTICE_ID' ) ) { define ( 'NIMBLE_FEEDBACK_NOTICE_ID', 'nimble-feedback-notice-04-2019' ); }
 if ( !defined( 'NIMBLE_FAWESOME_TRANSIENT_ID' ) ) { define ( 'NIMBLE_FAWESOME_TRANSIENT_ID', 'sek_font_awesome_february_2020' ); }

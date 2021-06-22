@@ -47,6 +47,62 @@ a.czr-rating-link:hover {
     color: #eea236;
 }
 
+/* FEEDBACK NOTICE */
+.nimble-logo-feedback-notice {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  /* -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between; */
+}
+
+@keyframes bounce {
+	from, 20%, 53%, 80%, to {
+		animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+		transform: translate3d(0,0,0);
+	}
+
+	40%, 43% {
+		animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+		transform: translate3d(0, -12px, 0);
+	}
+
+	70% {
+		animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+		transform: translate3d(0, -6px, 0);
+	}
+
+	90% {
+		transform: translate3d(0,-1px,0);
+	}
+}
+
+.nimble-logo-feedback-notice .nimble-logo {
+  width: 50px;
+  -webkit-animation: bounce .7s 3;
+  animation: bounce .7s 3;
+  -webkit-transform-origin: center bottom;
+  -ms-transform-origin: center bottom;
+  transform-origin: center bottom;
+}
+.nimble-logo-feedback-notice .nimble-feedback {
+  padding: 0 10px;
+  font-size: 1em;
+  line-height: 1.5;
+  display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+}
+.nimble-logo-feedback-notice .nimble-feedback a { text-decoration: underline;}
+.nimble-logo-feedback-notice .nimble-feedback p { font-size: 14px;font-weight: 600;}
+
+
+
 
 /* Nimble btn in admin top bar */
 #wpadminbar .sek-nimble-icon {

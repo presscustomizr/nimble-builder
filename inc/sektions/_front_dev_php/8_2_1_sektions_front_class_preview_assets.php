@@ -151,17 +151,6 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                 $media = 'all'
             );
             wp_enqueue_script( 'jquery-ui-resizable' );
-
-            // March 2020
-            // if ( sek_get_feedback_notif_status() ) {
-            //     wp_enqueue_script(
-            //       'sek-confettis',
-            //       sprintf( '%1$s/assets/front/css/libs/confetti.browser.min.js', NIMBLE_BASE_URL ),
-            //       array(),
-            //       NIMBLE_ASSETS_VERSION,
-            //       true
-            //     );
-            // }
         }
 
 
