@@ -83,8 +83,8 @@ a.czr-rating-link:hover {
 
 .nimble-logo-feedback-notice .nimble-logo {
   width: 50px;
-  -webkit-animation: bounce .7s 3;
-  animation: bounce .7s 3;
+  -webkit-animation: bounce .7s 2;
+  animation: bounce .7s 2;
   -webkit-transform-origin: center bottom;
   -ms-transform-origin: center bottom;
   transform-origin: center bottom;

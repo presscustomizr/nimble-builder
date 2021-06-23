@@ -502,7 +502,7 @@ function sek_register_dashboard_widgets() {
       return;
 
     // Don't render when feedback notification is printed
-    if ( !(defined('NIMBLE_DEV') && NIMBLE_DEV ) && 'eligible' === sek_get_feedback_notif_status() && !sek_feedback_notice_is_dismissed() )
+    if ( !sek_is_pro() && !(defined('NIMBLE_DEV') && NIMBLE_DEV ) && 'eligible' === sek_get_feedback_notif_status() && !sek_feedback_notice_is_dismissed() )
       return;
 
     $theme_name = sek_get_parent_theme_slug();
