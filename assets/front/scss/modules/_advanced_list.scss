@@ -1,5 +1,67 @@
 // Advanced List Module
 .sek-module-inner {
-    [data-sek-adv-list-type="none"] > ul { list-style-type: none;}
+    [data-sek-adv-list-type="none"] > ul {
+        list-style-type: none;
+        @if ( true == $is_rtl ) {
+            margin-right: 0!important;//50px is the default size of the quote icon, this CSS rule is overriden in dyn CSS if user changes the font size of the icon
+        }
+        @else {
+            margin-left: 0!important;//50px is the default size of the quote icon, this CSS rule is overriden in dyn CSS if user changes the font size of the icon
+        }
+    }
     [data-sek-adv-list-type="circle"] > ul { list-style-type: circle;}
+    [data-sek-adv-list-type="disc"] > ul { list-style-type: disc;}
+    [data-sek-adv-list-type="square"] > ul { list-style-type: square;}
+    [data-sek-adv-list-type="decimal"] > ol { list-style-type: decimal;}
+    [data-sek-adv-list-type="lower-alpha"] > ol { list-style-type: lower-alpha;}
+    [data-sek-adv-list-type="lower-roman"] > ol { list-style-type: lower-roman;}
+    [data-sek-adv-list-type="upper-roman"] > ol { list-style-type: upper-roman;}
+    [data-sek-adv-list-type="upper-alpha"] > ol { list-style-type: upper-alpha;}
+    .sek-adv-list-wrapper ul, .sek-adv-list-wrapper ol {
+        padding: 0;
+        line-height: 1.5;
+        margin: 0;//reset all margins
+        @if ( true == $is_rtl ) {
+            margin-right: 25px;//50px is the default size of the quote icon, this CSS rule is overriden in dyn CSS if user changes the font size of the icon
+        }
+        @else {
+            margin-left: 25px;//50px is the default size of the quote icon, this CSS rule is overriden in dyn CSS if user changes the font size of the icon
+        }
+        li { display: list-item; text-indent: 0px;}
+    }
+    .sek-adv-list-item {
+        .sek-adv-list-item-inner {
+            padding: 2.5px 4px;//<= consistent with module registration value
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-align: center;
+            align-items: center;
+        }
+        .sek-adv-list-item-text {
+            -webkit-transition: color 0.2s ease-in-out;
+            -o-transition: color 0.2s ease-in-out;
+            transition: color 0.2s ease-in-out;
+            p { 
+                margin: 0;
+            }
+        }
+        .sek-adv-list-item-icon {margin-right: 10px;}// consistent with module registration value
+        [data-sek-icon-border="circle"], [data-sek-icon-border="square"] {
+            border: 1px solid;
+            width: 2em;
+            height: 2em;
+            display: -ms-flexbox;
+            display: -webkit-box;
+            display: flex;
+            -ms-flex-align: center;
+            -webkit-box-align: center;
+                    align-items: center;
+            -webkit-box-pack: center;
+                -ms-flex-pack: center;
+                    justify-content: center;
+        }
+        [data-sek-icon-border="circle"] {
+            border-radius: 1em;
+        }
+    }
 }
