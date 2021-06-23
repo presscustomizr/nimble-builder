@@ -61,7 +61,10 @@ module.exports = {
       '!assets/_deprecated_preset_sections.json',
 
       // front tests php
-      '!dev_logs.php'
+      '!dev_logs.php',
+
+      // nimblizer
+      '!inc/nimblizer/**',
     ],
     dest: '__build__/<%= pkg.name %>/'
   },
