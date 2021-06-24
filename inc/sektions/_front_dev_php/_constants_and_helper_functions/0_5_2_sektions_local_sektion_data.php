@@ -192,6 +192,15 @@ function sek_get_raw_section_registration_params() {
             'name' => __('Footer sections', 'text_doma'),
             'section_collection' => array(
                 array(
+                    'content-id' => 'footer_pro_one',
+                    'title' => __('simple 2 columns footer', 'text-domain' ),
+                    'thumb' => 'footer_pro_one.jpg',
+                    'section_type' => 'footer',
+                    'height' => '75px',
+                    'active' => sek_is_pro(),
+                    'is_pro' => true
+                ),
+                array(
                     'content-id' => 'footer_with_social_links_one',
                     'title' => __('footer with dynamic date, site title and social links', 'text-domain' ),
                     'thumb' => 'footer_with_social_links_one.jpg',
