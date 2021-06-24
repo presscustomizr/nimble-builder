@@ -296,7 +296,8 @@
                   has_mod_opt : false,
                   ready_on_section_expanded : false,
                   ready_on_control_event : 'sek-accordion-expanded',// triggered in ::scheduleModuleAccordion()
-                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_accordion_collection_child' )
+                  defaultItemModel : api.czr_sektions.getDefaultItemModelFromRegisteredModuleData( 'czr_accordion_collection_child' ),
+                  items_are_clonable : true
             },
       });
 })( wp.customize , jQuery, _ );
