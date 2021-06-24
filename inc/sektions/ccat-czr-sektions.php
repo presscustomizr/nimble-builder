@@ -1224,7 +1224,13 @@ function sek_print_nimble_input_templates() {
           <# } else { #>
             <div class="{{css_attr.item_title}}"><h4>{{ data.title }}</h4></div>
           <# } #>
-          <div class="{{css_attr.item_btns}}"><a title="<?php _e('Edit', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-pencil-alt {{css_attr.edit_view_btn}}"></a>&nbsp;<a title="<?php _e('Remove', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-trash {{css_attr.display_alert_btn}}"></a></div>
+          <div class="{{css_attr.item_btns}}">
+            <a title="<?php _e('Edit', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-pencil-alt {{css_attr.edit_view_btn}}"></a>&nbsp;
+            <# if ( ( true === data.items_are_clonable ) ) { #>
+              <a title="<?php _e('Clone', 'text_doma'); ?>" href="javascript:void(0);" class="far fa-clone czr-clone-item"></a>&nbsp;
+            <# } #>
+            <a title="<?php _e('Remove', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-trash {{css_attr.display_alert_btn}}"></a>
+          </div>
           <div class="{{css_attr.remove_alert_wrapper}}"></div>
         </div>
       </script>
