@@ -64,7 +64,7 @@ ul[id*="sub-accordion-section-__nimble__"] {
 }
 /* CONTROLS */
 li[id*="__nimble__"].customize-control {
-    margin: 8px 0;
+    margin: 4px 0;
     padding: 2px;
     width: calc( 100% - 4px );
     border: 1px solid rgba(221, 221, 221, 0.43);
@@ -72,7 +72,15 @@ li[id*="__nimble__"].customize-control {
     -webkit-box-shadow: 1px 1px 2px 0 rgba(75, 75, 85, 0.2);
     background-color: #fff;
 }
-
+li[id*="__nimble__"].customize-control .customize-control-title {
+  font-size: 13.5px;
+  line-height: 1.5em;
+  font-weight: normal;
+  margin-bottom: 4px;
+}
+li[id*="__nimble__"].customize-control label {
+  cursor: pointer;
+}
 li[id*="__nimble__"].customize-control span.customize-control-title:first-child {
   margin-left: 21px;
 }
