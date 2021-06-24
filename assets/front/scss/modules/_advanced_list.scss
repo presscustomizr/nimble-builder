@@ -27,8 +27,10 @@
         @else {
             margin-left: 25px;//50px is the default size of the quote icon, this CSS rule is overriden in dyn CSS if user changes the font size of the icon
         }
-        li { display: list-item; text-indent: 0px;}
+        li {text-indent: 0px;}
     }
+    [data-sek-adv-list-layout="vertical"] ul li {display: list-item;}
+    [data-sek-adv-list-layout="horizontal"] ul li {display: inline-block;}
     .sek-adv-list-item {
         .sek-adv-list-item-inner {
             padding: 2.5px 4px;//<= consistent with module registration value
@@ -44,12 +46,25 @@
             p { 
                 margin: 0;
             }
+            a {
+                cursor:pointer;
+                &:hover {
+                    text-decoration:underline;
+                }
+            }
         }
-        .sek-adv-list-item-icon {margin-right: 10px;}// consistent with module registration value
+        .sek-adv-list-item-icon {
+            margin-right: 10px;
+            -ms-flex-negative: 0;
+                flex-shrink: 0;
+            -webkit-box-flex: 0;
+                -ms-flex-positive: 0;
+                    flex-grow: 0;
+        }// consistent with module registration value
         [data-sek-icon-border="circle"], [data-sek-icon-border="square"] {
             border: 1px solid;
-            width: 2em;
-            height: 2em;
+            width: 2.2em;
+            height: 2.2em;
             display: -ms-flexbox;
             display: -webkit-box;
             display: flex;
@@ -61,7 +76,7 @@
                     justify-content: center;
         }
         [data-sek-icon-border="circle"] {
-            border-radius: 1em;
+            border-radius: 2em;
         }
     }
 }
