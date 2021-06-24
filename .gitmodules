@@ -1,6 +1,6 @@
-[submodule "addons/assets/czr/fmk"]
-  path = addons/assets/czr/fmk
-  url = https://github.com/presscustomizr/themes-customizer-fmk.git
-[submodule "inc/czr-base-fmk"]
-  path = addons/assets/czr/fmk
-  url = https://github.com/presscustomizr/czr-base-fmk.git
+# [submodule "addons/assets/czr/fmk"]
+#   path = addons/assets/czr/fmk
+#   url = https://github.com/presscustomizr/themes-customizer-fmk.git
+# [submodule "inc/czr-base-fmk"]
+#   path = addons/assets/czr/fmk
+#   url = https://github.com/presscustomizr/czr-base-fmk.git
