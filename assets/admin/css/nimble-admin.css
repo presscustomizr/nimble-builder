@@ -482,6 +482,27 @@ span.sek-title-after-icon {
   position: relative;
   bottom: 3px;
 }
+
+.sek-pro-link-in-plugins, .sek-pro-link-in-dashboard {
+  color: #f07829;
+  font-weight: bold;
+  text-decoration: none;
+  /* font-size: 19px; */
+}
+.sek-pro-link-in-dashboard { font-size: 17px;}
+.sek-pro-link-in-plugins:hover, .sek-pro-link-in-dashboard:hover {
+  text-decoration: underline;
+  color: #f07829;
+}
+.sek-pro-link-in-plugins .dashicons {
+  position: relative;
+  bottom: 1px;
+}
+#presscustomizr-dashboard .sek-pro-link-in-dashboard .dashicons {
+  font-size: 20px;
+  bottom: 3px;
+  position: relative;
+}
 /* DOC PAGE */
 .nimble-doc-img {
   max-width: 60%;

@@ -541,16 +541,23 @@ function sek_nimble_dashboard_callback_fn() {
             <?php endif; ?>
           </div>
         </div>
-        <?php printf( '<a href="%1$s" class="button button-primary button-hero"><span class="dashicons dashicons-admin-appearance"></span> %2$s</a>',
-          esc_url( add_query_arg(
-              array(
-                array( 'autofocus' => array( 'section' => '__content_picker__' ) ),
-                'return' => urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) )
-              ),
-              admin_url( 'customize.php' )
-          ) ),
-          __( 'Start building', 'nimble' )
-      ); ?>
+        <?php if ( sek_is_upsell_enabled() ) : ?>
+          <?php printf( '<a class="sek-pro-link-in-dashboard" href="https://presscustomizr.com/nimble-builder-pro/" rel="noopener noreferrer" title="Go Pro" target="_blank">%1$s <span class="dashicons dashicons-external"></span></a>',
+                __('Go Pro', 'text_domain')
+              );
+          ?>
+        <?php else : ?>
+          <?php printf( '<a href="%1$s" class="button button-primary button-hero"><span class="dashicons dashicons-admin-appearance"></span> %2$s</a>',
+            esc_url( add_query_arg(
+                array(
+                  array( 'autofocus' => array( 'section' => '__content_picker__' ) ),
+                  'return' => urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) )
+                ),
+                admin_url( 'customize.php' )
+            ) ),
+            __( 'Start building', 'nimble' )
+          ); ?>
+        <?php endif; ?>
       </div>
       <?php if ( !empty( $post_data ) ) : ?>
         <div class="nimble-post-list">
@@ -1044,16 +1051,22 @@ add_filter( 'plugin_row_meta', function($plugin_meta, $plugin_file, $plugin_data
         $is_pro_installed = false;
         $pro_slug = 'nimble-builder-pro/nimble-builder-pro.php';
         $installed_plugins = get_plugins();
-        $is_pro_installed = false;//array_key_exists( $pro_slug, $installed_plugins ) || in_array( $pro_slug, $installed_plugins, true );
+        $is_pro_installed = array_key_exists( $pro_slug, $installed_plugins ) || in_array( $pro_slug, $installed_plugins, true );
 
         if ( sek_is_dev_mode() || !$is_pro_installed ) {
             $plugin_meta = is_array($plugin_meta) ? $plugin_meta : [];
-            $plugin_meta[] = sprintf(
-              '<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s %3$s</a>',
-              'https://wordpress.org/support/plugin/nimble-builder/reviews/?filter=5/#new-post',
-              __( 'Enjoying Nimble Builder ? Share a review' ),
-              '<span style="color:#ffb900;font-size: 12px;">&#9733;&#9733;&#9733;&#9733;&#9733;</span>'
-            );
+            if ( sek_is_upsell_enabled() ) {
+              $plugin_meta[] = sprintf( '<a class="sek-pro-link-in-plugins" href="https://presscustomizr.com/nimble-builder-pro/" rel="noopener noreferrer" title="Go Pro" target="_blank">%1$s <span class="dashicons dashicons-external"></span></a>',
+                __('Go Pro', 'text_domain')
+              );
+            } else {
+              $plugin_meta[] = sprintf(
+                '<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s %3$s</a>',
+                'https://wordpress.org/support/plugin/nimble-builder/reviews/?filter=5/#new-post',
+                __( 'Enjoying Nimble Builder ? Share a review' ),
+                '<span style="color:#ffb900;font-size: 12px;">&#9733;&#9733;&#9733;&#9733;&#9733;</span>'
+              );
+            }
         }
     }
     return $plugin_meta;

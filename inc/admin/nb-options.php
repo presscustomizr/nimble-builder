@@ -465,12 +465,12 @@ do_action('nb_base_admin_options_registered');
 *  RESTRICT USERS
 /* ------------------------------------------------------------------------- */
 //register option tab and print the form
-if ( sek_is_pro() || ( defined( 'NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON ) ) {
+if ( sek_is_pro() || sek_is_upsell_enabled() ) {
     $restrict_users_title = __('Manage authorized users', 'text-doma');
     if ( !sek_is_pro() ) {
         $restrict_users_title = sprintf( '<span class="sek-pro-icon"><img src="%1$s" alt="Pro feature"></span><span class="sek-title-after-icon">%2$s</span>',
             NIMBLE_BASE_URL.'/assets/czr/sek/img/pro_orange.svg?ver='.NIMBLE_VERSION,
-            __('Restrict users', 'nimble' )
+            __('Manage authorized users', 'nimble' )
         );
     }
     nb_register_option_tab([

@@ -170,10 +170,10 @@ function sek_get_module_collection() {
 
 
 // September 2020 : filter the collection of modules
-// Removes pro upsell modules if NIMBLE_PRO_UPSELL_ON is false
+// Removes pro upsell modules if sek_is_upsell_enabled() is false
 // filter declared in inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php
 add_filter('sek_get_module_collection', function( $collection ) {
-    if ( defined('NIMBLE_PRO_UPSELL_ON') && NIMBLE_PRO_UPSELL_ON )
+    if ( sek_is_upsell_enabled() )
       return $collection;
 
     $filtered = [];
