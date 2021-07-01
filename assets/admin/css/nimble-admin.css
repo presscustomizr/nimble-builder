@@ -489,7 +489,7 @@ span.sek-title-after-icon {
   text-decoration: none;
   /* font-size: 19px; */
 }
-.sek-pro-link-in-dashboard { font-size: 17px;}
+.sek-pro-link-in-dashboard { font-size: 16px;min-width: 80px;}
 .sek-pro-link-in-plugins:hover, .sek-pro-link-in-dashboard:hover {
   text-decoration: underline;
   color: #f07829;
