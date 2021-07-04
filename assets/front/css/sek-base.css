@@ -1988,6 +1988,10 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
 
 .sek-module-inner .sek-adv-list-item .sek-adv-list-item-text {
   transition: color 0.2s ease-in-out;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -ms-flexbox;
+  display: flex;
 }
 
 .sek-module-inner .sek-adv-list-item .sek-adv-list-item-text p {
