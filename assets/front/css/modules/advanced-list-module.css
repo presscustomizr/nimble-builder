@@ -57,8 +57,6 @@
 .sek-module-inner .sek-adv-list-item .sek-adv-list-item-inner {
   display: -ms-flexbox;
   display: flex;
-  -ms-flex-align: center;
-  align-items: center;
 }
 
 .sek-module-inner .sek-adv-list-item .sek-adv-list-item-text {
