@@ -658,12 +658,17 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
     transition: -webkit-transform .35s ease-in-out,height .25s ease-in-out,background-color .45s ease-in-out;
     transition: transform .35s ease-in-out,height .25s ease-in-out,background-color .45s ease-in-out;
     padding: 15px;
+    // make sure NB cleans any icon printed ::after the label ( like in hueman theme for example )
+    [role=search].search-form label::after {
+        content: none;
+    }
 }
 
 [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner [role=search].search-form {
     display: flex;
     float: none;
 }
+
 [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner label input[type=search] {
     max-width: 100%;
 }
