@@ -26,7 +26,7 @@
       >*:not(:last-child) {
         margin-top: 0!important;
       }
-
+      overflow: hidden;
       .sek-pg-content {
         >*:not(:last-child) {
           margin-top: 0!important;
@@ -301,6 +301,50 @@
   }
 }//.sek-post-grid-wrapper COLUMN LAYOUT
 
+// Masonry
+.sek-module-inner .nb-masonry-post-grid {
+  // &.nb-waiting-for-images-to-be-loaded {
+    // article figure {
+    //   a {
+    //     height: auto!important;
+    //     padding-top: 0!important;
+    //   }
+    //   img {
+    //     position: relative;
+    //     height: auto;
+    //   }
+    // }
+
+  .sek-grid-items {
+    //display: grid;
+    // grid-gap: 10px;
+    //grid-template-columns: repeat(auto-fill, minmax(250px,1fr))!important;
+    //grid-auto-rows: 5px;
+    &.nb-masonry-grid-images-loaded {
+      grid-auto-rows: 5px;
+    }
+    article { overflow: hidden;}
+    &.sek-thumb-no-custom-height .sek-pg-thumbnail {
+      a {
+        height: auto;
+        padding-top: 0;
+      }
+      img {
+        position: relative;
+        height: auto;
+        width: 100%;
+      }
+    }
+  }
+}
+
+
+// Box shadow
+.sek-module-inner .nb-item-box-shadow .sek-grid-items article {
+  -webkit-box-shadow:  0 3px 8px rgba(0, 0, 0, 0.2);
+  box-shadow:  0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
 
 
 // PAGINATION LINKS
@@ -410,6 +454,9 @@
     font-size: 0.9em;
   }
 }
+
+
+
 
 
 // NOV 2020 : max column number grows from 4 to 12

@@ -505,12 +505,14 @@ if ( is_object( $post_query ) && $post_query->have_posts() ) {
 
   $shadow_class = true === sek_booleanize_checkbox_val( $main_settings['apply_shadow_on_hover'] ) ? 'sek-shadow-on-hover' : '';
 
-  $has_thumb_custom_height = true === sek_booleanize_checkbox_val( $thumb_settings['img_has_custom_height'] ) ? 'sek-thumb-custom-height' : '';
+  $has_thumb_custom_height = true === sek_booleanize_checkbox_val( $thumb_settings['img_has_custom_height'] ) ? 'sek-thumb-custom-height' : 'sek-thumb-no-custom-height';
 
   $tablet_breakpoint_class = true === sek_booleanize_checkbox_val( $main_settings['has_tablet_breakpoint'] ) ? 'sek-has-tablet-breakpoint' : '';
   $mobile_breakpoint_class = true === sek_booleanize_checkbox_val( $main_settings['has_mobile_breakpoint'] ) ? 'sek-has-mobile-breakpoint' : '';
 
-  $grid_wrapper_classes = implode(' ', [ $tablet_breakpoint_class, $mobile_breakpoint_class ] );
+  $grid_wrapper_classes = [ $tablet_breakpoint_class, $mobile_breakpoint_class ];
+  $grid_wrapper_classes = apply_filters('nb_grid_wrapper_classes', $grid_wrapper_classes, $main_settings );
+  $grid_wrapper_classes = implode(' ', $grid_wrapper_classes );
 
   $grid_items_classes = [ $layout_class, $has_thumb_custom_height, $shadow_class ];
 
@@ -526,7 +528,7 @@ if ( is_object( $post_query ) && $post_query->have_posts() ) {
   }
 
   $grid_items_classes = implode(' ', $grid_items_classes );
-
+  do_action( 'nb_before_post_grid_wrapper' );
   ?>
   <div class="sek-post-grid-wrapper <?php echo $grid_wrapper_classes; ?>" id="<?php echo $model['id']; ?>">
     <div class="sek-grid-items <?php echo $grid_items_classes; ?>">

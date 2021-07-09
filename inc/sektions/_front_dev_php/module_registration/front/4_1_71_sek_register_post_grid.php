@@ -223,13 +223,6 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'html_before' => '<hr>'
                 ),
 
-                'apply_shadow_on_hover' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Apply a shadow effect when hovering with the cursor', 'text_doma'),
-                    'default'     => false,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20'
-                ),
                 'content_padding' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Content blocks padding', 'text_doma'),
@@ -274,7 +267,15 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'title_width' => 'width-100',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true
-                )//null,
+                ),//null,
+                'apply_shadow_on_hover' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Apply a shadow effect when hovering with the cursor', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'html_before' => '<hr/>'
+                )
             )
         ),
         'render_tmpl_path' => '',
