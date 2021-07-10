@@ -23,6 +23,10 @@ function sek_get_module_params_for_czr_post_grid_module() {
  *  CHILD MAIN GRID SETTINGS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_post_grid_main_child() {
+    $pro_text = '';
+    if ( !sek_is_pro() ) {
+        $pro_text = sek_get_pro_notice_for_czr_input( __('create beautiful and fast loading masonry grids', 'text-doma') );
+    }
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_post_grid_main_child',
@@ -129,7 +133,8 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'html_before' => '<hr>',
-                    'refresh_stylesheet' => true //<= some CSS rules are layout dependant
+                    'refresh_stylesheet' => true, //<= some CSS rules are layout dependant
+                    'html_before' => $pro_text
                 ),//null,
                 'columns'  => array(
                     'input_type'  => 'range_simple_device_switcher',
