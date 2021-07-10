@@ -54,7 +54,7 @@ function sek_register_active_modules_on_front() {
 }
 
 
-// @param $skope_id added in april 2020 for for https://github.com/presscustomizr/nimble-builder/issues/657
+// @param $skope_id added in april 2020 for https://github.com/presscustomizr/nimble-builder/issues/657
 function sek_register_modules_when_not_customizing_and_not_ajaxing( $skope_id = '' ) {
     $contextually_actives_raw = sek_get_collection_of_contextually_active_modules( $skope_id );
     $contextually_actives_raw = array_keys( $contextually_actives_raw );
