@@ -71,9 +71,16 @@ if ( !function_exists( 'Nimble\sek_render_post_navigation') ) {
               // https://developer.wordpress.org/reference/classes/wp_query/#pagination-parameters
               $pagination_query_var = Nimble_Manager()->is_viewing_static_front_page ? 'page' :'paged';
               $paged = get_query_var($pagination_query_var);
+              $paged = $paged ? $paged : 1;
               $model = Nimble_Manager()->model;
-              $is_current_grid_paginated = isset($_GET['nb_grid_module_go_to']) && $model['id'] === $_GET['nb_grid_module_go_to'];
-              $paged = ( $paged && $is_current_grid_paginated ) ? $paged : 1;
+              $is_nimble_pagination = isset($_GET['nb_grid_module_go_to']);
+              $is_current_grid_paginated = $is_nimble_pagination && $model['id'] === $_GET['nb_grid_module_go_to'];
+              // When user clicked on a pagination link, NB adds query params to the url ( removed via js once the page is loaded )
+              // in this case, if there are several grids printed on the page we want to paginate only the paginated one
+              // otherwise, if the pagination is accessed directly, or if the page is refreshed, all grids should be paginated according to the get_query_var($pagination_query_var) param
+              if ( $is_nimble_pagination ) {
+                $paged = $is_current_grid_paginated ? $paged : 1;
+              }
 
               // filter to add nimble module id ( ex : #__nimble__b4b942df40e5 ) at the end of the url so we focus on grid when navigating pagination
               add_filter('paginate_links', 'Nimble\sek_filter_pagination_nav_url' );
