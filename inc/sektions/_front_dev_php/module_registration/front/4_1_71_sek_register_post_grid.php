@@ -1174,6 +1174,12 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             $main_settings['columns'],
             [ 'desktop' => '2', 'tablet' => '2', 'mobile' => '1' ]
         );
+        if ( sek_is_pro() && array_key_exists('min_column_width', $main_settings ) ) {
+            $min_column_width_by_device = wp_parse_args(
+                $main_settings['min_column_width'],
+                [ 'desktop' => '250', 'tablet' => '250', 'mobile' => '250' ]
+            );
+        }
 
         $col_css_rules = '';
         foreach ( $cols_by_device as $device => $col_nb ) {
@@ -1215,24 +1221,36 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             //       grid-column-gap: 20px;
             //       grid-row-gap: 20px;
             //     }
-            $ms_grid_columns = [];
-            // Up to 12 columns
-            for ($i=1; $i <= $col_nb; $i++) {
-                if ( $i > 1 ) {
-                    $col_gap = array_key_exists('col-'.$col_nb, $col_nb_gap_map ) ? $col_nb_gap_map['col-'.$col_nb] : '5px';
-                    $ms_grid_columns[] = $col_gap;
+            // July 2021 : introduction of the auto-fill rule in pro
+            if ( sek_is_pro() && array_key_exists('auto_fill', $main_settings) && sek_booleanize_checkbox_val($main_settings['auto_fill']) ) {
+                $min_col_width = 250;
+                if ( array_key_exists($device, $min_column_width_by_device ) ) {
+                    $min_col_width = intval( $min_column_width_by_device[$device] );
                 }
-                $ms_grid_columns[] = 'minmax(0,1fr)';
+                $grid_template_columns = "repeat(auto-fill, minmax({$min_col_width}px,1fr));";
+                // in this case, no need to add '-ms-grid-columns' rule
+                $col_css_rules = [
+                    'grid-template-columns:' . $grid_template_columns
+                ];
+            } else {
+                $ms_grid_columns = [];
+                // Up to 12 columns
+                for ($i=1; $i <= $col_nb; $i++) {
+                    if ( $i > 1 ) {
+                        $col_gap = array_key_exists('col-'.$col_nb, $col_nb_gap_map ) ? $col_nb_gap_map['col-'.$col_nb] : '5px';
+                        $ms_grid_columns[] = $col_gap;
+                    }
+                    $ms_grid_columns[] = 'minmax(0,1fr)';
+                }
+
+                $ms_grid_columns = implode(' ', $ms_grid_columns);
+
+                $grid_template_columns = "repeat({$col_nb}, minmax(0,1fr))";
+                $col_css_rules = [
+                    '-ms-grid-columns:' . $ms_grid_columns,
+                    'grid-template-columns:' . $grid_template_columns
+                ];
             }
-
-            $ms_grid_columns = implode(' ', $ms_grid_columns);
-
-            $grid_template_columns = "repeat({$col_nb}, minmax(0,1fr))";
-
-            $col_css_rules = [
-                '-ms-grid-columns:' . $ms_grid_columns,
-                'grid-template-columns:' . $grid_template_columns
-            ];
 
             if ( $col_nb > 1 ) {
                 $col_gap = array_key_exists('col-'.$col_nb, $col_nb_gap_map ) ? $col_nb_gap_map['col-'.$col_nb] : '5px';
