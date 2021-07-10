@@ -1115,11 +1115,11 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
         // BASE CSS RULES
         // .sek-grid-layout.sek-all-col-1 {
         //   -ms-grid-columns: minmax(0,1fr);
-        //   grid-template-columns: minmax(0,1fr);
+        //   grid-template-columns: repeat(1, minmax(0,1fr));
         // }
         // .sek-grid-layout.sek-all-col-2 {
         //   -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr);
-        //   grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+        //   grid-template-columns: repeat(2, minmax(0,1fr));
         //   grid-column-gap: 20px;
         //   grid-row-gap: 20px;
         // }
@@ -1141,17 +1141,16 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
         foreach ($col_nb_gap_map as $col_nb_index => $col_gap) {
             $col_nb = intval( str_replace('col-', '', $col_nb_index ) );
             $ms_grid_columns = [];
-            $grid_template_columns = [];
             // Up to 12 columns
             for ($j=1; $j <= $col_nb; $j++) {
                 if ( $j > 1 ) {
                     $ms_grid_columns[] = $col_gap;
                 }
                 $ms_grid_columns[] = 'minmax(0,1fr)';
-                $grid_template_columns[] = 'minmax(0,1fr)';
             }
             $ms_grid_columns = implode(' ', $ms_grid_columns);
-            $grid_template_columns = implode(' ', $grid_template_columns);
+
+            $grid_template_columns = "repeat({$col_nb}, minmax(0,1fr))";
 
             $col_css_rules = [
                 '-ms-grid-columns:' . $ms_grid_columns,
@@ -1208,16 +1207,15 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             // CSS RULES
             //     .sek-grid-layout.sek-desktop-col-1 {
             //       -ms-grid-columns: minmax(0,1fr);
-            //       grid-template-columns: minmax(0,1fr);
+            //       grid-template-columns: repeat(1, minmax(0,1fr));
             //     }
             //     .sek-grid-layout.sek-desktop-col-2 {
             //       -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr);
-            //       grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+            //       grid-template-columns: repeat(2, minmax(0,1fr));
             //       grid-column-gap: 20px;
             //       grid-row-gap: 20px;
             //     }
             $ms_grid_columns = [];
-            $grid_template_columns = [];
             // Up to 12 columns
             for ($i=1; $i <= $col_nb; $i++) {
                 if ( $i > 1 ) {
@@ -1225,11 +1223,11 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
                     $ms_grid_columns[] = $col_gap;
                 }
                 $ms_grid_columns[] = 'minmax(0,1fr)';
-                $grid_template_columns[] = 'minmax(0,1fr)';
             }
 
             $ms_grid_columns = implode(' ', $ms_grid_columns);
-            $grid_template_columns = implode(' ', $grid_template_columns);
+
+            $grid_template_columns = "repeat({$col_nb}, minmax(0,1fr))";
 
             $col_css_rules = [
                 '-ms-grid-columns:' . $ms_grid_columns,
