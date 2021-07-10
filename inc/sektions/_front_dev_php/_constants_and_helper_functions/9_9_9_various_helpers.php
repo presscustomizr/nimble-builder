@@ -403,7 +403,7 @@ function sek_get_pro_notice_for_czr_input( $features = '' ) {
       __('Unlock more features with Nimble Builder Pro', 'text-doma'),
       $features,
       sprintf('<a href="%1$s" rel="noopener noreferrer" title="%2$s" target="_blank">%2$s <i class="fas fa-external-link-alt"></i></a>',
-          'https://presscustomizr.com/nimble-builder-pro/',
+          'https://presscustomizr.com/nimble-builder-pro/?utm_source=usersite&utm_medium=link&utm_campaign=czr',
           __('Go Pro', 'text-doma')
       )
   );
