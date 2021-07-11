@@ -58,10 +58,12 @@
 
   // POST THUMBNAIL
   .sek-pg-thumbnail {
-    box-shadow: 0 5px 5px 0 rgba(18,63,82,.035), 0 0 0 1px rgba(176,181,193,.2);
-    background-color: #fff;
+    img {
+      box-shadow: 0 5px 5px 0 rgba(18,63,82,.035), 0 0 0 1px rgba(176,181,193,.2);
+      border-radius: 4px;
+    }
+    background: inherit;
     overflow: hidden;
-    border-radius: 4px;
     // padding: 60px 35px;
     // --box-padding-vert: 60px;
     // --box-padding-hori: 35px;
@@ -78,6 +80,12 @@
       height: auto;
     }
   }//.sek-pg-thumbnail
+
+  // Item box shadow
+  &.nb-thumb-box-shadow article .sek-pg-thumbnail img {
+    -webkit-box-shadow:  0 3px 8px rgba(0, 0, 0, 0.2);
+    box-shadow:  0 3px 8px rgba(0, 0, 0, 0.2);
+  }
 
   // POST THUMBNAIL WITH CUSTOM HEIGHT
   // we set the height of the image container ( <a> tag ), with the padding property
@@ -339,11 +347,12 @@
 }
 
 
-// Box shadow
+// Item box shadow
 .sek-module-inner .nb-item-box-shadow .sek-grid-items article {
   -webkit-box-shadow:  0 3px 8px rgba(0, 0, 0, 0.2);
   box-shadow:  0 3px 8px rgba(0, 0, 0, 0.2);
 }
+
 
 
 

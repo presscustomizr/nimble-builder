@@ -25,7 +25,7 @@ function sek_get_module_params_for_czr_post_grid_module() {
 function sek_get_module_params_for_czr_post_grid_main_child() {
     $pro_text = '';
     if ( !sek_is_pro() ) {
-        $pro_text = sek_get_pro_notice_for_czr_input( __('create beautiful and fast loading masonry grids', 'text-doma') );
+        $pro_text = sek_get_pro_notice_for_czr_input( __('includes masonry grid, and various options like shadow, background color, border, spacing...', 'text-doma') );
     }
     return array(
         'dynamic_registration' => true,
@@ -362,7 +362,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'border_radius',
-                    'css_selectors'=> '.sek-pg-thumbnail'
+                    'css_selectors'=> '.sek-pg-thumbnail img'
                 ),
                 'use_post_thumb_placeholder' => array(
                     'input_type'  => 'nimblecheck',
