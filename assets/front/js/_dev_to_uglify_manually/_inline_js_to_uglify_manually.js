@@ -37,7 +37,6 @@ window.nb_ = {};
           return relList.supports('preload');
         },
         listenTo : function( evt, func ) {
-            // console.log('LISTENED TO', evt );
             // store it, so if the event has been emitted before the listener is fired, we know it's been emitted
             nb_.eventsListenedTo.push(evt);
 
@@ -56,7 +55,6 @@ window.nb_ = {};
                     return;
                 }
                 func();
-                // // console.log('LISTENED TO', evt );
                 // // store it, so if the event has been emitted before the listener is fired, we know it's been emitted
                 // nb_.eventsListenedTo.push(evt);
             };
@@ -80,7 +78,7 @@ window.nb_ = {};
             var _fire_once = nb_.isUndefined( params ) || params.fire_once;
             if ( _fire_once && nb_.wasEmitted(evt) )
               return;
-            //console.log('emitted event', evt );
+
             // it is possible to add params when dispatching the event, but we need to use new CustomEvent with a polyfill for IE
             // see : https://stackoverflow.com/questions/18613456/trigger-event-with-parameters
             var _evt = document.createEvent('Event');
@@ -149,12 +147,18 @@ window.nb_ = {};
                         }
                         headTag.appendChild(_script);
                         // clean the loader link
-                        if ( link && link.parentNode ) {
-                            link.parentNode.removeChild(link);
-                        }
+                        _maybeRemoveScriptEl.call(link);
                     }
                     if ( params.eventOnLoad ) {
                         nb_.emit( params.eventOnLoad );
+                    }
+                },
+                _maybeRemoveScriptEl = function() {
+                    var _el = this;
+                    if ( _el && _el.parentNode && _el.parentNode.contains(_el) ) {
+                        try{_el.parentNode.removeChild(_el);} catch(er) {
+                            nb_.errorLog('NB error when removing a script el', el);
+                        }
                     }
                 };
 
@@ -217,9 +221,7 @@ window.nb_ = {};
             nb_.preloadedAssets.push( params.id );
 
             // clean the script element from which preload has been requested
-            if ( params.scriptEl && params.scriptEl.parentNode ) {
-                params.scriptEl.parentNode.removeChild(params.scriptEl);
-            }
+            _maybeRemoveScriptEl.call(params.scriptEl);
         },
         mayBeRevealBG : function() {
             var imgSrc = this.getAttribute('data-sek-src');
@@ -289,6 +291,10 @@ window.nb_ = {};
     }
 
 }(window, document ));
+
+
+
+
 
 
 
