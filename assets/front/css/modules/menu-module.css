@@ -580,6 +580,10 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
   padding: 15px;
 }
 
+.nb-search-expand .nb-search-expand-inner [role=search].search-form label::after {
+  content: none;
+}
+
 [data-sek-module-type="czr_menu_module"] .nb-search-expand .nb-search-expand-inner [role=search].search-form {
   display: -ms-flexbox;
   display: flex;

@@ -2898,7 +2898,7 @@ function sek_get_feedback_notif_status() {
     // sek_error_log('$modules_used ?? ' . count($modules_used), $modules_used );
     // sek_error_log('$customized_pages ??', $customized_pages );
     //version_compare( $this->wp_version, '4.1', '>=' )
-    if ( $customized_pages > 2 && $nb_section_created > 4 && count($modules_used) > 3 ) {
+    if ( $customized_pages > 1 && $nb_section_created > 4 && count($modules_used) > 3 ) {
         $transient_value = 'eligible';
     }
     set_transient( $transient_name, $transient_value, 7 * DAY_IN_SECONDS );
@@ -3407,7 +3407,7 @@ function sek_get_pro_notice_for_czr_input( $features = '' ) {
       __('Unlock more features with Nimble Builder Pro', 'text-doma'),
       $features,
       sprintf('<a href="%1$s" rel="noopener noreferrer" title="%2$s" target="_blank">%2$s <i class="fas fa-external-link-alt"></i></a>',
-          'https://presscustomizr.com/nimble-builder-pro/',
+          'https://presscustomizr.com/nimble-builder-pro/?utm_source=usersite&utm_medium=link&utm_campaign=czr',
           __('Go Pro', 'text-doma')
       )
   );
@@ -3883,7 +3883,7 @@ function sek_get_raw_section_registration_params() {
                     'thumb' => 'pro_intro_two.jpg',
                     'active' => sek_is_pro(),
                     'is_pro' => true,
-                    'demo_url' => 'https://nimblebuilder.com/special-image-demo/'
+                    'demo_url' => 'https://nimblebuilder.com/special-image-demo?utm_source=usersite&utm_medium=link&utm_campaign=section_demos'
                 ),
                 array(
                     'content-id' => 'pro_intro_one',
@@ -3892,6 +3892,34 @@ function sek_get_raw_section_registration_params() {
                     'active' => sek_is_pro(),
                     'is_pro' => true,
                     'demo_url' => '#intro-four'
+                )
+            )
+        ],
+        'sek_post_grids_sec_picker_module' => [
+            'name' => __('Post lists sections', 'text_doma'),
+            'section_collection' => array(
+                array(
+                    'content-id' => 'grid_one',
+                    'title' => __('Simple post grid', 'text-domain' ),
+                    'thumb' => 'grid_one.jpg',
+                    'demo_url' => 'https://nimblebuilder.com/post-grid-sections?utm_source=usersite&utm_medium=link&utm_campaign=section_demos#grid-one'
+                    //'height' => '188px'
+                ),
+                array(
+                    'content-id' => 'grid_two',
+                    'title' => __('Posts on two columns', 'text-domain' ),
+                    'thumb' => 'grid_two.jpg',
+                    'demo_url' => 'https://nimblebuilder.com/post-grid-sections?utm_source=usersite&utm_medium=link&utm_campaign=section_demos#grid-two'
+                    //'height' => '188px'
+                ),
+                array(
+                    'content-id' => 'pro_grid_one',
+                    'title' => __('Masonry post grid', 'text-domain' ),
+                    'thumb' => 'pro_grid_one.jpg',
+                    'demo_url' => 'https://nimblebuilder.com/post-grid-sections?utm_source=usersite&utm_medium=link&utm_campaign=section_demos#pro-grid-one',
+                    'active' => sek_is_pro(),
+                    'is_pro' => true
+                    //'height' => '188px'
                 )
             )
         ],

@@ -1792,7 +1792,7 @@ function sek_print_nimble_input_templates() {
                   if ( secParams['demo_url'] && -1 === secParams['demo_url'].indexOf('http') ) { #>
                     <div class="sek-demo-link"><a href="https://nimblebuilder.com/nimble-builder-sections?utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=section_demos{{secParams['demo_url']}}" target="_blank" rel="noopener noreferrer">{{demo_title}} <i class="fas fa-external-link-alt"></i></a></div>
                   <# } else if ( secParams['demo_url'] ) { #>
-                    <div class="sek-demo-link"><a href="{{secParams['demo_url']}}?utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=section_demos" target="_blank" rel="noopener noreferrer">{{demo_title}} <i class="fas fa-external-link-alt"></i></a></div>
+                    <div class="sek-demo-link"><a href="{{secParams['demo_url']}}" target="_blank" rel="noopener noreferrer">{{demo_title}} <i class="fas fa-external-link-alt"></i></a></div>
                   <# } #>
                 </div>
                 <#

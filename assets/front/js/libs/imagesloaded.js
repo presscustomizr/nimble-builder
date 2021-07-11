@@ -143,7 +143,7 @@
       );
     } else {
       // browser global
-      window.imagesLoaded = factory(
+      window.nimbleImagesLoaded = factory(
         window,
         window.EvEmitter
       );
@@ -481,7 +481,7 @@
     // set local variable
     $ = jQuery;
     // $().imagesLoaded()
-    $.fn.imagesLoaded = function( options, callback ) {
+    $.fn.nimbleImagesLoaded = function( options, callback ) {
       var instance = new ImagesLoaded( this, options, callback );
       return instance.jqDeferred.promise( $(this) );
     };
@@ -494,5 +494,4 @@
   return ImagesLoaded;
   
   });
-  console.log('IMAGE LOADED LIB PARSED!!');
   nb_.emit('nb-image-loaded-lib-parsed');

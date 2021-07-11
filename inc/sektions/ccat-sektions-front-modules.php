@@ -3912,6 +3912,10 @@ function sek_get_module_params_for_czr_post_grid_module() {
  *  CHILD MAIN GRID SETTINGS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_post_grid_main_child() {
+    $pro_text = '';
+    if ( !sek_is_pro() ) {
+        $pro_text = sek_get_pro_notice_for_czr_input( __('includes masonry grid, and various options like shadow, background color, border, spacing...', 'text-doma') );
+    }
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_post_grid_main_child',
@@ -4018,7 +4022,8 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'html_before' => '<hr>',
-                    'refresh_stylesheet' => true //<= some CSS rules are layout dependant
+                    'refresh_stylesheet' => true, //<= some CSS rules are layout dependant
+                    'html_before' => $pro_text
                 ),//null,
                 'columns'  => array(
                     'input_type'  => 'range_simple_device_switcher',
@@ -4112,13 +4117,6 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'html_before' => '<hr>'
                 ),
 
-                'apply_shadow_on_hover' => array(
-                    'input_type'  => 'nimblecheck',
-                    'title'       => __('Apply a shadow effect when hovering with the cursor', 'text_doma'),
-                    'default'     => false,
-                    'title_width' => 'width-80',
-                    'input_width' => 'width-20'
-                ),
                 'content_padding' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
                     'title'       => __('Content blocks padding', 'text_doma'),
@@ -4163,7 +4161,15 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                     'title_width' => 'width-100',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true
-                )//null,
+                ),//null,
+                'apply_shadow_on_hover' => array(
+                    'input_type'  => 'nimblecheck',
+                    'title'       => __('Apply a shadow effect when hovering with the cursor', 'text_doma'),
+                    'default'     => false,
+                    'title_width' => 'width-80',
+                    'input_width' => 'width-20',
+                    'html_before' => '<hr/>'
+                )
             )
         ),
         'render_tmpl_path' => '',
@@ -4245,7 +4251,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'css_identifier' => 'border_radius',
-                    'css_selectors'=> '.sek-pg-thumbnail'
+                    'css_selectors'=> '.sek-pg-thumbnail img'
                 ),
                 'use_post_thumb_placeholder' => array(
                     'input_type'  => 'nimblecheck',
@@ -5003,11 +5009,11 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
         // BASE CSS RULES
         // .sek-grid-layout.sek-all-col-1 {
         //   -ms-grid-columns: minmax(0,1fr);
-        //   grid-template-columns: minmax(0,1fr);
+        //   grid-template-columns: repeat(1, minmax(0,1fr));
         // }
         // .sek-grid-layout.sek-all-col-2 {
         //   -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr);
-        //   grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+        //   grid-template-columns: repeat(2, minmax(0,1fr));
         //   grid-column-gap: 20px;
         //   grid-row-gap: 20px;
         // }
@@ -5029,17 +5035,16 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
         foreach ($col_nb_gap_map as $col_nb_index => $col_gap) {
             $col_nb = intval( str_replace('col-', '', $col_nb_index ) );
             $ms_grid_columns = [];
-            $grid_template_columns = [];
             // Up to 12 columns
             for ($j=1; $j <= $col_nb; $j++) {
                 if ( $j > 1 ) {
                     $ms_grid_columns[] = $col_gap;
                 }
                 $ms_grid_columns[] = 'minmax(0,1fr)';
-                $grid_template_columns[] = 'minmax(0,1fr)';
             }
             $ms_grid_columns = implode(' ', $ms_grid_columns);
-            $grid_template_columns = implode(' ', $grid_template_columns);
+
+            $grid_template_columns = "repeat({$col_nb}, minmax(0,1fr))";
 
             $col_css_rules = [
                 '-ms-grid-columns:' . $ms_grid_columns,
@@ -5063,6 +5068,12 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             $main_settings['columns'],
             [ 'desktop' => '2', 'tablet' => '2', 'mobile' => '1' ]
         );
+        if ( sek_is_pro() && array_key_exists('min_column_width', $main_settings ) ) {
+            $min_column_width_by_device = wp_parse_args(
+                $main_settings['min_column_width'],
+                [ 'desktop' => '250', 'tablet' => '250', 'mobile' => '250' ]
+            );
+        }
 
         $col_css_rules = '';
         foreach ( $cols_by_device as $device => $col_nb ) {
@@ -5096,33 +5107,44 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             // CSS RULES
             //     .sek-grid-layout.sek-desktop-col-1 {
             //       -ms-grid-columns: minmax(0,1fr);
-            //       grid-template-columns: minmax(0,1fr);
+            //       grid-template-columns: repeat(1, minmax(0,1fr));
             //     }
             //     .sek-grid-layout.sek-desktop-col-2 {
             //       -ms-grid-columns: minmax(0,1fr) 20px minmax(0,1fr);
-            //       grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+            //       grid-template-columns: repeat(2, minmax(0,1fr));
             //       grid-column-gap: 20px;
             //       grid-row-gap: 20px;
             //     }
-            $ms_grid_columns = [];
-            $grid_template_columns = [];
-            // Up to 12 columns
-            for ($i=1; $i <= $col_nb; $i++) {
-                if ( $i > 1 ) {
-                    $col_gap = array_key_exists('col-'.$col_nb, $col_nb_gap_map ) ? $col_nb_gap_map['col-'.$col_nb] : '5px';
-                    $ms_grid_columns[] = $col_gap;
+            // July 2021 : introduction of the auto-fill rule in pro
+            if ( sek_is_pro() && array_key_exists('auto_fill', $main_settings) && sek_booleanize_checkbox_val($main_settings['auto_fill']) ) {
+                $min_col_width = 250;
+                if ( array_key_exists($device, $min_column_width_by_device ) ) {
+                    $min_col_width = intval( $min_column_width_by_device[$device] );
                 }
-                $ms_grid_columns[] = 'minmax(0,1fr)';
-                $grid_template_columns[] = 'minmax(0,1fr)';
+                $grid_template_columns = "repeat(auto-fill, minmax({$min_col_width}px,1fr));";
+                // in this case, no need to add '-ms-grid-columns' rule
+                $col_css_rules = [
+                    'grid-template-columns:' . $grid_template_columns
+                ];
+            } else {
+                $ms_grid_columns = [];
+                // Up to 12 columns
+                for ($i=1; $i <= $col_nb; $i++) {
+                    if ( $i > 1 ) {
+                        $col_gap = array_key_exists('col-'.$col_nb, $col_nb_gap_map ) ? $col_nb_gap_map['col-'.$col_nb] : '5px';
+                        $ms_grid_columns[] = $col_gap;
+                    }
+                    $ms_grid_columns[] = 'minmax(0,1fr)';
+                }
+
+                $ms_grid_columns = implode(' ', $ms_grid_columns);
+
+                $grid_template_columns = "repeat({$col_nb}, minmax(0,1fr))";
+                $col_css_rules = [
+                    '-ms-grid-columns:' . $ms_grid_columns,
+                    'grid-template-columns:' . $grid_template_columns
+                ];
             }
-
-            $ms_grid_columns = implode(' ', $ms_grid_columns);
-            $grid_template_columns = implode(' ', $grid_template_columns);
-
-            $col_css_rules = [
-                '-ms-grid-columns:' . $ms_grid_columns,
-                'grid-template-columns:' . $grid_template_columns
-            ];
 
             if ( $col_nb > 1 ) {
                 $col_gap = array_key_exists('col-'.$col_nb, $col_nb_gap_map ) ? $col_nb_gap_map['col-'.$col_nb] : '5px';
