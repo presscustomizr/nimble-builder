@@ -59,7 +59,7 @@ function sek_get_raw_section_registration_params() {
                     'thumb' => 'pro_intro_two.jpg',
                     'active' => sek_is_pro(),
                     'is_pro' => true,
-                    'demo_url' => 'https://nimblebuilder.com/special-image-demo/'
+                    'demo_url' => 'https://nimblebuilder.com/special-image-demo?utm_source=usersite&utm_medium=link&utm_campaign=section_demos'
                 ),
                 array(
                     'content-id' => 'pro_intro_one',
@@ -78,21 +78,21 @@ function sek_get_raw_section_registration_params() {
                     'content-id' => 'grid_one',
                     'title' => __('Simple post grid', 'text-domain' ),
                     'thumb' => 'grid_one.jpg',
-                    'demo_url' => 'https://nimblebuilder.com/post-grid-sections/#grid-one'
+                    'demo_url' => 'https://nimblebuilder.com/post-grid-sections?utm_source=usersite&utm_medium=link&utm_campaign=section_demos#grid-one'
                     //'height' => '188px'
                 ),
                 array(
                     'content-id' => 'grid_two',
                     'title' => __('Posts on two columns', 'text-domain' ),
                     'thumb' => 'grid_two.jpg',
-                    'demo_url' => 'https://nimblebuilder.com/post-grid-sections/#grid-two'
+                    'demo_url' => 'https://nimblebuilder.com/post-grid-sections?utm_source=usersite&utm_medium=link&utm_campaign=section_demos#grid-two'
                     //'height' => '188px'
                 ),
                 array(
                     'content-id' => 'pro_grid_one',
                     'title' => __('Masonry post grid', 'text-domain' ),
                     'thumb' => 'pro_grid_one.jpg',
-                    'demo_url' => 'https://nimblebuilder.com/post-grid-sections/#pro-grid-one',
+                    'demo_url' => 'https://nimblebuilder.com/post-grid-sections?utm_source=usersite&utm_medium=link&utm_campaign=section_demos#pro-grid-one',
                     'active' => sek_is_pro(),
                     'is_pro' => true
                     //'height' => '188px'
