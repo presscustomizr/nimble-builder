@@ -71,6 +71,34 @@ function sek_get_raw_section_registration_params() {
                 )
             )
         ],
+        'sek_post_grids_sec_picker_module' => [
+            'name' => __('Post lists sections', 'text_doma'),
+            'section_collection' => array(
+                array(
+                    'content-id' => 'grid_one',
+                    'title' => __('Simple post grid', 'text-domain' ),
+                    'thumb' => 'grid_one.jpg',
+                    'demo_url' => 'https://nimblebuilder.com/post-grid-sections/#grid-one'
+                    //'height' => '188px'
+                ),
+                array(
+                    'content-id' => 'grid_two',
+                    'title' => __('Posts on two columns', 'text-domain' ),
+                    'thumb' => 'grid_two.jpg',
+                    'demo_url' => 'https://nimblebuilder.com/post-grid-sections/#grid-two'
+                    //'height' => '188px'
+                ),
+                array(
+                    'content-id' => 'pro_grid_one',
+                    'title' => __('Masonry post grid', 'text-domain' ),
+                    'thumb' => 'pro_grid_one.jpg',
+                    'demo_url' => 'https://nimblebuilder.com/post-grid-sections/#pro-grid-one',
+                    'active' => sek_is_pro(),
+                    'is_pro' => true
+                    //'height' => '188px'
+                )
+            )
+        ],
         'sek_features_sec_picker_module' => [
             'name' => __('Sections for services and features', 'text_doma'),
             'section_collection' => array(

@@ -48,7 +48,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               expandAndFocusOnInit : false,
                               priority : 10,
                               icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>',
-                              is_new : true
+                              is_new : false
                         },
                   });//
 
@@ -60,6 +60,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   _.each([
                         'sek_intro_sec_picker_module',
                         'sek_features_sec_picker_module',
+                        'sek_post_grids_sec_picker_module',
                         'sek_about_sec_picker_module',
                         'sek_contact_sec_picker_module',
                         'sek_team_sec_picker_module',
@@ -74,7 +75,8 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               content_type : 'section',
                               expandAndFocusOnInit : 0 === key,//<= first section group is expanded on start
                               priority : 30,
-                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>'
+                              icon : '<i class="fas fa-grip-vertical sek-level-option-icon"></i>',
+                              is_new : 'sek_post_grids_sec_picker_module' === mod_type
                         };
                   });
 
