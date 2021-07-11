@@ -518,7 +518,7 @@ if ( is_object( $post_query ) && $post_query->have_posts() ) {
   $mobile_breakpoint_class = true === sek_booleanize_checkbox_val( $main_settings['has_mobile_breakpoint'] ) ? 'sek-has-mobile-breakpoint' : '';
 
   $grid_wrapper_classes = [ $tablet_breakpoint_class, $mobile_breakpoint_class ];
-  $grid_wrapper_classes = apply_filters('nb_grid_wrapper_classes', $grid_wrapper_classes, $main_settings );
+  $grid_wrapper_classes = apply_filters('nb_grid_wrapper_classes', $grid_wrapper_classes, $value );
   $grid_wrapper_classes = implode(' ', $grid_wrapper_classes );
 
   $grid_items_classes = [ $layout_class, $has_thumb_custom_height, $shadow_class ];
