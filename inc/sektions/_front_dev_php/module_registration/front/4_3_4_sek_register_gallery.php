@@ -1,7 +1,7 @@
 <?php
 
 /* ------------------------------------------------------------------------- *
- *  LOAD AND REGISTER ACCORDION MODULE
+ *  LOAD AND REGISTER GALLERY MODULE
 /* ------------------------------------------------------------------------- */
 //Fired in add_action( 'after_setup_theme', 'sek_register_modules', 50 );
 function sek_get_module_params_for_czr_gallery_module() {
@@ -13,7 +13,7 @@ function sek_get_module_params_for_czr_gallery_module() {
             'gallery_collec' => 'czr_gallery_collection_child',
             'gallery_opts' => 'czr_gallery_opts_child'
         ),
-        'name' => __('Accordion', 'text_doma'),
+        'name' => __('Gallery', 'text_doma'),
         'starting_value' => array(
             'gallery_collec' => array(
                 array('text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'),
@@ -146,7 +146,7 @@ function sek_get_module_params_for_czr_gallery_collection_child() {
 
 
 /* ------------------------------------------------------------------------- *
- *  ACCORDION OPTIONS
+ *  GALLERY OPTIONS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_gallery_opts_child() {
     $title_content_selector = array( '.sek-accord-item .sek-accord-title *' );
@@ -154,7 +154,7 @@ function sek_get_module_params_for_czr_gallery_opts_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_gallery_opts_child',
-        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">tune</i> %1$s', __( 'Accordion options : font style, borders, background, ...', 'text_doma' ) ),
+        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">tune</i> %1$s', __( 'Gallery options', 'text_doma' ) ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         //     'button_text' => __('Click me','text_doma'),
