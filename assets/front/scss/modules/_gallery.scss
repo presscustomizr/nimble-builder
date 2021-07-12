@@ -1,3 +1,46 @@
+// COLUMN LAYOUT
+.sek-gal-wrapper {
+    .sek-gal-items {
+      display: -ms-grid;
+      display: grid;
+      -ms-grid-columns: 1fr 20px 1fr;
+      grid-template-columns: 1fr 1fr;
+      -ms-grid-rows: 1fr;
+      grid-template-rows: 1fr;
+      grid-row-gap: 20px;
+      grid-column-gap: 20px;
+      // Fix for ie11. @see https://github.com/presscustomizr/nimble-builder/issues/450
+      @media all and (-ms-high-contrast:none) {
+        display: block!important;
+      }
+    }
+    // The following has been added automatically when autoprefixing with https://autoprefixer.github.io/
+    // not sure why...
+    .sek-gal-items > *:nth-child(1) {
+      -ms-grid-row: 1;
+      -ms-grid-column: 1;
+    }
+    .sek-gal-items > *:nth-child(2) {
+      -ms-grid-row: 1;
+      -ms-grid-column: 3;
+    }
+
+    // images
+    .sek-img-gal-item {
+        img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+        }
+    }
+  }//.sek-post-grid-wrapper COLUMN LAYOUT
+  
+
+
+
+
+
+
 // synchronized with default on registration
 // [data-sek-module-type="czr_accordion_module"] .#{$project-prefix}module-inner {
 //   text-align: center;

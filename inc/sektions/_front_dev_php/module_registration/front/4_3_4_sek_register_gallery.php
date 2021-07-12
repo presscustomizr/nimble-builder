@@ -16,14 +16,14 @@ function sek_get_module_params_for_czr_gallery_module() {
         'name' => __('Gallery', 'text_doma'),
         'starting_value' => array(
             'gallery_collec' => array(
-                array('text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'),
-                array('text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'),
-                array('text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.')
+                array( 'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png' ),
+                array( 'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png' ),
+                array( 'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png' )
             )
         ),
         'sanitize_callback' => '\Nimble\sanitize_cb__czr_gallery_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
-        'css_selectors' => array( '[data-sek-gallery-id]' ),//array( '.sek-icon i' ),
+        'css_selectors' => array( '.sek-gal-wrapper' ),//array( '.sek-icon i' ),
         'render_tmpl_path' => "gallery_tmpl.php",
         // 'front_assets' => array(
         //       'czr-font-awesome' => array(
@@ -46,8 +46,8 @@ function sanitize_cb__czr_gallery_module( $value ) {
         return $value;
     if ( !empty($value['gallery_collec']) && is_array( $value['gallery_collec'] ) ) {
         foreach( $value['gallery_collec'] as $key => $data ) {
-            if ( array_key_exists( 'text_content', $data ) && is_string( $data['text_content'] ) ) {
-                $value['gallery_collec'][$key]['text_content'] = sek_maybe_encode_richtext( $data['text_content'] );
+            if ( array_key_exists( 'caption_text', $data ) && is_string( $data['caption_text'] ) ) {
+                $value['gallery_collec'][$key]['caption_text'] = sek_maybe_encode_richtext( $data['caption_text'] );
             }
             if ( array_key_exists( 'title_text', $data ) && is_string( $data['title_text'] ) ) {
                 $value['gallery_collec'][$key]['title_text'] = sek_maybe_encode_richtext( $data['title_text'] );
@@ -66,9 +66,9 @@ function sek_get_module_params_for_czr_gallery_collection_child() {
         'module_type' => 'czr_gallery_collection_child',
         'is_crud' => true,
         'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">toc</i> %1$s', __( 'Image collection', 'text_doma' ) ),
-        'starting_value' => array(
-            'text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
-        ),
+        // 'starting_value' => array(
+        //     'caption_text' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
+        // ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' => array( '.sek-social-icon' ),//array( '.sek-icon i' ),
         'tmpl' => array(
@@ -84,60 +84,137 @@ function sek_get_module_params_for_czr_gallery_collection_child() {
                 ),
             ),
             'item-inputs' => array(
-                'tabs' => array(
-                    array(
-                        'title' => __( 'Title', 'text_doma' ),
-                        'inputs' => array(
-                            'title_text' => array(
-                                'input_type'        => 'nimble_tinymce_editor',
-                                'editor_params'     => array(
-                                    'media_button' => false,
-                                    'includedBtns' => 'basic_btns',
-                                    'height' => 50
-                                ),
-                                'title'              => __( 'Heading text', 'text_doma' ),
-                                'default'            => '',
-                                'width-100'         => true,
-                                'refresh_markup'    => '.sek-inner-accord-title',
-                                'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
-                            ),
-                            'title_attr'  => array(
-                                'input_type'  => 'text',
-                                'default'     => '',
-                                'title'       => __('Title on mouse over', 'text_domain_to_be_replaced'),
-                                'notice_after' => __('This is the text displayed on mouse over.' )
-                            ),
-                        )
-                    ),
-                    array(
-                        'title' => __( 'Content', 'text_doma' ),
-                        'inputs' => array(
-                            'text_content' => array(
-                                'input_type'        => 'nimble_tinymce_editor',
-                                'editor_params'     => array(
-                                    'media_button' => true,
-                                    'includedBtns' => 'basic_btns_with_lists',
-                                ),
-                                'title'             => __( 'Text content', 'text_doma' ),
-                                'default'           => '',
-                                'width-100'         => true,
-                                'refresh_markup'    => '.sek-accord-content',
-                                'notice_before' => __('You may use some html tags in the "text" tab of the editor.', 'text_domain_to_be_replaced')
-                            ),
-                            'h_alignment_css' => array(
-                                'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
-                                'title'       => __('Horizontal alignment', 'text_doma'),
-                                'default'     => array( 'desktop' => 'center'),
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'h_alignment',
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                                'css_selectors' => array( '.sek-accord-content' )
-                            )
-                        )
-                    ),
-                )//'tabs'
+                'img' => array(
+                    'input_type'  => 'upload',
+                    'title'       => __('Pick an image', 'text_doma'),
+                    'default'     => ''
+                ),
+                // 'img-size' => array(
+                //     'input_type'  => 'simpleselect',
+                //     'title'       => __('Select the image size', 'text_doma'),
+                //     'default'     => 'large',
+                //     'choices'     => sek_get_select_options_for_input_id( 'img-size' ),
+                //     'notice_before' => __('Select a size for this image among those generated by WordPress.', 'text_doma' )
+                // ),
+
+
+
+
+
+                // 'link-to' => array(
+                //     'input_type'  => 'simpleselect',
+                //     'title'       => __('Schedule an action on click or tap', 'text_doma'),
+                //     'default'     => 'no-link',
+                //     'choices'     => array(
+                //         'no-link' => __('No click action', 'text_doma' ),
+                //         'img-lightbox' =>__('Lightbox : enlarge the image, and dim out the rest of the content', 'text_doma' ),
+                //         'url' => __('Link to site content or custom url', 'text_doma' ),
+                //         'img-file' => __('Link to image file', 'text_doma' ),
+                //         'img-page' =>__('Link to image page', 'text_doma' )
+                //     ),
+                //     'title_width' => 'width-100',
+                //     'width-100'   => true,
+                //     'notice_after' => __('Note that some click actions are disabled during customization.', 'text_doma' ),
+                // ),
+                // 'link-pick-url' => array(
+                //     'input_type'  => 'content_picker',
+                //     'title'       => __('Link url', 'text_doma'),
+                //     'default'     => array()
+                // ),
+                // 'link-custom-url' => array(
+                //     'input_type'  => 'text',
+                //     'title'       => __('Custom link url', 'text_doma'),
+                //     'default'     => ''
+                // ),
+                // 'link-target' => array(
+                //     'input_type'  => 'nimblecheck',
+                //     'title'       => __('Open link in a new page', 'text_doma'),
+                //     'default'     => false,
+                //     'title_width' => 'width-80',
+                //     'input_width' => 'width-20',
+                // ),
+
+
+
+
+                // 'h_alignment_css' => array(
+                //     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
+                //     'title'       => __('Alignment', 'text_doma'),
+                //     'default'     => array( 'desktop' => 'center' ),
+                //     'refresh_markup' => false,
+                //     'refresh_stylesheet' => true,
+                //     'css_identifier' => 'h_alignment',
+                //     'title_width' => 'width-100',
+                //     'width-100'   => true,
+                //     'css_selectors'=> 'figure'
+                // ),
+                // 'use_custom_title_attr' => array(
+                //     'input_type'  => 'nimblecheck',
+                //     'title'       => __('Set the text displayed when the mouse is held over', 'text_doma'),
+                //     'default'     => false,
+                //     'title_width' => 'width-80',
+                //     'input_width' => 'width-20',
+                //     'notice_after' => __('If not specified, Nimble will use by order of priority the caption, the description, and the image title. Those properties can be edited for each image in the media library.')
+                // ),
+                // 'heading_title' => array(
+                //     'input_type'         => 'text',
+                //     'title' => __('Custom text displayed on mouse hover', 'text_domain_to' ),
+                //     'default'            => '',
+                //     'title_width' => 'width-100',
+                //     'width-100'         => true
+                // ),
+                // 'use_custom_width' => array(
+                //     'input_type'  => 'nimblecheck',
+                //     'title'       => __( 'Custom image width', 'text_doma' ),
+                //     'default'     => 0,
+                //     'refresh_stylesheet' => true,
+                //     'html_before' => '<hr/>'
+                // ),
+                // 'custom_width' => array(
+                //     'input_type'  => 'range_with_unit_picker_device_switcher',
+                //     'title'       => __('Width', 'text_doma'),
+                //     'min' => 1,
+                //     'max' => 100,
+                //     //'unit' => '%',
+                //     'default'     => array( 'desktop' => '100%' ),
+                //     'max'     => 500,
+                //     'width-100'   => true,
+                //     'title_width' => 'width-100',
+                //     'refresh_markup' => false,
+                //     'refresh_stylesheet' => true
+                // ),
+                // 'use_custom_height' => array(
+                //     'input_type'  => 'nimblecheck',
+                //     'title'       => __( 'Custom image max height', 'text_doma' ),
+                //     'default'     => 0,
+                //     'refresh_stylesheet' => true
+                // ),
+                // 'custom_height' => array(
+                //     'input_type'  => 'range_with_unit_picker_device_switcher',
+                //     'title'       => __('Height', 'text_doma'),
+                //     'min' => 1,
+                //     'max' => 100,
+                //     //'unit' => '%',
+                //     'default'     => array( 'desktop' => '100%' ),
+                //     'max'     => 500,
+                //     'width-100'   => true,
+                //     'title_width' => 'width-100',
+                //     'refresh_markup' => false,
+                //     'refresh_stylesheet' => true
+                // ),
+                // 'use_box_shadow' => array(
+                //     'input_type'  => 'nimblecheck',
+                //     'title'       => __( 'Apply a shadow', 'text_doma' ),
+                //     'default'     => 0,
+                //     'html_before' => '<hr/>'
+                // ),
+                // 'img_hover_effect' => array(
+                //     'input_type'  => 'simpleselect',
+                //     'title'       => __('Mouse over effect', 'text_doma'),
+                //     'default'     => 'none',
+                //     'choices'     => sek_get_select_options_for_input_id( 'img_hover_effect' ),
+                //     'html_after' => $pro_text
+                // )
             )//'item-inputs'
         ),
         'render_tmpl_path' => '',
@@ -170,248 +247,59 @@ function sek_get_module_params_for_czr_gallery_opts_child() {
         //'css_selectors' => array( '.sek-social-icons-wrapper' ),//array( '.sek-icon i' ),
         'tmpl' => array(
             'item-inputs' => array(
-                'tabs' => array(
-                    array(
-                        'title' => __( 'General', 'text_doma' ),
-                        'inputs' => array(
-                            'first_expanded' => array(
-                                'input_type'  => 'nimblecheck',
-                                'title'       => __('Display first item expanded', 'text_doma'),
-                                'default'     => true,
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20'
-                            ),
-                            'one_expanded' => array(
-                                'input_type'  => 'nimblecheck',
-                                'title'       => __('Display one item expanded at a time', 'text_doma'),
-                                'default'     => true,
-                                'title_width' => 'width-80',
-                                'input_width' => 'width-20'
-                            ),
-                            'border_width_css' => array(
-                                'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Border weight', 'text_doma' ),
-                                'min' => 0,
-                                'max' => 80,
-                                'default' => '1px',
-                                'width-100'   => true,
-                                //'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'border_width',
-                                'css_selectors' => '.sek-accord-wrapper .sek-accord-item',
-                                'html_before' => '<hr/><h3>' . __('BORDER') .'</h3>'
-                            ),
-                            'border_color_css' => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Border color', 'text_doma' ),
-                                'width-100'   => true,
-                                'default'     => '#e3e3e3',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'border_color',
-                                'css_selectors' => '.sek-accord-wrapper .sek-accord-item'
-                            ),
-                        )//inputs
-                    ),
-                    array(
-                        'title' => __( 'Title style', 'text_doma' ),
-                        'inputs' => array(
-                            'title_bg_css' => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Backround color', 'text_doma'),
-                                'width-100'   => true,
-                                'title_width' => 'width-100',
-                                'default'    => '#ffffff',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'background_color',
-                                'css_selectors' => '.sek-accord-wrapper .sek-accord-item .sek-accord-title',
-                                'html_before' => '<h3>' . __('COLOR AND BACKGROUND') .'</h3>'
-                            ),
-                            'color_css'           => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
-                                'default'     => '#565656',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'css_identifier' => 'color',
-                                'css_selectors' => $title_content_selector
-                            ),//"#000000",
+                // 'layout'  => array(
+                //     'input_type'  => 'simpleselect',
+                //     'title'       => __( 'Grid layout : list or grid', 'text_doma' ),
+                //     'default'     => 'list',
+                //     'width-100'   => true,
+                //     'title_width' => 'width-100',
+                //     'choices'     => [],
+                //     //'html_before' => '<hr>',
+                //     'refresh_stylesheet' => true, //<= some CSS rules are layout dependant
+                //     //'html_before' => $pro_text
+                // ),//null,
+                'columns'  => array(
+                    'input_type'  => 'range_simple_device_switcher',
+                    'title'       => __( 'Number of columns', 'text_doma' ),
+                    'default'     => array( 'desktop' => '2', 'tablet' => '2', 'mobile' => '1' ),
+                    'min'         => 1,
+                    'max'         => 12,
+                    'step'        => 1,
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_stylesheet' => true //<= some CSS rules are layout dependant
+                ),//null,
+                'column_gap'  => array(
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
+                    'title'       => __( 'Space between columns', 'text_doma' ),
+                    'min' => 0,
+                    'max' => 100,
+                    'default'     => array( 'desktop' => '20px' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
+                ),//null,
 
-                            'color_active_css'           => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title_width' => 'width-100',
-                                'title'       => __( 'Text color when active', 'text_doma' ),
-                                'default'     => '#1e261f',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'css_identifier' => 'color',
-                                'css_selectors' => array( '.sek-accord-item .sek-accord-title:hover *', '[data-sek-expanded="true"] .sek-accord-title *')
-                            ),//"#000000",
+                'row_gap'  => array(
+                    'input_type'  => 'range_with_unit_picker_device_switcher',
+                    'title'       => __( 'Space between rows', 'text_doma' ),
+                    'min' => 0,
+                    'max' => 100,
+                    'default'     => array( 'desktop' => '25px' ),
+                    'width-100'   => true,
+                    'title_width' => 'width-100',
+                    'refresh_markup' => false,
+                    'refresh_stylesheet' => true
+                ),//null,
 
-                            'font_family_css' => array(
-                                'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_doma' ),
-                                'default'     => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'refresh_fonts' => true,
-                                'css_identifier' => 'font_family',
-                                'css_selectors' => $title_content_selector,
-                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>',
-                                'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
-                                    __('Find inspiration'),
-                                    'https://fonts.google.com/?sort=popularity'
-                                )
-                            ),
-                            'font_size_css'       => array(
-                                'input_type'  => 'range_with_unit_picker_device_switcher',
-                                'default'     => array( 'desktop' => '16px' ),
-                                'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_doma' ),
-                                'min' => 0,
-                                'max' => 100,
-                                'width-100' => true,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_size',
-                                'css_selectors' => $title_content_selector
-                            ),//16,//"14px",
-                            'line_height_css'     => array(
-                                'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_doma' ),
-                                'default'     => '1.5em',
-                                'min' => 0,
-                                'max' => 10,
-                                'step' => 0.1,
-                                'width-100' => true,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'line_height',
-                                'css_selectors' => $title_content_selector
-                            ),//24,//"20px",
-                            'title_border_w_css' => array(
-                                'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Border bottom weight', 'text_doma' ),
-                                'min' => 0,
-                                'max' => 80,
-                                'default' => '1px',
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'border_width',
-                                'css_selectors' => '.sek-accord-wrapper .sek-accord-item .sek-accord-title',
-                                'html_before' => '<hr/><h3>' . __('BORDER BOTTOM') .'</h3>'
-                            ),
-                            'title_border_c_css' => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Border bottom color', 'text_doma' ),
-                                'width-100'   => true,
-                                'default'     => '#e3e3e3',
-                                //'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'border_color',
-                                'css_selectors' => '.sek-accord-wrapper .sek-accord-item .sek-accord-title'
-                            ),
-                            'spacing_css'     => array(
-                                'input_type'  => 'spacingWithDeviceSwitcher',
-                                'title'       => __( 'Spacing', 'text_doma' ),
-                                'default'     => array('desktop' => array('padding-top' => '15', 'padding-right' => '20', 'padding-left' => '20', 'padding-bottom' => '15', 'unit' => 'px')),//consistent with SCSS
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                                'refresh_markup'     => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'spacing_with_device_switcher',
-                                'css_selectors'      => '.sek-accord-item .sek-accord-title',
-                                'html_before' => '<hr/><h3>' . __('SPACING') .'</h3>'
-                            )
-                        )
-                    ),
-                    array(
-                        'title' => __( 'Content style', 'text_doma' ),
-                        'inputs' => array(
-                            'ct_bg_css' => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Backround color', 'text_doma'),
-                                'width-100'   => true,
-                                'title_width' => 'width-100',
-                                'default'    => '#f2f2f2',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'background_color',
-                                'css_selectors' => array('.sek-accord-item .sek-accord-content'),
-                                'html_before' => '<h3>' . __('COLOR AND BACKGROUND') .'</h3>'
-                            ),
-                            'ct_color_css'           => array(
-                                'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
-                                'default'     => '#1e261f',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'width-100'   => true,
-                                'css_identifier' => 'color',
-                                'css_selectors' => $main_content_selector
-                            ),//"#000000",
-
-                            'ct_font_family_css' => array(
-                                'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_doma' ),
-                                'default'     => '',
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'refresh_fonts' => true,
-                                'css_identifier' => 'font_family',
-                                'css_selectors' => $main_content_selector,
-                                'html_before' => '<hr/><h3>' . __('FONT OPTIONS') .'</h3>',
-                                'html_after' => sprintf('<span class="czr-notice"><i class="far fa-lightbulb"></i> %1s => <a href="%2s" target="_blank" rel="noopener noreferrer">%2$s</a></span><hr/>',
-                                    __('Find inspiration'),
-                                    'https://fonts.google.com/?sort=popularity'
-                                )
-                            ),
-                            'ct_font_size_css'       => array(
-                                'input_type'  => 'range_with_unit_picker_device_switcher',
-                                'default'     => array( 'desktop' => '16px' ),
-                                'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_doma' ),
-                                'min' => 0,
-                                'max' => 100,
-                                'width-100'         => true,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'font_size',
-                                'css_selectors' => $main_content_selector
-                            ),//16,//"14px",
-                            'ct_line_height_css'     => array(
-                                'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_doma' ),
-                                'default'     => '1.5em',
-                                'min' => 0,
-                                'max' => 10,
-                                'step' => 0.1,
-                                'width-100'         => true,
-                                'refresh_markup' => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'line_height',
-                                'css_selectors' => $main_content_selector
-                            ),//24,//"20px",
-                            'ct_spacing_css'     => array(
-                                'input_type'  => 'spacingWithDeviceSwitcher',
-                                'title'       => __( 'Spacing', 'text_doma' ),
-                                'default'     => array('desktop' => array('padding-top' => '15', 'padding-right' => '20', 'padding-left' => '20', 'padding-bottom' => '15', 'unit' => 'px')),//consistent with SCSS
-                                'title_width' => 'width-100',
-                                'width-100'   => true,
-                                'refresh_markup'     => false,
-                                'refresh_stylesheet' => true,
-                                'css_identifier' => 'spacing_with_device_switcher',
-                                'css_selectors'      => '.sek-accord-item .sek-accord-content',
-                                'html_before' => '<hr/><h3>' . __('SPACING') .'</h3>'
-                            )
-                        )//inputs
-                    )
-                )//tabs
+                'img-size' => array(
+                    'input_type'  => 'simpleselect',
+                    'title'       => __('Select the image size', 'text_doma'),
+                    'default'     => 'large',
+                    'choices'     => sek_get_select_options_for_input_id( 'img-size' ),
+                    'notice_before' => __('Select a size for this image among those generated by WordPress.', 'text_doma' )
+                ),
             )
         ),
         'render_tmpl_path' => '',
@@ -496,7 +384,7 @@ function sek_add_css_rules_for_items_in_czr_gallery_collection_child( $rules, $p
 
 
 // GLOBAL CSS DESIGN => FILTERING OF THE ENTIRE MODULE MODEL
-add_filter( 'sek_add_css_rules_for_module_type___czr_gallery_module', '\Nimble\sek_add_css_rules_for_czr_gallery_module', 10, 2 );
+//add_filter( 'sek_add_css_rules_for_module_type___czr_gallery_module', '\Nimble\sek_add_css_rules_for_czr_gallery_module', 10, 2 );
 
 // filter documented in Sek_Dyn_CSS_Builder::sek_css_rules_sniffer_walker
 // Note : $complete_modul_model has been normalized
