@@ -163,7 +163,7 @@
                             _areDataSet = ! _.isUndefined( data ) && _.isObject( data );
 
                         //When shall we update the item title ?
-                        //=> when the slide title or the thumbnail have been updated
+                        //=> when the title or the thumbnail have been updated
                         //=> on module model initialized
                         if ( _areDataSet && data.input_changed && ! _.contains( [ 'title_text' ], data.input_changed ) )
                           return;
@@ -179,7 +179,7 @@
                               _index = _.isUndefined( _index ) ? index : _index + 1;
                         }
 
-                        //if the slide title is set, use it
+                        //if the title is set, use it
                         _title = api.CZR_Helpers.truncate( _title, 25 );
 
                         var $itemTitleEl = $( '.' + module.control.css_attr.item_title , item.container ).find('.sek-accord-title');
@@ -309,7 +309,7 @@
 
 
 /* ------------------------------------------------------------------------- *
- *  SLIDER OPTIONS
+ *  ACCORDION OPTIONS
 /* ------------------------------------------------------------------------- */
 ( function ( api, $, _ ) {
       var Constructor = {
