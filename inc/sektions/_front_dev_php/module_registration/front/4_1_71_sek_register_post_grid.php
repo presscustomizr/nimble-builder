@@ -25,7 +25,13 @@ function sek_get_module_params_for_czr_post_grid_module() {
 function sek_get_module_params_for_czr_post_grid_main_child() {
     $pro_text = '';
     if ( !sek_is_pro() ) {
-        $pro_text = sek_get_pro_notice_for_czr_input( __('masonry grid + more controls on grid items content, like shadow, background, spacing...', 'text-doma') );
+        $pro_text = sprintf( __( '%1$s + more controls on grid items content, like shadow, background, spacing...', 'text-doma'),
+            sprintf( '<a href="%1$s" target="_blank" rel="noopener noreferrer" style="text-decoration:underline">%2$s</a>',
+                'https://nimblebuilder.com/post-grid-sections/#pro-grid-one',
+                __('masonry grid', 'text-doma')
+            )
+        );
+        $pro_text = sek_get_pro_notice_for_czr_input( $pro_text );
     }
     return array(
         'dynamic_registration' => true,
