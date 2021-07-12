@@ -36,6 +36,14 @@ function sek_get_module_collection() {
           'title' => __( 'Image', 'text_doma' ),
           'icon' => 'Nimble__image_icon.svg'
         ),
+
+        array(
+            'content-type' => 'module',
+            'content-id' => 'czr_gallery_module',
+            'title' => __( 'Image gallery', 'text_doma' ),
+            'icon' => 'Nimble_gallery_icon.svg'
+          ),
+
         array(
           'content-type' => 'module',
           'content-id' => 'czr_heading_module',

@@ -97,5 +97,10 @@ module.exports = {
     files : {
       '<%= paths.front_assets %>css/modules/advanced-list-module.css' : '<%= paths.front_assets %>scss/stand-alone-module-generators/advanced-list-module.scss'
     }
+  },
+  sek_module_gallery: {
+    files : {
+      '<%= paths.front_assets %>css/modules/gallery-module.css' : '<%= paths.front_assets %>scss/stand-alone-module-generators/gallery-module.scss'
+    }
   }
 };

@@ -187,7 +187,8 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
 
             'czr_social_icons_module' => 'social-icons-module',
             'czr_button_module' => 'button-module',
-            'czr_heading_module' => 'heading-module'
+            'czr_heading_module' => 'heading-module',
+            'czr_gallery_module' => 'gallery-module',
         ];
 
         // March 2020, for https://github.com/presscustomizr/nimble-builder/issues/629
@@ -400,6 +401,12 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
                 'czr_accordion_module',
                 'czr_accordion_collection_child',
                 'czr_accordion_opts_child'
+              ),
+
+              'czr_gallery_module' => array(
+                'czr_gallery_module',
+                'czr_gallery_collection_child',
+                'czr_gallery_opts_child'
               ),
 
               'czr_shortcode_module',
