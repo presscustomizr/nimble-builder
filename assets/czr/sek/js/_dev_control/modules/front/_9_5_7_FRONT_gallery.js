@@ -106,8 +106,8 @@
                   //overrides the parent ready
                   ready : function() {
                         var item = this;
-                        //wait for the input collection to be populated,
-                        //and then set the input visibility dependencies
+                        // //wait for the input collection to be populated,
+                        // //and then set the input visibility dependencies
                         // item.inputCollection.bind( function( col ) {
                         //       if( _.isEmpty( col ) )
                         //         return;
@@ -286,14 +286,6 @@
                         // }
                   },//writeItemViewTitle
 
-
-
-
-
-                  //Fired when the input collection is populated
-                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
-                  //setInputVisibilityDeps : function() {},
-
                   // Overrides the default fmk method in order to disable the remove dialog box
                   toggleRemoveAlert : function() {
                         this.removeItem();
@@ -348,8 +340,7 @@
                               module.trigger( 'item-removed', _item_ );
                               module.control.trigger( 'item-removed', _item_ );
                         }
-
-                  },
+                  }
             },//CZRItemConstructor
       };//Constructor
 
@@ -421,7 +412,19 @@
                   //             module.updateItemModel( module.preItem, true );
                   //       });
                   // });
-
+                  //SET THE CONTENT PICKER DEFAULT OPTIONS
+                  //@see ::setupContentPicker()
+                  // module.bind( 'set_default_content_picker_options', function( params ) {
+                  //       params.defaultContentPickerOption.defaultOption = {
+                  //             'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
+                  //             'type'       : '',
+                  //             'type_label' : '',
+                  //             'object'     : '',
+                  //             'id'         : '_custom_',
+                  //             'url'        : ''
+                  //       };
+                  //       return params;
+                  // });
 
                   // run the parent initialize
                   // Note : must be always invoked always after the input / item class extension
@@ -435,20 +438,54 @@
                         var item = this;
                         //wait for the input collection to be populated,
                         //and then set the input visibility dependencies
-                        // item.inputCollection.bind( function( col ) {
-                        //       if( _.isEmpty( col ) )
-                        //         return;
-                        //       try { item.setInputVisibilityDeps(); } catch( er ) {
-                        //             api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
-                        //       }
-                        // });//item.inputCollection.bind()
+                        item.inputCollection.bind( function( col ) {
+                              if( _.isEmpty( col ) )
+                                return;
+                              try { item.setInputVisibilityDeps(); } catch( er ) {
+                                    api.errorLog( 'item.setInputVisibilityDeps() : ' + er );
+                              }
+                        });//item.inputCollection.bind()
 
                         api.CZRItem.prototype.ready.call( item );
                   },
 
                   //Fired when the input collection is populated
                   //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
-                  //setInputVisibilityDeps : function() {},
+                                    
+
+
+                  //Fired when the input collection is populated
+                  //At this point, the inputs are all ready (input.isReady.state() === 'resolved') and we can use their visible Value ( set to true by default )
+                  setInputVisibilityDeps : function() {
+                        var item = this,
+                            module = item.module;
+
+                        //Internal item dependencies
+                        item.czr_Input.each( function( input ) {
+                              switch( input.id ) {
+                                    // case 'img' :
+                                    //       api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'img-size', function() {
+                                    //             return ! _.isEmpty( input()+'' ) && _.isNumber( input() );
+                                    //       });
+                                    // break;
+                                    case 'link-to' :
+                                          _.each( [ 'link-target' ] , function( _inputId_ ) {
+                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'link-target' :
+                                                                  bool = ! _.contains( [ 'no-link', 'img-lightbox' ], input() );
+                                                            break;
+                                                      }
+                                                      return bool;
+                                                }); } catch( er ) {
+                                                      api.errare( 'Gallery module => error in setInputVisibilityDeps', er );
+                                                }
+                                          });
+                                    break;
+                              }
+                        });
+                  },
             },//CZRItemConstructor
       };//Constructor
       //provides a description of each module

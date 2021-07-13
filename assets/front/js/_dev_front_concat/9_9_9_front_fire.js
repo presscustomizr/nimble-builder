@@ -5,37 +5,58 @@
 (function(w, d){
     nb_.listenTo('nb-jmp-parsed', function() {
         jQuery(function($){
-            var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
+            if ( nb_.isCustomizing() )
+                  return;
+
+            var $linkCandidates = [
+                  $('[data-sek-level="module"]').find('.sek-link-to-img-lightbox'),// image module
+                  $('[data-sek-level="module"]').find('.sek-gallery-lightbox')// gallery module
+            ];
             // Abort if no link candidate
             if ( $linkCandidates.length < 1 )
               return;
 
-            $linkCandidates.each( function() {
-                $linkCandidate = $(this);
-                // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
-                if ( $linkCandidate.length < 1 || 'string' !== typeof( $linkCandidate[0].protocol ) || -1 !== $linkCandidate[0].protocol.indexOf('javascript') )
-                  return;
-                // Abort if candidate already setup
-                if ( $linkCandidate.data('nimble-mfp-done') )
-                  return;
-
-                try { $linkCandidate.magnificPopup({
-                    type: 'image',
-                    closeOnContentClick: true,
-                    closeBtnInside: true,
-                    fixedContentPos: true,
-                    mainClass: 'mfp-no-margins mfp-with-zoom', // class to remove default margin from left and right side
-                    image: {
-                      verticalFit: true
-                    },
-                    zoom: {
-                      enabled: true,
-                      duration: 300 // don't foget to change the duration also in CSS
-                    }
-                }); } catch( er ) {
-                      nb_.errorLog( 'error in callback of nimble-magnific-popup-loaded => ', er );
-                }
-                $linkCandidate.data('nimble-mfp-done', true );
+            var _params = {
+                  type: 'image',
+                  closeOnContentClick: true,
+                  closeBtnInside: true,
+                  fixedContentPos: true,
+                  mainClass: 'mfp-no-margins mfp-with-zoom', // class to remove default margin from left and right side
+                  image: {
+                        verticalFit: true
+                        // titleSrc: function(item) {
+                        //       return item.el.attr('title');
+                        // }
+                  },
+                  zoom: {
+                        enabled: true,
+                        duration: 300 // don't foget to change the duration also in CSS
+                  }
+            };
+            //var $linkCand;
+            $.each( $linkCandidates, function(_k, $linkCand) {
+                  //$linkCand = $(this);
+                  if ( $linkCand.hasClass('sek-gallery-lightbox') ) {
+                        _params.delegate = 'figure .sek-gal-img-has-link';
+                        _params.gallery = {
+                              enabled: true,
+                              navigateByImgClick: true
+                              //preload: [0,1] // Will preload 0 - before current, and 1 after the current image
+                        };
+                        _params.image = {
+                              verticalFit: true,
+                              titleSrc: function(item) {
+                                    return item.el.attr('title');
+                              }
+                        };
+                  }
+                  // Abort if candidate already setup
+                  if ( $linkCand.data('nimble-mfp-done') )
+                        return;
+                  try { $linkCand.magnificPopup( _params ); } catch( er ) {
+                        nb_.errorLog( 'error in callback of nimble-magnific-popup-loaded => ', er );
+                  }
+                  $linkCand.data('nimble-mfp-done', true );
             });
         });//jQuery(function($){})
     });
