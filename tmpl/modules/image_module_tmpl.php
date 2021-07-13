@@ -89,26 +89,31 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
         }
 
         $title = '';
-        //   'alt' => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
-        //   'caption' => $attachment->post_excerpt,
-        //   'description' => $attachment->post_content,
-        //   'href' => get_permalink( $attachment->ID ),
-        //   'src' => $attachment->guid,
-        //   'title' => $attachment->post_title
-        if ( is_int( $img ) ) {
-            $img_post = get_post( $img );
-            if ( !is_wp_error( $img_post ) && is_object( $img_post ) && 'attachment' === $img_post->post_type ) {
-                $caption = $img_post->post_excerpt;
-                $description = $img_post->post_content;
-                $img_title = $img_post->post_title;
-                if ( false !== sek_booleanize_checkbox_val( $value['use_custom_title_attr']) ) {
-                    $title = strip_tags( $value['heading_title'] );
-                } elseif ( !empty( $caption ) ) {
-                    $title = $caption;
-                } else if ( !empty( $description ) ) {
-                    $title = $description;
-                } else if ( !empty( $img_title ) ) {
-                    $title = $img_title;
+        if ( false !== sek_booleanize_checkbox_val( $value['use_custom_title_attr']) ) {
+            $title = strip_tags( $value['heading_title'] );
+            // convert into a json to prevent emoji breaking global json data structure
+            // fix for https://github.com/presscustomizr/nimble-builder/issues/544
+            $title = sek_maybe_decode_richtext($title);
+        } else {
+            //   'alt' => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
+            //   'caption' => $attachment->post_excerpt,
+            //   'description' => $attachment->post_content,
+            //   'href' => get_permalink( $attachment->ID ),
+            //   'src' => $attachment->guid,
+            //   'title' => $attachment->post_title
+            if ( is_int( $img ) ) {
+                $img_post = get_post( $img );
+                if ( !is_wp_error( $img_post ) && is_object( $img_post ) && 'attachment' === $img_post->post_type ) {
+                    $caption = $img_post->post_excerpt;
+                    $description = $img_post->post_content;
+                    $img_title = $img_post->post_title;
+                    if ( !empty( $caption ) ) {
+                        $title = $caption;
+                    } else if ( !empty( $description ) ) {
+                        $title = $description;
+                    } else if ( !empty( $img_title ) ) {
+                        $title = $img_title;
+                    }
                 }
             }
         }
@@ -157,11 +162,13 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
 if ( 'no-link' === $main_settings['link-to'] ) {
     echo apply_filters('nb_img_module_html', sek_get_img_module_img_html( $main_settings ), $main_settings );
 } else {
-    printf('<a class="%4$s" href="%1$s" %2$s>%3$s</a>',
-        sek_get_img_module_img_link( $main_settings ),
+    $link = sek_get_img_module_img_link( $main_settings );
+    printf('<a class="%4$s %5$s" href="%1$s" %2$s>%3$s</a>',
+        $link,
         true === sek_booleanize_checkbox_val( $main_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
         apply_filters('nb_img_module_html', sek_get_img_module_img_html( $main_settings ), $main_settings ),
-        'sek-link-to-'.$main_settings['link-to'] // sek-link-to-img-lightbox
+        'sek-link-to-'.$main_settings['link-to'], // sek-link-to-img-lightbox
+        false === strpos($link,'http') ? 'sek-no-img-link' : ''
     );
 }
 if ( 'img-lightbox' === $main_settings['link-to'] ) {

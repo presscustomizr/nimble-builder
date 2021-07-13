@@ -20,12 +20,30 @@ function sek_get_module_params_for_czr_image_module() {
                 'custom_width' => ''
             )
         ),
-        // 'sanitize_callback' => '\Nimble\czr_image_module_sanitize_validate',
+        'sanitize_callback' => '\Nimble\sanitize_cb__czr_image_module',
         // 'validate_callback' => '\Nimble\czr_image_module_sanitize_validate',
         'render_tmpl_path' => "image_module_tmpl.php",
         'placeholder_icon' => 'short_text'
     );
 }
+
+
+/* ------------------------------------------------------------------------- *
+ *  SANITIZATION
+/* ------------------------------------------------------------------------- */
+// convert into a json to prevent emoji breaking global json data structure
+// fix for https://github.com/presscustomizr/nimble-builder/issues/544
+    function sanitize_cb__czr_image_module( $value ) {
+        if ( !is_array( $value ) )
+            return $value;
+            if ( is_array( $value ) && !empty($value['main_settings']) && is_array( $value['main_settings'] ) && array_key_exists( 'heading_title', $value['main_settings'] ) ) {
+                //$value['content'][ 'button_text' ] = sanitize_text_field( $value['content'][ 'button_text' ] );
+                // convert into a json to prevent emoji breaking global json data structure
+                // fix for https://github.com/presscustomizr/nimble-builder/issues/544
+                $value['main_settings']['heading_title'] = sek_maybe_encode_richtext($value['main_settings']['heading_title']);
+            }
+        return $value;
+    }
 
 
 
