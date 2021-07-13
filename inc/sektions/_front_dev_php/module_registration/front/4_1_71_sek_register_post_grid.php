@@ -1148,34 +1148,36 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
             'col-11' => '5px',
             'col-12' => '5px'
         ];
-
-        foreach ($col_nb_gap_map as $col_nb_index => $col_gap) {
-            $col_nb = intval( str_replace('col-', '', $col_nb_index ) );
-            $ms_grid_columns = [];
-            // Up to 12 columns
-            for ($j=1; $j <= $col_nb; $j++) {
-                if ( $j > 1 ) {
-                    $ms_grid_columns[] = $col_gap;
+        if ( !isset(Nimble_Manager()->generic_post_grid_css_rules_written) ) {
+            foreach ($col_nb_gap_map as $col_nb_index => $col_gap) {
+                $col_nb = intval( str_replace('col-', '', $col_nb_index ) );
+                $ms_grid_columns = [];
+                // Up to 12 columns
+                for ($j=1; $j <= $col_nb; $j++) {
+                    if ( $j > 1 ) {
+                        $ms_grid_columns[] = $col_gap;
+                    }
+                    $ms_grid_columns[] = 'minmax(0,1fr)';
                 }
-                $ms_grid_columns[] = 'minmax(0,1fr)';
-            }
-            $ms_grid_columns = implode(' ', $ms_grid_columns);
+                $ms_grid_columns = implode(' ', $ms_grid_columns);
 
-            $grid_template_columns = "repeat({$col_nb}, minmax(0,1fr))";
+                $grid_template_columns = "repeat({$col_nb}, minmax(0,1fr))";
 
-            $col_css_rules = [
-                '-ms-grid-columns:' . $ms_grid_columns,
-                'grid-template-columns:' . $grid_template_columns
-            ];
-            if ( $col_nb > 1 ) {
-                $col_css_rules[] = 'grid-column-gap:'.$col_gap;
-                $col_css_rules[] = 'grid-row-gap:'.$col_gap;
+                $col_css_rules = [
+                    '-ms-grid-columns:' . $ms_grid_columns,
+                    'grid-template-columns:' . $grid_template_columns
+                ];
+                if ( $col_nb > 1 ) {
+                    $col_css_rules[] = 'grid-column-gap:'.$col_gap;
+                    $col_css_rules[] = 'grid-row-gap:'.$col_gap;
+                }
+                $rules[] = array(
+                    'selector' => '.sek-post-grid-wrapper .sek-grid-layout.sek-all-col-'.$col_nb,
+                    'css_rules' => implode(';', $col_css_rules),
+                    'mq' =>null
+                );
             }
-            $rules[] = array(
-                'selector' => '.sek-post-grid-wrapper .sek-grid-layout.sek-all-col-'.$col_nb,
-                'css_rules' => implode(';', $col_css_rules),
-                'mq' =>null
-            );
+            Nimble_Manager()->generic_post_grid_css_rules_written = true;
         }
 
 
