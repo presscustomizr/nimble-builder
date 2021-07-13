@@ -12,9 +12,6 @@
                   $('[data-sek-level="module"]').find('.sek-link-to-img-lightbox'),// image module
                   $('[data-sek-level="module"]').find('.sek-gallery-lightbox')// gallery module
             ];
-            // Abort if no link candidate
-            if ( $linkCandidates.length < 1 )
-              return;
 
             var _params = {
                   type: 'image',
@@ -35,6 +32,9 @@
             };
             //var $linkCand;
             $.each( $linkCandidates, function(_k, $linkCand) {
+                  // Abort if no link candidate
+                  if ( $linkCand.length < 1 )
+                        return;
                   //$linkCand = $(this);
                   if ( $linkCand.hasClass('sek-gallery-lightbox') ) {
                         _params.delegate = 'figure .sek-gal-img-has-link';
@@ -58,6 +58,12 @@
                   }
                   $linkCand.data('nimble-mfp-done', true );
             });
+
+            // July 2021, prevent gallery images to be clicked when no link is specified
+            $('.sek-gallery-lightbox').on('click', '.sek-no-img-link', function(evt) {
+                  evt.preventDefault();
+            });
+
         });//jQuery(function($){})
     });
 }(window, document));
