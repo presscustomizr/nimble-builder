@@ -454,6 +454,8 @@ function sek_add_css_rules_for_czr_gallery_module( $rules, $complete_modul_model
             $col_nb
         );
 
+        $has_custom_row_and_column_dimensions = sek_booleanize_checkbox_val( $main_settings['custom-rows-columns'] );
+        $has_auto_fill_column = array_key_exists('auto_fill', $main_settings ) && sek_booleanize_checkbox_val( $main_settings['auto_fill'] );//<= pro
         // CSS RULES
         //     .sek-gal-items.sek-desktop-col-1 {
         //       -ms-grid-columns: minmax(0,1fr);
@@ -466,7 +468,7 @@ function sek_add_css_rules_for_czr_gallery_module( $rules, $complete_modul_model
         //       grid-row-gap: 20px;
         //     }
         // July 2021 : introduction of the auto-fill rule in pro
-        if ( sek_is_pro() && array_key_exists('auto_fill', $main_settings) && sek_booleanize_checkbox_val($main_settings['auto_fill']) ) {
+        if ( sek_is_pro() && !$has_custom_row_and_column_dimensions && $has_auto_fill_column ) {
             $min_col_width = 250;
             if ( array_key_exists($device, $min_column_width_by_device ) ) {
                 $min_col_width = intval( $min_column_width_by_device[$device] );

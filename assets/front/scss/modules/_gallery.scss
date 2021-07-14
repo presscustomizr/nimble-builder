@@ -1,14 +1,16 @@
 // COLUMN LAYOUT
 .sek-gal-wrapper {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-align: center;
-        -ms-flex-align: center;
-            align-items: center;
-    -webkit-box-pack: center;
-        -ms-flex-pack: center;
-            justify-content: center;
+    &:not(.nb-auto-column-width) {//<= classes added by nb pro when auto-fill option is enabled
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-align: center;
+            -ms-flex-align: center;
+                align-items: center;
+        -webkit-box-pack: center;
+            -ms-flex-pack: center;
+                justify-content: center;
+    }
     .sek-gal-items {
       display: -ms-grid;
       display: grid;
@@ -36,6 +38,12 @@
 
     // images
     .sek-img-gal-item {
+        -webkit-transition: all 0.15s ease-in-out;
+        -moz-transition: all, 0.15s ease-in-out;
+        -ms-transition: all, 0.15s ease-in-out;
+        -o-transition: all, 0.15s ease-in-out;
+        transition: all 0.15s ease-in-out;
+        overflow: hidden;
         img {
             height: 100%;
             width: 100%;
@@ -45,12 +53,39 @@
             opacity: .9;
         }
     }
-  }//.sek-post-grid-wrapper COLUMN LAYOUT
+}//.sek-post-grid-wrapper COLUMN LAYOUT
   
+// Item box shadow
+.sek-module-inner .nb-gal-item-box-shadow .sek-gal-items figure {
+    -webkit-box-shadow:  0 3px 8px rgba(0, 0, 0, 0.2);
+    box-shadow:  0 3px 8px rgba(0, 0, 0, 0.2);
+}
 
 
-
-
+// Masonry
+.sek-module-inner .nb-masonry-gal-grid {
+    // &.nb-waiting-for-images-to-be-loaded {
+      // article figure {
+      //   a {
+      //     height: auto!important;
+      //     padding-top: 0!important;
+      //   }
+      //   img {
+      //     position: relative;
+      //     height: auto;
+      //   }
+      // }
+  
+    .sek-gal-items {
+      //display: grid;
+      // grid-gap: 10px;
+      //grid-template-columns: repeat(auto-fill, minmax(250px,1fr))!important;
+      //grid-auto-rows: 5px;
+      &.nb-masonry-gal-images-loaded {
+        grid-auto-rows: 5px;
+      }
+    }
+}
 
 
 // synchronized with default on registration

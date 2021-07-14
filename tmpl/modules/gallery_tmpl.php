@@ -122,6 +122,7 @@ if ( !function_exists( 'Nimble\sek_get_gal_img_title' ) ) {
 
 if ( !function_exists( 'Nimble\sek_print_gallery_mod' ) ) {
     function sek_print_gallery_mod( $model, $gallery_opts, $gallery_collec = array() ) {
+        $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
         $gallery_collec = is_array( $gallery_collec ) ? $gallery_collec : array();
         $gallery_opts = is_array( $gallery_opts ) ? $gallery_opts : array();
   
@@ -137,7 +138,7 @@ if ( !function_exists( 'Nimble\sek_print_gallery_mod' ) ) {
         ));
 
         $gal_wrapper_classes = [];
-        $gal_wrapper_classes = apply_filters('nb_gal_wrapper_classes', $gal_wrapper_classes, $model );
+        $gal_wrapper_classes = apply_filters('nb_gal_wrapper_classes', $gal_wrapper_classes, $value );
         $gal_wrapper_classes = implode(' ', $gal_wrapper_classes );
 
         $normalized_columns_by_device = array();
@@ -161,14 +162,14 @@ if ( !function_exists( 'Nimble\sek_print_gallery_mod' ) ) {
             }
         }
 
-
-        $gal_items_classes = apply_filters('nb_gal_item_classes', $gal_items_classes, $model );
+        $gal_items_classes = apply_filters('nb_gal_item_classes', $gal_items_classes, $value );
         $gal_items_classes = implode(' ', $gal_items_classes );
 
         if ( 'img-lightbox' === $gallery_opts['link-to'] ) {
             sek_emit_js_event('nb-needs-magnific-popup');
         }
         // wrapper should be data-sek-gallery-id, used as 'css_selectors' on registration
+        do_action( 'nb_before_post_gal_wrapper' );
         ?>
         
         <div class="sek-gal-wrapper <?php echo $gal_wrapper_classes; ?>" id="<?php echo $model['id']; ?>">
