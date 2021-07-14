@@ -463,14 +463,9 @@
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
-                                    // case 'img' :
-                                    //       api.czr_sektions.scheduleVisibilityOfInputId.call( input, 'img-size', function() {
-                                    //             return ! _.isEmpty( input()+'' ) && _.isNumber( input() );
-                                    //       });
-                                    // break;
                                     case 'link-to' :
                                           _.each( [ 'link-target' ] , function( _inputId_ ) {
-                                                try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
                                                       var bool = false;
                                                       switch( _inputId_ ) {
                                                             case 'link-target' :
@@ -478,9 +473,14 @@
                                                             break;
                                                       }
                                                       return bool;
-                                                }); } catch( er ) {
-                                                      api.errare( 'Gallery module => error in setInputVisibilityDeps', er );
-                                                }
+                                                });
+                                          });
+                                    break;
+                                    case 'custom-rows-columns' :
+                                          _.each( [ 'column_width', 'raw_height' ] , function( _inputId_ ) {
+                                                api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
+                                                      return input();
+                                                });
                                           });
                                     break;
                               }
