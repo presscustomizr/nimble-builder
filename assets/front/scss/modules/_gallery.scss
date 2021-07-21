@@ -84,6 +84,24 @@
       &.nb-masonry-gal-images-loaded {
         grid-auto-rows: 5px;
       }
+      .sek-img-gal-item {
+        img {
+            height: auto;
+        }
+      }
+      // CSS class added while resizing masonry gallery
+      // => let img have a natural height so NB can determine the height when resizing
+      &.sek-gal-img-natural-height {
+        img {
+          height: auto!important;
+        }
+      }
+      // CSS class added when masonry resizing is complete
+      &.sek-gal-img-height-100-percent {
+        img {
+          height: 100%;
+        }
+      }
     }
 }
 
