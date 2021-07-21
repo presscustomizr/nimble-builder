@@ -825,13 +825,13 @@ foreach ( array( 'wptexturize', 'convert_smilies') as $callback ) {
 function sek_maybe_display_feedback_notice() {
   if ( !( defined('NIMBLE_DEV') && NIMBLE_DEV ) && sek_is_pro() )
     return;
+  if ( 'eligible' !== sek_get_feedback_notif_status() )
+    return;
   if ( !current_user_can( 'customize' ) )
     return;
   if ( !sek_current_user_can_access_nb_ui() )
     return;
   if ( sek_feedback_notice_is_dismissed() )
-    return;
-  if ( 'eligible' !== sek_get_feedback_notif_status() )
     return;
 
   // Only display on admin home dashboard
