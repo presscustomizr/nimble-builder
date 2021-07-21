@@ -479,7 +479,19 @@
                                     case 'custom-rows-columns' :
                                           _.each( [ 'column_width', 'raw_height' ] , function( _inputId_ ) {
                                                 api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {
-                                                      return input();
+                                                      var _is_masonry_on = item.czr_Input.has('masonry_on')  &&  item.czr_Input('masonry_on')(),
+                                                            _is_auto_fill_on = item.czr_Input.has('auto_fill')  &&  item.czr_Input('auto_fill')();
+
+                                                      var bool = false;
+                                                      switch( _inputId_ ) {
+                                                            case 'column_width' :
+                                                                  bool = input() && !_is_masonry_on && !_is_auto_fill_on;
+                                                            break;
+                                                            case 'raw_height' :
+                                                                  bool = input() && !_is_masonry_on;
+                                                            break;
+                                                      }
+                                                      return bool;
                                                 });
                                           });
                                     break;
