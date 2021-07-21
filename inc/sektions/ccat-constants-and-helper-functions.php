@@ -942,6 +942,14 @@ function sek_get_module_collection() {
           'title' => __( 'Image', 'text_doma' ),
           'icon' => 'Nimble__image_icon.svg'
         ),
+
+        array(
+            'content-type' => 'module',
+            'content-id' => 'czr_gallery_module',
+            'title' => __( 'Image gallery', 'text_doma' ),
+            'icon' => 'Nimble_gallery_icon.svg'
+          ),
+
         array(
           'content-type' => 'module',
           'content-id' => 'czr_heading_module',
@@ -2898,7 +2906,7 @@ function sek_get_feedback_notif_status() {
     // sek_error_log('$modules_used ?? ' . count($modules_used), $modules_used );
     // sek_error_log('$customized_pages ??', $customized_pages );
     //version_compare( $this->wp_version, '4.1', '>=' )
-    if ( $customized_pages > 1 && $nb_section_created > 4 && count($modules_used) > 3 ) {
+    if ( $customized_pages > 1 && $nb_section_created > 3 && count($modules_used) > 3 ) {
         $transient_value = 'eligible';
     }
     set_transient( $transient_name, $transient_value, 7 * DAY_IN_SECONDS );

@@ -1,0 +1,82 @@
+.sek-gal-wrapper:not(.nb-auto-column-width) {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.sek-gal-wrapper .sek-gal-items {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr 20px 1fr;
+  grid-template-columns: 1fr 1fr;
+  -ms-grid-rows: 1fr;
+  grid-template-rows: 1fr;
+  grid-row-gap: 20px;
+  grid-column-gap: 20px;
+}
+
+@media all and (-ms-high-contrast: none) {
+  .sek-gal-wrapper .sek-gal-items {
+    display: block !important;
+  }
+}
+
+.sek-gal-wrapper .sek-gal-items > *:nth-child(1) {
+  -ms-grid-row: 1;
+  -ms-grid-column: 1;
+}
+
+.sek-gal-wrapper .sek-gal-items > *:nth-child(2) {
+  -ms-grid-row: 1;
+  -ms-grid-column: 3;
+}
+
+.sek-gal-wrapper .sek-img-gal-item {
+  -webkit-transition: all 0.15s ease-in-out;
+  -moz-transition: all, 0.15s ease-in-out;
+  -ms-transition: all, 0.15s ease-in-out;
+  -o-transition: all, 0.15s ease-in-out;
+  transition: all 0.15s ease-in-out;
+  overflow: hidden;
+}
+
+.sek-gal-wrapper .sek-img-gal-item img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.sek-gal-wrapper .sek-img-gal-item:hover {
+  opacity: .9;
+}
+
+.sek-module-inner .nb-gal-item-box-shadow .sek-gal-items figure {
+  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.sek-module-inner .nb-masonry-gal-grid .sek-gal-items.nb-masonry-gal-images-loaded {
+  grid-auto-rows: 5px;
+}
+
+.sek-module-inner .nb-masonry-gal-grid .sek-gal-items .sek-img-gal-item img {
+  height: auto;
+}
+
+.sek-module-inner .nb-masonry-gal-grid .sek-gal-items.sek-gal-img-natural-height img {
+  height: auto !important;
+}
+
+.sek-module-inner .nb-masonry-gal-grid .sek-gal-items.sek-gal-img-height-100-percent img {
+  height: 100%;
+}
+
+/*************************************
+* ACCORDION MODULE
+*************************************/

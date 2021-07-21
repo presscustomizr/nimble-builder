@@ -316,6 +316,23 @@
   background-color: rgba(255, 255, 255, 0.9);
 }
 
+.mfp-wrap button.mfp-arrow, .mfp-wrap button.mfp-close {
+  background: none !important;
+  background: transparent !important;
+}
+
+.mfp-wrap img.mfp-img {
+  padding: 40px 0 0;
+}
+
+.mfp-wrap::after {
+  bottom: 20px;
+}
+
+.mfp-wrap .mfp-bottom-bar {
+  margin-top: 0;
+}
+
 .sek-service-font, .sek-module .sek-module-inner .sek-btn {
   font-family: sans-serif;
 }

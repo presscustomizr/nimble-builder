@@ -1294,7 +1294,15 @@ class Sek_Dyn_CSS_Handler {
 
         if ( !file_exists( $index_path = wp_normalize_path( trailingslashit( $base_uri ) . 'index.php' ) ) ) {
             // predefined mode settings for WP files
-            $wp_filesystem->put_contents( $index_path, "<?php\n// Silence is golden.\n", FS_CHMOD_FILE );
+            // Make sure NB uses the proper FS_CHMOD_DIR value
+            // fixes https://github.com/presscustomizr/nimble-builder/issues/862
+            // doc : https://wordpress.org/support/article/editing-wp-config-php/#override-of-default-file-permissions
+            // doc : https://wordpress.stackexchange.com/questions/253274/use-of-undefined-constant-fs-chmod-dir-assumed-fs-chmod-dir
+            $chmod_dir = ( 0755 & ~ umask() );
+            if ( defined( 'FS_CHMOD_DIR' ) ) {
+                $chmod_dir = FS_CHMOD_DIR;
+            }
+            $wp_filesystem->put_contents( $index_path, "<?php\n// Silence is golden.\n", $chmod_dir );
         }
 
 
@@ -2315,7 +2323,8 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
 
             'czr_social_icons_module' => 'social-icons-module',
             'czr_button_module' => 'button-module',
-            'czr_heading_module' => 'heading-module'
+            'czr_heading_module' => 'heading-module',
+            'czr_gallery_module' => 'gallery-module',
         ];
 
         // March 2020, for https://github.com/presscustomizr/nimble-builder/issues/629
@@ -2528,6 +2537,12 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
                 'czr_accordion_module',
                 'czr_accordion_collection_child',
                 'czr_accordion_opts_child'
+              ),
+
+              'czr_gallery_module' => array(
+                'czr_gallery_module',
+                'czr_gallery_collection_child',
+                'czr_gallery_opts_child'
               ),
 
               'czr_shortcode_module',
