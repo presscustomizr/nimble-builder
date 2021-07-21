@@ -36,6 +36,12 @@ if ( !function_exists( 'Nimble\sek_print_text_heading_content' ) ) {
                 $to_print = $heading_content;
             }
         }
+        // Make sure to strip possible heading tags added as html content
+        if ( is_string($to_print) ) {
+            foreach (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as $tag) {
+                $to_print = preg_replace("/<\\/?" . $tag . "(.|\\s)*?>/",'', $to_print );
+            }
+        }
         if ( $echo ) {
             echo $to_print;
         } else {
