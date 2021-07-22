@@ -115,7 +115,7 @@ function sek_get_module_params_for_czr_gallery_opts_child() {
     $main_content_selector = array( '.sek-accord-item .sek-accord-content', '.sek-accord-item .sek-accord-content *' );
     $pro_text = '';
     if ( !sek_is_pro() ) {
-        $pro_text = __( 'masonry layout + additional options', 'text-doma');
+        $pro_text = __( 'create masonry galleries + additional options', 'text-doma');
         $pro_text = sek_get_pro_notice_for_czr_input( $pro_text );
     }
     return array(
@@ -154,7 +154,8 @@ function sek_get_module_params_for_czr_gallery_opts_child() {
                     'step'        => 1,
                     'width-100'   => true,
                     'title_width' => 'width-100',
-                    'refresh_stylesheet' => true //<= some CSS rules are layout dependant
+                    'refresh_stylesheet' => true, //<= some CSS rules are layout dependant
+                    'html_after' => $pro_text
                 ),//null,
 
                 'custom-rows-columns' => array(
