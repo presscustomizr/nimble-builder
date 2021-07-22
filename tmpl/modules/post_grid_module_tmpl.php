@@ -407,7 +407,11 @@ $post_query = null;
 if ( $replace_current_query && $post_nb > 0 ) {
     $cache_key = 'nb_post_q_' . $model['id'] . '_paged_' . $paged;
     $cache_group = 'nb_post_queries';
-    $cached = wp_cache_get( $cache_key, $cache_group );
+    // Use cached data when not customizing
+    $cached = false;
+    if ( !skp_is_customizing() ) {
+      $cached = wp_cache_get( $cache_key, $cache_group );
+    }
     if ( false !== $cached ) {
         $post_query = $cached;
     } else {
@@ -428,7 +432,9 @@ if ( $replace_current_query && $post_nb > 0 ) {
         } else {
           sek_error_log('post_grid_module_tmpl => query params is invalid');
         }
-        wp_cache_set( $cache_key, $post_query, $cache_group );
+        if ( !skp_is_customizing() ) {
+          wp_cache_add( $cache_key, $post_query, $cache_group );
+        }
     }
 } else if ( !$replace_current_query ) {
     if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
