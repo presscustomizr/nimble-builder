@@ -252,7 +252,24 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
                 // rendering property allows us to determine if we're rendering NB content while filtering WP core functions, like the one of the lazy load attributes
                 Nimble_Manager()->rendering = true;
-                $this->render( $locationSettingValue, $location_id );
+
+                if ( !empty($skope_id) && !skp_is_customizing() && defined('NIMBLE_OBJECT_CACHE_ENABLED') && NIMBLE_OBJECT_CACHE_ENABLED ) {
+                    $cache_key = $location_id . '__in__' . $skope_id;
+                    sek_error_log('cahche kye ???', $cache_key );
+                    $cache_group = $skope_id;
+                    $cached_candidate = wp_cache_get( $cache_key, $cache_group );
+                    sek_error_log('$cached_candidate ???', $cached_candidate );
+                    if ( false === $cached_candidate ) {
+                        ob_start();
+                            $this->render( $locationSettingValue, $location_id );
+                        $cached_candidate = ob_get_clean();
+                        wp_cache_add( $cache_key, $cached_candidate, $cache_group );
+                    }
+                    echo $cached_candidate;
+                } else {
+                    $this->render( $locationSettingValue, $location_id );
+                }
+
                 Nimble_Manager()->rendering = false;
 
                 add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ),NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );

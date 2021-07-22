@@ -272,13 +272,22 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             // see #838
             // prevents using persistent cache object systems like Memcached which override the default WP class WP_Object_Cache () which is normally refreshed on each page load )
             add_action('init', array( $this, 'sek_clear_cached_objects_when_customizing') );
+
+            // FLUSH CACHE OBJECT ON POST SAVE / UPDATE
+            // for https://github.com/presscustomizr/nimble-builder/issues/867
+            add_action( 'save_post', array( $this, 'sek_flush_object_cache_on_post_update') );
         }//__construct
 
+        // @init
         public function sek_clear_cached_objects_when_customizing() {
             if ( skp_is_customizing() ) {
                 // Make sure cached objects are cleaned
                 wp_cache_flush();
             }
+        }
+        // @save_post
+        function sek_flush_object_cache_on_post_update() {
+          wp_cache_flush();
         }
 
         // @fired @hook 'widgets_init'
