@@ -115,7 +115,12 @@ function sek_get_module_params_for_czr_gallery_opts_child() {
     $main_content_selector = array( '.sek-accord-item .sek-accord-content', '.sek-accord-item .sek-accord-content *' );
     $pro_text = '';
     if ( !sek_is_pro() ) {
-        $pro_text = __( 'create masonry galleries + additional options', 'text-doma');
+        $pro_text = sprintf( __( '%1$s + cool additional options', 'text-doma'),
+            sprintf( '<a href="%1$s" target="_blank" rel="noopener noreferrer" style="text-decoration:underline">%2$s</a>',
+                'https://nimblebuilder.com/gallery-examples/#masonry',
+                __('masonry galleries', 'text-doma')
+            )
+        );
         $pro_text = sek_get_pro_notice_for_czr_input( $pro_text );
     }
     return array(
