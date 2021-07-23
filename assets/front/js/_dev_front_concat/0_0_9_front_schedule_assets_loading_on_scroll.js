@@ -44,6 +44,7 @@
                 return;
 
             var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
+            $linkCandidates = $linkCandidates.add($('[data-sek-level="module"]').find('.sek-gallery-lightbox'));
             // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
             if ( $linkCandidates.length < 1 )
               return;
