@@ -2408,13 +2408,22 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             // see #838
             // prevents using persistent cache object systems like Memcached which override the default WP class WP_Object_Cache () which is normally refreshed on each page load )
             add_action('init', array( $this, 'sek_clear_cached_objects_when_customizing') );
+
+            // FLUSH CACHE OBJECT ON POST SAVE / UPDATE
+            // for https://github.com/presscustomizr/nimble-builder/issues/867
+            add_action( 'save_post', array( $this, 'sek_flush_object_cache_on_post_update') );
         }//__construct
 
+        // @init
         public function sek_clear_cached_objects_when_customizing() {
             if ( skp_is_customizing() ) {
                 // Make sure cached objects are cleaned
                 wp_cache_flush();
             }
+        }
+        // @save_post
+        function sek_flush_object_cache_on_post_update() {
+          wp_cache_flush();
         }
 
         // @fired @hook 'widgets_init'
@@ -4252,7 +4261,24 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 remove_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_after_content' ), NIMBLE_AFTER_CONTENT_FILTER_PRIORITY );
                 // rendering property allows us to determine if we're rendering NB content while filtering WP core functions, like the one of the lazy load attributes
                 Nimble_Manager()->rendering = true;
-                $this->render( $locationSettingValue, $location_id );
+
+                if ( !empty($skope_id) && !skp_is_customizing() && defined('NIMBLE_OBJECT_CACHE_ENABLED') && NIMBLE_OBJECT_CACHE_ENABLED ) {
+                    $cache_key = $location_id . '__in__' . $skope_id;
+                    sek_error_log('cahche kye ???', $cache_key );
+                    $cache_group = $skope_id;
+                    $cached_candidate = wp_cache_get( $cache_key, $cache_group );
+                    sek_error_log('$cached_candidate ???', $cached_candidate );
+                    if ( false === $cached_candidate ) {
+                        ob_start();
+                            $this->render( $locationSettingValue, $location_id );
+                        $cached_candidate = ob_get_clean();
+                        wp_cache_add( $cache_key, $cached_candidate, $cache_group );
+                    }
+                    echo $cached_candidate;
+                } else {
+                    $this->render( $locationSettingValue, $location_id );
+                }
+
                 Nimble_Manager()->rendering = false;
 
                 add_filter('the_content', array( $this, 'sek_schedule_sektion_rendering_before_content' ),NIMBLE_BEFORE_CONTENT_FILTER_PRIORITY );
