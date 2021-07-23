@@ -255,10 +255,8 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
 
                 if ( !empty($skope_id) && !skp_is_customizing() && defined('NIMBLE_OBJECT_CACHE_ENABLED') && NIMBLE_OBJECT_CACHE_ENABLED ) {
                     $cache_key = $location_id . '__in__' . $skope_id;
-                    sek_error_log('cahche kye ???', $cache_key );
                     $cache_group = $skope_id;
                     $cached_candidate = wp_cache_get( $cache_key, $cache_group );
-                    sek_error_log('$cached_candidate ???', $cached_candidate );
                     if ( false === $cached_candidate ) {
                         ob_start();
                             $this->render( $locationSettingValue, $location_id );
