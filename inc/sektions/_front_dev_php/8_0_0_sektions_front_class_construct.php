@@ -119,6 +119,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
           //'sek_level_section_layout_module',<// deactivated for now. Replaced by sek_level_width_section
           'sek_level_height_module',
           'sek_level_spacing_module',
+          'sek_level_spacing_module_for_columns',
           'sek_level_width_module',
           'sek_level_width_column',
           'sek_level_width_section',

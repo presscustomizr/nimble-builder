@@ -309,7 +309,8 @@ module.exports = {
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_width_column.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_level_width_section.js',
       //'<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_0_UI_sek_section_layout_module.js',
-      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_1_UI_spacing.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_1_UI_sek_level_spacing_module.js',
+      '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_1_UI_sek_level_spacing_module_for_columns.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_2_UI_sek_level_custom_css_levels.js',
       '<%= paths.czr_assets %>sek/js/_dev_control/modules/ui/_1_level/_9_0_3_UI_sek_level_animation_module.js',
 
@@ -457,6 +458,7 @@ module.exports = {
       //'<%= paths.sektions %>_front_dev_php/module_registration/ui/4_0_3_sek_register_section_layout.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_height.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_1_level/4_0_4_sek_register_spacing.php',
+      '<%= paths.sektions %>_front_dev_php/module_registration/ui/_1_level/4_0_4_sek_register_spacing_for_columns.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_1_level/4_0_5_sek_register_width_module.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_1_level/4_0_5_sek_register_width_column.php',
       '<%= paths.sektions %>_front_dev_php/module_registration/ui/_1_level/4_0_5_sek_register_width_section.php',

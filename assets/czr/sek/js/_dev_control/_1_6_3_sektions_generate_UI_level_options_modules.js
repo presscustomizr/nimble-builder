@@ -66,7 +66,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         },
                         spacing : {
                               settingControlId : params.id + '__spacing_options',
-                              module_type : 'sek_level_spacing_module',
+                              module_type : 'column' === params.level ? 'sek_level_spacing_module_for_columns' : 'sek_level_spacing_module',
                               controlLabel : sektionsLocalizedData.i18n['Padding and margin settings for the'] + ' ' + sektionsLocalizedData.i18n[params.level],
                               icon : '<i class="material-icons sek-level-option-icon">center_focus_weak</i>'
                         },
