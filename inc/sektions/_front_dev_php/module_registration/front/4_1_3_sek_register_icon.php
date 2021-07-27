@@ -275,23 +275,12 @@ function sek_add_css_rules_for_icon_front_module( $rules, $complete_modul_model 
     $icon_color = $icon_settings['color_css'];
     if ( sek_booleanize_checkbox_val( $icon_settings['use_custom_color_on_hover'] ) ) {
         $color_hover = $icon_settings['color_hover'];
-    } else {
-        // Build the lighter rgb from the user picked bg color
-        if ( 0 === strpos( $icon_color, 'rgba' ) ) {
-            list( $rgb, $alpha ) = sek_rgba2rgb_a( $icon_color );
-            $color_hover_rgb  = sek_lighten_rgb( $rgb, $percent=15, $array = true );
-            $color_hover      = sek_rgb2rgba( $color_hover_rgb, $alpha, $array = false, $make_prop_value = true );
-        } else if ( 0 === strpos( $icon_color, 'rgb' ) ) {
-            $color_hover      = sek_lighten_rgb( $icon_color, $percent=15 );
-        } else {
-            $color_hover      = sek_lighten_hex( $icon_color, $percent=15 );
-        }
+        $rules[] = array(
+            'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-icon i:hover',
+            'css_rules' => 'color:' . $color_hover . ';',
+            'mq' =>null
+        );
     }
-    $rules[] = array(
-        'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-icon i:hover',
-        'css_rules' => 'color:' . $color_hover . ';',
-        'mq' =>null
-    );
 
     // BORDERS
     $border_settings = $value[ 'spacing_border' ][ 'borders' ];
