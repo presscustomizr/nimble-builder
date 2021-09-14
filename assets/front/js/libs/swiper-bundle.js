@@ -10032,3 +10032,6 @@
 
 })));
 //# sourceMappingURL=swiper-bundle.js.map
+
+// on 'nb-app-ready', jQuery is loaded
+nb_.listenTo('nb-app-ready', function(){nb_.emit('nb-main-swiper-parsed');});
