@@ -585,7 +585,7 @@ function sek_add_css_rules_for_czr_img_slider_module( $rules, $complete_modul_mo
     $value = $complete_modul_model['value'];
     $slider_options = $value['slider_options'];
 
-    $selector = '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .swiper-container .swiper-wrapper';
+    $selector = '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .swiper .swiper-wrapper';
 
 
     // CUSTOM HEIGHT BY DEVICE

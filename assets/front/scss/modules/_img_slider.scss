@@ -19,7 +19,7 @@
     @at-root .customizer-preview .swiper-wrapper .swiper-lazy-preloader {
         display: none;
     }
-    .swiper-container {
+    .swiper {
       width: 100%;
       height: 100%;
       .swiper-wrapper {
@@ -76,7 +76,7 @@
           }
         }
       }
-    }//.swiper-container
+    }//.swiper
 
     .swiper-slide {
       text-align: center;

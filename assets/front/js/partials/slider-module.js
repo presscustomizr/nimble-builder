@@ -196,7 +196,7 @@
                           mySwipers = [];
                           doAllSwiperInstanciation();
 
-                          $(this).find('.swiper-container img').each( function() {
+                          $(this).find('.swiper img').each( function() {
                                 $(this).trigger('sek-nimble-refreshed');
                           });
                     }
@@ -206,7 +206,7 @@
               // this is needed when setting the custom height of the slider wrapper
               nb_.cachedElements.$body.on( 'sek-stylesheet-refreshed', '[data-sek-module-type="czr_img_slider_module"]',
                     function() {
-                          $(this).find('.swiper-container img').each( function() {
+                          $(this).find('.swiper img').each( function() {
                                 $(this).trigger('sek-nimble-refreshed');
                           });
                     }
@@ -214,7 +214,7 @@
 
 
               // on load
-              $('.sektion-wrapper').find('.swiper-container').each( function() {
+              $('.sektion-wrapper').find('.swiper').each( function() {
                     doAllSwiperInstanciation();
               });
 
@@ -231,7 +231,7 @@
               // Behaviour on mouse hover
               // @seehttps://stackoverflow.com/questions/53028089/swiper-autoplay-stop-the-swiper-when-you-move-the-mouse-cursor-and-start-playba
               $('.swiper-slide').on('mouseover mouseout', function( evt ) {
-                  var swiperInstance = $(this).closest('.swiper-container')[0].swiper;
+                  var swiperInstance = $(this).closest('.swiper')[0].swiper;
                   if ( ! nb_.isUndefined( swiperInstance ) && true === swiperInstance.params.autoplay.disableOnInteraction ) {
                       switch( evt.type ) {
                           case 'mouseover' :
@@ -249,14 +249,14 @@
               if ( window.wp && ! nb_.isUndefined( wp.customize ) ) {
                     wp.customize.preview.bind('sek-item-focus', function( params ) {
 
-                          var $itemEl = $('[data-sek-item-id="' + params.item_id +'"]', '.swiper-container').first();
+                          var $itemEl = $('[data-sek-item-id="' + params.item_id +'"]', '.swiper').first();
                           if ( 1 > $itemEl.length )
                             return;
-                          var $swiperContainer = $itemEl.closest('.swiper-container');
+                          var $swiperContainer = $itemEl.closest('.swiper');
                           if ( 1 > $swiperContainer.length )
                             return;
 
-                          var activeSwiperInstance = $itemEl.closest('.swiper-container')[0].swiper;
+                          var activeSwiperInstance = $itemEl.closest('.swiper')[0].swiper;
 
                           if ( nb_.isUndefined( activeSwiperInstance ) )
                             return;
