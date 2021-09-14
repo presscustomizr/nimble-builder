@@ -729,8 +729,7 @@ function sek_may_be_display_update_notice() {
         </p> -->
       </div>
       <?php
-      $_html = ob_get_contents();
-      if ($_html) ob_end_clean();
+      $_html = ob_get_clean();
       echo apply_filters( 'sek_update_notice', $_html );
       ?>
       <script type="text/javascript" id="nimble-dismiss-update-notice">
@@ -860,8 +859,7 @@ function sek_maybe_display_feedback_notice() {
       </button>
     </div>
     <?php
-      $_html = ob_get_contents();
-      if ($_html) ob_end_clean();
+      $_html = ob_get_clean();
       echo apply_filters( 'sek_feedback_notice', $_html );
     ?>
     <script>
