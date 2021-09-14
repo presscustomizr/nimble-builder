@@ -407,12 +407,9 @@ if ( !$use_current_query && $replace_current_query && true === sek_booleanize_ch
   $query_params['posts_per_page'] = $posts_per_page;
 }
 
-sek_error_log('QUERY PARAMS ?', $query_params );
-
 $post_query = null;
 if ( $replace_current_query && $post_nb > 0 ) {
     $cache_key = 'nb_post_q_' . $model['id'] . '_paged_' . $paged;
-    sek_error_log('$cache_key ??', $cache_key );
     $cache_group = 'nb_post_queries';
     // Use cached data when not customizing
     $cached = false;
