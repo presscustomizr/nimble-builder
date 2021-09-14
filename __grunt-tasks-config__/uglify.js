@@ -76,7 +76,7 @@ module.exports = {
     files: [{
       expand: true,
       cwd: '<%= paths.front_assets %>js/libs/',
-      src: [ '*.js', '!*.min.js' ],
+      src: [ '*.js', '!*.min.js', '!swiper-bundle.js' ],
       dest: '<%= paths.front_assets %>js/libs/',
       ext: '.min.js'
     }]
