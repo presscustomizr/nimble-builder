@@ -219,10 +219,9 @@ nb_.listenTo('nb-docready', function() {
                                     nb_.delay( function() {
                                           if ( $el.length > 0 ) {
                                                 $el.remove();
-                                                console.log('REMOVED LOADER', $el );
                                           }
                                           
-                                    }, 2000);
+                                    }, 1000);
                               }
                         });
                         
