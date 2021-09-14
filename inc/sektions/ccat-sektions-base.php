@@ -3161,7 +3161,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 if ( skp_is_customizing() || !sek_load_front_assets_in_ajax() ) {
                       wp_enqueue_style(
                           'nb-swiper',
-                          sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.css' : NIMBLE_BASE_URL . '/assets/front/css/libs/swiper.min.css',
+                          sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/css/libs/swiper-bundle.css' : NIMBLE_BASE_URL . '/assets/front/css/libs/swiper-bundle.min.css',
                           array(),
                           NIMBLE_ASSETS_VERSION,
                           $media = 'all'
@@ -3266,7 +3266,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // customizing : load if not loaded dynamically
             wp_enqueue_script(
                 'nb-swiper',
-                sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/swiper.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/swiper.min.js',
+                sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/swiper-bundle.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/swiper-bundle.min.js',
                 array(),
                 NIMBLE_ASSETS_VERSION,
                 false
@@ -3374,7 +3374,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             /* ------------------------------------------------------------------------- */
             $assets_urls = [
                 'nb-magnific-popup' => sek_is_dev_mode() ? '/assets/front/js/libs/jquery-magnific-popup.js' : '/assets/front/js/libs/jquery-magnific-popup.min.js',
-                'nb-swiper' => sek_is_dev_mode() ? '/assets/front/js/libs/swiper.js' : '/assets/front/js/libs/swiper.min.js',
+                'nb-swiper' => sek_is_dev_mode() ? '/assets/front/js/libs/swiper-bundle.js' : '/assets/front/js/libs/swiper-bundle.min.js',
                 'nb-video-bg-plugin' => sek_is_dev_mode() ? '/assets/front/js/libs/nimble-video-bg.js' : '/assets/front/js/libs/nimble-video-bg.min.js',
 
                 'nb-magnific-popup-style' => '/assets/front/css/libs/magnific-popup.min.css',

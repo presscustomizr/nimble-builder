@@ -784,7 +784,7 @@ window.nb_.getQueryVariable = function(variable) {
             // each time a new scroll handler is added, it emits the event 'nimble-new-scroll-handler-added'
             // so when caught, let's try to detect any dependant element is visible in the page
             // and if so, load.
-            // Typically useful on page load if for example the slider is on top of the page and we need to load swiper.js right away before scrolling
+            // Typically useful on page load if for example the slider is on top of the page and we need to load swiper-bundle.js right away before scrolling
             nb_.listenTo('nimble-new-scroll-handler-added', nb_.loopOnScrollHandlers );
 
         });//jQuery
@@ -896,11 +896,11 @@ window.nb_.getQueryVariable = function(variable) {
                               rel : 'stylesheet',
                               id : 'czr-swiper',
                               type : 'text/css',
-                              href : sekFrontLocalized.frontAssetsPath + 'css/libs/swiper.min.css?'+sekFrontLocalized.assetVersion
+                              href : sekFrontLocalized.frontAssetsPath + 'css/libs/swiper-bundle.min.css?'+sekFrontLocalized.assetVersion
                         }) );
                   }
                   nb_.ajaxLoadScript({
-                      path : 'js/libs/swiper.min.js?'+sekFrontLocalized.assetVersion,
+                      path : 'js/libs/swiper-bundle.min.js?'+sekFrontLocalized.assetVersion,
                       loadcheck : function() { return nb_.isFunction( window.Swiper ); },
                       // complete : function() {
                       //     nb_.ajaxLoadScript({
@@ -1226,4 +1226,36 @@ nb_.listenTo('nb-docready', function() {
                   }
             }
       }
+});
+
+// September 2021 => Solves the problem of CSS loaders not cleaned
+// see https://github.com/presscustomizr/nimble-builder/issues/874
+nb_.listenTo('nb-docready', function() {
+      jQuery(function($){
+            var $cssLoaders = $('.sek-css-loader');
+            if ( $cssLoaders.length < 1 )
+                  return;
+
+            var $el, 
+                  removeCssLoaderAfterADelay = nb_.throttle( function() {
+                        $cssLoaders = $('.sek-css-loader');
+                        $.each($cssLoaders, function(){
+                              $el = $(this);
+                              if ( nb_.elOrFirstVisibleParentIsInWindow($el) ) {
+                                    nb_.delay( function() {
+                                          if ( $el.length > 0 ) {
+                                                $el.remove();
+                                          }
+                                          
+                                    }, 1000);
+                              }
+                        });
+                        
+                        if ( $cssLoaders.length < 1 ) {
+                              // When no more loaders to remove, remove scroll listener
+                              nb_.cachedElements.$window.off('scroll', removeCssLoaderAfterADelay );
+                        }
+                  }, 200 );
+            nb_.cachedElements.$window.on('scroll', removeCssLoaderAfterADelay );
+      });
 });
