@@ -77,7 +77,7 @@
             // each time a new scroll handler is added, it emits the event 'nimble-new-scroll-handler-added'
             // so when caught, let's try to detect any dependant element is visible in the page
             // and if so, load.
-            // Typically useful on page load if for example the slider is on top of the page and we need to load swiper.js right away before scrolling
+            // Typically useful on page load if for example the slider is on top of the page and we need to load swiper-bundle.js right away before scrolling
             nb_.listenTo('nimble-new-scroll-handler-added', nb_.loopOnScrollHandlers );
 
         });//jQuery

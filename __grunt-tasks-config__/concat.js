@@ -176,7 +176,7 @@ module.exports = {
   sektions_front_slider_module_css:{
     src:[
       '<%= paths.front_assets %>css/modules/img-slider-module.css',
-      '<%= paths.front_assets %>css/libs/swiper.css'
+      '<%= paths.front_assets %>css/libs/swiper-bundle.css'
     ],
     dest : '<%= paths.front_assets %>css/modules/img-slider-module-with-swiper.css',
   },

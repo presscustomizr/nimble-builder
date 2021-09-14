@@ -105,11 +105,11 @@
                               rel : 'stylesheet',
                               id : 'czr-swiper',
                               type : 'text/css',
-                              href : sekFrontLocalized.frontAssetsPath + 'css/libs/swiper.min.css?'+sekFrontLocalized.assetVersion
+                              href : sekFrontLocalized.frontAssetsPath + 'css/libs/swiper-bundle.min.css?'+sekFrontLocalized.assetVersion
                         }) );
                   }
                   nb_.ajaxLoadScript({
-                      path : 'js/libs/swiper.min.js?'+sekFrontLocalized.assetVersion,
+                      path : 'js/libs/swiper-bundle.min.js?'+sekFrontLocalized.assetVersion,
                       loadcheck : function() { return nb_.isFunction( window.Swiper ); },
                       // complete : function() {
                       //     nb_.ajaxLoadScript({

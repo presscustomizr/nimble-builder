@@ -472,7 +472,7 @@ nb_.listenTo('nb-needs-videobg-js', function() {
 (function(w, d){
     nb_.listenTo( 'nb-jquery-loaded', function() {
         // params = {
-        //  path : 'js/libs/swiper.min.js'
+        //  path : 'js/libs/swiper-bundle.min.js'
         //  complete : function() {
         //    $.ajax( {
             //       url : sekFrontLocalized.frontAssetsPath + 'js/prod-front-simple-slider-module.min.js?'+sekFrontLocalized.assetVersion,
