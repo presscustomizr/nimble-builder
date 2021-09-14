@@ -386,6 +386,7 @@ if ( $use_current_query ) {
 }
 
 $paged = 1;
+$is_nimble_pagination_on = isset($_GET['nb_grid_module_go_to']);
 $is_current_grid_paginated = isset($_GET['nb_grid_module_go_to']) && $model['id'] === $_GET['nb_grid_module_go_to'];
 // may 2020 => is_front_page() was wrong to check if home was a static front page.
 // fixes https://github.com/presscustomizr/nimble-builder/issues/664
@@ -398,14 +399,20 @@ if ( !$use_current_query && $replace_current_query && true === sek_booleanize_ch
   // https://developer.wordpress.org/reference/classes/wp_query/#pagination-parameters
   $pagination_query_var = Nimble_Manager()->is_viewing_static_front_page ? 'page' :'paged';
   $paged = get_query_var($pagination_query_var);
-  $query_params['paged'] = ( $paged && $is_current_grid_paginated ) ? $paged : 1;
+  if ( $is_nimble_pagination_on ) {
+    $query_params['paged'] = ( $paged && $is_current_grid_paginated ) ? $paged : 1;
+  } else {
+    $query_params['paged'] = $paged;
+  }
   $query_params['posts_per_page'] = $posts_per_page;
 }
 
+sek_error_log('QUERY PARAMS ?', $query_params );
 
 $post_query = null;
 if ( $replace_current_query && $post_nb > 0 ) {
     $cache_key = 'nb_post_q_' . $model['id'] . '_paged_' . $paged;
+    sek_error_log('$cache_key ??', $cache_key );
     $cache_group = 'nb_post_queries';
     // Use cached data when not customizing
     $cached = false;
