@@ -201,3 +201,36 @@ nb_.listenTo('nb-docready', function() {
             }
       }
 });
+
+// September 2021 => Solves the problem of CSS loaders not cleaned
+// see https://github.com/presscustomizr/nimble-builder/issues/874
+nb_.listenTo('nb-docready', function() {
+      jQuery(function($){
+            var $cssLoaders = $('.sek-css-loader');
+            if ( $cssLoaders.length < 1 )
+                  return;
+
+            var $el, 
+                  removeCssLoaderAfterADelay = nb_.throttle( function() {
+                        $cssLoaders = $('.sek-css-loader');
+                        $.each($cssLoaders, function(){
+                              $el = $(this);
+                              if ( nb_.elOrFirstVisibleParentIsInWindow($el) ) {
+                                    nb_.delay( function() {
+                                          if ( $el.length > 0 ) {
+                                                $el.remove();
+                                                console.log('REMOVED LOADER', $el );
+                                          }
+                                          
+                                    }, 2000);
+                              }
+                        });
+                        
+                        if ( $cssLoaders.length < 1 ) {
+                              // When no more loaders to remove, remove scroll listener
+                              nb_.cachedElements.$window.off('scroll', removeCssLoaderAfterADelay );
+                        }
+                  }, 200 );
+            nb_.cachedElements.$window.on('scroll', removeCssLoaderAfterADelay );
+      });
+});
