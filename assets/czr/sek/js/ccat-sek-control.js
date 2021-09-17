@@ -21110,6 +21110,20 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   // Note : must be always invoked always after the input / item class extension
                   // Otherwise the constructor might be extended too early and not taken into account. @see https://github.com/presscustomizr/nimble-builder/issues/37
                   api.CZRDynModule.prototype.initialize.call( module, id, options );
+
+                  //SET THE CONTENT PICKER DEFAULT OPTIONS ( FOR PRO)
+                  //@see ::setupContentPicker()
+                  module.bind( 'set_default_content_picker_options', function( params ) {
+                        params.defaultContentPickerOption.defaultOption = {
+                              'title'      : '<span style="font-weight:bold">' + sektionsLocalizedData.i18n['Set a custom url'] + '</span>',
+                              'type'       : '',
+                              'type_label' : '',
+                              'object'     : '',
+                              'id'         : '_custom_',
+                              'url'        : ''
+                        };
+                        return params;
+                  });
             },//initialize
 
 
@@ -21371,6 +21385,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         //Internal item dependencies
                         item.czr_Input.each( function( input ) {
                               switch( input.id ) {
+                                    // link-to and pick url are FOR PRO
                                     case 'link-to' :
                                           _.each( [ 'link-pick-url', 'link-custom-url', 'link-target' ] , function( _inputId_ ) {
                                                 try { api.czr_sektions.scheduleVisibilityOfInputId.call( input, _inputId_, function() {

@@ -2875,6 +2875,7 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
 [data-sek-module-type="czr_img_slider_module"] .swiper {
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
 [data-sek-module-type="czr_img_slider_module"] .swiper .swiper-wrapper {
@@ -2944,6 +2945,10 @@ li.expanded > .nb-dd-mm-toggle-wrapper .nb-arrow-for-mobile-menu {
   justify-content: center;
   -ms-flex-align: center;
   align-items: center;
+}
+
+[data-sek-module-type="czr_img_slider_module"] .swiper-slide[data-sek-slide-link] {
+  cursor: pointer;
 }
 
 [data-sek-module-type="czr_img_slider_module"] .swiper-slide .sek-carousel-img {

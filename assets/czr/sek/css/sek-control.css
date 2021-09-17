@@ -1129,7 +1129,8 @@ credits : Gutenberg team @wordpress */
 .sek-pro-notice {
   position: relative;
   padding-left: 36px;
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: bold;
 }
 .sek-pro-notice a, .sek-pro-notice a:hover, .sek-pro-notice a:focus {
   color: #f07829;

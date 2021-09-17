@@ -407,7 +407,7 @@ function sek_get_module_params_for_czr_image_main_settings_child() {
                 ),
                 'link-target' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Open link in a new page', 'text_doma'),
+                    'title'       => __('Open link in a new browser tab', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -1240,7 +1240,7 @@ function sek_get_module_params_for_czr_heading_child() {
                 ),
                 'link-target' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Open link in a new page', 'text_doma'),
+                    'title'       => __('Open link in a new browser tab', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -1529,7 +1529,7 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                 ),
                 'link-target' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Open link in a new page', 'text_doma'),
+                    'title'       => __('Open link in a new browser tab', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -2438,7 +2438,7 @@ function sek_get_module_params_for_czr_btn_content_child() {
                 ),
                 'link-target' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Open link in a new page', 'text_doma'),
+                    'title'       => __('Open link in a new browser tab', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -5610,6 +5610,11 @@ function sanitize_cb__czr_img_slider_module( $value ) {
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_img_slider_collection_child() {
     $text_content_selector = array( '.sek-slider-text-content', '.sek-slider-text-content *' );
+    $pro_text = '';
+    if ( !sek_is_pro() ) {
+        $pro_text = __( 'add transition options with effects like fade or flip, link slides individually to any content.', 'text-doma');
+        $pro_text = sek_get_pro_notice_for_czr_input( $pro_text );
+    }
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_img_slider_collection_child',
@@ -5653,7 +5658,8 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
                                 'input_type'  => 'text',
                                 'default'     => '',
                                 'title'       => __('Title', 'text_domain_to_be_replaced'),
-                                'notice_after' => sprintf( __('This is the text displayed on mouse over. You can use the following template tags referring to the image attributes : %1$s', 'text_domain_to_be_replaced'), '&#123;&#123;title&#125;&#125;, &#123;&#123;caption&#125;&#125;, &#123;&#123;description&#125;&#125;' )
+                                'notice_after' => sprintf( __('This is the text displayed on mouse over. You can use the following template tags referring to the image attributes : %1$s', 'text_domain_to_be_replaced'), '&#123;&#123;title&#125;&#125;, &#123;&#123;caption&#125;&#125;, &#123;&#123;description&#125;&#125;' ),
+                                'html_after' => $pro_text
                             )
                         )
                     ),
@@ -5823,6 +5829,11 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
  *  SLIDER OPTIONS
 /* ------------------------------------------------------------------------- */
 function sek_get_module_params_for_czr_img_slider_opts_child() {
+    $pro_text = '';
+    if ( !sek_is_pro() ) {
+        $pro_text = __( 'add transition options with effects like fade or flip, link slides individually to any content.', 'text-doma');
+        $pro_text = sek_get_pro_notice_for_czr_input( $pro_text );
+    }
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_img_slider_opts_child',
@@ -5901,6 +5912,7 @@ function sek_get_module_params_for_czr_img_slider_opts_child() {
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20',
                                 'notice_after' => __('Lazy loading images improves page load performances.', 'text_doma' ),
+                                'html_before' => $pro_text
                             ),
                             'bg_color_css' => array(
                                 'input_type'  => 'wp_color_alpha',
@@ -7053,7 +7065,7 @@ function sek_get_module_params_for_czr_gallery_opts_child() {
 
                 'link-target' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Open link in a new page', 'text_doma'),
+                    'title'       => __('Open link in a new browser tab', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
