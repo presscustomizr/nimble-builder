@@ -97,7 +97,7 @@ function sek_get_module_params_for_czr_heading_child() {
                 ),
                 'link-target' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Open link in a new page', 'text_doma'),
+                    'title'       => __('Open link in a new browser tab', 'text_doma'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
