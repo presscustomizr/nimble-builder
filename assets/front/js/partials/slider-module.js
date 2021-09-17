@@ -151,6 +151,10 @@
                         });
                     }
 
+                    // Allow developers to add params to the slider
+                    // See swiper API https://swiperjs.com/swiper-api
+                    $('body').trigger('nb-filter-swiper-params', {swiper_params:swiperParams, swiper_wrapper:$swiperWrapper});
+
                     mySwipers.push( new Swiper(
                         '.' + swiperClass,//$(this)[0],
                         swiperParams

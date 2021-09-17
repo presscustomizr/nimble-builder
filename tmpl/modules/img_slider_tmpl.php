@@ -205,7 +205,7 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
       $nav_type = ( is_string( $slider_options['nav_type'] ) && !empty( $slider_options['nav_type'] ) ) ? $slider_options['nav_type'] : 'arrows_dots';
       $hide_nav_on_mobiles = true === sek_booleanize_checkbox_val( $slider_options['hide_nav_on_mobiles'] );
       ?>
-        <?php printf('<div class="swiper sek-swiper-loading sek-swiper%1$s" data-sek-swiper-id="%1$s" data-sek-autoplay="%2$s" data-sek-autoplay-delay="%3$s" data-sek-pause-on-hover="%4$s" data-sek-loop="%5$s" data-sek-image-layout="%6$s" data-sek-navtype="%7$s" data-sek-is-multislide="%8$s" data-sek-hide-nav-on-mobile="%9$s" data-sek-lazyload="%10$s">',
+        <?php printf('<div class="swiper sek-swiper-loading sek-swiper%1$s" data-sek-swiper-id="%1$s" data-sek-autoplay="%2$s" data-sek-autoplay-delay="%3$s" data-sek-pause-on-hover="%4$s" data-sek-loop="%5$s" data-sek-image-layout="%6$s" data-sek-navtype="%7$s" data-sek-is-multislide="%8$s" data-sek-hide-nav-on-mobile="%9$s" data-sek-lazyload="%10$s" %11$s>',
             $model['id'],
             $autoplay,
             $autoplay_delay,
@@ -215,7 +215,8 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
             $nav_type,
             $is_multislide ? 'true' : 'false',
             $hide_nav_on_mobiles ? 'true' : 'false',
-            $lazy_load_on
+            $lazy_load_on,
+            apply_filters('nb_slider_wrapper_custom_attributes', '', $slider_options, $model )
           ); ?>
           <?php if ( is_array( $img_collection ) && count( $img_collection ) > 0 ) : ?>
             <div class="swiper-wrapper">
@@ -238,12 +239,13 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
                   $has_overlay = true === sek_booleanize_checkbox_val( $item['apply-overlay'] );
 
                   // Put them together
-                  printf( '<div class="swiper-slide" title="%1$s" data-sek-item-id="%4$s" data-sek-has-overlay="%5$s"><figure class="sek-carousel-img">%2$s</figure>%3$s</div>',
+                  printf( '<div class="swiper-slide" title="%1$s" data-sek-item-id="%4$s" data-sek-has-overlay="%5$s" %6$s><figure class="sek-carousel-img">%2$s</figure>%3$s</div>',
                       sek_slider_parse_template_tags( strip_tags( esc_attr( $item['title_attr'] ) ), $item ),
                       sek_get_img_slider_module_img_html( $item, "true" === $lazy_load_on, $index ),
                       sek_slider_parse_template_tags( $text_html, $item ),
                       $item['id'],
-                      true === sek_booleanize_checkbox_val( $has_overlay ) ? 'true' : 'false'
+                      true === sek_booleanize_checkbox_val( $has_overlay ) ? 'true' : 'false',
+                      apply_filters('nb_single_slide_custom_attributes', '', $item, $model )
                   );
 
               }//foreach

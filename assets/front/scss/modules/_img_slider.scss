@@ -22,6 +22,7 @@
     .swiper {
       width: 100%;
       height: 100%;
+      overflow: hidden;
       .swiper-wrapper {
         display: -ms-flexbox;
         display: flex;
@@ -95,6 +96,9 @@
       -ms-flex-align: center;
       -webkit-align-items: center;
       align-items: center;
+      &[data-sek-slide-link] {
+        cursor: pointer;
+      }
       .sek-carousel-img {
         width: 100%;
         img {
