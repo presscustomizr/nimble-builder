@@ -151,9 +151,47 @@
                         });
                     }
 
-                    // Allow developers to add params to the slider
-                    // See swiper API https://swiperjs.com/swiper-api
-                    $('body').trigger('nb-filter-swiper-params', {swiper_params:swiperParams, swiper_wrapper:$swiperWrapper});
+                  // Prepare Pro slider effects
+                  var _effect = '',
+                        _duration = 300;//default Swiper value
+
+                  if ( $swiperWrapper && $swiperWrapper.length > 0 ) {
+                        _effect = $swiperWrapper.data('sek-slider-effect');
+                        _duration =  parseInt( $swiperWrapper.data('sek-effect-duration'), 10 );
+                  }
+                  if ( _duration > 0 ) {
+                        $.extend( swiperParams, {
+                              speed : _duration
+                        });
+                  }
+                  if ( nb_.isString( _effect) && 0 !== _effect.length ) {
+                        $.extend( swiperParams, {
+                              effect: _effect
+                        });
+                        // See doc here : https://swiperjs.com/swiper-api#fade-effect
+                        switch (_effect) {
+                              case 'fade':
+                                    swiperParams[_effect + 'Effect'] = {
+                                    crossFade: true
+                              };
+                              break;
+                              case 'coverflow':
+                                    swiperParams[_effect + 'Effect'] = {
+                                          rotate: 30,
+                                          slideShadows: false
+                                    };
+                              break;
+                              case 'flip':
+                              case 'cube':
+                                    swiperParams[_effect + 'Effect'] = {
+                                          slideShadows: false
+                                    };
+                              break;
+                              case 'cards':
+                                    swiperParams[_effect + 'Effect'] = {};
+                              break;
+                        }
+                  }
 
                     mySwipers.push( new Swiper(
                         '.' + swiperClass,//$(this)[0],
