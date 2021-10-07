@@ -5831,7 +5831,7 @@ function sek_get_module_params_for_czr_img_slider_collection_child() {
 function sek_get_module_params_for_czr_img_slider_opts_child() {
     $pro_text = '';
     if ( !sek_is_pro() ) {
-        $pro_text = __( 'add transition options with effects like fade or flip, link slides individually to any content.', 'text-doma');
+        $pro_text = __( 'add transition options with effects like fade and flip, link slides individually to any content.', 'text-doma');
         $pro_text = sek_get_pro_notice_for_czr_input( $pro_text );
     }
     return array(

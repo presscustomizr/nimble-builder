@@ -51,7 +51,7 @@ if ( !defined( 'NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID') ) { define( 'NIMBLE_DETACH
 // TRANSIENTS ID
 if ( !defined( 'NIMBLE_WELCOME_NOTICE_ID' ) ) { define ( 'NIMBLE_WELCOME_NOTICE_ID', 'nimble-welcome-notice-12-2018' ); }
 //mt_rand(0, 65535) . 'test-nimble-feedback-notice-04-2019'
-if ( !defined( 'NIMBLE_FEEDBACK_NOTICE_ID' ) ) { define ( 'NIMBLE_FEEDBACK_NOTICE_ID', 'nimble-feedback-notice-06-2021' ); }
+if ( !defined( 'NIMBLE_FEEDBACK_NOTICE_ID' ) ) { define ( 'NIMBLE_FEEDBACK_NOTICE_ID', 'nimble-feedback-notice-10-2021' ); }
 if ( !defined( 'NIMBLE_FAWESOME_TRANSIENT_ID' ) ) { define ( 'NIMBLE_FAWESOME_TRANSIENT_ID', 'sek_font_awesome_february_2020' ); }
 if ( !defined( 'NIMBLE_GFONTS_TRANSIENT_ID' ) ) { define ( 'NIMBLE_GFONTS_TRANSIENT_ID', 'sek_gfonts_march_2020' ); }
 if ( !defined( 'NIMBLE_FEEDBACK_STATUS_TRANSIENT_ID' ) ) { define ( 'NIMBLE_FEEDBACK_STATUS_TRANSIENT_ID', 'nimble_feedback_status' ); }
@@ -2906,7 +2906,7 @@ function sek_get_feedback_notif_status() {
     // sek_error_log('$modules_used ?? ' . count($modules_used), $modules_used );
     // sek_error_log('$customized_pages ??', $customized_pages );
     //version_compare( $this->wp_version, '4.1', '>=' )
-    if ( $customized_pages > 1 && $nb_section_created > 3 && count($modules_used) > 3 ) {
+    if ( $customized_pages > 1 && $nb_section_created > 1 && count($modules_used) > 1 ) {
         $transient_value = 'eligible';
     }
     set_transient( $transient_name, $transient_value, 7 * DAY_IN_SECONDS );
