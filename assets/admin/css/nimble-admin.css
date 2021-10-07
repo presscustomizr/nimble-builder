@@ -99,8 +99,24 @@ a.czr-rating-link:hover {
             align-items: center;
 }
 .nimble-logo-feedback-notice .nimble-feedback a { text-decoration: underline;}
-.nimble-logo-feedback-notice .nimble-feedback p { font-size: 14px;font-weight: 600;}
-
+.nimble-logo-feedback-notice .nimble-feedback p { font-size: 14px;font-weight:600;}
+/* style copied from wp core .update-plugins */
+.nb-wp-menu-notif {
+  display: inline-block;
+  vertical-align: top;
+  box-sizing: border-box;
+  margin: 1px 0 -1px 2px;
+  padding: 0 5px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background-color: #00a32a;
+  color: #fff;
+  font-size: 11px;
+  line-height: 1.6;
+  text-align: center;
+  z-index: 26;
+}
 
 
 
