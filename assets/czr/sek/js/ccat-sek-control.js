@@ -3625,6 +3625,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // 1) when instantiating the setting
             // 2) on each setting change, as an override of api.Value::validate( to ) @see customize-base.js
             // 3) directly when navigating the history log
+            // 4) when importing locally or globally
             // @return {} or null if did not pass the checks
             // @param scope = string, local or global
             validateSettingValue : function( valCandidate, scope ) {
@@ -3834,6 +3835,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   if ( errorDetected ) {
                         api.infoLog('error in ::validateSettingValue', valCandidate );
+                        return null;
                   }
                   //api.infoLog('in ::validateSettingValue', valCandidate );
                   // if null is returned, the setting value is not set @see customize-base.js
@@ -7261,7 +7263,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     } else if ( ! isSettingValueChangeCase && _.isEqual( currentSetValue, self.updAPISetParams.newSetValue ) ) {
                                           self.updAPISetParams.promise.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
-                                          if ( null !== self.validateSettingValue( self.updAPISetParams.newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
+                                          // method ::validateSettingValue() returns null if there is at least one validation error
+                                          var _settingValidationResult = self.validateSettingValue( self.updAPISetParams.newSetValue, params.is_global_location ? 'global' : 'local' );
+                                          if ( null !== _settingValidationResult && !_.isUndefined(_settingValidationResult) ) {
                                                 if ( !params.is_global_location ) {
                                                       // INHERITANCE
                                                       // solves the problem of preventing group template inheritance after a local reset
@@ -7294,7 +7298,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                               };//mayBeUpdateSektionsSetting()
 
-                              // For all scenarios but section injection, we can update the sektion setting now
+                              // For all scenarios except section injection, we can update the sektion setting now
                               // otherwise we need to wait for the injection to be processed asynchronously
                               // CRITICAL => self.updAPISetParams.promise has to be resolved / rejected
                               // otherwise this can lead to scenarios where a change is not taken into account in ::updateAPISettingAndExecutePreviewActions
@@ -15459,8 +15463,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                               api.errare( 'reset_button input => invalid scope provided.', scope );
                               return;
                         }
-
-                        api.previewer.trigger('sek-reset-collection', { scope : 'local' } );
+                        api.previewer.trigger('sek-reset-collection', { scope : scope } );
                         
                   });//on('click')
             }
