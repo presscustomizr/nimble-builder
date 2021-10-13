@@ -20,8 +20,7 @@
                               api.errare( 'reset_button input => invalid scope provided.', scope );
                               return;
                         }
-
-                        api.previewer.trigger('sek-reset-collection', { scope : 'local' } );
+                        api.previewer.trigger('sek-reset-collection', { scope : scope } );
                         
                   });//on('click')
             }
