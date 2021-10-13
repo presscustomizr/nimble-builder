@@ -302,7 +302,9 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     } else if ( ! isSettingValueChangeCase && _.isEqual( currentSetValue, self.updAPISetParams.newSetValue ) ) {
                                           self.updAPISetParams.promise.reject( 'updateAPISetting => the new setting value is unchanged when firing action : ' + params.action );
                                     } else {
-                                          if ( null !== self.validateSettingValue( self.updAPISetParams.newSetValue, params.is_global_location ? 'global' : 'local' ) ) {
+                                          // method ::validateSettingValue() returns null if there is at least one validation error
+                                          var _settingValidationResult = self.validateSettingValue( self.updAPISetParams.newSetValue, params.is_global_location ? 'global' : 'local' );
+                                          if ( null !== _settingValidationResult && !_.isUndefined(_settingValidationResult) ) {
                                                 if ( !params.is_global_location ) {
                                                       // INHERITANCE
                                                       // solves the problem of preventing group template inheritance after a local reset
@@ -335,7 +337,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                                     }
                               };//mayBeUpdateSektionsSetting()
 
-                              // For all scenarios but section injection, we can update the sektion setting now
+                              // For all scenarios except section injection, we can update the sektion setting now
                               // otherwise we need to wait for the injection to be processed asynchronously
                               // CRITICAL => self.updAPISetParams.promise has to be resolved / rejected
                               // otherwise this can lead to scenarios where a change is not taken into account in ::updateAPISettingAndExecutePreviewActions

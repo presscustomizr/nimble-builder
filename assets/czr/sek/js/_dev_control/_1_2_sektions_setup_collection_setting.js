@@ -108,6 +108,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
             // 1) when instantiating the setting
             // 2) on each setting change, as an override of api.Value::validate( to ) @see customize-base.js
             // 3) directly when navigating the history log
+            // 4) when importing locally or globally
             // @return {} or null if did not pass the checks
             // @param scope = string, local or global
             validateSettingValue : function( valCandidate, scope ) {
@@ -317,6 +318,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
 
                   if ( errorDetected ) {
                         api.infoLog('error in ::validateSettingValue', valCandidate );
+                        return null;
                   }
                   //api.infoLog('in ::validateSettingValue', valCandidate );
                   // if null is returned, the setting value is not set @see customize-base.js
