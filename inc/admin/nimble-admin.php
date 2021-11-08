@@ -919,6 +919,7 @@ function sek_maybe_display_feedback_notice() {
         </div>
       </div>
       <p style="font-size:14px;font-weight:600"><?php _e('Thank you 🙏 ! Nimble Builder needs your sponsorship to keep improving and helping you design your website in the best possible way.' ); ?></p>
+      <p style="font-size:14px;font-weight:bold"><?php _e('Limited offer : get 20% off with code BTDNOV2021 at checkout.' ); ?> <a class="sek-pro-link-in-dashboard" href="https://presscustomizr.com/nimble-builder-pro/" rel="noopener noreferrer" title="Go Pro" target="_blank">Go Pro</a> <span style="color: #f07829;" class="dashicons dashicons-external"></span></p>
       <button type="button" class="notice-dismiss" title="<?php _e('Dismiss this notice.'); ?>">
         <span class="screen-reader-text"><?php _e('Dismiss this notice.'); ?></span>
       </button>
