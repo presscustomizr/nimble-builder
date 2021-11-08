@@ -171,7 +171,7 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
                 $global_css = get_option(NIMBLE_OPT_FOR_GLOBAL_CSS);
             }
             if ( is_string( $global_css ) && !empty( $global_css ) ) {
-                printf('<style type="text/css" id="%1$s">%2$s</style>', NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID, $global_css );
+                printf('<style id="%1$s">%2$s</style>', NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID, $global_css );
             }
         }
 

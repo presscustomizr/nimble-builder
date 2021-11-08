@@ -1214,7 +1214,7 @@ class Sek_Dyn_CSS_Handler {
                     /*
                     * TODO: make sure all the deps are enqueued
                     */
-                    printf( '<link rel="stylesheet" id="sek-dyn-%1$s-css" href="%2$s" type="text/css" media="all" />',
+                    printf( '<link rel="stylesheet" id="sek-dyn-%1$s-css" href="%2$s" media="all" />',
                         $this->id,
                         //this resource version is built upon the file last modification time
                         add_query_arg( array( 'ver' => filemtime($this->uri) ), $this->url )
@@ -1253,7 +1253,7 @@ class Sek_Dyn_CSS_Handler {
             $dep =  array_pop( $this->dep );
 
             if ( !$dep || wp_style_is( $dep, 'done' ) || !wp_style_is( $dep, 'done' ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
-                printf( '<style id="sek-%1$s" type="text/css" media="all">%2$s</style>', $this->id, $this->css_string_to_enqueue_or_print );
+                printf( '<style id="sek-%1$s" media="all">%2$s</style>', $this->id, $this->css_string_to_enqueue_or_print );
             } else {
                 //not sure
                 wp_add_inline_style( $dep , $this->css_string_to_enqueue_or_print );
@@ -5891,7 +5891,7 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
                 $global_css = get_option(NIMBLE_OPT_FOR_GLOBAL_CSS);
             }
             if ( is_string( $global_css ) && !empty( $global_css ) ) {
-                printf('<style type="text/css" id="%1$s">%2$s</style>', NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID, $global_css );
+                printf('<style id="%1$s">%2$s</style>', NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID, $global_css );
             }
         }
 
