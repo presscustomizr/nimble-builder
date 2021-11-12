@@ -121,26 +121,26 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
     // If no results or post has been trashed, NB will try to get it with a query by name + update the index of skoped post ids
     $post_id = sek_get_nb_post_id_from_index( $skope_id );
 
-    //sek_error_log( __FUNCTION__ . ' post id => ' . $post_id . ' | skope id =>' . $skope_id);
-
     if ( !is_int( $post_id ) ) {
         error_log( 'sek_get_seks_post => post_id !is_int() for options => ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id );
     }
     // if the options has not been set yet, it will return (int) 0
     // id #1 is already taken by the 'Hello World' post.
-    if ( 1 > $post_id ) {
+    // skip this check when in NIMBLE_CPT_DEBUG_MODE
+    if ( 1 > $post_id && !( defined( "NIMBLE_CPT_DEBUG_MODE" ) && NIMBLE_CPT_DEBUG_MODE ) ) {
         //error_log( 'sek_get_seks_post => post_id is not valid for options => ' . NIMBLE_OPT_PREFIX_FOR_SEKTION_COLLECTION . $skope_id );
         return;
     }
-    
+
     if ( is_int( $post_id ) && $post_id > 0 ) {
         $post = get_post( $post_id );
     }
 
-    $no_post_found = !$post && -1 !== $post_id;
+    $no_post_found = !$post || -1 !== $post_id;
     $post_trashed = !empty($post) && is_object($post) && 'trash' === $post->post_status;
 
     // `-1` indicates no post exists; no query necessary.
+    // always query post when in NIMBLE_CPT_DEBUG_MODE
     if ( $no_post_found || $post_trashed ) {
         $query = new \WP_Query( $sek_post_query_vars );
         $post = $query->post;
@@ -151,6 +151,7 @@ function sek_get_seks_post( $skope_id = '', $skope_level = 'local' ) {
          */
         sek_set_nb_post_id_in_index( $skope_id, (int)$post_id );
     }
+    
     if ( !skp_is_customizing() ) {
         $cached_seks_posts[$skope_id] = $post;
         Nimble_Manager()->seks_posts = $cached_seks_posts;
@@ -215,7 +216,7 @@ function sek_get_skoped_seks( $skope_id = '', $location_id = '', $skope_level = 
         //     //sek_error_log('alors local skope id for fetching local sections ?', $skope_id );
         // }
         $seks_data = sek_get_seks_without_group_inheritance( $skope_id );
-
+        
         // March 2021 : added for site templates #478
         // Use site template if
         // - ! global skope
