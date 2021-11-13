@@ -8890,7 +8890,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                   if ( true === params.assign_missing_locations ) {
                         var importedActiveLocations = params.imported_content.metas.active_locations,
                             allActiveLocations = api.czr_sektions.activeLocations(),
-                            currentActiveLocations;
+                            currentActiveLocations = [];
 
                         // Set the current active locations excluding header and footer location
                         _.each( allActiveLocations, function( loc_id ) {
