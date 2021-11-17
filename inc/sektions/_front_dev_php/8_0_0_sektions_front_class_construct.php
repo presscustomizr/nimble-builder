@@ -297,6 +297,8 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             if ( sek_is_widget_module_disabled() )
               return;
 
+            $number_of_widgets = apply_filters( 'nimble_number_of_wp_widgets', 10 );
+
             // Header/footer, widgets module, menu module have been beta tested during 5 months and released in June 2019, in version 1.8.0
             $defaults = array(
                 'name'          => '',
@@ -308,7 +310,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
                 'before_title'  => '<h2 class="widget-title">',
                 'after_title'   => '</h2>',
             );
-            for ( $i=1; $i < 11; $i++ ) {
+            for ( $i=1; $i < ( intval( $number_of_widgets) + 1 ); $i++ ) {
                 $args['id'] = NIMBLE_WIDGET_PREFIX . $i;//'nimble-widget-area-'
                 $args['name'] = sprintf( __('Nimble widget area #%1$s', 'text_domain_to_replace' ), $i );
                 $args['description'] = $args['name'];
