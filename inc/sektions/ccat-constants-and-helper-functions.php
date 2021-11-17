@@ -39,6 +39,7 @@ if ( !defined( 'NIMBLE_OPT_NAME_FOR_SECTION_JSON' ) ) { define( 'NIMBLE_OPT_NAME
 
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES' ) ) { define( 'NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES' , 'nb_backward_fixes' ); }
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_SHORTCODE_PARSING' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SHORTCODE_PARSING' , 'nb_shortcodes_parsed_in_czr' ); }
+if ( !defined( 'NIMBLE_OPT_NAME_FOR_DISABLING_WIDGET_MODULE' ) ) { define( 'NIMBLE_OPT_NAME_FOR_DISABLING_WIDGET_MODULE' , 'nb_widgets_disabled_in_czr' ); }
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_DEBUG_MODE' ) ) { define( 'NIMBLE_OPT_NAME_FOR_DEBUG_MODE' , 'nb_debug_mode_active' ); }
 
 
@@ -1046,8 +1047,8 @@ function sek_get_module_collection() {
           'content-type' => 'module',
           'content-id' => 'czr_widget_area_module',
           'title' => __( 'WordPress widget area', 'text_doma' ),
-          'font_icon' => '<i class="fab fa-wordpress-simple"></i>'
-          //'active' => sek_are_beta_features_enabled()
+          'font_icon' => '<i class="fab fa-wordpress-simple"></i>',
+          'active' => !sek_is_widget_module_disabled()
         ),
         array(
           'content-type' => 'module',
@@ -3102,7 +3103,11 @@ function sek_is_nimble_widget_id( $id ) {
     return NIMBLE_WIDGET_PREFIX === substr( $id, 0, strlen( NIMBLE_WIDGET_PREFIX ) );
 }
 
-
+// @return bool
+// introduced for #883
+function sek_is_widget_module_disabled() {
+    return sek_booleanize_checkbox_val( get_option( NIMBLE_OPT_NAME_FOR_DISABLING_WIDGET_MODULE ) );
+}
 
 
 
