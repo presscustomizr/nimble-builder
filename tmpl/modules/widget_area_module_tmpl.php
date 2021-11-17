@@ -31,13 +31,14 @@ if ( !function_exists( 'Nimble\sek_maybe_print_widget_placeholder') ) {
   }
 }
 
-
-if ( array_key_exists( 'widget-area-id', $value ) && is_string( $value['widget-area-id'] )  ) {
-    if ( is_active_sidebar( $value['widget-area-id'] ) ) {
-        dynamic_sidebar( $value['widget-area-id'] );
-    } else {
-        if ( skp_is_customizing() ) {
-          sek_maybe_print_widget_placeholder( $value['widget-area-id'] );
+if ( ! sek_is_widget_module_disabled() ) {
+    if ( array_key_exists( 'widget-area-id', $value ) && is_string( $value['widget-area-id'] )  ) {
+        if ( is_active_sidebar( $value['widget-area-id'] ) ) {
+            dynamic_sidebar( $value['widget-area-id'] );
+        } else {
+            if ( skp_is_customizing() ) {
+            sek_maybe_print_widget_placeholder( $value['widget-area-id'] );
+            }
         }
     }
 }

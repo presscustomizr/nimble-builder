@@ -140,8 +140,8 @@ function sek_get_module_collection() {
           'content-type' => 'module',
           'content-id' => 'czr_widget_area_module',
           'title' => __( 'WordPress widget area', 'text_doma' ),
-          'font_icon' => '<i class="fab fa-wordpress-simple"></i>'
-          //'active' => sek_are_beta_features_enabled()
+          'font_icon' => '<i class="fab fa-wordpress-simple"></i>',
+          'active' => !sek_is_widget_module_disabled()
         ),
         array(
           'content-type' => 'module',

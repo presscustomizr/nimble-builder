@@ -294,6 +294,9 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // @fired @hook 'widgets_init'
         // Creates 10 widget zones
         public function sek_nimble_widgets_init() {
+            if ( sek_is_widget_module_disabled() )
+              return;
+
             // Header/footer, widgets module, menu module have been beta tested during 5 months and released in June 2019, in version 1.8.0
             $defaults = array(
                 'name'          => '',
@@ -316,7 +319,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
 
         // Invoked @'after_setup_theme'
         static function sek_get_front_module_collection() {
-            return apply_filters( 'sek_get_front_module_collection', [
+            $front_module_collection = [
               // FRONT MODULES
               'czr_simple_html_module',
 
@@ -393,8 +396,6 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
               ),
               //'czr_menu_design_child',
 
-              'czr_widget_area_module',
-
               'czr_social_icons_module' => array(
                 'czr_social_icons_module',
                 'czr_social_icons_settings_child',
@@ -420,7 +421,13 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
               ),
 
               'czr_shortcode_module',
-            ]);
+            ];
+
+            if ( !sek_is_widget_module_disabled() ) {
+              $front_module_collection[] = 'czr_widget_area_module';
+            }
+
+            return apply_filters( 'sek_get_front_module_collection', $front_module_collection );
         }
 
     }//class

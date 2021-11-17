@@ -352,6 +352,18 @@ function print_options_page() {
           </td>
         </tr>
         <tr>
+          <th scope="row"><?php _e('Widgets Module', 'text_doma'); ?></th>
+          <td>
+            <fieldset><legend class="screen-reader-text"><span><?php _e('Widgets module', 'text_doma'); ?></span></legend>
+              <?php
+                $widget_disabled_opt_val = get_option( NIMBLE_OPT_NAME_FOR_DISABLING_WIDGET_MODULE );
+              ?>
+              <label for="nb_widgets_disabled_in_czr"><input name="nb_widgets_disabled_in_czr" type="checkbox" id="nb_widgets_disabled_in_czr" value="on" <?php checked( $widget_disabled_opt_val, 'on' ); ?>>
+              <?php _e('Disable the Widgets Module', 'text_doma'); ?></label>
+            </fieldset>
+          </td>
+        </tr>
+        <tr>
           <th scope="row"><?php _e('Debug Mode', 'text_doma'); ?></th>
           <td>
             <fieldset><legend class="screen-reader-text"><span><?php _e('Debug Mode', 'text_doma'); ?></span></legend>
@@ -437,6 +449,8 @@ function nb_save_base_options() {
 
     // Shortcode parsing when customizing
     nb_maybe_update_checkbox_option( NIMBLE_OPT_NAME_FOR_SHORTCODE_PARSING, 'off' );
+    // Widgets disabled when customizing
+    nb_maybe_update_checkbox_option( NIMBLE_OPT_NAME_FOR_DISABLING_WIDGET_MODULE, 'off' );
     // Debug mode
     nb_maybe_update_checkbox_option( NIMBLE_OPT_NAME_FOR_DEBUG_MODE, 'off' );
 }

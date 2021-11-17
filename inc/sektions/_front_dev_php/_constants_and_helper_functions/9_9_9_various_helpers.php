@@ -90,7 +90,11 @@ function sek_is_nimble_widget_id( $id ) {
     return NIMBLE_WIDGET_PREFIX === substr( $id, 0, strlen( NIMBLE_WIDGET_PREFIX ) );
 }
 
-
+// @return bool
+// introduced for #883
+function sek_is_widget_module_disabled() {
+    return sek_booleanize_checkbox_val( get_option( NIMBLE_OPT_NAME_FOR_DISABLING_WIDGET_MODULE ) );
+}
 
 
 
