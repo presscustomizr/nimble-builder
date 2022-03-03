@@ -3342,10 +3342,16 @@ function sek_current_user_can_access_nb_ui() {
 function sek_clean_transients_like( $transient_string ) {
     global $wpdb;
     $where_like = '%'.$transient_string.'%';
+    // $sql = "SELECT `option_name` AS `name`, `option_value` AS `value`
+    //         FROM  $wpdb->options
+    //         WHERE `option_name` LIKE '$where_like'
+    //         ORDER BY `option_name`";
+    
     $sql = "SELECT `option_name` AS `name`, `option_value` AS `value`
             FROM  $wpdb->options
-            WHERE `option_name` LIKE '$where_like'
-            ORDER BY `option_name`";
+            WHERE `option_name` LIKE %s 
+            ORDER BY `option_name";
+    $sql = $wpdb->prepare($sql, array($where_like));
 
     $results = $wpdb->get_results( $sql );
     $transients = array();
@@ -3388,10 +3394,16 @@ function sek_clean_transients_like( $transient_string ) {
 function sek_clean_options_starting_like( $opt_string ) {
     global $wpdb;
     $where_like = '%'.$opt_string.'%';
+    // $sql = "SELECT `option_name` AS `name`, `option_value` AS `value`
+    //         FROM  $wpdb->options
+    //         WHERE `option_name` LIKE '$where_like'
+    //         ORDER BY `option_name`";
+
     $sql = "SELECT `option_name` AS `name`, `option_value` AS `value`
             FROM  $wpdb->options
-            WHERE `option_name` LIKE '$where_like'
+            WHERE `option_name` LIKE %s 
             ORDER BY `option_name`";
+    $sql = $wpdb->prepare($sql, array($where_like));
 
     $results = $wpdb->get_results( $sql );
     if ( !is_array( $results ) )
@@ -4255,7 +4267,13 @@ function sek_maybe_optimize_options() {
         if ( !array_key_exists('fix_skope_opt_autoload_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['fix_skope_opt_autoload_0321'] ) {
             // MOVE ALL OPTIONS LIKE nimble___skp__post_page_*****, nimble___skp__tax_product_cat_***** in a new option ( NIMBLE_OPT_SEKTION_POST_INDEX ), not autoloaded
             global $wpdb;
-            $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE autoload = 'yes' and option_name like 'nimble___skp_%'", ARRAY_A );
+            // $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE autoload = 'yes' and option_name like 'nimble___skp_%'", ARRAY_A );
+            
+            $tablename = $wpdb->prefix . "options";
+            
+            $sql = $wpdb->prepare( "SELECT * FROM %s WHERE autoload = 'yes' and option_name like 'nimble___skp_%'",$tablename );
+            $results = $wpdb->get_results( $sql , ARRAY_A );
+
             if ( is_array( $results ) ) {
                 foreach( $results as $old_opt_data ) {
                     if ( !is_array($old_opt_data) )
@@ -4277,7 +4295,12 @@ function sek_maybe_optimize_options() {
     if ( !array_key_exists('move_in_post_index_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['move_in_post_index_0321'] ) {
         // MOVE ALL OPTIONS LIKE nimble___skp__post_page_*****, nimble___skp__tax_product_cat_***** in a new option ( NIMBLE_OPT_SEKTION_POST_INDEX ), not autoloaded
         global $wpdb;
-        $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE autoload = 'yes' and option_name like 'nimble___skp_%'", ARRAY_A );
+        // $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE autoload = 'yes' and option_name like 'nimble___skp_%'", ARRAY_A );
+        
+        $tablename = $wpdb->prefix . "options";
+            
+        $sql = $wpdb->prepare( "SELECT * FROM %s WHERE autoload = 'yes' and option_name like 'nimble___skp_%'",$tablename );
+        $results = $wpdb->get_results( $sql , ARRAY_A );
         if ( is_array( $results ) ) {
             // Populate the new option ( it should not exists at this point )
             $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);

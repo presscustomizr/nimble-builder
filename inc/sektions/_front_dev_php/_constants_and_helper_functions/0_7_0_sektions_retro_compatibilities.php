@@ -38,7 +38,11 @@ function sek_maybe_optimize_options() {
         if ( !array_key_exists('fix_skope_opt_autoload_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['fix_skope_opt_autoload_0321'] ) {
             // MOVE ALL OPTIONS LIKE nimble___skp__post_page_*****, nimble___skp__tax_product_cat_***** in a new option ( NIMBLE_OPT_SEKTION_POST_INDEX ), not autoloaded
             global $wpdb;
-            $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE autoload = 'yes' and option_name like 'nimble___skp_%'", ARRAY_A );
+            $tablename = $wpdb->prefix . "options";
+            
+            $sql = $wpdb->prepare( "SELECT * FROM %s WHERE autoload = 'yes' and option_name like 'nimble___skp_%'",$tablename );
+            $results = $wpdb->get_results( $sql , ARRAY_A );
+            // $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE autoload = 'yes' and option_name like 'nimble___skp_%'", ARRAY_A );
             if ( is_array( $results ) ) {
                 foreach( $results as $old_opt_data ) {
                     if ( !is_array($old_opt_data) )
@@ -60,7 +64,13 @@ function sek_maybe_optimize_options() {
     if ( !array_key_exists('move_in_post_index_0321', $bw_fixes_options ) || 'done' != $bw_fixes_options['move_in_post_index_0321'] ) {
         // MOVE ALL OPTIONS LIKE nimble___skp__post_page_*****, nimble___skp__tax_product_cat_***** in a new option ( NIMBLE_OPT_SEKTION_POST_INDEX ), not autoloaded
         global $wpdb;
-        $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE autoload = 'yes' and option_name like 'nimble___skp_%'", ARRAY_A );
+        
+        $tablename = $wpdb->prefix . "options";
+            
+        $sql = $wpdb->prepare( "SELECT * FROM %s WHERE autoload = 'yes' and option_name like 'nimble___skp_%'",$tablename );
+        $results = $wpdb->get_results( $sql , ARRAY_A );
+
+        // $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}options WHERE autoload = 'yes' and option_name like 'nimble___skp_%'", ARRAY_A );
         if ( is_array( $results ) ) {
             // Populate the new option ( it should not exists at this point )
             $nb_posts_index = get_option(NIMBLE_OPT_SEKTION_POST_INDEX);

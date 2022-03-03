@@ -329,10 +329,15 @@ function sek_current_user_can_access_nb_ui() {
 function sek_clean_transients_like( $transient_string ) {
     global $wpdb;
     $where_like = '%'.$transient_string.'%';
-    $sql = "SELECT `option_name` AS `name`, `option_value` AS `value`
-            FROM  $wpdb->options
-            WHERE `option_name` LIKE '$where_like'
-            ORDER BY `option_name`";
+    // $sql = "SELECT `option_name` AS `name`, `option_value` AS `value`
+    //         FROM  $wpdb->options
+    //         WHERE `option_name` LIKE '$where_like'
+    //         ORDER BY `option_name`";
+
+    $tablename = $wpdb->prefix . "options";
+            
+    $sql = $wpdb->prepare( "SELECT * FROM %s WHERE `option_name` LIKE '$where_like' ORDER BY `option_name`",$tablename );
+    // $results = $wpdb->get_results( $sql , ARRAY_A );
 
     $results = $wpdb->get_results( $sql );
     $transients = array();
@@ -375,12 +380,16 @@ function sek_clean_transients_like( $transient_string ) {
 function sek_clean_options_starting_like( $opt_string ) {
     global $wpdb;
     $where_like = '%'.$opt_string.'%';
-    $sql = "SELECT `option_name` AS `name`, `option_value` AS `value`
-            FROM  $wpdb->options
-            WHERE `option_name` LIKE '$where_like'
-            ORDER BY `option_name`";
+    // $sql = "SELECT `option_name` AS `name`, `option_value` AS `value`
+    //         FROM  $wpdb->options
+    //         WHERE `option_name` LIKE '$where_like'
+    //         ORDER BY `option_name`";
+
+    $tablename = $wpdb->prefix . "options";        
+    $sql = $wpdb->prepare( "SELECT * FROM %s WHERE `option_name` LIKE '$where_like' ORDER BY `option_name`",$tablename );
 
     $results = $wpdb->get_results( $sql );
+    
     if ( !is_array( $results ) )
       return;
 

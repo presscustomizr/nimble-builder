@@ -26,7 +26,7 @@ function sek_plugin_menu() {
 // May 2020 => redirect to a system-info tab in the new options page
 add_action( 'admin_init' , '\Nimble\sek_redirect_system_info' );
 function sek_redirect_system_info() {
-    if ( isset( $_GET['page'] ) && 'nimble-builder' === $_GET['page'] ) {
+    if ( isset( $_GET['page'] ) && 'nimble-builder' === stripslashes($_GET['page']) ) {
         wp_safe_redirect( urldecode( admin_url( NIMBLE_OPTIONS_PAGE_URL . '&tab=system-info' ) ) );
         exit;
     }
@@ -968,7 +968,7 @@ function sek_render_welcome_notice() {
       return;
     if ( sek_welcome_notice_is_dismissed() )
       return;
-    if ( isset($_GET['page']) && NIMBLE_OPTIONS_PAGE === $_GET['page'] )
+    if ( isset($_GET['page']) && NIMBLE_OPTIONS_PAGE === stripslashes($_GET['page']) )
       return;
     // Prevent diplay on some admin pages
     // for https://github.com/presscustomizr/nimble-builder/issues/737

@@ -74,7 +74,7 @@ if ( !function_exists( 'Nimble\sek_render_post_navigation') ) {
               $paged = $paged ? $paged : 1;
               $model = Nimble_Manager()->model;
               $is_nimble_pagination = isset($_GET['nb_grid_module_go_to']);
-              $is_current_grid_paginated = $is_nimble_pagination && $model['id'] === $_GET['nb_grid_module_go_to'];
+              $is_current_grid_paginated = $is_nimble_pagination && $model['id'] === stripslashes($_GET['nb_grid_module_go_to']);
               // When user clicked on a pagination link, NB adds query params to the url ( removed via js once the page is loaded )
               // in this case, if there are several grids printed on the page we want to paginate only the paginated one
               // otherwise, if the pagination is accessed directly, or if the page is refreshed, all grids should be paginated according to the get_query_var($pagination_query_var) param
@@ -387,7 +387,7 @@ if ( $use_current_query ) {
 
 $paged = 1;
 $is_nimble_pagination_on = isset($_GET['nb_grid_module_go_to']);
-$is_current_grid_paginated = isset($_GET['nb_grid_module_go_to']) && $model['id'] === $_GET['nb_grid_module_go_to'];
+$is_current_grid_paginated = isset($_GET['nb_grid_module_go_to']) && $model['id'] === stripslashes($_GET['nb_grid_module_go_to']);
 // may 2020 => is_front_page() was wrong to check if home was a static front page.
 // fixes https://github.com/presscustomizr/nimble-builder/issues/664
 Nimble_Manager()->is_viewing_static_front_page = is_front_page() && 'page' == get_option( 'show_on_front' );

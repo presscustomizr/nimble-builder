@@ -519,7 +519,7 @@ function skp_is_customizing() {
     $is_customize_admin_page_one = (
       $is_customize_php_page
       ||
-      ( isset( $_REQUEST['wp_customize'] ) && 'on' == $_REQUEST['wp_customize'] )
+      ( isset( $_REQUEST['wp_customize'] ) && 'on' == stripslashes($_REQUEST['wp_customize']) )
       ||
       ( !empty( $_GET['customize_changeset_uuid'] ) || !empty( $_POST['customize_changeset_uuid'] ) )
     );
