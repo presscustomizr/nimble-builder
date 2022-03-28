@@ -26,8 +26,8 @@ sek_emit_js_event('nb-needs-menu-js');
 // janv 2021 => added data-sek-mobile-menu-breakpoint attribute which is hard coded to min-width:768px for the moment
 // in the future, this value could be set by users, see $grid-breakpoints in scss variables
 ?>
-<nav class="<?php echo $nav_classes; ?>" data-sek-expand-below="<?php echo $expand_below; ?>" data-sek-mobile-menu-breakpoint=768>
-    <button class="sek-nav-toggler sek-collapsed" type="button" data-target="#<?php echo $model['id'] ?>" aria-controls="<?php echo $model['id'] ?>" aria-expanded="false" aria-label="<?php esc_attr_e( 'Toggle navigation', 'textdomain_to_be_replaced' ) ?>">
+<nav class="<?php echo esc_attr($nav_classes); ?>" data-sek-expand-below="<?php echo esc_attr($expand_below); ?>" data-sek-mobile-menu-breakpoint=768>
+    <button class="sek-nav-toggler sek-collapsed" type="button" data-target="#<?php echo esc_attr($model['id']); ?>" aria-controls="<?php echo esc_attr($model['id']); ?>" aria-expanded="false" aria-label="<?php esc_attr_e( 'Toggle navigation', 'nimble-builder' ) ?>">
         <span class="sek-ham__span-wrapper">
           <span class="line line-1"></span>
           <span class="line line-2"></span>
@@ -38,7 +38,7 @@ sek_emit_js_event('nb-needs-menu-js');
       // WHY DO WE ADD this inline style display:none ?
       // in the stylesheet, .sek-nav-collapse {display: flex!important;} => This hack allows us to prevent a Content Layout Shift on page load
     ?>
-    <div class="sek-nav-collapse <?php echo $sek_nav_collapse_additional_classes ?>" id="<?php echo $model['id'] ?>" data-sek-mm-state="collapsed" style="display:none">
+    <div class="sek-nav-collapse <?php echo esc_attr($sek_nav_collapse_additional_classes) ?>" id="<?php echo esc_attr($model['id']); ?>" data-sek-mm-state="collapsed" style="display:none">
       <?php
         // june 2020 : filter menu classes => added for https://github.com/presscustomizr/nimble-builder-pro/issues/9
         $menu_classes = apply_filters( 'nb_wp_menu_classes', array( 'sek-menu-module', 'sek-nav' ), $model );

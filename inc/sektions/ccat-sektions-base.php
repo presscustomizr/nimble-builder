@@ -6847,7 +6847,7 @@ class Sek_Input_Textarea extends Sek_Input_Abstract {
     }
 
     public function sanitize( $value ) {
-        return wp_kses_post($value);
+        return sanitize_textarea_field($value);
     }
 
     public function escape( $value ) {

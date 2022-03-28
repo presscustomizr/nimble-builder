@@ -160,7 +160,7 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
 
 // Print
 if ( 'no-link' === $main_settings['link-to'] ) {
-    echo apply_filters('nb_img_module_html', sek_get_img_module_img_html( $main_settings ), $main_settings );
+    printf( apply_filters('nb_img_module_html', sek_get_img_module_img_html( $main_settings ), $main_settings ) );
 } else {
     $link = sek_get_img_module_img_link( $main_settings );
     printf('<a class="%4$s %5$s" href="%1$s" %2$s>%3$s</a>',

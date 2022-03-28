@@ -25,7 +25,7 @@ if ( !function_exists( __NAMESPACE__ . '\sek_print_quote_content' ) ) {
         //$quote_content = apply_filters( 'the_nimble_tinymce_module_content', $quote_content );
 
         if ( skp_is_customizing() ) {
-            $to_print = sprintf('<div title="%3$s" data-sek-input-type="textarea" data-sek-input-id="%1$s">%2$s</div>', $input_id, $quote_content, __( 'Click to edit', 'textdomain_to_be_replaced' ) );
+            $to_print = sprintf('<div title="%3$s" data-sek-input-type="textarea" data-sek-input-id="%1$s">%2$s</div>', $input_id, $quote_content, __( 'Click to edit', 'nimble-builder' ) );
         } else {
             $to_print = $quote_content;
         }

@@ -35,7 +35,7 @@ if ( !function_exists( 'Nimble\sek_print_tiny_mce_text_content') ) {
                 add_filter( 'the_nimble_tinymce_module_content', 'wpautop');
             }
             if ( skp_is_customizing() ) {
-                printf('<div title="%3$s" data-sek-input-type="detached_tinymce_editor" data-sek-input-id="%1$s">%2$s</div>', $input_id, $content, __( 'Click to edit', 'textdomain_to_be_replaced' ) );
+                printf('<div title="%3$s" data-sek-input-type="detached_tinymce_editor" data-sek-input-id="%1$s">%2$s</div>', $input_id, $content, __( 'Click to edit', 'nimble-builder' ) );
             } else {
                 echo apply_filters( 'nimble_parse_for_smart_load', $content );
             }

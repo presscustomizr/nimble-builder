@@ -206,12 +206,12 @@ if ( !class_exists( 'CZR_Fmk_Base_Load_Resources' ) ) :
                   'wp-color-picker',
                   'nb_wpColorPickerL10n',
                   array(
-                    'clear'            => __( 'Clear' ),
-                    'clearAriaLabel'   => __( 'Clear color' ),
-                    'defaultString'    => __( 'Default' ),
-                    'defaultAriaLabel' => __( 'Select default color' ),
-                    'pick'             => __( 'Select Color' ),
-                    'defaultLabel'     => __( 'Color value' )
+                    'clear'            => __( 'Clear', 'nimble-builder' ),
+                    'clearAriaLabel'   => __( 'Clear color', 'nimble-builder' ),
+                    'defaultString'    => __( 'Default', 'nimble-builder' ),
+                    'defaultAriaLabel' => __( 'Select default color', 'nimble-builder' ),
+                    'pick'             => __( 'Select Color', 'nimble-builder' ),
+                    'defaultLabel'     => __( 'Color value', 'nimble-builder' )
                   )
                 );
             }
@@ -265,25 +265,25 @@ if ( !class_exists( 'CZR_Fmk_Base_Load_Resources' ) ) :
                       'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('CZR_DEV') && true === CZR_DEV ),
                       'docURL'          => esc_url('docs.presscustomizr.com/'),
                       'i18n' => array(
-                            'edit' => __('Edit', 'text_doma'),
-                            'close' => __('Close', 'text_doma'),
-                            'notset' => __('Not set', 'text_doma'),
-                            'successMessage' => __('Done !', 'text_doma'),
+                            'edit' => __('Edit', 'nimble-builder'),
+                            'close' => __('Close', 'nimble-builder'),
+                            'notset' => __('Not set', 'nimble-builder'),
+                            'successMessage' => __('Done !', 'nimble-builder'),
 
-                            'readDocumentation' => __('Learn more about this in the documentation', 'text_doma'),
-                            'Settings' => __('Settings', 'text_doma'),
-                            'Options for' => __('Options for', 'text_doma'),
+                            'readDocumentation' => __('Learn more about this in the documentation', 'nimble-builder'),
+                            'Settings' => __('Settings', 'nimble-builder'),
+                            'Options for' => __('Options for', 'nimble-builder'),
 
                             // img upload translation
-                            'select_image'        => __( 'Select Image', 'text_doma' ),
-                            'change_image'        => __( 'Change Image', 'text_doma' ),
-                            'remove_image'        => __( 'Remove', 'text_doma' ),
-                            'default_image'       => __( 'Default', 'text_doma'  ),
-                            'placeholder_image'   => __( 'No image selected', 'text_doma' ),
-                            'frame_title_image'   => __( 'Select Image', 'text_doma' ),
-                            'frame_button_image'  => __( 'Choose Image', 'text_doma' ),
+                            'select_image'        => __( 'Select Image', 'nimble-builder' ),
+                            'change_image'        => __( 'Change Image', 'nimble-builder' ),
+                            'remove_image'        => __( 'Remove', 'nimble-builder' ),
+                            'default_image'       => __( 'Default', 'nimble-builder'  ),
+                            'placeholder_image'   => __( 'No image selected', 'nimble-builder' ),
+                            'frame_title_image'   => __( 'Select Image', 'nimble-builder' ),
+                            'frame_button_image'  => __( 'Choose Image', 'nimble-builder' ),
 
-                            'Customizing' => __('Customizing', 'text_doma'),
+                            'Customizing' => __('Customizing', 'nimble-builder'),
                       ),
                       'paramsForDynamicRegistration' => apply_filters( 'czr_fmk_dynamic_setting_js_params', array() ),
                       'activeTheme' => $parent_theme
@@ -474,7 +474,7 @@ if ( !class_exists( 'CZR_Fmk_Base_Ajax_Filter' ) ) :
             if ( !check_ajax_referer( $action, 'nonce', false ) ) {
                  wp_send_json_error( array(
                   'code' => 'invalid_nonce',
-                  'message' => __( 'ac_set_ajax_czr_tmpl => Security check failed.' ),
+                  'message' => __( 'ac_set_ajax_czr_tmpl => Security check failed.', 'nimble-builder' ),
                 ) );
             }
 
@@ -484,8 +484,8 @@ if ( !class_exists( 'CZR_Fmk_Base_Ajax_Filter' ) ) :
             if ( !isset( $_POST['tmpl'] ) || empty( $_POST['tmpl'] ) ) {
                 wp_send_json_error( 'ac_set_ajax_czr_tmpl => missing tmpl property in posted data' );
             }
-            $tmpl = $_POST['tmpl'];
-            $module_type = $_POST['module_type'];
+            $tmpl = sanitize_text_field($_POST['tmpl']);
+            $module_type = sanitize_text_field($_POST['module_type']);
 
             ///////////////////////////////////////////////////////////////////////
             // @param $tmpl = 'item-inputs'
@@ -546,34 +546,34 @@ if ( !class_exists( 'CZR_Fmk_Base_Ajax_Filter' ) ) :
             switch ( $requested_tmpl ) {
                 case 'crud-module-part' :
                     ?>
-                      <button class="<?php echo $css_attr['open_pre_add_btn']; ?>"><?php _e('Add New', 'text_doma'); ?> <span class="fas fa-plus-square"></span></button>
-                      <div class="<?php echo $css_attr['pre_add_wrapper']; ?>">
-                        <div class="<?php echo $css_attr['pre_add_success']; ?>"><p></p></div>
-                        <div class="<?php echo $css_attr['pre_add_item_content']; ?>">
+                      <button class="<?php echo esc_attr($css_attr['open_pre_add_btn']); ?>"><?php _e('Add New', 'nimble-builder'); ?> <span class="fas fa-plus-square"></span></button>
+                      <div class="<?php echo esc_attr($css_attr['pre_add_wrapper']); ?>">
+                        <div class="<?php echo esc_attr($css_attr['pre_add_success']); ?>"><p></p></div>
+                        <div class="<?php echo esc_attr($css_attr['pre_add_item_content']); ?>">
 
-                          <span class="<?php echo $css_attr['cancel_pre_add_btn']; ?> button"><?php _e('Cancel', 'text_doma'); ?></span> <span class="<?php echo $css_attr['add_new_btn']; ?> button"><?php _e('Add it', 'text_doma'); ?></span>
+                          <span class="<?php echo esc_attr($css_attr['cancel_pre_add_btn']); ?> button"><?php _e('Cancel', 'nimble-builder'); ?></span> <span class="<?php echo esc_attr($css_attr['add_new_btn']); ?> button"><?php _e('Add it', 'nimble-builder'); ?></span>
                         </div>
                       </div>
                     <?php
                 break;
                 case 'rud-item-part' :
                     ?>
-                      <div class="<?php echo $css_attr['item_header']; ?> czr-custom-model">
+                      <div class="<?php echo esc_attr($css_attr['item_header']); ?> czr-custom-model">
                         <# if ( ( true === data.is_sortable ) ) { #>
-                          <div class="<?php echo $css_attr['item_title']; ?> <?php echo $css_attr['item_sort_handle']; ?>"><h4>{{ data.title }}</h4></div>
+                          <div class="<?php echo esc_attr($css_attr['item_title']); ?> <?php echo esc_attr($css_attr['item_sort_handle']); ?>"><h4>{{ data.title }}</h4></div>
                         <# } else { #>
-                          <div class="<?php echo $css_attr['item_title']; ?>"><h4>{{ data.title }}</h4></div>
+                          <div class="<?php echo esc_attr($css_attr['item_title']); ?>"><h4>{{ data.title }}</h4></div>
                         <# } #>
-                        <div class="<?php echo $css_attr['item_btns']; ?>"><a title="<?php _e('Edit', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-pencil-alt <?php echo $css_attr['edit_view_btn']; ?>"></a>&nbsp;<a title="<?php _e('Remove', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-trash <?php echo $css_attr['display_alert_btn']; ?>"></a></div>
-                        <div class="<?php echo $css_attr['remove_alert_wrapper']; ?>"></div>
+                        <div class="<?php echo esc_attr($css_attr['item_btns']); ?>"><a title="<?php _e('Edit', 'nimble-builder'); ?>" href="javascript:void(0);" class="fas fa-pencil-alt <?php echo esc_attr($css_attr['edit_view_btn']); ?>"></a>&nbsp;<a title="<?php _e('Remove', 'nimble-builder'); ?>" href="javascript:void(0);" class="fas fa-trash <?php echo esc_attr($css_attr['display_alert_btn']); ?>"></a></div>
+                        <div class="<?php echo esc_attr($css_attr['remove_alert_wrapper']); ?>"></div>
                       </div>
                     <?php
                 break;
 
                 case 'rud-item-alert-part' :
                     ?>
-                      <p class="czr-item-removal-title"><?php _e('Are you sure you want to remove : <strong>{{ data.title }} ?</strong>', 'text_doma'); ?></p>
-                      <span class="<?php echo $css_attr['remove_view_btn']; ?> button"><?php _e('Yes', 'text_doma'); ?></span> <span class="<?php echo $css_attr['cancel_alert_btn']; ?> button"><?php _e('No', 'text_doma'); ?></span>
+                      <p class="czr-item-removal-title"><?php _e('Are you sure you want to remove : <strong>{{ data.title }} ?</strong>', 'nimble-builder'); ?></p>
+                      <span class="<?php echo esc_attr($css_attr['remove_view_btn']); ?> button"><?php _e('Yes', 'nimble-builder'); ?></span> <span class="<?php echo esc_attr($css_attr['cancel_alert_btn']); ?> button"><?php _e('No', 'nimble-builder'); ?></span>
                     <?php
                 break;
 
@@ -843,7 +843,7 @@ if ( !class_exists( 'CZR_Fmk_Base_Tmpl_Builder' ) ) :
                     /* ------------------------------------------------------------------------- */
                     case 'hidden':
                       ?>
-                        <input data-czrtype="<?php echo $input_id; ?>" type="hidden" value=""></input>
+                        <input data-czrtype="<?php echo esc_attr($input_id); ?>" type="hidden" value=""></input>
                       <?php
                     break;
 
@@ -854,14 +854,14 @@ if ( !class_exists( 'CZR_Fmk_Base_Tmpl_Builder' ) ) :
                     case 'select'://<= used in the customizr and hueman theme
                     case 'simpleselect'://<=used in Nimble Builder
                       ?>
-                        <select data-czrtype="<?php echo $input_id; ?>"></select>
+                        <select data-czrtype="<?php echo esc_attr($input_id); ?>"></select>
                       <?php
                     break;
                     // multiselect with select2() js library
                     case 'multiselect':
                     case 'category_picker':
                       ?>
-                        <select multiple="multiple" data-czrtype="<?php echo $input_id; ?>"></select>
+                        <select multiple="multiple" data-czrtype="<?php echo esc_attr($input_id); ?>"></select>
                       <?php
                     break;
 
@@ -870,7 +870,7 @@ if ( !class_exists( 'CZR_Fmk_Base_Tmpl_Builder' ) ) :
                     /* ------------------------------------------------------------------------- */
                     case 'text' :
                       ?>
-                        <input data-czrtype="<?php echo $input_id; ?>" type="text" value="" placeholder="<?php echo $input_data['placeholder']; ?>"></input>
+                        <input data-czrtype="<?php echo esc_attr($input_id); ?>" type="text" value="" placeholder="<?php echo esc_attr($input_data['placeholder']); ?>"></input>
                       <?php
                     break;
 
@@ -895,12 +895,12 @@ if ( !class_exists( 'CZR_Fmk_Base_Tmpl_Builder' ) ) :
                     /* ------------------------------------------------------------------------- */
                     case 'wp_color_alpha' :
                       ?>
-                        <input data-czrtype="<?php echo $input_id; ?>" class="width-100"  data-alpha="true" type="text" value="{{ data['<?php echo $input_id; ?>'] }}"></input>
+                        <input data-czrtype="<?php echo esc_attr($input_id); ?>" class="width-100"  data-alpha="true" type="text" value="{{ data['<?php echo esc_attr($input_id); ?>'] }}"></input>
                       <?php
                     break;
                     case 'color' :
                       ?>
-                        <input data-czrtype="<?php echo $input_id; ?>" type="text" value="{{ data['<?php echo $input_id; ?>'] }}"></input>
+                        <input data-czrtype="<?php echo esc_attr($input_id); ?>" type="text" value="{{ data['<?php echo esc_attr($input_id); ?>'] }}"></input>
                       <?php
                     break;
 
@@ -911,7 +911,7 @@ if ( !class_exists( 'CZR_Fmk_Base_Tmpl_Builder' ) ) :
                     case 'check' :
                       ?>
                         <#
-                          var _checked = ( false != data['<?php echo $input_id; ?>'] ) ? "checked=checked" : '';
+                          var _checked = ( false != data['<?php echo esc_attr($input_id); ?>'] ) ? "checked=checked" : '';
                         #>
                         <input data-czrtype="<?php echo $input_id; ?>" type="checkbox" {{ _checked }}></input>
                       <?php
@@ -921,16 +921,16 @@ if ( !class_exists( 'CZR_Fmk_Base_Tmpl_Builder' ) ) :
                     case 'gutencheck' :
                         ?>
                           <#
-                            var _checked = ( false != data['<?php echo $input_id; ?>'] ) ? "checked=checked" : '';
+                            var _checked = ( false != data['<?php echo esc_attr($input_id); ?>'] ) ? "checked=checked" : '';
                           #>
-                          <span class="czr-toggle-check"><input class="czr-toggle-check__input" data-czrtype="<?php echo $input_id; ?>" type="checkbox" {{ _checked }}><span class="czr-toggle-check__track"></span><span class="czr-toggle-check__thumb"></span></span>
+                          <span class="czr-toggle-check"><input class="czr-toggle-check__input" data-czrtype="<?php echo esc_attr($input_id); ?>" type="checkbox" {{ _checked }}><span class="czr-toggle-check__track"></span><span class="czr-toggle-check__thumb"></span></span>
                         <?php
                     break;
 
                     case 'nimblecheck' :
                         ?>
                           <#
-                            var _checked = ( false != data['<?php echo $input_id; ?>'] ) ? "checked=checked" : '';
+                            var _checked = ( false != data['<?php echo esc_attr($input_id); ?>'] ) ? "checked=checked" : '';
                           #>
                           <?php
                           // when input and label are tied by an id - for relationship
@@ -941,8 +941,8 @@ if ( !class_exists( 'CZR_Fmk_Base_Tmpl_Builder' ) ) :
                           $unique_id = sprintf('%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535));
                           ?>
                           <div class="nimblecheck-wrap">
-                            <input id="nimblecheck-<?php echo $unique_id; ?>" data-czrtype="<?php echo $input_id; ?>" type="checkbox" {{ _checked }} class="nimblecheck-input">
-                            <label for="nimblecheck-<?php echo $unique_id; ?>" class="nimblecheck-label">Switch</label>
+                            <input id="nimblecheck-<?php echo esc_attr($unique_id); ?>" data-czrtype="<?php echo esc_attr($input_id); ?>" type="checkbox" {{ _checked }} class="nimblecheck-input">
+                            <label for="nimblecheck-<?php echo esc_attr($unique_id); ?>" class="nimblecheck-label">Switch</label>
                           </div>
                         <?php
                     break;
@@ -954,7 +954,7 @@ if ( !class_exists( 'CZR_Fmk_Base_Tmpl_Builder' ) ) :
                       // Added an id attribute for https://github.com/presscustomizr/nimble-builder/issues/403
                       // needed to instantiate wp.editor.initialize(...)
                       ?>
-                        <textarea id="textarea-{{ data.id }}" data-czrtype="<?php echo $input_id; ?>" class="width-100" name="textarea" rows="10" cols="">{{ data.value }}</textarea>
+                        <textarea id="textarea-{{ data.id }}" data-czrtype="<?php echo esc_attr($input_id); ?>" class="width-100" name="textarea" rows="10" cols="">{{ data.value }}</textarea>
                       <?php
                     break;
 
@@ -964,8 +964,8 @@ if ( !class_exists( 'CZR_Fmk_Base_Tmpl_Builder' ) ) :
                     case 'upload' :
                     case 'upload_url' :
                       ?>
-                        <input data-czrtype="<?php echo $input_id; ?>" type="hidden"/>
-                        <div class="<?php echo $css_attr['img_upload_container']; ?>"></div>
+                        <input data-czrtype="<?php echo esc_attr($input_id); ?>" type="hidden"/>
+                        <div class="<?php echo esc_attr($css_attr['img_upload_container']); ?>"></div>
                       <?php
                     break;
 
@@ -1688,7 +1688,7 @@ if ( !class_exists( 'CZR_Fmk_Base' ) ) :
               return array_merge(
                   array(
                       array(
-                         'title'      => sprintf( '<span style="font-weight:bold">%1$s</span>', __('Set a custom url', 'text_doma') ),
+                         'title'      => sprintf( '<span style="font-weight:bold">%1$s</span>', __('Set a custom url', 'nimble-builder') ),
                          'type'       => '',
                          'type_label' => '',
                          'object'     => '',
@@ -1722,7 +1722,7 @@ if ( !class_exists( 'CZR_Fmk_Base' ) ) :
             if ( !check_ajax_referer( $action, 'nonce', false ) ) {
                  wp_send_json_error( array(
                   'code' => 'invalid_nonce',
-                  'message' => __( 'ajax_load_available_items => Security check failed.' ),
+                  'message' => __( 'ajax_load_available_items => Security check failed.', 'nimble-builder' ),
                 ) );
             }
 
@@ -1843,7 +1843,7 @@ if ( !class_exists( 'CZR_Fmk_Base' ) ) :
                         $post_title = $post->post_title;
                         if ( '' === $post_title ) {
                           // translators: %d: ID of a post
-                          $post_title = sprintf( __( '#%d (no title)', 'text_doma' ), $post->ID );
+                          $post_title = sprintf( __( '#%d (no title)', 'nimble-builder' ), $post->ID );
                         }
                         $items[] = array(
                             'title'      => html_entity_decode( $post_title, ENT_QUOTES, get_bloginfo( 'charset' ) ),
@@ -1922,7 +1922,7 @@ if ( !class_exists( 'CZR_Fmk_Base' ) ) :
             if ( !check_ajax_referer( $action, 'nonce', false ) ) {
                 wp_send_json_error( array(
                     'code' => 'invalid_nonce',
-                    'message' => __( 'ajax_load_available_items => Security check failed.' ),
+                    'message' => __( 'ajax_load_available_items => Security check failed.', 'nimble-builder' ),
                 ) );
             }
 
@@ -1986,7 +1986,7 @@ if ( !class_exists( 'CZR_Fmk_Base' ) ) :
             remove_filter( 'pre_post_link', array( $this, 'dont_use_fancy_permalinks' ), 999 );
 
             if ( empty( $items ) ) {
-                wp_send_json_success( array( 'message' => __( 'No results found.', 'text_doma') ) );
+                wp_send_json_success( array( 'message' => __( 'No results found.', 'nimble-builder') ) );
             } else {
                 wp_send_json_success( array(
                     'items' => apply_filters( 'content_picker_ajax_items', $items, $p, 'ajax_search_available_items' )
@@ -2052,7 +2052,7 @@ if ( !class_exists( 'CZR_Fmk_Base' ) ) :
                             $post_title = $post->post_title;
                             if ( '' === $post_title ) {
                               /* translators: %d: ID of a post */
-                              $post_title = sprintf( __( '#%d (no title)', 'text_doma' ), $post->ID );
+                              $post_title = sprintf( __( '#%d (no title)', 'nimble-builder' ), $post->ID );
                             }
                             $items[] = array(
                                 'title'      => html_entity_decode( $post_title, ENT_QUOTES, get_bloginfo( 'charset' ) ),

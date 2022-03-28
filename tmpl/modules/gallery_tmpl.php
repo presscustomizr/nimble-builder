@@ -172,10 +172,10 @@ if ( !function_exists( 'Nimble\sek_print_gallery_mod' ) ) {
         do_action( 'nb_before_post_gal_wrapper' );
         ?>
         
-        <div class="sek-gal-wrapper <?php echo $gal_wrapper_classes; ?>" id="<?php echo $model['id']; ?>">
-            <div class="sek-gal-items <?php echo $gal_items_classes; ?>">
+        <div class="sek-gal-wrapper <?php echo esc_attr($gal_wrapper_classes); ?>" id="<?php echo esc_attr($model['id']); ?>">
+            <div class="sek-gal-items <?php echo esc_attr($gal_items_classes); ?>">
                 <?php foreach ( $gallery_collec as $index => $item ) : ?>
-                    <figure class="sek-img-gal-item" data-sek-item-id="<?php echo $item['id']; ?>">
+                    <figure class="sek-img-gal-item" data-sek-item-id="<?php echo esc_attr($item['id']); ?>">
                         <?php
                             if ( 'no-link' === $gallery_opts['link-to'] ) {
                                 echo sek_get_gal_img_item_html( $item, $gallery_opts );
@@ -211,7 +211,7 @@ if ( !empty( $gallery_collec ) ) {
 } else {
     if ( skp_is_customizing() ) {
         printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',
-            __('Click to start adding images.', 'text_doma'),
+            __('Click to start adding images.', 'nimble-builder'),
             'background: url(' . NIMBLE_MODULE_ICON_PATH . 'Nimble_gallery_icon.svg) no-repeat 50% 75%;background-size: 170px;'
         );
     }

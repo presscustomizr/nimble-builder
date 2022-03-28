@@ -147,7 +147,7 @@ endif;
     <div class="sek-row marketing"><?php //js-center-images-disabled ?>
 
 <?php foreach ( $value as $fp ) : ?>
-        <div class="sek-col-base sek-col-<?php echo $fp_col_suffix ?>">
+        <div class="sek-col-base sek-col-<?php echo esc_attr($fp_col_suffix); ?>">
             <div class="sek-fp-widget sek-link-mask-p round">
         <?php
             // normalizes
@@ -219,23 +219,23 @@ endif;
             <?php /* SINGLE FP RENDERING*/
                 if ( $fp_image ) : /* FP IMAGE */?>
                 <div class="sek-fp-thumb-wrapper sek__r-wFP">
-                    <a class="sek-link-mask" href="<?php echo $fp_link ?>" title="<?php echo $fp_title  ?>"></a>
-                    <?php echo $fp_image ?>
+                    <a class="sek-link-mask" href="<?php echo esc_attr($fp_link); ?>" title="<?php echo esc_attr($fp_title);  ?>"></a>
+                    <?php echo $fp_image; ?>
                 </div>
             <?php
                 endif; /* END FP IMAGE*/
                 /* FP TITLE */
             ?>
-                <h4 class="sek-fp-title"><?php echo $fp_title ?></h4>
+                <h4 class="sek-fp-title"><?php echo esc_html($fp_title); ?></h4>
             <?php
                 if ( $fp_text ) :
             ?>
-                  <p class="sek-fp-text"><?php echo $fp_text ?></p>
+                  <p class="sek-fp-text"><?php echo esc_html($fp_text); ?></p>
             <?php endif;/* END FP TEXT*/
                 /* FP BUTTON TEXT */
                 if ( $fp_button ) :
             ?>
-                <span class="sek-fp-button-holder"><a class="sek-btn sek-fp-btn-link" href="<?php echo $fp_link ?>" title="<?php echo $fp_title ?>"><?php echo $fp_button_text ?></a></span>
+                <span class="sek-fp-button-holder"><a class="sek-btn sek-fp-btn-link" href="<?php esc_attr($fp_link); ?>" title="<?php echo esc_attr($fp_title) ?>"><?php echo esc_html($fp_button_text); ?></a></span>
             <?php
                 endif;/* END FP BUTTON TEXT*/
             endif; /* end sek_fp_is_fp_set */

@@ -119,4 +119,4 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
 }
 
 // Print
-echo sek_get_img_module_img_html( $main_settings );
+echo esc_html(sek_get_img_module_img_html( $main_settings ));

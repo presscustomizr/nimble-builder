@@ -6,7 +6,7 @@ Tags: page builder, visual editor, customizer, drag and drop, header, footer, la
 Requires at least: 4.7
 Requires PHP: 5.4
 Tested up to: 5.9
-Stable tag: 3.1.32
+Stable tag: 3.1.33
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FMNQPU36U27J&source=url
@@ -130,4 +130,5 @@ You can report a problem by opening a new thread in [Nimble Builder support foru
 Visit the [Github release page](https://github.com/presscustomizr/nimble-builder/releases).
 
 == Changelog ==
+3/8/2022 Validation, Sanitization and Escaping
 You'll find the latest changelog on the [Github page](https://github.com/presscustomizr/nimble-builder/releases).

@@ -28,3 +28,8 @@ function nimble_get_content_as_json() {
     ]);
     return wp_json_encode( $raw_content );
 }
+
+remove_action( 'shutdown', 'wp_ob_end_flush_all', 1 );
+add_action( 'shutdown', function() {
+   while ( @ob_end_flush() );
+} );

@@ -31,7 +31,7 @@ if ( !function_exists( 'Nimble\sek_print_text_heading_content' ) ) {
             $heading_content = sek_strip_script_tags($heading_content);
             add_filter( 'the_nimble_tinymce_module_content', 'wpautop');
             if ( skp_is_customizing() ) {
-                $to_print = sprintf('<div title="%3$s" data-sek-input-type="textarea" data-sek-input-id="%1$s">%2$s</div>', $input_id, $heading_content, __( 'Click to edit', 'textdomain_to_be_replaced' ) );
+                $to_print = sprintf('<div title="%3$s" data-sek-input-type="textarea" data-sek-input-id="%1$s">%2$s</div>', $input_id, $heading_content, __( 'Click to edit', 'nimble-builder' ) );
             } else {
                 $to_print = $heading_content;
             }

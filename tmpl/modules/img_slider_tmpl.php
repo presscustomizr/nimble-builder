@@ -253,13 +253,13 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
             </div><?php //.swiper-wrapper ?>
           <?php endif; ?>
           <?php if ( in_array($nav_type,array('arrows_dots', 'dots') ) && $is_multislide ) : ?>
-            <div class="swiper-pagination swiper-pagination<?php echo $model['id']; ?>"></div>
+            <div class="swiper-pagination swiper-pagination<?php echo esc_attr($model['id']); ?>"></div>
           <?php endif; ?>
 
           <?php if ( in_array($nav_type,array('arrows_dots', 'arrows') ) && $is_multislide ) : ?>
             <div class="sek-swiper-nav">
-              <div class="sek-swiper-arrows sek-swiper-prev sek-swiper-prev<?php echo $model['id']; ?>" title="<?php _e('previous', 'textdom'); ?>"><div class="sek-chevron"></div></div>
-              <div class="sek-swiper-arrows sek-swiper-next sek-swiper-next<?php echo $model['id']; ?>" title="<?php _e('next', 'textdom'); ?>"><div class="sek-chevron"></div></div>
+              <div class="sek-swiper-arrows sek-swiper-prev sek-swiper-prev<?php echo esc_attr($model['id']); ?>" title="<?php _e('previous', 'nimble-builder'); ?>"><div class="sek-chevron"></div></div>
+              <div class="sek-swiper-arrows sek-swiper-next sek-swiper-next<?php echo esc_attr($model['id']); ?>" title="<?php _e('next', 'nimble-builder'); ?>"><div class="sek-chevron"></div></div>
             </div>
           <?php endif; ?>
           <?php
@@ -284,7 +284,7 @@ if ( !empty( $img_collection ) ) {
 } else {
     if ( skp_is_customizing() ) {
         printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',
-            __('Click to start adding images.', 'hueman'),
+            __('Click to start adding images.', 'nimble-builder'),
             'background: url(' . NIMBLE_MODULE_ICON_PATH . 'Nimble_slideshow_icon.svg) no-repeat 50% 75%;background-size: 200px;'
         );
     }
