@@ -8,8 +8,8 @@ function sek_filter_skp_get_skope_id( $skope_id, $level ) {
     //       $.extend( query, { local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ) } );
     // });
     // implemented to fix : https://github.com/presscustomizr/nimble-builder/issues/242
-    if ( 'local' === $level && is_array( $_POST ) && !empty( $_POST['local_skope_id'] ) && 'customize_save' === $_POST['action'] ) {
-        $skope_id = $_POST['local_skope_id'];
+    if ( 'local' === $level && is_array( $_POST ) && !empty( $_POST['local_skope_id'] ) && 'customize_save' === sanitize_text_field($_POST['action']) ) {
+        $skope_id = sanitize_text_field($_POST['local_skope_id']);
     }
     return $skope_id;
 }

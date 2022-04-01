@@ -87,7 +87,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
             if ( !isset( $_POST['sek_action'] ) || empty( $_POST['sek_action'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing sek_action' );
             }
-            $sek_action = $_POST['sek_action'];
+            $sek_action = sanitize_text_field($_POST['sek_action']);
 
             $exported_setting_validities = array();
 
@@ -115,7 +115,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
             if ( in_array( $sek_action, $this->ajax_action_map ) ) {
                 $content_type = null;
                 if ( array_key_exists( 'content_type', $_POST ) && is_string( $_POST['content_type'] ) ) {
-                    $content_type = $_POST['content_type'];
+                    $content_type = sanitize_text_field($_POST['content_type']);
                 }
 
                 // This 'preset_section' === $content_type statement has been introduced when implementing support for multi-section pre-build sections
@@ -136,7 +136,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                                     break;
                                 }
                                 foreach ( $_POST['collection_of_preset_section_id'] as $preset_section_id ) {
-                                    $html .= $this->sek_ajax_fetch_content( $sek_action, $preset_section_id );
+                                    $html .= $this->sek_ajax_fetch_content( $sek_action, sanitize_text_field($preset_section_id ));
                                 }
                             // 'module' === $content_type
                             } else {
@@ -197,7 +197,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
             // c) then when ajaxing, the $_POST['customized'] param is added by WP core with $.ajaxPrefilter() in customize-preview.js
             //
             // 2) since 'wp' hook has not been fired yet, we need to use the posted skope_id param.
-            $sektionSettingValue = sek_get_skoped_seks( $_POST['location_skope_id'] );
+            $sektionSettingValue = sek_get_skoped_seks( sanitize_text_field($_POST['location_skope_id']) );
             if ( !is_array( $sektionSettingValue ) ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => invalid sektionSettingValue => it should be an array().' );
                 return;
@@ -221,13 +221,13 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
             switch ( $sek_action ) {
                 case 'sek-add-section' :
                 case 'sek-duplicate-section' :
-                    if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
+                    if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( sanitize_text_field($_POST['is_nested']) ) ) {
                         // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
-                        $this->parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
-                        $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
+                        $this->parent_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_sektion' ]), $sektion_collection );
+                        $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_column' ]), $sektion_collection );
                     } else {
                         //$level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
-                        $level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
+                        $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'id' ]), $sektion_collection );
                     }
                 break;
 
@@ -238,7 +238,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                 case 'sek-add-content-in-new-nested-sektion' :
                     $content_type = null;
                     if ( array_key_exists( 'content_type', $_POST ) && is_string( $_POST['content_type'] ) ) {
-                        $content_type = $_POST['content_type'];
+                        $content_type = sanitize_text_field($_POST['content_type']);
                     }
                     if ( 'preset_section' === $content_type ) {
                         if ( !array_key_exists( 'collection_of_preset_section_id', $_POST ) || !is_array( $_POST['collection_of_preset_section_id'] ) ) {
@@ -246,20 +246,20 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                             break;
                         }
                         if ( !is_string( $maybe_preset_section_id ) || empty( $maybe_preset_section_id ) ) {
-                            wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => inavalid preset section id' );
+                            wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => invalid preset section id' );
                             break;
                         }
                         $level_id = $maybe_preset_section_id;
                     // module content type case.
                     // the level id has been passed the regular way
                     } else {
-                        $level_id = $_POST[ 'id' ];
+                        $level_id = sanitize_text_field($_POST[ 'id' ]);
                     }
 
-                    if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
+                    if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( sanitize_text_field($_POST['is_nested']) ) ) {
                         // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
-                        $this->parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
-                        $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
+                        $this->parent_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_sektion' ]), $sektion_collection );
+                        $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_column' ]), $sektion_collection );
                     } else {
                         //$level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
                         $level_model = sek_get_level_model( $level_id, $sektion_collection );
@@ -268,13 +268,13 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
 
                 //only used for nested section
                 case 'sek-remove-section' :
-                    if ( !array_key_exists( 'is_nested', $_POST ) || true !== json_decode( $_POST['is_nested'] ) ) {
+                    if ( !array_key_exists( 'is_nested', $_POST ) || true !== json_decode( sanitize_text_field($_POST['is_nested'] )) ) {
                         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => the section must be nested in this ajax action' );
                         break;
                     } else {
                         // we need to set the parent_model here to access it later in the ::render method to calculate the column width.
-                        $this->parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
-                        $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
+                        $this->parent_model = sek_get_parent_level_model( sanitize_text_field($_POST[ 'in_column' ]), $sektion_collection );
+                        $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_column' ]), $sektion_collection );
                     }
                 break;
 
@@ -288,7 +288,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                         break;
                     }
                     // sek_error_log('sektion_collection', $sektion_collection );
-                    $level_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
+                    $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_sektion' ]), $sektion_collection );
                 break;
 
                 // We re-render the entire parent column collection
@@ -301,11 +301,11 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                         break;
                     }
                     if ( !array_key_exists( 'in_sektion', $_POST ) || empty( $_POST[ 'in_sektion' ] ) ) {
-                        $this->parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
+                        $this->parent_model = sek_get_parent_level_model( sanitize_text_field($_POST[ 'in_column' ]), $sektion_collection );
                     } else {
-                        $this->parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
+                        $this->parent_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_sektion' ]), $sektion_collection );
                     }
-                    $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
+                    $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_column' ]), $sektion_collection );
                 break;
 
                 case 'sek-resize-columns' :
@@ -325,11 +325,11 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing level id' );
                         break;
                     }
-                    if ( !empty( $_POST['level'] ) && 'column' === $_POST['level'] ) {
+                    if ( !empty( $_POST['level'] ) && 'column' === sanitize_text_field($_POST['level']) ) {
                         // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
-                        $this->parent_model = sek_get_parent_level_model( $_POST['id'], $sektion_collection );
+                        $this->parent_model = sek_get_parent_level_model( sanitize_text_field($_POST['id']), $sektion_collection );
                     }
-                    $level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
+                    $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'id' ]), $sektion_collection );
                 break;
             }//Switch sek_action
 
@@ -338,7 +338,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
             ob_start();
 
             if ( $is_stylesheet ) {
-                $r = $this->print_or_enqueue_seks_style( $_POST['location_skope_id'] );
+                $r = $this->print_or_enqueue_seks_style( sanitize_text_field($_POST['location_skope_id']) );
             } else {
                 if ( 'no_match' == $level_model ) {
                     wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action . ' => missing level model' );
@@ -380,7 +380,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing post_id' );
             }
 
-            $post_id = $_POST['nimble_edit_post_id'];
+            $post_id = sanitize_text_field($_POST['nimble_edit_post_id']);
 
             // Build customize_url
             // @see function sek_get_customize_url_when_is_admin()

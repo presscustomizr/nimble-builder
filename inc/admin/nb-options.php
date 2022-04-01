@@ -459,7 +459,7 @@ function nb_save_base_options() {
 // the option is updated only if different than the default val or if the option exists already
 function nb_maybe_update_checkbox_option( $opt_name, $unchecked_value ) {
     $opt_value = get_option( $opt_name );
-    $posted_value = array_key_exists( $opt_name, $_POST ) ? $_POST[$opt_name] : $unchecked_value;
+    $posted_value = array_key_exists( $opt_name, $_POST ) ? sanitize_text_field($_POST[$opt_name]) : $unchecked_value;
     if ( $unchecked_value !== $posted_value ) {
         update_option( $opt_name, esc_attr( $posted_value ), 'no' );
     } else {

@@ -52,7 +52,7 @@ class Sek_Dyn_CSS_Builder {
         // June 2020 : this property is set when saving the customizer
         // and used to determine if we need to generate css for a given location
         // typically useful when a local header is populated with sections but not used on the page. While still present in the collection of location, we don't want to generate css for it.
-        $this->customizer_active_locations = ( isset($_POST['active_locations']) && is_array($_POST['active_locations']) ) ? $_POST['active_locations'] : '_not_set_';
+        $this->customizer_active_locations = ( isset($_POST['active_locations']) && is_array($_POST['active_locations']) ) ? sanitize_text_field($_POST['active_locations']) : '_not_set_';
 
         $this->is_global_stylesheet = $is_global_stylesheet;
         // set the css rules for columns
@@ -104,6 +104,7 @@ class Sek_Dyn_CSS_Builder {
             // The global stylesheet may be inactive on a given customization, which means that the customizer_active_locations won't include any global locations.
             // But this does not mean that the global stylesheet is inactive on other pages.
             // That's why we only verify the active location condition when !$this->is_global_stylesheet
+            sek_error_log('$this->customizer_active_locations ?', $this->customizer_active_locations );
             if ( !$this->is_global_stylesheet && '_not_set_' !== $this->customizer_active_locations && '_not_set_' !== $this->current_sniffed_location && !in_array($this->current_sniffed_location, $this->customizer_active_locations ) ) {
                 continue;
             }

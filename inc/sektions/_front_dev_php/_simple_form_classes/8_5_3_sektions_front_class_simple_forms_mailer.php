@@ -28,7 +28,7 @@ class Sek_Mailer {
         // @see print_recaptcha_inline_js
         // on submission, we get the posted token value, and validate it with a remote http request to the google api
         if ( isset( $_POST['nimble_recaptcha_resp'] ) ) {
-            if ( !$this->validate_recaptcha( $_POST['nimble_recaptcha_resp'] ) ) {
+            if ( !$this->validate_recaptcha( sanitize_text_field($_POST['nimble_recaptcha_resp']) ) ) {
                 $this->status = 'recaptcha_fail';
                 if ( sek_is_dev_mode() ) {
                     sek_error_log('reCAPTCHA failure', $this->recaptcha_errors );

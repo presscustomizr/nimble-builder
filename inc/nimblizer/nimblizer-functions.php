@@ -37,9 +37,9 @@ function _nb_nimblize_include() {
 	$should_include          = (
 		$is_customize_admin_page
 		||
-		( isset( $_REQUEST['wp_customize'] ) && 'on' === $_REQUEST['wp_customize'] )
+		( isset( $_REQUEST['wp_customize'] ) && 'on' === sanitize_text_field($_REQUEST['wp_customize']) )
 		||
-		( ! empty( $_GET['customize_changeset_uuid'] ) || ! empty( $_POST['customize_changeset_uuid'] ) )
+		( ! empty( $_GET['customize_changeset_uuid'] ) || ! empty( sanitize_text_field($_POST['customize_changeset_uuid'] )) )
 	);
 
 	if ( ! $should_include ) {

@@ -38,7 +38,7 @@ function sek_ajax_get_single_api_section_data() {
     if ( empty( $_POST['api_section_id']) || !is_string( $_POST['api_section_id'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_api_section_id' );
     }
-    $api_section_id = $_POST['api_section_id'];
+    $api_section_id = sanitize_text_field($_POST['api_section_id']);
 
     $is_pro_section_id = sek_is_pro() && is_string($api_section_id) && 'pro_' === substr($api_section_id,0,4);
     $pro_key_status = apply_filters( 'nimble_pro_key_status_OK', 'nok' );
@@ -97,7 +97,7 @@ function sek_ajax_sek_get_user_section_json() {
     // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
     //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
     // }
-    $section_post = sek_get_saved_section_post( $_POST['section_post_name'] );
+    $section_post = sek_get_saved_section_post( sanitize_text_field($_POST['section_post_name']) );
     if ( !is_wp_error( $section_post ) && $section_post && is_object( $section_post ) ) {
         $section_decoded = maybe_unserialize( $section_post->post_content );
         // Structure of $content :
@@ -141,7 +141,7 @@ add_action( 'wp_ajax_sek_save_user_section', '\Nimble\sek_ajax_save_user_section
 // hook : wp_ajax_sek_save_user_section
 function sek_ajax_save_user_section() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
-    $is_edit_metas_only_case = isset( $_POST['edit_metas_only'] ) && 'yes' === $_POST['edit_metas_only'];
+    $is_edit_metas_only_case = isset( $_POST['edit_metas_only'] ) && 'yes' === sanitize_text_field($_POST['edit_metas_only']);
     // TMPL DATA => the nimble content
     if ( !$is_edit_metas_only_case && empty( $_POST['section_data']) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_section_data' );
@@ -174,17 +174,17 @@ function sek_ajax_save_user_section() {
     }
 
     // make sure description and title are clean before DB
-    $sec_title = sek_maybe_encode_richtext( $_POST['section_title'] );
-    $sec_description = sek_maybe_encode_richtext( $_POST['section_description'] );
+    $sec_title = sek_maybe_encode_richtext( sanitize_text_field($_POST['section_title']) );
+    $sec_description = sek_maybe_encode_richtext( sanitize_text_field($_POST['section_description']) );
 
     $section_to_save = array(
         'data' => $seks_data,//<= json stringified
         // the section post name is provided only when updating
-        'section_post_name' => ( !empty( $_POST['section_post_name'] ) && is_string( $_POST['section_post_name'] ) ) ? $_POST['section_post_name'] : null,
+        'section_post_name' => ( !empty( $_POST['section_post_name'] ) && is_string( $_POST['section_post_name'] ) ) ? sanitize_text_field($_POST['section_post_name']) : null,
         'metas' => array(
             'title' => $sec_title,
             'description' => $sec_description,
-            'skope_id' => $_POST['skope_id'],
+            'skope_id' => sanitize_text_field($_POST['skope_id']),
             'version' => NIMBLE_VERSION,
             // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
             //'active_locations' => is_array( $_POST['active_locations'] ) ? $_POST['active_locations'] : array(),
@@ -245,7 +245,7 @@ function sek_ajax_remove_user_section() {
     // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
     //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
     // }
-    $section_post_to_remove = sek_get_saved_section_post( $_POST['section_post_name'] );
+    $section_post_to_remove = sek_get_saved_section_post( sanitize_text_field($_POST['section_post_name']) );
 
     if ( $section_post_to_remove && is_object( $section_post_to_remove ) ) {
         // the CPT is moved to Trash instead of permanently deleted when using wp_delete_post()
@@ -260,7 +260,7 @@ function sek_ajax_remove_user_section() {
     if ( is_wp_error( $section_post_to_remove ) || is_null($section_post_to_remove) || empty($section_post_to_remove) ) {
         wp_send_json_error( __FUNCTION__ . '_removal_error' );
     } else {
-        wp_send_json_success( [ 'section_post_removed' => $_POST['section_post_name'] ] );
+        wp_send_json_success( [ 'section_post_removed' => sanitize_text_field($_POST['section_post_name']) ] );
     }
 }
 ?>

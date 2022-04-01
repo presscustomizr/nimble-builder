@@ -1746,7 +1746,7 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
     if ( 'not_set' === $collection  ) {
         if ( empty( $skope_id ) ) {
             if ( is_array( $_POST ) && !empty( $_POST['location_skope_id'] ) ) {
-                $skope_id = $_POST['location_skope_id'];
+                $skope_id = sanitize_text_field($_POST['location_skope_id']);
             } else {
                 // When fired during an ajax 'customize_save' action, the skp_get_skope_id() is determined with $_POST['local_skope_id']
                 // @see add_filter( 'skp_get_skope_id', '\Nimble\sek_filter_skp_get_skope_id', 10, 2 );
@@ -2643,7 +2643,7 @@ function sek_get_parent_level_model( $child_level_id = '', $collection = array()
     if ( empty( $collection ) ) {
         if ( empty( $skope_id ) ) {
             if ( is_array( $_POST ) && !empty( $_POST['location_skope_id'] ) ) {
-                $skope_id = $_POST['location_skope_id'];
+                $skope_id = sanitize_text_field($_POST['location_skope_id']);
             } else {
                 // When fired during an ajax 'customize_save' action, the skp_get_skope_id() is determined with $_POST['local_skope_id']
                 // @see add_filter( 'skp_get_skope_id', '\Nimble\sek_filter_skp_get_skope_id', 10, 2 );
@@ -3021,8 +3021,8 @@ function sek_filter_skp_get_skope_id( $skope_id, $level ) {
     //       $.extend( query, { local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ) } );
     // });
     // implemented to fix : https://github.com/presscustomizr/nimble-builder/issues/242
-    if ( 'local' === $level && is_array( $_POST ) && !empty( $_POST['local_skope_id'] ) && 'customize_save' === $_POST['action'] ) {
-        $skope_id = $_POST['local_skope_id'];
+    if ( 'local' === $level && is_array( $_POST ) && !empty( $_POST['local_skope_id'] ) && 'customize_save' === sanitize_text_field($_POST['action']) ) {
+        $skope_id = sanitize_text_field($_POST['local_skope_id']);
     }
     return $skope_id;
 }

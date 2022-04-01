@@ -68,9 +68,9 @@ function sek_ajax_import_attachment() {
         wp_send_json_error( 'missing_or_invalid_img_url_when_importing_image');
     }
 
-    $id = sek_sideload_img_and_return_attachment_id( $_POST['img_url'] );
+    $id = sek_sideload_img_and_return_attachment_id( sanitize_text_field($_POST['img_url']) );
     if ( is_wp_error( $id ) ) {
-        wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => problem when trying to wp_insert_attachment() for img : ' . $_POST['img_url'] . ' | SERVER ERROR => ' . json_encode( $id ) );
+        wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => problem when trying to wp_insert_attachment() for img : ' . sanitize_text_field($_POST['img_url']) . ' | SERVER ERROR => ' . json_encode( $id ) );
     } else {
         wp_send_json_success([
           'id' => $id,
@@ -92,7 +92,7 @@ function sek_get_revision_history() {
     if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
     }
-    $rev_list = sek_get_revision_history_from_posts( $_POST['skope_id'] );
+    $rev_list = sek_get_revision_history_from_posts( sanitize_text_field($_POST['skope_id']) );
     wp_send_json_success( $rev_list );
 }
 
@@ -103,7 +103,7 @@ function sek_get_single_revision() {
     if ( !isset( $_POST['revision_post_id'] ) || empty( $_POST['revision_post_id'] ) ) {
         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing revision_post_id' );
     }
-    $revision = sek_get_single_post_revision( $_POST['revision_post_id'] );
+    $revision = sek_get_single_post_revision( sanitize_text_field($_POST['revision_post_id']) );
     wp_send_json_success( $revision );
 }
 
@@ -134,7 +134,7 @@ function sek_get_post_categories() {
 // Fired in __construct()
 function sek_get_code_editor_params() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
-    $code_type = isset( $_POST['code_type'] ) ? $_POST['code_type'] : 'text/html';
+    $code_type = isset( $_POST['code_type'] ) ? sanitize_text_field($_POST['code_type']) : 'text/html';
     $editor_params = nimble_get_code_editor_settings( array(
         'type' => $code_type
     ));
@@ -152,7 +152,7 @@ function sek_postpone_feedback_notification() {
     if ( !isset( $_POST['transient_duration_in_days'] ) ||!is_numeric( $_POST['transient_duration_in_days'] ) ) {
         $transient_duration = 7 * DAY_IN_SECONDS;
     } else {
-        $transient_duration = $_POST['transient_duration_in_days'] * DAY_IN_SECONDS;
+        $transient_duration = sanitize_text_field($_POST['transient_duration_in_days']) * DAY_IN_SECONDS;
     }
     set_transient( NIMBLE_FEEDBACK_NOTICE_ID, 'maybe_later', $transient_duration );
     wp_die( 1 );
