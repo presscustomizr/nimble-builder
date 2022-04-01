@@ -185,7 +185,7 @@ if ( !function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
             // the default img is excluded from the Nimble Builder smart loading parsing @see nimble_regex_callback()
             // => this is needed because this image has no specific dimensions set. And therefore can create false javascript computations of other element's distance to top on page load.
             // in particular when calculting if is_visible() to decide if we smart load.
-            $html = sprintf( '<img alt="default img" data-skip-lazyload="true" src="%1$s"/>', esc_url(  $item['img'] )  );
+            $html = sprintf( '<img alt="default img" data-skip-lazyload="true" src="%1$s"/>', esc_url( $item['img'] )  );
         }
         return skp_is_customizing() ? $html : apply_filters( 'nimble_parse_for_smart_load', $html );
     }
@@ -202,16 +202,16 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
       $pause_on_hover = true === sek_booleanize_checkbox_val( $slider_options['pause_on_hover'] ) ? "true" : "false";
       $loop_on = true === sek_booleanize_checkbox_val( $slider_options['infinite_loop'] ) ? "true" : "false";
       $lazy_load_on = true === sek_booleanize_checkbox_val( $slider_options['lazy_load'] ) ? "true" : "false";
-      $nav_type = ( is_string( $slider_options['nav_type'] ) && !empty( $slider_options['nav_type'] ) ) ? $slider_options['nav_type'] : 'arrows_dots';
+      $nav_type = ( is_string( $slider_options['nav_type'] ) && !empty( $slider_options['nav_type'] ) ) ? esc_attr($slider_options['nav_type']) : 'arrows_dots';
       $hide_nav_on_mobiles = true === sek_booleanize_checkbox_val( $slider_options['hide_nav_on_mobiles'] );
       ?>
         <?php printf('<div class="swiper sek-swiper-loading sek-swiper%1$s" data-sek-swiper-id="%1$s" data-sek-autoplay="%2$s" data-sek-autoplay-delay="%3$s" data-sek-pause-on-hover="%4$s" data-sek-loop="%5$s" data-sek-image-layout="%6$s" data-sek-navtype="%7$s" data-sek-is-multislide="%8$s" data-sek-hide-nav-on-mobile="%9$s" data-sek-lazyload="%10$s" %11$s>',
-            $model['id'],
+            esc_attr($model['id']),
             $autoplay,
             $autoplay_delay,
             $pause_on_hover,
             $loop_on,
-            $slider_options['image-layout'],
+            esc_attr($slider_options['image-layout']),
             $nav_type,
             $is_multislide ? 'true' : 'false',
             $hide_nav_on_mobiles ? 'true' : 'false',
@@ -243,7 +243,7 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
                       sek_slider_parse_template_tags( strip_tags( esc_attr( $item['title_attr'] ) ), $item ),
                       sek_get_img_slider_module_img_html( $item, "true" === $lazy_load_on, $index ),
                       sek_slider_parse_template_tags( $text_html, $item ),
-                      $item['id'],
+                      esc_attr($item['id']),
                       true === sek_booleanize_checkbox_val( $has_overlay ) ? 'true' : 'false',
                       apply_filters('nb_single_slide_custom_attributes', '', $item, $model )
                   );
@@ -253,13 +253,13 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
             </div><?php //.swiper-wrapper ?>
           <?php endif; ?>
           <?php if ( in_array($nav_type,array('arrows_dots', 'dots') ) && $is_multislide ) : ?>
-            <div class="swiper-pagination swiper-pagination<?php echo $model['id']; ?>"></div>
+            <div class="swiper-pagination swiper-pagination<?php echo esc_attr($model['id']); ?>"></div>
           <?php endif; ?>
 
           <?php if ( in_array($nav_type,array('arrows_dots', 'arrows') ) && $is_multislide ) : ?>
             <div class="sek-swiper-nav">
-              <div class="sek-swiper-arrows sek-swiper-prev sek-swiper-prev<?php echo $model['id']; ?>" title="<?php _e('previous', 'textdom'); ?>"><div class="sek-chevron"></div></div>
-              <div class="sek-swiper-arrows sek-swiper-next sek-swiper-next<?php echo $model['id']; ?>" title="<?php _e('next', 'textdom'); ?>"><div class="sek-chevron"></div></div>
+              <div class="sek-swiper-arrows sek-swiper-prev sek-swiper-prev<?php echo esc_attr($model['id']); ?>" title="<?php _e('previous', 'textdom'); ?>"><div class="sek-chevron"></div></div>
+              <div class="sek-swiper-arrows sek-swiper-next sek-swiper-next<?php echo esc_attr($model['id']); ?>" title="<?php _e('next', 'textdom'); ?>"><div class="sek-chevron"></div></div>
             </div>
           <?php endif; ?>
           <?php

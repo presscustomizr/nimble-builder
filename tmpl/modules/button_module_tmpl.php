@@ -32,7 +32,7 @@ if ( !function_exists( 'Nimble\sek_get_button_module_link' ) ) {
 
 if ( !function_exists( 'Nimble\sek_get_button_module_icon' ) ) {
     function sek_get_button_module_icon( $content_settings ) {
-        return !empty( $content_settings[ 'icon' ] ) ? sprintf( '<i class="%1$s"></i>', $content_settings[ 'icon' ] ) : '';
+        return !empty( $content_settings[ 'icon' ] ) ? sprintf( '<i class="%1$s"></i>', esc_attr($content_settings[ 'icon' ]) ) : '';
     }
 }
 
@@ -58,7 +58,7 @@ if ( !isset( $content_settings['link-to'] ) || isset( $content_settings['link-to
         'left' === $icon_side ? $icon_html : '',
         // allow user to use smileys in buttons
         sek_strip_script_tags( convert_smilies( $btn_text ) ),
-        $visual_effect_class,
+        esc_attr($visual_effect_class),
         'right' === $icon_side ? $icon_html : '',
         !empty($content_settings['btn_text_on_hover']) ? 'title="' . esc_html( $content_settings['btn_text_on_hover'] ) . '"' : ''
     );
@@ -69,7 +69,7 @@ if ( !isset( $content_settings['link-to'] ) || isset( $content_settings['link-to
         'left' === $icon_side ? $icon_html : '',
         // allow user to use smileys in buttons
         sek_strip_script_tags( convert_smilies( $btn_text ) ),
-        $visual_effect_class,
+        esc_attr($visual_effect_class),
         'right' === $icon_side ? $icon_html : '',
         !empty($content_settings['btn_text_on_hover']) ? 'title="' . esc_html( $content_settings['btn_text_on_hover'] ) . '"' : ''
     );

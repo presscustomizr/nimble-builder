@@ -121,7 +121,7 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
         if ( !skp_is_customizing() && false !== strpos($html, 'data-sek-src="http') ) {
             $html = $html.Nimble_Manager()->css_loader_html;
         }
-        return sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', $img_figure_classes, $html, esc_html( $title ) );
+        return sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', esc_attr($img_figure_classes), $html, esc_html( $title ) );
     }
 }
 
@@ -167,7 +167,7 @@ if ( 'no-link' === $main_settings['link-to'] ) {
         $link,
         true === sek_booleanize_checkbox_val( $main_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
         apply_filters('nb_img_module_html', sek_get_img_module_img_html( $main_settings ), $main_settings ),
-        'sek-link-to-'.$main_settings['link-to'], // sek-link-to-img-lightbox
+        'sek-link-to-'.esc_attr($main_settings['link-to']), // sek-link-to-img-lightbox
         false === strpos($link,'http') ? 'sek-no-img-link' : ''
     );
 }

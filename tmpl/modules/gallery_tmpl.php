@@ -25,7 +25,7 @@ if ( !function_exists( 'Nimble\sek_get_gal_img_item_html') ) {
             if ( false !== wp_http_validate_url( $img ) ) {
                 $html = sprintf( '<img alt="default img" data-skip-lazyload="true" src="%1$s" title="%2$s"/>',
                     esc_url( $img ),
-                    sek_get_gal_img_title( $item, $gallery_opts )
+                    esc_attr(sek_get_gal_img_title( $item, $gallery_opts ))
                 );
             }
         } else {
@@ -172,10 +172,10 @@ if ( !function_exists( 'Nimble\sek_print_gallery_mod' ) ) {
         do_action( 'nb_before_post_gal_wrapper' );
         ?>
         
-        <div class="sek-gal-wrapper <?php echo $gal_wrapper_classes; ?>" id="<?php echo $model['id']; ?>">
+        <div class="sek-gal-wrapper <?php echo esc_attr($gal_wrapper_classes); ?>" id="<?php echo esc_attr($model['id']); ?>">
             <div class="sek-gal-items <?php echo $gal_items_classes; ?>">
                 <?php foreach ( $gallery_collec as $index => $item ) : ?>
-                    <figure class="sek-img-gal-item" data-sek-item-id="<?php echo $item['id']; ?>">
+                    <figure class="sek-img-gal-item" data-sek-item-id="<?php echo esc_attr($item['id']); ?>">
                         <?php
                             if ( 'no-link' === $gallery_opts['link-to'] ) {
                                 echo sek_get_gal_img_item_html( $item, $gallery_opts );
@@ -187,7 +187,7 @@ if ( !function_exists( 'Nimble\sek_print_gallery_mod' ) ) {
                                     sek_get_gal_img_item_html( $item, $gallery_opts ),
                                     'sek-gal-link-to-'.$gallery_opts['link-to'], // sek-link-to-img-lightbox
                                     false === strpos($link,'http') ? 'sek-no-img-link' : 'sek-gal-img-has-link',
-                                    sek_get_gal_img_title( $item, $gallery_opts )
+                                    esc_attr(sek_get_gal_img_title( $item, $gallery_opts ))
                                 );
                             }
                         ?>

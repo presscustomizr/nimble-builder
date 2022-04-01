@@ -19,6 +19,6 @@ if ( true === sek_booleanize_checkbox_val( $value['fields_design']['use_inset_sh
     $visual_effect_class .= ' use-inset-shadow';
 }
 ?>
-<div class="sek-simple-form-wrapper <?php echo $visual_effect_class; ?>">
+<div class="sek-simple-form-wrapper <?php echo esc_attr($visual_effect_class); ?>">
   <?php echo Nimble_Manager()->get_simple_form_html( $model ); ?>
 </div>

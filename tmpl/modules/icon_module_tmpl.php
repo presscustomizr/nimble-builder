@@ -36,7 +36,7 @@ if ( !function_exists( 'Nimble\sek_get_icon_module_icon_html') ) {
         $spacing_border = $value['spacing_border'];
 
         if ( !empty( $icon_settings['icon'] ) ) {
-            $html = sprintf( '<div class="sek-icon-wrapper"><i class="%1$s"></i></div>', $icon_settings[ 'icon' ] );
+            $html = sprintf( '<div class="sek-icon-wrapper"><i class="%1$s"></i></div>', esc_attr($icon_settings[ 'icon' ]) );
         } else {
             //falls back on an icon if previewing
             if ( skp_is_customizing() ) {
@@ -81,14 +81,14 @@ $icon_html = sek_get_icon_module_icon_html( $value );
 if ( 'no-link' === $icon_settings['link-to'] ) :
     printf('<div class="sek-icon %2$s">%1$s</div>',
         $icon_html,
-        $visual_effect_class
+        esc_attr($visual_effect_class)
     );
 else :
     printf('<a class="sek-icon %4$s" href="%1$s" %2$s>%3$s</a>',
         sek_get_icon_module_icon_link( $icon_settings ),
         true === sek_booleanize_checkbox_val( $icon_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
         $icon_html,
-        $visual_effect_class
+        esc_attr($visual_effect_class)
     );
 endif;
 if ( !empty($icon_html) ) {

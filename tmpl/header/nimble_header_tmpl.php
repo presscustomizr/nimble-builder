@@ -24,7 +24,7 @@ if ( !defined( 'ABSPATH' ) ) {
     if ( is_array( $header_classes ) ) {
         $header_classes = implode( ' ', $header_classes );
     }
-    $header_classes = is_string($header_classes) ? $header_classes : '';
+    $header_classes = is_string($header_classes) ? esc_attr($header_classes) : '';
     ?>
     <div id="nimble-page" class="">
       <a class="sek-skip-link sek-screen-reader-text" href="#nimble-page"><?php _e( 'Skip to content', 'text_domain_to_replace' ); ?></a>

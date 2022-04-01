@@ -57,7 +57,7 @@ if ( !function_exists( 'Nimble\sek_render_post_navigation') ) {
       <nav id="sek-nav-below" class="sek-col-100">
         <h2 class="sek-screen-reader-text"><?php _e('Posts navigation', 'text_doma') ?></h2>
         <ul class="sek-czr-pager sek-row">
-          <li class="sek-next-posts sek-col-base sek-col-33 <?php echo $tnext_align_class ?> ">
+          <li class="sek-next-posts sek-col-base sek-col-33 <?php echo esc_attr($tnext_align_class); ?> ">
           <?php if ( null != $next_link ) : ?>
             <span class="sek-screen-reader-text"><?php echo $_newer_label ?></span>
             <span class="sek-nav-next sek-nav-dir"><?php echo $next_link ?></span>
@@ -101,7 +101,7 @@ if ( !function_exists( 'Nimble\sek_render_post_navigation') ) {
             ?>
             </ul>
           </li>
-          <li class="sek-previous-posts sek-col-base sek-col-33 <?php echo $tprev_align_class ?>">
+          <li class="sek-previous-posts sek-col-base sek-col-33 <?php echo esc_attr($tprev_align_class); ?>">
           <?php if ( null != $prev_link ) : ?>
             <span class="sek-screen-reader-text"><?php echo $_older_label ?></span>
             <span class="sek-nav-previous sek-nav-dir"><?php echo $prev_link ?></span>
@@ -167,7 +167,7 @@ if ( !function_exists( 'Nimble\sek_render_post') ) {
                       }
                       echo $img_html;
                   } else if ( $use_post_thumb_placeholder ) {
-                      echo apply_filters( 'nimble_post_grid_module_default_featured_image', sprintf( '<img alt="default img" data-skip-lazyload="true" src="%1$s"/>', NIMBLE_BASE_URL . '/assets/img/default-img.png' ) );
+                      echo apply_filters( 'nimble_post_grid_module_default_featured_image', sprintf( '<img alt="default img" data-skip-lazyload="true" src="%1$s"/>', esc_url(NIMBLE_BASE_URL . '/assets/img/default-img.png' ) ) );
                   }
               ?>
             </a>
@@ -547,8 +547,8 @@ if ( is_object( $post_query ) && $post_query->have_posts() ) {
   $grid_items_classes = implode(' ', $grid_items_classes );
   do_action( 'nb_before_post_grid_wrapper' );
   ?>
-  <div class="sek-post-grid-wrapper <?php echo $grid_wrapper_classes; ?>" id="<?php echo $model['id']; ?>">
-    <div class="sek-grid-items <?php echo $grid_items_classes; ?>">
+  <div class="sek-post-grid-wrapper <?php echo esc_attr($grid_wrapper_classes); ?>" id="<?php echo esc_attr($model['id']); ?>">
+    <div class="sek-grid-items <?php echo esc_attr($grid_items_classes); ?>">
       <?php
         // $post_query->have_posts() fires 'loop_end', which we don't want
         while ( sek_pg_the_nimble_have_post( $post_query ) ) {

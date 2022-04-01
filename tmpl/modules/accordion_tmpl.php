@@ -19,7 +19,7 @@ if ( !function_exists( 'Nimble\sek_print_accordion' ) ) {
 
       ?>
         <?php printf('<div class="sek-accord-wrapper" data-sek-accord-id="%1$s" data-sek-is-multi-item="%2$s" data-sek-first-expanded="%3$s" data-sek-one-expanded="%4$s" data-sek-has-global-border="%5$s" data-sek-has-title-border="%6$s" role="tablist">',
-            $model['id'],
+            esc_attr($model['id']),
             $is_accordion_multi_item ? "true" : "false",
             $first_expanded,
             true === sek_booleanize_checkbox_val( $accord_opts['one_expanded'] ) ? "true" : "false",
@@ -54,8 +54,8 @@ if ( !function_exists( 'Nimble\sek_print_accordion' ) ) {
                     $title_attr = esc_html( esc_attr( $item['title_attr'] ) );
                     printf( '<div class="sek-accord-item" %1$s data-sek-item-id="%2$s" data-sek-expanded="%5$s"><div id="sek-tab-title-%2$s" class="sek-accord-title" role="tab" aria-controls="sek-tab-content-%2$s"><span class="sek-inner-accord-title">%3$s</span><div class="expander"><span></span><span></span></div></div><div id="sek-tab-content-%2$s" class="sek-accord-content" role="tabpanel" aria-labelledby="sek-tab-title-%2$s">%4$s</div></div>',
                         empty($title_attr) ? '' : 'title="'. $title_attr . '"',
-                        $item['id'],
-                        $title,
+                        esc_attr($item['id']),
+                        esc_attr($title),
                         $item_html_content,
                         ( 'true' === $first_expanded && 1 === $ind ) ? "true" : "false"
                     );
