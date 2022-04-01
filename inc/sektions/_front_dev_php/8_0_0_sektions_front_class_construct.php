@@ -337,7 +337,6 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
                 'czr_image_borders_corners_child'
               ),
 
-              //'czr_featured_pages_module',
               'czr_heading_module'  => array(
                 'czr_heading_module',
                 'czr_heading_child',
