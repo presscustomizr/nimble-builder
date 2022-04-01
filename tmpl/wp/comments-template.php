@@ -3,7 +3,7 @@
 <section id="sek-comments" class="sek-themeform">
 	<?php if ( have_comments() ) : global $wp_query; ?>
 
-		<h3><?php comments_number( __( 'No Responses', 'hueman' ), __( '1 Response', 'hueman' ), __( '% Responses', 'hueman' ) ); ?></h3>
+		<h3><?php comments_number( __( 'No Responses', 'text_doma' ), __( '1 Response', 'text_doma' ), __( '% Responses', 'text_doma' ) ); ?></h3>
 
 		<div id="sek-commentlist-container" class="comment-tab">
 
