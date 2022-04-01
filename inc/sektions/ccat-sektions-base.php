@@ -52,7 +52,18 @@ class Sek_Dyn_CSS_Builder {
         // June 2020 : this property is set when saving the customizer
         // and used to determine if we need to generate css for a given location
         // typically useful when a local header is populated with sections but not used on the page. While still present in the collection of location, we don't want to generate css for it.
-        $this->customizer_active_locations = ( isset($_POST['active_locations']) && is_array($_POST['active_locations']) ) ? $_POST['active_locations'] : '_not_set_';
+        $raw_customizer_active_locations = ( isset($_POST['active_locations']) && is_array($_POST['active_locations']) ) ? $_POST['active_locations'] : '_not_set_';
+        
+        // sanitize now and cache
+        if ( !is_array($raw_customizer_active_locations) ) {
+            $this->customizer_active_locations = sanitize_text_field($raw_customizer_active_locations);
+        } else {
+            $_active_locations = [];
+            foreach($raw_customizer_active_locations as $loc ) {
+                $_active_locations[] = sanitize_text_field($loc);
+            }
+            $this->customizer_active_locations = $_active_locations;
+        }
 
         $this->is_global_stylesheet = $is_global_stylesheet;
         // set the css rules for columns
@@ -104,7 +115,7 @@ class Sek_Dyn_CSS_Builder {
             // The global stylesheet may be inactive on a given customization, which means that the customizer_active_locations won't include any global locations.
             // But this does not mean that the global stylesheet is inactive on other pages.
             // That's why we only verify the active location condition when !$this->is_global_stylesheet
-            if ( !$this->is_global_stylesheet && '_not_set_' !== $this->customizer_active_locations && '_not_set_' !== $this->current_sniffed_location && !in_array($this->current_sniffed_location, $this->customizer_active_locations ) ) {
+            if ( !$this->is_global_stylesheet && '_not_set_' !== $this->customizer_active_locations && is_array($this->customizer_active_locations) && '_not_set_' !== $this->current_sniffed_location && !in_array($this->current_sniffed_location, $this->customizer_active_locations ) ) {
                 continue;
             }
 
@@ -2473,7 +2484,6 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
                 'czr_image_borders_corners_child'
               ),
 
-              //'czr_featured_pages_module',
               'czr_heading_module'  => array(
                 'czr_heading_module',
                 'czr_heading_child',
@@ -2659,7 +2669,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
             if ( !isset( $_POST['sek_action'] ) || empty( $_POST['sek_action'] ) ) {
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing sek_action' );
             }
-            $sek_action = $_POST['sek_action'];
+            $sek_action = sanitize_text_field($_POST['sek_action']);
 
             $exported_setting_validities = array();
 
@@ -2687,7 +2697,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
             if ( in_array( $sek_action, $this->ajax_action_map ) ) {
                 $content_type = null;
                 if ( array_key_exists( 'content_type', $_POST ) && is_string( $_POST['content_type'] ) ) {
-                    $content_type = $_POST['content_type'];
+                    $content_type = sanitize_text_field($_POST['content_type']);
                 }
 
                 // This 'preset_section' === $content_type statement has been introduced when implementing support for multi-section pre-build sections
@@ -2708,7 +2718,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                                     break;
                                 }
                                 foreach ( $_POST['collection_of_preset_section_id'] as $preset_section_id ) {
-                                    $html .= $this->sek_ajax_fetch_content( $sek_action, $preset_section_id );
+                                    $html .= $this->sek_ajax_fetch_content( $sek_action, sanitize_text_field($preset_section_id ));
                                 }
                             // 'module' === $content_type
                             } else {
@@ -2769,7 +2779,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
             // c) then when ajaxing, the $_POST['customized'] param is added by WP core with $.ajaxPrefilter() in customize-preview.js
             //
             // 2) since 'wp' hook has not been fired yet, we need to use the posted skope_id param.
-            $sektionSettingValue = sek_get_skoped_seks( $_POST['location_skope_id'] );
+            $sektionSettingValue = sek_get_skoped_seks( sanitize_text_field($_POST['location_skope_id']) );
             if ( !is_array( $sektionSettingValue ) ) {
                 wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => invalid sektionSettingValue => it should be an array().' );
                 return;
@@ -2793,13 +2803,13 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
             switch ( $sek_action ) {
                 case 'sek-add-section' :
                 case 'sek-duplicate-section' :
-                    if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
+                    if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( sanitize_text_field($_POST['is_nested']) ) ) {
                         // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
-                        $this->parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
-                        $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
+                        $this->parent_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_sektion' ]), $sektion_collection );
+                        $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_column' ]), $sektion_collection );
                     } else {
                         //$level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
-                        $level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
+                        $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'id' ]), $sektion_collection );
                     }
                 break;
 
@@ -2810,7 +2820,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                 case 'sek-add-content-in-new-nested-sektion' :
                     $content_type = null;
                     if ( array_key_exists( 'content_type', $_POST ) && is_string( $_POST['content_type'] ) ) {
-                        $content_type = $_POST['content_type'];
+                        $content_type = sanitize_text_field($_POST['content_type']);
                     }
                     if ( 'preset_section' === $content_type ) {
                         if ( !array_key_exists( 'collection_of_preset_section_id', $_POST ) || !is_array( $_POST['collection_of_preset_section_id'] ) ) {
@@ -2818,20 +2828,20 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                             break;
                         }
                         if ( !is_string( $maybe_preset_section_id ) || empty( $maybe_preset_section_id ) ) {
-                            wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => inavalid preset section id' );
+                            wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => invalid preset section id' );
                             break;
                         }
                         $level_id = $maybe_preset_section_id;
                     // module content type case.
                     // the level id has been passed the regular way
                     } else {
-                        $level_id = $_POST[ 'id' ];
+                        $level_id = sanitize_text_field($_POST[ 'id' ]);
                     }
 
-                    if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( $_POST['is_nested'] ) ) {
+                    if ( array_key_exists( 'is_nested', $_POST ) && true === json_decode( sanitize_text_field($_POST['is_nested']) ) ) {
                         // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
-                        $this->parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
-                        $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
+                        $this->parent_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_sektion' ]), $sektion_collection );
+                        $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_column' ]), $sektion_collection );
                     } else {
                         //$level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
                         $level_model = sek_get_level_model( $level_id, $sektion_collection );
@@ -2840,13 +2850,13 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
 
                 //only used for nested section
                 case 'sek-remove-section' :
-                    if ( !array_key_exists( 'is_nested', $_POST ) || true !== json_decode( $_POST['is_nested'] ) ) {
+                    if ( !array_key_exists( 'is_nested', $_POST ) || true !== json_decode( sanitize_text_field($_POST['is_nested'] )) ) {
                         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => the section must be nested in this ajax action' );
                         break;
                     } else {
                         // we need to set the parent_model here to access it later in the ::render method to calculate the column width.
-                        $this->parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
-                        $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
+                        $this->parent_model = sek_get_parent_level_model( sanitize_text_field($_POST[ 'in_column' ]), $sektion_collection );
+                        $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_column' ]), $sektion_collection );
                     }
                 break;
 
@@ -2860,7 +2870,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                         break;
                     }
                     // sek_error_log('sektion_collection', $sektion_collection );
-                    $level_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
+                    $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_sektion' ]), $sektion_collection );
                 break;
 
                 // We re-render the entire parent column collection
@@ -2873,11 +2883,11 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                         break;
                     }
                     if ( !array_key_exists( 'in_sektion', $_POST ) || empty( $_POST[ 'in_sektion' ] ) ) {
-                        $this->parent_model = sek_get_parent_level_model( $_POST[ 'in_column' ], $sektion_collection );
+                        $this->parent_model = sek_get_parent_level_model( sanitize_text_field($_POST[ 'in_column' ]), $sektion_collection );
                     } else {
-                        $this->parent_model = sek_get_level_model( $_POST[ 'in_sektion' ], $sektion_collection );
+                        $this->parent_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_sektion' ]), $sektion_collection );
                     }
-                    $level_model = sek_get_level_model( $_POST[ 'in_column' ], $sektion_collection );
+                    $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_column' ]), $sektion_collection );
                 break;
 
                 case 'sek-resize-columns' :
@@ -2897,11 +2907,11 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing level id' );
                         break;
                     }
-                    if ( !empty( $_POST['level'] ) && 'column' === $_POST['level'] ) {
+                    if ( !empty( $_POST['level'] ) && 'column' === sanitize_text_field($_POST['level']) ) {
                         // we need to set the parent_mode here to access it later in the ::render method to calculate the column width.
-                        $this->parent_model = sek_get_parent_level_model( $_POST['id'], $sektion_collection );
+                        $this->parent_model = sek_get_parent_level_model( sanitize_text_field($_POST['id']), $sektion_collection );
                     }
-                    $level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
+                    $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'id' ]), $sektion_collection );
                 break;
             }//Switch sek_action
 
@@ -2910,7 +2920,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
             ob_start();
 
             if ( $is_stylesheet ) {
-                $r = $this->print_or_enqueue_seks_style( $_POST['location_skope_id'] );
+                $r = $this->print_or_enqueue_seks_style( sanitize_text_field($_POST['location_skope_id']) );
             } else {
                 if ( 'no_match' == $level_model ) {
                     wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action . ' => missing level model' );
@@ -2952,7 +2962,7 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                 wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing post_id' );
             }
 
-            $post_id = $_POST['nimble_edit_post_id'];
+            $post_id = sanitize_text_field($_POST['nimble_edit_post_id']);
 
             // Build customize_url
             // @see function sek_get_customize_url_when_is_admin()
@@ -3150,8 +3160,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // the stylesheet is always preloaded on front
             if ( skp_is_customizing() ) {
                 wp_enqueue_style(
-                    'nb-magnific-popup',
-                    NIMBLE_BASE_URL . '/assets/front/css/libs/magnific-popup.min.css',
+                    'nb-swipebox',
+                    NIMBLE_BASE_URL . '/assets/front/css/libs/swipebox.min.css',
                     array(),
                     NIMBLE_ASSETS_VERSION,
                     $media = 'all'
@@ -3257,13 +3267,13 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
              *  LIGHT BOX WITH MAGNIFIC POPUP
             /* ------------------------------------------------------------------------- */
             wp_enqueue_script(
-                'nb-magnific-popups',
-                sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.min.js',
+                'nb-swipebox',
+                sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-swipebox.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-swipebox.min.js',
                 array(), //( !skp_is_customizing() && sek_is_jquery_replaced() ) ? array() : array( 'jquery'),
                 NIMBLE_ASSETS_VERSION,
                 false
             );
-            sek_defer_script('nb-magnific-popups');
+            sek_defer_script('nb-swipebox');
 
 
             /* ------------------------------------------------------------------------- *
@@ -3382,11 +3392,11 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
              *  PRELOAD FRONT SCRIPT
             /* ------------------------------------------------------------------------- */
             $assets_urls = [
-                'nb-magnific-popup' => sek_is_dev_mode() ? '/assets/front/js/libs/jquery-magnific-popup.js' : '/assets/front/js/libs/jquery-magnific-popup.min.js',
+                'nb-swipebox' => sek_is_dev_mode() ? '/assets/front/js/libs/jquery-swipebox.js' : '/assets/front/js/libs/jquery-swipebox.min.js',
                 'nb-swiper' => sek_is_dev_mode() ? '/assets/front/js/libs/swiper-bundle.js' : '/assets/front/js/libs/swiper-bundle.min.js',
                 'nb-video-bg-plugin' => sek_is_dev_mode() ? '/assets/front/js/libs/nimble-video-bg.js' : '/assets/front/js/libs/nimble-video-bg.min.js',
 
-                'nb-magnific-popup-style' => '/assets/front/css/libs/magnific-popup.min.css',
+                'nb-swipebox-style' => '/assets/front/css/libs/swipebox.min.css',
             ];
 
             // add version
@@ -3394,7 +3404,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 $assets_urls[$k] = NIMBLE_BASE_URL .$path .'?'.NIMBLE_ASSETS_VERSION;
             }
             ?>
-            <script id="nb-load-front-script-and-styles">nb_.listenTo("nb-needs-magnific-popup",function(){nb_.preloadOrDeferAsset({id:"nb-magnific-popup",as:"script",href:"<?php echo $assets_urls['nb-magnific-popup']; ?>",onEvent:"nb-docready"}),nb_.preloadOrDeferAsset({id:"nb-magnific-popup-style",as:"style",href:"<?php echo $assets_urls['nb-magnific-popup-style']; ?>",onEvent:"nb-docready"})}),nb_.listenTo("nb-needs-swiper",function(){nb_.preloadOrDeferAsset({id:"nb-swiper",as:"script",href:"<?php echo $assets_urls['nb-swiper']; ?>",onEvent:"nb-docready"})}),nb_.listenTo("nb-needs-videobg-js",function(){nb_.preloadOrDeferAsset({id:"nb-video-bg-plugin",as:"script",href:"<?php echo $assets_urls['nb-video-bg-plugin']; ?>",onEvent:"nb-docready"})});</script>
+            <script id="nb-load-front-script-and-styles">nb_.listenTo('nb-needs-swipebox',function(){nb_.preloadOrDeferAsset({id:'nb-swipebox',as:'script',href:"<?php echo $assets_urls['nb-swipebox']; ?>",onEvent:'nb-docready',});nb_.preloadOrDeferAsset({id:'nb-swipebox-style',as:'style',href:"<?php echo $assets_urls['nb-swipebox-style']; ?>",onEvent:'nb-docready',})});nb_.listenTo('nb-needs-swiper',function(){nb_.preloadOrDeferAsset({id:'nb-swiper',as:'script',href:"<?php echo $assets_urls['nb-swiper']; ?>",onEvent:'nb-docready',})});nb_.listenTo('nb-needs-videobg-js',function(){nb_.preloadOrDeferAsset({id:'nb-video-bg-plugin',as:'script',href:"<?php echo $assets_urls['nb-video-bg-plugin']; ?>",onEvent:'nb-docready',})});</script>
             <?php
 
             /* ------------------------------------------------------------------------- *
@@ -3588,12 +3598,12 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // 1) window.nb_ utils starts being populated
         // 2) 'nb-jquery-loaded' => fired in footer when jQuery is defined <= window.nb_ utils is completed with jQuery dependant helper properties and methods
         // 3) 'nb-app-ready' => fired in footer on 'nb-jquery-loaded' <= all module scripts are fired on this event
-        // 4) 'nb-jmp-parsed', ... are emitted in each script files
+        // 4) 'nb-{js-library}-parsed', ... are emitted in each script files
         function sek_initialize_front_js_app() {
             if ( !skp_is_customizing() && !Nimble_Manager()->page_has_local_or_global_sections )
               return;
             ?>
-            <script id="nimble-app-init">window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isArray(e)||"[object Array]"===toString.call(e)},inArray:function(e,t){return!(!nb_.isArray(e)||nb_.isUndefined(t))&&e.indexOf(t)>-1},isUndefined:function(e){return void 0===e},isObject:function(e){var t=typeof e;return"function"===t||"object"===t&&!!e},errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},hasPreloadSupport:function(e){var t=document.createElement("link").relList;return!(!t||!t.supports)&&t.supports("preload")},listenTo:function(e,t){nb_.eventsListenedTo.push(e);var n={"nb-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nb-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nb-jquery-loaded")},"nb-jmp-parsed":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup},"nb-main-swiper-parsed":function(){return void 0!==window.Swiper}},o=function(o){nb_.isUndefined(n[e])||!1!==n[e]()?t():nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",e,nb_.eventsListenedTo,t)};"function"==typeof t?nb_.wasEmitted(e)?o():document.addEventListener(e,o):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",e)},eventsEmitted:[],eventsListenedTo:[],emit:function(e,t){if(!(nb_.isUndefined(t)||t.fire_once)||!nb_.wasEmitted(e)){var n=document.createEvent("Event");n.initEvent(e,!0,!0),document.dispatchEvent(n),nb_.eventsEmitted.push(e)}},wasListenedTo:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsListenedTo,e)},wasEmitted:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsEmitted,e)},isInScreen:function(e){if(!nb_.isObject(e))return!1;var t=e.getBoundingClientRect(),n=Math.max(document.documentElement.clientHeight,window.innerHeight);return!(t.bottom<0||t.top-n>=0)},isCustomizing:function(){return!1},isLazyLoadEnabled:function(){return!nb_.isCustomizing()&&!1},preloadOrDeferAsset:function(e){if(e=e||{},nb_.preloadedAssets=nb_.preloadedAssets||[],!nb_.inArray(nb_.preloadedAssets,e.id)){var t,n=document.getElementsByTagName("head")[0],o=function(){if("style"===e.as)this.setAttribute("rel","stylesheet"),this.setAttribute("type","text/css"),this.setAttribute("media","all");else{var t=document.createElement("script");t.setAttribute("src",e.href),t.setAttribute("id",e.id),"script"===e.as&&t.setAttribute("defer","defer"),n.appendChild(t),i.call(this)}e.eventOnLoad&&nb_.emit(e.eventOnLoad)},i=function(){if(this&&this.parentNode&&this.parentNode.contains(this))try{this.parentNode.removeChild(this)}catch(e){nb_.errorLog("NB error when removing a script el",el)}};("font"!==e.as||nb_.hasPreloadSupport())&&(t=document.createElement("link"),"script"===e.as?e.onEvent?nb_.listenTo(e.onEvent,function(){o.call(t)}):o.call(t):(t.setAttribute("href",e.href),"style"===e.as?t.setAttribute("rel",nb_.hasPreloadSupport()?"preload":"stylesheet"):"font"===e.as&&nb_.hasPreloadSupport()&&t.setAttribute("rel","preload"),t.setAttribute("id",e.id),t.setAttribute("as",e.as),"font"===e.as&&(t.setAttribute("type",e.type),t.setAttribute("crossorigin","anonymous")),t.onload=function(){this.onload=null,"font"!==e.as?e.onEvent?nb_.listenTo(e.onEvent,function(){o.call(t)}):o.call(t):e.eventOnLoad&&nb_.emit(e.eventOnLoad)},t.onerror=function(t){nb_.errorLog("Nimble preloadOrDeferAsset error",t,e)}),n.appendChild(t),nb_.preloadedAssets.push(e.id),i.call(e.scriptEl))}},mayBeRevealBG:function(){this.getAttribute("data-sek-src")&&(this.setAttribute("style",'background-image:url("'+this.getAttribute("data-sek-src")+'")'),this.className+=" sek-lazy-loaded",this.querySelectorAll(".sek-css-loader").forEach(function(e){nb_.isObject(e)&&e.parentNode.removeChild(e)}))}},window.NodeList&&!NodeList.prototype.forEach&&(NodeList.prototype.forEach=function(e,t){t=t||window;for(var n=0;n<this.length;n++)e.call(t,this[n],n,this)}),nb_.listenTo("nb-docready",function(){var e=document.querySelectorAll("div.sek-has-bg");!nb_.isObject(e)||e.length<1||e.forEach(function(e){nb_.isObject(e)&&(window.sekFrontLocalized&&window.sekFrontLocalized.lazyload_enabled?nb_.isInScreen(e)&&nb_.mayBeRevealBG.call(e):nb_.mayBeRevealBG.call(e))})}),"complete"===document.readyState||"loading"!==document.readyState&&!document.documentElement.doScroll)nb_.emit("nb-docready");else{var n=function(){nb_.wasEmitted("nb-docready")||nb_.emit("nb-docready")};document.addEventListener("DOMContentLoaded",n),window.addEventListener("load",n)}}(window,document);</script>
+            <script id="nimble-app-init">window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isArray(e)||"[object Array]"===toString.call(e)},inArray:function(e,t){return!(!nb_.isArray(e)||nb_.isUndefined(t))&&e.indexOf(t)>-1},isUndefined:function(e){return void 0===e},isObject:function(e){var t=typeof e;return"function"===t||"object"===t&&!!e},errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},hasPreloadSupport:function(e){var t=document.createElement("link").relList;return!(!t||!t.supports)&&t.supports("preload")},listenTo:function(e,t){nb_.eventsListenedTo.push(e);var n={"nb-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nb-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nb-jquery-loaded")},"nb-swipebox-parsed":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.swipebox},"nb-main-swiper-parsed":function(){return void 0!==window.Swiper}},o=function(o){nb_.isUndefined(n[e])||!1!==n[e]()?t():nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",e,nb_.eventsListenedTo,t)};"function"==typeof t?nb_.wasEmitted(e)?o():document.addEventListener(e,o):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",e)},eventsEmitted:[],eventsListenedTo:[],emit:function(e,t){if(!(nb_.isUndefined(t)||t.fire_once)||!nb_.wasEmitted(e)){var n=document.createEvent("Event");n.initEvent(e,!0,!0),document.dispatchEvent(n),nb_.eventsEmitted.push(e)}},wasListenedTo:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsListenedTo,e)},wasEmitted:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsEmitted,e)},isInScreen:function(e){if(!nb_.isObject(e))return!1;var t=e.getBoundingClientRect(),n=Math.max(document.documentElement.clientHeight,window.innerHeight);return!(t.bottom<0||t.top-n>=0)},isCustomizing:function(){return!1},isLazyLoadEnabled:function(){return!nb_.isCustomizing()&&!1},preloadOrDeferAsset:function(e){if(e=e||{},nb_.preloadedAssets=nb_.preloadedAssets||[],!nb_.inArray(nb_.preloadedAssets,e.id)){var t,n=document.getElementsByTagName("head")[0],o=function(){var t=this;if("style"===e.as)t.setAttribute("rel","stylesheet"),t.setAttribute("type","text/css"),t.setAttribute("media","all");else{var o=document.createElement("script");o.setAttribute("src",e.href),o.setAttribute("id",e.id),"script"===e.as&&o.setAttribute("defer","defer"),n.appendChild(o),r.call(t)}e.eventOnLoad&&nb_.emit(e.eventOnLoad)},r=function(){var e=this;if(e&&e.parentNode&&e.parentNode.contains(e))try{e.parentNode.removeChild(e)}catch(e){nb_.errorLog("NB error when removing a script el",el)}};("font"!==e.as||nb_.hasPreloadSupport())&&(t=document.createElement("link"),"script"===e.as?e.onEvent?nb_.listenTo(e.onEvent,(function(){o.call(t)})):o.call(t):(t.setAttribute("href",e.href),"style"===e.as?t.setAttribute("rel",nb_.hasPreloadSupport()?"preload":"stylesheet"):"font"===e.as&&nb_.hasPreloadSupport()&&t.setAttribute("rel","preload"),t.setAttribute("id",e.id),t.setAttribute("as",e.as),"font"===e.as&&(t.setAttribute("type",e.type),t.setAttribute("crossorigin","anonymous")),t.onload=function(){this.onload=null,"font"!==e.as?e.onEvent?nb_.listenTo(e.onEvent,(function(){o.call(t)})):o.call(t):e.eventOnLoad&&nb_.emit(e.eventOnLoad)},t.onerror=function(t){nb_.errorLog("Nimble preloadOrDeferAsset error",t,e)}),n.appendChild(t),nb_.preloadedAssets.push(e.id),r.call(e.scriptEl))}},mayBeRevealBG:function(){this.getAttribute("data-sek-src")&&(this.setAttribute("style",'background-image:url("'+this.getAttribute("data-sek-src")+'")'),this.className+=" sek-lazy-loaded",this.querySelectorAll(".sek-css-loader").forEach((function(e){nb_.isObject(e)&&e.parentNode.removeChild(e)})))}},window.NodeList&&!NodeList.prototype.forEach&&(NodeList.prototype.forEach=function(e,t){t=t||window;for(var n=0;n<this.length;n+=1)e.call(t,this[n],n,this)}),nb_.listenTo("nb-docready",(function(){var e=document.querySelectorAll("div.sek-has-bg");!nb_.isObject(e)||e.length<1||e.forEach((function(e){nb_.isObject(e)&&(window.sekFrontLocalized&&window.sekFrontLocalized.lazyload_enabled?nb_.isInScreen(e)&&nb_.mayBeRevealBG.call(e):nb_.mayBeRevealBG.call(e))}))})),"complete"===document.readyState||"loading"!==document.readyState&&!document.documentElement.doScroll)nb_.emit("nb-docready");else{var n=function(){nb_.wasEmitted("nb-docready")||nb_.emit("nb-docready")};document.addEventListener("DOMContentLoaded",n),window.addEventListener("load",n)}}(window,document);</script>
             <?php
         }
 
@@ -5556,7 +5566,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                       if ( empty( $_POST['preview-level-guid'] ) ) {
                             sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => error, preview-level-guid can not be empty' );
                       }
-                      $this->preview_level_guid = $_POST['preview-level-guid'];
+                      $this->preview_level_guid = sanitize_text_field($_POST['preview-level-guid']);
                   } else {
                       $this->preview_level_guid = sprintf('%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535) );
                   }
@@ -5760,7 +5770,7 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
                     sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => error missing local_skope_id');
                     return;
                 }
-                $local_skope_id = $_POST['local_skope_id'];
+                $local_skope_id = sanitize_text_field($_POST['local_skope_id']);
 
                  // Feb 2021 => for site template #478
                 $local_skope_id = apply_filters( 'nb_set_skope_id_before_generating_local_front_css', $local_skope_id );
@@ -6044,13 +6054,13 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         // get the module options
         // we are before 'wp', so let's use the posted skope_id and level_id to get our $module_user_values
         $module_model = array();
-        if ( isset( $_POST['nimble_skope_id'] ) && '_skope_not_set_' !== $_POST['nimble_skope_id'] ) {
-            $local_sektions = sek_get_skoped_seks( $_POST['nimble_skope_id'] );
+        if ( isset( $_POST['nimble_skope_id'] ) && '_skope_not_set_' !== sanitize_text_field($_POST['nimble_skope_id']) ) {
+            $local_sektions = sek_get_skoped_seks( sanitize_text_field($_POST['nimble_skope_id']) );
             if ( is_array( $local_sektions ) && !empty( $local_sektions ) ) {
             $sektion_collection = array_key_exists('collection', $local_sektions) ? $local_sektions['collection'] : array();
             }
             if ( is_array($sektion_collection) && !empty( $sektion_collection ) && isset( $_POST['nimble_level_id'] ) ) {
-                $module_model = sek_get_level_model($_POST['nimble_level_id'], $sektion_collection );
+                $module_model = sek_get_level_model( sanitize_text_field($_POST['nimble_level_id']), $sektion_collection );
                 $module_model = sek_normalize_module_value_with_defaults( $module_model );
             }
         } else {
@@ -6067,7 +6077,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         foreach ( $this->form_composition as $name => $field ) {
             $form_composition[ $name ]                = $field;
             if ( isset( $_POST[ $name ] ) ) {
-                $form_composition[ $name ][ 'value' ] = $_POST[ $name ];
+                $form_composition[ $name ][ 'value' ] = sanitize_text_field($_POST[ $name ]);
             }
         }
         //set the form composition according to the user's options
@@ -6188,7 +6198,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             // In this case, don't echo the form, but only the user defined message which should be displayed after submitting the form
             if ( !is_null( $this->mailer ) ) {
                 // Make sure we target the right form if several forms are displayed in a page
-                $current_form_has_been_submitted = isset( $_POST['nimble_level_id'] ) && $_POST['nimble_level_id'] === $module_id;
+                $current_form_has_been_submitted = isset( $_POST['nimble_level_id'] ) && sanitize_text_field($_POST['nimble_level_id']) === $module_id;
 
                 if ( 'sent' == $this->mailer->get_status() && $current_form_has_been_submitted ) {
                     $echo_form = false;
@@ -6319,7 +6329,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                     // of course we don't need to set this input value when customizing.
                     $skope_id = '';
                     if ( !skp_is_customizing() ) {
-                        $skope_id = isset( $_POST['nimble_skope_id'] ) ? $_POST['nimble_skope_id'] : sek_get_level_skope_id( $module_model['id'] );
+                        $skope_id = isset( $_POST['nimble_skope_id'] ) ? sanitize_text_field($_POST['nimble_skope_id']) : sek_get_level_skope_id( $module_model['id'] );
                     }
 
                     // always use the posted skope_id
@@ -6893,7 +6903,7 @@ class Sek_Mailer {
         // @see print_recaptcha_inline_js
         // on submission, we get the posted token value, and validate it with a remote http request to the google api
         if ( isset( $_POST['nimble_recaptcha_resp'] ) ) {
-            if ( !$this->validate_recaptcha( $_POST['nimble_recaptcha_resp'] ) ) {
+            if ( !$this->validate_recaptcha( sanitize_text_field($_POST['nimble_recaptcha_resp']) ) ) {
                 $this->status = 'recaptcha_fail';
                 if ( sek_is_dev_mode() ) {
                     sek_error_log('reCAPTCHA failure', $this->recaptcha_errors );

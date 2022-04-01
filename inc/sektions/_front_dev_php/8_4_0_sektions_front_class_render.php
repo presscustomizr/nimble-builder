@@ -1537,7 +1537,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                       if ( empty( $_POST['preview-level-guid'] ) ) {
                             sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => error, preview-level-guid can not be empty' );
                       }
-                      $this->preview_level_guid = $_POST['preview-level-guid'];
+                      $this->preview_level_guid = sanitize_text_field($_POST['preview-level-guid']);
                   } else {
                       $this->preview_level_guid = sprintf('%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535) );
                   }

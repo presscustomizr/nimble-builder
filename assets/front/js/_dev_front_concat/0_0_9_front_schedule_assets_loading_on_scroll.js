@@ -35,8 +35,8 @@
 
 
 /* ------------------------------------------------------------------------- *
- *  LOAD MAGNIFIC POPUP
- /* ------------------------------------------------------------------------- */
+ *  LOAD SWIPEBOX
+/* ------------------------------------------------------------------------- */
 (function(w, d){
     var callbackFunc = function() {
         jQuery(function($){
@@ -44,33 +44,33 @@
                 return;
 
             var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
-            $linkCandidates = $linkCandidates.add($('[data-sek-level="module"]').find('.sek-gallery-lightbox'));
+            $linkCandidates = $linkCandidates.add($('[data-sek-level="module"]').find('.sek-gal-link-to-img-lightbox'));
             // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
             if ( $linkCandidates.length < 1 )
               return;
             var doLoad = function() {
                   //Load the style
-                  if ( $('head').find( '#czr-magnific-popup' ).length < 1 ) {
+                  if ( $('head').find( '#nb-swipebox' ).length < 1 ) {
                         $('head').append( $('<link/>' , {
                               rel : 'stylesheet',
-                              id : 'czr-magnific-popup',
+                              id : 'nb-swipebox',
                               type : 'text/css',
-                              href : sekFrontLocalized.frontAssetsPath + 'css/libs/magnific-popup.min.css?' + sekFrontLocalized.assetVersion
+                              href : sekFrontLocalized.frontAssetsPath + 'css/libs/swipebox.min.css?' + sekFrontLocalized.assetVersion
                         }) );
                   }
 
-                  if ( !nb_.isFunction( $.fn.magnificPopup ) && sekFrontLocalized.load_front_assets_on_scroll ) {
+                  if ( !nb_.isFunction( $.fn.swipebox ) && sekFrontLocalized.load_front_assets_on_scroll ) {
                         nb_.ajaxLoadScript({
-                            path : 'js/libs/jquery-magnific-popup.min.js',
-                            loadcheck : function() { return nb_.isFunction( $.fn.magnificPopup ); }
+                            path : 'js/libs/jquery-swipebox.min.js',
+                            loadcheck : function() { return nb_.isFunction( $.fn.swipebox ); }
                         });
                   }
               };// doLoad
 
             // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nb-jmp-parsed' listened to by nb_.listenTo()
+            // when the plugin is loaded => it emits 'nb-swipebox-parsed' listened to by nb_.listenTo()
             nb_.maybeLoadAssetsWhenSelectorInScreen( {
-                id : 'magnific-popup',
+                id : 'swipebox',
                 elements : $linkCandidates,
                 func : doLoad
             });
@@ -79,12 +79,9 @@
 
     //When loaded with defer, we can not be sure that jQuery will be loaded before
     nb_.listenTo( 'nb-app-ready', function() {
-        nb_.listenTo( 'nb-needs-magnific-popup', callbackFunc );
+        nb_.listenTo( 'nb-needs-swipebox', callbackFunc );
     });
 }(window, document));
-
-
-
 
 
 
@@ -160,7 +157,7 @@
               return;
 
             // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nb-jmp-parsed' listened to by nb_.listenTo()
+            // when the plugin is loaded => it emits 'nb-..-parsed' listened to by nb_.listenTo()
             nb_.maybeLoadAssetsWhenSelectorInScreen( {
                 id : 'nb-video-bg',
                 elements : $candidates,
@@ -219,7 +216,7 @@
                   }
             };// doLoad
             // Load js plugin if needed
-            // when the plugin is loaded => it emits 'nb-jmp-parsed' listened to by nb_.listenTo()
+            // when the plugin is loaded => it emits 'nb-...-parsed' listened to by nb_.listenTo()
             nb_.maybeLoadAssetsWhenSelectorInScreen({
                 id : 'font-awesome',
                 elements : $candidates,

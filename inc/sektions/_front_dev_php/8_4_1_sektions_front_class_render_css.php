@@ -31,7 +31,7 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
                     sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => error missing local_skope_id');
                     return;
                 }
-                $local_skope_id = $_POST['local_skope_id'];
+                $local_skope_id = sanitize_text_field($_POST['local_skope_id']);
 
                  // Feb 2021 => for site template #478
                 $local_skope_id = apply_filters( 'nb_set_skope_id_before_generating_local_front_css', $local_skope_id );

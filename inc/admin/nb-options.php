@@ -63,7 +63,7 @@ function nb_options_page() {
             if ( function_exists( $_cb ) ) {
               call_user_func( $_cb );
             } else {
-              echo $_cb;
+              echo esc_attr($_cb);
             }
           } else if ( is_array($_cb) && 2 == count($_cb) ) {
             if ( is_object($_cb[0]) ) {
@@ -164,7 +164,7 @@ function nb_register_option_tab( $tab ) {
 
 function nb_get_active_option_tab() {
     // check that we have a tab param and that this tab is registered
-    $tab_id = isset( $_GET['tab'] ) ? $_GET['tab'] : 'welcome';
+    $tab_id = isset( $_GET['tab'] ) ? sanitize_text_field($_GET['tab']) : 'welcome';
     if ( !array_key_exists( $tab_id, Nimble_Manager()->admin_option_tabs ) ) {
         sek_error_log( __FUNCTION__ . ' error => invalid tab');
         $tab_id = 'welcome';
@@ -404,7 +404,7 @@ function print_options_page() {
                 var nb_refresh_opt_page = function() {
                   jQuery( function($) {
                     _nonce_value = $('#nb-base-options-nonce').val();
-                    _url = '<?php echo $refresh_url; ?>';
+                    _url = '<?php echo esc_url($refresh_url); ?>';
                     // add nonce as param so NB can verify it when the page reloads
                     if ( _nonce_value ) {
                       _url = _url + '&ecnon=' + _nonce_value;// looks like site.com/wp-admin/options-general.php?page=nb-options&tab=options&clean_nb=true&ecnon=7cc5758b65
@@ -413,8 +413,8 @@ function print_options_page() {
                   });
                 };
               </script>
-
-              <?php if ( isset( $_GET['clean_nb'] ) && $_GET['clean_nb'] ) : ?>
+              <?php $clean_nb = isset( $_GET['clean_nb'] ) ? sanitize_text_field($_GET['clean_nb']) : false; ?>
+              <?php if ( $clean_nb ) : ?>
                   <?php $status = sek_clean_all_nimble_data(); ?>
                     <?php if ( 'success' === $status ) : ?>
                       <div id="message" class="updated notice">
@@ -459,7 +459,7 @@ function nb_save_base_options() {
 // the option is updated only if different than the default val or if the option exists already
 function nb_maybe_update_checkbox_option( $opt_name, $unchecked_value ) {
     $opt_value = get_option( $opt_name );
-    $posted_value = array_key_exists( $opt_name, $_POST ) ? $_POST[$opt_name] : $unchecked_value;
+    $posted_value = array_key_exists( $opt_name, $_POST ) ? sanitize_text_field($_POST[$opt_name]) : $unchecked_value;
     if ( $unchecked_value !== $posted_value ) {
         update_option( $opt_name, esc_attr( $posted_value ), 'no' );
     } else {

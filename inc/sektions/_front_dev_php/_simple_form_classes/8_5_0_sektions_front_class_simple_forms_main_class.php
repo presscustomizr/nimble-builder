@@ -85,13 +85,13 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         // get the module options
         // we are before 'wp', so let's use the posted skope_id and level_id to get our $module_user_values
         $module_model = array();
-        if ( isset( $_POST['nimble_skope_id'] ) && '_skope_not_set_' !== $_POST['nimble_skope_id'] ) {
-            $local_sektions = sek_get_skoped_seks( $_POST['nimble_skope_id'] );
+        if ( isset( $_POST['nimble_skope_id'] ) && '_skope_not_set_' !== sanitize_text_field($_POST['nimble_skope_id']) ) {
+            $local_sektions = sek_get_skoped_seks( sanitize_text_field($_POST['nimble_skope_id']) );
             if ( is_array( $local_sektions ) && !empty( $local_sektions ) ) {
             $sektion_collection = array_key_exists('collection', $local_sektions) ? $local_sektions['collection'] : array();
             }
             if ( is_array($sektion_collection) && !empty( $sektion_collection ) && isset( $_POST['nimble_level_id'] ) ) {
-                $module_model = sek_get_level_model($_POST['nimble_level_id'], $sektion_collection );
+                $module_model = sek_get_level_model( sanitize_text_field($_POST['nimble_level_id']), $sektion_collection );
                 $module_model = sek_normalize_module_value_with_defaults( $module_model );
             }
         } else {
@@ -108,7 +108,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         foreach ( $this->form_composition as $name => $field ) {
             $form_composition[ $name ]                = $field;
             if ( isset( $_POST[ $name ] ) ) {
-                $form_composition[ $name ][ 'value' ] = $_POST[ $name ];
+                $form_composition[ $name ][ 'value' ] = sanitize_text_field($_POST[ $name ]);
             }
         }
         //set the form composition according to the user's options
@@ -229,7 +229,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             // In this case, don't echo the form, but only the user defined message which should be displayed after submitting the form
             if ( !is_null( $this->mailer ) ) {
                 // Make sure we target the right form if several forms are displayed in a page
-                $current_form_has_been_submitted = isset( $_POST['nimble_level_id'] ) && $_POST['nimble_level_id'] === $module_id;
+                $current_form_has_been_submitted = isset( $_POST['nimble_level_id'] ) && sanitize_text_field($_POST['nimble_level_id']) === $module_id;
 
                 if ( 'sent' == $this->mailer->get_status() && $current_form_has_been_submitted ) {
                     $echo_form = false;
@@ -360,7 +360,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                     // of course we don't need to set this input value when customizing.
                     $skope_id = '';
                     if ( !skp_is_customizing() ) {
-                        $skope_id = isset( $_POST['nimble_skope_id'] ) ? $_POST['nimble_skope_id'] : sek_get_level_skope_id( $module_model['id'] );
+                        $skope_id = isset( $_POST['nimble_skope_id'] ) ? sanitize_text_field($_POST['nimble_skope_id']) : sek_get_level_skope_id( $module_model['id'] );
                     }
 
                     // always use the posted skope_id

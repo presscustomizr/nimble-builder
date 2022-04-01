@@ -39,7 +39,7 @@ function sek_get_parent_level_model( $child_level_id = '', $collection = array()
     if ( empty( $collection ) ) {
         if ( empty( $skope_id ) ) {
             if ( is_array( $_POST ) && !empty( $_POST['location_skope_id'] ) ) {
-                $skope_id = $_POST['location_skope_id'];
+                $skope_id = sanitize_text_field($_POST['location_skope_id']);
             } else {
                 // When fired during an ajax 'customize_save' action, the skp_get_skope_id() is determined with $_POST['local_skope_id']
                 // @see add_filter( 'skp_get_skope_id', '\Nimble\sek_filter_skp_get_skope_id', 10, 2 );

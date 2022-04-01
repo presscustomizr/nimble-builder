@@ -26,7 +26,7 @@ function sek_plugin_menu() {
 // May 2020 => redirect to a system-info tab in the new options page
 add_action( 'admin_init' , '\Nimble\sek_redirect_system_info' );
 function sek_redirect_system_info() {
-    if ( isset( $_GET['page'] ) && 'nimble-builder' === $_GET['page'] ) {
+    if ( isset( $_GET['page'] ) && 'nimble-builder' === sanitize_text_field($_GET['page']) ) {
         wp_safe_redirect( urldecode( admin_url( NIMBLE_OPTIONS_PAGE_URL . '&tab=system-info' ) ) );
         exit;
     }
@@ -261,7 +261,7 @@ function sek_print_nb_btn_edit_with_nimble( $editor_type ) {
     }
     $btn_css_classes = 'classic' === $editor_type ? 'button button-primary button-hero classic-ed' : 'button button-primary button-large guten-ed';
     ?>
-    <button id="sek-edit-with-nimble" type="button" class="<?php echo $btn_css_classes; ?>" data-cust-url="<?php echo esc_url( $customize_url ); ?>">
+    <button id="sek-edit-with-nimble" type="button" class="<?php echo esc_attr($btn_css_classes); ?>" data-cust-url="<?php echo esc_url( $customize_url ); ?>">
       <?php //_e( 'Edit with Nimble Builder', 'text_doma' ); ?>
       <?php printf( '<span class="sek-spinner"></span><span class="sek-nimble-icon" title="%3$s"><img src="%1$s" alt="%2$s"/><span class="sek-nimble-admin-bar-title">%2$s</span><span class="sek-nimble-mobile-admin-bar-title">%3$s</span></span>',
           NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
@@ -378,7 +378,7 @@ function sek_ajax_get_nimble_content_for_seo_plugins() {
     if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
         wp_send_json_error( __FUNCTION__ . ' error => missing skope_id' );
     }
-    $html = sek_get_raw_html_from_skope_id( $_POST['skope_id'] );
+    $html = sek_get_raw_html_from_skope_id( sanitize_text_field($_POST['skope_id']) );
     wp_send_json_success($html);
 }
 
@@ -401,7 +401,7 @@ function sek_print_js_for_yoast_analysis() {
             var NimblePlugin = function() {
                 YoastSEO.app.registerPlugin( 'nimblePlugin', {status: 'loading'} );
                 wp.ajax.post( 'sek_get_nimble_content_for_seo_plugins', {
-                    skope_id : '<?php echo $manually_built_skope_id; ?>'
+                    skope_id : '<?php echo esc_attr($manually_built_skope_id); ?>'
                 }).done( function( nimbleContent ) {
                     YoastSEO.app.pluginReady('nimblePlugin');
                     YoastSEO.app.registerModification( 'content', function(originalContent) { return originalContent + nimbleContent; }, 'nimblePlugin', 5 );
@@ -472,8 +472,8 @@ function sek_print_js_for_rank_math_analyser() {
     <script id="nimble-add-content-to-rank-math-analyzer">
         jQuery(function($){
             // Write skope_id as a global var + trigger an event => solves the problem of nimble-rank-seo-analyzer.js being loaded before
-            window.nb_skope_id_for_rank_math_seo = '<?php echo $manually_built_skope_id; ?>';
-            $(document).trigger('nb-skope-id-ready.rank-math', { skope_id : '<?php echo $manually_built_skope_id; ?>' } );
+            window.nb_skope_id_for_rank_math_seo = '<?php echo esc_attr($manually_built_skope_id); ?>';
+            $(document).trigger('nb-skope-id-ready.rank-math', { skope_id : '<?php echo esc_attr($manually_built_skope_id); ?>' } );
         });
     </script>
     <?php
@@ -530,9 +530,9 @@ function sek_nimble_dashboard_callback_fn() {
     <div class="nimble-db-wrapper">
       <div class="nimble-db-header">
         <div class="nimble-logo-version">
-          <div class="nimble-logo"><div class="sek-nimble-icon" title="<?php _e('Add sections in live preview with Nimble Builder', 'text_doma' );?>"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="Nimble Builder"></div></div>
+          <div class="nimble-logo"><div class="sek-nimble-icon" title="<?php _e('Add sections in live preview with Nimble Builder', 'text_doma' );?>"><img src="<?php echo esc_url(NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION); ?>" alt="Nimble Builder"></div></div>
           <div class="nimble-version">
-            <span class="nimble-version-text"><?php _e('Nimble Builder', 'text_doma'); ?> v<?php echo NIMBLE_VERSION; ?></span>
+            <span class="nimble-version-text"><?php _e('Nimble Builder', 'text_doma'); ?> v<?php echo esc_attr(NIMBLE_VERSION); ?></span>
             <?php if ( sek_is_presscustomizr_theme( $theme_name ) ) : ?>
               <?php
                 $theme_data = wp_get_theme();
@@ -561,7 +561,7 @@ function sek_nimble_dashboard_callback_fn() {
       </div>
       <?php if ( !empty( $post_data ) ) : ?>
         <div class="nimble-post-list">
-          <h3 class="nimble-post-list-title"><?php echo __( 'News & release notes', 'text_doma' ); ?></h3>
+          <h3 class="nimble-post-list-title"><?php _e( 'News & release notes', 'text_doma' ); ?></h3>
           <ul class="nimble-collection">
             <?php foreach ( $post_data as $single_post_data ) : ?>
               <li class="nimble-single-post">
@@ -603,7 +603,7 @@ function sek_nimble_dashboard_callback_fn() {
           <?php foreach ( $footer_links as $link_id => $link_data ) : ?>
             <div class="nimble-footer-link-<?php echo esc_attr( $link_id ); ?>">
               <?php if ( !empty( $link_data['html'] ) ) : ?>
-                <?php echo $link_data['html']; ?>
+                <?php echo esc_attr($link_data['html']); ?>
               <?php else : ?>
               <a href="<?php echo esc_attr( $link_data['link'] ); ?>" target="_blank"><?php echo esc_html( $link_data['title'] ); ?> <span class="screen-reader-text"><?php echo __( '(opens in a new window)', 'text_doma' ); ?></span></a><span aria-hidden="true" class="dashicons dashicons-external"></span>
               <?php endif; ?>
@@ -712,7 +712,7 @@ function sek_may_be_display_update_notice() {
               __( "Read the detailled release notes" , 'text_doma' )
           );
         ?>
-        <p style="text-align:right;position: absolute;font-size: 1.1em;<?php echo is_rtl()? 'left' : 'right';?>: 7px;bottom: -6px;">
+        <p style="text-align:right;position: absolute;font-size: 1.1em;<?php echo is_rtl() ? 'left' : 'right';?>: 7px;bottom: -6px;">
         <?php printf('<a href="#" title="%1$s" class="nimble-dismiss-update-notice"> ( %1$s <strong>X</strong> ) </a>',
             __('close' , 'text_doma')
           );
@@ -905,7 +905,7 @@ function sek_maybe_display_feedback_notice() {
     <div class="notice notice-success is-dismissible" id="<?php echo esc_attr( $notice_id ); ?>">
       <h3><span class="nb-wp-menu-notif"><span class="update-count">1</span></span> <?php _e('Hi👋 ! A quick note on Nimble Builder Pro'); ?> </h3>
       <div class="nimble-logo-feedback-notice">
-        <div class="nimble-logo"><div class="sek-nimble-icon"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="Nimble Builder"></div></div>
+        <div class="nimble-logo"><div class="sek-nimble-icon"><img src="<?php echo esc_url(NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION); ?>" alt="Nimble Builder"></div></div>
         <div class="nimble-feedback">
           
           <p><?php
@@ -968,7 +968,7 @@ function sek_render_welcome_notice() {
       return;
     if ( sek_welcome_notice_is_dismissed() )
       return;
-    if ( isset($_GET['page']) && NIMBLE_OPTIONS_PAGE === $_GET['page'] )
+    if ( isset($_GET['page']) && NIMBLE_OPTIONS_PAGE === sanitize_text_field($_GET['page']) )
       return;
     // Prevent diplay on some admin pages
     // for https://github.com/presscustomizr/nimble-builder/issues/737
@@ -1034,7 +1034,7 @@ function sek_render_welcome_notice() {
 function sek_get_welcome_block() {
   ?>
   <div class="nimble-welcome-icon-holder">
-    <img class="nimble-welcome-icon" src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_banner.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php esc_html_e( 'Nimble Builder', 'nimble' ); ?>" />
+    <img class="nimble-welcome-icon" src="<?php echo esc_url(NIMBLE_BASE_URL.'/assets/img/nimble/nimble_banner.svg?ver='.NIMBLE_VERSION); ?>" alt="<?php esc_html_e( 'Nimble Builder', 'nimble' ); ?>" />
   </div>
   <div class="nimble-welcome-content">
     <h1><?php echo apply_filters( 'nimble_parse_admin_text', __('Welcome to Nimble Builder for WordPress :D', 'nimble' ) ); ?></h1>

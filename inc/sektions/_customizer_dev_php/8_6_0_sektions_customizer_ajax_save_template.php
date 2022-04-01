@@ -53,7 +53,7 @@ function sek_ajax_sek_get_user_tmpl_json() {
     // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
     //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
     // }
-    $tmpl_post = sek_get_saved_tmpl_post( $_POST['tmpl_post_name'] );
+    $tmpl_post = sek_get_saved_tmpl_post( sanitize_text_field($_POST['tmpl_post_name']) );
     if ( !is_wp_error( $tmpl_post ) && $tmpl_post && is_object( $tmpl_post ) ) {
         $tmpl_decoded = maybe_unserialize( $tmpl_post->post_content );
 
@@ -107,10 +107,10 @@ function sek_ajax_sek_get_api_tmpl_json() {
     if ( empty( $_POST['api_tmpl_name']) || !is_string( $_POST['api_tmpl_name'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_tmpl_post_name' );
     }
-    $tmpl_name = $_POST['api_tmpl_name'];
+    $tmpl_name = sanitize_text_field($_POST['api_tmpl_name']);
 
     // Pro Template case
-    $is_pro_tmpl = array_key_exists('api_tmpl_is_pro', $_POST ) && 'yes' === $_POST['api_tmpl_is_pro'];
+    $is_pro_tmpl = array_key_exists('api_tmpl_is_pro', $_POST ) && 'yes' === sanitize_text_field($_POST['api_tmpl_is_pro']);
     if ( $is_pro_tmpl ) {
         $pro_key_status = apply_filters( 'nimble_pro_key_status_OK', 'nok' );
         if ( 'pro_key_status_ok' !== $pro_key_status ) {
@@ -161,7 +161,7 @@ add_action( 'wp_ajax_sek_save_user_template', '\Nimble\sek_ajax_save_user_templa
 // hook : wp_ajax_sek_save_user_template
 function sek_ajax_save_user_template() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
-    $is_edit_metas_only_case = isset( $_POST['edit_metas_only'] ) && 'yes' === $_POST['edit_metas_only'];
+    $is_edit_metas_only_case = isset( $_POST['edit_metas_only'] ) && 'yes' === sanitize_text_field($_POST['edit_metas_only']);
 
     // TMPL DATA => the nimble content
     if ( !$is_edit_metas_only_case && empty( $_POST['tmpl_data']) ) {
@@ -201,21 +201,30 @@ function sek_ajax_save_user_template() {
     }
     
     // make sure description and title are clean before DB
-    $tmpl_title = sek_maybe_encode_richtext( $_POST['tmpl_title'] );
-    $tmpl_description = sek_maybe_encode_richtext( $_POST['tmpl_description'] );
+    $tmpl_title = sek_maybe_encode_richtext( sanitize_text_field($_POST['tmpl_title']) );
+    $tmpl_description = sek_maybe_encode_richtext( sanitize_text_field($_POST['tmpl_description']) );
+    
+    // sanitize tmpl_locations
+    $tmpl_locations = [];
+    if ( is_array($_POST['tmpl_locations']) ) {
+        foreach($_POST['tmpl_locations'] as $loc ) {
+            $tmpl_locations[] = sanitize_text_field($loc);
+        }
+    }
+
     // sek_error_log('json decode ?', json_decode( wp_unslash( $_POST['sek_data'] ), true ) );
     $template_to_save = array(
         'data' => $tmpl_data,//<= array
-        'tmpl_post_name' => ( !empty( $_POST['tmpl_post_name'] ) && is_string( $_POST['tmpl_post_name'] ) ) ? $_POST['tmpl_post_name'] : null,
+        'tmpl_post_name' => ( !empty( $_POST['tmpl_post_name'] ) && is_string( $_POST['tmpl_post_name'] ) ) ? sanitize_text_field($_POST['tmpl_post_name']) : null,
         'metas' => array(
             'title' => $tmpl_title,
             'description' => $tmpl_description,
-            'skope_id' => $_POST['skope_id'],
+            'skope_id' => sanitize_text_field($_POST['skope_id']),
             'version' => NIMBLE_VERSION,
             // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
-            'tmpl_locations' => is_array( $_POST['tmpl_locations'] ) ? $_POST['tmpl_locations'] : array(),
-            'tmpl_header_location' => isset( $_POST['tmpl_header_location'] ) ? $_POST['tmpl_header_location'] : '',
-            'tmpl_footer_location' => isset( $_POST['tmpl_footer_location'] ) ? $_POST['tmpl_footer_location'] : '',
+            'tmpl_locations' => $tmpl_locations,
+            'tmpl_header_location' => isset( $_POST['tmpl_header_location'] ) ? sanitize_text_field($_POST['tmpl_header_location']) : '',
+            'tmpl_footer_location' => isset( $_POST['tmpl_footer_location'] ) ? sanitize_text_field($_POST['tmpl_footer_location']) : '',
             'date' => date("Y-m-d"),
             'theme' => sanitize_title_with_dashes( get_stylesheet() ),
             // for api templates
@@ -282,7 +291,7 @@ function sek_ajax_remove_user_template() {
     if ( empty( $_POST['tmpl_post_name']) || !is_string( $_POST['tmpl_post_name'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_tmpl_post_name' );
     }
-    $tmpl_post_name = $_POST['tmpl_post_name'];
+    $tmpl_post_name = sanitize_text_field($_POST['tmpl_post_name']);
     // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
     //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
     // }

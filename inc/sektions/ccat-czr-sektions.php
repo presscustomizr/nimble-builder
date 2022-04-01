@@ -3999,9 +3999,9 @@ function sek_ajax_import_attachment() {
         wp_send_json_error( 'missing_or_invalid_img_url_when_importing_image');
     }
 
-    $id = sek_sideload_img_and_return_attachment_id( $_POST['img_url'] );
+    $id = sek_sideload_img_and_return_attachment_id( sanitize_text_field($_POST['img_url']) );
     if ( is_wp_error( $id ) ) {
-        wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => problem when trying to wp_insert_attachment() for img : ' . $_POST['img_url'] . ' | SERVER ERROR => ' . json_encode( $id ) );
+        wp_send_json_error( __CLASS__ . '::' . __FUNCTION__ . ' => problem when trying to wp_insert_attachment() for img : ' . sanitize_text_field($_POST['img_url']) . ' | SERVER ERROR => ' . json_encode( $id ) );
     } else {
         wp_send_json_success([
           'id' => $id,
@@ -4023,7 +4023,7 @@ function sek_get_revision_history() {
     if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing skope_id' );
     }
-    $rev_list = sek_get_revision_history_from_posts( $_POST['skope_id'] );
+    $rev_list = sek_get_revision_history_from_posts( sanitize_text_field($_POST['skope_id']) );
     wp_send_json_success( $rev_list );
 }
 
@@ -4034,7 +4034,7 @@ function sek_get_single_revision() {
     if ( !isset( $_POST['revision_post_id'] ) || empty( $_POST['revision_post_id'] ) ) {
         wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' => missing revision_post_id' );
     }
-    $revision = sek_get_single_post_revision( $_POST['revision_post_id'] );
+    $revision = sek_get_single_post_revision( sanitize_text_field($_POST['revision_post_id']) );
     wp_send_json_success( $revision );
 }
 
@@ -4065,7 +4065,7 @@ function sek_get_post_categories() {
 // Fired in __construct()
 function sek_get_code_editor_params() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
-    $code_type = isset( $_POST['code_type'] ) ? $_POST['code_type'] : 'text/html';
+    $code_type = isset( $_POST['code_type'] ) ? sanitize_text_field($_POST['code_type']) : 'text/html';
     $editor_params = nimble_get_code_editor_settings( array(
         'type' => $code_type
     ));
@@ -4083,7 +4083,7 @@ function sek_postpone_feedback_notification() {
     if ( !isset( $_POST['transient_duration_in_days'] ) ||!is_numeric( $_POST['transient_duration_in_days'] ) ) {
         $transient_duration = 7 * DAY_IN_SECONDS;
     } else {
-        $transient_duration = $_POST['transient_duration_in_days'] * DAY_IN_SECONDS;
+        $transient_duration = sanitize_text_field($_POST['transient_duration_in_days']) * DAY_IN_SECONDS;
     }
     set_transient( NIMBLE_FEEDBACK_NOTICE_ID, 'maybe_later', $transient_duration );
     wp_die( 1 );
@@ -4293,7 +4293,7 @@ function sek_maybe_export() {
         return;
     }
 
-    $seks_data = sek_get_skoped_seks( $_REQUEST['skope_id'] );
+    $seks_data = sek_get_skoped_seks( sanitize_text_field($_REQUEST['skope_id']) );
 
     //sek_error_log('EXPORT BEFORE FILTER ? ' . $_REQUEST['skope_id'] , $seks_data );
     // the filter 'nimble_pre_export' is used to :
@@ -4305,15 +4305,15 @@ function sek_maybe_export() {
     //$seks_data = sek_sektion_collection_sanitize_cb( $seks_data );
 
     $theme_name = sanitize_title_with_dashes( get_stylesheet() );
-
+    
     //sek_error_log('EXPORT AFTER FILTER ?', $seks_data );
     $export = array(
         'data' => $seks_data,
         'metas' => array(
-            'skope_id' => $_REQUEST['skope_id'],
+            'skope_id' => sanitize_text_field($_REQUEST['skope_id']),
             'version' => NIMBLE_VERSION,
             // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
-            'active_locations' => is_string( $_REQUEST['active_locations'] ) ? explode( ',', $_REQUEST['active_locations'] ) : array(),
+            'active_locations' => is_string( $_REQUEST['active_locations'] ) ? explode( ',', sanitize_text_field($_REQUEST['active_locations']) ) : array(),
             'date' => date("Y-m-d"),
             'theme' => $theme_name
         )
@@ -4321,7 +4321,7 @@ function sek_maybe_export() {
 
     //sek_error_log('$export ?', $export );
 
-    $skope_id = str_replace('skp__', '',  $_REQUEST['skope_id'] );
+    $skope_id = str_replace('skp__', '',  sanitize_text_field($_REQUEST['skope_id']) );
     $filename = $theme_name . '_' . $skope_id . '.nimblebuilder';
 
     // Set the download headers.
@@ -4497,11 +4497,11 @@ function sek_ajax_get_manually_imported_file_content() {
 
     $maybe_import_images = true;
     // in a pre-import-check context, we don't need to sniff and upload images
-    if ( array_key_exists( 'pre_import_check', $_POST ) && true === sek_booleanize_checkbox_val( $_POST['pre_import_check'] ) ) {
+    if ( array_key_exists( 'pre_import_check', $_POST ) && true === sek_booleanize_checkbox_val( sanitize_text_field($_POST['pre_import_check']) ) ) {
         $maybe_import_images = false;
     }
     // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
-    if ( array_key_exists( 'import_img', $_POST ) && false === sek_booleanize_checkbox_val( $_POST['import_img'] ) ) {
+    if ( array_key_exists( 'import_img', $_POST ) && false === sek_booleanize_checkbox_val( sanitize_text_field($_POST['import_img']) ) ) {
         $maybe_import_images = false;
     }
 
@@ -4580,7 +4580,7 @@ function sek_ajax_sek_get_user_tmpl_json() {
     // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
     //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
     // }
-    $tmpl_post = sek_get_saved_tmpl_post( $_POST['tmpl_post_name'] );
+    $tmpl_post = sek_get_saved_tmpl_post( sanitize_text_field($_POST['tmpl_post_name']) );
     if ( !is_wp_error( $tmpl_post ) && $tmpl_post && is_object( $tmpl_post ) ) {
         $tmpl_decoded = maybe_unserialize( $tmpl_post->post_content );
 
@@ -4634,10 +4634,10 @@ function sek_ajax_sek_get_api_tmpl_json() {
     if ( empty( $_POST['api_tmpl_name']) || !is_string( $_POST['api_tmpl_name'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_tmpl_post_name' );
     }
-    $tmpl_name = $_POST['api_tmpl_name'];
+    $tmpl_name = sanitize_text_field($_POST['api_tmpl_name']);
 
     // Pro Template case
-    $is_pro_tmpl = array_key_exists('api_tmpl_is_pro', $_POST ) && 'yes' === $_POST['api_tmpl_is_pro'];
+    $is_pro_tmpl = array_key_exists('api_tmpl_is_pro', $_POST ) && 'yes' === sanitize_text_field($_POST['api_tmpl_is_pro']);
     if ( $is_pro_tmpl ) {
         $pro_key_status = apply_filters( 'nimble_pro_key_status_OK', 'nok' );
         if ( 'pro_key_status_ok' !== $pro_key_status ) {
@@ -4688,7 +4688,7 @@ add_action( 'wp_ajax_sek_save_user_template', '\Nimble\sek_ajax_save_user_templa
 // hook : wp_ajax_sek_save_user_template
 function sek_ajax_save_user_template() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
-    $is_edit_metas_only_case = isset( $_POST['edit_metas_only'] ) && 'yes' === $_POST['edit_metas_only'];
+    $is_edit_metas_only_case = isset( $_POST['edit_metas_only'] ) && 'yes' === sanitize_text_field($_POST['edit_metas_only']);
 
     // TMPL DATA => the nimble content
     if ( !$is_edit_metas_only_case && empty( $_POST['tmpl_data']) ) {
@@ -4728,21 +4728,30 @@ function sek_ajax_save_user_template() {
     }
     
     // make sure description and title are clean before DB
-    $tmpl_title = sek_maybe_encode_richtext( $_POST['tmpl_title'] );
-    $tmpl_description = sek_maybe_encode_richtext( $_POST['tmpl_description'] );
+    $tmpl_title = sek_maybe_encode_richtext( sanitize_text_field($_POST['tmpl_title']) );
+    $tmpl_description = sek_maybe_encode_richtext( sanitize_text_field($_POST['tmpl_description']) );
+    
+    // sanitize tmpl_locations
+    $tmpl_locations = [];
+    if ( is_array($_POST['tmpl_locations']) ) {
+        foreach($_POST['tmpl_locations'] as $loc ) {
+            $tmpl_locations[] = sanitize_text_field($loc);
+        }
+    }
+
     // sek_error_log('json decode ?', json_decode( wp_unslash( $_POST['sek_data'] ), true ) );
     $template_to_save = array(
         'data' => $tmpl_data,//<= array
-        'tmpl_post_name' => ( !empty( $_POST['tmpl_post_name'] ) && is_string( $_POST['tmpl_post_name'] ) ) ? $_POST['tmpl_post_name'] : null,
+        'tmpl_post_name' => ( !empty( $_POST['tmpl_post_name'] ) && is_string( $_POST['tmpl_post_name'] ) ) ? sanitize_text_field($_POST['tmpl_post_name']) : null,
         'metas' => array(
             'title' => $tmpl_title,
             'description' => $tmpl_description,
-            'skope_id' => $_POST['skope_id'],
+            'skope_id' => sanitize_text_field($_POST['skope_id']),
             'version' => NIMBLE_VERSION,
             // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
-            'tmpl_locations' => is_array( $_POST['tmpl_locations'] ) ? $_POST['tmpl_locations'] : array(),
-            'tmpl_header_location' => isset( $_POST['tmpl_header_location'] ) ? $_POST['tmpl_header_location'] : '',
-            'tmpl_footer_location' => isset( $_POST['tmpl_footer_location'] ) ? $_POST['tmpl_footer_location'] : '',
+            'tmpl_locations' => $tmpl_locations,
+            'tmpl_header_location' => isset( $_POST['tmpl_header_location'] ) ? sanitize_text_field($_POST['tmpl_header_location']) : '',
+            'tmpl_footer_location' => isset( $_POST['tmpl_footer_location'] ) ? sanitize_text_field($_POST['tmpl_footer_location']) : '',
             'date' => date("Y-m-d"),
             'theme' => sanitize_title_with_dashes( get_stylesheet() ),
             // for api templates
@@ -4809,7 +4818,7 @@ function sek_ajax_remove_user_template() {
     if ( empty( $_POST['tmpl_post_name']) || !is_string( $_POST['tmpl_post_name'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_tmpl_post_name' );
     }
-    $tmpl_post_name = $_POST['tmpl_post_name'];
+    $tmpl_post_name = sanitize_text_field($_POST['tmpl_post_name']);
     // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
     //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
     // }
@@ -4879,7 +4888,7 @@ function sek_ajax_get_single_api_section_data() {
     if ( empty( $_POST['api_section_id']) || !is_string( $_POST['api_section_id'] ) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_api_section_id' );
     }
-    $api_section_id = $_POST['api_section_id'];
+    $api_section_id = sanitize_text_field($_POST['api_section_id']);
 
     $is_pro_section_id = sek_is_pro() && is_string($api_section_id) && 'pro_' === substr($api_section_id,0,4);
     $pro_key_status = apply_filters( 'nimble_pro_key_status_OK', 'nok' );
@@ -4938,7 +4947,7 @@ function sek_ajax_sek_get_user_section_json() {
     // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
     //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
     // }
-    $section_post = sek_get_saved_section_post( $_POST['section_post_name'] );
+    $section_post = sek_get_saved_section_post( sanitize_text_field($_POST['section_post_name']) );
     if ( !is_wp_error( $section_post ) && $section_post && is_object( $section_post ) ) {
         $section_decoded = maybe_unserialize( $section_post->post_content );
         // Structure of $content :
@@ -4982,7 +4991,7 @@ add_action( 'wp_ajax_sek_save_user_section', '\Nimble\sek_ajax_save_user_section
 // hook : wp_ajax_sek_save_user_section
 function sek_ajax_save_user_section() {
     sek_do_ajax_pre_checks( array( 'check_nonce' => true ) );
-    $is_edit_metas_only_case = isset( $_POST['edit_metas_only'] ) && 'yes' === $_POST['edit_metas_only'];
+    $is_edit_metas_only_case = isset( $_POST['edit_metas_only'] ) && 'yes' === sanitize_text_field($_POST['edit_metas_only']);
     // TMPL DATA => the nimble content
     if ( !$is_edit_metas_only_case && empty( $_POST['section_data']) ) {
         wp_send_json_error( __FUNCTION__ . '_missing_section_data' );
@@ -5015,17 +5024,17 @@ function sek_ajax_save_user_section() {
     }
 
     // make sure description and title are clean before DB
-    $sec_title = sek_maybe_encode_richtext( $_POST['section_title'] );
-    $sec_description = sek_maybe_encode_richtext( $_POST['section_description'] );
+    $sec_title = sek_maybe_encode_richtext( sanitize_text_field($_POST['section_title']) );
+    $sec_description = sek_maybe_encode_richtext( sanitize_text_field($_POST['section_description']) );
 
     $section_to_save = array(
         'data' => $seks_data,//<= json stringified
         // the section post name is provided only when updating
-        'section_post_name' => ( !empty( $_POST['section_post_name'] ) && is_string( $_POST['section_post_name'] ) ) ? $_POST['section_post_name'] : null,
+        'section_post_name' => ( !empty( $_POST['section_post_name'] ) && is_string( $_POST['section_post_name'] ) ) ? sanitize_text_field($_POST['section_post_name']) : null,
         'metas' => array(
             'title' => $sec_title,
             'description' => $sec_description,
-            'skope_id' => $_POST['skope_id'],
+            'skope_id' => sanitize_text_field($_POST['skope_id']),
             'version' => NIMBLE_VERSION,
             // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
             //'active_locations' => is_array( $_POST['active_locations'] ) ? $_POST['active_locations'] : array(),
@@ -5086,7 +5095,7 @@ function sek_ajax_remove_user_section() {
     // if ( !isset( $_POST['skope_id'] ) || empty( $_POST['skope_id'] ) ) {
     //     wp_send_json_error( __FUNCTION__ . '_missing_skope_id' );
     // }
-    $section_post_to_remove = sek_get_saved_section_post( $_POST['section_post_name'] );
+    $section_post_to_remove = sek_get_saved_section_post( sanitize_text_field($_POST['section_post_name']) );
 
     if ( $section_post_to_remove && is_object( $section_post_to_remove ) ) {
         // the CPT is moved to Trash instead of permanently deleted when using wp_delete_post()
@@ -5101,7 +5110,7 @@ function sek_ajax_remove_user_section() {
     if ( is_wp_error( $section_post_to_remove ) || is_null($section_post_to_remove) || empty($section_post_to_remove) ) {
         wp_send_json_error( __FUNCTION__ . '_removal_error' );
     } else {
-        wp_send_json_success( [ 'section_post_removed' => $_POST['section_post_name'] ] );
+        wp_send_json_success( [ 'section_post_removed' => sanitize_text_field($_POST['section_post_name']) ] );
     }
 }
 ?><?php

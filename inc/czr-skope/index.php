@@ -330,11 +330,11 @@ function skp_get_skope_id( $level = 'local' ) {
     // => which will lead to skope_id set to '_skope_not_set_'
     // in order to prevent this, let's get the skope_id value from the customizer posted value when available.
     if ( skp_is_customizing() && '_skope_not_set_' === $skope_id_to_return && 'local' === $level && !empty($_POST['local_skope_id']) ) {
-        $skope_id_to_return = $_POST['local_skope_id'];
+        $skope_id_to_return = sanitize_text_field($_POST['local_skope_id']);
     }
     // Feb 2021 => added for https://github.com/presscustomizr/nimble-builder/issues/478
     if ( skp_is_customizing() && '_skope_not_set_' === $skope_id_to_return && 'group' === $level && !empty($_POST['group_skope_id']) ) {
-        $skope_id_to_return = $_POST['group_skope_id'];
+        $skope_id_to_return = sanitize_text_field($_POST['group_skope_id']);
     }
 
     $skope_id_to_return = apply_filters( 'skp_get_skope_id', $skope_id_to_return, $level );
@@ -410,7 +410,7 @@ function skp_get_skope_title( $args = array() ) {
     $long         = $args['long'];
     $is_prefixed  = $args['is_prefixed'];
 
-    $_dyn_type = ( skp_is_customize_preview_frame() && isset( $_POST['dyn_type']) ) ? $_POST['dyn_type'] : '';
+    $_dyn_type = ( skp_is_customize_preview_frame() && isset( $_POST['dyn_type']) ) ? sanitize_text_field($_POST['dyn_type']) : '';
     $type = skp_get_skope('type');
     $skope = skp_get_skope();
     $title = '';
@@ -519,7 +519,7 @@ function skp_is_customizing() {
     $is_customize_admin_page_one = (
       $is_customize_php_page
       ||
-      ( isset( $_REQUEST['wp_customize'] ) && 'on' == $_REQUEST['wp_customize'] )
+      ( isset( $_REQUEST['wp_customize'] ) && 'on' == sanitize_text_field($_REQUEST['wp_customize']) )
       ||
       ( !empty( $_GET['customize_changeset_uuid'] ) || !empty( $_POST['customize_changeset_uuid'] ) )
     );

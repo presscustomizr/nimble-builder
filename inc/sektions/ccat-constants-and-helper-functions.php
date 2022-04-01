@@ -351,34 +351,6 @@ function sek_emit_js_event( $event = '', $echo = true ) {
 //     return $bool;
 // }
 
-// @return bool
-// Fired in 'wp_enqueue_scripts'
-// Recursively sniff the local and global sections to find a 'img-lightbox' string
-// @see sek_get_module_params_for_czr_image_main_settings_child
-// function sek_front_needs_magnific_popup( $bool = false, $recursive_data = null ) {
-//     if ( !$bool ) {
-//         if ( is_null( $recursive_data ) ) {
-//             $local_skope_settings = sek_get_skoped_seks( skp_get_skope_id() );
-//             $local_collection = ( is_array( $local_skope_settings ) && !empty( $local_skope_settings['collection'] ) ) ? $local_skope_settings['collection'] : array();
-//             $global_skope_settings = sek_get_skoped_seks( NIMBLE_GLOBAL_SKOPE_ID );
-//             $global_collection = ( is_array( $global_skope_settings ) && !empty( $global_skope_settings['collection'] ) ) ? $global_skope_settings['collection'] : array();
-
-//             $recursive_data = array_merge( $local_collection, $global_collection );
-//         }
-
-//         foreach ($recursive_data as $key => $value) {
-//             // @see sek_get_module_params_for_czr_image_main_settings_child
-//             if ( is_string( $value ) && 'img-lightbox' === $value ) {
-//                 $bool = true;
-//                 break;
-//             }
-//             if ( is_array( $value ) ) {
-//                 $bool = sek_front_needs_magnific_popup( $bool, $value );
-//             }
-//         }
-//     }
-//     return true === $bool;
-// }
 
 // @return bool
 // Fired in 'wp_enqueue_scripts'
@@ -1070,14 +1042,6 @@ function sek_get_module_collection() {
           'font_icon' => '<i class="material-icons">menu</i>'
           //'active' => sek_are_beta_features_enabled()
         )
-        // array(
-        //   'content-type' => 'module',
-        //   'content-id' => 'czr_featured_pages_module',
-        //   'title' => __( 'Featured pages',  'text_doma' ),
-        //   'icon' => 'Nimble__featured_icon.svg'
-        // ),
-
-
     ));
 }
 
@@ -1746,7 +1710,7 @@ function sek_get_closest_section_custom_breakpoint( $params ) {
     if ( 'not_set' === $collection  ) {
         if ( empty( $skope_id ) ) {
             if ( is_array( $_POST ) && !empty( $_POST['location_skope_id'] ) ) {
-                $skope_id = $_POST['location_skope_id'];
+                $skope_id = sanitize_text_field($_POST['location_skope_id']);
             } else {
                 // When fired during an ajax 'customize_save' action, the skp_get_skope_id() is determined with $_POST['local_skope_id']
                 // @see add_filter( 'skp_get_skope_id', '\Nimble\sek_filter_skp_get_skope_id', 10, 2 );
@@ -2643,7 +2607,7 @@ function sek_get_parent_level_model( $child_level_id = '', $collection = array()
     if ( empty( $collection ) ) {
         if ( empty( $skope_id ) ) {
             if ( is_array( $_POST ) && !empty( $_POST['location_skope_id'] ) ) {
-                $skope_id = $_POST['location_skope_id'];
+                $skope_id = sanitize_text_field($_POST['location_skope_id']);
             } else {
                 // When fired during an ajax 'customize_save' action, the skp_get_skope_id() is determined with $_POST['local_skope_id']
                 // @see add_filter( 'skp_get_skope_id', '\Nimble\sek_filter_skp_get_skope_id', 10, 2 );
@@ -3021,8 +2985,8 @@ function sek_filter_skp_get_skope_id( $skope_id, $level ) {
     //       $.extend( query, { local_skope_id : api.czr_skopeBase.getSkopeProperty( 'skope_id' ) } );
     // });
     // implemented to fix : https://github.com/presscustomizr/nimble-builder/issues/242
-    if ( 'local' === $level && is_array( $_POST ) && !empty( $_POST['local_skope_id'] ) && 'customize_save' === $_POST['action'] ) {
-        $skope_id = $_POST['local_skope_id'];
+    if ( 'local' === $level && is_array( $_POST ) && !empty( $_POST['local_skope_id'] ) && 'customize_save' === sanitize_text_field($_POST['action']) ) {
+        $skope_id = sanitize_text_field($_POST['local_skope_id']);
     }
     return $skope_id;
 }

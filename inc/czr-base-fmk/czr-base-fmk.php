@@ -484,8 +484,8 @@ if ( !class_exists( 'CZR_Fmk_Base_Ajax_Filter' ) ) :
             if ( !isset( $_POST['tmpl'] ) || empty( $_POST['tmpl'] ) ) {
                 wp_send_json_error( 'ac_set_ajax_czr_tmpl => missing tmpl property in posted data' );
             }
-            $tmpl = $_POST['tmpl'];
-            $module_type = $_POST['module_type'];
+            $tmpl = sanitize_text_field($_POST['tmpl']);
+            $module_type = sanitize_text_field($_POST['module_type']);
 
             ///////////////////////////////////////////////////////////////////////
             // @param $tmpl = 'item-inputs'

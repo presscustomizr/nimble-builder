@@ -163,14 +163,6 @@ function sek_get_module_collection() {
           'font_icon' => '<i class="material-icons">menu</i>'
           //'active' => sek_are_beta_features_enabled()
         )
-        // array(
-        //   'content-type' => 'module',
-        //   'content-id' => 'czr_featured_pages_module',
-        //   'title' => __( 'Featured pages',  'text_doma' ),
-        //   'icon' => 'Nimble__featured_icon.svg'
-        // ),
-
-
     ));
 }
 

@@ -36,7 +36,7 @@ function sek_maybe_export() {
         return;
     }
 
-    $seks_data = sek_get_skoped_seks( $_REQUEST['skope_id'] );
+    $seks_data = sek_get_skoped_seks( sanitize_text_field($_REQUEST['skope_id']) );
 
     //sek_error_log('EXPORT BEFORE FILTER ? ' . $_REQUEST['skope_id'] , $seks_data );
     // the filter 'nimble_pre_export' is used to :
@@ -48,15 +48,15 @@ function sek_maybe_export() {
     //$seks_data = sek_sektion_collection_sanitize_cb( $seks_data );
 
     $theme_name = sanitize_title_with_dashes( get_stylesheet() );
-
+    
     //sek_error_log('EXPORT AFTER FILTER ?', $seks_data );
     $export = array(
         'data' => $seks_data,
         'metas' => array(
-            'skope_id' => $_REQUEST['skope_id'],
+            'skope_id' => sanitize_text_field($_REQUEST['skope_id']),
             'version' => NIMBLE_VERSION,
             // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
-            'active_locations' => is_string( $_REQUEST['active_locations'] ) ? explode( ',', $_REQUEST['active_locations'] ) : array(),
+            'active_locations' => is_string( $_REQUEST['active_locations'] ) ? explode( ',', sanitize_text_field($_REQUEST['active_locations']) ) : array(),
             'date' => date("Y-m-d"),
             'theme' => $theme_name
         )
@@ -64,7 +64,7 @@ function sek_maybe_export() {
 
     //sek_error_log('$export ?', $export );
 
-    $skope_id = str_replace('skp__', '',  $_REQUEST['skope_id'] );
+    $skope_id = str_replace('skp__', '',  sanitize_text_field($_REQUEST['skope_id']) );
     $filename = $theme_name . '_' . $skope_id . '.nimblebuilder';
 
     // Set the download headers.
@@ -240,11 +240,11 @@ function sek_ajax_get_manually_imported_file_content() {
 
     $maybe_import_images = true;
     // in a pre-import-check context, we don't need to sniff and upload images
-    if ( array_key_exists( 'pre_import_check', $_POST ) && true === sek_booleanize_checkbox_val( $_POST['pre_import_check'] ) ) {
+    if ( array_key_exists( 'pre_import_check', $_POST ) && true === sek_booleanize_checkbox_val( sanitize_text_field($_POST['pre_import_check']) ) ) {
         $maybe_import_images = false;
     }
     // april 2020 : introduced for https://github.com/presscustomizr/nimble-builder/issues/663
-    if ( array_key_exists( 'import_img', $_POST ) && false === sek_booleanize_checkbox_val( $_POST['import_img'] ) ) {
+    if ( array_key_exists( 'import_img', $_POST ) && false === sek_booleanize_checkbox_val( sanitize_text_field($_POST['import_img']) ) ) {
         $maybe_import_images = false;
     }
 

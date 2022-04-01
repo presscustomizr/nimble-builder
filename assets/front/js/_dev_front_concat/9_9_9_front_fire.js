@@ -1,72 +1,48 @@
 // global sekFrontLocalized, nimbleListenTo
 /* ------------------------------------------------------------------------- *
- *  LIGHT BOX WITH MAGNIFIC POPUP
+ *  LIGHT BOX SWIPEBOX ( April 2022 for #886)
  /* ------------------------------------------------------------------------- */
-(function(w, d){
-    nb_.listenTo('nb-jmp-parsed', function() {
-        jQuery(function($){
-            if ( nb_.isCustomizing() )
-                  return;
-
-            var $linkCandidates = [
-                  $('[data-sek-level="module"]').find('.sek-link-to-img-lightbox'),// image module
-                  $('[data-sek-level="module"]').find('.sek-gallery-lightbox')// gallery module
-            ];
-
-            var _params = {
-                  type: 'image',
-                  closeOnContentClick: true,
-                  closeBtnInside: true,
-                  fixedContentPos: true,
-                  mainClass: 'mfp-no-margins mfp-with-zoom', // class to remove default margin from left and right side
-                  image: {
-                        verticalFit: true
-                        // titleSrc: function(item) {
-                        //       return item.el.attr('title');
-                        // }
-                  },
-                  zoom: {
-                        enabled: true,
-                        duration: 300 // don't foget to change the duration also in CSS
-                  }
-            };
-            //var $linkCand;
-            $.each( $linkCandidates, function(_k, $linkCand) {
-                  // Abort if no link candidate
-                  if ( $linkCand.length < 1 )
+ (function(w, d){
+      nb_.listenTo('nb-swipebox-parsed', function() {
+            jQuery(function($){
+                  if ( nb_.isCustomizing() )
                         return;
-                  //$linkCand = $(this);
-                  if ( $linkCand.hasClass('sek-gallery-lightbox') ) {
-                        _params.delegate = 'figure .sek-gal-img-has-link';
-                        _params.gallery = {
-                              enabled: true,
-                              navigateByImgClick: true
-                              //preload: [0,1] // Will preload 0 - before current, and 1 after the current image
-                        };
-                        _params.image = {
-                              verticalFit: true,
-                              titleSrc: function(item) {
-                                    return item.el.attr('title');
-                              }
-                        };
-                  }
-                  // Abort if candidate already setup
-                  if ( $linkCand.data('nimble-mfp-done') )
-                        return;
-                  try { $linkCand.magnificPopup( _params ); } catch( er ) {
-                        nb_.errorLog( 'error in callback of nimble-magnific-popup-loaded => ', er );
-                  }
-                  $linkCand.data('nimble-mfp-done', true );
-            });
+      
+                  var $linkCandidates = [
+                        $('[data-sek-level="module"]').find('.sek-link-to-img-lightbox'),// image module
+                        $('[data-sek-level="module"]').find('.sek-gal-link-to-img-lightbox')// gallery module
+                  ];
 
-            // July 2021, prevent gallery images to be clicked when no link is specified
-            $('.sek-gallery-lightbox').on('click', '.sek-no-img-link', function(evt) {
-                  evt.preventDefault();
-            });
+                  //https://github.com/brutaldesign/swipebox
+                  var _params = {
+                        loopAtEnd: true
+                  };
+                  //var $linkCand;
+                  $.each( $linkCandidates, function(_k, $linkCand) {
+                        // Abort if no link candidate
+                        if ( $linkCand.length < 1 ) {
+                              return;
+                        }
+                        // Abort if candidate already setup
+                        if ( $linkCand.data('nimble-swiperbox-done') )
+                              return;
+                        try { $linkCand.swipebox( _params ); } catch( er ) {
+                              nb_.errorLog( 'error in callback of nb-swipebox-parsed => ', er );
+                        }
+                        $linkCand.data('nimble-swiperbox-done', true );
+                  });
 
-        });//jQuery(function($){})
-    });
-}(window, document));
+                  // July 2021, prevent gallery images to be clicked when no link is specified
+                  $('.sek-gallery-lightbox').on('click', '.sek-no-img-link', function(evt) {
+                        evt.preventDefault();
+                  });
+
+            });//jQuery(function($){})
+      });
+  }(window, document));
+
+
+
 
 
 
