@@ -22,6 +22,8 @@ module.exports = {
       '!phpunit.xml',
       '!readme.md',
       '!npm-debug.log',
+      '!composer.json',
+      '!composer.lock',
 
       '!nimble_banner.png',
 
