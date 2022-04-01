@@ -59,8 +59,8 @@ if ( !function_exists( 'Nimble\sek_render_post_navigation') ) {
         <ul class="sek-czr-pager sek-row">
           <li class="sek-next-posts sek-col-base sek-col-33 <?php echo esc_attr($tnext_align_class); ?> ">
           <?php if ( null != $next_link ) : ?>
-            <span class="sek-screen-reader-text"><?php echo $_newer_label ?></span>
-            <span class="sek-nav-next sek-nav-dir"><?php echo $next_link ?></span>
+            <span class="sek-screen-reader-text"><?php echo esc_html($_newer_label); ?></span>
+            <span class="sek-nav-next sek-nav-dir"><?php echo esc_html($next_link); ?></span>
           <?php endif ?>
           </li>
           <li class="sek-pagination sek-col-base sek-col-33">
