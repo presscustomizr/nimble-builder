@@ -2484,7 +2484,6 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
                 'czr_image_borders_corners_child'
               ),
 
-              //'czr_featured_pages_module',
               'czr_heading_module'  => array(
                 'czr_heading_module',
                 'czr_heading_child',
@@ -3161,8 +3160,8 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
             // the stylesheet is always preloaded on front
             if ( skp_is_customizing() ) {
                 wp_enqueue_style(
-                    'nb-magnific-popup',
-                    NIMBLE_BASE_URL . '/assets/front/css/libs/magnific-popup.min.css',
+                    'nb-swipebox',
+                    NIMBLE_BASE_URL . '/assets/front/css/libs/swipebox.min.css',
                     array(),
                     NIMBLE_ASSETS_VERSION,
                     $media = 'all'
@@ -3268,13 +3267,13 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
              *  LIGHT BOX WITH MAGNIFIC POPUP
             /* ------------------------------------------------------------------------- */
             wp_enqueue_script(
-                'nb-magnific-popups',
-                sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-magnific-popup.min.js',
+                'nb-swipebox',
+                sek_is_dev_mode() ? NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-swipebox.js' : NIMBLE_BASE_URL . '/assets/front/js/libs/jquery-swipebox.min.js',
                 array(), //( !skp_is_customizing() && sek_is_jquery_replaced() ) ? array() : array( 'jquery'),
                 NIMBLE_ASSETS_VERSION,
                 false
             );
-            sek_defer_script('nb-magnific-popups');
+            sek_defer_script('nb-swipebox');
 
 
             /* ------------------------------------------------------------------------- *
@@ -3393,11 +3392,11 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
              *  PRELOAD FRONT SCRIPT
             /* ------------------------------------------------------------------------- */
             $assets_urls = [
-                'nb-magnific-popup' => sek_is_dev_mode() ? '/assets/front/js/libs/jquery-magnific-popup.js' : '/assets/front/js/libs/jquery-magnific-popup.min.js',
+                'nb-swipebox' => sek_is_dev_mode() ? '/assets/front/js/libs/jquery-swipebox.js' : '/assets/front/js/libs/jquery-swipebox.min.js',
                 'nb-swiper' => sek_is_dev_mode() ? '/assets/front/js/libs/swiper-bundle.js' : '/assets/front/js/libs/swiper-bundle.min.js',
                 'nb-video-bg-plugin' => sek_is_dev_mode() ? '/assets/front/js/libs/nimble-video-bg.js' : '/assets/front/js/libs/nimble-video-bg.min.js',
 
-                'nb-magnific-popup-style' => '/assets/front/css/libs/magnific-popup.min.css',
+                'nb-swipebox-style' => '/assets/front/css/libs/swipebox.min.css',
             ];
 
             // add version
@@ -3405,7 +3404,7 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
                 $assets_urls[$k] = NIMBLE_BASE_URL .$path .'?'.NIMBLE_ASSETS_VERSION;
             }
             ?>
-            <script id="nb-load-front-script-and-styles">nb_.listenTo("nb-needs-magnific-popup",function(){nb_.preloadOrDeferAsset({id:"nb-magnific-popup",as:"script",href:"<?php echo $assets_urls['nb-magnific-popup']; ?>",onEvent:"nb-docready"}),nb_.preloadOrDeferAsset({id:"nb-magnific-popup-style",as:"style",href:"<?php echo $assets_urls['nb-magnific-popup-style']; ?>",onEvent:"nb-docready"})}),nb_.listenTo("nb-needs-swiper",function(){nb_.preloadOrDeferAsset({id:"nb-swiper",as:"script",href:"<?php echo $assets_urls['nb-swiper']; ?>",onEvent:"nb-docready"})}),nb_.listenTo("nb-needs-videobg-js",function(){nb_.preloadOrDeferAsset({id:"nb-video-bg-plugin",as:"script",href:"<?php echo $assets_urls['nb-video-bg-plugin']; ?>",onEvent:"nb-docready"})});</script>
+            <script id="nb-load-front-script-and-styles">nb_.listenTo('nb-needs-swipebox',function(){nb_.preloadOrDeferAsset({id:'nb-swipebox',as:'script',href:"<?php echo $assets_urls['nb-swipebox']; ?>",onEvent:'nb-docready',});nb_.preloadOrDeferAsset({id:'nb-swipebox-style',as:'style',href:"<?php echo $assets_urls['nb-swipebox-style']; ?>",onEvent:'nb-docready',})});nb_.listenTo('nb-needs-swiper',function(){nb_.preloadOrDeferAsset({id:'nb-swiper',as:'script',href:"<?php echo $assets_urls['nb-swiper']; ?>",onEvent:'nb-docready',})});nb_.listenTo('nb-needs-videobg-js',function(){nb_.preloadOrDeferAsset({id:'nb-video-bg-plugin',as:'script',href:"<?php echo $assets_urls['nb-video-bg-plugin']; ?>",onEvent:'nb-docready',})});</script>
             <?php
 
             /* ------------------------------------------------------------------------- *
@@ -3599,12 +3598,12 @@ if ( !class_exists( 'SEK_Front_Assets' ) ) :
         // 1) window.nb_ utils starts being populated
         // 2) 'nb-jquery-loaded' => fired in footer when jQuery is defined <= window.nb_ utils is completed with jQuery dependant helper properties and methods
         // 3) 'nb-app-ready' => fired in footer on 'nb-jquery-loaded' <= all module scripts are fired on this event
-        // 4) 'nb-jmp-parsed', ... are emitted in each script files
+        // 4) 'nb-{js-library}-parsed', ... are emitted in each script files
         function sek_initialize_front_js_app() {
             if ( !skp_is_customizing() && !Nimble_Manager()->page_has_local_or_global_sections )
               return;
             ?>
-            <script id="nimble-app-init">window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isArray(e)||"[object Array]"===toString.call(e)},inArray:function(e,t){return!(!nb_.isArray(e)||nb_.isUndefined(t))&&e.indexOf(t)>-1},isUndefined:function(e){return void 0===e},isObject:function(e){var t=typeof e;return"function"===t||"object"===t&&!!e},errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},hasPreloadSupport:function(e){var t=document.createElement("link").relList;return!(!t||!t.supports)&&t.supports("preload")},listenTo:function(e,t){nb_.eventsListenedTo.push(e);var n={"nb-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nb-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nb-jquery-loaded")},"nb-jmp-parsed":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.magnificPopup},"nb-main-swiper-parsed":function(){return void 0!==window.Swiper}},o=function(o){nb_.isUndefined(n[e])||!1!==n[e]()?t():nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",e,nb_.eventsListenedTo,t)};"function"==typeof t?nb_.wasEmitted(e)?o():document.addEventListener(e,o):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",e)},eventsEmitted:[],eventsListenedTo:[],emit:function(e,t){if(!(nb_.isUndefined(t)||t.fire_once)||!nb_.wasEmitted(e)){var n=document.createEvent("Event");n.initEvent(e,!0,!0),document.dispatchEvent(n),nb_.eventsEmitted.push(e)}},wasListenedTo:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsListenedTo,e)},wasEmitted:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsEmitted,e)},isInScreen:function(e){if(!nb_.isObject(e))return!1;var t=e.getBoundingClientRect(),n=Math.max(document.documentElement.clientHeight,window.innerHeight);return!(t.bottom<0||t.top-n>=0)},isCustomizing:function(){return!1},isLazyLoadEnabled:function(){return!nb_.isCustomizing()&&!1},preloadOrDeferAsset:function(e){if(e=e||{},nb_.preloadedAssets=nb_.preloadedAssets||[],!nb_.inArray(nb_.preloadedAssets,e.id)){var t,n=document.getElementsByTagName("head")[0],o=function(){if("style"===e.as)this.setAttribute("rel","stylesheet"),this.setAttribute("type","text/css"),this.setAttribute("media","all");else{var t=document.createElement("script");t.setAttribute("src",e.href),t.setAttribute("id",e.id),"script"===e.as&&t.setAttribute("defer","defer"),n.appendChild(t),i.call(this)}e.eventOnLoad&&nb_.emit(e.eventOnLoad)},i=function(){if(this&&this.parentNode&&this.parentNode.contains(this))try{this.parentNode.removeChild(this)}catch(e){nb_.errorLog("NB error when removing a script el",el)}};("font"!==e.as||nb_.hasPreloadSupport())&&(t=document.createElement("link"),"script"===e.as?e.onEvent?nb_.listenTo(e.onEvent,function(){o.call(t)}):o.call(t):(t.setAttribute("href",e.href),"style"===e.as?t.setAttribute("rel",nb_.hasPreloadSupport()?"preload":"stylesheet"):"font"===e.as&&nb_.hasPreloadSupport()&&t.setAttribute("rel","preload"),t.setAttribute("id",e.id),t.setAttribute("as",e.as),"font"===e.as&&(t.setAttribute("type",e.type),t.setAttribute("crossorigin","anonymous")),t.onload=function(){this.onload=null,"font"!==e.as?e.onEvent?nb_.listenTo(e.onEvent,function(){o.call(t)}):o.call(t):e.eventOnLoad&&nb_.emit(e.eventOnLoad)},t.onerror=function(t){nb_.errorLog("Nimble preloadOrDeferAsset error",t,e)}),n.appendChild(t),nb_.preloadedAssets.push(e.id),i.call(e.scriptEl))}},mayBeRevealBG:function(){this.getAttribute("data-sek-src")&&(this.setAttribute("style",'background-image:url("'+this.getAttribute("data-sek-src")+'")'),this.className+=" sek-lazy-loaded",this.querySelectorAll(".sek-css-loader").forEach(function(e){nb_.isObject(e)&&e.parentNode.removeChild(e)}))}},window.NodeList&&!NodeList.prototype.forEach&&(NodeList.prototype.forEach=function(e,t){t=t||window;for(var n=0;n<this.length;n++)e.call(t,this[n],n,this)}),nb_.listenTo("nb-docready",function(){var e=document.querySelectorAll("div.sek-has-bg");!nb_.isObject(e)||e.length<1||e.forEach(function(e){nb_.isObject(e)&&(window.sekFrontLocalized&&window.sekFrontLocalized.lazyload_enabled?nb_.isInScreen(e)&&nb_.mayBeRevealBG.call(e):nb_.mayBeRevealBG.call(e))})}),"complete"===document.readyState||"loading"!==document.readyState&&!document.documentElement.doScroll)nb_.emit("nb-docready");else{var n=function(){nb_.wasEmitted("nb-docready")||nb_.emit("nb-docready")};document.addEventListener("DOMContentLoaded",n),window.addEventListener("load",n)}}(window,document);</script>
+            <script id="nimble-app-init">window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isArray(e)||"[object Array]"===toString.call(e)},inArray:function(e,t){return!(!nb_.isArray(e)||nb_.isUndefined(t))&&e.indexOf(t)>-1},isUndefined:function(e){return void 0===e},isObject:function(e){var t=typeof e;return"function"===t||"object"===t&&!!e},errorLog:function(){nb_.isUndefined(console)||"function"!=typeof window.console.log||console.log.apply(console,arguments)},hasPreloadSupport:function(e){var t=document.createElement("link").relList;return!(!t||!t.supports)&&t.supports("preload")},listenTo:function(e,t){nb_.eventsListenedTo.push(e);var n={"nb-jquery-loaded":function(){return"undefined"!=typeof jQuery},"nb-app-ready":function(){return void 0!==window.nb_&&nb_.wasListenedTo("nb-jquery-loaded")},"nb-swipebox-parsed":function(){return"undefined"!=typeof jQuery&&void 0!==jQuery.fn.swipebox},"nb-main-swiper-parsed":function(){return void 0!==window.Swiper}},o=function(o){nb_.isUndefined(n[e])||!1!==n[e]()?t():nb_.errorLog("Nimble error => an event callback could not be fired because conditions not met => ",e,nb_.eventsListenedTo,t)};"function"==typeof t?nb_.wasEmitted(e)?o():document.addEventListener(e,o):nb_.errorLog("Nimble error => listenTo func param is not a function for event => ",e)},eventsEmitted:[],eventsListenedTo:[],emit:function(e,t){if(!(nb_.isUndefined(t)||t.fire_once)||!nb_.wasEmitted(e)){var n=document.createEvent("Event");n.initEvent(e,!0,!0),document.dispatchEvent(n),nb_.eventsEmitted.push(e)}},wasListenedTo:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsListenedTo,e)},wasEmitted:function(e){return"string"==typeof e&&nb_.inArray(nb_.eventsEmitted,e)},isInScreen:function(e){if(!nb_.isObject(e))return!1;var t=e.getBoundingClientRect(),n=Math.max(document.documentElement.clientHeight,window.innerHeight);return!(t.bottom<0||t.top-n>=0)},isCustomizing:function(){return!1},isLazyLoadEnabled:function(){return!nb_.isCustomizing()&&!1},preloadOrDeferAsset:function(e){if(e=e||{},nb_.preloadedAssets=nb_.preloadedAssets||[],!nb_.inArray(nb_.preloadedAssets,e.id)){var t,n=document.getElementsByTagName("head")[0],o=function(){var t=this;if("style"===e.as)t.setAttribute("rel","stylesheet"),t.setAttribute("type","text/css"),t.setAttribute("media","all");else{var o=document.createElement("script");o.setAttribute("src",e.href),o.setAttribute("id",e.id),"script"===e.as&&o.setAttribute("defer","defer"),n.appendChild(o),r.call(t)}e.eventOnLoad&&nb_.emit(e.eventOnLoad)},r=function(){var e=this;if(e&&e.parentNode&&e.parentNode.contains(e))try{e.parentNode.removeChild(e)}catch(e){nb_.errorLog("NB error when removing a script el",el)}};("font"!==e.as||nb_.hasPreloadSupport())&&(t=document.createElement("link"),"script"===e.as?e.onEvent?nb_.listenTo(e.onEvent,(function(){o.call(t)})):o.call(t):(t.setAttribute("href",e.href),"style"===e.as?t.setAttribute("rel",nb_.hasPreloadSupport()?"preload":"stylesheet"):"font"===e.as&&nb_.hasPreloadSupport()&&t.setAttribute("rel","preload"),t.setAttribute("id",e.id),t.setAttribute("as",e.as),"font"===e.as&&(t.setAttribute("type",e.type),t.setAttribute("crossorigin","anonymous")),t.onload=function(){this.onload=null,"font"!==e.as?e.onEvent?nb_.listenTo(e.onEvent,(function(){o.call(t)})):o.call(t):e.eventOnLoad&&nb_.emit(e.eventOnLoad)},t.onerror=function(t){nb_.errorLog("Nimble preloadOrDeferAsset error",t,e)}),n.appendChild(t),nb_.preloadedAssets.push(e.id),r.call(e.scriptEl))}},mayBeRevealBG:function(){this.getAttribute("data-sek-src")&&(this.setAttribute("style",'background-image:url("'+this.getAttribute("data-sek-src")+'")'),this.className+=" sek-lazy-loaded",this.querySelectorAll(".sek-css-loader").forEach((function(e){nb_.isObject(e)&&e.parentNode.removeChild(e)})))}},window.NodeList&&!NodeList.prototype.forEach&&(NodeList.prototype.forEach=function(e,t){t=t||window;for(var n=0;n<this.length;n+=1)e.call(t,this[n],n,this)}),nb_.listenTo("nb-docready",(function(){var e=document.querySelectorAll("div.sek-has-bg");!nb_.isObject(e)||e.length<1||e.forEach((function(e){nb_.isObject(e)&&(window.sekFrontLocalized&&window.sekFrontLocalized.lazyload_enabled?nb_.isInScreen(e)&&nb_.mayBeRevealBG.call(e):nb_.mayBeRevealBG.call(e))}))})),"complete"===document.readyState||"loading"!==document.readyState&&!document.documentElement.doScroll)nb_.emit("nb-docready");else{var n=function(){nb_.wasEmitted("nb-docready")||nb_.emit("nb-docready")};document.addEventListener("DOMContentLoaded",n),window.addEventListener("load",n)}}(window,document);</script>
             <?php
         }
 
