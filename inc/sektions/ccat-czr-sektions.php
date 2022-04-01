@@ -4305,7 +4305,7 @@ function sek_maybe_export() {
     //$seks_data = sek_sektion_collection_sanitize_cb( $seks_data );
 
     $theme_name = sanitize_title_with_dashes( get_stylesheet() );
-
+    
     //sek_error_log('EXPORT AFTER FILTER ?', $seks_data );
     $export = array(
         'data' => $seks_data,
@@ -4730,6 +4730,15 @@ function sek_ajax_save_user_template() {
     // make sure description and title are clean before DB
     $tmpl_title = sek_maybe_encode_richtext( sanitize_text_field($_POST['tmpl_title']) );
     $tmpl_description = sek_maybe_encode_richtext( sanitize_text_field($_POST['tmpl_description']) );
+    
+    // sanitize tmpl_locations
+    $tmpl_locations = [];
+    if ( is_array($_POST['tmpl_locations']) ) {
+        foreach($_POST['tmpl_locations'] as $loc ) {
+            $tmpl_locations[] = sanitize_text_field($loc);
+        }
+    }
+
     // sek_error_log('json decode ?', json_decode( wp_unslash( $_POST['sek_data'] ), true ) );
     $template_to_save = array(
         'data' => $tmpl_data,//<= array
@@ -4740,7 +4749,7 @@ function sek_ajax_save_user_template() {
             'skope_id' => sanitize_text_field($_POST['skope_id']),
             'version' => NIMBLE_VERSION,
             // is sent as a string : "__after_header,__before_main_wrapper,loop_start,__before_footer"
-            'tmpl_locations' => is_array( $_POST['tmpl_locations'] ) ? sanitize_text_field($_POST['tmpl_locations']) : array(),
+            'tmpl_locations' => $tmpl_locations,
             'tmpl_header_location' => isset( $_POST['tmpl_header_location'] ) ? sanitize_text_field($_POST['tmpl_header_location']) : '',
             'tmpl_footer_location' => isset( $_POST['tmpl_footer_location'] ) ? sanitize_text_field($_POST['tmpl_footer_location']) : '',
             'date' => date("Y-m-d"),

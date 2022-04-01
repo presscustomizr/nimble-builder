@@ -48,7 +48,7 @@ function sek_maybe_export() {
     //$seks_data = sek_sektion_collection_sanitize_cb( $seks_data );
 
     $theme_name = sanitize_title_with_dashes( get_stylesheet() );
-
+    
     //sek_error_log('EXPORT AFTER FILTER ?', $seks_data );
     $export = array(
         'data' => $seks_data,
