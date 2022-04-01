@@ -172,5 +172,5 @@ if ( 'no-link' === $main_settings['link-to'] ) {
     );
 }
 if ( 'img-lightbox' === $main_settings['link-to'] ) {
-    sek_emit_js_event('nb-needs-magnific-popup');
+    sek_emit_js_event('nb-needs-swipebox');
 }

@@ -43,7 +43,7 @@ window.nb_ = {};
             var canWeFireCallbackForEvent = {
                 'nb-jquery-loaded' : function() { return typeof undefined !== typeof jQuery; },
                 'nb-app-ready' : function() { return ( typeof undefined !== typeof window.nb_ ) && nb_.wasListenedTo('nb-jquery-loaded'); },
-                'nb-jmp-parsed' : function() { return ( typeof undefined !== typeof jQuery ) && ( typeof undefined !== typeof jQuery.fn.magnificPopup ); },
+                'nb-swipebox-parsed' : function() { return ( typeof undefined !== typeof jQuery ) && ( typeof undefined !== typeof jQuery.fn.swipebox ); },
                 'nb-main-swiper-parsed' : function() { return typeof undefined !== typeof window.Swiper; }
             };
             // e is the event object passed
@@ -321,20 +321,6 @@ window.nb_ = {};
 // in <script id="nimble-load-jquery">
 
 
-// nb_.listenTo = function( evt, func ) {
-//     var bools = {
-//         'nb-jquery-loaded' : typeof undefined !== typeof jQuery,
-//         'nb-app-ready' : typeof undefined !== typeof window.nb_ && nb_.isReady === true,
-//         'nb-jmp-parsed' : typeof undefined !== typeof jQuery && typeof undefined !== typeof jQuery.fn.magnificPopup,
-//         'nb-main-swiper-parsed' : typeof undefined !== typeof window.Swiper
-//     };
-//     if ( 'function' === typeof func ) {
-//       if ( true === bools[evt] ) func();
-//       else document.addEventListener(evt,func);
-//     }
-// }
-
-
 // printed in function sek_detect_jquery()
 // march 2020 : wp_footer js code to be minified
 // introduced for https://github.com/presscustomizr/nimble-builder/issues/626
@@ -375,22 +361,23 @@ window.nb_ = {};
 
 
 // printed in sek_maybe_preload_front_scripts_and_styles
-nb_.listenTo('nb-needs-magnific-popup', function() {
+nb_.listenTo('nb-needs-swipebox', function() {
     nb_.preloadOrDeferAsset( {
-        id : 'nb-magnific-popup',
+        id : 'nb-swipebox',
         as : 'script',
-        href : "<?php echo $assets_urls['nb-magnific-popup']; ?>",
+        href : "<?php echo $assets_urls['nb-swipebox']; ?>",
         onEvent : 'nb-docready',
         // scriptEl : document.currentScript
     });
     nb_.preloadOrDeferAsset( {
-      id : 'nb-magnific-popup-style',
+      id : 'nb-swipebox-style',
       as : 'style',
-      href : "<?php echo $assets_urls['nb-magnific-popup-style']; ?>",
+      href : "<?php echo $assets_urls['nb-swipebox-style']; ?>",
       onEvent : 'nb-docready',
       // scriptEl : document.currentScript
     });
 });
+
 nb_.listenTo('nb-needs-swiper', function() {
     nb_.preloadOrDeferAsset( {
         id : 'nb-swiper',
