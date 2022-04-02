@@ -465,7 +465,7 @@ function sek_enqueue_js_for_rank_math_analyser() {
 }
 
 // 2) Provide the current skope_id to the script
-add_action( 'admin_footer', '\Nimble\sek_print_js_for_rank_math_analyser' );
+add_action( 'admin_head', '\Nimble\sek_print_js_for_rank_math_analyser', PHP_INT_MAX );
 function sek_print_js_for_rank_math_analyser() {
     if ( !defined( 'RANK_MATH_VERSION' ) )
       return;
@@ -477,15 +477,18 @@ function sek_print_js_for_rank_math_analyser() {
 
     $post = get_post();
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
+    ob_start();
     ?>
-    <script id="nimble-add-content-to-rank-math-analyzer">
         jQuery(function($){
             // Write skope_id as a global var + trigger an event => solves the problem of nimble-rank-seo-analyzer.js being loaded before
             window.nb_skope_id_for_rank_math_seo = '<?php echo esc_attr($manually_built_skope_id); ?>';
             $(document).trigger('nb-skope-id-ready.rank-math', { skope_id : '<?php echo esc_attr($manually_built_skope_id); ?>' } );
         });
-    </script>
     <?php
+    $script = ob_get_clean();
+    wp_register_script( 'nb_rank_math_analyzer_js', '');
+    wp_enqueue_script( 'nb_rank_math_analyzer_js' );
+    wp_add_inline_script( 'nb_rank_math_analyzer_js', $script );
 }
 
 
@@ -740,8 +743,9 @@ function sek_may_be_display_update_notice() {
       <?php
       $_html = ob_get_clean();
       echo apply_filters( 'sek_update_notice', $_html );
+      
+      ob_start();
       ?>
-      <script type="text/javascript" id="nimble-dismiss-update-notice">
         ( function($){
           var _ajax_action = function( $_el ) {
               var AjaxUrl = "<?php echo admin_url( 'admin-ajax.php' ); ?>",
@@ -774,8 +778,11 @@ function sek_may_be_display_update_notice() {
           } );
 
         })( jQuery );
-      </script>
       <?php
+      $script = ob_get_clean();
+      wp_register_script( 'nb_update_notice_js', '');
+      wp_enqueue_script( 'nb_update_notice_js' );
+      wp_add_inline_script( 'nb_update_notice_js', $script );
 }
 
 
@@ -827,7 +834,7 @@ foreach ( array( 'wptexturize', 'convert_smilies') as $callback ) {
 }
 
 // print some js related to feedback notifications
-add_action( 'admin_footer', function() {
+add_action( 'admin_head', function() {
   if ( !( defined('NIMBLE_DEV') && NIMBLE_DEV ) && sek_is_pro() )
     return;
   if ( 'eligible' !== sek_get_feedback_notif_status() )
@@ -839,8 +846,8 @@ add_action( 'admin_footer', function() {
   if ( sek_feedback_notice_is_dismissed() )
     return;
   // Adds bubbles to the settings admin menu
+  ob_start();
   ?>
-  <script>
     jQuery( function( $ ) {
       var $optionGenMenu = $('#adminmenu').find('#menu-settings');
       if ( $optionGenMenu.length < 1 )
@@ -855,17 +862,20 @@ add_action( 'admin_footer', function() {
         $nbTitle.append(noticeHtml);
       }
     } );
-  </script>
-
   <?php
+  $script = ob_get_clean();
+  wp_register_script( 'nb_feedback_notice_js', '');
+  wp_enqueue_script( 'nb_feedback_notice_js' );
+  wp_add_inline_script( 'nb_feedback_notice_js', $script );
+
   // Only display on admin home dashboard
   $current_screen = get_current_screen();
   if( 'settings_page_nb-options' !== $current_screen->base )
     return;
   
   $notice_id = NIMBLE_FEEDBACK_NOTICE_ID;
+  ob_start();
   ?>
-  <script>
     jQuery( function( $ ) {
       // On dismissing the notice, make a POST request to store this notice with the dismissed WP pointers so it doesn't display again.
       // .notice-dismiss button markup is added by WP
@@ -882,9 +892,12 @@ add_action( 'admin_footer', function() {
         }
       } );
     } );
-  </script>
   <?php
-});
+  $script = ob_get_clean();
+  wp_register_script( 'nb_feedback_other_notice_js', '');
+  wp_enqueue_script( 'nb_feedback_other_notice_js' );
+  wp_add_inline_script( 'nb_feedback_other_notice_js', $script );
+}, PHP_INT_MAX);
 
 
 
