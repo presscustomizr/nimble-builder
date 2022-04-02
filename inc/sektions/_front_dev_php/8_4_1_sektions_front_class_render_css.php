@@ -5,8 +5,8 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
         function _setup_hook_for_front_css_printing_or_enqueuing() {
             add_action( 'wp_enqueue_scripts', array( $this, 'print_or_enqueue_seks_style'), PHP_INT_MAX );
 
-            // Print global option inline CSS
-            add_action( 'wp_head', array( $this, 'sek_print_global_css' ), 1000 );
+            // wp_add_inline_style for global CSS
+            add_action( 'wp_head', array( $this, 'sek_enqueue_global_css' ) );
             
         }
 
@@ -37,7 +37,7 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
                 $local_skope_id = apply_filters( 'nb_set_skope_id_before_generating_local_front_css', $local_skope_id );
 
                 $css_handler_instance = $this->_instantiate_css_handler( array( 'skope_id' => $skope_id, 'is_global_stylesheet' => NIMBLE_GLOBAL_SKOPE_ID === $skope_id ) );
-                $this->sek_print_global_css();
+                $this->sek_get_global_css_for_ajax();
             }
             // in a front normal context, the css is enqueued from the already written file.
             else {
@@ -146,20 +146,25 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
 
 
 
-        // @wp_head:1000
-        // Or called directly when ajaxing stylesheet during customization
-        // introduced in oct 2020
-        function sek_print_global_css() {
+        // invoked when ajaxing during customization
+        function sek_get_global_css_for_ajax() {
             // During customization, always rebuild the css from fresh values instead of relying on the saved option
             // because on first call we get the customized option value, but on another one quickly after, we get the current option value in the database
             if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
                 $global_css = $this->sek_build_global_options_inline_css();
-            } else {
-                $global_css = get_option(NIMBLE_OPT_FOR_GLOBAL_CSS);
+                if ( is_string( $global_css ) && !empty( $global_css ) ) {
+                    printf('<style id="%1$s">%2$s</style>', NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID, $global_css );
+                }
             }
-            if ( is_string( $global_css ) && !empty( $global_css ) ) {
-                printf('<style id="%1$s">%2$s</style>', NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID, $global_css );
-            }
+        }
+
+
+        // hook wp_enqueue_script
+        function sek_enqueue_global_css() {
+            $global_css = get_option(NIMBLE_OPT_FOR_GLOBAL_CSS);
+            wp_register_style( NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID, false );
+            wp_enqueue_style( NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID );
+            wp_add_inline_style( NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID, $global_css );
         }
 
 
