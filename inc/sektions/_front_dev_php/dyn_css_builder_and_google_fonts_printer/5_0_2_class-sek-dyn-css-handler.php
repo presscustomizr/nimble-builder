@@ -470,43 +470,12 @@ class Sek_Dyn_CSS_Handler {
 
             //if the file exists
             if ( $this->file_exists ) {
-                //print the needed html to enqueue a style only if we're in wp_footer or wp_head
-                if ( in_array( current_filter(), array( 'wp_footer', 'wp_head' ) ) ) {
-                    /*
-                    * TODO: make sure all the deps are enqueued
-                    */
-                    printf( '<link rel="stylesheet" id="sek-dyn-%1$s-css" href="%2$s" media="all" />',
-                        $this->id,
-                        //this resource version is built upon the file last modification time
-                        add_query_arg( array( 'ver' => filemtime($this->uri) ), $this->url )
-                    );
-                } else {
-                    //this resource version is built upon the file last modification time
-                    wp_enqueue_style( "sek-dyn-{$this->id}", $this->url, $this->dep, filemtime($this->uri) );
-                }
+                //this resource version is built upon the file last modification time
+                wp_enqueue_style( "sek-dyn-{$this->id}", $this->url, $this->dep, filemtime($this->uri) );
 
                 $this->enqueued_or_printed = true;
             }
         }// if ( self::MODE_FILE )
-
-        // case when sek_inline_dynamic_stylesheets_on_front()
-        // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-        else if ( !is_customize_preview() && self::MODE_INLINE == $this->mode ) {
-            global $wp_filesystem;
-            $this->file_exists = $wp_filesystem->exists($this->uri) && $wp_filesystem->is_readable($this->uri);
-            // $this->force_rewrite is set to true when is_user_logged_in() && current_user_can( 'customize' )
-            // @see ::_instantiate_css_handler
-            // By rewriting the CSS, we make sure that a bug fixed when generating a stylesheet gets fixed after an update of the plugin and a refresh of the page on front end, witout the need to open the customizer
-            if ( $this->force_rewrite || ( !$this->file_exists && $this->force_write ) ) {
-                $this->file_exists = $this->sek_dyn_css_maybe_write_css_file();
-            }
-            if ( $this->file_exists ) {
-                $file_content = $wp_filesystem->get_contents($this->uri);
-                printf( '<style id="sek-dyn-%1$s-css" media="all">%2$s</style>', $this->id, $file_content );
-                $this->enqueued_or_printed = true;
-            }
-        }
-
 
         //if $this->mode != 'file' or the file enqueuing didn't go through (fall back)
         //print inline style

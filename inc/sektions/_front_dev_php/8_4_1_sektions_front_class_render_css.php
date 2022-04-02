@@ -92,16 +92,10 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
             $print_mode = Sek_Dyn_CSS_Handler::MODE_FILE;
             if ( is_customize_preview() ) {
               $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
-            } else if ( sek_inline_dynamic_stylesheets_on_front() ) {
-              $print_mode = Sek_Dyn_CSS_Handler::MODE_INLINE;
             }
             // Which hook ?
             $fire_at_hook = '';
             if ( !defined( 'DOING_AJAX' ) && is_customize_preview() ) {
-              $fire_at_hook = 'wp_head';
-            }
-            // introduced for https://github.com/presscustomizr/nimble-builder/issues/612
-            else if ( !defined( 'DOING_AJAX' ) && !is_customize_preview() && sek_inline_dynamic_stylesheets_on_front() ) {
               $fire_at_hook = 'wp_head';
             }
 
