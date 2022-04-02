@@ -884,39 +884,6 @@ final class _NIMBLE_Editors {
       $settings = '{}';
     }
 
-    ?>
-    <script type="text/javascript">
-    window.wp = window.wp || {};
-    window.wp.editor = window.wp.editor || {};
-    window.wp.editor.getDefaultSettings = function() {
-      return {
-        tinymce: <?php echo $settings; ?>,
-        quicktags: {
-          buttons: 'strong,em,link,ul,ol,li,code'
-        }
-      };
-    };
-
-    <?php
-
-    if ( $user_can_richedit ) {
-      $suffix  = SCRIPT_DEBUG ? '' : '.min';
-      $baseurl = self::get_baseurl();
-
-      ?>
-      var nimbleTinyMCEPreInit = {
-        baseURL: "<?php echo $baseurl; ?>",
-        suffix: "<?php echo $suffix; ?>",
-        mceInit: {},
-        qtInit: {},
-        load_ext: function(url,lang){var sl=tinymce.ScriptLoader;sl.markDone(url+'/langs/'+lang+'.js');sl.markDone(url+'/langs/'+lang+'_dlg.js');}
-      };
-      <?php
-    }
-    ?>
-    </script>
-    <?php
-
     if ( $user_can_richedit ) {
       self::print_tinymce_scripts();
     }
