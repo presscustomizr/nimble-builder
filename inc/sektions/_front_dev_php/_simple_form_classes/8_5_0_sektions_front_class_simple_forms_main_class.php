@@ -147,7 +147,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
         );
 
         wp_enqueue_script( 'google-recaptcha', $url, array(), '3.0', true );
-        add_action('wp_footer', array( $this, 'print_recaptcha_inline_js'), 100 );
+        add_action('wp_head', array( $this, 'print_recaptcha_inline_js'), PHP_INT_MAX );
     }
 
     // @hook wp_footer
@@ -155,8 +155,8 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
     // AND
     // sek_front_sections_include_a_form()
     function print_recaptcha_inline_js() {
+        ob_start();
         ?>
-            <script id="nimble-inline-recaptcha">
               if ( sekFrontLocalized.recaptcha_public_key ) {
                 !( function( grecaptcha, sitekey ) {
                     var recaptcha = {
@@ -188,8 +188,11 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                     console.log('Nimble Builder form error => missing reCAPTCHA key');
                 }
               }
-            </script>
         <?php
+        $script = ob_get_clean();
+        wp_register_script( 'nb_recaptcha_js', '');
+        wp_enqueue_script( 'nb_recaptcha_js' );
+        wp_add_inline_script( 'nb_recaptcha_js', $script );
     }
 
     // @hook body_class
@@ -237,8 +240,8 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             }
 
             if ( !$echo_form ) {
+                ob_start();
                 ?>
-                  <script type="text/javascript">
                       nb_.listenTo( 'nb-jquery-loaded', function() {
                             jQuery( function($) {
                                 var $elToFocusOn = $('div[data-sek-id="<?php echo $module_id; ?>"]' );
@@ -252,8 +255,11 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                                 }
                             });
                       });
-                  </script>
                 <?php
+                $script = ob_get_clean();
+                wp_register_script( 'nb_simple_form_js', '');
+                wp_enqueue_script( 'nb_simple_form_js' );
+                wp_add_inline_script( 'nb_simple_form_js', $script );
 
                 $message = $this->mailer->get_message( $this->mailer->get_status(), $module_model );
                 if ( !empty($message) ) {
