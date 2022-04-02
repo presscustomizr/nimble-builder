@@ -222,7 +222,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         public $rendering = false;//<= set to true when rendering NB content
 
         // October 2020
-        public $emitted_js_event = [];//<= collection of unique js event emitted with a script like <script>nb_.emit('nb-needs-parallax');</script>
+        public $emitted_js_event = [];//<= collection of unique js event emitted with a script like nb_.emit('nb-needs-parallax')
 
         // October 2020, for https://github.com/presscustomizr/nimble-builder/issues/751
         public $partial_front_scripts = [
