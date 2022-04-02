@@ -155,10 +155,4 @@ if ( nimble_passes_requirements() ) {
         require_once( NIMBLE_BASE_PATH . '/inc/admin/nimble-admin.php' );
         do_action('nimble_admin_loaded');
     }
-
-    // Load nimblizer
-    if ( is_admin() && defined('NIMBLIZER_ENABLED') && NIMBLIZER_ENABLED ) {
-        require_once( NIMBLE_BASE_PATH . '/inc/nimblizer/nimblizer-functions.php' );
-        do_action('nimblizer_loaded');
-    }
 }//if ( nimble_passes_requirements() )
