@@ -783,7 +783,6 @@ function sek_print_nimble_czr_control_js() {
         };
         _loadWhenWpCustomizeLoaded();
       })();
-    </script>
     <?php
     $script = ob_get_clean();
     wp_register_script( 'nb_load_czr_control_js', '');
