@@ -55,25 +55,20 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
             if ( !empty( $google_fonts_print_candidates ) ) {
                 // When customizing we get the google font content
                 if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-                    $this->sek_gfont_print( $google_fonts_print_candidates );
+                    $this->sek_get_gfont_in_ajax( $google_fonts_print_candidates );
                 } else {
-                    if ( in_array( current_filter(), array( 'wp_footer', 'wp_head' ) ) ) {
-                        $this->sek_gfont_print( $google_fonts_print_candidates );
+                    // preload implemented for https://github.com/presscustomizr/nimble-builder/issues/629
+                    if ( !skp_is_customizing() && sek_preload_google_fonts_on_front() ) {
+                        add_action( 'wp_footer', array( $this, 'sek_gfont_print_with_preload') );
                     } else {
-
-                        // preload implemented for https://github.com/presscustomizr/nimble-builder/issues/629
-                        if ( !skp_is_customizing() && sek_preload_google_fonts_on_front() ) {
-                            add_action( 'wp_footer', array( $this, 'sek_gfont_print_with_preload') );
-                        } else {
-                            // March 2020 added param display=swap => Ensure text remains visible during webfont load #572
-                            wp_enqueue_style(
-                                NIMBLE_GOOGLE_FONTS_STYLESHEET_ID,
-                                sprintf( '//fonts.googleapis.com/css?family=%s&display=swap', $google_fonts_print_candidates ),
-                                array(),
-                                null,
-                                'all'
-                            );
-                        }
+                        // March 2020 added param display=swap => Ensure text remains visible during webfont load #572
+                        wp_enqueue_style(
+                            NIMBLE_GOOGLE_FONTS_STYLESHEET_ID,
+                            sprintf( '//fonts.googleapis.com/css?family=%s&display=swap', $google_fonts_print_candidates ),
+                            array(),
+                            null,
+                            'all'
+                        );
                     }
                 }
             }
@@ -125,11 +120,9 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
         }
         
 
-        // hook : wp_head
-        // or fired directly when ajaxing
         // When ajaxing, the link#sek-gfonts-{$this->id} gets removed from the dom and replaced by this string
         // March 2020 added param display=swap => Ensure text remains visible during webfont load #572
-        function sek_gfont_print( $print_candidates ) {
+        function sek_get_gfont_in_ajax( $print_candidates ) {
             if ( !empty( $print_candidates ) ) {
                 printf('<link rel="stylesheet" id="%1$s" href="%2$s">',
                     NIMBLE_GOOGLE_FONTS_STYLESHEET_ID,

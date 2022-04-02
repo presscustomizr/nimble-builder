@@ -516,7 +516,6 @@ class Sek_Dyn_CSS_Handler {
             if ( !$dep || wp_style_is( $dep, 'done' ) || !wp_style_is( $dep, 'done' ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
                 printf( '<style id="sek-%1$s" media="all">%2$s</style>', $this->id, $this->css_string_to_enqueue_or_print );
             } else {
-                //not sure
                 wp_add_inline_style( $dep , $this->css_string_to_enqueue_or_print );
             }
 
