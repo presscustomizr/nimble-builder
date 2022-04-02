@@ -1034,7 +1034,7 @@ function sek_render_welcome_notice() {
       <?php sek_get_welcome_block(); ?>
     </div>
 
-    <script>
+    <?php ob_start(); ?>
     jQuery( function( $ ) {
       // On dismissing the notice, make a POST request to store this notice with the dismissed WP pointers so it doesn't display again.
       // .notice-dismiss button markup is added by WP
@@ -1046,8 +1046,11 @@ function sek_render_welcome_notice() {
         } );
       } );
     } );
-    </script>
     <?php
+    $script = ob_get_clean();
+    wp_register_script( 'nb_welcome_notice', '');
+    wp_enqueue_script( 'nb_welcome_notice' );
+    wp_add_inline_script( 'nb_welcome_notice', $script );
 }
 
 
