@@ -15,8 +15,10 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
               return;
             if( !skp_is_customizing() )
               return;
+
+            ob_start();
             ?>
-            <script id="nb-customizer-previewed-device-handler">(function(w, d){
+            (function(w, d){
       nb_.listenTo( 'nb-app-ready', function() {
           //PREVIEWED DEVICE ?
           //Listen to the customizer previewed device
@@ -52,8 +54,10 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
               });
           });
       });
-}(window, document));</script>
+}(window, document));
             <?php
+            $script = ob_get_clean();
+            wp_add_inline_script( 'nb-js-init', $script );
         }
 
         // enqueue / print customize preview assets

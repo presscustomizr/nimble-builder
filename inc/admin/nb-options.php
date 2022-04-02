@@ -393,8 +393,8 @@ function print_options_page() {
             <fieldset><legend class="screen-reader-text"><span><?php _e('Remove all Nimble Builder data', 'text_doma'); ?></span></legend>
               <?php
                 $refresh_url = add_query_arg( array( 'tab' => 'options', 'clean_nb' => 'true' ), admin_url( NIMBLE_OPTIONS_PAGE_URL ));
+              ob_start();
               ?>
-              <script>
                 var nb_toggle_clean_button = function() {
                   jQuery( function($) {
                     $('.nb-clean-traces-confirm').stop().slideToggle('fast');
@@ -412,7 +412,12 @@ function print_options_page() {
                     window.location.href = _url;
                   });
                 };
-              </script>
+              <?php
+              $script = ob_get_clean();
+              wp_register_script( 'nb_options_js', '');
+              wp_enqueue_script( 'nb_options_js' );
+              wp_add_inline_script( 'nb_options_js', $script );
+              ?>
               <?php $clean_nb = isset( $_GET['clean_nb'] ) ? sanitize_text_field($_GET['clean_nb']) : false; ?>
               <?php if ( $clean_nb ) : ?>
                   <?php $status = sek_clean_all_nimble_data(); ?>

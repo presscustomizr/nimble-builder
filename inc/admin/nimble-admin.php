@@ -162,7 +162,7 @@ function sek_enqueue_js_asset_for_gutenberg_edit_button() {
 }
 
 // Handle both classic and gutenberg editors
-add_action( 'admin_footer', '\Nimble\sek_print_js_for_nimble_edit_btn' );
+add_action( 'admin_head', '\Nimble\sek_print_js_for_nimble_edit_btn', PHP_INT_MAX );
 // @hook 'admin_footer'
 // If Gutenberg editor is active :
 // => print the button as a js template
@@ -193,8 +193,9 @@ function sek_print_js_for_nimble_edit_btn() {
       <?php sek_print_nb_btn_edit_with_nimble( 'gutenberg' ); ?>
     </script>
   <?php else : ?>
-    <?php // Only printed when Gutenberg editor is NOT enabled ?>
-      <script type="text/javascript">
+    <?php // Only printed when Gutenberg editor is NOT enabled 
+    ob_start();
+    ?>
       (function ($) {
           var _doRedirectToCustomizer = function( post_id, $clickedEl ) {
               wp.ajax.post( 'sek_get_customize_url_for_nimble_edit_button', {
@@ -238,7 +239,12 @@ function sek_print_js_for_nimble_edit_btn() {
               }
           });
       })(jQuery);
-    </script>
+      <?php
+      $script = ob_get_clean();
+      wp_register_script( 'nb_print_js_for_nimble_edit_btn', '');
+      wp_enqueue_script( 'nb_print_js_for_nimble_edit_btn' );
+      wp_add_inline_script( 'nb_print_js_for_nimble_edit_btn', $script );
+      ?>
   <?php endif; ?>
   <?php
 }
@@ -385,7 +391,7 @@ function sek_ajax_get_nimble_content_for_seo_plugins() {
 // APRIL 2020 : implement compatibility with Yoast content analyzer
 // for https://github.com/presscustomizr/nimble-builder/issues/657
 // documented here : https://github.com/Yoast/javascript/blob/master/packages/yoastseo/docs/Customization.md
-add_action( 'admin_footer', '\Nimble\sek_print_js_for_yoast_analysis' );
+add_action( 'admin_head', '\Nimble\sek_print_js_for_yoast_analysis', PHP_INT_MAX );
 function sek_print_js_for_yoast_analysis() {
     if ( !defined( 'WPSEO_VERSION' ) )
       return;
@@ -395,8 +401,8 @@ function sek_print_js_for_yoast_analysis() {
       return;
     $post = get_post();
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
+    ob_start();
     ?>
-    <script id="nimble-add-content-to-yoast-analysis">
         jQuery(function($){
             var NimblePlugin = function() {
                 YoastSEO.app.registerPlugin( 'nimblePlugin', {status: 'loading'} );
@@ -413,8 +419,11 @@ function sek_print_js_for_yoast_analysis() {
                 try { new NimblePlugin(); } catch(er){ console.log('Yoast NimblePlugin error', er );}
             });
         });
-    </script>
     <?php
+    $script = ob_get_clean();
+    wp_register_script( 'nb_yoast_compat', '');
+    wp_enqueue_script( 'nb_yoast_compat' );
+    wp_add_inline_script( 'nb_yoast_compat', $script );
 }
 
 
