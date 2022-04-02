@@ -34,7 +34,7 @@
                   return true;//<=> continue see https://api.jquery.com/jquery.each/
 
                 // do nothing if dynamic asset loading is not enabled for js and css AND the assets in not in "force" mode
-                var load_authorized = sekFrontLocalized.load_front_assets_on_scroll;
+                var load_authorized = sekFrontLocalized.load_front_assets_on_dynamically;
                 if ( true === handlerParams.force_loading ) {
                     load_authorized = true;
                 }

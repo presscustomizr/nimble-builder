@@ -59,7 +59,7 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
                 } else {
                     // preload implemented for https://github.com/presscustomizr/nimble-builder/issues/629
                     if ( !skp_is_customizing() && sek_preload_google_fonts_on_front() ) {
-                        add_action( 'wp_footer', array( $this, 'sek_gfont_print_with_preload') );
+                        add_action( 'wp_head', array( $this, 'sek_gfont_print_with_preload') );
                     } else {
                         // March 2020 added param display=swap => Ensure text remains visible during webfont load #572
                         wp_enqueue_style(
@@ -138,9 +138,14 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
             $print_candidates = $this->sek_get_gfont_print_candidates();
 
             if ( !empty( $print_candidates ) ) {
+                ob_start();
                 ?>
-                <script id="nimble-preload-gfonts">nb_.preloadOrDeferAsset( { id : '<?php echo NIMBLE_GOOGLE_FONTS_STYLESHEET_ID; ?>', as : 'style', href : '//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>&display=swap', scriptEl : document.currentScript } );</script>
+                nb_.preloadOrDeferAsset( { id : '<?php echo NIMBLE_GOOGLE_FONTS_STYLESHEET_ID; ?>', as : 'style', href : '//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>&display=swap', scriptEl : document.currentScript } );
                 <?php
+                $script = ob_get_clean();
+                wp_register_script( 'nb_preload_gfonts', '');
+                wp_enqueue_script( 'nb_preload_gfonts' );
+                wp_add_inline_script( 'nb_preload_gfonts', $script );
             }
         }
 
@@ -162,6 +167,7 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
         // hook wp_enqueue_script
         function sek_enqueue_global_css() {
             $global_css = get_option(NIMBLE_OPT_FOR_GLOBAL_CSS);
+            // following https://developer.wordpress.org/reference/functions/wp_add_inline_script/#comment-5304
             wp_register_style( NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID, false );
             wp_enqueue_style( NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID );
             wp_add_inline_style( NIMBLE_GLOBAL_OPTIONS_STYLESHEET_ID, $global_css );

@@ -40,7 +40,7 @@
 (function(w, d){
     var callbackFunc = function() {
         jQuery(function($){
-            if ( !sekFrontLocalized.load_front_assets_on_scroll )
+            if ( !sekFrontLocalized.load_front_assets_on_dynamically )
                 return;
 
             var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
@@ -59,7 +59,7 @@
                         }) );
                   }
 
-                  if ( !nb_.isFunction( $.fn.swipebox ) && sekFrontLocalized.load_front_assets_on_scroll ) {
+                  if ( !nb_.isFunction( $.fn.swipebox ) && sekFrontLocalized.load_front_assets_on_dynamically ) {
                         nb_.ajaxLoadScript({
                             path : 'js/libs/jquery-swipebox.min.js',
                             loadcheck : function() { return nb_.isFunction( $.fn.swipebox ); }
@@ -91,7 +91,7 @@
 (function(w, d){
     var callbackFunc = function() {
         jQuery(function($){
-            if ( !sekFrontLocalized.load_front_assets_on_scroll )
+            if ( !sekFrontLocalized.load_front_assets_on_dynamically )
               return;
             // Load js plugin if needed
             // // when the plugin is loaded => it emits 'nimble-swiper-ready' listened to by nb_.listenTo()
@@ -149,7 +149,7 @@
 (function(w, d){
     var callbackFunc = function() {
         jQuery(function($){
-            if ( !sekFrontLocalized.load_front_assets_on_scroll )
+            if ( !sekFrontLocalized.load_front_assets_on_dynamically )
               return;
             var $candidates = $('[data-sek-video-bg-src]');
             // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
@@ -188,7 +188,7 @@
             // we don't need to inject font awesome if already enqueued by a theme
             if ( sekFrontLocalized.fontAwesomeAlreadyEnqueued )
               return;
-            if ( !sekFrontLocalized.load_front_assets_on_scroll )
+            if ( !sekFrontLocalized.load_front_assets_on_dynamically )
               return;
             var $candidates = $('i[class*=fa-]');
 
