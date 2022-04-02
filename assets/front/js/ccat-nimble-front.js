@@ -741,7 +741,7 @@ window.nb_.getQueryVariable = function(variable) {
                   return true;//<=> continue see https://api.jquery.com/jquery.each/
 
                 // do nothing if dynamic asset loading is not enabled for js and css AND the assets in not in "force" mode
-                var load_authorized = sekFrontLocalized.load_front_assets_on_scroll;
+                var load_authorized = sekFrontLocalized.load_front_assets_on_dynamically;
                 if ( true === handlerParams.force_loading ) {
                     load_authorized = true;
                 }
@@ -831,7 +831,7 @@ window.nb_.getQueryVariable = function(variable) {
 (function(w, d){
     var callbackFunc = function() {
         jQuery(function($){
-            if ( !sekFrontLocalized.load_front_assets_on_scroll )
+            if ( !sekFrontLocalized.load_front_assets_on_dynamically )
                 return;
 
             var $linkCandidates = $('[data-sek-module-type="czr_image_module"]').find('.sek-link-to-img-lightbox');
@@ -850,7 +850,7 @@ window.nb_.getQueryVariable = function(variable) {
                         }) );
                   }
 
-                  if ( !nb_.isFunction( $.fn.swipebox ) && sekFrontLocalized.load_front_assets_on_scroll ) {
+                  if ( !nb_.isFunction( $.fn.swipebox ) && sekFrontLocalized.load_front_assets_on_dynamically ) {
                         nb_.ajaxLoadScript({
                             path : 'js/libs/jquery-swipebox.min.js',
                             loadcheck : function() { return nb_.isFunction( $.fn.swipebox ); }
@@ -882,7 +882,7 @@ window.nb_.getQueryVariable = function(variable) {
 (function(w, d){
     var callbackFunc = function() {
         jQuery(function($){
-            if ( !sekFrontLocalized.load_front_assets_on_scroll )
+            if ( !sekFrontLocalized.load_front_assets_on_dynamically )
               return;
             // Load js plugin if needed
             // // when the plugin is loaded => it emits 'nimble-swiper-ready' listened to by nb_.listenTo()
@@ -940,7 +940,7 @@ window.nb_.getQueryVariable = function(variable) {
 (function(w, d){
     var callbackFunc = function() {
         jQuery(function($){
-            if ( !sekFrontLocalized.load_front_assets_on_scroll )
+            if ( !sekFrontLocalized.load_front_assets_on_dynamically )
               return;
             var $candidates = $('[data-sek-video-bg-src]');
             // Abort if no link candidate, or if the link href looks like :javascript:void(0) <= this can occur with the default image for example.
@@ -979,7 +979,7 @@ window.nb_.getQueryVariable = function(variable) {
             // we don't need to inject font awesome if already enqueued by a theme
             if ( sekFrontLocalized.fontAwesomeAlreadyEnqueued )
               return;
-            if ( !sekFrontLocalized.load_front_assets_on_scroll )
+            if ( !sekFrontLocalized.load_front_assets_on_dynamically )
               return;
             var $candidates = $('i[class*=fa-]');
 
@@ -1203,7 +1203,7 @@ nb_.listenTo('nb-docready', function() {
 
 // September 2021 => Solves the problem of CSS loaders not cleaned
 // see https://github.com/presscustomizr/nimble-builder/issues/874
-nb_.listenTo('nb-docready', function() {
+nb_.listenTo('nb-app-ready', function() {
       jQuery(function($){
             var $cssLoaders = $('.sek-css-loader');
             if ( $cssLoaders.length < 1 )

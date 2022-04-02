@@ -180,7 +180,7 @@ nb_.listenTo('nb-docready', function() {
 
 // September 2021 => Solves the problem of CSS loaders not cleaned
 // see https://github.com/presscustomizr/nimble-builder/issues/874
-nb_.listenTo('nb-docready', function() {
+nb_.listenTo('nb-app-ready', function() {
       jQuery(function($){
             var $cssLoaders = $('.sek-css-loader');
             if ( $cssLoaders.length < 1 )

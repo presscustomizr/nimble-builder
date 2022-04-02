@@ -634,7 +634,7 @@ if ( !class_exists( 'Flat_Export_Skope_Data_And_Send_To_Panel' ) ) :
     class Flat_Export_Skope_Data_And_Send_To_Panel extends Flat_Skop_Register_And_Load_Control_Assets {
           // Fired in Flat_Skop_Base::__construct()
           public function skp_export_skope_data_and_schedule_sending_to_panel() {
-              add_action( 'wp_footer', array( $this, 'skp_print_server_skope_data') , 30 );
+              add_action( 'wp_head', array( $this, 'skp_print_server_skope_data') , 30 );
           }
 
 
@@ -649,16 +649,11 @@ if ( !class_exists( 'Flat_Export_Skope_Data_And_Send_To_Panel' ) ) :
               // $_czr_scopes = array( );
               $_czr_skopes            = $this->_skp_get_json_export_ready_skopes();
               $_czr_query_data        = $this->_skp_get_json_export_ready_query_data();
-
+            
+              ob_start();
               ?>
-                  <script type="text/javascript" id="czr-print-skop">
-                      (function ( _export ){
-                              _export.czr_new_skopes        = <?php echo wp_json_encode( $_czr_skopes ); ?>;
-                              _export.czr_stylesheet    = '<?php echo get_stylesheet(); ?>';
-                              _export.czr_query_params  = <?php echo wp_json_encode($_czr_query_data); ?>;
-                      })( _wpCustomizeSettings );
-
-                      // December 2020 : it may happen that the 'sync' event was already sent and that we missed it
+                    var _doSend = function() {
+                        // December 2020 : it may happen that the 'sync' event was already sent and that we missed it
                       // Typically when the site is slow.
                       // So we need to check if the "sync" event has fired already ( see customize-base.js, ::bind method )
                       // For more security, let's introduce a marker and attempt to re-sent after a moment if needed
@@ -673,22 +668,49 @@ if ( !class_exists( 'Flat_Export_Skope_Data_And_Send_To_Panel' ) ) :
                             window.czr_skopes_sent = true;
                       };
 
-                      jQuery( function() {
-                          if ( wp.customize.preview.topics && wp.customize.preview.topics.sync && wp.customize.preview.topics.sync.fired() ) {
-                              _send();
-                          } else {
-                              wp.customize.preview.bind( 'sync', function( events ) {
-                                  _send();
-                              });
-                          }
-                          setTimeout( function() {
-                                if ( !window.czr_skopes_sent ) {
+                        jQuery( function() {
+                            if ( wp.customize.preview.topics && wp.customize.preview.topics.sync && wp.customize.preview.topics.sync.fired() ) {
+                                _send();
+                            } else {
+                                wp.customize.preview.bind( 'sync', function( events ) {
                                     _send();
-                                }
-                          }, 2500 );
-                      });
-                  </script>
+                                });
+                            }
+                            setTimeout( function() {
+                                    if ( !window.czr_skopes_sent ) {
+                                        _send();
+                                    }
+                            }, 2500 );
+                        });
+                    };
+                    
+                    
+                    // recursively try to load jquery every 200ms during 6s ( max 30 times )
+                    var _doWhenCustomizeSettingsReady = function( attempts ) {
+                        attempts = attempts || 0;
+                        if ( typeof undefined !== typeof window._wpCustomizeSettings ) {
+                            _wpCustomizeSettings.czr_new_skopes        = <?php echo wp_json_encode( $_czr_skopes ); ?>;
+                            _wpCustomizeSettings.czr_stylesheet    = '<?php echo get_stylesheet(); ?>';
+                            _wpCustomizeSettings.czr_query_params  = <?php echo wp_json_encode($_czr_query_data); ?>;
+                            _doSend();
+                        } else if ( attempts < 30 ) {
+                            setTimeout( function() {
+                                attempts++;
+                                _doWhenCustomizeSettingsReady( attempts );
+                            }, 20 );
+                        } else {
+                            if ( window.console && window.console.log ) {
+                                console.log('Nimble Builder problem : _wpCustomizeSettings is not defined');
+                            }
+                        }
+                    };
+
+                    _doWhenCustomizeSettingsReady();
               <?php
+              $script = ob_get_clean();
+              wp_register_script( 'nb_print_skope_data_js', '');
+              wp_enqueue_script( 'nb_print_skope_data_js' );
+              wp_add_inline_script( 'nb_print_skope_data_js', $script );
           }
 
 

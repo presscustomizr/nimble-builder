@@ -29,7 +29,7 @@ module.exports = {
 
       '!**/*.db',
       '!patches/**',
-
+      '!vendor/**',
       // czr js dev fmk
       '!assets/czr/fmk/**',
       // czr php dev

@@ -738,7 +738,7 @@ function add_sektion_values_to_skope_export( $skopes ) {
 // June 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/708
 // print a script in the head of the customizer
 // inject control js script on api "ready" event
-add_action( 'customize_controls_print_footer_scripts', '\Nimble\sek_print_nimble_czr_control_js', 100 );
+add_action( 'customize_controls_print_scripts', '\Nimble\sek_print_nimble_czr_control_js', 100 );
 //add_action( 'customize_controls_print_scripts', '\Nimble\sek_print_nimble_czr_control_js', 100 );
 function sek_print_nimble_czr_control_js() {
     if ( !sek_current_user_can_access_nb_ui() )
@@ -749,8 +749,8 @@ function sek_print_nimble_czr_control_js() {
         sek_is_dev_mode() ? 'ccat-sek-control.js' : 'ccat-sek-control.min.js',
         NIMBLE_ASSETS_VERSION
     );
+    ob_start();
     ?>
-    <script id="nb-schedule-control-js-load">
       (function() {
         var _loadScript = function() {
           wp.customize.bind( 'ready', function() {
@@ -783,8 +783,11 @@ function sek_print_nimble_czr_control_js() {
         };
         _loadWhenWpCustomizeLoaded();
       })();
-    </script>
     <?php
+    $script = ob_get_clean();
+    wp_register_script( 'nb_load_czr_control_js', '');
+    wp_enqueue_script( 'nb_load_czr_control_js' );
+    wp_add_inline_script( 'nb_load_czr_control_js', $script );
 };
 
 add_action( 'customize_controls_print_footer_scripts', '\Nimble\sek_print_nimble_customizer_tmpl' );
@@ -3032,39 +3035,6 @@ final class _NIMBLE_Editors {
     } else {
       $settings = '{}';
     }
-
-    ?>
-    <script type="text/javascript">
-    window.wp = window.wp || {};
-    window.wp.editor = window.wp.editor || {};
-    window.wp.editor.getDefaultSettings = function() {
-      return {
-        tinymce: <?php echo $settings; ?>,
-        quicktags: {
-          buttons: 'strong,em,link,ul,ol,li,code'
-        }
-      };
-    };
-
-    <?php
-
-    if ( $user_can_richedit ) {
-      $suffix  = SCRIPT_DEBUG ? '' : '.min';
-      $baseurl = self::get_baseurl();
-
-      ?>
-      var nimbleTinyMCEPreInit = {
-        baseURL: "<?php echo $baseurl; ?>",
-        suffix: "<?php echo $suffix; ?>",
-        mceInit: {},
-        qtInit: {},
-        load_ext: function(url,lang){var sl=tinymce.ScriptLoader;sl.markDone(url+'/langs/'+lang+'.js');sl.markDone(url+'/langs/'+lang+'_dlg.js');}
-      };
-      <?php
-    }
-    ?>
-    </script>
-    <?php
 
     if ( $user_can_richedit ) {
       self::print_tinymce_scripts();
