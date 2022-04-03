@@ -39,10 +39,10 @@ function nb_options_page() {
       <h1 class="nb-option-page-title">
         <?php
         printf('<span class="sek-nimble-title-icon"><img src="%1$s" alt="Build with Nimble Builder">%2$s</span>',
-            NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
+            esc_url( NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION ),
             apply_filters( 'nimble_option_title_icon_after', '' )
         );
-        echo apply_filters( 'nimble_parse_admin_text', $page_title );
+        echo apply_filters( 'nimble_parse_admin_text', esc_html( $page_title ) );
         ?>
       </h1>
       <div class="nav-tab-wrapper">
@@ -50,7 +50,7 @@ function nb_options_page() {
             foreach ($option_tabs as $tab_id => $tab_data ) {
               printf('<a class="nav-tab %1$s" href="%2$s">%3$s</a>',
                   $tab_id === nb_get_active_option_tab() ? 'nav-tab-active' : '',
-                  admin_url( NIMBLE_OPTIONS_PAGE_URL ) . '&tab=' . $tab_id,
+                  esc_url( admin_url( NIMBLE_OPTIONS_PAGE_URL ) . '&tab=' . $tab_id ),
                   $tab_data['title']
               );
             }
@@ -184,7 +184,7 @@ nb_register_option_tab([
 function print_welcome_page() {
     ?>
     <div class="nimble-welcome-content">
-      <?php echo sek_get_welcome_block(); ?>
+      <?php echo wp_kses_post(sek_get_welcome_block()); ?>
     </div>
     <div class="clear"></div>
     <hr/>
@@ -526,7 +526,7 @@ function print_system_info() {
     ?>
      <h3><?php _e( 'System Informations', 'text_domain_to_be_chg' ); ?></h3>
       <h4><?php _e( 'Please include your system informations when posting support requests.' , 'text_domain_to_be_chg' ) ?></h4>
-      <textarea readonly="readonly" onclick="this.focus();this.select()" id="system-info-textarea" name="tc-sysinfo" title="<?php _e( 'To copy the system info, click below then press Ctrl + C (PC) or Cmd + C (Mac).', 'text_domain_to_be_chg' ); ?>" style="width: 800px;min-height: 800px;font-family: Menlo,Monaco,monospace;background: 0 0;white-space: pre;overflow: auto;display:block;"><?php echo sek_config_infos(); ?></textarea>
+      <textarea readonly="readonly" onclick="this.focus();this.select()" id="system-info-textarea" name="tc-sysinfo" title="<?php _e( 'To copy the system info, click below then press Ctrl + C (PC) or Cmd + C (Mac).', 'text_domain_to_be_chg' ); ?>" style="width: 800px;min-height: 800px;font-family: Menlo,Monaco,monospace;background: 0 0;white-space: pre;overflow: auto;display:block;"><?php echo wp_kses_post(sek_config_infos()); ?></textarea>
     <?php
 }
 

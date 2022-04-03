@@ -272,7 +272,7 @@ function sek_print_nb_btn_edit_with_nimble( $editor_type ) {
     <button id="sek-edit-with-nimble" type="button" class="<?php echo esc_attr($btn_css_classes); ?>" data-cust-url="<?php echo esc_url( $customize_url ); ?>">
       <?php //_e( 'Edit with Nimble Builder', 'text_doma' ); ?>
       <?php printf( '<span class="sek-spinner"></span><span class="sek-nimble-icon" title="%3$s"><img src="%1$s" alt="%2$s"/><span class="sek-nimble-admin-bar-title">%2$s</span><span class="sek-nimble-mobile-admin-bar-title">%3$s</span></span>',
-          NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
+          esc_url( NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION ),
           apply_filters( 'nb_admin_nb_button_edit_title', sek_local_skope_has_been_customized( $manually_built_skope_id ) ? __('Continue building with Nimble','text_domain') : __('Build with Nimble Builder','text_domain'), $manually_built_skope_id ),
           __('Build','text_domain'),
           __('Build sections in live preview with Nimble Builder', 'text_domain')
@@ -744,7 +744,7 @@ function sek_may_be_display_update_notice() {
       </div>
       <?php
       $_html = ob_get_clean();
-      echo apply_filters( 'sek_update_notice', $_html );
+      echo wp_kses_post( apply_filters( 'sek_update_notice', $_html ) );
       
       ob_start();
       ?>
@@ -943,7 +943,7 @@ function sek_maybe_display_feedback_notice() {
         </div>
       </div>
       <p style="font-size:14px;font-weight:600"><?php _e('Thank you 🙏 ! Nimble Builder needs your sponsorship to keep improving and helping you design your website in the best possible way.' ); ?></p>
-      <p style="font-size:14px;font-weight:bold"><?php _e('Limited offer : get 25% off with code HELLO2022 at checkout.' ); ?> <a class="sek-pro-link-in-dashboard" href="https://presscustomizr.com/nimble-builder-pro/" rel="noopener noreferrer" title="Go Pro" target="_blank">Go Pro</a> <span style="color: #f07829;" class="dashicons dashicons-external"></span></p>
+      <!--<p style="font-size:14px;font-weight:bold"><?php _e('Limited offer : get 25% off with code HELLO2022 at checkout.' ); ?> <a class="sek-pro-link-in-dashboard" href="https://presscustomizr.com/nimble-builder-pro/" rel="noopener noreferrer" title="Go Pro" target="_blank">Go Pro</a> <span style="color: #f07829;" class="dashicons dashicons-external"></span></p>-->
       <button type="button" class="notice-dismiss" title="<?php _e('Dismiss this notice.'); ?>">
         <span class="screen-reader-text"><?php _e('Dismiss this notice.'); ?></span>
       </button>
