@@ -1021,38 +1021,30 @@ function sek_print_nimble_customizer_tmpl() {
           </button>
       </div>
     </script>
-
-
-    <?php // Detached WP Editor => added when coding https://github.com/presscustomizr/nimble-builder/issues/403 ?>
-    <div id="czr-customize-content_editor-pane">
-      <div data-czr-action="close-tinymce-editor" class="czr-close-editor"><i class="fas fa-arrow-circle-down" title="<?php _e( 'Hide Editor', 'text_doma' ); ?>"></i>&nbsp;<span><?php _e( 'Hide Editor', 'text_doma');?></span></div>
-      <div id="czr-customize-content_editor-dragbar" title="<?php _e('Resize the editor', 'text_domain'); ?>">
-        <span class="screen-reader-text"><?php _e( 'Resize the editor', 'nimble-builder' ); ?></span>
-        <i class="czr-resize-handle fas fa-arrows-alt-v"></i>
-      </div>
-      <!-- <textarea style="height:250px;width:100%" id="czr-customize-content_editor"></textarea> -->
-      <?php
-        // the textarea id for the detached editor is 'czr-customize-content_editor'
-        // this function generates the <textarea> markup
-        sek_setup_nimble_editor( '', NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID , array(
-            '_content_editor_dfw' => false,
-            'drag_drop_upload' => true,
-            'tabfocus_elements' => 'content-html,save-post',
-            'editor_height' => 235,
-            'default_editor' => 'tinymce',
-            'tinymce' => array(
-                'resize' => false,
-                'wp_autoresize_on' => false,
-                'add_unload_trigger' => false,
-                'wpautop' => true
-            ),
-        ) );
-      ?>
-    </div>
     <?php
 }
 
-
+add_action( 'customize_controls_print_scripts', '\Nimble\sek_print_detached_editor' );
+function sek_print_detached_editor() {
+  ?>
+  <?php // Detached WP Editor => added when coding https://github.com/presscustomizr/nimble-builder/issues/403 ?>
+  <?php
+    // the textarea id for the detached editor is 'czr-customize-content_editor'
+    // this function generates the <textarea> markup
+    sek_setup_nimble_editor( '', NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID , array(
+        '_content_editor_dfw' => false,
+        'drag_drop_upload' => true,
+        'tabfocus_elements' => 'content-html,save-post',
+        'editor_height' => 235,
+        'default_editor' => 'tinymce',
+        'tinymce' => array(
+            'resize' => false,
+            'wp_autoresize_on' => false,
+            'add_unload_trigger' => false,
+            'wpautop' => true
+        ),
+    ) );
+}
 
 
 // Introduced for https://github.com/presscustomizr/nimble-builder/issues/395

@@ -36,6 +36,8 @@ final class _NIMBLE_Editors {
   private static $tinymce_scripts_printed = false;
   private static $link_dialog_printed     = false;
 
+  private static $editor_markup;// <= used to cache the editor markup and render it afterwards @customize_controls_print_footer_scripts
+
   private function __construct() {}
 
   /**
@@ -207,8 +209,8 @@ final class _NIMBLE_Editors {
       $wrap_class .= ' has-dfw';
     }
 
+    ob_start();
     echo '<div id="wp-' . $editor_id_attr . '-wrap" class="' . $wrap_class . '">';
-
     if ( self::$editor_buttons_css ) {
       wp_print_styles( 'editor-buttons' );
       self::$editor_buttons_css = false;
@@ -309,7 +311,30 @@ final class _NIMBLE_Editors {
     printf( $the_editor, $content );
     echo "\n</div>\n\n";
 
+    self::$editor_markup = ob_get_clean();
+
     self::editor_settings( $editor_id, $set );
+
+    // The idea here is to print the markup in customize_controls_print_footer_scripts hook and print the js in customize_controls_print_scripts
+    // printing inline scripts @customize_controls_print_scripts is mandatory to be able to use wp_add_inline_script(). see https://github.com/presscustomizr/nimble-builder/issues/887
+    add_action('customize_controls_print_footer_scripts', function() {
+      ?>
+      <?php // Detached WP Editor => added when coding https://github.com/presscustomizr/nimble-builder/issues/403 ?>
+        <div id="czr-customize-content_editor-pane">
+          <div data-czr-action="close-tinymce-editor" class="czr-close-editor"><i class="fas fa-arrow-circle-down" title="<?php _e( 'Hide Editor', 'text_doma' ); ?>"></i>&nbsp;<span><?php _e( 'Hide Editor', 'text_doma');?></span></div>
+          <div id="czr-customize-content_editor-dragbar" title="<?php _e('Resize the editor', 'text_domain'); ?>">
+            <span class="screen-reader-text"><?php _e( 'Resize the editor', 'nimble-builder' ); ?></span>
+            <i class="czr-resize-handle fas fa-arrows-alt-v"></i>
+          </div>
+          <!-- <textarea style="height:250px;width:100%" id="czr-customize-content_editor"></textarea> -->
+          <?php
+            // the textarea id for the detached editor is 'czr-customize-content_editor'
+            // this function generates the <textarea> markup
+            echo self::$editor_markup;
+          ?>
+        </div>
+        <?php
+    }, PHP_INT_MAX);
   }
 
   /**
@@ -322,7 +347,7 @@ final class _NIMBLE_Editors {
     global $tinymce_version;
 
     if ( empty( self::$first_init ) ) {
-      add_action( 'customize_controls_print_footer_scripts', array( __CLASS__, 'editor_js' ), 50 );
+      add_action( 'customize_controls_print_scripts', array( __CLASS__, 'editor_js' ), 50 );
       add_action( 'customize_controls_print_footer_scripts', array( __CLASS__, 'force_uncompressed_tinymce' ), 1 );
       add_action( 'customize_controls_print_footer_scripts', array( __CLASS__, 'enqueue_scripts' ), 1 );
     }
@@ -830,7 +855,7 @@ final class _NIMBLE_Editors {
     wp_enqueue_style( 'editor-buttons' );
 
     add_action( 'customize_controls_print_footer_scripts', array( __CLASS__, 'force_uncompressed_tinymce' ), 1 );
-    add_action( 'customize_controls_print_footer_scripts', array( __CLASS__, 'print_default_editor_scripts' ), 45 );
+    add_action( 'customize_controls_print_scripts', array( __CLASS__, 'print_default_editor_scripts' ), 45 );
 
   }
 
@@ -883,6 +908,41 @@ final class _NIMBLE_Editors {
     } else {
       $settings = '{}';
     }
+    ob_start();
+    ?>
+    window.wp = window.wp || {};
+    window.wp.editor = window.wp.editor || {};
+    window.wp.editor.getDefaultSettings = function() {
+      return {
+        tinymce: <?php echo $settings; ?>,
+        quicktags: {
+          buttons: 'strong,em,link,ul,ol,li,code'
+        }
+      };
+    };
+
+    <?php
+
+    if ( $user_can_richedit ) {
+      $suffix  = SCRIPT_DEBUG ? '' : '.min';
+      $baseurl = self::get_baseurl();
+
+      ?>
+      var nimbleTinyMCEPreInit = {
+        baseURL: "<?php echo $baseurl; ?>",
+        suffix: "<?php echo $suffix; ?>",
+        mceInit: {},
+        qtInit: {},
+        load_ext: function(url,lang){var sl=tinymce.ScriptLoader;sl.markDone(url+'/langs/'+lang+'.js');sl.markDone(url+'/langs/'+lang+'_dlg.js');}
+      };
+      <?php
+    }
+    ?>
+    <?php
+    $editor_script_three = ob_get_clean();
+    wp_register_script( 'nb_print_editor_js_three', '');
+    wp_enqueue_script( 'nb_print_editor_js_three' );
+    wp_add_inline_script( 'nb_print_editor_js_three', $editor_script_three );
 
     if ( $user_can_richedit ) {
       self::print_tinymce_scripts();
@@ -1412,10 +1472,12 @@ final class _NIMBLE_Editors {
     if ( !isset( $concatenate_scripts ) ) {
       script_concat_settings();
     }
-
+    
     wp_print_scripts( array( 'wp-tinymce' ) );
-
-    echo "<script type='text/javascript'>\n" . self::wp_mce_translation() . "</script>\n";
+    $script = self::wp_mce_translation();
+    wp_register_script( 'nb_print_tinymce_translations', '');
+    wp_enqueue_script( 'nb_print_tinymce_translations' );
+    wp_add_inline_script( 'nb_print_tinymce_translations', $script );
   }
 
   /**
@@ -1467,9 +1529,9 @@ final class _NIMBLE_Editors {
      * @param array $mce_settings TinyMCE settings array.
      */
     do_action( 'before_wp_tiny_mce', self::$mce_settings );
-    ?>
 
-    <script type="text/javascript">
+    ob_start();
+    ?>
     nimbleTinyMCEPreInit = {
       baseURL: "<?php echo $baseurl; ?>",
       suffix: "<?php echo $suffix; ?>",
@@ -1485,16 +1547,22 @@ final class _NIMBLE_Editors {
       ref: <?php echo self::_parse_init( $ref ); ?>,
       load_ext: function(url,lang){var sl=tinymce.ScriptLoader;sl.markDone(url+'/langs/'+lang+'.js');sl.markDone(url+'/langs/'+lang+'_dlg.js');}
     };
-    </script>
     <?php
+
+    $editor_script_one = ob_get_clean();
+    wp_register_script( 'nb_print_editor_js', '');
+    wp_enqueue_script( 'nb_print_editor_js' );
+    wp_add_inline_script( 'nb_print_editor_js', $editor_script_one );
+
 
     if ( $tmce_on ) {
       self::print_tinymce_scripts();
-
-      if ( self::$ext_plugins ) {
-        // Load the old-format English strings to prevent unsightly labels in old style popups
-        echo "<script type='text/javascript' src='{$baseurl}/langs/wp-langs-en.js?$version'></script>\n";
-      }
+      
+      // @nikeo addon => not needed
+      // if ( self::$ext_plugins ) {
+      //   // Load the old-format English strings to prevent unsightly labels in old style popups
+      //   echo "<script type='text/javascript' src='{$baseurl}/langs/wp-langs-en.js?$version'></script>\n";
+      // }
     }
 
     /**
@@ -1507,8 +1575,8 @@ final class _NIMBLE_Editors {
      */
     do_action( 'wp_tiny_mce_init', self::$mce_settings );
 
+    ob_start();
     ?>
-    <script type="text/javascript">
     <?php
 
     if ( self::$ext_plugins ) {
@@ -1520,7 +1588,6 @@ final class _NIMBLE_Editors {
     }
 
     ?>
-
     ( function() {
       var init, id, $wrap;
 
@@ -1553,8 +1620,11 @@ final class _NIMBLE_Editors {
         }
       }
     }());
-    </script>
     <?php
+    $editor_script_two = ob_get_clean();
+    wp_register_script( 'nb_print_editor_js_two', '');
+    wp_enqueue_script( 'nb_print_editor_js_two' );
+    wp_add_inline_script( 'nb_print_editor_js_two', $editor_script_two );
 
     if ( in_array( 'wplink', self::$plugins, true ) || in_array( 'link', self::$qt_buttons, true ) ) {
       self::wp_link_dialog();
