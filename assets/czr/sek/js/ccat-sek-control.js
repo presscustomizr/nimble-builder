@@ -15884,7 +15884,7 @@ var CZRSeksPrototype = CZRSeksPrototype || {};
                         // we've started to implement the json saved for the heading module, but all modules will progressively transition to this new format
                         // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
                         // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
-                        initial_value = input();
+                        initial_value = input.input_value;
                         if ( api.czr_sektions.isJsonString(initial_value) ) {
                               initial_value = JSON.parse( initial_value );
                         }
