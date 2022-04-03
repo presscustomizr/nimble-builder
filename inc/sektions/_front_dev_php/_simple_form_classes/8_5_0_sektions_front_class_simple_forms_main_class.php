@@ -275,10 +275,11 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                               $class = 'sek-mail-aborted';
                           break;
                     }
-                    printf( '<div class="sek-form-message %1$s">%2$s</div>', $class, $message );
+                    printf( '<div class="sek-form-message %1$s">%2$s</div>', esc_attr($class), wp_kses_post($message) );
                 }
             } else {
                 // If we're in the regular case ( not after submission ), echo the form
+                // output secured in $this->simple_form_generate_form()
                 echo $form;
             }
           ?>

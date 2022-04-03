@@ -23,10 +23,12 @@ if ( !function_exists( 'Nimble\sek_print_shortcode_module_content' ) ) {
     // april 2020 : optional parsing for lazy load added for https://github.com/presscustomizr/nimble-builder/issues/669
     // disable by default https://github.com/presscustomizr/nimble-builder/issues/678
     if ( true === sek_booleanize_checkbox_val( $value['lazyload'] ) ) {
-        $content = apply_filters( 'nimble_parse_for_smart_load', $content );
+        $content = apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($content) );
+    } else {
+        $content = wp_kses_post($content);
     }
     printf( '<div class="sek-shortcode-content" data-sek-use-flexbox="%2$s">%1$s</div>',
-      $content,
+      $content,//output secured with wp_kses_post($content)
       ( array_key_exists( 'use_flex', $value ) && true === sek_booleanize_checkbox_val( $value['use_flex'] ) ) ? "true" : "false"
     );
   }

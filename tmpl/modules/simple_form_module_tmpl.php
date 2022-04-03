@@ -20,5 +20,6 @@ if ( true === sek_booleanize_checkbox_val( $value['fields_design']['use_inset_sh
 }
 ?>
 <div class="sek-simple-form-wrapper <?php echo esc_attr($visual_effect_class); ?>">
+    <?php // output secured in Nimble_Manager()->get_simple_form_html() ?>
   <?php echo Nimble_Manager()->get_simple_form_html( $model ); ?>
 </div>

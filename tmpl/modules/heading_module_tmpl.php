@@ -46,10 +46,11 @@ if ( !function_exists( 'Nimble\sek_print_text_heading_content' ) ) {
                 $to_print = preg_replace("/<\\/?" . $tag . "(.|\\s)*?>/",'', $to_print );
             }
         }
+
         if ( $echo ) {
-            echo $to_print;
+            echo wp_kses_post($to_print);
         } else {
-            return $to_print;
+            return wp_kses_post($to_print);
         }
 
     }
@@ -85,16 +86,16 @@ if ( array_key_exists('heading_text', $value ) ) {
     if ( false === sek_booleanize_checkbox_val( $value['link-to'] ) ) {
         printf( '<%1$s %3$s class="sek-heading">%2$s</%1$s>',
             $tag,
-            sek_print_text_heading_content( $value['heading_text'], 'heading_text', $model ),
+            sek_print_text_heading_content( $value['heading_text'], 'heading_text', $model ),//<= secured with wp_kses_post
             !empty( $heading_title ) ? 'title="' . esc_html( $heading_title ) . '"' : ''
         );
     } else {
         printf( '<%1$s %3$s class="sek-heading">%2$s</%1$s>',
             $tag,
             sprintf('<a href="%1$s" %2$s>%3$s</a>',
-                sek_get_heading_module_link( $value ),
+                sek_get_heading_module_link( $value ),//<= secured with esc_url()
                 true === sek_booleanize_checkbox_val( $value['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
-                sek_print_text_heading_content( $value['heading_text'], 'heading_text', $model )
+                sek_print_text_heading_content( $value['heading_text'], 'heading_text', $model )//<= secured with wp_kses_post
             ),
             !empty( $heading_title ) ? 'title="' . esc_html( $heading_title ) . '"' : ''
         );

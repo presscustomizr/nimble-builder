@@ -90,7 +90,7 @@ class Sek_Form {
         }
 
         return sprintf('<form %1$s>%2$s</form>',
-            $this->get_attributes_html(),
+            esc_attr($this->get_attributes_html()),
             $fields
         );
     }
@@ -181,7 +181,7 @@ class Sek_Field {
 
             $html = sprintf( '<%1$s%2$s>%3$s</%1$s>',
                 $wrapper_tag,
-                $wrapper_class,
+                esc_attr($wrapper_class),
                 $html
             );
         }

@@ -187,7 +187,7 @@ if ( !function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
             // in particular when calculting if is_visible() to decide if we smart load.
             $html = sprintf( '<img alt="default img" data-skip-lazyload="true" src="%1$s"/>', esc_url( $item['img'] )  );
         }
-        return skp_is_customizing() ? $html : apply_filters( 'nimble_parse_for_smart_load', $html );
+        return skp_is_customizing() ? wp_kses_post($html) : apply_filters( 'nimble_parse_for_smart_load',$html );
     }
 }
 
@@ -239,13 +239,14 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
                   $has_overlay = true === sek_booleanize_checkbox_val( $item['apply-overlay'] );
 
                   // Put them together
+                  // output secured in sek_get_img_slider_module_img_html()
                   printf( '<div class="swiper-slide" title="%1$s" data-sek-item-id="%4$s" data-sek-has-overlay="%5$s" %6$s><figure class="sek-carousel-img">%2$s</figure>%3$s</div>',
                       sek_slider_parse_template_tags( strip_tags( esc_attr( $item['title_attr'] ) ), $item ),
                       sek_get_img_slider_module_img_html( $item, "true" === $lazy_load_on, $index ),
-                      sek_slider_parse_template_tags( $text_html, $item ),
+                      wp_kses_post( sek_slider_parse_template_tags( $text_html, $item ) ),
                       esc_attr($item['id']),
                       true === sek_booleanize_checkbox_val( $has_overlay ) ? 'true' : 'false',
-                      apply_filters('nb_single_slide_custom_attributes', '', $item, $model )
+                      esc_attr( apply_filters('nb_single_slide_custom_attributes', '', $item, $model ) )
                   );
 
               }//foreach
@@ -264,7 +265,7 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
           <?php endif; ?>
           <?php
             if ( !skp_is_customizing() ) {
-              echo Nimble_Manager()->css_loader_html;
+              echo wp_kses_post(Nimble_Manager()->css_loader_html);
             }
           ?>
         </div><?php //.swiper ?>

@@ -42,10 +42,10 @@ if ( !function_exists( 'Nimble\sek_print_social_links' ) ) {
               printf( '<li data-sek-item-id="%5$s"><a title="%1$s" aria-label="%1$s" href="%2$s" %3$s>%4$s<span class="screen-reader-text">%6$s</span></a></li>',
                   esc_attr( $item['title_attr'] ),
                   $social_link,
-                  implode( ' ', $link_attr ),
-                  ( ( empty( $item['icon'] ) || !is_string( $item['icon'] ) ) && skp_is_customizing() ) ? '<i class="material-icons">pan_tool</i>' : '<i class="sek-social-icon ' . $item['icon'] .'"></i>',
-                  $item['id'],
-                  ( empty( $item['icon'] ) || !is_string( $item['icon'] ) ) ? 'social-link' : $item['icon']
+                  esc_attr( implode( ' ', $link_attr ) ),
+                  wp_kses_post( ( ( empty( $item['icon'] ) || !is_string( $item['icon'] ) ) && skp_is_customizing() ) ? '<i class="material-icons">pan_tool</i>' : '<i class="sek-social-icon ' . $item['icon'] .'"></i>' ),
+                  esc_attr( $item['id'] ),
+                  wp_kses_post(( empty( $item['icon'] ) || !is_string( $item['icon'] ) ) ? 'social-link' : $item['icon'] )
               );
           }//foreach
       echo '</ul>';

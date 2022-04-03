@@ -79,13 +79,13 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
         } else {
             //falls back on an icon if previewing
             if ( skp_is_customizing() ) {
-                $html = sprintf('<div style="min-height:50px">%1$s</div>', Nimble_Manager()->sek_get_input_placeholder_content( 'upload' ));
+                $html = sprintf('<div style="min-height:50px">%1$s</div>', wp_kses_post(Nimble_Manager()->sek_get_input_placeholder_content( 'upload' )));
             }
         }
 
         // Do we have something ? If not print the placeholder
         if ( empty($html) && skp_is_customizing() ) {
-            $html = sprintf('<div style="min-height:50px">%1$s</div>', Nimble_Manager()->sek_get_input_placeholder_content( 'upload' ));
+            $html = sprintf('<div style="min-height:50px">%1$s</div>', wp_kses_post(Nimble_Manager()->sek_get_input_placeholder_content( 'upload' )));
         }
 
         $title = '';
@@ -117,11 +117,14 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
                 }
             }
         }
-        $html = apply_filters( 'nimble_parse_for_smart_load', $html );
         if ( !skp_is_customizing() && false !== strpos($html, 'data-sek-src="http') ) {
             $html = $html.Nimble_Manager()->css_loader_html;
         }
-        return sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', esc_attr($img_figure_classes), $html, esc_html( $title ) );
+        return sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', 
+            esc_attr($img_figure_classes), 
+            apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($html) ), 
+            esc_html( $title ) 
+        );
     }
 }
 
@@ -160,9 +163,12 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
 
 // Print
 if ( 'no-link' === $main_settings['link-to'] ) {
+    // output is secured in sek_get_img_module_img_html()
     echo apply_filters('nb_img_module_html', sek_get_img_module_img_html( $main_settings ), $main_settings );
 } else {
+    // output is secured in sek_get_img_module_img_link()
     $link = sek_get_img_module_img_link( $main_settings );
+    // output is secured in sek_get_img_module_img_html()
     printf('<a class="%4$s %5$s" href="%1$s" %2$s>%3$s</a>',
         $link,
         true === sek_booleanize_checkbox_val( $main_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',

@@ -34,8 +34,8 @@ if ( !function_exists( 'Nimble\sek_print_accordion' ) ) {
                     $item_html_content = $item['text_content'];
                     // convert into a json to prevent emoji breaking global json data structure
                     // fix for https://github.com/presscustomizr/nimble-builder/issues/544
-                    $title = sek_maybe_decode_richtext($title);
-                    $item_html_content = sek_maybe_decode_richtext($item_html_content);
+                    $title = wp_kses_post(sek_maybe_decode_richtext($title));
+                    $item_html_content = wp_kses_post( sek_maybe_decode_richtext($item_html_content) );
 
                     if ( !skp_is_customizing() ) {
                         $item_html_content = apply_filters( 'nimble_parse_for_smart_load', $item_html_content );
@@ -55,8 +55,8 @@ if ( !function_exists( 'Nimble\sek_print_accordion' ) ) {
                     printf( '<div class="sek-accord-item" %1$s data-sek-item-id="%2$s" data-sek-expanded="%5$s"><div id="sek-tab-title-%2$s" class="sek-accord-title" role="tab" aria-controls="sek-tab-content-%2$s"><span class="sek-inner-accord-title">%3$s</span><div class="expander"><span></span><span></span></div></div><div id="sek-tab-content-%2$s" class="sek-accord-content" role="tabpanel" aria-labelledby="sek-tab-title-%2$s">%4$s</div></div>',
                         empty($title_attr) ? '' : 'title="'. $title_attr . '"',
                         esc_attr($item['id']),
-                        esc_attr($title),
-                        $item_html_content,
+                        $title,//<= secured with wp_kses_post()
+                        $item_html_content,//<= secured with wp_kses_post()
                         ( 'true' === $first_expanded && 1 === $ind ) ? "true" : "false"
                     );
                     $ind++;

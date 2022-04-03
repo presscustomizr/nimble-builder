@@ -26,7 +26,7 @@ if ( !function_exists( 'Nimble\sek_maybe_print_widget_placeholder') ) {
       printf('<div class="widget" data-czr-panel-focus="widgets"><div class="czr-placeholder-widget" %1$s><h3 %2$s>%3$s</h3></div></div>',
           'style="background:#f7f8f9;padding:30px;text-align:center;outline:3px dotted #858585;;font-size:.875em;"',
           'style="margin:0.5em;font-size:17px;line-height:1.5em;color:#444"',
-          $placeholder_text
+          wp_kses_post($placeholder_text)
       );
   }
 }

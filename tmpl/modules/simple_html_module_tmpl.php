@@ -14,7 +14,7 @@ $value = array_key_exists( 'value', $model ) ? $model['value'] : array();
 if ( !function_exists( 'Nimble\sek_print_html_content') ) {
     function sek_print_html_content( $html_content, $input_id ) {
         if ( empty( $html_content ) ) {
-            echo Nimble_Manager()->sek_get_input_placeholder_content( 'text', 'html_content' );
+            echo wp_kses_post(Nimble_Manager()->sek_get_input_placeholder_content( 'text', 'html_content' ));
         } else {
             // Feb 2021 : now saved as a json to fix emojis issues
             // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
@@ -34,9 +34,10 @@ if ( !function_exists( 'Nimble\sek_print_html_content') ) {
             add_filter( 'sek_html_content', 'do_shortcode' );
             $html_content = apply_filters( 'sek_html_content', $html_content );
             if ( !skp_is_customizing() ) {
-                $html_content = apply_filters( 'nimble_parse_for_smart_load', $html_content );
+                echo apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($html_content) );
+            } else {
+                echo wp_kses_post($html_content);
             }
-            echo $html_content;
             remove_filter( 'sek_html_content', 'do_shortcode' );
         }
     }

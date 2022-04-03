@@ -6093,10 +6093,11 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                               $class = 'sek-mail-aborted';
                           break;
                     }
-                    printf( '<div class="sek-form-message %1$s">%2$s</div>', $class, $message );
+                    printf( '<div class="sek-form-message %1$s">%2$s</div>', esc_attr($class), wp_kses_post($message) );
                 }
             } else {
                 // If we're in the regular case ( not after submission ), echo the form
+                // output secured in $this->simple_form_generate_form()
                 echo $form;
             }
           ?>
@@ -6338,7 +6339,7 @@ class Sek_Form {
         }
 
         return sprintf('<form %1$s>%2$s</form>',
-            $this->get_attributes_html(),
+            esc_attr($this->get_attributes_html()),
             $fields
         );
     }
@@ -6429,7 +6430,7 @@ class Sek_Field {
 
             $html = sprintf( '<%1$s%2$s>%3$s</%1$s>',
                 $wrapper_tag,
-                $wrapper_class,
+                esc_attr($wrapper_class),
                 $html
             );
         }

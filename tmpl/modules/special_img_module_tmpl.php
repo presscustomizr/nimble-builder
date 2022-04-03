@@ -82,7 +82,7 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
             );
         }
         // Would be great if this would be able to parse also the background-url inline style and move it into the data-sek-lazy-bg attribute
-        return apply_filters( 'nimble_parse_for_smart_load', sprintf('<figure class="sek-nimble-image-wrapper %1$s" title="%3$s">%2$s</figure>', esc_attr(implode( ' ', $visual_effect_class)), $html, esc_html( $title ) ) );
+        return apply_filters( 'nimble_parse_for_smart_load', sprintf('<figure class="sek-nimble-image-wrapper %1$s" title="%3$s">%2$s</figure>', esc_attr(implode( ' ', $visual_effect_class)), wp_kses_post($html), esc_html( $title ) ) );
     }
 }
 
@@ -119,4 +119,4 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
 }
 
 // Print
-echo sek_get_img_module_img_html( $main_settings );
+echo wp_kses_post(sek_get_img_module_img_html( $main_settings ));

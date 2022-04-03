@@ -31,9 +31,9 @@ if ( !function_exists( __NAMESPACE__ . '\sek_print_quote_content' ) ) {
         }
 
         if ( $echo ) {
-            echo $to_print;
+            echo wp_kses_post($to_print);
         } else {
-            return $to_print;
+            return wp_kses_post($to_print);
         }
     }
 }
@@ -56,8 +56,8 @@ if ( !empty( $quote_content_settings['quote_text'] ) ) {
             // Feb 2021 : now saved as a json to fix emojis issues
             // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
             // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
-            sek_maybe_decode_richtext( $quote_content_settings['quote_text'] ),
-            !empty( $cite_text ) ? sprintf( '<footer class="sek-quote-footer"><cite class="sek-cite">%1$s</cite></footer>', $cite_text ) : '',
+            wp_kses_post(sek_maybe_decode_richtext( $quote_content_settings['quote_text'] )),
+            !empty( $cite_text ) ? sprintf( '<footer class="sek-quote-footer"><cite class="sek-cite">%1$s</cite></footer>', wp_kses_post($cite_text )) : '',
             empty( $design_settings['quote_design'] ) || 'none' == $design_settings['quote_design'] ? '' : " sek-quote-design sek-{$design_settings['quote_design']}",
             $design_settings['quote_design']
         ),

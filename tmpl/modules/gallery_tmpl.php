@@ -31,18 +31,13 @@ if ( !function_exists( 'Nimble\sek_get_gal_img_item_html') ) {
         } else {
             //falls back on an icon if previewing
             if ( skp_is_customizing() ) {
-                $html = sprintf('<div style="min-height:50px">%1$s</div>', Nimble_Manager()->sek_get_input_placeholder_content( 'upload' ));
+                $html = sprintf('<div style="min-height:50px">%1$s</div>', wp_kses_post(Nimble_Manager()->sek_get_input_placeholder_content( 'upload' )));
             }
         }
 
         // Do we have something ? If not print the placeholder
         if ( empty($html) && skp_is_customizing() ) {
-            $html = sprintf('<div style="min-height:50px">%1$s</div>', Nimble_Manager()->sek_get_input_placeholder_content( 'upload' ));
-        }
-
-        $html = apply_filters( 'nimble_parse_for_smart_load', $html );
-        if ( !skp_is_customizing() && false !== strpos($html, 'data-sek-src="http') ) {
-            $html = $html.Nimble_Manager()->css_loader_html;
+            $html = sprintf('<div style="min-height:50px">%1$s</div>', wp_kses_post(Nimble_Manager()->sek_get_input_placeholder_content( 'upload' )));
         }
         return $html;
     }
@@ -173,19 +168,28 @@ if ( !function_exists( 'Nimble\sek_print_gallery_mod' ) ) {
         ?>
         
         <div class="sek-gal-wrapper <?php echo esc_attr($gal_wrapper_classes); ?>" id="<?php echo esc_attr($model['id']); ?>">
-            <div class="sek-gal-items <?php echo $gal_items_classes; ?>">
+            <div class="sek-gal-items <?php echo esc_attr($gal_items_classes); ?>">
                 <?php foreach ( $gallery_collec as $index => $item ) : ?>
                     <figure class="sek-img-gal-item" data-sek-item-id="<?php echo esc_attr($item['id']); ?>">
                         <?php
                             if ( 'no-link' === $gallery_opts['link-to'] ) {
-                                echo sek_get_gal_img_item_html( $item, $gallery_opts );
+                                $html = sek_get_gal_img_item_html( $item, $gallery_opts );
+                                $html = apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($html) );
+                                if ( !skp_is_customizing() && false !== strpos($html, 'data-sek-src="http') ) {
+                                    $html = $html.Nimble_Manager()->css_loader_html;
+                                }
+                                // output secured earlier with wp_kses_post()
+                                echo $html;
                             } else {
                                 $link = sek_get_gal_img_link( $item, $gallery_opts );
+                                $html = sek_get_gal_img_item_html( $item, $gallery_opts );
+
+                                //html secured with wp_kses_post()
                                 printf('<a class="%4$s %5$s" href="%1$s" %2$s title="%6$s">%3$s</a>',
-                                    $link,
+                                    $link,//secured with esc_url() in function
                                     true === sek_booleanize_checkbox_val( $gallery_opts['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
-                                    sek_get_gal_img_item_html( $item, $gallery_opts ),
-                                    'sek-gal-link-to-'.$gallery_opts['link-to'], // sek-gal-link-to-img-lightbox
+                                    apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($html) ),
+                                    esc_attr( 'sek-gal-link-to-'.$gallery_opts['link-to'] ), // sek-gal-link-to-img-lightbox
                                     false === strpos($link,'http') ? 'sek-no-img-link' : 'sek-gal-img-has-link',
                                     esc_attr(sek_get_gal_img_title( $item, $gallery_opts ))
                                 );
