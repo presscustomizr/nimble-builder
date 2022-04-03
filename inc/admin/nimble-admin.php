@@ -188,7 +188,9 @@ function sek_print_js_for_nimble_edit_btn() {
   // Only print when Gutenberg editor is enabled
   ?>
   <?php if ( did_action( 'enqueue_block_editor_assets' ) ) : ?>
-    <?php // Only printed when Gutenberg editor is enabled ?>
+    <?php // Only printed when Gutenberg editor is enabled 
+      // this script tag is a template and doesn't need to be inlined
+    ?>
     <script id="sek-edit-with-nb" type="text/html">
       <?php sek_print_nb_btn_edit_with_nimble( 'gutenberg' ); ?>
     </script>
