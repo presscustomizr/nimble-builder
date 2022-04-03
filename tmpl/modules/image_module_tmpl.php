@@ -120,10 +120,10 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
         if ( !skp_is_customizing() && false !== strpos($html, 'data-sek-src="http') ) {
             $html = $html.Nimble_Manager()->css_loader_html;
         }
-        return sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>', 
-            esc_attr($img_figure_classes), 
-            apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($html) ), 
-            esc_html( $title ) 
+        return sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>',
+            esc_attr($img_figure_classes),
+            apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($html) ),
+            esc_html( $title )
         );
     }
 }
