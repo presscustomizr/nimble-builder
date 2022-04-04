@@ -2189,7 +2189,7 @@ function sek_get_the_content() {
     return sek_get_tmpl_tag_error( $tag = 'the_content', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
-      $post_id = sek_get_posted_query_param_when_customizing( 'post_id' );
+      $post_id = (int)sek_get_posted_query_param_when_customizing( 'post_id' );
       if ( is_int($post_id) ) {
           $post_object = get_post( $post_id );
           return !empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
@@ -2261,12 +2261,30 @@ function sek_get_author_id_on_front_and_when_customizing() {
 // when performing ajax action, we need the posted query params made available from the ajax params
 function sek_get_post_id_on_front_and_when_customizing() {
     if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
-        $post_id = sek_get_posted_query_param_when_customizing( 'post_id' );
+        $post_id = (int)sek_get_posted_query_param_when_customizing( 'post_id' );
     } else {
         $post_id = get_the_ID();
     }
     return is_int($post_id) ? $post_id : null;
 }
+
+// recursively sanitize an array of posted ($_POST) query_params to be used when customzing
+// @param params (array)
+function sek_sanitize_query_params_array( $params = array()) {
+  foreach ($params as $prm => $val) {
+    if ( is_array($val) ) {
+      if ( empty($val) ) {
+        $sanitized_query_params[$prm] = [];
+      } else {
+        $sanitized_query_params[$prm] = sek_sanitize_query_params_array($params);
+      }
+    } else if ( is_string($val) ) {
+      $sanitized_query_params[$prm] = sanitize_text_field($val);
+    }
+  }
+  return $sanitized_query_params;
+}
+
 
 // introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
 // Possible params as of October 2019
@@ -2277,7 +2295,11 @@ function sek_get_posted_query_param_when_customizing( $param ) {
   if ( isset( $_POST['czr_query_params'] ) ) {
       $query_params = json_decode( wp_unslash( $_POST['czr_query_params'] ), true );
       if ( array_key_exists( $param, $query_params ) ) {
-          return $query_params[$param];
+          if ( !is_array($query_params[$param]) ) {
+            return sanitize_text_field($query_params[$param]);
+          } else {
+            return sek_sanitize_query_params_array($query_params[$param]);
+          }
       } else {
           sek_error_log( __FUNCTION__ . ' => invalid param requested');
           return null;
@@ -3010,8 +3032,8 @@ function sek_is_customize_previewing_a_changeset_post() {
 function sek_get_parent_theme_slug() {
     $theme_slug = get_option( 'stylesheet' );
     // $_REQUEST['theme'] is set both in live preview and when we're customizing a non active theme
-    $theme_slug = isset($_REQUEST['theme']) ? $_REQUEST['theme'] : $theme_slug; //old wp versions
-    $theme_slug = isset($_REQUEST['customize_theme']) ? $_REQUEST['customize_theme'] : $theme_slug;
+    $theme_slug = sanitize_text_field( isset($_REQUEST['theme']) ? $_REQUEST['theme'] : $theme_slug ); //old wp versions
+    $theme_slug = sanitize_text_field( isset($_REQUEST['customize_theme']) ? $_REQUEST['customize_theme'] : $theme_slug );
 
     //gets the theme name (or parent if child)
     $theme_data = wp_get_theme( $theme_slug );
@@ -3914,7 +3936,7 @@ function sek_add_customize_link() {
         if ( is_customize_preview() && $wp_customize->changeset_post_id() && !current_user_can( get_post_type_object( 'customize_changeset' )->cap->edit_post, $wp_customize->changeset_post_id() ) ) {
           return;
         }
-        $current_url = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $current_url = ( is_ssl() ? 'https://' : 'http://' ) . sanitize_text_field($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
         if ( is_customize_preview() && $wp_customize->changeset_uuid() ) {
             $current_url = remove_query_arg( 'customize_changeset_uuid', $current_url );
         }

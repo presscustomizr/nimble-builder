@@ -7013,7 +7013,7 @@ class Sek_Mailer {
     // inspired from wpcf7
     private function get_from_email() {
         $admin_email = get_option( 'admin_email' );
-        $sitename    = strtolower( $_SERVER['SERVER_NAME'] );
+        $sitename    = strtolower( sanitize_text_field($_SERVER['SERVER_NAME']) );
 
         if ( in_array( $sitename, array( 'localhost', '127.0.0.1' ) ) ) {
             return $admin_email;
