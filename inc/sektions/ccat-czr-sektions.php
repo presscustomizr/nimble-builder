@@ -3675,8 +3675,8 @@ final class _NIMBLE_Editors {
     ob_start();
     ?>
     nimbleTinyMCEPreInit = {
-      baseURL: "<?php echo esc_attr($baseurl); ?>",
-      suffix: "<?php echo esc_url($suffix); ?>",
+      baseURL: "<?php echo esc_url($baseurl); ?>",
+      suffix: "<?php echo esc_attr($suffix); ?>",
       <?php
 
       if ( self::$drag_drop_upload ) {
