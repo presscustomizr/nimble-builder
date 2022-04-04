@@ -308,7 +308,7 @@ final class _NIMBLE_Editors {
       $content = preg_replace( '%</textarea%i', '&lt;/textarea', $content );
     }
 
-    printf( $the_editor, $content );
+    echo wp_kses_post(sprintf( $the_editor, $content ));
     echo "\n</div>\n\n";
 
     self::$editor_markup = ob_get_clean();

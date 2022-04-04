@@ -244,7 +244,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 ?>
                       nb_.listenTo( 'nb-jquery-loaded', function() {
                             jQuery( function($) {
-                                var $elToFocusOn = $('div[data-sek-id="<?php echo $module_id; ?>"]' );
+                                var $elToFocusOn = $('div[data-sek-id="<?php echo esc_attr($module_id); ?>"]' );
                                 if ( $elToFocusOn.length > 0 ) {
                                       var _do = function() {
                                           $('html, body').animate({

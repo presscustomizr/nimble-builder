@@ -54,24 +54,24 @@ if ( !class_exists( 'CZR_Fmk_Base_Construct' ) ) :
             if ( !defined( 'NIMBLE_FMK_BASE_VERSION' ) ) { define( 'NIMBLE_FMK_BASE_VERSION' , isset( $params['version'] ) ? $params['version'] : '1.0.0' ); }
 
             // Cache the css attr used in the tmpl builder and in the localized params
-            $this -> czr_css_attr = $this -> czr_fmk_get_customizer_controls_css_attr();
+            $this->czr_css_attr = $this->czr_fmk_get_customizer_controls_css_attr();
 
             // Cache the default dynamic params
-            $this -> default_dynamic_setting_params = $this -> czr_fmk_get_default_dynamic_setting_params();
-            $this -> default_dynamic_module_params = $this -> czr_fmk_get_default_dynamic_module_params();
+            $this->default_dynamic_setting_params = $this->czr_fmk_get_default_dynamic_setting_params();
+            $this->default_dynamic_module_params = $this->czr_fmk_get_default_dynamic_module_params();
 
             // Enqueue the fmk control js + a module tmpl
-            $this -> czr_enqueue_fmk_resources();
+            $this->czr_enqueue_fmk_resources();
 
             // ajax filters + template generator
-            $this -> czr_setup_ajax_tmpl();
+            $this->czr_setup_ajax_tmpl();
 
             // Dynamic Module Registration
-            $this -> czr_setup_dynamic_settings_registration();
-            $this -> czr_setup_dynamic_modules_registration();
+            $this->czr_setup_dynamic_settings_registration();
+            $this->czr_setup_dynamic_modules_registration();
 
             // Content picker
-            $this -> czr_setup_content_picker_ajax_actions();
+            $this->czr_setup_content_picker_ajax_actions();
         }//__construct
 
 
@@ -127,7 +127,7 @@ if ( !class_exists( 'CZR_Fmk_Base_Construct' ) ) :
 
         // Copy of czr_fn_get_controls_css_attr() and the equivalent in Hueman Pro
         public function czr_fmk_get_customizer_controls_css_attr() {
-          return apply_filters('czr_fmk_controls_css_attr',
+          $css_attr = apply_filters('czr_fmk_controls_css_attr',
             array(
               'multi_input_wrapper' => 'czr-multi-input-wrapper',
               'sub_set_wrapper'     => 'czr-sub-set',
@@ -164,6 +164,13 @@ if ( !class_exists( 'CZR_Fmk_Base_Construct' ) ) :
               'pre_add_success'   => 'czr-add-success'
             )
           );
+          $css_attr_secured = [];
+          if ( is_array($css_attr) ) {
+            foreach ($css_attr as $key => $class) {
+                $css_attr_secured[$key] = esc_attr($class);
+            }
+          }
+          return is_array($css_attr_secured) ? $css_attr_secured : [];
         }
 }//class
 endif;

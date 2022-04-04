@@ -555,7 +555,7 @@ function sek_print_nimble_input_templates() {
                   'is_pro' : false
                 },
                 modData = jQuery.extend( defaultModParams, modData );
-                var _assets_version = "<?php echo NIMBLE_ASSETS_VERSION; ?>";
+                var _assets_version = "<?php echo esc_attr(NIMBLE_ASSETS_VERSION); ?>";
                 if ( !_.isEmpty( modData['icon'] ) ) {
                     if ( 'http' === modData['icon'].substring(0, 4) ) {
                       icon_img_src = modData['icon'];

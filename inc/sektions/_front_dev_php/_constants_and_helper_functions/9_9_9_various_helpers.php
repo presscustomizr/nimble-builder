@@ -23,18 +23,6 @@ function sek_get_seks_setting_id( $skope_id = '' ) {
 }
 
 
-
-// @return void()
-/*function sek_get_module_placeholder( $placeholder_icon = 'short_text' ) {
-  $placeholder_icon = empty( $placeholder_icon ) ? 'not_interested' : $placeholder_icon;
-  ?>
-    <div class="sek-module-placeholder">
-      <i class="material-icons"><?php echo $placeholder_icon; ?></i>
-    </div>
-  <?php
-}*/
-
-
 /* ------------------------------------------------------------------------- *
  *  HELPER FOR CHECKBOX OPTIONS
 /* ------------------------------------------------------------------------- */

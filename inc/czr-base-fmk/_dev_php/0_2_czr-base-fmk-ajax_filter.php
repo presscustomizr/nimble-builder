@@ -94,11 +94,11 @@ if ( !class_exists( 'CZR_Fmk_Base_Ajax_Filter' ) ) :
         // 2) the module meta options, or mod-opt
         // 3) the item input options
         function ac_get_all_modules_tmpl( $html, $requested_tmpl = '', $posted_params = array() ) {
-            $css_attr = $this -> czr_css_attr;
+            $css_attr = $this->czr_css_attr;
             if ( empty( $requested_tmpl ) ) {
                 wp_send_json_error( 'ac_get_all_modules_tmpl => the requested tmpl is empty' );
             }
-
+            // all css attributes $css_attr are secured in ::czr_fmk_get_customizer_controls_css_attr()
             ob_start();
             switch ( $requested_tmpl ) {
                 case 'crud-module-part' :

@@ -400,7 +400,7 @@ window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isAr
                 nb_.preloadOrDeferAsset( {
                   id : 'nb-main-js',
                   as : 'script',
-                  href : "<?php echo $script_url; ?>",
+                  href : "<?php echo esc_url($script_url); ?>",
                   scriptEl : document.getElementById('<?php echo "nb-load-main-script"; ?>')
                 });
             });
@@ -412,12 +412,12 @@ window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isAr
             foreach ($partial_front_scripts as $name => $event) {
                 $url = sprintf('%1$s/assets/front/js/partials/%2$s.%3$s?v=%4$s', NIMBLE_BASE_URL, $name, sek_is_dev_mode() ? 'js' : 'min.js', NIMBLE_ASSETS_VERSION);
                 ?>
-                nb_.listenTo('<?php echo $event; ?>', function() {
+                nb_.listenTo('<?php echo esc_attr($event); ?>', function() {
                     nb_.preloadOrDeferAsset( {
-                      id : "<?php echo $name; ?>",
+                      id : "<?php echo esc_attr($name); ?>",
                       as : 'script',
-                      href : "<?php echo $url; ?>",
-                      scriptEl : document.getElementById('<?php echo "nb-load-script-{$name}"; ?>')
+                      href : "<?php echo esc_url($url); ?>",
+                      scriptEl : document.getElementById('<?php echo esc_attr("nb-load-script-{$name}"); ?>')
                     });
                 });
                 <?php
@@ -470,14 +470,14 @@ window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isAr
                 nb_.preloadOrDeferAsset( {
                     id : 'nb-swipebox',
                     as : 'script',
-                    href : "<?php echo $assets_urls['nb-swipebox']; ?>",
+                    href : "<?php echo esc_url($assets_urls['nb-swipebox']); ?>",
                     onEvent : 'nb-docready',
                     // scriptEl : document.currentScript
                 });
                 nb_.preloadOrDeferAsset( {
                   id : 'nb-swipebox-style',
                   as : 'style',
-                  href : "<?php echo $assets_urls['nb-swipebox-style']; ?>",
+                  href : "<?php echo esc_url($assets_urls['nb-swipebox-style']); ?>",
                   onEvent : 'nb-docready',
                   // scriptEl : document.currentScript
                 });
@@ -487,7 +487,7 @@ window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isAr
                 nb_.preloadOrDeferAsset( {
                     id : 'nb-swiper',
                     as : 'script',
-                    href : "<?php echo $assets_urls['nb-swiper']; ?>",
+                    href : "<?php echo esc_url($assets_urls['nb-swiper']); ?>",
                     onEvent : 'nb-docready',
                     // scriptEl : document.currentScript
                 });
@@ -496,7 +496,7 @@ window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isAr
                 nb_.preloadOrDeferAsset( {
                     id : 'nb-video-bg-plugin',
                     as : 'script',
-                    href : "<?php echo $assets_urls['nb-video-bg-plugin']; ?>",
+                    href : "<?php echo esc_url($assets_urls['nb-video-bg-plugin']); ?>",
                     onEvent : 'nb-docready',
                     // scriptEl : document.currentScript
                 });
@@ -517,7 +517,7 @@ window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isAr
                     nb_.preloadOrDeferAsset( {
                       id : 'nb-font-awesome',
                       as : 'style',
-                      href : "<?php echo $fa_style_url; ?>",
+                      href : "<?php echo esc_url($fa_style_url); ?>",
                       onEvent : 'nb-docready',
                       scriptEl : document.currentScript
                     });
@@ -556,13 +556,13 @@ window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isAr
                 <?php $font_url = NIMBLE_BASE_URL .'/assets/front/fonts/webfonts/'.$name; ?>
                   nb_.listenTo('nb-needs-fa', function() {
                       nb_.preloadOrDeferAsset( {
-                        id : "<?php echo $id; ?>",
+                        id : "<?php echo esc_attr($id); ?>",
                         as : 'font',
-                        href : "<?php echo $font_url; ?>",
+                        href : "<?php echo esc_url($font_url); ?>",
                         type : 'font/woff2',
                         //onEvent : 'nb-docready',
                         //eventOnLoad : 'nb-font-awesome-preloaded',
-                        scriptEl : document.getElementById('<?php echo "nb-load-{$id}"; ?>')
+                        scriptEl : document.getElementById('<?php echo esc_attr("nb-load-{$id}"); ?>')
                       });
                   });
               <?php endforeach; ?>

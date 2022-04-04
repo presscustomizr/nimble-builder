@@ -306,7 +306,8 @@ class Sek_Dyn_CSS_Handler {
                 $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model, $this->is_global_stylesheet );
 
                 // now that the stylesheet is ready let's cache it
-                $this->css_string_to_enqueue_or_print = (string)$this->builder->get_stylesheet();
+                // Note that esc_html() cannot be used because `div &gt; span` is not interpreted properly.
+                $this->css_string_to_enqueue_or_print = (string)strip_tags($this->builder->get_stylesheet());
             }
 
             // Do we have any rules to print / enqueue ?
@@ -484,7 +485,11 @@ class Sek_Dyn_CSS_Handler {
 
             if ( !$dep || wp_style_is( $dep, 'done' ) || !wp_style_is( $dep, 'done' ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
                 // only fired when doing ajax during customization in order to return a refreshed partial stylesheet
-                printf( '<style id="sek-%1$s" media="all">%2$s</style>', $this->id, $this->css_string_to_enqueue_or_print );
+                printf( '<style id="sek-%1$s" media="all">%2$s</style>',
+                    esc_attr($this->id),
+                    // Note that esc_html() cannot be used because `div &gt; span` is not interpreted properly.
+                    strip_tags($this->css_string_to_enqueue_or_print)
+                );
             } else {
                 wp_add_inline_style( $dep , $this->css_string_to_enqueue_or_print );
             }
@@ -543,7 +548,7 @@ class Sek_Dyn_CSS_Handler {
         //actual write try and update the file_exists status
         $this->file_exists = $wp_filesystem->put_contents(
             $this->uri,
-            $this->css_string_to_enqueue_or_print,
+            $this->css_string_to_enqueue_or_print,//secured earlier with strip_tags()
             // predefined mode settings for WP files
             FS_CHMOD_FILE
         );

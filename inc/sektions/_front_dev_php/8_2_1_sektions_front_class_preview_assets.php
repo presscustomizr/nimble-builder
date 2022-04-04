@@ -184,7 +184,7 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
               <script type="text/html" id="sek-dyn-ui-tmpl-section">
                   <?php //<# console.log( 'data', data ); #> ?>
                   <div class="sek-dyn-ui-wrapper sek-section-dyn-ui">
-                    <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
+                    <div class="sek-dyn-ui-inner <?php echo esc_attr($icon_left_side_class); ?>">
                       <div class="sek-dyn-ui-icons">
 
                         <?php if ( sek_is_dev_mode() ) : ?>
@@ -250,7 +250,7 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                   ?>
                   <# var has_nested_section_class = true === data.has_nested_section ? 'sek-col-has-nested-section' : ''; #>
                   <div class="sek-dyn-ui-wrapper sek-column-dyn-ui {{has_nested_section_class}}">
-                    <div class="sek-dyn-ui-inner <?php echo $icon_right_side_class; ?>">
+                    <div class="sek-dyn-ui-inner <?php echo esc_attr($icon_right_side_class); ?>">
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move column', 'text_domain' ); ?>"></i>
                         <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>">tune</i>
@@ -282,7 +282,7 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
 
               <script type="text/html" id="sek-dyn-ui-tmpl-module">
                   <div class="sek-dyn-ui-wrapper sek-module-dyn-ui">
-                    <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
+                    <div class="sek-dyn-ui-inner <?php echo esc_attr($icon_left_side_class); ?>">
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-arrows-alt sek-move-module" title="<?php _e( 'Move module', 'text_domain' ); ?>"></i>
                         <i data-sek-click-on="edit-module" class="fas fa-pencil-alt sek-tip sek-click-on" title="<?php _e( 'Edit module content', 'text_domain' ); ?>"></i>

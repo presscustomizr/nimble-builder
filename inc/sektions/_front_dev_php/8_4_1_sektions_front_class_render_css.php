@@ -119,8 +119,8 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
         function sek_get_gfont_in_ajax( $print_candidates ) {
             if ( !empty( $print_candidates ) ) {
                 printf('<link rel="stylesheet" id="%1$s" href="%2$s">',
-                    NIMBLE_GOOGLE_FONTS_STYLESHEET_ID,
-                    "//fonts.googleapis.com/css?family={$print_candidates}&display=swap"
+                    esc_attr(NIMBLE_GOOGLE_FONTS_STYLESHEET_ID),
+                    esc_url("//fonts.googleapis.com/css?family={$print_candidates}&display=swap")
                 );
             }
         }
@@ -140,7 +140,7 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
             if ( !empty( $print_candidates ) ) {
                 ob_start();
                 ?>
-                nb_.preloadOrDeferAsset( { id : '<?php echo NIMBLE_GOOGLE_FONTS_STYLESHEET_ID; ?>', as : 'style', href : '//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>&display=swap', scriptEl : document.currentScript } );
+                nb_.preloadOrDeferAsset( { id : '<?php echo esc_attr(NIMBLE_GOOGLE_FONTS_STYLESHEET_ID); ?>', as : 'style', href : '//fonts.googleapis.com/css?family=<?php echo esc_attr($print_candidates); ?>&display=swap', scriptEl : document.currentScript } );
                 <?php
                 $script = ob_get_clean();
                 wp_register_script( 'nb_preload_gfonts', '');

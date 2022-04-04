@@ -43,7 +43,7 @@ if ( !class_exists( 'CZR_Fmk_Dyn_Module_Registration' ) ) :
             }
 
             // normalize
-            $module_params = wp_parse_args( $module_params, $this -> default_dynamic_module_params );
+            $module_params = wp_parse_args( $module_params, $this->default_dynamic_module_params );
 
             $registered = $this->registered_modules;
             $module_type_candidate = $module_params['module_type'];
@@ -116,7 +116,7 @@ if ( !class_exists( 'CZR_Fmk_Dyn_Module_Registration' ) ) :
 
             // loop on each registered modules
             foreach ( $this->registered_modules as $module_type => $params ) {
-                $params = wp_parse_args( $params, $this -> default_dynamic_module_params );
+                $params = wp_parse_args( $params, $this->default_dynamic_module_params );
                 //error_log( print_r( $params, true ) );
                 $control_js_params = $params[ 'customizer_assets' ][ 'control_js' ];
                 // Enqueue the list of registered scripts
@@ -172,7 +172,7 @@ if ( !class_exists( 'CZR_Fmk_Dyn_Module_Registration' ) ) :
               return;
 
             foreach ( $this->registered_modules as $module_type => $params ) {
-                $params = wp_parse_args( $params, $this -> default_dynamic_module_params );
+                $params = wp_parse_args( $params, $this->default_dynamic_module_params );
                 if ( !empty( $params['tmpl'] ) ) {
                     $module_type = $params['module_type'];
                     // filter declared with $html = apply_filters( "ac_set_ajax_czr_tmpl___{$module_type}", '', $tmpl, $_POST );
@@ -272,9 +272,9 @@ if ( !class_exists( 'CZR_Fmk_Dyn_Module_Registration' ) ) :
                         // print the tabs nav
                         foreach ( $tmpl_map['tabs'] as $_key => $tab ) {
                           printf( '<li data-tab-id="section-topline-%1$s" %2$s><a href="#"><span>%3$s</span></a></li>',
-                              $_key + 1,
-                              array_key_exists('attributes', $tab) ? $tab['attributes'] : '',
-                              $tab['title']
+                              esc_attr($_key + 1),
+                              esc_attr(array_key_exists('attributes', $tab) ? $tab['attributes'] : ''),
+                              esc_html($tab['title'])
                           );
                         }//foreach
                       ?>
@@ -284,8 +284,8 @@ if ( !class_exists( 'CZR_Fmk_Dyn_Module_Registration' ) ) :
                     <?php
                       foreach ( $tmpl_map['tabs'] as $_key => $tab ) {
                         printf( '<section id="section-topline-%1$s">%2$s</section>',
-                            $_key + 1,
-                            $this -> ac_generate_czr_tmpl_from_map( $tab['inputs'] )
+                            esc_attr($_key + 1),
+                            wp_kses_post($this->ac_generate_czr_tmpl_from_map( $tab['inputs'] ))
                         );
                       }//foreach
                     ?>
@@ -294,7 +294,7 @@ if ( !class_exists( 'CZR_Fmk_Dyn_Module_Registration' ) ) :
                 <?php
                 return ob_get_clean();
             } else {
-                return $this -> ac_generate_czr_tmpl_from_map( $tmpl_map );
+                return $this->ac_generate_czr_tmpl_from_map( $tmpl_map );
             }
         }
 

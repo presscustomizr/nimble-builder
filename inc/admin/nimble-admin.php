@@ -335,7 +335,7 @@ function sek_filter_post_row_actions( $actions, $post ) {
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
     if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_been_customized( $manually_built_skope_id ) ) {
         $actions['edit_with_nimble_builder'] = sprintf( '<a href="%1$s" title="%2$s">%2$s</a>',
-            sek_get_customize_url_for_post_id( $post->ID ),
+            sek_get_customize_url_for_post_id( $post->ID ),//secured output
             __( 'Edit with Nimble Builder', 'text-doma' )
         );
     }
@@ -716,13 +716,13 @@ function sek_may_be_display_update_notice() {
               __( "Thanks, you successfully upgraded", 'text_doma'),
               'Nimble Builder',
               __( "to version", 'text_doma'),
-              NIMBLE_VERSION
+              esc_attr(NIMBLE_VERSION)
           );
         ?>
         <?php
           printf( '<h4>%1$s <a class="" href="%2$s" title="%3$s" target="_blank">%3$s &raquo;</a></h4>',
               '',//__( "Let us introduce the new features we've been working on.", 'text_doma'),
-              NIMBLE_RELEASE_NOTE_URL,
+              esc_url(NIMBLE_RELEASE_NOTE_URL),
               __( "Read the detailled release notes" , 'text_doma' )
           );
         ?>
@@ -950,7 +950,7 @@ function sek_maybe_display_feedback_notice() {
     </div>
     <?php
       $_html = ob_get_clean();
-      echo apply_filters( 'sek_feedback_notice', $_html );
+      echo wp_kses_post(apply_filters( 'sek_feedback_notice', $_html ));
     ?>
     <?php
 }

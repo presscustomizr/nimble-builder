@@ -53,7 +53,7 @@ function sek_page_menu_fallback( $args = array() ) {
 
     //$menu = apply_filters( 'wp_page_menu', $menu, $args );
     if ( $args['echo'] )
-      echo $menu;
+      echo wp_kses_post($menu);
     else
       return $menu;
 }
@@ -108,7 +108,7 @@ function sek_list_pages( $args = '' ) {
     }
     $html = apply_filters( 'wp_list_pages', $output, $r );
     if ( $r['echo'] ) {
-        echo $html;
+        echo wp_kses_post($html);
     } else {
         return $html;
     }

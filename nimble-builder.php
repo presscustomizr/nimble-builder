@@ -66,8 +66,8 @@ function nimble_display_min_requirement_notice( $requires_what, $requires_what_v
     printf( '<div class="error"><p>%1$s</p></div>',
         sprintf( __( 'The <strong>%1$s</strong> plugin requires at least %2$s version %3$s.', 'text_doma' ),
             __('Nimble Builder', 'text_doma'),
-            $requires_what,
-            $requires_what_version
+            esc_attr($requires_what),
+            esc_attr($requires_what_version)
         )
     );
 }
