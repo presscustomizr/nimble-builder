@@ -415,7 +415,7 @@ function sek_sanitize_query_params_array( $params = array()) {
       } else {
         $sanitized_query_params[$prm] = sek_sanitize_query_params_array($params);
       }
-    } else if ( is_string($val) ) {
+    } else {
       $sanitized_query_params[$prm] = sanitize_text_field($val);
     }
   }
