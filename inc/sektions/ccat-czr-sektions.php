@@ -757,7 +757,7 @@ function sek_print_nimble_czr_control_js() {
               wp.customize.apiIsReady = true; //<= used in CZRSeksPrototype::initialize()
               var _script = document.createElement("script"),
                   customizePreviewTag = document.getElementById('customize-preview');
-              _script.setAttribute('src', '<?php echo $script_url; ?>'  );
+              _script.setAttribute('src', '<?php echo esc_url($script_url); ?>'  );
               _script.setAttribute('id', 'nb-control-js' );
               //_script.setAttribute('defer', 'defer');
 
@@ -838,7 +838,7 @@ function sek_print_nimble_customizer_tmpl() {
             <?php endif; ?>
           </div>
           <div class="sek-nimble-doc" data-doc-href="https://docs.presscustomizr.com/collection/334-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-customizer-topbar">
-            <div class="sek-nimble-icon"><img src="<?php echo NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION; ?>" alt="<?php _e('Nimble Builder','text_domain_to_replace'); ?>" title="<?php _e('Knowledge base', 'text_domain'); ?>"/></div>
+            <div class="sek-nimble-icon"><img src="<?php echo esc_url(NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION); ?>" alt="<?php _e('Nimble Builder','text_domain_to_replace'); ?>" title="<?php _e('Knowledge base', 'text_domain'); ?>"/></div>
             <span class="sek-pointer" title="<?php _e('Knowledge base', 'text_domain'); ?>"><?php _e('Knowledge base', 'text_domain'); ?></span>
             <button class="far fa-question-circle" type="button" title="<?php _e('Knowledge base', 'text_domain'); ?>" data-nimble-state="enabled">
               <span class="screen-reader-text"><?php _e('Knowledge base', 'text_domain'); ?></span>
@@ -1685,7 +1685,7 @@ function sek_print_nimble_input_templates() {
                   'is_pro' : false
                 },
                 modData = jQuery.extend( defaultModParams, modData );
-                var _assets_version = "<?php echo NIMBLE_ASSETS_VERSION; ?>";
+                var _assets_version = "<?php echo esc_attr(NIMBLE_ASSETS_VERSION); ?>";
                 if ( !_.isEmpty( modData['icon'] ) ) {
                     if ( 'http' === modData['icon'].substring(0, 4) ) {
                       icon_img_src = modData['icon'];
@@ -2452,7 +2452,7 @@ final class _NIMBLE_Editors {
       $content = preg_replace( '%</textarea%i', '&lt;/textarea', $content );
     }
 
-    printf( $the_editor, $content );
+    echo wp_kses_post(sprintf( $the_editor, $content ));
     echo "\n</div>\n\n";
 
     self::$editor_markup = ob_get_clean();

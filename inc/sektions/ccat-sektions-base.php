@@ -1056,7 +1056,8 @@ class Sek_Dyn_CSS_Handler {
                 $this->builder = new Sek_Dyn_CSS_Builder( $this->sek_model, $this->is_global_stylesheet );
 
                 // now that the stylesheet is ready let's cache it
-                $this->css_string_to_enqueue_or_print = (string)$this->builder->get_stylesheet();
+                // Note that esc_html() cannot be used because `div &gt; span` is not interpreted properly.
+                $this->css_string_to_enqueue_or_print = (string)strip_tags($this->builder->get_stylesheet());
             }
 
             // Do we have any rules to print / enqueue ?
@@ -1234,7 +1235,11 @@ class Sek_Dyn_CSS_Handler {
 
             if ( !$dep || wp_style_is( $dep, 'done' ) || !wp_style_is( $dep, 'done' ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
                 // only fired when doing ajax during customization in order to return a refreshed partial stylesheet
-                printf( '<style id="sek-%1$s" media="all">%2$s</style>', $this->id, $this->css_string_to_enqueue_or_print );
+                printf( '<style id="sek-%1$s" media="all">%2$s</style>',
+                    esc_attr($this->id),
+                    // Note that esc_html() cannot be used because `div &gt; span` is not interpreted properly.
+                    strip_tags($this->css_string_to_enqueue_or_print)
+                );
             } else {
                 wp_add_inline_style( $dep , $this->css_string_to_enqueue_or_print );
             }
@@ -1293,7 +1298,7 @@ class Sek_Dyn_CSS_Handler {
         //actual write try and update the file_exists status
         $this->file_exists = $wp_filesystem->put_contents(
             $this->uri,
-            $this->css_string_to_enqueue_or_print,
+            $this->css_string_to_enqueue_or_print,//secured earlier with strip_tags()
             // predefined mode settings for WP files
             FS_CHMOD_FILE
         );
@@ -3343,7 +3348,7 @@ window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isAr
                 nb_.preloadOrDeferAsset( {
                   id : 'nb-main-js',
                   as : 'script',
-                  href : "<?php echo $script_url; ?>",
+                  href : "<?php echo esc_url($script_url); ?>",
                   scriptEl : document.getElementById('<?php echo "nb-load-main-script"; ?>')
                 });
             });
@@ -3355,12 +3360,12 @@ window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isAr
             foreach ($partial_front_scripts as $name => $event) {
                 $url = sprintf('%1$s/assets/front/js/partials/%2$s.%3$s?v=%4$s', NIMBLE_BASE_URL, $name, sek_is_dev_mode() ? 'js' : 'min.js', NIMBLE_ASSETS_VERSION);
                 ?>
-                nb_.listenTo('<?php echo $event; ?>', function() {
+                nb_.listenTo('<?php echo esc_attr($event); ?>', function() {
                     nb_.preloadOrDeferAsset( {
-                      id : "<?php echo $name; ?>",
+                      id : "<?php echo esc_attr($name); ?>",
                       as : 'script',
-                      href : "<?php echo $url; ?>",
-                      scriptEl : document.getElementById('<?php echo "nb-load-script-{$name}"; ?>')
+                      href : "<?php echo esc_url($url); ?>",
+                      scriptEl : document.getElementById('<?php echo esc_attr("nb-load-script-{$name}"); ?>')
                     });
                 });
                 <?php
@@ -3413,14 +3418,14 @@ window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isAr
                 nb_.preloadOrDeferAsset( {
                     id : 'nb-swipebox',
                     as : 'script',
-                    href : "<?php echo $assets_urls['nb-swipebox']; ?>",
+                    href : "<?php echo esc_url($assets_urls['nb-swipebox']); ?>",
                     onEvent : 'nb-docready',
                     // scriptEl : document.currentScript
                 });
                 nb_.preloadOrDeferAsset( {
                   id : 'nb-swipebox-style',
                   as : 'style',
-                  href : "<?php echo $assets_urls['nb-swipebox-style']; ?>",
+                  href : "<?php echo esc_url($assets_urls['nb-swipebox-style']); ?>",
                   onEvent : 'nb-docready',
                   // scriptEl : document.currentScript
                 });
@@ -3430,7 +3435,7 @@ window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isAr
                 nb_.preloadOrDeferAsset( {
                     id : 'nb-swiper',
                     as : 'script',
-                    href : "<?php echo $assets_urls['nb-swiper']; ?>",
+                    href : "<?php echo esc_url($assets_urls['nb-swiper']); ?>",
                     onEvent : 'nb-docready',
                     // scriptEl : document.currentScript
                 });
@@ -3439,7 +3444,7 @@ window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isAr
                 nb_.preloadOrDeferAsset( {
                     id : 'nb-video-bg-plugin',
                     as : 'script',
-                    href : "<?php echo $assets_urls['nb-video-bg-plugin']; ?>",
+                    href : "<?php echo esc_url($assets_urls['nb-video-bg-plugin']); ?>",
                     onEvent : 'nb-docready',
                     // scriptEl : document.currentScript
                 });
@@ -3460,7 +3465,7 @@ window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isAr
                     nb_.preloadOrDeferAsset( {
                       id : 'nb-font-awesome',
                       as : 'style',
-                      href : "<?php echo $fa_style_url; ?>",
+                      href : "<?php echo esc_url($fa_style_url); ?>",
                       onEvent : 'nb-docready',
                       scriptEl : document.currentScript
                     });
@@ -3499,13 +3504,13 @@ window.nb_={},function(e,t){if(window.nb_={isArray:function(e){return Array.isAr
                 <?php $font_url = NIMBLE_BASE_URL .'/assets/front/fonts/webfonts/'.$name; ?>
                   nb_.listenTo('nb-needs-fa', function() {
                       nb_.preloadOrDeferAsset( {
-                        id : "<?php echo $id; ?>",
+                        id : "<?php echo esc_attr($id); ?>",
                         as : 'font',
-                        href : "<?php echo $font_url; ?>",
+                        href : "<?php echo esc_url($font_url); ?>",
                         type : 'font/woff2',
                         //onEvent : 'nb-docready',
                         //eventOnLoad : 'nb-font-awesome-preloaded',
-                        scriptEl : document.getElementById('<?php echo "nb-load-{$id}"; ?>')
+                        scriptEl : document.getElementById('<?php echo esc_attr("nb-load-{$id}"); ?>')
                       });
                   });
               <?php endforeach; ?>
@@ -3739,7 +3744,7 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
               <script type="text/html" id="sek-dyn-ui-tmpl-section">
                   <?php //<# console.log( 'data', data ); #> ?>
                   <div class="sek-dyn-ui-wrapper sek-section-dyn-ui">
-                    <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
+                    <div class="sek-dyn-ui-inner <?php echo esc_attr($icon_left_side_class); ?>">
                       <div class="sek-dyn-ui-icons">
 
                         <?php if ( sek_is_dev_mode() ) : ?>
@@ -3805,7 +3810,7 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                   ?>
                   <# var has_nested_section_class = true === data.has_nested_section ? 'sek-col-has-nested-section' : ''; #>
                   <div class="sek-dyn-ui-wrapper sek-column-dyn-ui {{has_nested_section_class}}">
-                    <div class="sek-dyn-ui-inner <?php echo $icon_right_side_class; ?>">
+                    <div class="sek-dyn-ui-inner <?php echo esc_attr($icon_right_side_class); ?>">
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move column', 'text_domain' ); ?>"></i>
                         <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>">tune</i>
@@ -3837,7 +3842,7 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
 
               <script type="text/html" id="sek-dyn-ui-tmpl-module">
                   <div class="sek-dyn-ui-wrapper sek-module-dyn-ui">
-                    <div class="sek-dyn-ui-inner <?php echo $icon_left_side_class; ?>">
+                    <div class="sek-dyn-ui-inner <?php echo esc_attr($icon_left_side_class); ?>">
                       <div class="sek-dyn-ui-icons">
                         <i class="fas fa-arrows-alt sek-move-module" title="<?php _e( 'Move module', 'text_domain' ); ?>"></i>
                         <i data-sek-click-on="edit-module" class="fas fa-pencil-alt sek-tip sek-click-on" title="<?php _e( 'Edit module content', 'text_domain' ); ?>"></i>
@@ -4147,6 +4152,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         $cached_candidate = ob_get_clean();
                         wp_cache_add( $cache_key, $cached_candidate, $cache_group );
                     }
+                    // output has been secured when rendering the template
                     echo $cached_candidate;
                 } else {
                     $this->render( $locationSettingValue, $location_id );
@@ -4322,7 +4328,17 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             $level_css_classes = apply_filters( 'nimble_level_css_classes', $level_css_classes, $model );
             $level_custom_data_attributes = apply_filters( 'nimble_level_custom_data_attributes', '', $model );
 
-            do_action('nimble_before_rendering_level', $model, $level_css_classes, $level_custom_data_attributes );
+            // secure custom data atttributes output
+            $secured_level_custom_data_attr = '';
+            if ( is_string($level_custom_data_attributes) && !empty($level_custom_data_attributes) ) {
+                $secured_level_custom_data_attr = wp_kses_post( $level_custom_data_attributes );
+            } else if ( is_array($level_custom_data_attributes) && !empty( $level_custom_data_attributes ) ) {
+                foreach( $level_custom_data_attributes as $attr_name => $attr_value ) {
+                    $secured_level_custom_data_attr .= $attr_name . '="' . $attr_value .'" ';
+                }
+            }
+
+            do_action('nimble_before_rendering_level', $model, $level_css_classes, $secured_level_custom_data_attr );
 
             switch ( $level_type ) {
                 /********************************************************
@@ -4365,10 +4381,10 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                               Nimble_Manager()->nimble_customizing_or_content_is_printed_on_this_page = true;
                               printf( '<div class="sektion-wrapper nb-loc %6$s" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s %5$s>',
                                   $id,
-                                  sprintf('data-sek-is-global-location="%1$s"', sek_is_global_location( $id ) ? 'true' : 'false'),
+                                  esc_attr(sprintf('data-sek-is-global-location="%1$s"', sek_is_global_location( $id ) ? 'true' : 'false')),
                                   $is_header_location ? 'data-sek-is-header-location="true"' : '',
                                   $is_footer_location ? 'data-sek-is-footer-location="true"' : '',
-                                  $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
+                                  $this->sek_maybe_print_preview_level_guid_html(),// secured output
                                   $location_needs_css_class_to_style_password_form ? 'sek-password-protected' : ''//<= added for #673
                               );
                             ?>
@@ -4391,7 +4407,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                                     if ( $is_header_location || $is_footer_location ) {
                                         printf('<span class="sek-header-footer-location-placeholder">%1$s %2$s</span>',
                                             sprintf( '<span class="sek-nimble-icon"><img src="%1$s"/></span>',
-                                                NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION
+                                                esc_url(NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION)
                                             ),
                                             $is_header_location ? __('Start designing the header', 'text_doma') : __('Start designing the footer', 'text_doma')
                                         );
@@ -4430,20 +4446,20 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     array_push( $section_classes, $level_css_classes );
 
                     printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s %6$s" %7$s %8$s %9$s %10$s>%11$s',
-                        $id,
+                        esc_attr($id),
                         $is_nested ? 'data-sek-is-nested="true"' : '',
                         $has_at_least_one_module ? 'sek-has-modules' : '',
-                        $this->get_level_visibility_css_class( $model ),
+                        esc_attr($this->get_level_visibility_css_class( $model )),
                         $has_bg_img ? 'sek-has-bg' : '',
-                        implode(' ', $section_classes),
+                        esc_attr(implode(' ', $section_classes)),
 
-                        is_null( $custom_anchor ) ? '' : 'id="' . ltrim( $custom_anchor , '#' ) . '"',// make sure we clean the hash if user left it
+                        is_null( $custom_anchor ) ? '' : 'id="' . ltrim( esc_attr($custom_anchor) , '#' ) . '"',// make sure we clean the hash if user left it
                         // add smartload + parallax attributes
-                        $bg_attributes,
+                        $bg_attributes,//secured in sek_maybe_add_bg_attributes()
 
-                        $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
-                        $level_custom_data_attributes,
-                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
+                        $this->sek_maybe_print_preview_level_guid_html(),//secured output
+                        $secured_level_custom_data_attr,//secured output earlier
+                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''//secured output
                     );
                     if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
                         sek_emit_js_event('nb-needs-videobg-js');
@@ -4453,7 +4469,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     }
                     ?>
 
-                          <div class="<?php echo $column_container_class; ?>">
+                          <div class="<?php echo esc_attr($column_container_class); ?>">
                             <div class="sek-row sek-sektion-inner">
                                 <?php
                                   // Set the parent model now
@@ -4518,20 +4534,20 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         $has_bg_img = true;
                     }
                     printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s %5$s" %6$s %7$s %8$s %9$s %10$s>%11$s',
-                        $id,
-                        $grid_column_class,
-                        $this->get_level_visibility_css_class( $model ),
+                        esc_attr($id),
+                        esc_attr($grid_column_class),
+                        esc_attr($this->get_level_visibility_css_class( $model )),
                         $has_bg_img ? 'sek-has-bg' : '',
-                        $level_css_classes,
+                        esc_attr($level_css_classes),
 
                         empty( $collection ) ? 'data-sek-no-modules="true"' : '',
                         // add smartload + parallax attributes
-                        $bg_attributes,
-                        is_null( $custom_anchor ) ? '' : 'id="' . ltrim( $custom_anchor , '#' ) . '"',// make sure we clean the hash if user left it
+                        $bg_attributes,//secured in sek_maybe_add_bg_attributes()
+                        is_null( $custom_anchor ) ? '' : 'id="' . ltrim( esc_attr($custom_anchor) , '#' ) . '"',// make sure we clean the hash if user left it
 
-                        $this->sek_maybe_print_preview_level_guid_html(),//<= added for #494
-                        $level_custom_data_attributes,
-                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
+                        $this->sek_maybe_print_preview_level_guid_html(),//secured output
+                        $secured_level_custom_data_attr,//secured output earlier
+                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''//secured output
                     );
                     if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
                         sek_emit_js_event('nb-needs-videobg-js');
@@ -4555,7 +4571,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                                   ?>
                                   <div class="sek-no-modules-column">
                                     <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
-                                      <i data-sek-click-on="pick-content" data-sek-content-type="<?php echo $content_type; ?>" class="material-icons sek-click-on" title="<?php echo $title; ?>">add_circle_outline</i>
+                                      <i data-sek-click-on="pick-content" data-sek-content-type="<?php echo esc_attr($content_type); ?>" class="material-icons sek-click-on" title="<?php echo esc_html($title); ?>">add_circle_outline</i>
                                       <span class="sek-injection-instructions"><?php _e('Drag and drop or double-click the content that you want to insert here.', 'text_domain_to_rep'); ?></span>
                                     </div>
                                   </div>
@@ -4600,7 +4616,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     $title_attribute = '';
                     if ( skp_is_customizing() ) {
                         $title_attribute = __('Edit module settings', 'text-domain');
-                        $title_attribute = 'title="'.$title_attribute.'"';
+                        $title_attribute = 'title="'.esc_html($title_attribute).'"';
                     }
 
                     // SETUP MODULE TEMPLATE PATH
@@ -4659,19 +4675,19 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     ];
 
                     printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s" %4$s %5$s %6$s %7$s %8$s %9$s>%10$s',
-                        $id,
-                        $module_type,
-                        implode(' ', $module_classes ),
+                        esc_attr($id),
+                        esc_attr($module_type),
+                        esc_attr(implode(' ', $module_classes )),
 
-                        $title_attribute,
+                        $title_attribute,//secured earlier
                         // add smartload + parallax attributes
-                        $bg_attributes,
+                        $bg_attributes,//secured in sek_maybe_add_bg_attributes()
                         is_null( $custom_anchor ) ? '' : 'id="' . ltrim( $custom_anchor , '#' ) . '"',// make sure we clean the hash if user left it
 
-                        $this->sek_maybe_print_preview_level_guid_html(), //<= added for #494
+                        $this->sek_maybe_print_preview_level_guid_html(), //secured output
                         $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': '',// <= added for #532
-                        $level_custom_data_attributes,
-                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''
+                        $secured_level_custom_data_attr,//secured output earlier
+                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''//secured output
                     );
                       ?>
                         <div class="sek-module-inner">
@@ -4680,7 +4696,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                                 // added for https://github.com/presscustomizr/nimble-builder/issues/688
                                 // allows us to print the structure without the potentially broken javascript content ( hard coded or generated by a shortcode )
                                 printf('<p class="sek-debug-modules">Module type : %1$s | id : %2$s</p>',
-                                    ucfirst( str_replace( array( 'czr_', '_' ), array( '', ' ' ), $module_type) ),
+                                    ucfirst( str_replace( array( 'czr_', '_' ), array( '', ' ' ), esc_attr($module_type) ) ),
                                     $id
                                 );
                             } else if ( !empty( $render_tmpl_path ) && file_exists( $render_tmpl_path ) ) {
@@ -4940,9 +4956,9 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     if ( !empty( $bg_img_url ) ) {
                         $new_attributes[] = 'data-sek-has-bg="true"';
                         if ( defined('DOING_AJAX') && DOING_AJAX ) {
-                            $new_attributes[] = sprintf('style="background-image:url(\'%1$s\');"', $bg_img_url );
+                            $new_attributes[] = sprintf('style="background-image:url(\'%1$s\');"', esc_url( $bg_img_url ));
                         } else {
-                            $new_attributes[] = sprintf( 'data-sek-src="%1$s"', $bg_img_url );
+                            $new_attributes[] = sprintf( 'data-sek-src="%1$s"', esc_url($bg_img_url) );
                             if ( sek_is_img_smartload_enabled() ) {
                                 $new_attributes[] = sprintf( 'data-sek-lazy-bg="true"' );
                             }
@@ -5000,9 +5016,9 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 $new_attributes[] = 'data-sek-bg-fixed="true"';
             } else if ( $parallax_enabled ) {
                 $new_attributes[] = sprintf('data-sek-bg-parallax="true" data-bg-width="%1$s" data-bg-height="%2$s" data-sek-parallax-force="%3$s"',
-                    $width,
-                    $height,
-                    array_key_exists('bg-parallax-force', $bg_options) ? $bg_options['bg-parallax-force'] : '40'
+                    esc_attr($width),
+                    esc_attr($height),
+                    esc_attr(array_key_exists('bg-parallax-force', $bg_options) ? $bg_options['bg-parallax-force'] : '40')
                     //!empty( $bg_options['bg-parallax-force'] ) ? $bg_options['bg-parallax-force'] : '40'
                 );
             }
@@ -5010,17 +5026,17 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             // video background insertion can only be done for sections and columns
             if ( in_array( $level_type, array( 'section', 'column') ) ) {
                 if ( !empty( $video_bg_url ) && is_string( $video_bg_url ) ) {
-                    $new_attributes[] = sprintf('data-sek-video-bg-src="%1$s"', $video_bg_url );
+                    $new_attributes[] = sprintf('data-sek-video-bg-src="%1$s"', esc_url( $video_bg_url ));
                     $new_attributes[] = sprintf('data-sek-video-bg-loop="%1$s"', $video_bg_loop ? 'true' : 'false' );
                     if ( !is_null( $video_bg_delay_before_start ) && $video_bg_delay_before_start >= 0 ) {
-                        $new_attributes[] = sprintf('data-sek-video-delay-before="%1$s"', $video_bg_delay_before_start );
+                        $new_attributes[] = sprintf('data-sek-video-delay-before="%1$s"', esc_attr($video_bg_delay_before_start ));
                     }
                     $new_attributes[] = sprintf('data-sek-video-bg-on-mobile="%1$s"', $video_bg_on_mobile ? 'true' : 'false' );
                     if ( !is_null( $video_bg_start_time ) && $video_bg_start_time >= 0 ) {
-                        $new_attributes[] = sprintf('data-sek-video-start-at="%1$s"', $video_bg_start_time );
+                        $new_attributes[] = sprintf('data-sek-video-start-at="%1$s"', esc_attr($video_bg_start_time ));
                     }
                     if ( !is_null( $video_bg_end_time ) && $video_bg_end_time >= 0 ) {
-                        $new_attributes[] = sprintf('data-sek-video-end-at="%1$s"', $video_bg_end_time );
+                        $new_attributes[] = sprintf('data-sek-video-end-at="%1$s"', esc_attr($video_bg_end_time ));
                     }
                 }
             }
@@ -5401,7 +5417,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         // introduced for https://github.com/presscustomizr/nimble-builder/issues/494
         function sek_maybe_print_preview_level_guid_html() {
               if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
-                  return sprintf( 'data-sek-preview-level-guid="%1$s"', $this->sek_get_preview_level_guid() );
+                  return sprintf( 'data-sek-preview-level-guid="%1$s"', esc_attr( $this->sek_get_preview_level_guid() ) );
               }
               return '';
         }
@@ -5709,8 +5725,8 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
         function sek_get_gfont_in_ajax( $print_candidates ) {
             if ( !empty( $print_candidates ) ) {
                 printf('<link rel="stylesheet" id="%1$s" href="%2$s">',
-                    NIMBLE_GOOGLE_FONTS_STYLESHEET_ID,
-                    "//fonts.googleapis.com/css?family={$print_candidates}&display=swap"
+                    esc_attr(NIMBLE_GOOGLE_FONTS_STYLESHEET_ID),
+                    esc_url("//fonts.googleapis.com/css?family={$print_candidates}&display=swap")
                 );
             }
         }
@@ -5730,7 +5746,7 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
             if ( !empty( $print_candidates ) ) {
                 ob_start();
                 ?>
-                nb_.preloadOrDeferAsset( { id : '<?php echo NIMBLE_GOOGLE_FONTS_STYLESHEET_ID; ?>', as : 'style', href : '//fonts.googleapis.com/css?family=<?php echo $print_candidates; ?>&display=swap', scriptEl : document.currentScript } );
+                nb_.preloadOrDeferAsset( { id : '<?php echo esc_attr(NIMBLE_GOOGLE_FONTS_STYLESHEET_ID); ?>', as : 'style', href : '//fonts.googleapis.com/css?family=<?php echo esc_attr($print_candidates); ?>&display=swap', scriptEl : document.currentScript } );
                 <?php
                 $script = ob_get_clean();
                 wp_register_script( 'nb_preload_gfonts', '');
@@ -6062,7 +6078,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 ?>
                       nb_.listenTo( 'nb-jquery-loaded', function() {
                             jQuery( function($) {
-                                var $elToFocusOn = $('div[data-sek-id="<?php echo $module_id; ?>"]' );
+                                var $elToFocusOn = $('div[data-sek-id="<?php echo esc_attr($module_id); ?>"]' );
                                 if ( $elToFocusOn.length > 0 ) {
                                       var _do = function() {
                                           $('html, body').animate({
