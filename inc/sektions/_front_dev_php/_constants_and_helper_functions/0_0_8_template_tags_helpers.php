@@ -326,7 +326,7 @@ function sek_get_the_content() {
     return sek_get_tmpl_tag_error( $tag = 'the_content', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
-      $post_id = sek_get_posted_query_param_when_customizing( 'post_id' );
+      $post_id = (int)sek_get_posted_query_param_when_customizing( 'post_id' );
       if ( is_int($post_id) ) {
           $post_object = get_post( $post_id );
           return !empty( $post_object ) ? apply_filters( 'the_content', $post_object->post_content ) : null;
@@ -398,7 +398,7 @@ function sek_get_author_id_on_front_and_when_customizing() {
 // when performing ajax action, we need the posted query params made available from the ajax params
 function sek_get_post_id_on_front_and_when_customizing() {
     if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
-        $post_id = sek_get_posted_query_param_when_customizing( 'post_id' );
+        $post_id = (int)sek_get_posted_query_param_when_customizing( 'post_id' );
     } else {
         $post_id = get_the_ID();
     }
