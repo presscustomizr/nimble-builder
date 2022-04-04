@@ -405,6 +405,24 @@ function sek_get_post_id_on_front_and_when_customizing() {
     return is_int($post_id) ? $post_id : null;
 }
 
+// recursively sanitize an array of posted ($_POST) query_params to be used when customzing
+// @param params (array)
+function sek_sanitize_query_params_array( $params = array()) {
+  foreach ($params as $prm => $val) {
+    if ( is_array($val) ) {
+      if ( empty($val) ) {
+        $sanitized_query_params[$prm] = [];
+      } else {
+        $sanitized_query_params[$prm] = sek_sanitize_query_params_array($params);
+      }
+    } else if ( is_string($val) ) {
+      $sanitized_query_params[$prm] = sanitize_text_field($val);
+    }
+  }
+  return $sanitized_query_params;
+}
+
+
 // introduced in october 2019 for https://github.com/presscustomizr/nimble-builder/issues/401
 // Possible params as of October 2019
 // @see inc/czr-skope/_dev/1_1_0_skop_customizer_preview_load_assets.php::
@@ -414,7 +432,11 @@ function sek_get_posted_query_param_when_customizing( $param ) {
   if ( isset( $_POST['czr_query_params'] ) ) {
       $query_params = json_decode( wp_unslash( $_POST['czr_query_params'] ), true );
       if ( array_key_exists( $param, $query_params ) ) {
-          return $query_params[$param];
+          if ( !is_array($query_params[$param]) ) {
+            return sanitize_text_field($query_params[$param]);
+          } else {
+            return sek_sanitize_query_params_array($query_params[$param]);
+          }
       } else {
           sek_error_log( __FUNCTION__ . ' => invalid param requested');
           return null;

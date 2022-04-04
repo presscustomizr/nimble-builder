@@ -21,7 +21,7 @@ function sek_add_customize_link() {
         if ( is_customize_preview() && $wp_customize->changeset_post_id() && !current_user_can( get_post_type_object( 'customize_changeset' )->cap->edit_post, $wp_customize->changeset_post_id() ) ) {
           return;
         }
-        $current_url = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $current_url = ( is_ssl() ? 'https://' : 'http://' ) . sanitize_text_field($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
         if ( is_customize_preview() && $wp_customize->changeset_uuid() ) {
             $current_url = remove_query_arg( 'customize_changeset_uuid', $current_url );
         }

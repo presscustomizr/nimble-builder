@@ -137,7 +137,7 @@ function sek_config_infos() {
     $return .= "\n\n" . '------------ WEBSERVER CONFIG' . "\n";
     $return .= 'PHP Version:              ' . PHP_VERSION . "\n";
     $return .= 'MySQL Version:            ' . $wpdb->db_version() . "\n";
-    $return .= 'Webserver Info:           ' . $_SERVER['SERVER_SOFTWARE'] . "\n";
+    $return .= 'Webserver Info:           ' . sanitize_text_field($_SERVER['SERVER_SOFTWARE']) . "\n";
     $return .= 'Write/Read permissions:   ' . sek_get_write_permissions_status() . "\n";
 
     // PHP configs

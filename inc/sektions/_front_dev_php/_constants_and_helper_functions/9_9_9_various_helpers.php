@@ -177,8 +177,8 @@ function sek_is_customize_previewing_a_changeset_post() {
 function sek_get_parent_theme_slug() {
     $theme_slug = get_option( 'stylesheet' );
     // $_REQUEST['theme'] is set both in live preview and when we're customizing a non active theme
-    $theme_slug = isset($_REQUEST['theme']) ? $_REQUEST['theme'] : $theme_slug; //old wp versions
-    $theme_slug = isset($_REQUEST['customize_theme']) ? $_REQUEST['customize_theme'] : $theme_slug;
+    $theme_slug = sanitize_text_field( isset($_REQUEST['theme']) ? $_REQUEST['theme'] : $theme_slug ); //old wp versions
+    $theme_slug = sanitize_text_field( isset($_REQUEST['customize_theme']) ? $_REQUEST['customize_theme'] : $theme_slug );
 
     //gets the theme name (or parent if child)
     $theme_data = wp_get_theme( $theme_slug );

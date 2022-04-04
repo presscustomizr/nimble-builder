@@ -330,7 +330,7 @@ final class _NIMBLE_Editors {
           <?php
             // the textarea id for the detached editor is 'czr-customize-content_editor'
             // this function generates the <textarea> markup
-            echo self::$editor_markup;
+            echo self::$editor_markup;//escaped earlier
           ?>
         </div>
         <?php
@@ -914,7 +914,7 @@ final class _NIMBLE_Editors {
     window.wp.editor = window.wp.editor || {};
     window.wp.editor.getDefaultSettings = function() {
       return {
-        tinymce: <?php echo $settings; ?>,
+        tinymce: <?php echo wp_kses_post($settings); ?>,
         quicktags: {
           buttons: 'strong,em,link,ul,ol,li,code'
         }
@@ -926,11 +926,10 @@ final class _NIMBLE_Editors {
     if ( $user_can_richedit ) {
       $suffix  = SCRIPT_DEBUG ? '' : '.min';
       $baseurl = self::get_baseurl();
-
       ?>
       var nimbleTinyMCEPreInit = {
-        baseURL: "<?php echo $baseurl; ?>",
-        suffix: "<?php echo $suffix; ?>",
+        baseURL: "<?php echo esc_url($baseurl); ?>",
+        suffix: "<?php echo esc_attr($suffix); ?>",
         mceInit: {},
         qtInit: {},
         load_ext: function(url,lang){var sl=tinymce.ScriptLoader;sl.markDone(url+'/langs/'+lang+'.js');sl.markDone(url+'/langs/'+lang+'_dlg.js');}
@@ -1529,21 +1528,19 @@ final class _NIMBLE_Editors {
      * @param array $mce_settings TinyMCE settings array.
      */
     do_action( 'before_wp_tiny_mce', self::$mce_settings );
-
     ob_start();
     ?>
     nimbleTinyMCEPreInit = {
-      baseURL: "<?php echo $baseurl; ?>",
-      suffix: "<?php echo $suffix; ?>",
+      baseURL: "<?php echo esc_attr($baseurl); ?>",
+      suffix: "<?php echo esc_url($suffix); ?>",
       <?php
 
       if ( self::$drag_drop_upload ) {
         echo 'dragDropUpload: true,';
       }
-
       ?>
-      mceInit: <?php echo $mceInit; ?>,
-      qtInit: <?php echo $qtInit; ?>,
+      mceInit: <?php echo wp_kses_post($mceInit); ?>,
+      qtInit: <?php echo wp_kses_post($qtInit); ?>,
       ref: <?php echo self::_parse_init( $ref ); ?>,
       load_ext: function(url,lang){var sl=tinymce.ScriptLoader;sl.markDone(url+'/langs/'+lang+'.js');sl.markDone(url+'/langs/'+lang+'_dlg.js');}
     };
