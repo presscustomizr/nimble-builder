@@ -481,7 +481,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                                   esc_attr(sprintf('data-sek-is-global-location="%1$s"', sek_is_global_location( $id ) ? 'true' : 'false')),
                                   $is_header_location ? 'data-sek-is-header-location="true"' : '',
                                   $is_footer_location ? 'data-sek-is-footer-location="true"' : '',
-                                  $this->sek_maybe_print_preview_level_guid_html(),// secured output
+                                  $this->sek_maybe_print_preview_level_guid_html(),// secured attribute output
                                   $location_needs_css_class_to_style_password_form ? 'sek-password-protected' : ''//<= added for #673
                               );
                             ?>
@@ -554,7 +554,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         // add smartload + parallax attributes
                         $bg_attributes,//secured in sek_maybe_add_bg_attributes()
 
-                        $this->sek_maybe_print_preview_level_guid_html(),//secured output
+                        $this->sek_maybe_print_preview_level_guid_html(),// secured attribute output
                         $secured_level_custom_data_attr,//secured output earlier
                         ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''//secured output
                     );
@@ -642,7 +642,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         $bg_attributes,//secured in sek_maybe_add_bg_attributes()
                         is_null( $custom_anchor ) ? '' : 'id="' . ltrim( esc_attr($custom_anchor) , '#' ) . '"',// make sure we clean the hash if user left it
 
-                        $this->sek_maybe_print_preview_level_guid_html(),//secured output
+                        $this->sek_maybe_print_preview_level_guid_html(),// secured attribute output
                         $secured_level_custom_data_attr,//secured output earlier
                         ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''//secured output
                     );
@@ -781,7 +781,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         $bg_attributes,//secured in sek_maybe_add_bg_attributes()
                         is_null( $custom_anchor ) ? '' : 'id="' . ltrim( $custom_anchor , '#' ) . '"',// make sure we clean the hash if user left it
 
-                        $this->sek_maybe_print_preview_level_guid_html(), //secured output
+                        $this->sek_maybe_print_preview_level_guid_html(), // secured attribute output
                         $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': '',// <= added for #532
                         $secured_level_custom_data_attr,//secured output earlier
                         ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''//secured output
