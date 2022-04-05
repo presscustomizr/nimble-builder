@@ -40,7 +40,7 @@ function nb_options_page() {
         <?php
         printf('<span class="sek-nimble-title-icon"><img src="%1$s" alt="Build with Nimble Builder">%2$s</span>',
             esc_url( NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION ),
-            apply_filters( 'nimble_option_title_icon_after', '' )
+            wp_kses_post( apply_filters( 'nimble_option_title_icon_after', '' ) )
         );
         echo apply_filters( 'nimble_parse_admin_text', esc_html( $page_title ) );
         ?>
@@ -51,7 +51,7 @@ function nb_options_page() {
               printf('<a class="nav-tab %1$s" href="%2$s">%3$s</a>',
                   $tab_id === nb_get_active_option_tab() ? 'nav-tab-active' : '',
                   esc_url( admin_url( NIMBLE_OPTIONS_PAGE_URL ) . '&tab=' . $tab_id ),
-                  $tab_data['title']
+                  esc_html($tab_data['title'])
               );
             }
           ?>
