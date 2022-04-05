@@ -1024,14 +1024,15 @@ function sek_print_nimble_customizer_tmpl() {
     <?php
 }
 
-add_action( 'customize_controls_print_scripts', '\Nimble\sek_print_detached_editor' );
-function sek_print_detached_editor() {
+// The idea here is to print the markup in customize_controls_print_footer_scripts hook and print the js in customize_controls_print_scripts
+// printing inline scripts @customize_controls_print_scripts is mandatory to be able to use wp_add_inline_script(). see https://github.com/presscustomizr/nimble-builder/issues/887
+add_action( 'customize_controls_print_scripts', function() {
   ?>
   <?php // Detached WP Editor => added when coding https://github.com/presscustomizr/nimble-builder/issues/403 ?>
   <?php
     // the textarea id for the detached editor is 'czr-customize-content_editor'
     // this function generates the <textarea> markup
-    sek_setup_nimble_editor( '', NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID , array(
+    sek_setup_nimble_editor_js( '', NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID , array(
         '_content_editor_dfw' => false,
         'drag_drop_upload' => true,
         'tabfocus_elements' => 'content-html,save-post',
@@ -1044,8 +1045,30 @@ function sek_print_detached_editor() {
             'wpautop' => true
         ),
     ) );
-}
+});
 
+// The idea here is to print the markup in customize_controls_print_footer_scripts hook and print the js in customize_controls_print_scripts
+// printing inline scripts @customize_controls_print_scripts is mandatory to be able to use wp_add_inline_script(). see https://github.com/presscustomizr/nimble-builder/issues/887
+add_action( 'customize_controls_print_footer_scripts', function() {
+  ?>
+  <?php // Detached WP Editor => added when coding https://github.com/presscustomizr/nimble-builder/issues/403 ?>
+  <?php
+    // the textarea id for the detached editor is 'czr-customize-content_editor'
+    // this function generates the <textarea> markup
+    sek_setup_nimble_editor_html( '', NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID , array(
+        '_content_editor_dfw' => false,
+        'drag_drop_upload' => true,
+        'tabfocus_elements' => 'content-html,save-post',
+        'editor_height' => 235,
+        'default_editor' => 'tinymce',
+        'tinymce' => array(
+            'resize' => false,
+            'wp_autoresize_on' => false,
+            'add_unload_trigger' => false,
+            'wpautop' => true
+        ),
+    ) );
+}, PHP_INT_MAX);
 
 // Introduced for https://github.com/presscustomizr/nimble-builder/issues/395
 function sek_has_active_cache_plugin() {
@@ -2143,10 +2166,15 @@ if ( !class_exists( 'SEK_CZR_Dyn_Register' ) ) :
 endif;
 
 ?><?php
-function sek_setup_nimble_editor( $content, $editor_id, $settings = array() ) {
-  _NIMBLE_Editors::nimble_editor( $content, $editor_id, $settings );
+// The idea here is to print the markup in customize_controls_print_footer_scripts hook and print the js in customize_controls_print_scripts
+// printing inline scripts @customize_controls_print_scripts is mandatory to be able to use wp_add_inline_script(). see https://github.com/presscustomizr/nimble-builder/issues/887
+function sek_setup_nimble_editor_js( $content, $editor_id, $settings = array() ) {
+  _NIMBLE_Editors::nimble_editor_js( $content, $editor_id, $settings );
 }
 
+function sek_setup_nimble_editor_html( $content, $editor_id, $settings = array() ) {
+  _NIMBLE_Editors::render_nimble_editor( $content, $editor_id, $settings );
+}
 
 
 
@@ -2299,28 +2327,38 @@ final class _NIMBLE_Editors {
   }
 
   /**
-   * Outputs the HTML for a single instance of the editor.
+   * Outputs the JS for a single instance of the editor.
    *
    * @param string $content The initial content of the editor.
    * @param string $editor_id ID for the textarea and TinyMCE and Quicktags instances (can contain only ASCII letters and numbers).
    * @param array $settings See _NIMBLE_Editors::parse_settings() for description.
    */
-  public static function nimble_editor( $content, $editor_id, $settings = array() ) {
+  public static function nimble_editor_js( $content, $editor_id, $settings = array() ) {
     $set            = self::parse_settings( $editor_id, $settings );
-    $editor_class   = ' class="' . trim( esc_attr( $set['editor_class'] ) . ' wp-editor-area' ) . '"';
-    $tabindex       = $set['tabindex'] ? ' tabindex="' . (int) $set['tabindex'] . '"' : '';
+
+    if ( !current_user_can( 'upload_files' ) ) {
+      $set['media_buttons'] = false;
+    }
+    self::editor_settings( $editor_id, $set );
+  }
+
+
+/**
+   * Outputs the HTML for a single instance of the editor.
+   * 
+   *
+   * @param string $content The initial content of the editor.
+   * @param string $editor_id ID for the textarea and TinyMCE and Quicktags instances (can contain only ASCII letters and numbers).
+   * @param array $settings See _NIMBLE_Editors::parse_settings() for description.
+   */
+  public static function render_nimble_editor( $content, $editor_id, $settings = array() ) {
+    $set            = self::parse_settings( $editor_id, $settings );
     $default_editor = 'html';
     $buttons        = $autocomplete = '';
     $editor_id_attr = esc_attr( $editor_id );
 
     if ( $set['drag_drop_upload'] ) {
       self::$drag_drop_upload = true;
-    }
-
-    if ( !empty( $set['editor_height'] ) ) {
-      $height = ' style="height: ' . (int) $set['editor_height'] . 'px"';
-    } else {
-      $height = ' rows="' . (int) $set['textarea_rows'] . '"';
     }
 
     if ( !current_user_can( 'upload_files' ) ) {
@@ -2353,133 +2391,145 @@ final class _NIMBLE_Editors {
       $wrap_class .= ' has-dfw';
     }
 
-    ob_start();
-    echo '<div id="wp-' . $editor_id_attr . '-wrap" class="' . $wrap_class . '">';
-    if ( self::$editor_buttons_css ) {
-      wp_print_styles( 'editor-buttons' );
-      self::$editor_buttons_css = false;
-    }
+    // Detached WP Editor => added when coding https://github.com/presscustomizr/nimble-builder/issues/403
+    echo '<div id="czr-customize-content_editor-pane">';
+    printf('<div data-czr-action="close-tinymce-editor" class="czr-close-editor"><i class="fas fa-arrow-circle-down" title="%1$s"></i>&nbsp;<span>%2$s</span></div>', __( 'Hide Editor', 'text_doma' ), __( 'Hide Editor', 'text_doma'));
+      printf('<div id="czr-customize-content_editor-dragbar" title="%1$s">', __('Resize the editor', 'text_domain'));
+        printf('<span class="screen-reader-text">%1$s</span>', __( 'Resize the editor', 'nimble-builder' ));
+        echo '<i class="czr-resize-handle fas fa-arrows-alt-v"></i>';
+      echo '</div>';
 
-    if ( !empty( $set['editor_css'] ) ) {
-      echo $set['editor_css'] . "\n";
-    }
+      echo '<div id="wp-' . esc_attr($editor_id_attr) . '-wrap" class="' . esc_attr($wrap_class) . '">';
+      if ( self::$editor_buttons_css ) {
+        wp_print_styles( 'editor-buttons' );
+        self::$editor_buttons_css = false;
+      }
 
-    if ( !empty( $buttons ) || $set['media_buttons'] ) {
-      echo '<div id="wp-' . $editor_id_attr . '-editor-tools" class="wp-editor-tools hide-if-no-js">';
+      if ( !empty( $set['editor_css'] ) ) {
+        echo wp_kses_post($set['editor_css']) . "\n";
+      }
 
-      if ( $set['media_buttons'] ) {
-        self::$has_medialib = true;
+      if ( !empty( $buttons ) || $set['media_buttons'] ) {
+        echo '<div id="wp-' . esc_attr($editor_id_attr) . '-editor-tools" class="wp-editor-tools hide-if-no-js">';
 
-        if ( !function_exists( 'media_buttons' ) ) {
-          include( ABSPATH . 'wp-admin/includes/media.php' );
+        if ( $set['media_buttons'] ) {
+          self::$has_medialib = true;
+
+          if ( !function_exists( 'media_buttons' ) ) {
+            include( ABSPATH . 'wp-admin/includes/media.php' );
+          }
+
+          echo '<div id="wp-' . esc_attr($editor_id_attr) . '-media-buttons" class="wp-media-buttons">';
+
+          /**
+           * Fires after the default media button(s) are displayed.
+           *
+           * @since 2.5.0
+           *
+           * @param string $editor_id Unique editor identifier, e.g. 'content'.
+           */
+          do_action( 'media_buttons', $editor_id );
+          echo "</div>\n";
         }
 
-        echo '<div id="wp-' . $editor_id_attr . '-media-buttons" class="wp-media-buttons">';
-
-        /**
-         * Fires after the default media button(s) are displayed.
-         *
-         * @since 2.5.0
-         *
-         * @param string $editor_id Unique editor identifier, e.g. 'content'.
-         */
-        do_action( 'media_buttons', $editor_id );
+        echo '<div class="wp-editor-tabs">' . wp_kses_post($buttons) . "</div>\n";
         echo "</div>\n";
       }
 
-      echo '<div class="wp-editor-tabs">' . $buttons . "</div>\n";
-      echo "</div>\n";
-    }
+      $quicktags_toolbar = '';
 
-    $quicktags_toolbar = '';
+      if ( self::$this_quicktags ) {
+        if ( 'content' === $editor_id && !empty( $GLOBALS['current_screen'] ) && $GLOBALS['current_screen']->base === 'post' ) {
+          $toolbar_id = 'ed_toolbar';
+        } else {
+          $toolbar_id = 'qt_' . esc_attr($editor_id_attr) . '_toolbar';
+        }
 
-    if ( self::$this_quicktags ) {
-      if ( 'content' === $editor_id && !empty( $GLOBALS['current_screen'] ) && $GLOBALS['current_screen']->base === 'post' ) {
-        $toolbar_id = 'ed_toolbar';
-      } else {
-        $toolbar_id = 'qt_' . $editor_id_attr . '_toolbar';
+        $quicktags_toolbar = '<div id="' . esc_attr($toolbar_id) . '" class="quicktags-toolbar"></div>';
       }
 
-      $quicktags_toolbar = '<div id="' . $toolbar_id . '" class="quicktags-toolbar"></div>';
-    }
+      /**
+       * Filters the HTML markup output that displays the editor.
+       *
+       * @since 2.1.0
+       *
+       * @param string $output Editor's HTML markup.
+       */
+      $the_editor = apply_filters(
+        'the_nimble_editor',
+        '<div id="wp-' . esc_attr($editor_id_attr) . '-editor-container" class="wp-editor-container">' .
+        $quicktags_toolbar .
+        sprintf('<textarea' . ' class="%1$s" %2$s %3$s %4$s cols="40" name="%5$s" ' .
+        'id="' . esc_attr($editor_id_attr) . '">',
+          trim( esc_attr( $set['editor_class'] ) . ' wp-editor-area' ),
+          !empty( $set['editor_height'] ) ? 'style="height: ' . esc_attr((int) $set['editor_height']) . 'px"' : 'rows="' . esc_attr((int) $set['textarea_rows']) . '"',
+          $set['tabindex'] ? ' tabindex="' . esc_attr((int) $set['tabindex']) . '"' : '',
+          self::$this_tinymce ? 'autocomplete="off"' : '',
+          esc_attr( $set['textarea_name'] )
+        ) . '%s</textarea></div>'
+      );
 
-    /**
-     * Filters the HTML markup output that displays the editor.
-     *
-     * @since 2.1.0
-     *
-     * @param string $output Editor's HTML markup.
-     */
-    $the_editor = apply_filters(
-      'the_nimble_editor',
-      '<div id="wp-' . $editor_id_attr . '-editor-container" class="wp-editor-container">' .
-      $quicktags_toolbar .
-      '<textarea' . $editor_class . $height . $tabindex . $autocomplete . ' cols="40" name="' . esc_attr( $set['textarea_name'] ) . '" ' .
-      'id="' . $editor_id_attr . '">%s</textarea></div>'
-    );
+      // if ( self::$this_tinymce ) {
+      //   $autocomplete = ' autocomplete="off"';
 
-    // Prepare the content for the Visual or Text editor, only when TinyMCE is used (back-compat).
-    if ( self::$this_tinymce ) {
-      add_filter( 'the_nimble_editor_content', 'format_for_editor', 10, 2 );
-    }
+      // $the_editor = apply_filters(
+      //   'the_nimble_editor',
+      //   '<div id="wp-' . esc_attr($editor_id_attr) . '-editor-container" class="wp-editor-container">' .
+      //   $quicktags_toolbar .
+      //   '<textarea' . $editor_class . $height . $tabindex . $autocomplete . ' cols="40" name="' . esc_attr( $set['textarea_name'] ) . '" ' .
+      //   'id="' . esc_attr($editor_id_attr) . '">%s</textarea></div>'
+      // );
 
-    /**
-     * Filters the default editor content.
-     *
-     * @since 2.1.0
-     *
-     * @param string $content        Default editor content.
-     * @param string $default_editor The default editor for the current user.
-     *                               Either 'html' or 'tinymce'.
-     */
-    $content = apply_filters( 'the_nimble_editor_content', $content, $default_editor );
+      // if ( !empty( $set['editor_height'] ) ) {
+      //   $height = ' style="height: ' . (int) $set['editor_height'] . 'px"';
+      // } else {
+      //   $height = ' rows="' . (int) $set['textarea_rows'] . '"';
+      // }
 
-    // Remove the filter as the next editor on the same page may not need it.
-    if ( self::$this_tinymce ) {
-      remove_filter( 'the_editor_content', 'format_for_editor' );
-    }
 
-    // Back-compat for the `htmledit_pre` and `richedit_pre` filters
-    if ( 'html' === $default_editor && has_filter( 'htmledit_pre' ) ) {
-      /** This filter is documented in wp-includes/deprecated.php */
-      $content = apply_filters_deprecated( 'htmledit_pre', array( $content ), '4.3.0', 'format_for_editor' );
-    } elseif ( 'tinymce' === $default_editor && has_filter( 'richedit_pre' ) ) {
-      /** This filter is documented in wp-includes/deprecated.php */
-      $content = apply_filters_deprecated( 'richedit_pre', array( $content ), '4.3.0', 'format_for_editor' );
-    }
+      // Prepare the content for the Visual or Text editor, only when TinyMCE is used (back-compat).
+      if ( self::$this_tinymce ) {
+        add_filter( 'the_nimble_editor_content', 'format_for_editor', 10, 2 );
+      }
 
-    if ( false !== stripos( $content, 'textarea' ) ) {
-      $content = preg_replace( '%</textarea%i', '&lt;/textarea', $content );
-    }
+      /**
+       * Filters the default editor content.
+       *
+       * @since 2.1.0
+       *
+       * @param string $content        Default editor content.
+       * @param string $default_editor The default editor for the current user.
+       *                               Either 'html' or 'tinymce'.
+       */
+      $content = apply_filters( 'the_nimble_editor_content', $content, $default_editor );
 
-    echo wp_kses_post(sprintf( $the_editor, $content ));
-    echo "\n</div>\n\n";
+      // Remove the filter as the next editor on the same page may not need it.
+      if ( self::$this_tinymce ) {
+        remove_filter( 'the_editor_content', 'format_for_editor' );
+      }
 
-    self::$editor_markup = ob_get_clean();
+      // Back-compat for the `htmledit_pre` and `richedit_pre` filters
+      if ( 'html' === $default_editor && has_filter( 'htmledit_pre' ) ) {
+        /** This filter is documented in wp-includes/deprecated.php */
+        $content = apply_filters_deprecated( 'htmledit_pre', array( $content ), '4.3.0', 'format_for_editor' );
+      } elseif ( 'tinymce' === $default_editor && has_filter( 'richedit_pre' ) ) {
+        /** This filter is documented in wp-includes/deprecated.php */
+        $content = apply_filters_deprecated( 'richedit_pre', array( $content ), '4.3.0', 'format_for_editor' );
+      }
 
-    self::editor_settings( $editor_id, $set );
+      if ( false !== stripos( $content, 'textarea' ) ) {
+        $content = preg_replace( '%</textarea%i', '&lt;/textarea', $content );
+      }
 
-    // The idea here is to print the markup in customize_controls_print_footer_scripts hook and print the js in customize_controls_print_scripts
-    // printing inline scripts @customize_controls_print_scripts is mandatory to be able to use wp_add_inline_script(). see https://github.com/presscustomizr/nimble-builder/issues/887
-    add_action('customize_controls_print_footer_scripts', function() {
-      ?>
-      <?php // Detached WP Editor => added when coding https://github.com/presscustomizr/nimble-builder/issues/403 ?>
-        <div id="czr-customize-content_editor-pane">
-          <div data-czr-action="close-tinymce-editor" class="czr-close-editor"><i class="fas fa-arrow-circle-down" title="<?php _e( 'Hide Editor', 'text_doma' ); ?>"></i>&nbsp;<span><?php _e( 'Hide Editor', 'text_doma');?></span></div>
-          <div id="czr-customize-content_editor-dragbar" title="<?php _e('Resize the editor', 'text_domain'); ?>">
-            <span class="screen-reader-text"><?php _e( 'Resize the editor', 'nimble-builder' ); ?></span>
-            <i class="czr-resize-handle fas fa-arrows-alt-v"></i>
-          </div>
-          <!-- <textarea style="height:250px;width:100%" id="czr-customize-content_editor"></textarea> -->
-          <?php
-            // the textarea id for the detached editor is 'czr-customize-content_editor'
-            // this function generates the <textarea> markup
-            echo self::$editor_markup;//escaped earlier
-          ?>
-        </div>
-        <?php
-    }, PHP_INT_MAX);
+      echo wp_kses_post(sprintf( $the_editor, $content ));
+    echo "\n</div></div>\n\n";
   }
+
+
+
+
+
+
 
   /**
    * @global string $tinymce_version
@@ -3685,7 +3735,7 @@ final class _NIMBLE_Editors {
       ?>
       mceInit: <?php echo wp_kses_post($mceInit); ?>,
       qtInit: <?php echo wp_kses_post($qtInit); ?>,
-      ref: <?php echo self::_parse_init( $ref ); ?>,
+      ref: <?php echo wp_kses_post(self::_parse_init( $ref )); ?>,
       load_ext: function(url,lang){var sl=tinymce.ScriptLoader;sl.markDone(url+'/langs/'+lang+'.js');sl.markDone(url+'/langs/'+lang+'_dlg.js');}
     };
     <?php
@@ -3721,7 +3771,7 @@ final class _NIMBLE_Editors {
     <?php
 
     if ( self::$ext_plugins ) {
-      echo self::$ext_plugins . "\n";
+      echo wp_kses_post(self::$ext_plugins) . "\n";
     }
 
     if ( !is_admin() ) {
@@ -3958,6 +4008,7 @@ final class _NIMBLE_Editors {
     <?php
   }
 }
+
 ?><?php
 ////////////////////////////////////////////////////////////////
 // GENERIC HELPER FIRED IN ALL AJAX CALLBACKS
