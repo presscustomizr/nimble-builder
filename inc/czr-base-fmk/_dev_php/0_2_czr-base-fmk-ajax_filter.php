@@ -98,31 +98,30 @@ if ( !class_exists( 'CZR_Fmk_Base_Ajax_Filter' ) ) :
             if ( empty( $requested_tmpl ) ) {
                 wp_send_json_error( 'ac_get_all_modules_tmpl => the requested tmpl is empty' );
             }
-            // all css attributes $css_attr are secured in ::czr_fmk_get_customizer_controls_css_attr()
             ob_start();
             switch ( $requested_tmpl ) {
                 case 'crud-module-part' :
                     ?>
-                      <button class="<?php echo $css_attr['open_pre_add_btn']; ?>"><?php _e('Add New', 'text_doma'); ?> <span class="fas fa-plus-square"></span></button>
-                      <div class="<?php echo $css_attr['pre_add_wrapper']; ?>">
-                        <div class="<?php echo $css_attr['pre_add_success']; ?>"><p></p></div>
-                        <div class="<?php echo $css_attr['pre_add_item_content']; ?>">
+                      <button class="<?php echo esc_attr($css_attr['open_pre_add_btn']); ?>"><?php _e('Add New', 'text_doma'); ?> <span class="fas fa-plus-square"></span></button>
+                      <div class="<?php echo esc_attr($css_attr['pre_add_wrapper']); ?>">
+                        <div class="<?php echo esc_attr($css_attr['pre_add_success']); ?>"><p></p></div>
+                        <div class="<?php echo esc_attr($css_attr['pre_add_item_content']); ?>">
 
-                          <span class="<?php echo $css_attr['cancel_pre_add_btn']; ?> button"><?php _e('Cancel', 'text_doma'); ?></span> <span class="<?php echo $css_attr['add_new_btn']; ?> button"><?php _e('Add it', 'text_doma'); ?></span>
+                          <span class="<?php echo esc_attr($css_attr['cancel_pre_add_btn']); ?> button"><?php _e('Cancel', 'text_doma'); ?></span> <span class="<?php echo esc_attr($css_attr['add_new_btn']); ?> button"><?php _e('Add it', 'text_doma'); ?></span>
                         </div>
                       </div>
                     <?php
                 break;
                 case 'rud-item-part' :
                     ?>
-                      <div class="<?php echo $css_attr['item_header']; ?> czr-custom-model">
+                      <div class="<?php echo esc_attr($css_attr['item_header']); ?> czr-custom-model">
                         <# if ( ( true === data.is_sortable ) ) { #>
-                          <div class="<?php echo $css_attr['item_title']; ?> <?php echo $css_attr['item_sort_handle']; ?>"><h4>{{ data.title }}</h4></div>
+                          <div class="<?php echo esc_attr($css_attr['item_title']); ?> <?php echo esc_attr($css_attr['item_sort_handle']); ?>"><h4>{{ data.title }}</h4></div>
                         <# } else { #>
-                          <div class="<?php echo $css_attr['item_title']; ?>"><h4>{{ data.title }}</h4></div>
+                          <div class="<?php echo esc_attr($css_attr['item_title']); ?>"><h4>{{ data.title }}</h4></div>
                         <# } #>
-                        <div class="<?php echo $css_attr['item_btns']; ?>"><a title="<?php _e('Edit', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-pencil-alt <?php echo $css_attr['edit_view_btn']; ?>"></a>&nbsp;<a title="<?php _e('Remove', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-trash <?php echo $css_attr['display_alert_btn']; ?>"></a></div>
-                        <div class="<?php echo $css_attr['remove_alert_wrapper']; ?>"></div>
+                        <div class="<?php echo esc_attr($css_attr['item_btns']); ?>"><a title="<?php _e('Edit', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-pencil-alt <?php echo esc_attr($css_attr['edit_view_btn']); ?>"></a>&nbsp;<a title="<?php _e('Remove', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-trash <?php echo esc_attr($css_attr['display_alert_btn']); ?>"></a></div>
+                        <div class="<?php echo esc_attr($css_attr['remove_alert_wrapper']); ?>"></div>
                       </div>
                     <?php
                 break;

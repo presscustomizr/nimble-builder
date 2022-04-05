@@ -127,7 +127,7 @@ if ( !class_exists( 'CZR_Fmk_Base_Construct' ) ) :
 
         // Copy of czr_fn_get_controls_css_attr() and the equivalent in Hueman Pro
         public function czr_fmk_get_customizer_controls_css_attr() {
-          $css_attr = apply_filters('czr_fmk_controls_css_attr',
+          return apply_filters('czr_fmk_controls_css_attr',
             array(
               'multi_input_wrapper' => 'czr-multi-input-wrapper',
               'sub_set_wrapper'     => 'czr-sub-set',
@@ -164,13 +164,6 @@ if ( !class_exists( 'CZR_Fmk_Base_Construct' ) ) :
               'pre_add_success'   => 'czr-add-success'
             )
           );
-          $css_attr_secured = [];
-          if ( is_array($css_attr) ) {
-            foreach ($css_attr as $key => $class) {
-                $css_attr_secured[$key] = esc_attr($class);
-            }
-          }
-          return is_array($css_attr_secured) ? $css_attr_secured : [];
         }
 }//class
 endif;
