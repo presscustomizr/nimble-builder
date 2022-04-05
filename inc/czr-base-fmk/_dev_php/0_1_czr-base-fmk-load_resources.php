@@ -91,7 +91,7 @@ if ( !class_exists( 'CZR_Fmk_Base_Load_Resources' ) ) :
                 'serverControlParams',
                 apply_filters( 'czr_js_customizer_control_params' ,
                   array(
-                      'css_attr' => $this -> czr_css_attr,
+                      'css_attr' => $this->czr_css_attr,
                       'isDevMode' => ( defined('WP_DEBUG') && true === WP_DEBUG ) || ( defined('CZR_DEV') && true === CZR_DEV ),
                       'docURL'          => esc_url('docs.presscustomizr.com/'),
                       'i18n' => array(
