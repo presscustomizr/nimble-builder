@@ -1024,14 +1024,15 @@ function sek_print_nimble_customizer_tmpl() {
     <?php
 }
 
-add_action( 'customize_controls_print_scripts', '\Nimble\sek_print_detached_editor' );
-function sek_print_detached_editor() {
+// The idea here is to print the markup in customize_controls_print_footer_scripts hook and print the js in customize_controls_print_scripts
+// printing inline scripts @customize_controls_print_scripts is mandatory to be able to use wp_add_inline_script(). see https://github.com/presscustomizr/nimble-builder/issues/887
+add_action( 'customize_controls_print_scripts', function() {
   ?>
   <?php // Detached WP Editor => added when coding https://github.com/presscustomizr/nimble-builder/issues/403 ?>
   <?php
     // the textarea id for the detached editor is 'czr-customize-content_editor'
     // this function generates the <textarea> markup
-    sek_setup_nimble_editor( '', NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID , array(
+    sek_setup_nimble_editor_js( '', NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID , array(
         '_content_editor_dfw' => false,
         'drag_drop_upload' => true,
         'tabfocus_elements' => 'content-html,save-post',
@@ -1044,8 +1045,30 @@ function sek_print_detached_editor() {
             'wpautop' => true
         ),
     ) );
-}
+});
 
+// The idea here is to print the markup in customize_controls_print_footer_scripts hook and print the js in customize_controls_print_scripts
+// printing inline scripts @customize_controls_print_scripts is mandatory to be able to use wp_add_inline_script(). see https://github.com/presscustomizr/nimble-builder/issues/887
+add_action( 'customize_controls_print_footer_scripts', function() {
+  ?>
+  <?php // Detached WP Editor => added when coding https://github.com/presscustomizr/nimble-builder/issues/403 ?>
+  <?php
+    // the textarea id for the detached editor is 'czr-customize-content_editor'
+    // this function generates the <textarea> markup
+    sek_setup_nimble_editor_html( '', NIMBLE_DETACHED_TINYMCE_TEXTAREA_ID , array(
+        '_content_editor_dfw' => false,
+        'drag_drop_upload' => true,
+        'tabfocus_elements' => 'content-html,save-post',
+        'editor_height' => 235,
+        'default_editor' => 'tinymce',
+        'tinymce' => array(
+            'resize' => false,
+            'wp_autoresize_on' => false,
+            'add_unload_trigger' => false,
+            'wpautop' => true
+        ),
+    ) );
+}, PHP_INT_MAX);
 
 // Introduced for https://github.com/presscustomizr/nimble-builder/issues/395
 function sek_has_active_cache_plugin() {
