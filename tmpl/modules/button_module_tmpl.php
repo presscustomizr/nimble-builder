@@ -56,22 +56,22 @@ $icon_side = empty($content_settings['icon-side']) ? 'left' : $content_settings[
 
 if ( !isset( $content_settings['link-to'] ) || isset( $content_settings['link-to'] ) && 'no-link' === $content_settings['link-to'] )  {
     printf('<button %5$s class="sek-btn%3$s"><span class="sek-btn-inner">%1$s<span class="sek-btn-text">%2$s</span>%4$s</span></button>',
-        'left' === $icon_side ? $icon_html : '',
+        'left' === $icon_side ? $icon_html : '',// output secured in sek_get_button_module_icon()
         // allow user to use smileys in buttons
         convert_smilies( wp_kses_post($btn_text) ),
         esc_attr($visual_effect_class),
-        'right' === $icon_side ? $icon_html : '',
+        'right' === $icon_side ? $icon_html : '',// output secured in sek_get_button_module_icon()
         !empty($content_settings['btn_text_on_hover']) ? 'title="' . esc_html( $content_settings['btn_text_on_hover'] ) . '"' : ''
     );
 } else {
     printf('<a %7$s class="sek-btn%5$s" href="%1$s" %2$s><span class="sek-btn-inner">%3$s<span class="sek-btn-text">%4$s</span>%6$s</span></a>',
         sek_get_button_module_link( $content_settings ),//secured with esc_url()
         true === sek_booleanize_checkbox_val( $content_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
-        'left' === $icon_side ? $icon_html : '',
+        'left' === $icon_side ? $icon_html : '',// output secured in sek_get_button_module_icon()
         // allow user to use smileys in buttons
         convert_smilies( wp_kses_post($btn_text) ),
         esc_attr($visual_effect_class),
-        'right' === $icon_side ? $icon_html : '',
+        'right' === $icon_side ? $icon_html : '',// output secured in sek_get_button_module_icon()
         !empty($content_settings['btn_text_on_hover']) ? 'title="' . esc_html( $content_settings['btn_text_on_hover'] ) . '"' : ''
     );
 }

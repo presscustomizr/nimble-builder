@@ -27,11 +27,6 @@ if ( !function_exists( 'Nimble\sek_print_social_links' ) ) {
 
               $item = wp_parse_args( $item, $default_item );
 
-              $social_link = 'javascript:void(0)';
-              if ( isset($item['link']) && !empty( $item['link'] ) ) {
-                  $social_link = esc_url( $item['link'], $allowed_protocols );
-              }
-
               $link_attr = array();
               // target attr.
               $link_attr[] = false != $item['link_target'] ? 'target="_blank"' : '';
@@ -41,7 +36,7 @@ if ( !function_exists( 'Nimble\sek_print_social_links' ) ) {
               // Put them together
               printf( '<li data-sek-item-id="%5$s"><a title="%1$s" aria-label="%1$s" href="%2$s" %3$s>%4$s<span class="screen-reader-text">%6$s</span></a></li>',
                   esc_attr( $item['title_attr'] ),
-                  $social_link,
+                  (isset($item['link']) && !empty( $item['link'] )) ? esc_url( $item['link'], $allowed_protocols ) : 'javascript:void(0)',
                   esc_attr( implode( ' ', $link_attr ) ),
                   wp_kses_post( ( ( empty( $item['icon'] ) || !is_string( $item['icon'] ) ) && skp_is_customizing() ) ? '<i class="material-icons">pan_tool</i>' : '<i class="sek-social-icon ' . $item['icon'] .'"></i>' ),
                   esc_attr( $item['id'] ),
@@ -65,7 +60,7 @@ if ( !empty( $icons_collection ) ) {
     if ( skp_is_customizing() ) {
         printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',
             __('Click to start adding social icons.', 'text_doma'),
-            'background: url(' . NIMBLE_MODULE_ICON_PATH . 'Nimble_social_icon.svg) no-repeat 50% 75%;background-size: 150px;'
+            'background: url(' . esc_url(NIMBLE_MODULE_ICON_PATH) . 'Nimble_social_icon.svg) no-repeat 50% 75%;background-size: 150px;'
         );
     }
 }

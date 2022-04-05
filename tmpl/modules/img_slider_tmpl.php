@@ -207,16 +207,16 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
       ?>
         <?php printf('<div class="swiper sek-swiper-loading sek-swiper%1$s" data-sek-swiper-id="%1$s" data-sek-autoplay="%2$s" data-sek-autoplay-delay="%3$s" data-sek-pause-on-hover="%4$s" data-sek-loop="%5$s" data-sek-image-layout="%6$s" data-sek-navtype="%7$s" data-sek-is-multislide="%8$s" data-sek-hide-nav-on-mobile="%9$s" data-sek-lazyload="%10$s" %11$s>',
             esc_attr($model['id']),
-            $autoplay,
-            $autoplay_delay,
-            $pause_on_hover,
-            $loop_on,
+            esc_attr($autoplay),
+            esc_attr($autoplay_delay),
+            esc_attr($pause_on_hover),
+            esc_attr($loop_on),
             esc_attr($slider_options['image-layout']),
-            $nav_type,
+            esc_attr($nav_type),
             $is_multislide ? 'true' : 'false',
             $hide_nav_on_mobiles ? 'true' : 'false',
-            $lazy_load_on,
-            apply_filters('nb_slider_wrapper_custom_attributes', '', $slider_options, $model )
+            esc_attr($lazy_load_on),
+            wp_kses_post(apply_filters('nb_slider_wrapper_custom_attributes', '', $slider_options, $model ))
           ); ?>
           <?php if ( is_array( $img_collection ) && count( $img_collection ) > 0 ) : ?>
             <div class="swiper-wrapper">
@@ -286,7 +286,7 @@ if ( !empty( $img_collection ) ) {
     if ( skp_is_customizing() ) {
         printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',
             __('Click to start adding images.', 'text_doma'),
-            'background: url(' . NIMBLE_MODULE_ICON_PATH . 'Nimble_slideshow_icon.svg) no-repeat 50% 75%;background-size: 200px;'
+            'background: url(' . esc_url(NIMBLE_MODULE_ICON_PATH) . 'Nimble_slideshow_icon.svg) no-repeat 50% 75%;background-size: 200px;'
         );
     }
 }

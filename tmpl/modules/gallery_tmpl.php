@@ -54,7 +54,7 @@ if ( !function_exists( 'Nimble\sek_get_gal_img_link' ) ) {
                 if ( !empty( $opts['link-pick-url'] ) && !empty( $opts['link-pick-url']['id'] ) ) {
                     if ( '_custom_' == $opts['link-pick-url']['id']  && !empty( $opts['link-custom-url'] ) ) {
                         $custom_url = apply_filters( 'nimble_parse_template_tags', $opts['link-custom-url'] );
-                        $link = esc_url( $custom_url );
+                        $link = $custom_url;
                     } else if ( !empty( $opts['link-pick-url']['url'] ) ) {
                         $link = esc_url( $opts['link-pick-url']['url'] );
                     }
@@ -176,7 +176,7 @@ if ( !function_exists( 'Nimble\sek_print_gallery_mod' ) ) {
                                 $html = sek_get_gal_img_item_html( $item, $gallery_opts );
                                 $html = apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($html) );
                                 if ( !skp_is_customizing() && false !== strpos($html, 'data-sek-src="http') ) {
-                                    $html = $html.Nimble_Manager()->css_loader_html;
+                                    $html = $html.Nimble_Manager()->css_loader_html;//the css_loader_html property contains only HTML, no PHP vars
                                 }
                                 // output secured earlier with wp_kses_post()
                                 echo $html;
@@ -186,7 +186,7 @@ if ( !function_exists( 'Nimble\sek_print_gallery_mod' ) ) {
 
                                 //html secured with wp_kses_post()
                                 printf('<a class="%4$s %5$s" href="%1$s" %2$s title="%6$s">%3$s</a>',
-                                    $link,//secured with esc_url() in function
+                                    esc_url($link),
                                     true === sek_booleanize_checkbox_val( $gallery_opts['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
                                     apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($html) ),
                                     esc_attr( 'sek-gal-link-to-'.$gallery_opts['link-to'] ), // sek-gal-link-to-img-lightbox
@@ -216,7 +216,7 @@ if ( !empty( $gallery_collec ) ) {
     if ( skp_is_customizing() ) {
         printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',
             __('Click to start adding images.', 'text_doma'),
-            'background: url(' . NIMBLE_MODULE_ICON_PATH . 'Nimble_gallery_icon.svg) no-repeat 50% 75%;background-size: 170px;'
+            'background: url(' . esc_url(NIMBLE_MODULE_ICON_PATH) . 'Nimble_gallery_icon.svg) no-repeat 50% 75%;background-size: 170px;'
         );
     }
 }

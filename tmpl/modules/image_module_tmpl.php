@@ -139,9 +139,9 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
                 if ( !empty( $value['link-pick-url'] ) && !empty( $value['link-pick-url']['id'] ) ) {
                     if ( '_custom_' == $value['link-pick-url']['id']  && !empty( $value['link-custom-url'] ) ) {
                         $custom_url = apply_filters( 'nimble_parse_template_tags', $value['link-custom-url'] );
-                        $link = esc_url( $custom_url );
+                        $link = $custom_url;
                     } else if ( !empty( $value['link-pick-url']['url'] ) ) {
-                        $link = esc_url( $value['link-pick-url']['url'] );
+                        $link = $value['link-pick-url']['url'];
                     }
                 }
             break;
@@ -170,7 +170,7 @@ if ( 'no-link' === $main_settings['link-to'] ) {
     $link = sek_get_img_module_img_link( $main_settings );
     // output is secured in sek_get_img_module_img_html()
     printf('<a class="%4$s %5$s" href="%1$s" %2$s>%3$s</a>',
-        $link,
+        esc_url($link),
         true === sek_booleanize_checkbox_val( $main_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
         apply_filters('nb_img_module_html', sek_get_img_module_img_html( $main_settings ), $main_settings ),
         'sek-link-to-'.esc_attr($main_settings['link-to']), // sek-link-to-img-lightbox

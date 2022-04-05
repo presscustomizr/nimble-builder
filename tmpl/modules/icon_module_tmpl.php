@@ -57,9 +57,9 @@ if ( !function_exists( 'Nimble\sek_get_icon_module_icon_link' ) ) {
         if ( 'url' == $icon_settings['link-to'] ) {
             if ( !empty( $icon_settings['link-pick-url'] ) && !empty( $icon_settings['link-pick-url']['id'] ) ) {
                 if ( '_custom_' == $icon_settings['link-pick-url']['id']  && !empty( $icon_settings['link-custom-url'] ) ) {
-                    $link = esc_url( $icon_settings['link-custom-url'] );
+                    $link = $icon_settings['link-custom-url'];
                 } else if ( !empty( $icon_settings['link-pick-url']['url'] ) ) {
-                    $link = esc_url( $icon_settings['link-pick-url']['url'] );
+                    $link = $icon_settings['link-pick-url']['url'];
                 }
             }
         }
@@ -85,7 +85,7 @@ if ( 'no-link' === $icon_settings['link-to'] ) :
     );
 else :
     printf('<a class="sek-icon %4$s" href="%1$s" %2$s>%3$s</a>',
-        sek_get_icon_module_icon_link( $icon_settings ),
+        esc_url(sek_get_icon_module_icon_link( $icon_settings )),
         true === sek_booleanize_checkbox_val( $icon_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
         wp_kses_post($icon_html),
         esc_attr($visual_effect_class)

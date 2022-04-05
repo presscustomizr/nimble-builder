@@ -12,8 +12,8 @@ $value = $value['main_settings'];
 // Utility to print the text content generated with tinyMce
 // should be wrapped in a specific selector when customizing,
 //  => so we can listen to user click actions and open the editor on for each separate tiny_mce_editor input
-if ( !function_exists( 'Nimble\sek_print_text_heading_content' ) ) {
-    function sek_print_text_heading_content( $heading_content, $input_id, $module_model, $echo = false ) {
+if ( !function_exists( 'Nimble\sek_get_text_heading_content' ) ) {
+    function sek_get_text_heading_content( $heading_content, $input_id, $module_model, $echo = false ) {
         if ( empty( $heading_content ) ) {
             $to_print = Nimble_Manager()->sek_get_input_placeholder_content( 'text', $input_id );
         } else {
@@ -48,9 +48,9 @@ if ( !function_exists( 'Nimble\sek_print_text_heading_content' ) ) {
         }
 
         if ( $echo ) {
-            echo wp_kses_post($to_print);
+            echo $to_print;
         } else {
-            return wp_kses_post($to_print);
+            return $to_print;
         }
 
     }
@@ -78,24 +78,24 @@ if ( !function_exists( 'Nimble\sek_get_heading_module_link') ) {
 
 // print the module content if not empty
 if ( array_key_exists('heading_text', $value ) ) {
-    $tag = empty( $value[ 'heading_tag' ] ) ? 'h1' : esc_attr($value[ 'heading_tag' ]);
+    $tag = empty( $value[ 'heading_tag' ] ) ? 'h1' : $value[ 'heading_tag' ];
     // Feb 2021 : now saved as a json to fix emojis issues
     // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
     // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
     $heading_title = sek_maybe_decode_richtext( empty( $value['heading_title'] ) ? '' : $value['heading_title'] );
     if ( false === sek_booleanize_checkbox_val( $value['link-to'] ) ) {
         printf( '<%1$s %3$s class="sek-heading">%2$s</%1$s>',
-            $tag,
-            sek_print_text_heading_content( $value['heading_text'], 'heading_text', $model ),//<= secured with wp_kses_post
+            esc_attr($tag),
+            wp_kses_post(sek_get_text_heading_content( $value['heading_text'], 'heading_text', $model )),
             !empty( $heading_title ) ? 'title="' . esc_html( $heading_title ) . '"' : ''
         );
     } else {
         printf( '<%1$s %3$s class="sek-heading">%2$s</%1$s>',
-            $tag,
+            esc_attr($tag),
             sprintf('<a href="%1$s" %2$s>%3$s</a>',
                 sek_get_heading_module_link( $value ),//<= secured with esc_url()
                 true === sek_booleanize_checkbox_val( $value['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
-                sek_print_text_heading_content( $value['heading_text'], 'heading_text', $model )//<= secured with wp_kses_post
+                wp_kses_post(sek_get_text_heading_content( $value['heading_text'], 'heading_text', $model ))
             ),
             !empty( $heading_title ) ? 'title="' . esc_html( $heading_title ) . '"' : ''
         );

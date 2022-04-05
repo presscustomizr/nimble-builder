@@ -21,7 +21,7 @@ if ( !function_exists( 'Nimble\sek_print_accordion' ) ) {
         <?php printf('<div class="sek-accord-wrapper" data-sek-accord-id="%1$s" data-sek-is-multi-item="%2$s" data-sek-first-expanded="%3$s" data-sek-one-expanded="%4$s" data-sek-has-global-border="%5$s" data-sek-has-title-border="%6$s" role="tablist">',
             esc_attr($model['id']),
             $is_accordion_multi_item ? "true" : "false",
-            $first_expanded,
+            esc_attr($first_expanded),
             true === sek_booleanize_checkbox_val( $accord_opts['one_expanded'] ) ? "true" : "false",
             $global_border_width > 0 ? "true" : "false",
             $title_border_width > 0 ? "true" : "false"
@@ -32,15 +32,8 @@ if ( !function_exists( 'Nimble\sek_print_accordion' ) ) {
                 foreach( $accord_collec as $key => $item ) {
                     $title = !empty( $item['title_text'] ) ? $item['title_text'] : sprintf( '%s %s', __('Accordion title', 'text_dom'), '#' . $ind );
                     $item_html_content = $item['text_content'];
-                    // convert into a json to prevent emoji breaking global json data structure
-                    // fix for https://github.com/presscustomizr/nimble-builder/issues/544
-                    $title = wp_kses_post(sek_maybe_decode_richtext($title));
-                    $item_html_content = wp_kses_post( sek_maybe_decode_richtext($item_html_content) );
 
-                    if ( !skp_is_customizing() ) {
-                        $item_html_content = apply_filters( 'nimble_parse_for_smart_load', $item_html_content );
-                    }
-
+                    $item_html_content = sek_maybe_decode_richtext($item_html_content);
                     // added may 2020 related to https://github.com/presscustomizr/nimble-builder/issues/688
                     $item_html_content = sek_strip_script_tags( $item_html_content );
 
@@ -49,13 +42,15 @@ if ( !function_exists( 'Nimble\sek_print_accordion' ) ) {
                     // added may 2020 for #699
                     // 'the_nimble_tinymce_module_content' includes parsing template tags
                     $item_html_content = apply_filters( 'the_nimble_tinymce_module_content', $item_html_content );
-
+                    if ( !skp_is_customizing() ) {
+                        $item_html_content = apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($item_html_content) );
+                    }
                     // Put them together
                     $title_attr = esc_html( esc_attr( $item['title_attr'] ) );
                     printf( '<div class="sek-accord-item" %1$s data-sek-item-id="%2$s" data-sek-expanded="%5$s"><div id="sek-tab-title-%2$s" class="sek-accord-title" role="tab" aria-controls="sek-tab-content-%2$s"><span class="sek-inner-accord-title">%3$s</span><div class="expander"><span></span><span></span></div></div><div id="sek-tab-content-%2$s" class="sek-accord-content" role="tabpanel" aria-labelledby="sek-tab-title-%2$s">%4$s</div></div>',
                         empty($title_attr) ? '' : 'title="'. $title_attr . '"',
                         esc_attr($item['id']),
-                        $title,//<= secured with wp_kses_post()
+                        wp_kses_post(sek_maybe_decode_richtext($title)),// convert into a json to prevent emoji breaking global json data structure
                         $item_html_content,//<= secured with wp_kses_post()
                         ( 'true' === $first_expanded && 1 === $ind ) ? "true" : "false"
                     );
@@ -81,7 +76,7 @@ if ( !empty( $accord_collec ) ) {
     if ( skp_is_customizing() ) {
         printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',
             __('Click to start adding items.', 'text_doma'),
-            'background: url(' . NIMBLE_MODULE_ICON_PATH . 'Nimble_accordion_icon.svg) no-repeat 50% 75%;background-size: 170px;'
+            'background: url(' . esc_url(NIMBLE_MODULE_ICON_PATH) . 'Nimble_accordion_icon.svg) no-repeat 50% 75%;background-size: 170px;'
         );
     }
 }
