@@ -253,25 +253,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 // rendering property allows us to determine if we're rendering NB content while filtering WP core functions, like the one of the lazy load attributes
                 Nimble_Manager()->rendering = true;
 
-                // Is paged ? ( when using post grid module ) => Don't cache
-                // Never use object caching when displaying paginated post grids
-                $pagination_query_var = (is_front_page() && 'page' == get_option( 'show_on_front' )) ? 'page' :'paged';
-                $paged = get_query_var($pagination_query_var);
-                if ( ( intval( $paged ) < 2 ) && !empty($skope_id) && !skp_is_customizing() && defined('NIMBLE_OBJECT_CACHE_ENABLED') && NIMBLE_OBJECT_CACHE_ENABLED ) {
-                    $cache_key = $location_id . '__in__' . $skope_id;
-                    $cache_group = $skope_id;
-                    $cached_candidate = wp_cache_get( $cache_key, $cache_group );
-                    if ( false === $cached_candidate ) {
-                        ob_start();
-                            $this->render( $locationSettingValue, $location_id );
-                        $cached_candidate = ob_get_clean();
-                        wp_cache_add( $cache_key, $cached_candidate, $cache_group );
-                    }
-                    // output has been secured when rendering the template
-                    echo $cached_candidate;
-                } else {
-                    $this->render( $locationSettingValue, $location_id );
-                }
+                $this->render( $locationSettingValue, $location_id );
 
                 Nimble_Manager()->rendering = false;
 
