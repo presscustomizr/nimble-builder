@@ -619,7 +619,7 @@ function sek_nimble_dashboard_callback_fn() {
               <?php if ( !empty( $link_data['html'] ) ) : ?>
                 <?php echo esc_attr($link_data['html']); ?>
               <?php else : ?>
-              <a href="<?php echo esc_attr( $link_data['link'] ); ?>" target="_blank"><?php echo esc_html( $link_data['title'] ); ?> <span class="screen-reader-text"><?php echo __( '(opens in a new window)', 'text_doma' ); ?></span></a><span aria-hidden="true" class="dashicons dashicons-external"></span>
+              <a href="<?php echo esc_attr( $link_data['link'] ); ?>" target="_blank"><?php echo esc_html( $link_data['title'] ); ?> <span class="screen-reader-text"><?php _e( '(opens in a new window)', 'text_doma' ); ?></span></a><span aria-hidden="true" class="dashicons dashicons-external"></span>
               <?php endif; ?>
             </div>
           <?php endforeach; ?>
