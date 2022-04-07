@@ -121,17 +121,12 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                 // This 'preset_section' === $content_type statement has been introduced when implementing support for multi-section pre-build sections
                 // @see https://github.com/presscustomizr/nimble-builder/issues/489
                 if ( 'preset_section' === $content_type ) {
-                    $collection_of_preset_section_id = null;
-                    if ( array_key_exists( 'collection_of_preset_section_id', $_POST ) && is_array( $_POST['collection_of_preset_section_id'] ) ) {
-                        $collection_of_preset_section_id = $_POST['collection_of_preset_section_id'];
-                    }
-
                     switch ( $sek_action ) {
                         // when 'sek-add-content-in-new-sektion' is fired, the section has already been populated with a column and a module
                         case 'sek-add-content-in-new-sektion' :
                         case 'sek-add-content-in-new-nested-sektion' :
                             if ( 'preset_section' === $content_type ) {
-                                if ( !is_array( $collection_of_preset_section_id ) || empty( $collection_of_preset_section_id ) ) {
+                                if ( !array_key_exists( 'collection_of_preset_section_id', $_POST ) || !is_array( $_POST['collection_of_preset_section_id'] ) || empty( $_POST['collection_of_preset_section_id'] ) ) {
                                     wp_send_json_error(  __CLASS__ . '::' . __FUNCTION__ . ' ' . $sek_action .' => missing param collection_of_preset_section_id when injecting a preset section' );
                                     break;
                                 }
@@ -261,7 +256,6 @@ if ( !class_exists( 'SEK_Front_Ajax' ) ) :
                         $this->parent_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_sektion' ]), $sektion_collection );
                         $level_model = sek_get_level_model( sanitize_text_field($_POST[ 'in_column' ]), $sektion_collection );
                     } else {
-                        //$level_model = sek_get_level_model( $_POST[ 'id' ], $sektion_collection );
                         $level_model = sek_get_level_model( $level_id, $sektion_collection );
                     }
                 break;
