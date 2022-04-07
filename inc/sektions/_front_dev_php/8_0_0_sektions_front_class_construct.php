@@ -236,6 +236,12 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
         // see in inc\sektions\_front_dev_php\dyn_css_builder_and_google_fonts_printer\5_0_1_class-sek-dyn-css-builder.php
         public $concatenated_module_stylesheets = [];
 
+        // April 2021 => added some properties when implementing late escape for attributes
+        // @see ::render() and base-tmpl PHP files
+        public $level_css_classes;
+        public $level_custom_anchor;
+        public $level_custom_attr;
+
         /////////////////////////////////////////////////////////////////
         // <CONSTRUCTOR>
         function __construct( $params = array() ) {

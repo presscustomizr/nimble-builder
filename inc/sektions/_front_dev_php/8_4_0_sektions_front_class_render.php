@@ -398,10 +398,10 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             $collection = array_key_exists( 'collection', $model ) ? $model['collection'] : array();
 
             //sek_error_log( __FUNCTION__ . ' WHAT ARE WE RENDERING? ' . $id, current_filter() . ' | ' . current_action() );
-            $custom_anchor = null;
+            $level_custom_anchor = null;
             if ( !empty( $model[ 'options' ] ) && !empty( $model[ 'options' ][ 'anchor' ] ) && !empty( $model[ 'options' ][ 'anchor' ]['custom_anchor'] ) ) {
                 if ( is_string( $model[ 'options' ][ 'anchor' ]['custom_anchor'] ) ) {
-                    $custom_anchor = esc_attr( $model[ 'options' ][ 'anchor' ]['custom_anchor'] );
+                    $level_custom_anchor = esc_attr( $model[ 'options' ][ 'anchor' ]['custom_anchor'] );
                 }
             }
             $level_css_classes = '';
@@ -421,392 +421,25 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 }
             }
 
-            // sept 2020 => allows NB pro to filter $level_css_classes
-            $level_css_classes = apply_filters( 'nimble_level_css_classes', $level_css_classes, $model );
-            $level_custom_data_attributes = apply_filters( 'nimble_level_custom_data_attributes', '', $model );
+            Nimble_Manager()->level_css_classes = apply_filters( 'nimble_level_css_classes', $level_css_classes, $model );
+            Nimble_Manager()->level_custom_anchor = $level_custom_anchor;
+            Nimble_Manager()->level_custom_attr = apply_filters( 'nimble_level_custom_data_attributes', '', $model );
 
-            // secure custom data atttributes output
-            $secured_level_custom_data_attr = '';
-            if ( is_string($level_custom_data_attributes) && !empty($level_custom_data_attributes) ) {
-                $secured_level_custom_data_attr = wp_kses_post( $level_custom_data_attributes );
-            } else if ( is_array($level_custom_data_attributes) && !empty( $level_custom_data_attributes ) ) {
-                foreach( $level_custom_data_attributes as $attr_name => $attr_value ) {
-                    $secured_level_custom_data_attr .= $attr_name . '="' . $attr_value .'" ';
-                }
-            }
-
-            do_action('nimble_before_rendering_level', $model, $level_css_classes, $secured_level_custom_data_attr );
+            do_action('nimble_before_rendering_level', $model, Nimble_Manager()->level_css_classes, Nimble_Manager()->level_custom_attr );
 
             switch ( $level_type ) {
-                /********************************************************
-                 LOCATIONS
-                ********************************************************/
                 case 'location' :
-                    $is_header_location = true === sek_get_registered_location_property( $id, 'is_header_location' );
-                    $is_footer_location = true === sek_get_registered_location_property( $id, 'is_footer_location' );
-
-                    //sek_error_log( __FUNCTION__ . ' WHAT ARE WE RENDERING? ' . $id , $collection );
-
-                    // Store the header-footer location boolean in the manager
-                    // Used to determine if we are allowed to lazyload
-                    // @see https://github.com/presscustomizr/nimble-builder/issues/705
-                    Nimble_Manager()->current_location_is_header = $is_header_location;
-                    Nimble_Manager()->current_location_is_footer = $is_footer_location;
-
-                    // PASSWORD PROTECTION see #673 and #679
-                    // If the page/post is password protect, and this is not a header or footer location,
-                    // => stop the recursive walker here and print the password form
-                    // for https://github.com/presscustomizr/nimble-builder/issues/673
-                    // Nimble_Manager()->is_content_restricted is set at 'wp', see ::sek_maybe_empty_password_form
-
-                    // 1) we want to protect content added with Nimble Builder, but not if header or footer
-                    // 2) we want to apply the protection on front, not when customizing
-                    // 3) we need to check if the single page or post is password protected
-                    // 4) we don't want to render the password form multiple times
-                    $has_content_restriction_for_location = Nimble_Manager()->is_content_restricted && !$is_header_location && !$is_footer_location;
-                    $location_needs_css_class_to_style_password_form = false;
-
-                    if ( $has_content_restriction_for_location ) {
-                        // in the case of the built-in WP password form, we only print it once, so we don't need to add the CSS class to each locations
-                        $location_needs_css_class_to_style_password_form = !did_action('nimble_wp_pwd_form_rendered');
-                    }
-
-                    // NOTE : empty sektions wrapper are only printed when customizing
-                    ?>
-                      <?php if ( skp_is_customizing() || ( !skp_is_customizing() && !empty( $collection ) ) ) : ?>
-                            <?php
-                              Nimble_Manager()->nimble_customizing_or_content_is_printed_on_this_page = true;
-                              printf( '<div class="sektion-wrapper nb-loc %6$s" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s %5$s>',
-                                  $id,
-                                  esc_attr(sprintf('data-sek-is-global-location="%1$s"', sek_is_global_location( $id ) ? 'true' : 'false')),
-                                  $is_header_location ? 'data-sek-is-header-location="true"' : '',
-                                  $is_footer_location ? 'data-sek-is-footer-location="true"' : '',
-                                  $this->sek_maybe_print_preview_level_guid_html(),// secured attribute output
-                                  $location_needs_css_class_to_style_password_form ? 'sek-password-protected' : ''//<= added for #673
-                              );
-                            ?>
-                            <?php
-                              if ( $has_content_restriction_for_location ) {
-                                  // april 2020 : added for https://github.com/presscustomizr/nimble-builder/issues/685
-                                  do_action('nimble_content_restriction_for_location', $model );
-                              } else {
-                                  $this->parent_model = $model;
-                                  foreach ( $collection as $_key => $sec_model ) { $this->render( $sec_model ); }
-                              }
-                            ?>
-                            <?php
-                              // empty global locations placeholders are only printed when customizing But not previewing a changeset post
-                              // since https://github.com/presscustomizr/nimble-builder/issues/351
-                            ?>
-                            <?php if ( empty( $collection ) && !sek_is_customize_previewing_a_changeset_post() ) : ?>
-                                <div class="sek-empty-location-placeholder">
-                                  <?php
-                                    if ( $is_header_location || $is_footer_location ) {
-                                        printf('<span class="sek-header-footer-location-placeholder">%1$s %2$s</span>',
-                                            sprintf( '<span class="sek-nimble-icon"><img src="%1$s"/></span>',
-                                                esc_url(NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION)
-                                            ),
-                                            $is_header_location ? __('Start designing the header', 'text_doma') : __('Start designing the footer', 'text_doma')
-                                        );
-                                    }
-                                  ?>
-                                </div>
-                            <?php endif; ?>
-                          </div><?php //class="sektion-wrapper" ?>
-                      <?php endif; ?>
-                    <?php
+                    load_template( sek_get_templates_dir() . "/base-tmpl/location.php", false );
                 break;
-
-
-                /********************************************************
-                 SECTIONS
-                ********************************************************/
                 case 'section' :
-                    $is_nested = array_key_exists( 'is_nested', $model ) && true == $model['is_nested'];
-                    $has_at_least_one_module = sek_section_has_modules( $collection );
-                    $column_container_class = 'sek-container-fluid';
-                    //when boxed use proper container class
-                    if ( !empty( $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) && 'boxed' == $model[ 'options' ][ 'layout' ][ 'boxed-wide' ] ) {
-                        $column_container_class = 'sek-container';
-                    }
-                    // if there's a video background or a parallax bg we need to inform js api
-                    $bg_attributes = $this->sek_maybe_add_bg_attributes( $model );
-
-                    // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
-                    $has_bg_img = false;
-                    if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
-                        $has_bg_img = true;
-                    }
-
-                    // June 2020 : introduced for https://github.com/presscustomizr/nimble-builder-pro/issues/6
-                    $section_classes = apply_filters( 'nimble_section_level_css_classes', array(), $model );
-                    array_push( $section_classes, $level_css_classes );
-
-                    printf('<div data-sek-level="section" data-sek-id="%1$s" %2$s class="sek-section %3$s %4$s %5$s %6$s" %7$s %8$s %9$s %10$s>%11$s',
-                        esc_attr($id),
-                        $is_nested ? 'data-sek-is-nested="true"' : '',
-                        $has_at_least_one_module ? 'sek-has-modules' : '',
-                        esc_attr($this->get_level_visibility_css_class( $model )),
-                        $has_bg_img ? 'sek-has-bg' : '',
-                        esc_attr(implode(' ', $section_classes)),
-
-                        is_null( $custom_anchor ) ? '' : 'id="' . ltrim( esc_attr($custom_anchor) , '#' ) . '"',// make sure we clean the hash if user left it
-                        // add smartload + parallax attributes
-                        $bg_attributes,//secured in sek_maybe_add_bg_attributes()
-
-                        $this->sek_maybe_print_preview_level_guid_html(),// secured attribute output
-                        $secured_level_custom_data_attr,//secured output earlier
-                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''//secured output
-                    );
-                    if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
-                        sek_emit_js_event('nb-needs-videobg-js');
-                    }
-                    if ( false !== strpos($bg_attributes, 'data-sek-bg-parallax="true"') ) {
-                        sek_emit_js_event('nb-needs-parallax');
-                    }
-                    ?>
-
-                          <div class="<?php echo esc_attr($column_container_class); ?>">
-                            <div class="sek-row sek-sektion-inner">
-                                <?php
-                                  // Set the parent model now
-                                  $this->parent_model = $model;
-                                  foreach ( $collection as $col_model ) {$this->render( $col_model ); }
-                                ?>
-                            </div>
-                          </div>
-                      </div><?php //data-sek-level="section" ?>
-                    <?php
+                    load_template( sek_get_templates_dir() . "/base-tmpl/section.php", false );
                 break;
-
-
-                /********************************************************
-                 COLUMNS
-                ********************************************************/
                 case 'column' :
-                    // if ( defined('DOING_AJAX') && DOING_AJAX ) {
-                    //     error_log( print_r( $parent_model, true ) );
-                    // }
-                    // sek_error_log( 'PARENT MODEL WHEN RENDERING', $parent_model );
-
-                    // SETUP THE DEFAULT CSS CLASS
-                    // Note : the css rules for custom width are generated in Sek_Dyn_CSS_Builder::sek_add_rules_for_column_width
-                    $col_number = ( array_key_exists( 'collection', $parent_model ) && is_array( $parent_model['collection'] ) ) ? count( $parent_model['collection'] ) : 1;
-                    $col_number = 12 < $col_number ? 12 : $col_number;
-                    $col_width_in_percent = 100/$col_number;
-
-                    //@note : we use the same logic in the customizer preview js to compute the column css classes when dragging them
-                    //@see sek_preview::makeColumnsSortableInSektion
-                    //TODO, we might want to be sure the $col_suffix is related to an allowed size
-                    $col_suffix = floor( $col_width_in_percent );
-
-                    // SETUP THE GLOBAL CUSTOM BREAKPOINT CSS CLASS
-                    $global_custom_breakpoint = intval( sek_get_global_custom_breakpoint() );
-
-                    // SETUP THE LEVEL CUSTOM BREAKPOINT CSS CLASS
-                    // nested section should inherit the custom breakpoint of the parent
-                    // @fixes https://github.com/presscustomizr/nimble-builder/issues/554
-
-                    // the 'for_responsive_columns' param has been introduced for https://github.com/presscustomizr/nimble-builder/issues/564
-                    // so we can differentiate when the custom breakpoint is requested for column responsiveness or for css rules generation
-                    // when for columns, we always apply the custom breakpoint defined by the user
-                    // otherwise, when generating CSS rules like alignment, the custom breakpoint is applied if user explicitely checked the 'apply_to_all' option
-                    // 'for_responsive_columns' is set to true when sek_get_closest_section_custom_breakpoint() is invoked from Nimble_Manager()::render()
-                    $section_custom_breakpoint =  intval( sek_get_closest_section_custom_breakpoint( array(
-                        'searched_level_id' => $parent_model['id'],
-                        'for_responsive_columns' => true
-                    )));
-
-                    $grid_column_class = "sek-col-{$col_suffix}";
-                    if ( is_int($section_custom_breakpoint) && $section_custom_breakpoint >= 1 ) {
-                        $grid_column_class = "sek-section-custom-breakpoint-col-{$col_suffix}";
-                    } else if ( $global_custom_breakpoint >= 1 ) {
-                        $grid_column_class = "sek-global-custom-breakpoint-col-{$col_suffix}";
-                    }
-                    $bg_attributes = $this->sek_maybe_add_bg_attributes( $model );
-
-                    // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
-                    $has_bg_img = false;
-                    if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
-                        $has_bg_img = true;
-                    }
-                    printf('<div data-sek-level="column" data-sek-id="%1$s" class="sek-column sek-col-base %2$s %3$s %4$s %5$s" %6$s %7$s %8$s %9$s %10$s>%11$s',
-                        esc_attr($id),
-                        esc_attr($grid_column_class),
-                        esc_attr($this->get_level_visibility_css_class( $model )),
-                        $has_bg_img ? 'sek-has-bg' : '',
-                        esc_attr($level_css_classes),
-
-                        empty( $collection ) ? 'data-sek-no-modules="true"' : '',
-                        // add smartload + parallax attributes
-                        $bg_attributes,//secured in sek_maybe_add_bg_attributes()
-                        is_null( $custom_anchor ) ? '' : 'id="' . ltrim( esc_attr($custom_anchor) , '#' ) . '"',// make sure we clean the hash if user left it
-
-                        $this->sek_maybe_print_preview_level_guid_html(),// secured attribute output
-                        $secured_level_custom_data_attr,//secured output earlier
-                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''//secured output
-                    );
-                    if ( false !== strpos($bg_attributes, 'data-sek-video-bg-src') ) {
-                        sek_emit_js_event('nb-needs-videobg-js');
-                    }
-                    if ( false !== strpos($bg_attributes, 'data-sek-bg-parallax="true"') ) {
-                        sek_emit_js_event('nb-needs-parallax');
-                    }
-                      ?>
-                        <?php
-                        // Drop zone : if no modules, the drop zone is wrapped in sek-no-modules-columns
-                        // if at least one module, the sek-drop-zone is the .sek-column-inner wrapper
-                        ?>
-                        <div class="sek-column-inner <?php echo empty( $collection ) ? 'sek-empty-col' : ''; ?>">
-                            <?php
-                              // the drop zone is inserted when customizing but not when previewing a changeset post
-                              // since https://github.com/presscustomizr/nimble-builder/issues/351
-                              if ( skp_is_customizing() && !sek_is_customize_previewing_a_changeset_post() && empty( $collection ) ) {
-                                  //$content_type = 1 === $col_number ? 'section' : 'module';
-                                  $content_type = 'module';
-                                  $title = 'section' === $content_type ? __('Drag and drop a section or a module here', 'text_doma' ) : __('Drag and drop a block of content here', 'text_doma' );
-                                  ?>
-                                  <div class="sek-no-modules-column">
-                                    <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
-                                      <i data-sek-click-on="pick-content" data-sek-content-type="<?php echo esc_attr($content_type); ?>" class="material-icons sek-click-on" title="<?php echo esc_html($title); ?>">add_circle_outline</i>
-                                      <span class="sek-injection-instructions"><?php _e('Drag and drop or double-click the content that you want to insert here.', 'text_domain_to_rep'); ?></span>
-                                    </div>
-                                  </div>
-                                  <?php
-                              } else {
-                                  // Set the parent model now
-                                  $this->parent_model = $model;
-                                  foreach ( $collection as $module_or_nested_section_model ) {
-                                      ?>
-                                      <?php
-                                      $this->render( $module_or_nested_section_model );
-                                  }
-                                  ?>
-                                  <?php
-                              }
-                            ?>
-                        </div>
-                      </div><?php //data-sek-level="column" ?>
-                    <?php
+                    load_template( sek_get_templates_dir() . "/base-tmpl/column.php", false );
                 break;
-
-
-                /********************************************************
-                 MODULES
-                ********************************************************/
                 case 'module' :
-                    if ( empty( $model['module_type'] ) ) {
-                        sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => missing module_type for a module', $model );
-                        break;
-                    }
-
-                    $module_type = $model['module_type'];
-
-                    if ( !CZR_Fmk_Base()->czr_is_module_registered($module_type) ) {
-                        sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' => module_type not registered', $module_type );
-                        break;
-                    }
-
-                    $model = sek_normalize_module_value_with_defaults( $model );
-                    // update the current cached model
-                    $this->model = $model;
-                    $title_attribute = '';
-                    if ( skp_is_customizing() ) {
-                        $title_attribute = __('Edit module settings', 'text-domain');
-                        $title_attribute = 'title="'.esc_html($title_attribute).'"';
-                    }
-
-                    // SETUP MODULE TEMPLATE PATH
-                    // introduced for #532, october 2019
-                    // Default tmpl path looks like : NIMBLE_BASE_PATH . "/tmpl/modules/image_module_tmpl.php",
-                    //
-                    // Important note :
-                    // @fixes https://github.com/presscustomizr/nimble-builder/issues/537
-                    // since #532, module registered in Nimble Builder core have a render_tmpl_path property looking like 'render_tmpl_path' => "simple_html_module_tmpl.php",
-                    // But if a developer wants to register a custom module with a specific template path, it is still possible by using a full path
-                    // 1) We first check if the file exists, if it is a full path this will return TRUE and the render tmpl path will be set this way
-                    // , for example, we use a custom gif module on presscustomizr.com, for which the render_tmpl_path is a full path:
-                    // 'render_tmpl_path' => TC_BASE_CHILD . "inc/nimble-modules/modules-registration/tmpl/modules/gif_image_module_tmpl.php",
-                    // 2) then we check if there's an override
-                    // 3) finally we use the default Nimble Builder path
-
-                    // render_tmpl_path can be
-                    // 1) simple_html_module_tmpl.php <= most common case, the module is registered by Nimble Builder
-                    // 2) srv/www/pc-dev/htdocs/wp-content/themes/tc/inc/nimble-modules/modules-registration/tmpl/modules/gif_image_module_tmpl.php <= case of a custom module
-                    $template_name_or_path = sek_get_registered_module_type_property( $module_type, 'render_tmpl_path' );
-
-                    $template_name = basename( $template_name_or_path );
-                    $template_name = ltrim( $template_name_or_path, '/' );
-
-                    if ( file_exists( $template_name_or_path ) ) {
-                        $template_path = $template_name_or_path;
-                    } else {
-                        $template_path = sek_get_templates_dir() . "/modules/{$template_name}";
-                    }
-
-                    // make this filtrable
-                    $render_tmpl_path = apply_filters( 'nimble_module_tmpl_path', $template_path, $module_type );
-
-                    // Then check if there's an override
-                    $overriden_template_path = $this->sek_maybe_get_overriden_template_path_for_module( $template_name );
-
-                    $is_module_template_overriden = false;
-                    if ( !empty( $overriden_template_path ) ) {
-                        $render_tmpl_path = $overriden_template_path;
-                        $is_module_template_overriden = true;
-                    }
-                    // if there's a lazy loaded img background let's print a CSS loader removed when lazy loaded
-                    $bg_attributes = $this->sek_maybe_add_bg_attributes( $model );
-                    $has_bg_img = false;
-                    if ( false !== strpos( $bg_attributes, 'data-sek-src="http') ) {
-                        $has_bg_img = true;
-                    }
-                    if ( false !== strpos($bg_attributes, 'data-sek-bg-parallax="true"') ) {
-                        sek_emit_js_event('nb-needs-parallax');
-                    }
-
-                    $module_classes = [
-                        $this->get_level_visibility_css_class( $model ),
-                        $has_bg_img ? 'sek-has-bg' : '',
-                        $level_css_classes
-                    ];
-
-                    printf('<div data-sek-level="module" data-sek-id="%1$s" data-sek-module-type="%2$s" class="sek-module %3$s" %4$s %5$s %6$s %7$s %8$s %9$s>%10$s',
-                        esc_attr($id),
-                        esc_attr($module_type),
-                        esc_attr(implode(' ', $module_classes )),
-
-                        $title_attribute,//secured earlier
-                        // add smartload + parallax attributes
-                        $bg_attributes,//secured in sek_maybe_add_bg_attributes()
-                        is_null( $custom_anchor ) ? '' : 'id="' . ltrim( $custom_anchor , '#' ) . '"',// make sure we clean the hash if user left it
-
-                        $this->sek_maybe_print_preview_level_guid_html(), // secured attribute output
-                        $is_module_template_overriden ? 'data-sek-module-template-overriden="true"': '',// <= added for #532
-                        $secured_level_custom_data_attr,//secured output earlier
-                        ( $has_bg_img && !skp_is_customizing() && sek_is_img_smartload_enabled() ) ? Nimble_Manager()->css_loader_html : ''//secured output
-                    );
-                      ?>
-                        <div class="sek-module-inner">
-                          <?php
-                            if ( skp_is_customizing() && sek_is_debug_mode() ) {
-                                // added for https://github.com/presscustomizr/nimble-builder/issues/688
-                                // allows us to print the structure without the potentially broken javascript content ( hard coded or generated by a shortcode )
-                                printf('<p class="sek-debug-modules">Module type : %1$s | id : %2$s</p>',
-                                    ucfirst( str_replace( array( 'czr_', '_' ), array( '', ' ' ), esc_attr($module_type) ) ),
-                                    $id
-                                );
-                            } else if ( !empty( $render_tmpl_path ) && file_exists( $render_tmpl_path ) ) {
-                                load_template( $render_tmpl_path, false );
-                            } else {
-                                error_log( __FUNCTION__ . ' => no template found for module type ' . $module_type  );
-                            }
-                          ?>
-                        </div>
-                    </div><?php //data-sek-level="module" ?>
-                    <?php
+                    load_template( sek_get_templates_dir() . "/base-tmpl/module.php", false );
                 break;
-
                 default :
                     sek_error_log( __CLASS__ . '::' . __FUNCTION__ . ' error => a level is invalid : ' . $level_type  );
                 break;
@@ -831,7 +464,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         // The CSS class are kept only for information when inspecting the markup
         // @see sek_add_css_rules_for_level_visibility()
         // @return string
-        private function get_level_visibility_css_class( $model ) {
+        public function get_level_visibility_css_class( $model ) {
             if ( !is_array( $model ) ) {
                 error_log( __FUNCTION__ . ' => $model param should be an array' );
                 return;
@@ -858,7 +491,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         // module templates can be overriden from a child theme when located in nimble_templates/modules/{template_name}.php
         // for example /wp-content/themes/twenty-nineteen-child/nimble_templates/modules/image_module_tmpl.php
         // added for #532, october 2019
-        private function sek_maybe_get_overriden_template_path_for_module( $template_name = '') {
+        public function sek_maybe_get_overriden_template_path_for_module( $template_name = '') {
             if ( empty( $template_name ) )
               return;
             $overriden_template_path = '';
@@ -996,7 +629,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         /* ------------------------------------------------------------------------- *
          *  SMART LOAD.
         /* ------------------------------------------------------------------------- */
-        // @return string
+        // @return array of bg attributes
         // adds the lazy load data attributes when sek_is_img_smartload_enabled()
         // adds the parallax attributes
         // img smartload can be set globally with 'global-img-smart-load' and locally with 'local-img-smart-load'
@@ -1051,13 +684,13 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                     // At this point we may not have a valid $bg_img_url
                     // let's check
                     if ( !empty( $bg_img_url ) ) {
-                        $new_attributes[] = 'data-sek-has-bg="true"';
+                        $new_attributes['data-sek-has-bg'] = 'true';
                         if ( defined('DOING_AJAX') && DOING_AJAX ) {
-                            $new_attributes[] = sprintf('style="background-image:url(\'%1$s\');"', esc_url( $bg_img_url ));
+                            $new_attributes['style'] = sprintf('background-image:url(\'%1$s\');', esc_url( $bg_img_url ));
                         } else {
-                            $new_attributes[] = sprintf( 'data-sek-src="%1$s"', esc_url($bg_img_url) );
+                            $new_attributes['data-sek-src'] = sprintf( '%1$s', esc_url($bg_img_url) );
                             if ( sek_is_img_smartload_enabled() ) {
-                                $new_attributes[] = sprintf( 'data-sek-lazy-bg="true"' );
+                                $new_attributes['data-sek-lazy-bg'] = 'true';
                             }
                         }
 
@@ -1110,34 +743,32 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             // we can't have both fixed and parallax option together
             // when the fixed background is ckecked, it wins against parallax
             if ( $fixed_bg_enabled ) {
-                $new_attributes[] = 'data-sek-bg-fixed="true"';
+                $new_attributes['data-sek-bg-fixed'] = 'true';
             } else if ( $parallax_enabled ) {
-                $new_attributes[] = sprintf('data-sek-bg-parallax="true" data-bg-width="%1$s" data-bg-height="%2$s" data-sek-parallax-force="%3$s"',
-                    esc_attr($width),
-                    esc_attr($height),
-                    esc_attr(array_key_exists('bg-parallax-force', $bg_options) ? $bg_options['bg-parallax-force'] : '40')
-                    //!empty( $bg_options['bg-parallax-force'] ) ? $bg_options['bg-parallax-force'] : '40'
-                );
+                $new_attributes['data-sek-bg-parallax'] = 'true';
+                $new_attributes['data-bg-width'] = $width;
+                $new_attributes['data-bg-height'] = $height;
+                $new_attributes['data-sek-parallax-force'] = array_key_exists('bg-parallax-force', $bg_options) ? $bg_options['bg-parallax-force'] : '40';
             }
 
             // video background insertion can only be done for sections and columns
             if ( in_array( $level_type, array( 'section', 'column') ) ) {
                 if ( !empty( $video_bg_url ) && is_string( $video_bg_url ) ) {
-                    $new_attributes[] = sprintf('data-sek-video-bg-src="%1$s"', esc_url( $video_bg_url ));
-                    $new_attributes[] = sprintf('data-sek-video-bg-loop="%1$s"', $video_bg_loop ? 'true' : 'false' );
+                    $new_attributes['data-sek-video-bg-src'] = esc_url( $video_bg_url );
+                    $new_attributes['data-sek-video-bg-loop'] = $video_bg_loop ? 'true' : 'false';
                     if ( !is_null( $video_bg_delay_before_start ) && $video_bg_delay_before_start >= 0 ) {
-                        $new_attributes[] = sprintf('data-sek-video-delay-before="%1$s"', esc_attr($video_bg_delay_before_start ));
+                        $new_attributes['data-sek-video-delay-before'] = $video_bg_delay_before_start;
                     }
-                    $new_attributes[] = sprintf('data-sek-video-bg-on-mobile="%1$s"', $video_bg_on_mobile ? 'true' : 'false' );
+                    $new_attributes['data-sek-video-bg-on-mobile'] = $video_bg_on_mobile ? 'true' : 'false';
                     if ( !is_null( $video_bg_start_time ) && $video_bg_start_time >= 0 ) {
-                        $new_attributes[] = sprintf('data-sek-video-start-at="%1$s"', esc_attr($video_bg_start_time ));
+                        $new_attributes['data-sek-video-start-at'] = $video_bg_start_time;
                     }
                     if ( !is_null( $video_bg_end_time ) && $video_bg_end_time >= 0 ) {
-                        $new_attributes[] = sprintf('data-sek-video-end-at="%1$s"', esc_attr($video_bg_end_time ));
+                        $new_attributes['data-sek-video-end-at'] = $video_bg_end_time;
                     }
                 }
             }
-            return implode( ' ', $new_attributes );
+            return $new_attributes;
         }
 
 
@@ -1508,16 +1139,6 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
         }// return
 
 
-
-
-        // @sek_maybe_include_nimble_content_in_search_results html string
-        // introduced for https://github.com/presscustomizr/nimble-builder/issues/494
-        function sek_maybe_print_preview_level_guid_html() {
-              if ( skp_is_customizing() || ( defined('DOING_AJAX') && DOING_AJAX ) ) {
-                  return sprintf( 'data-sek-preview-level-guid="%1$s"', esc_attr( $this->sek_get_preview_level_guid() ) );
-              }
-              return '';
-        }
 
         // @return unique guid()
         // inspired from https://stackoverflow.com/questions/21671179/how-to-generate-a-new-guid#26163679
