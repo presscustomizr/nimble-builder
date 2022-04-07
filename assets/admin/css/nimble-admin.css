@@ -451,6 +451,12 @@ body .block-editor .sek-nimble-mobile-admin-bar-title { display: none; }
 #nimble-options .nb-option-page-title {
   padding-left: 40px;
   position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 [dir="rtl"] .nb-option-page-title {
   padding-right: 40px;

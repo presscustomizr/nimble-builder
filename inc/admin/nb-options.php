@@ -38,11 +38,10 @@ function nb_options_page() {
   <div id="nimble-options" class="wrap">
       <h1 class="nb-option-page-title">
         <?php
-        printf('<span class="sek-nimble-title-icon"><img src="%1$s" alt="Build with Nimble Builder">%2$s</span>',
-            esc_url( NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION ),
-            wp_kses_post( apply_filters( 'nimble_option_title_icon_after', '' ) )
+        printf('<span class="sek-nimble-title-icon"><img src="%1$s" alt="Build with Nimble Builder"></span>',
+            esc_url( NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION )
         );
-        echo apply_filters( 'nimble_parse_admin_text', esc_html( $page_title ) );
+        echo apply_filters( 'nimble_parse_admin_text', esc_html( $page_title ) ) . wp_kses_post( apply_filters( 'nimble_option_title_icon_after', '' ) );
         ?>
       </h1>
       <div class="nav-tab-wrapper">
