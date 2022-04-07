@@ -1312,7 +1312,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             if ( function_exists('members_can_current_user_view_post') ) {
                 $post_id = get_the_ID();
                 if ( !members_can_current_user_view_post( $post_id ) && function_exists('members_get_post_error_message') ) {
-                    echo members_get_post_error_message( $post_id );
+                    echo wp_kses_post(members_get_post_error_message( $post_id ));
                 }
             // 2) for other plugins, if not printed already, print a default fitrable message
             } else if ( !did_action('nimble_after_restricted_content_html') ) {
