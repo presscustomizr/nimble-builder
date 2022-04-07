@@ -39,13 +39,6 @@ if ( $has_content_restriction_for_location ) {
     $location_needs_css_class_to_style_password_form = !did_action('nimble_wp_pwd_form_rendered');
 }
 
-$attributes = [
-    'data-caca' => 'pipi',
-    'data-bite' => 'chatte',
-    'data-combray' => 'proust'
-];
-
-
 // NOTE : empty sektions wrapper are only printed when customizing
 ?>
 <?php if ( skp_is_customizing() || ( !skp_is_customizing() && !empty( $collection ) ) ) : ?>

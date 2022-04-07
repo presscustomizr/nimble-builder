@@ -279,7 +279,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 }
             } else {
                 // If we're in the regular case ( not after submission ), echo the form
-                echo $form;
+                echo $form;//<= this is too early to escape now because it's being buffered with ob_start(). The output is late escaped in tmpl/modules/simple_form_module_tmpl.php
             }
           ?>
         </div>
