@@ -335,7 +335,7 @@ function sek_filter_post_row_actions( $actions, $post ) {
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
     if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_been_customized( $manually_built_skope_id ) ) {
         $actions['edit_with_nimble_builder'] = sprintf( '<a href="%1$s" title="%2$s">%2$s</a>',
-            sek_get_customize_url_for_post_id( $post->ID ),//secured output
+            esc_url(sek_get_customize_url_for_post_id( $post->ID )),
             __( 'Edit with Nimble Builder', 'text-doma' )
         );
     }
