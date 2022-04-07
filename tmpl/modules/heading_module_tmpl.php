@@ -13,7 +13,7 @@ $value = $value['main_settings'];
 // should be wrapped in a specific selector when customizing,
 //  => so we can listen to user click actions and open the editor on for each separate tiny_mce_editor input
 if ( !function_exists( 'Nimble\sek_get_text_heading_content' ) ) {
-    function sek_get_text_heading_content( $heading_content, $input_id, $module_model, $echo = false ) {
+    function sek_get_text_heading_content( $heading_content, $input_id, $module_model ) {
         if ( empty( $heading_content ) ) {
             $to_print = Nimble_Manager()->sek_get_input_placeholder_content( 'text', $input_id );
         } else {
@@ -47,12 +47,7 @@ if ( !function_exists( 'Nimble\sek_get_text_heading_content' ) ) {
             }
         }
 
-        if ( $echo ) {
-            echo wp_kses_post($to_print);
-        } else {
-            return $to_print;
-        }
-
+        echo wp_kses_post($to_print);
     }
 }
 
