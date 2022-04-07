@@ -279,14 +279,96 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 }
             } else {
                 // If we're in the regular case ( not after submission ), echo the form
-                // output secured in $this->simple_form_generate_form()
-                echo $form;
+                echo wp_kses( $form, $this->get_kses_allowed_html() );
+                //echo $form;
             }
           ?>
         </div>
         <?php
         return ob_get_clean();
     }
+
+
+
+ 
+    // Returns an array of allowed HTML tags and attributes when securing form output with wp_kses()
+    function get_kses_allowed_html() {
+        $allowed = array(
+            'div' => array(),
+            'span' => array(),
+            'form' => array(
+                'action' => true,
+                'method' => true,
+                'post' => true
+            ),
+            'button' => array(
+                'disabled' => true,
+                'name' => true,
+                'type' => true,
+                'value' => true,
+            ),
+            'input' => array(
+                'alt' => true,
+                'capture' => true,
+                'checked' => true,
+                'disabled' => true,
+                'list' => true,
+                'name' => true,
+                'placeholder' => true,
+                'readonly' => true,
+                'type' => true,
+                'value' => true,
+            ),
+            'label' => array(
+                'for' => true,
+            ),
+            'textarea' => array(
+                'cols' => true,
+                'disabled' => true,
+                'maxlength' => true,
+                'minlength' => true,
+                'name' => true,
+                'placeholder' => true,
+                'readonly' => true,
+                'rows' => true,
+                'spellcheck' => true,
+                'wrap' => true,
+            ),
+        );
+   
+        $allowed = array_map(
+            function ($to_map) {
+                $attr = array(
+                    'aria-checked' => true,
+                    'aria-describedby' => true,
+                    'aria-details' => true,
+                    'aria-disabled' => true,
+                    'aria-hidden' => true,
+                    'aria-invalid' => true,
+                    'aria-label' => true,
+                    'aria-labelledby' => true,
+                    'aria-live' => true,
+                    'aria-relevant' => true,
+                    'aria-required' => true,
+                    'aria-selected' => true,
+                    'class' => true,
+                    'data-*' => true,
+                    'id' => true,
+                    'inputmode' => true,
+                    'role' => true,
+                    'style' => true,
+                    'tabindex' => true,
+                    'title' => true,
+                );
+
+                return array_merge( $attr, (array) $to_map );
+            },
+            $allowed
+        );
+        return $allowed;
+    }
+
+
 
     //set the fields to render
     private function _set_form_composition( $form_composition, $module_model = array() ) {
