@@ -1402,6 +1402,84 @@ function _sek_normalize_single_module_values( $raw_module_value, $module_type ) 
     return $module_values;
 }
 
+
+// Returns an array of allowed HTML tags and attributes when securing form echoed with wp_kses()
+function sek_get_allowed_html_in_forms() {
+    $allowed = array(
+        'div' => array(),
+        'span' => array(),
+        'form' => array(
+            'action' => true,
+            'method' => true,
+            'post' => true
+        ),
+        'button' => array(
+            'disabled' => true,
+            'name' => true,
+            'type' => true,
+            'value' => true,
+        ),
+        'input' => array(
+            'alt' => true,
+            'capture' => true,
+            'checked' => true,
+            'disabled' => true,
+            'list' => true,
+            'name' => true,
+            'placeholder' => true,
+            'readonly' => true,
+            'type' => true,
+            'value' => true,
+        ),
+        'label' => array(
+            'for' => true,
+        ),
+        'textarea' => array(
+            'cols' => true,
+            'disabled' => true,
+            'maxlength' => true,
+            'minlength' => true,
+            'name' => true,
+            'placeholder' => true,
+            'readonly' => true,
+            'rows' => true,
+            'spellcheck' => true,
+            'wrap' => true,
+        ),
+    );
+
+    $allowed = array_map(
+        function ($to_map) {
+            $attr = array(
+                'aria-checked' => true,
+                'aria-describedby' => true,
+                'aria-details' => true,
+                'aria-disabled' => true,
+                'aria-hidden' => true,
+                'aria-invalid' => true,
+                'aria-label' => true,
+                'aria-labelledby' => true,
+                'aria-live' => true,
+                'aria-relevant' => true,
+                'aria-required' => true,
+                'aria-selected' => true,
+                'class' => true,
+                'data-*' => true,
+                'id' => true,
+                'inputmode' => true,
+                'role' => true,
+                'style' => true,
+                'tabindex' => true,
+                'title' => true,
+            );
+
+            return array_merge( $attr, (array) $to_map );
+        },
+        $allowed
+    );
+    return $allowed;
+}
+
 ?><?php
 /* ------------------------------------------------------------------------- *
  *  BREAKPOINTS HELPER

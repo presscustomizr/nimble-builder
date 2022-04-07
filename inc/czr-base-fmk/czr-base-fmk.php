@@ -572,7 +572,7 @@ if ( !class_exists( 'CZR_Fmk_Base_Ajax_Filter' ) ) :
                 case 'rud-item-alert-part' :
                     ?>
                       <p class="czr-item-removal-title"><?php _e('Are you sure you want to remove : <strong>{{ data.title }} ?</strong>', 'text_doma'); ?></p>
-                      <span class="<?php echo $css_attr['remove_view_btn']; ?> button"><?php _e('Yes', 'text_doma'); ?></span> <span class="<?php echo $css_attr['cancel_alert_btn']; ?> button"><?php _e('No', 'text_doma'); ?></span>
+                      <span class="<?php echo esc_attr($css_attr['remove_view_btn']); ?> button"><?php _e('Yes', 'text_doma'); ?></span> <span class="<?php echo esc_attr($css_attr['cancel_alert_btn']); ?> button"><?php _e('No', 'text_doma'); ?></span>
                     <?php
                 break;
 

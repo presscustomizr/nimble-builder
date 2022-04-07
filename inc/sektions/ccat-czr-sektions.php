@@ -4408,8 +4408,6 @@ function sek_maybe_export() {
     header( 'Content-disposition: attachment; filename=' . $filename );
     header( 'Content-Type: application/octet-stream; charset=' . get_option( 'blog_charset' ) );
 
-    // Serialize the export data.
-    //echo serialize( $export );
     echo wp_json_encode( $export );
 
     // Start the download.
