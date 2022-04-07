@@ -48,7 +48,7 @@ if ( !function_exists( 'Nimble\sek_get_text_heading_content' ) ) {
         }
 
         if ( $echo ) {
-            echo $to_print;
+            echo wp_kses_post($to_print);
         } else {
             return $to_print;
         }
