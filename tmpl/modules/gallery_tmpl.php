@@ -174,17 +174,14 @@ if ( !function_exists( 'Nimble\sek_print_gallery_mod' ) ) {
                         <?php
                             if ( 'no-link' === $gallery_opts['link-to'] ) {
                                 $html = sek_get_gal_img_item_html( $item, $gallery_opts );
-                                $html = apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($html) );
+                                echo apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($html) );
                                 if ( !skp_is_customizing() && false !== strpos($html, 'data-sek-src="http') ) {
-                                    $html = $html.Nimble_Manager()->css_loader_html;//the css_loader_html property contains only HTML, no PHP vars
+                                    echo '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>';
                                 }
-                                // output secured earlier with wp_kses_post()
-                                echo $html;
                             } else {
                                 $link = sek_get_gal_img_link( $item, $gallery_opts );
                                 $html = sek_get_gal_img_item_html( $item, $gallery_opts );
 
-                                //html secured with wp_kses_post()
                                 printf('<a class="%4$s %5$s" href="%1$s" %2$s title="%6$s">%3$s</a>',
                                     esc_url($link),
                                     true === sek_booleanize_checkbox_val( $gallery_opts['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',

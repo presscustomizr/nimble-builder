@@ -41,17 +41,13 @@ if ( !function_exists( 'Nimble\sek_print_accordion' ) ) {
                     // because of potential third party plugins corrupting 'the_content' filter. https://github.com/presscustomizr/nimble-builder/issues/233
                     // added may 2020 for #699
                     // 'the_nimble_tinymce_module_content' includes parsing template tags
-                    $item_html_content = apply_filters( 'the_nimble_tinymce_module_content', $item_html_content );
-                    if ( !skp_is_customizing() ) {
-                        $item_html_content = apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($item_html_content) );
-                    }
                     // Put them together
-                    $title_attr = esc_html( esc_attr( $item['title_attr'] ) );
+                    $title_attr = esc_attr( $item['title_attr'] );
                     printf( '<div class="sek-accord-item" %1$s data-sek-item-id="%2$s" data-sek-expanded="%5$s"><div id="sek-tab-title-%2$s" class="sek-accord-title" role="tab" aria-controls="sek-tab-content-%2$s"><span class="sek-inner-accord-title">%3$s</span><div class="expander"><span></span><span></span></div></div><div id="sek-tab-content-%2$s" class="sek-accord-content" role="tabpanel" aria-labelledby="sek-tab-title-%2$s">%4$s</div></div>',
-                        empty($title_attr) ? '' : 'title="'. $title_attr . '"',
+                        empty($title_attr) ? '' : 'title="'. esc_html($title_attr) . '"',
                         esc_attr($item['id']),
                         wp_kses_post(sek_maybe_decode_richtext($title)),// convert into a json to prevent emoji breaking global json data structure
-                        $item_html_content,//<= secured with wp_kses_post()
+                        !skp_is_customizing() ? apply_filters( 'nimble_parse_for_smart_load', apply_filters( 'the_nimble_tinymce_module_content', wp_kses_post($item_html_content)  )) : apply_filters( 'the_nimble_tinymce_module_content', wp_kses_post($item_html_content) ),
                         ( 'true' === $first_expanded && 1 === $ind ) ? "true" : "false"
                     );
                     $ind++;

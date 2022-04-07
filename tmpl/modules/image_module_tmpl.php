@@ -122,7 +122,7 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_html') ) {
         }
         return sprintf('<figure class="%1$s" title="%3$s">%2$s</figure>',
             esc_attr($img_figure_classes),
-            apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($html) ),
+            $html,
             esc_html( $title )
         );
     }
@@ -163,19 +163,18 @@ if ( !function_exists( 'Nimble\sek_get_img_module_img_link' ) ) {
 
 // Print
 if ( 'no-link' === $main_settings['link-to'] ) {
-    // output is secured in sek_get_img_module_img_html()
-    echo apply_filters('nb_img_module_html', sek_get_img_module_img_html( $main_settings ), $main_settings );
+    $to_render = apply_filters('nb_img_module_html', sek_get_img_module_img_html( $main_settings ), $main_settings );
+    echo apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($to_render));
 } else {
-    // output is secured in sek_get_img_module_img_link()
     $link = sek_get_img_module_img_link( $main_settings );
-    // output is secured in sek_get_img_module_img_html()
-    printf('<a class="%4$s %5$s" href="%1$s" %2$s>%3$s</a>',
+    $to_render = sprintf('<a class="%4$s %5$s" href="%1$s" %2$s>%3$s</a>',
         esc_url($link),
         true === sek_booleanize_checkbox_val( $main_settings['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
         apply_filters('nb_img_module_html', sek_get_img_module_img_html( $main_settings ), $main_settings ),
         'sek-link-to-'.esc_attr($main_settings['link-to']), // sek-link-to-img-lightbox
         false === strpos($link,'http') ? 'sek-no-img-link' : ''
     );
+    echo apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($to_render));
 }
 if ( 'img-lightbox' === $main_settings['link-to'] ) {
     sek_emit_js_event('nb-needs-swipebox');

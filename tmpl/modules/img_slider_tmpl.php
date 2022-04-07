@@ -132,11 +132,13 @@ if ( !function_exists('Nimble\sek_maybe_parse_slider_img_html_for_lazyload') ) {
                 unset( $attr['srcset'] );
             }
 
-            if ( !empty( $attr['src'] ) ) {
-                $attr['data-src'] = $attr['src'];
-                $attr['src'] = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-                //unset( $attr['src'] );
-            }
+            // april 22 : deactivated when implementing late escape for #885 because it breaks data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7
+            // No idea how to escape this without breaking it for now
+            // if ( !empty( $attr['src'] ) ) {
+            //     $attr['data-src'] = $attr['src'];
+            //     $attr['src'] = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            //     //unset( $attr['src'] );
+            // }
             if ( !empty( $attr['sizes'] ) ) {
                 $attr['data-sek-img-sizes'] = $attr['sizes'];
                 unset( $attr['sizes'] );
@@ -187,7 +189,7 @@ if ( !function_exists( 'Nimble\sek_get_img_slider_module_img_html') ) {
             // in particular when calculting if is_visible() to decide if we smart load.
             $html = sprintf( '<img alt="default img" data-skip-lazyload="true" src="%1$s"/>', esc_url( $item['img'] )  );
         }
-        return skp_is_customizing() ? wp_kses_post($html) : apply_filters( 'nimble_parse_for_smart_load',$html );
+        return $html;
     }
 }
 
@@ -239,15 +241,15 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
                   $has_overlay = true === sek_booleanize_checkbox_val( $item['apply-overlay'] );
 
                   // Put them together
-                  // output secured in sek_get_img_slider_module_img_html()
-                  printf( '<div class="swiper-slide" title="%1$s" data-sek-item-id="%4$s" data-sek-has-overlay="%5$s" %6$s><figure class="sek-carousel-img">%2$s</figure>%3$s</div>',
+                  $to_render = sprintf( '<div class="swiper-slide" title="%1$s" data-sek-item-id="%4$s" data-sek-has-overlay="%5$s" %6$s><figure class="sek-carousel-img">%2$s</figure>%3$s</div>',
                       sek_slider_parse_template_tags( strip_tags( esc_attr( $item['title_attr'] ) ), $item ),
                       sek_get_img_slider_module_img_html( $item, "true" === $lazy_load_on, $index ),
-                      wp_kses_post( sek_slider_parse_template_tags( $text_html, $item ) ),
+                      sek_slider_parse_template_tags( $text_html, $item ),
                       esc_attr($item['id']),
                       true === sek_booleanize_checkbox_val( $has_overlay ) ? 'true' : 'false',
                       esc_attr( apply_filters('nb_single_slide_custom_attributes', '', $item, $model ) )
                   );
+                  echo skp_is_customizing() ? wp_kses_post($to_render) : apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($to_render) );
 
               }//foreach
               ?>
@@ -265,7 +267,7 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
           <?php endif; ?>
           <?php
             if ( !skp_is_customizing() ) {
-              echo wp_kses_post(Nimble_Manager()->css_loader_html);
+              echo '<div class="sek-css-loader sek-mr-loader"><div></div><div></div><div></div></div>';
             }
           ?>
         </div><?php //.swiper ?>

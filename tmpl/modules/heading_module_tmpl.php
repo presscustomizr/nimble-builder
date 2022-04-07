@@ -66,9 +66,9 @@ if ( !function_exists( 'Nimble\sek_get_heading_module_link') ) {
             if ( !empty( $value['link-pick-url'] ) && !empty( $value['link-pick-url']['id'] ) ) {
                 if ( '_custom_' == $value['link-pick-url']['id']  && !empty( $value['link-custom-url'] ) ) {
                     $custom_url = apply_filters( 'nimble_parse_template_tags', $value['link-custom-url'] );
-                    $link = esc_url( $custom_url );
+                    $link = $custom_url;
                 } else if ( !empty( $value['link-pick-url']['url'] ) ) {
-                    $link = esc_url( $value['link-pick-url']['url'] );
+                    $link = $value['link-pick-url']['url'];
                 }
             }
         }
@@ -93,7 +93,7 @@ if ( array_key_exists('heading_text', $value ) ) {
         printf( '<%1$s %3$s class="sek-heading">%2$s</%1$s>',
             esc_attr($tag),
             sprintf('<a href="%1$s" %2$s>%3$s</a>',
-                sek_get_heading_module_link( $value ),//<= secured with esc_url()
+                esc_url(sek_get_heading_module_link( $value )),
                 true === sek_booleanize_checkbox_val( $value['link-target'] ) ? 'target="_blank" rel="noopener noreferrer"' : '',
                 wp_kses_post(sek_get_text_heading_content( $value['heading_text'], 'heading_text', $model ))
             ),

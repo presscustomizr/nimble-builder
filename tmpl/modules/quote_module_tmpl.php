@@ -15,7 +15,7 @@ $design_settings = $value['design'];
 // should be wrapped in a specific selector when customizing,
 //  => so we can listen to user click actions and open the editor on for each separate tiny_mce_editor input
 if ( !function_exists( __NAMESPACE__ . '\sek_print_quote_content' ) ) {
-    function sek_print_quote_content( $quote_content, $input_id, $module_model, $echo = false ) {
+    function sek_print_quote_content( $quote_content, $input_id, $module_model ) {
         // added september 2020 related to https://github.com/presscustomizr/nimble-builder/issues/688
         $quote_content = sek_strip_script_tags( $quote_content );
 
@@ -30,11 +30,7 @@ if ( !function_exists( __NAMESPACE__ . '\sek_print_quote_content' ) ) {
             $to_print = $quote_content;
         }
 
-        if ( $echo ) {
-            echo wp_kses_post($to_print);
-        } else {
-            return wp_kses_post($to_print);
-        }
+        echo apply_filters( 'the_nimble_tinymce_module_content', wp_kses_post($to_print) );
     }
 }
 
@@ -46,9 +42,6 @@ if ( !empty( $quote_content_settings['quote_text'] ) ) {
         // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
         // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
         $cite_text = sek_maybe_decode_richtext( $cite_content_settings['cite_text'] );
-
-        // filter added since text editor implementation https://github.com/presscustomizr/nimble-builder/issues/403
-        $cite_text = apply_filters( 'the_nimble_tinymce_module_content', sek_strip_script_tags( $cite_text ) );
     }
 
     sek_print_quote_content(
@@ -57,12 +50,11 @@ if ( !empty( $quote_content_settings['quote_text'] ) ) {
             // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
             // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
             wp_kses_post(sek_maybe_decode_richtext( $quote_content_settings['quote_text'] )),
-            !empty( $cite_text ) ? sprintf( '<footer class="sek-quote-footer"><cite class="sek-cite">%1$s</cite></footer>', wp_kses_post($cite_text )) : '',
+            !empty( $cite_text ) ? sprintf( '<footer class="sek-quote-footer"><cite class="sek-cite">%1$s</cite></footer>', sek_strip_script_tags( $cite_text ) ) : '',
             empty( $design_settings['quote_design'] ) || 'none' == $design_settings['quote_design'] ? '' : " sek-quote-design sek-{$design_settings['quote_design']}",
             $design_settings['quote_design']
         ),
         'quote_text',
-        $model,
-        $echo = true
+        $model
     );
 }
