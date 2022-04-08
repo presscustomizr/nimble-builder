@@ -3217,16 +3217,38 @@ function sek_get_th_start_ver( $theme_name ) {
  *  STRIP SCRIPT TAG WHEN CUSTOMIZING
  *  to prevent customizer breakages. See https://github.com/presscustomizr/nimble-builder/issues/688
 /* ------------------------------------------------------------------------- */
-function sek_strip_script_tags_when_customizing( $html = '' ) {
-      if ( !skp_is_customizing() || !is_string( $html ) ) {
-          return $html;
-      }
-      // June 2020 => added a notice for https://github.com/presscustomizr/nimble-builder/issues/710
-      $script_notice = sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>',
-          __('Custom javascript code is not executed when customizing.', 'text-doma')
-      );
-      return preg_replace('#<script(.*?)>(.*?)</script>#is', $script_notice, $html);
+function sek_strip_script_tags_and_print_js_inline( $html, $model ) {
+    if ( !is_string( $html ) )
+        return $html;
+    if ( skp_is_customizing() ) {
+        // June 2020 => added a notice for https://github.com/presscustomizr/nimble-builder/issues/710
+        $script_notice = sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>',
+        __('Custom javascript code is not executed when customizing.', 'text-doma')
+        );
+        return preg_replace('#<script(.*?)>(.*?)</script>#is', $script_notice, $html);
+    } else {
+        $js = "";
+        // Get the script tags content
+        preg_match_all('/<script>(.*?)<\/script>/s', $html, $matches);
+        foreach ($matches[1] as $value) {
+            if (!empty($value)) {
+                $js .= $value .";\n";
+            }
+        }
+        
+        // Remove the scripts from the content
+        $html = preg_replace('#<script(.*?)</script>#is', '', $html);
+        
+        // Print scripts inline safely
+        if ( !empty($js) ) {
+            wp_register_script( 'nb_module_custom_js_' . $model['id'], '');
+            wp_enqueue_script( 'nb_module_custom_js_' . $model['id'] );
+            wp_add_inline_script( 'nb_module_custom_js_' . $model['id'], $js );
+        }
+        return $html;
+    }
 }
+
 function sek_strip_script_tags( $html = '' ) {
       if (!is_string( $html ) ) {
           return $html;
