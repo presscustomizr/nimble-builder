@@ -32,9 +32,8 @@ if ( !function_exists( 'Nimble\sek_print_html_content') ) {
             //Also consider to add several other filter callbacks e.g. wptexturize, wpemoji... : see default-filters for 'the_content' in wp-incudes/default-filters.php
             //The html widget for sure doesn't conver emojis
             add_filter( 'sek_html_content', 'do_shortcode' );
-            $html_content = apply_filters( 'sek_html_content', $html_content );
             if ( !skp_is_customizing() ) {
-                echo apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($html_content) );
+                echo apply_filters( 'nimble_parse_for_smart_load',apply_filters( 'sek_html_content',  wp_kses_post($html_content )) );
             } else {
                 echo wp_kses_post($html_content);
             }
