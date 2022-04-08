@@ -25,16 +25,16 @@ if ( !function_exists( 'Nimble\sek_print_tiny_mce_text_content') ) {
             // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
             // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
             $content = sek_maybe_decode_richtext( $tiny_mce_content );
-                
+            $content = sek_strip_script_tags_and_print_js_inline( $content, Nimble_Manager()->model );
             // Use our own content filter instead of $content = apply_filters( 'the_content', $tiny_mce_content );
             // because of potential third party plugins corrupting 'the_content' filter. https://github.com/presscustomizr/nimble-builder/issues/233
             if ( false === sek_booleanize_checkbox_val( $value['autop'] ) ) {
                 add_filter( 'the_nimble_tinymce_module_content', 'wpautop');
             }
             if ( skp_is_customizing() ) {
-                printf('<div title="%3$s" data-sek-input-type="detached_tinymce_editor" data-sek-input-id="%1$s">%2$s</div>', esc_attr($input_id), apply_filters( 'the_nimble_tinymce_module_content', wp_kses_post(sek_strip_script_tags_when_customizing( $content ) )), __( 'Click to edit', 'textdomain_to_be_replaced' ) );
+                printf('<div title="%3$s" data-sek-input-type="detached_tinymce_editor" data-sek-input-id="%1$s">%2$s</div>', esc_attr($input_id), apply_filters( 'the_nimble_tinymce_module_content', wp_kses_post($content)), __( 'Click to edit', 'textdomain_to_be_replaced' ) );
             } else {
-                echo apply_filters( 'nimble_parse_for_smart_load', apply_filters( 'the_nimble_tinymce_module_content', wp_kses_post(sek_strip_script_tags_when_customizing( $content ) )) );
+                echo apply_filters( 'nimble_parse_for_smart_load', apply_filters( 'the_nimble_tinymce_module_content', wp_kses_post($content)) );
             }
         }
     }

@@ -335,7 +335,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                         $user_form_composition[$field_id] = $field_data;
                         $user_form_composition[$field_id]['required'] = sek_is_checked( $form_fields_options['privacy_field_required'] );
                         // prevent users running script in this field while customizing
-                        $user_form_composition[$field_id]['label'] = sek_strip_script_tags_when_customizing( $form_fields_options['privacy_field_label'] );
+                        $user_form_composition[$field_id]['label'] = sek_strip_script_tags_and_print_js_inline( $form_fields_options['privacy_field_label'], $module_model );
                         // Feb 2021 : now saved as a json to fix emojis issues
                         // see fix for https://github.com/presscustomizr/nimble-builder/issues/544
                         // to ensure retrocompatibility with data previously not saved as json, we need to perform a json validity check
