@@ -46,11 +46,16 @@ function nb_options_page() {
       </h1>
       <div class="nav-tab-wrapper">
           <?php
+            $allowed_tags = array(
+              'div' => array('class'=>true),
+              'span' => array('class'=>true),
+              'img' => array('class'=>true, 'src'=>true, 'alt'=>true),
+            ); 
             foreach ($option_tabs as $tab_id => $tab_data ) {
               printf('<a class="nav-tab %1$s" href="%2$s">%3$s</a>',
                   $tab_id === nb_get_active_option_tab() ? 'nav-tab-active' : '',
                   esc_url( admin_url( NIMBLE_OPTIONS_PAGE_URL ) . '&tab=' . $tab_id ),
-                  esc_html($tab_data['title'])
+                  wp_kses($tab_data['title'], $allowed_tags)
               );
             }
           ?>
