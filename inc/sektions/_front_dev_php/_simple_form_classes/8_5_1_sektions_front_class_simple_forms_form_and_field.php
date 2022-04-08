@@ -89,8 +89,9 @@ class Sek_Form {
             $fields .= $field;
         }
 
+        // The form output is late escaped on rendering in tmpl\modules\simple_form_module_tmpl.php
         return sprintf('<form %1$s>%2$s</form>',
-            esc_attr($this->get_attributes_html()),
+            $this->get_attributes_html(),
             $fields
         );
     }
