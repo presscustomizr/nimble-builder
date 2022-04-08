@@ -141,10 +141,11 @@ function sek_process_column_width_for_device( $params ) {
             // First try to find a width value in options, then look in the previous width property for backward compatibility
             // After implementing https://github.com/presscustomizr/nimble-builder/issues/279
             $column_options = isset( $level['options'] ) ? $level['options'] : array();
+            $custom_width = null;
             if ( !empty( $column_options['width'] ) && !empty( $column_options['width']['custom-width'] ) ) {
                 $width_candidate = (float)$column_options['width']['custom-width'];
                 if ( $width_candidate < 0 || $width_candidate > 100 ) {
-                    sek_error_log( __FUNCTION__ . ' => invalid width value for column id : ' . $column['id'] );
+                    sek_error_log( __FUNCTION__ . ' => invalid width value for column id : ' . $level['id'] );
                 } else {
                     $custom_width = $width_candidate;
                 }
