@@ -46,8 +46,7 @@ if ( !function_exists( 'Nimble\sek_get_text_heading_content' ) ) {
                 $to_print = preg_replace("/<\\/?" . $tag . "(.|\\s)*?>/",'', $to_print );
             }
         }
-
-        echo wp_kses_post($to_print);
+        return $to_print;
     }
 }
 
