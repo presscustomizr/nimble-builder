@@ -3237,7 +3237,7 @@ function sek_strip_script_tags_and_print_js_inline( $html, $model ) {
         }
         
         // Remove the scripts from the content
-        $html = preg_replace('#<script(.*?)</script>#is', '', $html);
+        //$html = preg_replace('#<script(.*?)</script>#is', '', $html);
         
         // Print scripts inline safely
         if ( !empty($js) ) {
