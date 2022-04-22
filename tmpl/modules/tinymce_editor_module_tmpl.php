@@ -34,7 +34,7 @@ if ( !function_exists( 'Nimble\sek_print_tiny_mce_text_content') ) {
             if ( skp_is_customizing() ) {
                 printf('<div title="%3$s" data-sek-input-type="detached_tinymce_editor" data-sek-input-id="%1$s">%2$s</div>', esc_attr($input_id), apply_filters( 'the_nimble_tinymce_module_content', wp_kses_post($content)), __( 'Click to edit', 'textdomain_to_be_replaced' ) );
             } else {
-                echo apply_filters( 'nimble_parse_for_smart_load', apply_filters( 'the_nimble_tinymce_module_content', wp_kses_post($content)) );
+                echo apply_filters( 'nimble_parse_for_smart_load', apply_filters( 'the_nimble_tinymce_module_content', htmlspecialchars_decode(esc_html($content))) );
             }
         }
     }
