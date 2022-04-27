@@ -294,7 +294,7 @@
   }
 }
 
-.sek-animate-candidate:not(.sek-animate-displayed-before-starting) {
+body:not(.customizer-preview) .sek-animate-candidate:not(.sek-animate-displayed-before-starting) {
   opacity: 0;
 }
 
