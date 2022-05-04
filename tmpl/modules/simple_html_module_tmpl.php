@@ -33,7 +33,7 @@ if ( !function_exists( 'Nimble\sek_print_html_content') ) {
             //The html widget for sure doesn't conver emojis
             add_filter( 'sek_html_content', 'do_shortcode' );
             if ( !skp_is_customizing() ) {
-                echo apply_filters( 'nimble_parse_for_smart_load',apply_filters( 'sek_html_content',  wp_kses_post($html_content )) );
+                echo apply_filters( 'nimble_parse_for_smart_load',apply_filters( 'sek_html_content',  htmlspecialchars_decode(esc_html($html_content) )) );
             } else {
                 echo wp_kses_post($html_content);
             }
