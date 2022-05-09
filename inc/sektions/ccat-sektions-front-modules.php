@@ -7456,4 +7456,29 @@ function sek_add_css_rules_for_items_in_czr_gallery_collection_child( $rules, $p
 }
 
 
+/* ------------------------------------------------------------------------- *
+ *  REMOVE LAZY LOAD OF 3RD PARTY PLUGINS
+/* ------------------------------------------------------------------------- */
+
+add_filter('wp_get_attachment_image_attributes','Nimble\nimble_image_no_lazy');
+
+function nimble_image_no_lazy( $attr ){
+    $attr['class'] .= " no-lazy";
+    return $attr;
+}
+
+/* ------------------------------------------------------------------------- *
+ *  EXCLUDE LAZY LOAD FROM WP ROCKET PLUGIN
+/* ------------------------------------------------------------------------- */
+
+add_action( 'init', 'Nimble\nimble_include_no_lazy_class' );
+
+function nimble_include_no_lazy_class(){
+    $settings = get_option('wp_rocket_settings');
+    if( is_array( $settings ) && !in_array('no-lazy', $settings['exclude_lazyload'] ) ){
+        $settings['exclude_lazyload'][] = 'no-lazy';
+        update_option( 'wp_rocket_settings', $settings );
+    }
+}
+
 ?>

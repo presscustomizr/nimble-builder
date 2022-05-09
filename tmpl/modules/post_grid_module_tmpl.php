@@ -169,7 +169,7 @@ if ( !function_exists( 'Nimble\sek_render_post') ) {
                         echo wp_kses_post($img_html);
                       }
                   } else if ( $use_post_thumb_placeholder ) {
-                      echo apply_filters( 'nimble_post_grid_module_default_featured_image', sprintf( '<img alt="default img" data-skip-lazyload="true" src="%1$s"/>', esc_url(NIMBLE_BASE_URL . '/assets/img/default-img.png' ) ) );
+                      echo apply_filters( 'nimble_post_grid_module_default_featured_image', sprintf( '<img alt="default img" class="no-lazy" data-skip-lazyload="true" src="%1$s"/>', esc_url(NIMBLE_BASE_URL . '/assets/img/default-img.png' ) ) );
                   }
               ?>
             </a>
