@@ -5,7 +5,7 @@ Plugin URI: https://wordpress.org/plugins/nimble-builder/
 Tags: page builder, visual editor, customizer, drag and drop, header, footer, landing page, contact form, grid, post grid
 Requires at least: 4.7
 Requires PHP: 5.4
-Tested up to: 5.9
+Tested up to: 6.0
 Stable tag: 3.2.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
