@@ -35,7 +35,9 @@ if ( !function_exists( 'Nimble\sek_print_html_content') ) {
             if ( !skp_is_customizing() ) {
                 echo apply_filters( 'nimble_parse_for_smart_load',apply_filters( 'sek_html_content',  htmlspecialchars_decode(esc_html($html_content) )) );
             } else {
+                add_filter( 'safe_style_css', 'nimble_allow_display_attribute' );
                 echo wp_kses_post($html_content);
+                remove_filter( 'safe_style_css', 'nimble_allow_display_attribute' );
             }
             remove_filter( 'sek_html_content', 'do_shortcode' );
         }
