@@ -5664,7 +5664,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 // Make sure we target the right form if several forms are displayed in a page
                 $current_form_has_been_submitted = isset( $_POST['nimble_level_id'] ) && sanitize_text_field($_POST['nimble_level_id']) === $module_id;
 
-                if ( 'sent' == $this->mailer->get_status() && $current_form_has_been_submitted ) {
+                if ( in_array( $this->mailer->get_status(), ['sent', 'not_sent', 'aborted'] ) && $current_form_has_been_submitted ) {
                     $echo_form = false;
                 }
             }
