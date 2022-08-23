@@ -21,5 +21,8 @@ if ( true === sek_booleanize_checkbox_val( $value['fields_design']['use_inset_sh
 ?>
 <div class="sek-simple-form-wrapper <?php echo esc_attr($visual_effect_class); ?>">
     <?php // output secured in Nimble_Manager()->get_simple_form_html() ?>
-  <?php echo wp_kses(Nimble_Manager()->get_simple_form_html( $model ), sek_get_allowed_html_in_forms()); ?>
+    <?php 
+    $allowed_tags = sek_get_allowed_html_in_forms();
+    $allowed_tags['a'] = ['href' => 1, 'title' => 1, 'target' => 1]; ?>
+  <?php echo wp_kses(Nimble_Manager()->get_simple_form_html( $model ), $allowed_tags); ?>
 </div>
