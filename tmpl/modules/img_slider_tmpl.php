@@ -247,7 +247,7 @@ if ( !function_exists( 'Nimble\sek_print_img_slider' ) ) {
                       sek_slider_parse_template_tags( $text_html, $item ),
                       esc_attr($item['id']),
                       true === sek_booleanize_checkbox_val( $has_overlay ) ? 'true' : 'false',
-                      esc_attr( apply_filters('nb_single_slide_custom_attributes', '', $item, $model ) )
+                      apply_filters('nb_single_slide_custom_attributes', '', $item, $model )
                   );
                   echo skp_is_customizing() ? wp_kses_post($to_render) : apply_filters( 'nimble_parse_for_smart_load', wp_kses_post($to_render) );
 
