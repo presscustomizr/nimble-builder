@@ -41,7 +41,7 @@ if ( !defined( 'NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES' ) ) { define( 'NIMBLE_OPT_NA
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_SHORTCODE_PARSING' ) ) { define( 'NIMBLE_OPT_NAME_FOR_SHORTCODE_PARSING' , 'nb_shortcodes_parsed_in_czr' ); }
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_DISABLING_WIDGET_MODULE' ) ) { define( 'NIMBLE_OPT_NAME_FOR_DISABLING_WIDGET_MODULE' , 'nb_widgets_disabled_in_czr' ); }
 if ( !defined( 'NIMBLE_OPT_NAME_FOR_DEBUG_MODE' ) ) { define( 'NIMBLE_OPT_NAME_FOR_DEBUG_MODE' , 'nb_debug_mode_active' ); }
-
+if ( !defined( 'NIMBLE_OPT_NAME_FOR_DISABLING_GOOGLE_FONTS' ) ) { define( 'NIMBLE_OPT_NAME_FOR_DISABLING_GOOGLE_FONTS' , 'nb_google_font_disable' ); }
 
 if ( !defined( 'NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED' ) ) { define( 'NIMBLE_PREFIX_FOR_SETTING_NOT_SAVED' , '__nimble__' ); }
 if ( !defined( 'NIMBLE_WIDGET_PREFIX' ) ) { define( 'NIMBLE_WIDGET_PREFIX' , 'nimble-widget-area-' ); }

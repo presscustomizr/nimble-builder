@@ -5254,7 +5254,7 @@ if ( !class_exists( 'SEK_Front_Render_Css' ) ) :
             }
             $google_fonts_print_candidates = $this->sek_get_gfont_print_candidates( $local_skope_id );
             // GOOGLE FONTS
-            if ( !empty( $google_fonts_print_candidates ) ) {
+            if ( !empty( $google_fonts_print_candidates ) && get_option( NIMBLE_OPT_NAME_FOR_DISABLING_GOOGLE_FONTS ) != 'on' ) {
                 // When customizing we get the google font content
                 if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
                     $this->sek_get_gfont_in_ajax( $google_fonts_print_candidates );
