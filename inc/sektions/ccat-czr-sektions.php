@@ -482,7 +482,7 @@ function nimble_get_code_editor_settings( $args ) {
 /* ------------------------------------------------------------------------- */
 add_filter( 'nimble-sek-localized-customizer-control-params', '\Nimble\nimble_add_i18n_localized_control_params' );
 function nimble_add_i18n_localized_control_params( $params ) {
-    return array_merge( $params, array(
+    $data = array_merge( $params, array(
         'i18n' => array(
             'Sections' => __( 'Sections', 'text_doma'),
 
@@ -675,6 +675,10 @@ function nimble_add_i18n_localized_control_params( $params ) {
         )//array()
     )//array()
     );//array_merge
+    if( get_option( NIMBLE_OPT_NAME_FOR_DISABLING_GOOGLE_FONTS ) == 'on' ){
+        unset( $data['i18n']['Google fonts'] );   
+    }
+    return $data;
 }//'nimble_add_i18n_localized_control_params'
 
 
@@ -4231,7 +4235,7 @@ function sek_get_font_list_tmpl( $html, $requested_tmpl = '', $posted_params = a
 
     return wp_json_encode( array(
         'cfonts' => sek_get_cfonts(),
-        'gfonts' => sek_get_gfonts(),
+        'gfonts' => get_option( NIMBLE_OPT_NAME_FOR_DISABLING_GOOGLE_FONTS ) == 'on' ? [] : sek_get_gfonts(),
     ) );//will be sent by wp_send_json_success() in ::ac_set_ajax_czr_tmpl()
 }
 

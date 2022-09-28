@@ -255,7 +255,8 @@ function print_welcome_page() {
       'NIMBLE_OPT_NAME_FOR_BACKWARD_FIXES',
       // admin options
       'NIMBLE_OPT_NAME_FOR_SHORTCODE_PARSING',
-      'NIMBLE_OPT_NAME_FOR_DEBUG_MODE'
+      'NIMBLE_OPT_NAME_FOR_DEBUG_MODE',
+      'NIMBLE_OPT_NAME_FOR_DISABLING_GOOGLE_FONTS'
     ];
     foreach( $nb_opts as $opt_name ) {
       if ( !defined( $opt_name ) )
@@ -368,6 +369,18 @@ function print_options_page() {
           </td>
         </tr>
         <tr>
+          <th scope="row"><?php _e('Google Fonts', 'text_doma'); ?></th>
+          <td>
+            <fieldset><legend class="screen-reader-text"><span><?php _e('Disable Google Fonts', 'text_doma'); ?></span></legend>
+              <?php
+                $nb_debug_mode_opt_val = get_option( NIMBLE_OPT_NAME_FOR_DISABLING_GOOGLE_FONTS );
+              ?>
+              <label for="nb_google_font_disable"><input name="nb_google_font_disable" type="checkbox" id="nb_google_font_disable" value="on" <?php checked( $nb_debug_mode_opt_val, 'on' ); ?>>
+              <?php _e('Activate to disable Google fonts', 'text_doma'); ?></label>
+            </fieldset>
+          </td>
+        </tr>
+        <tr>
           <th scope="row"><?php _e('Debug Mode', 'text_doma'); ?></th>
           <td>
             <fieldset><legend class="screen-reader-text"><span><?php _e('Debug Mode', 'text_doma'); ?></span></legend>
@@ -462,6 +475,8 @@ function nb_save_base_options() {
     nb_maybe_update_checkbox_option( NIMBLE_OPT_NAME_FOR_DISABLING_WIDGET_MODULE, 'off' );
     // Debug mode
     nb_maybe_update_checkbox_option( NIMBLE_OPT_NAME_FOR_DEBUG_MODE, 'off' );
+    // Google font disabled
+    nb_maybe_update_checkbox_option( NIMBLE_OPT_NAME_FOR_DISABLING_GOOGLE_FONTS, 'off' );
 }
 
 // helper to update a checkbox option
