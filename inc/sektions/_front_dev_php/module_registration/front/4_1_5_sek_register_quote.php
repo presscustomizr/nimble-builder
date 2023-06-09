@@ -14,15 +14,15 @@ function sek_get_module_params_for_czr_quote_module() {
             'cite_content' => 'czr_quote_cite_child',
             'design' => 'czr_quote_design_child'
         ),
-        'name' => __('Quote', 'text_doma' ),
+        'name' => __('Quote', 'nimble-builder' ),
         'sanitize_callback' => __NAMESPACE__ . '\sanitize_callback__czr_quote_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'starting_value' => array(
             'quote_content' => array(
-                'quote_text'  => __('Hey, careful, man, there\'s a beverage here!','text_doma'),
+                'quote_text'  => __('Hey, careful, man, there\'s a beverage here!','nimble-builder'),
             ),
             'cite_content' => array(
-                'cite_text'   => sprintf( __('The Dude in %1s', 'text_doma'), '<a href="https://www.imdb.com/title/tt0118715/quotes/qt0464770" rel="nofollow noopener noreferrer" target="_blank">The Big Lebowski</a>' ),
+                'cite_text'   => sprintf( __('The Dude in %1s', 'nimble-builder'), '<a href="https://www.imdb.com/title/tt0118715/quotes/qt0464770" rel="nofollow noopener noreferrer" target="_blank">The Big Lebowski</a>' ),
                 'cite_font_style_css' => 'italic',
             ),
             'design' => array(
@@ -57,7 +57,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_quote_quote_child',
-        'name' => __( 'Quote content', 'text_doma' ),
+        'name' => __( 'Quote content', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' =>'',
         'tmpl' => array(
@@ -68,15 +68,15 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                         'media_button' => false,
                         'includedBtns' => 'basic_btns',
                     ),
-                    'title'             => __( 'Main quote content', 'text_doma' ),
+                    'title'             => __( 'Main quote content', 'nimble-builder' ),
                     'default'           => '',
                     'width-100'         => true,
-                    //'notice_before'     => __( 'You may use some html tags like a, br,p, div, span with attributes like style, id, class ...', 'text_doma'),
+                    //'notice_before'     => __( 'You may use some html tags like a, br,p, div, span with attributes like style, id, class ...', 'nimble-builder'),
                     'refresh_markup'    => '.sek-quote-content'
                 ),
                 'quote_font_family_css' => array(
                     'input_type'  => 'font_picker',
-                    'title'       => __( 'Font family', 'text_doma' ),
+                    'title'       => __( 'Font family', 'nimble-builder' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -90,7 +90,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),
                 'quote_font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Font size', 'text_doma' ),
+                    'title'       => __( 'Font size', 'nimble-builder' ),
                     'default'     => array( 'desktop' => '1.2em' ),
                     'min' => 0,
                     'max' => 100,
@@ -103,7 +103,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//16,//"14px",
                 'quote_line_height_css'     => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Line height', 'text_doma' ),
+                    'title'       => __( 'Line height', 'nimble-builder' ),
                     'default'     => '1.5em',
                     'min' => 0,
                     'max' => 10,
@@ -116,7 +116,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//24,//"20px",
                 'quote_color_css'           => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Text color', 'text_doma' ),
+                    'title'       => __( 'Text color', 'nimble-builder' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -126,7 +126,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//"#000000",
                 'quote_color_hover_css'     => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                    'title'       => __( 'Text color on mouse over', 'nimble-builder' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -137,7 +137,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//"#000000",
                 'quote_font_weight_css'     => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __( 'Font weight', 'text_doma' ),
+                    'title'       => __( 'Font weight', 'nimble-builder' ),
                     'default'     => 400,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -147,7 +147,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//null,
                 'quote_font_style_css'      => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __( 'Font style', 'text_doma' ),
+                    'title'       => __( 'Font style', 'nimble-builder' ),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -157,7 +157,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//null,
                 'quote_text_decoration_css' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __( 'Text decoration', 'text_doma' ),
+                    'title'       => __( 'Text decoration', 'nimble-builder' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -167,7 +167,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//null,
                 'quote_text_transform_css'  => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __( 'Text transform', 'text_doma' ),
+                    'title'       => __( 'Text transform', 'nimble-builder' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -177,7 +177,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 ),//null,
                 'quote_letter_spacing_css'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Letter spacing', 'text_doma' ),
+                    'title'       => __( 'Letter spacing', 'nimble-builder' ),
                     'default'     => 0,
                     'min'         => 0,
                     'step'        => 1,
@@ -190,7 +190,7 @@ function sek_get_module_params_for_czr_quote_quote_child() {
                 // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
                 'quote___flag_important'       => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
+                    'title'       => __( 'Make those style options win if other rules are applied.', 'nimble-builder' ),
                     'default'     => 0,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -230,7 +230,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_quote_cite_child',
-        'name' => __( 'Cite content', 'text_doma' ),
+        'name' => __( 'Cite content', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' =>'',
         'tmpl' => array(
@@ -243,14 +243,14 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                         'height' => 50
                     ),
                     'refresh_markup' => '.sek-cite',
-                    'title'              => __( 'Cite text', 'text_doma' ),
+                    'title'              => __( 'Cite text', 'nimble-builder' ),
                     'default'            => '',
                     'width-100'         => true,
-                    //'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
+                    //'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'nimble-builder'),
                 ),
                 'cite_font_family_css' => array(
                     'input_type'  => 'font_picker',
-                    'title'       => __( 'Font family', 'text_doma' ),
+                    'title'       => __( 'Font family', 'nimble-builder' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -264,7 +264,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),
                 'cite_font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Font size', 'text_doma' ),
+                    'title'       => __( 'Font size', 'nimble-builder' ),
                     'default'     => array( 'desktop' => '14px' ),
                     'min' => 0,
                     'max' => 100,
@@ -277,7 +277,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//16,//"14px",
                 'cite_line_height_css'     => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Line height', 'text_doma' ),
+                    'title'       => __( 'Line height', 'nimble-builder' ),
                     'default'     => '1.5em',
                     'min' => 0,
                     'max' => 10,
@@ -290,7 +290,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//24,//"20px",
                 'cite_color_css'           => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Text color', 'text_doma' ),
+                    'title'       => __( 'Text color', 'nimble-builder' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -300,7 +300,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//"#000000",
                 'cite_color_hover_css'     => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                    'title'       => __( 'Text color on mouse over', 'nimble-builder' ),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -311,7 +311,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//"#000000",
                 'cite_font_weight_css'     => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __( 'Font weight', 'text_doma' ),
+                    'title'       => __( 'Font weight', 'nimble-builder' ),
                     'default'     => 'normal',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -321,7 +321,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//null,
                 'cite_font_style_css'      => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __( 'Font style', 'text_doma' ),
+                    'title'       => __( 'Font style', 'nimble-builder' ),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -331,7 +331,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//null,
                 'cite_text_decoration_css' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __( 'Text decoration', 'text_doma' ),
+                    'title'       => __( 'Text decoration', 'nimble-builder' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -341,7 +341,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//null,
                 'cite_text_transform_css'  => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __( 'Text transform', 'text_doma' ),
+                    'title'       => __( 'Text transform', 'nimble-builder' ),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -351,7 +351,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 ),//null,
                 'cite_letter_spacing_css'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Letter spacing', 'text_doma' ),
+                    'title'       => __( 'Letter spacing', 'nimble-builder' ),
                     'default'     => 0,
                     'min'         => 0,
                     'step'        => 1,
@@ -364,7 +364,7 @@ function sek_get_module_params_for_czr_quote_cite_child() {
                 // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
                 'cite___flag_important'       => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
+                    'title'       => __( 'Make those style options win if other rules are applied.', 'nimble-builder' ),
                     'default'     => 0,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -409,20 +409,20 @@ function sek_get_module_params_for_czr_quote_design_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_quote_design_child',
-        'name' => __( 'Design', 'text_doma' ),
+        'name' => __( 'Design', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' =>'',
         'tmpl' => array(
             'item-inputs' => array(
                 'quote_design' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __( 'Design', 'text_doma' ),
+                    'title'       => __( 'Design', 'nimble-builder' ),
                     'default'     => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'quote_design' )
                 ),
                 'border_width_css' => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Border weight', 'text_doma' ),
+                    'title'       => __( 'Border weight', 'nimble-builder' ),
                     'min' => 1,
                     'max' => 80,
                     'default' => '5px',
@@ -434,7 +434,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
                 ),
                 'border_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Border Color', 'text_doma' ),
+                    'title'       => __( 'Border Color', 'nimble-builder' ),
                     'width-100'   => true,
                     'default'     => 'rgba(0,0,0,0.1)',
                     'refresh_markup' => false,
@@ -444,7 +444,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
                 ),
                 'icon_size_css' => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Icon Size', 'text_doma' ),
+                    'title'       => __( 'Icon Size', 'nimble-builder' ),
                     'default'     => '50px',
                     'min' => 0,
                     'max' => 100,
@@ -456,7 +456,7 @@ function sek_get_module_params_for_czr_quote_design_child() {
                 ),
                 'icon_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Icon Color', 'text_doma' ),
+                    'title'       => __( 'Icon Color', 'nimble-builder' ),
                     'width-100'   => true,
                     'default'     => '#ccc',
                     'refresh_markup' => false,

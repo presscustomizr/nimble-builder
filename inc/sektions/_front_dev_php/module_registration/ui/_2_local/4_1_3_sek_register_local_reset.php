@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_local_reset() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_reset',
-        //'name' => __('Reset the sections of the current page', 'text_doma'),
+        //'name' => __('Reset the sections of the current page', 'nimble-builder'),
         'tmpl' => array(
             'item-inputs' => array(
                 // Added April 2021 for #478
@@ -14,7 +14,7 @@ function sek_get_module_params_for_sek_local_reset() {
                 // Note : If this property is set to true => NB removes the local skope post in Nimble_Collection_Setting::update()
                 'inherit_group_scope' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('After removal : inherit the site template if specified', 'text_doma'),
+                    'title'       => __('After removal : inherit the site template if specified', 'nimble-builder'),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -25,15 +25,15 @@ function sek_get_module_params_for_sek_local_reset() {
                         __('How to use site templates with Nimble Builder ?'),
                         'https://docs.presscustomizr.com/article/428-how-to-use-site-templates-with-nimble-builder'
                     ),
-                    'notice_after' => __('If a site template is defined for this context, this page will inherit the site template by default, unless this option is unchecked.', 'text_doma'),
-                    //'notice_after' => __( 'Check this option if you want to keep the existing sections of this page, and combine them with the imported ones.', 'text_doma'),
+                    'notice_after' => __('If a site template is defined for this context, this page will inherit the site template by default, unless this option is unchecked.', 'nimble-builder'),
+                    //'notice_after' => __( 'Check this option if you want to keep the existing sections of this page, and combine them with the imported ones.', 'nimble-builder'),
                 ),
                 'reset_local' => array(
                     'input_type'  => 'reset_button',
-                    'title'       => __( 'Remove all sections and Nimble Builder options of this page' , 'text_doma' ),
+                    'title'       => __( 'Remove all sections and Nimble Builder options of this page' , 'nimble-builder' ),
                     'scope'       => 'local',
                     'html_before' => '<hr/>',
-                    'notice_after' => __('This will remove the options and sections created for the currently previewed page only. All other sections and options in other contexts will be preserved.', 'text_doma'),
+                    'notice_after' => __('This will remove the options and sections created for the currently previewed page only. All other sections and options in other contexts will be preserved.', 'nimble-builder'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
                 )

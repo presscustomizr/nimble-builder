@@ -28,7 +28,7 @@ function sek_sektion_collection_sanitize_cb( $setting_data, $setting_instance = 
             }
         }
     }
-    //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_doma' ), $setting_data );
+    //return new \WP_Error( 'required', __( 'Error in a sektion', 'nimble-builder' ), $setting_data );
     return $setting_data;
 }
 
@@ -55,7 +55,7 @@ function sek_sektion_collection_validate_cb( $validity, $setting_data, $setting_
         }
     }
 
-    //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_doma' ), $setting_data );
+    //return new \WP_Error( 'required', __( 'Error in a sektion', 'nimble-builder' ), $setting_data );
     if ( true !== $validated ) {
         if ( is_wp_error( $validated ) ) {
             $validation_msg = $validation_msg->get_error_message();

@@ -274,7 +274,7 @@ function sek_get_img_sizes() {
 
     $sizes = array();
     $to_return = array(
-        'original' => __('Original image dimensions', 'text_doma')
+        'original' => __('Original image dimensions', 'nimble-builder')
     );
 
     foreach ( get_intermediate_image_sizes() as $_size ) {
@@ -744,59 +744,59 @@ function sek_get_module_collection() {
         array(
           'content-type' => 'preset_section',
           'content-id' => 'two_columns',
-          'title' => __( 'Two Columns', 'text_doma' ),
+          'title' => __( 'Two Columns', 'nimble-builder' ),
           'icon' => 'Nimble_2-columns_icon.svg'
         ),
         array(
           'content-type' => 'preset_section',
           'content-id' => 'three_columns',
-          'title' => __( 'Three Columns', 'text_doma' ),
+          'title' => __( 'Three Columns', 'nimble-builder' ),
           'icon' => 'Nimble_3-columns_icon.svg'
         ),
         array(
           'content-type' => 'preset_section',
           'content-id' => 'four_columns',
-          'title' => __( 'Four Columns', 'text_doma' ),
+          'title' => __( 'Four Columns', 'nimble-builder' ),
           'icon' => 'Nimble_4-columns_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_tiny_mce_editor_module',
-          'title' => __( 'Rich Text Editor', 'text_doma' ),
+          'title' => __( 'Rich Text Editor', 'nimble-builder' ),
           'icon' => 'Nimble_rich-text-editor_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_image_module',
-          'title' => __( 'Image', 'text_doma' ),
+          'title' => __( 'Image', 'nimble-builder' ),
           'icon' => 'Nimble__image_icon.svg'
         ),
 
         array(
             'content-type' => 'module',
             'content-id' => 'czr_gallery_module',
-            'title' => __( 'Image gallery', 'text_doma' ),
+            'title' => __( 'Image gallery', 'nimble-builder' ),
             'icon' => 'Nimble_gallery_icon.svg'
           ),
 
         array(
           'content-type' => 'module',
           'content-id' => 'czr_heading_module',
-          'title' => __( 'Heading', 'text_doma' ),
+          'title' => __( 'Heading', 'nimble-builder' ),
           'icon' => 'Nimble__heading_icon.svg'
         ),
 
         array(
           'content-type' => 'module',
           'content-id' => 'czr_icon_module',
-          'title' => __( 'Icon', 'text_doma' ),
+          'title' => __( 'Icon', 'nimble-builder' ),
           'icon' => 'Nimble__icon_icon.svg'
         ),
 
         array(
           'content-type' => 'module',
           'content-id' => 'czr_special_img_module',
-          'title' => __( 'Nimble Image', 'text_doma' ),
+          'title' => __( 'Nimble Image', 'nimble-builder' ),
           'icon' => 'Nimble_img_icon.svg',
           'is_pro' => !sek_is_pro(),
           'active' => sek_is_pro()
@@ -805,25 +805,25 @@ function sek_get_module_collection() {
         array(
           'content-type' => 'module',
           'content-id' => 'czr_button_module',
-          'title' => __( 'Button', 'text_doma' ),
+          'title' => __( 'Button', 'nimble-builder' ),
           'icon' => 'Nimble_button_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_img_slider_module',
-          'title' => __( 'Image & Text Carousel', 'text_doma' ),
+          'title' => __( 'Image & Text Carousel', 'nimble-builder' ),
           'icon' => 'Nimble_slideshow_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_accordion_module',
-          'title' => __( 'Accordion', 'text_doma' ),
+          'title' => __( 'Accordion', 'nimble-builder' ),
           'icon' => 'Nimble_accordion_icon.svg'
         ),
         array(
             'content-type' => 'module',
             'content-id' => 'czr_advanced_list_module',
-            'title' => __( 'Advanced List', 'text_doma' ),
+            'title' => __( 'Advanced List', 'nimble-builder' ),
             'icon' => 'Nimble__advanced_list_icon.svg',
             'is_pro' => !sek_is_pro(),
             'active' => sek_is_pro()
@@ -831,70 +831,70 @@ function sek_get_module_collection() {
         array(
           'content-type' => 'module',
           'content-id' => 'czr_simple_html_module',
-          'title' => __( 'Html Content', 'text_doma' ),
+          'title' => __( 'Html Content', 'nimble-builder' ),
           'icon' => 'Nimble_html_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_post_grid_module',
-          'title' => __( 'Post Grid', 'text_doma' ),
+          'title' => __( 'Post Grid', 'nimble-builder' ),
           'icon' => 'Nimble_posts-list_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_quote_module',
-          'title' => __( 'Quote', 'text_doma' ),
+          'title' => __( 'Quote', 'nimble-builder' ),
           'icon' => 'Nimble_quote_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_shortcode_module',
-          'title' => __( 'Shortcode', 'text_doma' ),
+          'title' => __( 'Shortcode', 'nimble-builder' ),
           'icon' => 'Nimble_shortcode_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_spacer_module',
-          'title' => __( 'Spacer', 'text_doma' ),
+          'title' => __( 'Spacer', 'nimble-builder' ),
           'icon' => 'Nimble__spacer_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_divider_module',
-          'title' => __( 'Divider', 'text_doma' ),
+          'title' => __( 'Divider', 'nimble-builder' ),
           'icon' => 'Nimble__divider_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_map_module',
-          'title' => __( 'Map', 'text_doma' ),
+          'title' => __( 'Map', 'nimble-builder' ),
           'icon' => 'Nimble_map_icon.svg'
         ),
 
         array(
           'content-type' => 'module',
           'content-id' => 'czr_widget_area_module',
-          'title' => __( 'WordPress widget area', 'text_doma' ),
+          'title' => __( 'WordPress widget area', 'nimble-builder' ),
           'font_icon' => '<i class="fab fa-wordpress-simple"></i>',
           'active' => !sek_is_widget_module_disabled()
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_social_icons_module',
-          'title' => __( 'Social Profiles', 'text_doma' ),
+          'title' => __( 'Social Profiles', 'nimble-builder' ),
           'icon' => 'Nimble_social_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_simple_form_module',
-          'title' => __( 'Simple Contact Form', 'text_doma' ),
+          'title' => __( 'Simple Contact Form', 'nimble-builder' ),
           'icon' => 'Nimble_contact-form_icon.svg'
         ),
 
         array(
           'content-type' => 'module',
           'content-id' => 'czr_menu_module',
-          'title' => __( 'Menu', 'text_doma' ),
+          'title' => __( 'Menu', 'nimble-builder' ),
           'font_icon' => '<i class="material-icons">menu</i>'
           //'active' => sek_are_beta_features_enabled()
         )
@@ -1134,13 +1134,13 @@ function sek_get_default_module_model( $module_type = '' ) {
 //     'pre-item' => array(
 //         'social-icon' => array(
 //             'input_type'  => 'select',
-//             'title'       => __('Select an icon', 'text_doma')
+//             'title'       => __('Select an icon', 'nimble-builder')
 //         ),
 //     ),
 //     'mod-opt' => array(
 //         'social-size' => array(
 //             'input_type'  => 'number',
-//             'title'       => __('Size in px', 'text_doma'),
+//             'title'       => __('Size in px', 'nimble-builder'),
 //             'step'        => 1,
 //             'min'         => 5,
 //             'transport' => 'postMessage'
@@ -1150,16 +1150,16 @@ function sek_get_default_module_model( $module_type = '' ) {
 //         'item-inputs' => array(
                 // 'tabs' => array(
                 //     array(
-                //         'title' => __('Content', 'text_doma'),
+                //         'title' => __('Content', 'nimble-builder'),
                 //         //'attributes' => 'data-sek-device="desktop"',
                 //         'inputs' => array(
                 //             'content' => array(
                 //                 'input_type'  => 'detached_tinymce_editor',
-                //                 'title'       => __('Content', 'text_doma')
+                //                 'title'       => __('Content', 'nimble-builder')
                 //             ),
                 //             'h_alignment_css' => array(
                 //                 'input_type'  => 'h_text_alignment',
-                //                 'title'       => __('Alignment', 'text_doma'),
+                //                 'title'       => __('Alignment', 'nimble-builder'),
                 //                 'default'     => is_rtl() ? 'right' : 'left',
                 //                 'refresh_markup' => false,
                 //                 'refresh_stylesheet' => true
@@ -1283,13 +1283,13 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
 //     'pre-item' => array(
 //         'social-icon' => array(
 //             'input_type'  => 'select',
-//             'title'       => __('Select an icon', 'text_doma')
+//             'title'       => __('Select an icon', 'nimble-builder')
 //         ),
 //     ),
 //     'mod-opt' => array(
 //         'social-size' => array(
 //             'input_type'  => 'number',
-//             'title'       => __('Size in px', 'text_doma'),
+//             'title'       => __('Size in px', 'nimble-builder'),
 //             'step'        => 1,
 //             'min'         => 5,
 //             'transport' => 'postMessage'
@@ -1299,16 +1299,16 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
 //         'item-inputs' => array(
                 // 'tabs' => array(
                 //     array(
-                //         'title' => __('Content', 'text_doma'),
+                //         'title' => __('Content', 'nimble-builder'),
                 //         //'attributes' => 'data-sek-device="desktop"',
                 //         'inputs' => array(
                 //             'content' => array(
                 //                 'input_type'  => 'detached_tinymce_editor',
-                //                 'title'       => __('Content', 'text_doma')
+                //                 'title'       => __('Content', 'nimble-builder')
                 //             ),
                 //             'h_alignment_css' => array(
                 //                 'input_type'  => 'h_text_alignment',
-                //                 'title'       => __('Alignment', 'text_doma'),
+                //                 'title'       => __('Alignment', 'nimble-builder'),
                 //                 'default'     => is_rtl() ? 'right' : 'left',
                 //                 'refresh_markup' => false,
                 //                 'refresh_stylesheet' => true
@@ -2029,7 +2029,7 @@ function sek_get_the_archive_title() {
     $is_archive = sek_get_posted_query_param_when_customizing( 'is_archive' );
   }
   if ( !$is_archive ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_archive_title', $msg = __('It can be used in archive pages only.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_archive_title', $msg = __('It can be used in archive pages only.', 'nimble-builder') );
   }
 
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
@@ -2048,7 +2048,7 @@ function sek_get_the_archive_description() {
     $is_archive = sek_get_posted_query_param_when_customizing( 'is_archive' );
   }
   if ( !$is_archive ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_archive_description', $msg = __('It can be used in archive pages only.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_archive_description', $msg = __('It can be used in archive pages only.', 'nimble-builder') );
   }
 
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
@@ -2067,7 +2067,7 @@ function sek_get_next_post_link() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_next_post_link', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_next_post_link', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
     $title = sek_get_posted_query_param_when_customizing( 'the_next_post_link' );
@@ -2087,7 +2087,7 @@ function sek_get_previous_post_link() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_previous_post_link', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_previous_post_link', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
     $title = sek_get_posted_query_param_when_customizing( 'the_previous_post_link' );
@@ -2107,11 +2107,11 @@ function sek_get_the_comments() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_comments', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_comments', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
     return sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>',
-      __('Comment template can not be refreshed while customizing', 'text_doma')
+      __('Comment template can not be refreshed while customizing', 'nimble-builder')
     );
   }
 
@@ -2141,7 +2141,7 @@ function sek_get_the_published_date() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_published_date', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_published_date', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   $post_id = sek_get_post_id_on_front_and_when_customizing();
   $published_date = get_the_date( get_option('date_format'), $post_id);
@@ -2158,7 +2158,7 @@ function sek_get_the_modified_date() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_modified_date', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_modified_date', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   $post_id = sek_get_post_id_on_front_and_when_customizing();
   $modified_date = get_the_modified_date( get_option('date_format'), $post_id );
@@ -2175,7 +2175,7 @@ function sek_get_the_tags( $separator = ' &middot; ') {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_tags', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_tags', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   return sprintf( '<span class="sek-post-tags">%1$s</span>', get_the_tag_list( $before = '', $sep = $separator, $after = '', $post_id = sek_get_post_id_on_front_and_when_customizing() ) );
 }
@@ -2187,7 +2187,7 @@ function sek_get_the_categories( $separator = ' / ') {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_categories', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_categories', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   return sprintf( '<span class="sek-post-category">%1$s</span>', get_the_category_list( $separator, '', $post_id = sek_get_post_id_on_front_and_when_customizing() ) );
 }
@@ -2198,7 +2198,7 @@ function sek_get_the_comment_number() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_comment_number', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_comment_number', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   return sprintf( '<span class="sek-post-comment-number">%1$s</span>', get_comments_number_text( $zero = false, $one = false, $more = false, $post_id = sek_get_post_id_on_front_and_when_customizing() ) );
 }
@@ -2252,7 +2252,7 @@ function sek_get_the_title() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_title', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_title', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   return get_the_title( sek_get_post_id_on_front_and_when_customizing() );
 }
@@ -2264,7 +2264,7 @@ function sek_get_the_content() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_content', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_content', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
       $post_id = (int)sek_get_posted_query_param_when_customizing( 'post_id' );
@@ -2289,7 +2289,7 @@ function sek_get_search_query() {
     $search_query = get_search_query();
   }
   if ( !$is_search ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_search_query', $msg = __('It can only be used in search results page.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_search_query', $msg = __('It can only be used in search results page.', 'nimble-builder') );
   }
   return sprintf( '<span class="sek-search-query">%1$s</span>', esc_html( $search_query ) );
 }
@@ -2304,7 +2304,7 @@ function sek_get_search_results_nb() {
     $search_res_nb = (int)$wp_query->found_posts;
   }
   if ( !$is_search ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_search_results_number', $msg = __('It can only be used in search results page.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_search_results_number', $msg = __('It can only be used in search results page.', 'nimble-builder') );
   }
   return sprintf( '<span class="sek-search-results-number">%1$s</span>', esc_html( $search_res_nb ) );
 }
@@ -2390,7 +2390,7 @@ function sek_get_tmpl_tag_error( $tag, $msg ) {
   if ( !skp_is_customizing() )
     return;
   return sprintf('<div class="nimble-notice-in-preview nimble-inline-notice-in-preview"><i class="fas fa-info-circle"></i> %1$s %2$s</div>',
-    '{{' . $tag . '}} ' . __('could not be printed.', 'text_doma'),
+    '{{' . $tag . '}} ' . __('could not be printed.', 'nimble-builder'),
     $msg
   );
 }
@@ -3800,7 +3800,7 @@ function sek_get_sections_registration_params( $force_update = false ) {
 function sek_get_raw_section_registration_params() {
     return apply_filters( 'sek_get_raw_section_registration_params', [
         'sek_intro_sec_picker_module' => [
-            'name' => __('Sections for an introduction', 'text_doma'),
+            'name' => __('Sections for an introduction', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'intro_three',
@@ -3839,7 +3839,7 @@ function sek_get_raw_section_registration_params() {
             )
         ],
         'sek_post_grids_sec_picker_module' => [
-            'name' => __('Post lists sections', 'text_doma'),
+            'name' => __('Post lists sections', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'grid_one',
@@ -3867,7 +3867,7 @@ function sek_get_raw_section_registration_params() {
             )
         ],
         'sek_features_sec_picker_module' => [
-            'name' => __('Sections for services and features', 'text_doma'),
+            'name' => __('Sections for services and features', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'features_one',
@@ -3886,7 +3886,7 @@ function sek_get_raw_section_registration_params() {
             )
         ],
         'sek_about_sec_picker_module' => [
-            'name' => __('About us sections', 'text_doma'),
+            'name' => __('About us sections', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'about_one',
@@ -3898,7 +3898,7 @@ function sek_get_raw_section_registration_params() {
             )
         ],
         'sek_contact_sec_picker_module' => [
-            'name' => __('Contact-us sections', 'text_doma'),
+            'name' => __('Contact-us sections', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'contact_one',
@@ -3917,7 +3917,7 @@ function sek_get_raw_section_registration_params() {
             )
         ],
         'sek_team_sec_picker_module' => [
-            'name' => __('Sections for teams', 'text_doma'),
+            'name' => __('Sections for teams', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'team_one',
@@ -3944,7 +3944,7 @@ function sek_get_raw_section_registration_params() {
             )
         ],
         'sek_column_layouts_sec_picker_module' => [
-            'name' => __('Empty sections with columns layout', 'text_doma'),
+            'name' => __('Empty sections with columns layout', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'two_columns',
@@ -3965,7 +3965,7 @@ function sek_get_raw_section_registration_params() {
         ],
         // pre-built sections for header and footer
         'sek_header_sec_picker_module' => [
-            'name' => __('Header sections', 'text_doma'),
+            'name' => __('Header sections', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'header_one',
@@ -3984,7 +3984,7 @@ function sek_get_raw_section_registration_params() {
             )
         ],
         'sek_footer_sec_picker_module' => [
-            'name' => __('Footer sections', 'text_doma'),
+            'name' => __('Footer sections', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'footer_pro_one',
@@ -6103,7 +6103,7 @@ function sek_sektion_collection_sanitize_cb( $setting_data, $setting_instance = 
             }
         }
     }
-    //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_doma' ), $setting_data );
+    //return new \WP_Error( 'required', __( 'Error in a sektion', 'nimble-builder' ), $setting_data );
     return $setting_data;
 }
 
@@ -6130,7 +6130,7 @@ function sek_sektion_collection_validate_cb( $validity, $setting_data, $setting_
         }
     }
 
-    //return new \WP_Error( 'required', __( 'Error in a sektion', 'text_doma' ), $setting_data );
+    //return new \WP_Error( 'required', __( 'Error in a sektion', 'nimble-builder' ), $setting_data );
     if ( true !== $validated ) {
         if ( is_wp_error( $validated ) ) {
             $validation_msg = $validation_msg->get_error_message();

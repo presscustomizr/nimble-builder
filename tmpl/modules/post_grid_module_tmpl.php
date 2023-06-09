@@ -32,8 +32,8 @@ if ( !function_exists( 'Nimble\sek_render_post_navigation') ) {
     $prev_dir          = is_rtl() ? 'left' : 'right';
     $tnext_align_class = "sek-text-{$next_dir}";
     $tprev_align_class = "sek-text-{$prev_dir}";
-    $_older_label      = __( 'Older' , 'text_doma' );
-    $_newer_label      = __( 'Newer' , 'text_doma' );
+    $_older_label      = __( 'Older' , 'nimble-builder' );
+    $_newer_label      = __( 'Newer' , 'nimble-builder' );
 
     // filter to add nimble module id ( ex : #__nimble__b4b942df40e5 ) at the end of the url so we focus on grid when navigating pagination
     add_filter('get_pagenum_link', 'Nimble\sek_filter_pagination_nav_url' );
@@ -55,7 +55,7 @@ if ( !function_exists( 'Nimble\sek_render_post_navigation') ) {
     ?>
     <div class="sek-row sek-post-navigation">
       <nav id="sek-nav-below" class="sek-col-100">
-        <h2 class="sek-screen-reader-text"><?php _e('Posts navigation', 'text_doma') ?></h2>
+        <h2 class="sek-screen-reader-text"><?php _e('Posts navigation', 'nimble-builder') ?></h2>
         <ul class="sek-czr-pager sek-row">
           <li class="sek-next-posts sek-col-base sek-col-33 <?php echo esc_attr($tnext_align_class); ?> ">
           <?php if ( null != $next_link ) : ?>
@@ -194,7 +194,7 @@ if ( !function_exists( 'Nimble\sek_render_post') ) {
                   <span class="published updated"><?php echo get_the_date( get_option('date_format') ); ?></span>
                 <?php endif; ?>
                 <?php if ( $show_comments ) : ?>
-                  <span><?php comments_number( __('0 comments', 'text_doma'), __('1 comment', 'text_doma'), __('% comments', 'text_doma') ); ?></span>
+                  <span><?php comments_number( __('0 comments', 'nimble-builder'), __('1 comment', 'nimble-builder'), __('% comments', 'nimble-builder') ); ?></span>
                 <?php endif; ?>
               </aside><!--/.pg-meta-->
             <?php endif; ?>

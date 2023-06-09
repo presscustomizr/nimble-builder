@@ -9,59 +9,59 @@ function sek_get_module_collection() {
         array(
           'content-type' => 'preset_section',
           'content-id' => 'two_columns',
-          'title' => __( 'Two Columns', 'text_doma' ),
+          'title' => __( 'Two Columns', 'nimble-builder' ),
           'icon' => 'Nimble_2-columns_icon.svg'
         ),
         array(
           'content-type' => 'preset_section',
           'content-id' => 'three_columns',
-          'title' => __( 'Three Columns', 'text_doma' ),
+          'title' => __( 'Three Columns', 'nimble-builder' ),
           'icon' => 'Nimble_3-columns_icon.svg'
         ),
         array(
           'content-type' => 'preset_section',
           'content-id' => 'four_columns',
-          'title' => __( 'Four Columns', 'text_doma' ),
+          'title' => __( 'Four Columns', 'nimble-builder' ),
           'icon' => 'Nimble_4-columns_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_tiny_mce_editor_module',
-          'title' => __( 'Rich Text Editor', 'text_doma' ),
+          'title' => __( 'Rich Text Editor', 'nimble-builder' ),
           'icon' => 'Nimble_rich-text-editor_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_image_module',
-          'title' => __( 'Image', 'text_doma' ),
+          'title' => __( 'Image', 'nimble-builder' ),
           'icon' => 'Nimble__image_icon.svg'
         ),
 
         array(
             'content-type' => 'module',
             'content-id' => 'czr_gallery_module',
-            'title' => __( 'Image gallery', 'text_doma' ),
+            'title' => __( 'Image gallery', 'nimble-builder' ),
             'icon' => 'Nimble_gallery_icon.svg'
           ),
 
         array(
           'content-type' => 'module',
           'content-id' => 'czr_heading_module',
-          'title' => __( 'Heading', 'text_doma' ),
+          'title' => __( 'Heading', 'nimble-builder' ),
           'icon' => 'Nimble__heading_icon.svg'
         ),
 
         array(
           'content-type' => 'module',
           'content-id' => 'czr_icon_module',
-          'title' => __( 'Icon', 'text_doma' ),
+          'title' => __( 'Icon', 'nimble-builder' ),
           'icon' => 'Nimble__icon_icon.svg'
         ),
 
         array(
           'content-type' => 'module',
           'content-id' => 'czr_special_img_module',
-          'title' => __( 'Nimble Image', 'text_doma' ),
+          'title' => __( 'Nimble Image', 'nimble-builder' ),
           'icon' => 'Nimble_img_icon.svg',
           'is_pro' => !sek_is_pro(),
           'active' => sek_is_pro()
@@ -70,25 +70,25 @@ function sek_get_module_collection() {
         array(
           'content-type' => 'module',
           'content-id' => 'czr_button_module',
-          'title' => __( 'Button', 'text_doma' ),
+          'title' => __( 'Button', 'nimble-builder' ),
           'icon' => 'Nimble_button_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_img_slider_module',
-          'title' => __( 'Image & Text Carousel', 'text_doma' ),
+          'title' => __( 'Image & Text Carousel', 'nimble-builder' ),
           'icon' => 'Nimble_slideshow_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_accordion_module',
-          'title' => __( 'Accordion', 'text_doma' ),
+          'title' => __( 'Accordion', 'nimble-builder' ),
           'icon' => 'Nimble_accordion_icon.svg'
         ),
         array(
             'content-type' => 'module',
             'content-id' => 'czr_advanced_list_module',
-            'title' => __( 'Advanced List', 'text_doma' ),
+            'title' => __( 'Advanced List', 'nimble-builder' ),
             'icon' => 'Nimble__advanced_list_icon.svg',
             'is_pro' => !sek_is_pro(),
             'active' => sek_is_pro()
@@ -96,70 +96,70 @@ function sek_get_module_collection() {
         array(
           'content-type' => 'module',
           'content-id' => 'czr_simple_html_module',
-          'title' => __( 'Html Content', 'text_doma' ),
+          'title' => __( 'Html Content', 'nimble-builder' ),
           'icon' => 'Nimble_html_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_post_grid_module',
-          'title' => __( 'Post Grid', 'text_doma' ),
+          'title' => __( 'Post Grid', 'nimble-builder' ),
           'icon' => 'Nimble_posts-list_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_quote_module',
-          'title' => __( 'Quote', 'text_doma' ),
+          'title' => __( 'Quote', 'nimble-builder' ),
           'icon' => 'Nimble_quote_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_shortcode_module',
-          'title' => __( 'Shortcode', 'text_doma' ),
+          'title' => __( 'Shortcode', 'nimble-builder' ),
           'icon' => 'Nimble_shortcode_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_spacer_module',
-          'title' => __( 'Spacer', 'text_doma' ),
+          'title' => __( 'Spacer', 'nimble-builder' ),
           'icon' => 'Nimble__spacer_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_divider_module',
-          'title' => __( 'Divider', 'text_doma' ),
+          'title' => __( 'Divider', 'nimble-builder' ),
           'icon' => 'Nimble__divider_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_map_module',
-          'title' => __( 'Map', 'text_doma' ),
+          'title' => __( 'Map', 'nimble-builder' ),
           'icon' => 'Nimble_map_icon.svg'
         ),
 
         array(
           'content-type' => 'module',
           'content-id' => 'czr_widget_area_module',
-          'title' => __( 'WordPress widget area', 'text_doma' ),
+          'title' => __( 'WordPress widget area', 'nimble-builder' ),
           'font_icon' => '<i class="fab fa-wordpress-simple"></i>',
           'active' => !sek_is_widget_module_disabled()
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_social_icons_module',
-          'title' => __( 'Social Profiles', 'text_doma' ),
+          'title' => __( 'Social Profiles', 'nimble-builder' ),
           'icon' => 'Nimble_social_icon.svg'
         ),
         array(
           'content-type' => 'module',
           'content-id' => 'czr_simple_form_module',
-          'title' => __( 'Simple Contact Form', 'text_doma' ),
+          'title' => __( 'Simple Contact Form', 'nimble-builder' ),
           'icon' => 'Nimble_contact-form_icon.svg'
         ),
 
         array(
           'content-type' => 'module',
           'content-id' => 'czr_menu_module',
-          'title' => __( 'Menu', 'text_doma' ),
+          'title' => __( 'Menu', 'nimble-builder' ),
           'font_icon' => '<i class="material-icons">menu</i>'
           //'active' => sek_are_beta_features_enabled()
         )
@@ -399,13 +399,13 @@ function sek_get_default_module_model( $module_type = '' ) {
 //     'pre-item' => array(
 //         'social-icon' => array(
 //             'input_type'  => 'select',
-//             'title'       => __('Select an icon', 'text_doma')
+//             'title'       => __('Select an icon', 'nimble-builder')
 //         ),
 //     ),
 //     'mod-opt' => array(
 //         'social-size' => array(
 //             'input_type'  => 'number',
-//             'title'       => __('Size in px', 'text_doma'),
+//             'title'       => __('Size in px', 'nimble-builder'),
 //             'step'        => 1,
 //             'min'         => 5,
 //             'transport' => 'postMessage'
@@ -415,16 +415,16 @@ function sek_get_default_module_model( $module_type = '' ) {
 //         'item-inputs' => array(
                 // 'tabs' => array(
                 //     array(
-                //         'title' => __('Content', 'text_doma'),
+                //         'title' => __('Content', 'nimble-builder'),
                 //         //'attributes' => 'data-sek-device="desktop"',
                 //         'inputs' => array(
                 //             'content' => array(
                 //                 'input_type'  => 'detached_tinymce_editor',
-                //                 'title'       => __('Content', 'text_doma')
+                //                 'title'       => __('Content', 'nimble-builder')
                 //             ),
                 //             'h_alignment_css' => array(
                 //                 'input_type'  => 'h_text_alignment',
-                //                 'title'       => __('Alignment', 'text_doma'),
+                //                 'title'       => __('Alignment', 'nimble-builder'),
                 //                 'default'     => is_rtl() ? 'right' : 'left',
                 //                 'refresh_markup' => false,
                 //                 'refresh_stylesheet' => true
@@ -548,13 +548,13 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
 //     'pre-item' => array(
 //         'social-icon' => array(
 //             'input_type'  => 'select',
-//             'title'       => __('Select an icon', 'text_doma')
+//             'title'       => __('Select an icon', 'nimble-builder')
 //         ),
 //     ),
 //     'mod-opt' => array(
 //         'social-size' => array(
 //             'input_type'  => 'number',
-//             'title'       => __('Size in px', 'text_doma'),
+//             'title'       => __('Size in px', 'nimble-builder'),
 //             'step'        => 1,
 //             'min'         => 5,
 //             'transport' => 'postMessage'
@@ -564,16 +564,16 @@ function sek_get_registered_module_input_list( $module_type = '' ) {
 //         'item-inputs' => array(
                 // 'tabs' => array(
                 //     array(
-                //         'title' => __('Content', 'text_doma'),
+                //         'title' => __('Content', 'nimble-builder'),
                 //         //'attributes' => 'data-sek-device="desktop"',
                 //         'inputs' => array(
                 //             'content' => array(
                 //                 'input_type'  => 'detached_tinymce_editor',
-                //                 'title'       => __('Content', 'text_doma')
+                //                 'title'       => __('Content', 'nimble-builder')
                 //             ),
                 //             'h_alignment_css' => array(
                 //                 'input_type'  => 'h_text_alignment',
-                //                 'title'       => __('Alignment', 'text_doma'),
+                //                 'title'       => __('Alignment', 'nimble-builder'),
                 //                 'default'     => is_rtl() ? 'right' : 'left',
                 //                 'refresh_markup' => false,
                 //                 'refresh_stylesheet' => true

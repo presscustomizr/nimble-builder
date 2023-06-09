@@ -33,7 +33,7 @@ function sek_get_sections_registration_params( $force_update = false ) {
 function sek_get_raw_section_registration_params() {
     return apply_filters( 'sek_get_raw_section_registration_params', [
         'sek_intro_sec_picker_module' => [
-            'name' => __('Sections for an introduction', 'text_doma'),
+            'name' => __('Sections for an introduction', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'intro_three',
@@ -72,7 +72,7 @@ function sek_get_raw_section_registration_params() {
             )
         ],
         'sek_post_grids_sec_picker_module' => [
-            'name' => __('Post lists sections', 'text_doma'),
+            'name' => __('Post lists sections', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'grid_one',
@@ -100,7 +100,7 @@ function sek_get_raw_section_registration_params() {
             )
         ],
         'sek_features_sec_picker_module' => [
-            'name' => __('Sections for services and features', 'text_doma'),
+            'name' => __('Sections for services and features', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'features_one',
@@ -119,7 +119,7 @@ function sek_get_raw_section_registration_params() {
             )
         ],
         'sek_about_sec_picker_module' => [
-            'name' => __('About us sections', 'text_doma'),
+            'name' => __('About us sections', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'about_one',
@@ -131,7 +131,7 @@ function sek_get_raw_section_registration_params() {
             )
         ],
         'sek_contact_sec_picker_module' => [
-            'name' => __('Contact-us sections', 'text_doma'),
+            'name' => __('Contact-us sections', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'contact_one',
@@ -150,7 +150,7 @@ function sek_get_raw_section_registration_params() {
             )
         ],
         'sek_team_sec_picker_module' => [
-            'name' => __('Sections for teams', 'text_doma'),
+            'name' => __('Sections for teams', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'team_one',
@@ -177,7 +177,7 @@ function sek_get_raw_section_registration_params() {
             )
         ],
         'sek_column_layouts_sec_picker_module' => [
-            'name' => __('Empty sections with columns layout', 'text_doma'),
+            'name' => __('Empty sections with columns layout', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'two_columns',
@@ -198,7 +198,7 @@ function sek_get_raw_section_registration_params() {
         ],
         // pre-built sections for header and footer
         'sek_header_sec_picker_module' => [
-            'name' => __('Header sections', 'text_doma'),
+            'name' => __('Header sections', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'header_one',
@@ -217,7 +217,7 @@ function sek_get_raw_section_registration_params() {
             )
         ],
         'sek_footer_sec_picker_module' => [
-            'name' => __('Footer sections', 'text_doma'),
+            'name' => __('Footer sections', 'nimble-builder'),
             'section_collection' => array(
                 array(
                     'content-id' => 'footer_pro_one',

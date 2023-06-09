@@ -344,52 +344,52 @@ function print_options_page() {
     <table class="form-table" role="presentation">
       <tbody>
         <tr>
-          <th scope="row"><?php _e('Shortcodes', 'text_doma'); ?></th>
+          <th scope="row"><?php _e('Shortcodes', 'nimble-builder'); ?></th>
           <td>
-            <fieldset><legend class="screen-reader-text"><span><?php _e('Shortcodes', 'text_doma'); ?></span></legend>
+            <fieldset><legend class="screen-reader-text"><span><?php _e('Shortcodes', 'nimble-builder'); ?></span></legend>
               <?php
                 $shortcode_opt_val = get_option( NIMBLE_OPT_NAME_FOR_SHORTCODE_PARSING );
               ?>
               <label for="nb_shortcodes_parsed_in_czr"><input name="nb_shortcodes_parsed_in_czr" type="checkbox" id="nb_shortcodes_parsed_in_czr" value="on" <?php checked( $shortcode_opt_val, 'on' ); ?>>
-              <?php _e('Parse shortcodes when building your pages in the customizer', 'text_doma'); ?></label>
-              <p class="description"><?php _e('Shortcodes are disabled by default when customizing to prevent any conflicts with Nimble Builder interface.', 'text_doma'); ?></p>
+              <?php _e('Parse shortcodes when building your pages in the customizer', 'nimble-builder'); ?></label>
+              <p class="description"><?php _e('Shortcodes are disabled by default when customizing to prevent any conflicts with Nimble Builder interface.', 'nimble-builder'); ?></p>
             </fieldset>
           </td>
         </tr>
         <tr>
-          <th scope="row"><?php _e('Widgets Module', 'text_doma'); ?></th>
+          <th scope="row"><?php _e('Widgets Module', 'nimble-builder'); ?></th>
           <td>
-            <fieldset><legend class="screen-reader-text"><span><?php _e('Widgets module', 'text_doma'); ?></span></legend>
+            <fieldset><legend class="screen-reader-text"><span><?php _e('Widgets module', 'nimble-builder'); ?></span></legend>
               <?php
                 $widget_disabled_opt_val = get_option( NIMBLE_OPT_NAME_FOR_DISABLING_WIDGET_MODULE );
               ?>
               <label for="nb_widgets_disabled_in_czr"><input name="nb_widgets_disabled_in_czr" type="checkbox" id="nb_widgets_disabled_in_czr" value="on" <?php checked( $widget_disabled_opt_val, 'on' ); ?>>
-              <?php _e('Disable the Widgets Module', 'text_doma'); ?></label>
+              <?php _e('Disable the Widgets Module', 'nimble-builder'); ?></label>
             </fieldset>
           </td>
         </tr>
         <tr>
-          <th scope="row"><?php _e('Google Fonts', 'text_doma'); ?></th>
+          <th scope="row"><?php _e('Google Fonts', 'nimble-builder'); ?></th>
           <td>
-            <fieldset><legend class="screen-reader-text"><span><?php _e('Disable Google Fonts', 'text_doma'); ?></span></legend>
+            <fieldset><legend class="screen-reader-text"><span><?php _e('Disable Google Fonts', 'nimble-builder'); ?></span></legend>
               <?php
                 $nb_debug_mode_opt_val = get_option( NIMBLE_OPT_NAME_FOR_DISABLING_GOOGLE_FONTS );
               ?>
               <label for="nb_google_font_disable"><input name="nb_google_font_disable" type="checkbox" id="nb_google_font_disable" value="on" <?php checked( $nb_debug_mode_opt_val, 'on' ); ?>>
-              <?php _e('Activate to disable Google fonts', 'text_doma'); ?></label>
+              <?php _e('Activate to disable Google fonts', 'nimble-builder'); ?></label>
             </fieldset>
           </td>
         </tr>
         <tr>
-          <th scope="row"><?php _e('Debug Mode', 'text_doma'); ?></th>
+          <th scope="row"><?php _e('Debug Mode', 'nimble-builder'); ?></th>
           <td>
-            <fieldset><legend class="screen-reader-text"><span><?php _e('Debug Mode', 'text_doma'); ?></span></legend>
+            <fieldset><legend class="screen-reader-text"><span><?php _e('Debug Mode', 'nimble-builder'); ?></span></legend>
               <?php
                 $nb_debug_mode_opt_val = get_option( NIMBLE_OPT_NAME_FOR_DEBUG_MODE );
               ?>
               <label for="nb_debug_mode_active"><input name="nb_debug_mode_active" type="checkbox" id="nb_debug_mode_active" value="on" <?php checked( $nb_debug_mode_opt_val, 'on' ); ?>>
-              <?php _e('Activate the debug mode when customizing', 'text_doma'); ?></label>
-              <p class="description"><?php _e('In debug mode, during customization Nimble Builder deactivates all modules content and prints only the structure of your sections. This lets you troubleshoot, remove or edit your modules safely.', 'text_doma'); ?></p>
+              <?php _e('Activate the debug mode when customizing', 'nimble-builder'); ?></label>
+              <p class="description"><?php _e('In debug mode, during customization Nimble Builder deactivates all modules content and prints only the structure of your sections. This lets you troubleshoot, remove or edit your modules safely.', 'nimble-builder'); ?></p>
             </fieldset>
           </td>
         </tr>
@@ -405,9 +405,9 @@ function print_options_page() {
     <table class="form-table" role="presentation">
       <tbody>
         <tr>
-          <th scope="row"><?php _e('Remove all Nimble Builder data', 'text_doma'); ?></th>
+          <th scope="row"><?php _e('Remove all Nimble Builder data', 'nimble-builder'); ?></th>
           <td>
-            <fieldset><legend class="screen-reader-text"><span><?php _e('Remove all Nimble Builder data', 'text_doma'); ?></span></legend>
+            <fieldset><legend class="screen-reader-text"><span><?php _e('Remove all Nimble Builder data', 'nimble-builder'); ?></span></legend>
               <?php
                 $refresh_url = add_query_arg( array( 'tab' => 'options', 'clean_nb' => 'true' ), admin_url( NIMBLE_OPTIONS_PAGE_URL ));
               ob_start();
@@ -440,19 +440,19 @@ function print_options_page() {
                   <?php $status = sek_clean_all_nimble_data(); ?>
                     <?php if ( 'success' === $status ) : ?>
                       <div id="message" class="updated notice">
-                        <p class="nb-clean-traces-success"><strong><?php _e('All Nimble Builder data have been successfully removed from your WordPress website.', 'text_doma'); ?></strong></p>
+                        <p class="nb-clean-traces-success"><strong><?php _e('All Nimble Builder data have been successfully removed from your WordPress website.', 'nimble-builder'); ?></strong></p>
                       </div>
                     <?php else : ?>
                       <div id="message" class="error notice">
-                        <p><strong><?php _e('Security problem when trying to remove Nimble Builder data.', 'text_doma'); ?></strong></p>
+                        <p><strong><?php _e('Security problem when trying to remove Nimble Builder data.', 'nimble-builder'); ?></strong></p>
                       </div>
                     <?php endif; ?>
               <?php else : ?>
-                  <p class="description"><?php _e('This will permanently remove all data created by Nimble Builder and stored in your database or as stylesheets : page customizations, custom sections, custom templates, options, CSS stylesheets.', 'text_doma'); ?></p><br/>
-                  <button class="button" onclick="window.nb_toggle_clean_button()"><?php _e('Remove now', 'text_doma'); ?></button>
+                  <p class="description"><?php _e('This will permanently remove all data created by Nimble Builder and stored in your database or as stylesheets : page customizations, custom sections, custom templates, options, CSS stylesheets.', 'nimble-builder'); ?></p><br/>
+                  <button class="button" onclick="window.nb_toggle_clean_button()"><?php _e('Remove now', 'nimble-builder'); ?></button>
                   <div class="nb-clean-traces-confirm" style="display:none">
-                    <p class="description"><?php _e('Once you delete Nimble Builder data, there is no going back. Please be certain. ', 'text_doma'); ?></p><br/>
-                    <button class="button nb-permanent-removal-btn" onclick="window.nb_refresh_opt_page()"><?php _e('Yes I want to clean all data', 'text_doma'); ?></button>
+                    <p class="description"><?php _e('Once you delete Nimble Builder data, there is no going back. Please be certain. ', 'nimble-builder'); ?></p><br/>
+                    <button class="button nb-permanent-removal-btn" onclick="window.nb_refresh_opt_page()"><?php _e('Yes I want to clean all data', 'nimble-builder'); ?></button>
                   </div>
               <?php endif; ?>
             </fieldset>

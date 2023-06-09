@@ -4,14 +4,14 @@ function sek_get_module_params_for_sek_level_width_column() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_width_column',
-        //'name' => __('Column width', 'text_doma'),
+        //'name' => __('Column width', 'nimble-builder'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
                 'custom-width' => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __('Column width in percent', 'text_doma'),
+                    'title'       => __('Column width in percent', 'nimble-builder'),
                     'min' => 0,
                     'max' => 100,
                     'default'     => '_not_set_',
@@ -21,7 +21,7 @@ function sek_get_module_params_for_sek_level_width_column() {
                 )
                 // 'h_alignment' => array(
                 //     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                //     'title'       => __('Horizontal alignment', 'text_doma'),
+                //     'title'       => __('Horizontal alignment', 'nimble-builder'),
                 //     'default'     => array( 'desktop' => 'center' ),
                 //     'refresh_markup' => false,
                 //     'refresh_stylesheet' => true,

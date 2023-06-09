@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_global_breakpoint() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_breakpoint',
-        //'name' => __('Site wide breakpoint options', 'text_doma'),
+        //'name' => __('Site wide breakpoint options', 'nimble-builder'),
         // 'starting_value' => array(
 
         // ),
@@ -14,15 +14,15 @@ function sek_get_module_params_for_sek_global_breakpoint() {
             'item-inputs' => array(
                 'use-custom-breakpoint' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Use a global custom breakpoint for responsive columns', 'text_doma'),
+                    'title'       => __('Use a global custom breakpoint for responsive columns', 'nimble-builder'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_before_title' => __( 'This is the viewport width from which columns are rearranged vertically. The default global breakpoint is 768px. A custom breakpoint can also be set for each section.', 'text_doma')
+                    'notice_before_title' => __( 'This is the viewport width from which columns are rearranged vertically. The default global breakpoint is 768px. A custom breakpoint can also be set for each section.', 'nimble-builder')
                 ),
                 'global-custom-breakpoint'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Define a custom breakpoint in pixels', 'text_doma' ),
+                    'title'       => __( 'Define a custom breakpoint in pixels', 'nimble-builder' ),
                     'default'     => 768,
                     'min'         => 1,
                     'max'         => 2000,
@@ -35,12 +35,12 @@ function sek_get_module_params_for_sek_global_breakpoint() {
                 ),
                 'apply-to-all' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Apply this breakpoint to all by-device customizations', 'text_doma'),
+                    'title'       => __('Apply this breakpoint to all by-device customizations', 'nimble-builder'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'notice_after' => sprintf(
-                        __( '%s When enabled, this custom breakpoint is applied not only to responsive columns but also to all by-device customizations, like alignment for example.', 'text_doma'),
+                        __( '%s When enabled, this custom breakpoint is applied not only to responsive columns but also to all by-device customizations, like alignment for example.', 'nimble-builder'),
                         '<span class="sek-mobile-device-icons"><i class="sek-switcher preview-desktop"></i>&nbsp;<i class="sek-switcher preview-tablet"></i>&nbsp;<i class="sek-switcher preview-mobile"></i></span>'
                     )
                 ),

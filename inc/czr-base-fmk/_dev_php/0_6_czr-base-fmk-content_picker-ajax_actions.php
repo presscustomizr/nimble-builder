@@ -26,7 +26,7 @@ if ( !class_exists( 'CZR_Fmk_Base' ) ) :
               return array_merge(
                   array(
                       array(
-                         'title'      => sprintf( '<span style="font-weight:bold">%1$s</span>', __('Set a custom url', 'text_doma') ),
+                         'title'      => sprintf( '<span style="font-weight:bold">%1$s</span>', __('Set a custom url', 'nimble-builder') ),
                          'type'       => '',
                          'type_label' => '',
                          'object'     => '',
@@ -181,7 +181,7 @@ if ( !class_exists( 'CZR_Fmk_Base' ) ) :
                         $post_title = $post->post_title;
                         if ( '' === $post_title ) {
                           // translators: %d: ID of a post
-                          $post_title = sprintf( __( '#%d (no title)', 'text_doma' ), $post->ID );
+                          $post_title = sprintf( __( '#%d (no title)', 'nimble-builder' ), $post->ID );
                         }
                         $items[] = array(
                             'title'      => html_entity_decode( $post_title, ENT_QUOTES, get_bloginfo( 'charset' ) ),
@@ -324,7 +324,7 @@ if ( !class_exists( 'CZR_Fmk_Base' ) ) :
             remove_filter( 'pre_post_link', array( $this, 'dont_use_fancy_permalinks' ), 999 );
 
             if ( empty( $items ) ) {
-                wp_send_json_success( array( 'message' => __( 'No results found.', 'text_doma') ) );
+                wp_send_json_success( array( 'message' => __( 'No results found.', 'nimble-builder') ) );
             } else {
                 wp_send_json_success( array(
                     'items' => apply_filters( 'content_picker_ajax_items', $items, $p, 'ajax_search_available_items' )
@@ -390,7 +390,7 @@ if ( !class_exists( 'CZR_Fmk_Base' ) ) :
                             $post_title = $post->post_title;
                             if ( '' === $post_title ) {
                               /* translators: %d: ID of a post */
-                              $post_title = sprintf( __( '#%d (no title)', 'text_doma' ), $post->ID );
+                              $post_title = sprintf( __( '#%d (no title)', 'nimble-builder' ), $post->ID );
                             }
                             $items[] = array(
                                 'title'      => html_entity_decode( $post_title, ENT_QUOTES, get_bloginfo( 'charset' ) ),

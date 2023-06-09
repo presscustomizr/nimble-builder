@@ -13,19 +13,19 @@ function sek_get_module_params_for_czr_simple_html_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_html_module',
-        'name' => __( 'Html Content', 'text_doma' ),
+        'name' => __( 'Html Content', 'nimble-builder' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_html_module',
         'tmpl' => array(
             'item-inputs' => array(
                 'html_content' => array(
                     'input_type'  => 'code_editor',
-                    'title'       => __( 'HTML Content' , 'text_doma' ),
+                    'title'       => __( 'HTML Content' , 'nimble-builder' ),
                     'refresh_markup' => '.sek-module-inner'
                     //'code_type' => 'text/html' //<= use 'text/css' to instantiate the code mirror as CSS editor, which by default will be an HTML editor
                 ),
                 'h_alignment_css'        => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'              => __( 'Horizontal text alignment', 'text_doma' ),
+                    'title'              => __( 'Horizontal text alignment', 'nimble-builder' ),
                     'default'     => array( 'desktop' => 'left' ),
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
@@ -37,7 +37,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
                 ),
                 'font_family_css' => array(
                     'input_type'  => 'font_picker',
-                    'title'       => __('Font family', 'text_doma'),
+                    'title'       => __('Font family', 'nimble-builder'),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -51,7 +51,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
                 ),
                 'font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Font size', 'text_doma' ),
+                    'title'       => __( 'Font size', 'nimble-builder' ),
                     // the default value is commented to fix https://github.com/presscustomizr/nimble-builder/issues/313
                     // => as a consequence, when a module uses the font child module, the default font-size rule must be defined in the module SCSS file.
                     //'default'     => array( 'desktop' => '16px' ),
@@ -65,7 +65,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
                 ),//16,//"14px",
                 'line_height_css'     => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Line height', 'text_doma' ),
+                    'title'       => __( 'Line height', 'nimble-builder' ),
                     'default'     => '1.5em',
                     'min' => 0,
                     'max' => 10,
@@ -77,7 +77,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
                 ),//24,//"20px",
                 'color_css'           => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Text color', 'text_doma'),
+                    'title'       => __('Text color', 'nimble-builder'),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -86,7 +86,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
                 ),//"#000000",
                 'color_hover_css'     => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Text color on mouse over', 'text_doma'),
+                    'title'       => __('Text color on mouse over', 'nimble-builder'),
                     'default'     => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -96,7 +96,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
                 ),//"#000000",
                 'font_weight_css'     => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Font weight', 'text_doma'),
+                    'title'       => __('Font weight', 'nimble-builder'),
                     'default'     => 400,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -105,7 +105,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
                 ),//null,
                 'font_style_css'      => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Font style', 'text_doma'),
+                    'title'       => __('Font style', 'nimble-builder'),
                     'default'     => 'inherit',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -114,7 +114,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
                 ),//null,
                 'text_decoration_css' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Text decoration', 'text_doma'),
+                    'title'       => __('Text decoration', 'nimble-builder'),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -123,7 +123,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
                 ),//null,
                 'text_transform_css'  => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Text transform', 'text_doma'),
+                    'title'       => __('Text transform', 'nimble-builder'),
                     'default'     => 'none',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -133,7 +133,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
 
                 'letter_spacing_css'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Letter spacing', 'text_doma' ),
+                    'title'       => __( 'Letter spacing', 'nimble-builder' ),
                     'default'     => 0,
                     'min'         => 0,
                     'step'        => 1,
@@ -145,7 +145,7 @@ function sek_get_module_params_for_czr_simple_html_module() {
                 // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
                 'fonts___flag_important'  => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Apply the style options in priority (uses !important).', 'text_doma'),
+                    'title'       => __('Apply the style options in priority (uses !important).', 'nimble-builder'),
                     'default'     => 0,
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,

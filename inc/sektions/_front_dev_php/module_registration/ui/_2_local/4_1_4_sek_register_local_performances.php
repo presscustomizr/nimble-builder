@@ -4,9 +4,9 @@ function sek_get_module_params_for_sek_local_performances() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_local_performances',
-        //'name' => __('Performance optimizations', 'text_doma'),
+        //'name' => __('Performance optimizations', 'nimble-builder'),
         // 'starting_value' => array(
-        //     'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) )
+        //     'local_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'nimble-builder' ) )
         // ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -14,7 +14,7 @@ function sek_get_module_params_for_sek_local_performances() {
             'item-inputs' => array(
                 'local-img-smart-load' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Select how you want to load the images in the sections of this page.', 'text_doma'),
+                    'title'       => __('Select how you want to load the images in the sections of this page.', 'nimble-builder'),
                     'default'     => 'inherit',
                     'choices'     => array(
                         'inherit' => __('Inherit the site wide option', 'text_domain' ),

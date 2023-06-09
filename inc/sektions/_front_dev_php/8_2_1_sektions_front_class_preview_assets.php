@@ -104,25 +104,25 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                 'sekPreviewLocalized',
                 array(
                     'i18n' => array(
-                        "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_doma'),
-                        "Moving elements between global and local sections is not allowed." => __( "Moving elements between global and local sections is not allowed.", 'text_doma'),
-                        'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_doma'),
-                        'Insert here' => __('Insert here', 'text_doma'),
+                        "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'nimble-builder'),
+                        "Moving elements between global and local sections is not allowed." => __( "Moving elements between global and local sections is not allowed.", 'nimble-builder'),
+                        'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'nimble-builder'),
+                        'Insert here' => __('Insert here', 'nimble-builder'),
                         'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'text_domain' ),
 
-                        'Insert a new section' => __('Insert a new section', 'text_doma' ),
+                        'Insert a new section' => __('Insert a new section', 'nimble-builder' ),
                         '@location' => __('@location', 'text_domain_to_be'),
-                        'Insert a new global section' => __('Insert a new global section', 'text_doma' ),
+                        'Insert a new global section' => __('Insert a new global section', 'nimble-builder' ),
 
-                        'section' => __('section', 'text_doma'),
-                        'header section' => __('header section', 'text_doma'),
-                        'footer section' => __('footer section', 'text_doma'),
-                        '(global)' => __('(global)', 'text_doma'),
-                        'nested section' => __('nested section', 'text_doma'),
+                        'section' => __('section', 'nimble-builder'),
+                        'header section' => __('header section', 'nimble-builder'),
+                        'footer section' => __('footer section', 'nimble-builder'),
+                        '(global)' => __('(global)', 'nimble-builder'),
+                        'nested section' => __('nested section', 'nimble-builder'),
 
-                        'Shift-click to visit the link' => __('Shift-click to visit the link', 'text_doma'),
-                        'External links are disabled when customizing' => __('External links are disabled when customizing', 'text_doma'),
-                        'Link deactivated while previewing' => __('Link deactivated while previewing', 'text_doma')
+                        'Shift-click to visit the link' => __('Shift-click to visit the link', 'nimble-builder'),
+                        'External links are disabled when customizing' => __('External links are disabled when customizing', 'nimble-builder'),
+                        'Link deactivated while previewing' => __('Link deactivated while previewing', 'nimble-builder')
                     ),
                     'isDevMode' => sek_is_dev_mode(),
                     'isPreviewUIDebugMode' => isset( $_GET['preview_ui_debug'] ) || NIMBLE_IS_PREVIEW_UI_DEBUG_MODE,

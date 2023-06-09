@@ -57,15 +57,15 @@ function nimble_passes_requirements(){
 }
 
 function nimble_display_min_php_message() {
-    nimble_display_min_requirement_notice( __( 'PHP', 'text_doma' ), NIMBLE_MIN_PHP_VERSION );
+    nimble_display_min_requirement_notice( __( 'PHP', 'nimble-builder' ), NIMBLE_MIN_PHP_VERSION );
 }
 function nimble_display_min_wp_message() {
-    nimble_display_min_requirement_notice( __( 'WordPress', 'text_doma' ), NIMBLE_MIN_WP_VERSION );
+    nimble_display_min_requirement_notice( __( 'WordPress', 'nimble-builder' ), NIMBLE_MIN_WP_VERSION );
 }
 function nimble_display_min_requirement_notice( $requires_what, $requires_what_version ) {
     printf( '<div class="error"><p>%1$s</p></div>',
-        sprintf( __( 'The <strong>%1$s</strong> plugin requires at least %2$s version %3$s.', 'text_doma' ),
-            __('Nimble Builder', 'text_doma'),
+        sprintf( __( 'The <strong>%1$s</strong> plugin requires at least %2$s version %3$s.', 'nimble-builder' ),
+            __('Nimble Builder', 'nimble-builder'),
             esc_attr($requires_what),
             esc_attr($requires_what_version)
         )

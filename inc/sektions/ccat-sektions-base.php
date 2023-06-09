@@ -2074,7 +2074,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
 // Example of a *_flag_important input:
 // 'quote___flag_important'       => array(
 //     'input_type'  => 'nimblecheck',
-//     'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
+//     'title'       => __( 'Make those style options win if other rules are applied.', 'nimble-builder' ),
 //     'default'     => 0,
 //     'refresh_markup' => false,
 //     'refresh_stylesheet' => true,
@@ -3657,25 +3657,25 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                 'sekPreviewLocalized',
                 array(
                     'i18n' => array(
-                        "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_doma'),
-                        "Moving elements between global and local sections is not allowed." => __( "Moving elements between global and local sections is not allowed.", 'text_doma'),
-                        'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_doma'),
-                        'Insert here' => __('Insert here', 'text_doma'),
+                        "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'nimble-builder'),
+                        "Moving elements between global and local sections is not allowed." => __( "Moving elements between global and local sections is not allowed.", 'nimble-builder'),
+                        'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'nimble-builder'),
+                        'Insert here' => __('Insert here', 'nimble-builder'),
                         'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'text_domain' ),
 
-                        'Insert a new section' => __('Insert a new section', 'text_doma' ),
+                        'Insert a new section' => __('Insert a new section', 'nimble-builder' ),
                         '@location' => __('@location', 'text_domain_to_be'),
-                        'Insert a new global section' => __('Insert a new global section', 'text_doma' ),
+                        'Insert a new global section' => __('Insert a new global section', 'nimble-builder' ),
 
-                        'section' => __('section', 'text_doma'),
-                        'header section' => __('header section', 'text_doma'),
-                        'footer section' => __('footer section', 'text_doma'),
-                        '(global)' => __('(global)', 'text_doma'),
-                        'nested section' => __('nested section', 'text_doma'),
+                        'section' => __('section', 'nimble-builder'),
+                        'header section' => __('header section', 'nimble-builder'),
+                        'footer section' => __('footer section', 'nimble-builder'),
+                        '(global)' => __('(global)', 'nimble-builder'),
+                        'nested section' => __('nested section', 'nimble-builder'),
 
-                        'Shift-click to visit the link' => __('Shift-click to visit the link', 'text_doma'),
-                        'External links are disabled when customizing' => __('External links are disabled when customizing', 'text_doma'),
-                        'Link deactivated while previewing' => __('Link deactivated while previewing', 'text_doma')
+                        'Shift-click to visit the link' => __('Shift-click to visit the link', 'nimble-builder'),
+                        'External links are disabled when customizing' => __('External links are disabled when customizing', 'nimble-builder'),
+                        'Link deactivated while previewing' => __('Link deactivated while previewing', 'nimble-builder')
                     ),
                     'isDevMode' => sek_is_dev_mode(),
                     'isPreviewUIDebugMode' => isset( $_GET['preview_ui_debug'] ) || NIMBLE_IS_PREVIEW_UI_DEBUG_MODE,
@@ -5194,7 +5194,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 }
             // 2) for other plugins, if not printed already, print a default fitrable message
             } else if ( !did_action('nimble_after_restricted_content_html') ) {
-                echo apply_filters('nimble_restricted_content_html', sprintf( '<p>%1$s</p>', __('You need to login to view this content.', 'text_doma') ) );
+                echo apply_filters('nimble_restricted_content_html', sprintf( '<p>%1$s</p>', __('You need to login to view this content.', 'nimble-builder') ) );
                 do_action('nimble_after_restricted_content_html');
             }
         }
@@ -5464,31 +5464,31 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 'value'           => ''
             ),
             'nimble_name' => array(
-                'label'            => __( 'Name', 'text_doma' ),
+                'label'            => __( 'Name', 'nimble-builder' ),
                 'required'         => true,
                 'type'             => 'text',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_email' => array(
-                'label'            => __( 'Email', 'text_doma' ),
+                'label'            => __( 'Email', 'nimble-builder' ),
                 'required'         => true,
                 'type'             => 'email',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_subject' => array(
-                'label'            => __( 'Subject', 'text_doma' ),
+                'label'            => __( 'Subject', 'nimble-builder' ),
                 'type'             => 'text',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_message' => array(
-                'label'            => __( 'Message', 'text_doma' ),
+                'label'            => __( 'Message', 'nimble-builder' ),
                 'required'         => true,
                 'additional_attrs' => array( 'rows' => "10", 'cols' => "50" ),
                 'type'             => 'textarea',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_privacy' => array(
-                'label'            => __( 'I have read and agree to the privacy policy.', 'text_doma' ),
+                'label'            => __( 'I have read and agree to the privacy policy.', 'nimble-builder' ),
                 'type'             => 'checkbox',
                 'required'         => true,
                 'value'            => false,
@@ -5498,7 +5498,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             ),
             'nimble_submit' => array(
                 'type'             => 'submit',
-                'value'            => __( 'Submit', 'text_doma' ),
+                'value'            => __( 'Submit', 'nimble-builder' ),
                 'additional_attrs' => array( 'class' => 'sek-btn' ),
                 'wrapper_tag'      => 'div',
                 'wrapper_class'    => array( 'sek-form-field', 'sek-form-btn-wrapper' )
@@ -6009,7 +6009,7 @@ class Sek_Field {
         if ( $label ) {
             if ( true == $this->input->get_data( 'required' ) ) {
                 $label .= ' *';
-                //$label .= ' ' . esc_html__( '(required)', 'text_doma' );
+                //$label .= ' ' . esc_html__( '(required)', 'nimble-builder' );
             }
             $label = sprintf( '%1$s<label for="%2$s">%3$s</label>%4$s',
                 $this->data[ 'before_label' ],
@@ -6301,7 +6301,7 @@ class Sek_Input_Submit extends Sek_Input_Basic {
         $args             = is_array( $args ) ? $args : array();
         $args[ 'type' ]   = 'submit';
         $args             = wp_parse_args($args, [
-            'value' => esc_html__( 'Contact', 'text_doma' ),
+            'value' => esc_html__( 'Contact', 'nimble-builder' ),
         ]);
 
         parent::__construct( $args );
@@ -6361,9 +6361,9 @@ class Sek_Mailer {
 
         $this->messages = array(
             //status          => message
-            //'not_sent'        => __( 'Message was not sent. Try Again.', 'text_doma'),
-            //'sent'            => __( 'Thanks!Your message has been sent.', 'text_doma'),
-            'aborted'         => __( 'Please supply correct information.', 'text_doma') //<-todo too much generic
+            //'not_sent'        => __( 'Message was not sent. Try Again.', 'nimble-builder'),
+            //'sent'            => __( 'Thanks!Your message has been sent.', 'nimble-builder'),
+            'aborted'         => __( 'Please supply correct information.', 'nimble-builder') //<-todo too much generic
         );
         $this->status = 'init';
 
@@ -6476,7 +6476,7 @@ class Sek_Mailer {
 
         // Define a default sender name + make sure the field exists
         // fixes https://github.com/presscustomizr/nimble-builder/issues/513
-        $sender_name    = __('Someone', 'text_doma');
+        $sender_name    = __('Someone', 'nimble-builder');
         $sender_name_is_set = false;
         if ( is_array( $form_composition ) && array_key_exists( 'nimble_name', $form_composition ) ) {
             $sender_name_candidate  = sprintf( '%1$s', $this->form->get_field('nimble_name')->get_input()->get_value() );
@@ -6497,22 +6497,22 @@ class Sek_Mailer {
         if ( array_key_exists( 'nimble_subject' , $form_composition ) ) {
             $subject = $this->form->get_field('nimble_subject')->get_input()->get_value();
         } else if ( $sender_name_is_set ) {
-            $subject = sprintf( __( '%1$s sent a message from %2$s', 'text_doma' ), $sender_name, get_bloginfo( 'name' ) );
+            $subject = sprintf( __( '%1$s sent a message from %2$s', 'nimble-builder' ), $sender_name, get_bloginfo( 'name' ) );
         } else {
-            $subject = sprintf( __( 'Someone sent a message from %1$s', 'text_doma' ), get_bloginfo( 'name' ) );
+            $subject = sprintf( __( 'Someone sent a message from %1$s', 'nimble-builder' ), get_bloginfo( 'name' ) );
         }
 
 
 
-        // $sender_website = sprintf( __( 'Website: %1$s %2$s', 'text_doma' ),
+        // $sender_website = sprintf( __( 'Website: %1$s %2$s', 'nimble-builder' ),
         //     $this->form->get_field('website')->get_input()->get_value(),
         //     $allow_html ? '<br><br><br>': "\r\n\r\n\r\n"
         // );
 
         // the sender's email is written in the email's header reply-to field.
         // But it is also written inside the message body following this issue, https://github.com/presscustomizr/nimble-builder/issues/218
-        $before_message = sprintf( '%1$s: %2$s &lt;%3$s&gt;', __('From', 'text_doma'), $sender_name, $sender_email );//$sender_website;
-        $before_message .= sprintf( '<br>%1$s: %2$s', __('Subject', 'text_doma'), $subject );
+        $before_message = sprintf( '%1$s: %2$s &lt;%3$s&gt;', __('From', 'nimble-builder'), $sender_name, $sender_email );//$sender_website;
+        $before_message .= sprintf( '<br>%1$s: %2$s', __('Subject', 'nimble-builder'), $subject );
         $after_message  = '';
 
         if ( array_key_exists( 'email_footer', $submission_options ) ) {
@@ -6522,7 +6522,7 @@ class Sek_Mailer {
             $email_footer = sek_maybe_decode_richtext( $submission_options['email_footer'] );
             $email_footer = sek_strip_script_tags( $email_footer );
         } else {
-            $email_footer = sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_doma' ),
+            $email_footer = sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'nimble-builder' ),
                 get_bloginfo( 'name' ),
                 get_site_url( 'url' )
             );
@@ -6530,7 +6530,7 @@ class Sek_Mailer {
 
         if ( !empty( $sender_body_message ) ) {
             $sender_body_message = sprintf( '<br><br>%1$s: <br>%2$s',
-                __('Message body', 'text_doma'),
+                __('Message body', 'nimble-builder'),
                 //$allow_html ? '<br><br>': "\r\n\r\n",
                 $sender_body_message
             );
@@ -6599,7 +6599,7 @@ class Sek_Mailer {
         }
 
         if ( '_no_error_' !== $this->recaptcha_errors && current_user_can( 'customize' ) ) {
-              $submission_message .= sprintf( '<br/>%s : <i>%s</i>', __('reCAPTCHA problem (only visible by a logged in administrator )', 'text_doma'), $this->recaptcha_errors );
+              $submission_message .= sprintf( '<br/>%s : <i>%s</i>', __('reCAPTCHA problem (only visible by a logged in administrator )', 'nimble-builder'), $this->recaptcha_errors );
         }
         return $submission_message;
     }
@@ -6644,23 +6644,23 @@ endif;
 function sek_simple_form_mail_template() {
     $template = array(
         'subject' =>
-            sprintf( __( '%1$s: new contact request', 'text_doma' ),
+            sprintf( __( '%1$s: new contact request', 'nimble-builder' ),
                 get_bloginfo( 'name' )
             ),
         'sender' => sprintf( '[your-name] <%s>', simple_form_from_email() ),
         'body' =>
             /* translators: %s: [your-name] <[your-email]> */
-            sprintf( __( 'From: %s', 'text_doma' ),
+            sprintf( __( 'From: %s', 'nimble-builder' ),
                 '[your-name] <[your-email]>' ) . "\n"
             /* translators: %s: [your-subject] */
-            . sprintf( __( 'Subject: %s', 'text_doma' ),
+            . sprintf( __( 'Subject: %s', 'nimble-builder' ),
                 '[your-subject]' ) . "\n\n"
-            . __( 'Message Body:', 'text_doma' )
+            . __( 'Message Body:', 'nimble-builder' )
                 . "\n" . '[your-message]' . "\n\n"
             . '-- ' . "\n"
             /* translators: 1: blog name, 2: blog URL */
             . sprintf(
-                __( 'This e-mail was sent from a contact form on %1$s (%2$s)', 'text_doma' ),
+                __( 'This e-mail was sent from a contact form on %1$s (%2$s)', 'nimble-builder' ),
                 get_bloginfo( 'name' ),
                 get_bloginfo( 'url' ) ),
         'recipient' => get_option( 'admin_email' ),

@@ -75,7 +75,7 @@ if ( $has_content_restriction_for_location ) {
                     sprintf( '<span class="sek-nimble-icon"><img src="%1$s"/></span>',
                         esc_url(NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION)
                     ),
-                    $is_header_location ? __('Start designing the header', 'text_doma') : __('Start designing the footer', 'text_doma')
+                    $is_header_location ? __('Start designing the header', 'nimble-builder') : __('Start designing the footer', 'nimble-builder')
                 );
             }
             ?>

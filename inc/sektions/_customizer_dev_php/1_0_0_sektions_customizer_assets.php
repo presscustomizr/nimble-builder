@@ -165,7 +165,7 @@ function sek_enqueue_controls_js_css() {
 
                 'areBetaFeaturesEnabled' => sek_are_beta_features_enabled(),
 
-                'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'text_doma') ), sek_get_registered_widget_areas() ),
+                'registeredWidgetZones' => array_merge( array( '_none_' => __('Select a widget area', 'nimble-builder') ), sek_get_registered_widget_areas() ),
 
                 'globalOptionsMap' => SEK_Front_Construct::$global_options_map,
                 'localOptionsMap' => SEK_Front_Construct::$local_options_map,
@@ -484,117 +484,117 @@ add_filter( 'nimble-sek-localized-customizer-control-params', '\Nimble\nimble_ad
 function nimble_add_i18n_localized_control_params( $params ) {
     return array_merge( $params, array(
         'i18n' => array(
-            'Sections' => __( 'Sections', 'text_doma'),
+            'Sections' => __( 'Sections', 'nimble-builder'),
 
-            'Nimble Builder' => __('Nimble Builder', 'text_doma'),
+            'Nimble Builder' => __('Nimble Builder', 'nimble-builder'),
 
-            "You've reached the maximum number of allowed nested sections." => __("You've reached the maximum number of allowed nested sections.", 'text_doma'),
-            "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_doma'),
-            "A section must have at least one column." => __( "A section must have at least one column.", 'text_doma'),
+            "You've reached the maximum number of allowed nested sections." => __("You've reached the maximum number of allowed nested sections.", 'nimble-builder'),
+            "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'nimble-builder'),
+            "A section must have at least one column." => __( "A section must have at least one column.", 'nimble-builder'),
 
-            'If this problem locks Nimble Builder, you can try resetting the sections of this page.' => __('If this problem locks Nimble Builder, you can try resetting the sections of this page.', 'text_doma'),
-            'Reset' => __('Reset', 'text_doma'),
-            'Reset complete' => __('Reset complete', 'text_doma'),
-            'Reset failed' => __('Reset failed', 'text_doma'),
+            'If this problem locks Nimble Builder, you can try resetting the sections of this page.' => __('If this problem locks Nimble Builder, you can try resetting the sections of this page.', 'nimble-builder'),
+            'Reset' => __('Reset', 'nimble-builder'),
+            'Reset complete' => __('Reset complete', 'nimble-builder'),
+            'Reset failed' => __('Reset failed', 'nimble-builder'),
 
             // Header button title text
-            'Drag and drop content' => __('Drag and drop content', 'text_doma'),
+            'Drag and drop content' => __('Drag and drop content', 'nimble-builder'),
 
             // Generated UI
-            'Content Picker' => __('Content Picker', 'text_doma'),
-            'Pick a pre-designed section' => __('Pick a pre-designed section', 'text_doma'),
+            'Content Picker' => __('Content Picker', 'nimble-builder'),
+            'Pick a pre-designed section' => __('Pick a pre-designed section', 'nimble-builder'),
 
-            'Header location only accepts modules and pre-built header sections' => __('Header location only accepts modules and pre-built header sections', 'text_doma'),
-            'Footer location only accepts modules and pre-built footer sections' => __('Footer location only accepts modules and pre-built footer sections', 'text_doma'),
-            'You can\'t drop a header section in the footer location' => __('You can\'t drop a header section in the footer location', 'text_doma'),
-            'You can\'t drop a footer section in the header location' => __('You can\'t drop a footer section in the header location', 'text_doma'),
+            'Header location only accepts modules and pre-built header sections' => __('Header location only accepts modules and pre-built header sections', 'nimble-builder'),
+            'Footer location only accepts modules and pre-built footer sections' => __('Footer location only accepts modules and pre-built footer sections', 'nimble-builder'),
+            'You can\'t drop a header section in the footer location' => __('You can\'t drop a header section in the footer location', 'nimble-builder'),
+            'You can\'t drop a footer section in the header location' => __('You can\'t drop a footer section in the header location', 'nimble-builder'),
 
-            'Module' => __('Module', 'text_doma'),
-            'Content for' => __('Content for', 'text_doma'),
-            'Customize the options for module :' => __('Customize the options for module :', 'text_doma'),
+            'Module' => __('Module', 'nimble-builder'),
+            'Content for' => __('Content for', 'nimble-builder'),
+            'Customize the options for module :' => __('Customize the options for module :', 'nimble-builder'),
 
-            'Layout settings for the' => __('Layout settings for the', 'text_doma'),
-            'Background settings for the' => __('Background settings for the', 'text_doma'),
-            'Text settings for the' => __('Text settings for the', 'text_doma'),
-            'Borders settings for the' => __('Borders settings for the', 'text_doma'),
-            'Padding and margin settings for the' => __('Padding and margin settings for the', 'text_doma'),
-            'Height, vertical alignment, z-index for the' => __('Height, vertical alignment, z-index for the', 'text_doma'),
-            'Width settings for the' => __('Width settings for the', 'text_doma'),
-            'Width and horizontal alignment for the' => __('Width and horizontal alignment for the', 'text_doma'),
-            'Custom anchor ( CSS ID ) and CSS classes for the' => __('Custom anchor ( CSS ID ) and CSS classes for the', 'text_doma'),
-            'Device visibility settings for the' => __('Device visibility settings for the', 'text_doma'),
-            'Responsive settings : breakpoint, column direction' => __('Responsive settings : breakpoint, column direction', 'text_doma'),
+            'Layout settings for the' => __('Layout settings for the', 'nimble-builder'),
+            'Background settings for the' => __('Background settings for the', 'nimble-builder'),
+            'Text settings for the' => __('Text settings for the', 'nimble-builder'),
+            'Borders settings for the' => __('Borders settings for the', 'nimble-builder'),
+            'Padding and margin settings for the' => __('Padding and margin settings for the', 'nimble-builder'),
+            'Height, vertical alignment, z-index for the' => __('Height, vertical alignment, z-index for the', 'nimble-builder'),
+            'Width settings for the' => __('Width settings for the', 'nimble-builder'),
+            'Width and horizontal alignment for the' => __('Width and horizontal alignment for the', 'nimble-builder'),
+            'Custom anchor ( CSS ID ) and CSS classes for the' => __('Custom anchor ( CSS ID ) and CSS classes for the', 'nimble-builder'),
+            'Device visibility settings for the' => __('Device visibility settings for the', 'nimble-builder'),
+            'Responsive settings : breakpoint, column direction' => __('Responsive settings : breakpoint, column direction', 'nimble-builder'),
 
-            'Animation settings for the' => __('Animation settings for the', 'text_doma'),
-            'Settings for the' => __('Settings for the', 'text_doma'),//section / column / module
+            'Animation settings for the' => __('Animation settings for the', 'nimble-builder'),
+            'Settings for the' => __('Settings for the', 'nimble-builder'),//section / column / module
 
-            'The section cannot be moved higher.' => __('The section cannot be moved higher.', 'text_doma'),
-            'The section cannot be moved lower.' => __('The section cannot be moved lower.', 'text_doma'),
+            'The section cannot be moved higher.' => __('The section cannot be moved higher.', 'nimble-builder'),
+            'The section cannot be moved lower.' => __('The section cannot be moved lower.', 'nimble-builder'),
 
             // UI global and local options
-            'Current page options' => __( 'Current page options', 'text_doma'),
-            'Page template' => __( 'Page template', 'text_doma'),
-            'This page uses Nimble Builder template.' => __( 'This page uses Nimble Builder template.', 'text_doma'),
-            'Page header and footer' => __( 'Page header and footer', 'text_doma'),
-            'Inner and outer widths' => __( 'Inner and outer widths', 'text_doma'),
-            'Custom CSS' => __( 'Custom CSS', 'text_doma'),
-            'Remove all sections and options of this page' => __( 'Remove all sections and options of this page', 'text_doma'),
-            'Remove the sections displayed in global locations' => __( 'Remove the sections displayed in global locations', 'text_doma'),
-            'Page speed optimizations' => __( 'Page speed optimizations', 'text_doma'),
+            'Current page options' => __( 'Current page options', 'nimble-builder'),
+            'Page template' => __( 'Page template', 'nimble-builder'),
+            'This page uses Nimble Builder template.' => __( 'This page uses Nimble Builder template.', 'nimble-builder'),
+            'Page header and footer' => __( 'Page header and footer', 'nimble-builder'),
+            'Inner and outer widths' => __( 'Inner and outer widths', 'nimble-builder'),
+            'Custom CSS' => __( 'Custom CSS', 'nimble-builder'),
+            'Remove all sections and options of this page' => __( 'Remove all sections and options of this page', 'nimble-builder'),
+            'Remove the sections displayed in global locations' => __( 'Remove the sections displayed in global locations', 'nimble-builder'),
+            'Page speed optimizations' => __( 'Page speed optimizations', 'nimble-builder'),
 
-            'Global text options for Nimble sections' => __('Global text options for Nimble sections', 'text_doma'),
-            'Site wide header and footer' => __( 'Site wide header and footer', 'text_doma'),
-            'Site wide breakpoint for Nimble sections' => __( 'Site wide breakpoint for Nimble sections', 'text_doma'),
-            'Site wide inner and outer sections widths' => __( 'Site wide inner and outer sections widths', 'text_doma'),
+            'Global text options for Nimble sections' => __('Global text options for Nimble sections', 'nimble-builder'),
+            'Site wide header and footer' => __( 'Site wide header and footer', 'nimble-builder'),
+            'Site wide breakpoint for Nimble sections' => __( 'Site wide breakpoint for Nimble sections', 'nimble-builder'),
+            'Site wide inner and outer sections widths' => __( 'Site wide inner and outer sections widths', 'nimble-builder'),
 
-            'Site wide page speed optimizations' => __( 'Site wide page speed optimizations', 'text_doma'),
-            'Beta features' => __( 'Beta features', 'text_doma'),
-            'Protect your contact forms with Google reCAPTCHA' => __( 'Protect your contact forms with Google reCAPTCHA', 'text_doma'),
+            'Site wide page speed optimizations' => __( 'Site wide page speed optimizations', 'nimble-builder'),
+            'Beta features' => __( 'Beta features', 'nimble-builder'),
+            'Protect your contact forms with Google reCAPTCHA' => __( 'Protect your contact forms with Google reCAPTCHA', 'nimble-builder'),
 
             // DEPRECATED
-            'Options for the sections of the current page' => __( 'Options for the sections of the current page', 'text_doma'),
-            'General options applied for the sections site wide' => __( 'General options applied for the sections site wide', 'text_doma'),
+            'Options for the sections of the current page' => __( 'Options for the sections of the current page', 'nimble-builder'),
+            'General options applied for the sections site wide' => __( 'General options applied for the sections site wide', 'nimble-builder'),
 
-            'Site wide options' => __( 'Site wide options', 'text_doma'),
-            'Site templates' => __('Site templates', 'text_doma'),
+            'Site wide options' => __( 'Site wide options', 'nimble-builder'),
+            'Site templates' => __('Site templates', 'nimble-builder'),
 
             // Levels
-            'location' => __('location', 'text_doma'),
-            'section' => __('section', 'text_doma'),
-            'nested section' => __('nested section', 'text_doma'),
-            'column' => __('column', 'text_doma'),
-            'module' => __('module', 'text_doma'),
+            'location' => __('location', 'nimble-builder'),
+            'section' => __('section', 'nimble-builder'),
+            'nested section' => __('nested section', 'nimble-builder'),
+            'column' => __('column', 'nimble-builder'),
+            'module' => __('module', 'nimble-builder'),
 
             // DRAG n DROP
-            'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'text_doma'),
-            'You first need to click on a target ( with a + icon ) in the preview.' => __('You first need to click on a target ( with a + icon ) in the preview.', 'text_doma'),
-            'Insert here' => __('Insert here', 'text_doma'),
-            'Insert in a new section' => __('Insert in a new section', 'text_doma'),
-            'Insert a new section here' => __('Insert a new section here', 'text_doma'),
+            'This browser does not support drag and drop. You might need to update your browser or use another one.' => __('This browser does not support drag and drop. You might need to update your browser or use another one.', 'nimble-builder'),
+            'You first need to click on a target ( with a + icon ) in the preview.' => __('You first need to click on a target ( with a + icon ) in the preview.', 'nimble-builder'),
+            'Insert here' => __('Insert here', 'nimble-builder'),
+            'Insert in a new section' => __('Insert in a new section', 'nimble-builder'),
+            'Insert a new section here' => __('Insert a new section here', 'nimble-builder'),
 
             // DOUBLE CLICK INSERTION
 
 
             // MODULES
-            'Select a font family' => __('Select a font family', 'text_doma'),
-            'Web safe fonts' => __('Web safe fonts', 'text_doma'),
-            'Google fonts' => __('Google fonts', 'text_doma'),
-            'Already used fonts' => __( 'Already used fonts', 'text_doma'),
+            'Select a font family' => __('Select a font family', 'nimble-builder'),
+            'Web safe fonts' => __('Web safe fonts', 'nimble-builder'),
+            'Google fonts' => __('Google fonts', 'nimble-builder'),
+            'Already used fonts' => __( 'Already used fonts', 'nimble-builder'),
 
-            'Set a custom url' => __('Set a custom url', 'text_doma'),
+            'Set a custom url' => __('Set a custom url', 'nimble-builder'),
 
-            'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_doma'),
+            'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'nimble-builder'),
 
-            'Select an icon' => __( 'Select an icon', 'text_doma' ),
+            'Select an icon' => __( 'Select an icon', 'nimble-builder' ),
 
             // Code Editor
-            'codeEditorSingular' => __( 'There is %d error in your %s code which might break your site. Please fix it before saving.', 'text_doma' ),
-            'codeEditorPlural' => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'text_doma' ),
+            'codeEditorSingular' => __( 'There is %d error in your %s code which might break your site. Please fix it before saving.', 'nimble-builder' ),
+            'codeEditorPlural' => __( 'There are %d errors in your %s code which might break your site. Please fix them before saving.', 'nimble-builder' ),
 
             // Various
-            'Settings on desktops' => __('Settings on desktops', 'text_doma'),
-            'Settings on tablets' => __('Settings on tablets', 'text_doma'),
-            'Settings on mobiles' => __('Settings on mobiles', 'text_doma'),
+            'Settings on desktops' => __('Settings on desktops', 'nimble-builder'),
+            'Settings on tablets' => __('Settings on tablets', 'nimble-builder'),
+            'Settings on mobiles' => __('Settings on mobiles', 'nimble-builder'),
 
             // Level Tree
             'No sections to navigate' => __('No sections to navigate', 'text_dom'),
@@ -607,34 +607,34 @@ function nimble_add_i18n_localized_control_params( $params ) {
 
             // Revision history
             // @see https://github.com/presscustomizr/nimble-builder/issues/392
-            'Revision history of local sections' => __('Revision history of local sections', 'text_doma'),
-            'Revision history of global sections' => __('Revision history of global sections', 'text_doma'),
-            'The revision could not be restored.' => __('The revision could not be restored.', 'text_doma'),
-            'The revision has been successfully restored.' => __('The revision has been successfully restored.', 'text_doma'),
-            'Select' => __('Select', 'text_doma'),
-            'No revision history available for the moment.' => __('No revision history available for the moment.', 'text_doma'),
-            'This is the current version.' => __('This is the current version.', 'text_doma'),
-            '(currently published version)' => __('(currently published version)','text_doma'),
+            'Revision history of local sections' => __('Revision history of local sections', 'nimble-builder'),
+            'Revision history of global sections' => __('Revision history of global sections', 'nimble-builder'),
+            'The revision could not be restored.' => __('The revision could not be restored.', 'nimble-builder'),
+            'The revision has been successfully restored.' => __('The revision has been successfully restored.', 'nimble-builder'),
+            'Select' => __('Select', 'nimble-builder'),
+            'No revision history available for the moment.' => __('No revision history available for the moment.', 'nimble-builder'),
+            'This is the current version.' => __('This is the current version.', 'nimble-builder'),
+            '(currently published version)' => __('(currently published version)','nimble-builder'),
 
             // Import / export
-            'You need to publish before exporting.' => __( 'Nimble Builder : you need to publish before exporting.', 'text_doma'),
-            'Export / Import' => __('Export / Import', 'text_doma'),
-            'Export / Import global sections' => __('Export / Import global sections', 'text_doma'),
-            'Export failed' => __('Export failed', 'text_doma'),
-            'Nothing to export.' => __('Nimble Builder : you have nothing to export. Start adding sections to this page!', 'text_doma'),
-            'Import failed' => __('Import failed', 'text_doma'),
-            'Import exceeds server response time, try to uncheck "import images" option.' => __('Import exceeds server response time, try to uncheck "import images" option.', 'text_doma'),
-            'The current page has no available locations to import Nimble Builder sections.' => __('The current page has no available locations to import Nimble Builder sections.', 'text_doma'),
-            'Missing file' => __('Missing file', 'text_doma'),
-            'File successfully imported' => __('File successfully imported', 'text_doma'),
-            'Template successfully imported' => __('Template successfully imported', 'text_doma'),
-            'Import failed, invalid file content' => __('Import failed, invalid file content', 'text_doma'),
-            'Import failed, file problem' => __('Import failed, file problem', 'text_doma'),
-            'Some image(s) could not be imported' => __('Some image(s) could not be imported', 'text_doma'),
-            // 'Module' => __('Module', 'text_doma'),
+            'You need to publish before exporting.' => __( 'Nimble Builder : you need to publish before exporting.', 'nimble-builder'),
+            'Export / Import' => __('Export / Import', 'nimble-builder'),
+            'Export / Import global sections' => __('Export / Import global sections', 'nimble-builder'),
+            'Export failed' => __('Export failed', 'nimble-builder'),
+            'Nothing to export.' => __('Nimble Builder : you have nothing to export. Start adding sections to this page!', 'nimble-builder'),
+            'Import failed' => __('Import failed', 'nimble-builder'),
+            'Import exceeds server response time, try to uncheck "import images" option.' => __('Import exceeds server response time, try to uncheck "import images" option.', 'nimble-builder'),
+            'The current page has no available locations to import Nimble Builder sections.' => __('The current page has no available locations to import Nimble Builder sections.', 'nimble-builder'),
+            'Missing file' => __('Missing file', 'nimble-builder'),
+            'File successfully imported' => __('File successfully imported', 'nimble-builder'),
+            'Template successfully imported' => __('Template successfully imported', 'nimble-builder'),
+            'Import failed, invalid file content' => __('Import failed, invalid file content', 'nimble-builder'),
+            'Import failed, file problem' => __('Import failed, file problem', 'nimble-builder'),
+            'Some image(s) could not be imported' => __('Some image(s) could not be imported', 'nimble-builder'),
+            // 'Module' => __('Module', 'nimble-builder'),
 
             // Column width
-            'This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.' => __('This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.', 'text_doma'),
+            'This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.' => __('This is a single-column section with a width of 100%. You can act on the internal width of the parent section, or adjust padding and margin.', 'nimble-builder'),
 
             // Accordion module
             'Accordion title' => __('Accordion title', 'text_dom'),
@@ -654,7 +654,7 @@ function nimble_add_i18n_localized_control_params( $params ) {
             'Last modified' => __('Last modified', 'text_dom'),
             'You did not save any templates yet.' => __('You did not save any templates yet.', 'text_dom'),
             'Live demo' => __('Live demo', 'text_dom'),
-            '🍥 More templates coming...' => __('🍥 More templates coming...', 'text_doma'),
+            '🍥 More templates coming...' => __('🍥 More templates coming...', 'nimble-builder'),
 
             // Section Save
             'You did not save any section yet.' => __('You did not save any section yet.', 'text_dom'),
@@ -872,13 +872,13 @@ function sek_print_nimble_customizer_tmpl() {
             </div>
           </div>
           <?php // the select input is printed with a default 'none' option, other options will be populated dynamically with ajax fetching results ?>
-          <select class="sek-saved-section-picker"><option selected="selected" value="none"><?php _e('Select a section', 'text_doma'); ?></option></select>
+          <select class="sek-saved-section-picker"><option selected="selected" value="none"><?php _e('Select a section', 'nimble-builder'); ?></option></select>
           <div class="sek-section-title">
-              <label for="sek-saved-section-title" class="customize-control-title"><?php _e('Section title', 'text_doma'); ?></label>
+              <label for="sek-saved-section-title" class="customize-control-title"><?php _e('Section title', 'nimble-builder'); ?></label>
               <input id="sek-saved-section-title" type="text" value="">
           </div>
           <div class="sek-section-description">
-              <label for="sek-saved-section-description" class="customize-control-title"><?php _e('Section description', 'text_doma'); ?></label>
+              <label for="sek-saved-section-description" class="customize-control-title"><?php _e('Section description', 'nimble-builder'); ?></label>
               <textarea id="sek-saved-section-description" type="text" value=""></textarea>
           </div>
           <div class="sek-save-section-action">
@@ -898,7 +898,7 @@ function sek_print_nimble_customizer_tmpl() {
             </div>
           </div>
           <div class="sek-section-remove-dialog">
-            <p><?php _e('Removing a section cannot be undone. Are you sure you want to continue?', 'text_doma'); ?>
+            <p><?php _e('Removing a section cannot be undone. Are you sure you want to continue?', 'nimble-builder'); ?>
             <div class="sek-ui-button-group" role="group">
               <button class="sek-ui-button sek-do-remove-section" type="button" title="<?php _e('Remove section', 'text_domain'); ?>">
                 <?php _e('Remove section', 'text_domain'); ?><span class="spinner"></span>
@@ -937,13 +937,13 @@ function sek_print_nimble_customizer_tmpl() {
             </div>
           </div>
           <?php // the select input is printed with a default 'none' option, other options will be populated dynamically with ajax fetching results ?>
-          <select class="sek-saved-tmpl-picker"><option selected="selected" value="none"><?php _e('Select a template', 'text_doma'); ?></option></select>
+          <select class="sek-saved-tmpl-picker"><option selected="selected" value="none"><?php _e('Select a template', 'nimble-builder'); ?></option></select>
           <div class="sek-tmpl-title">
-              <label for="sek-saved-tmpl-title" class="customize-control-title"><?php _e('Template title', 'text_doma'); ?></label>
+              <label for="sek-saved-tmpl-title" class="customize-control-title"><?php _e('Template title', 'nimble-builder'); ?></label>
               <input id="sek-saved-tmpl-title" type="text" value="">
           </div>
           <div class="sek-tmpl-description">
-              <label for="sek-saved-tmpl-description" class="customize-control-title"><?php _e('Template description', 'text_doma'); ?></label>
+              <label for="sek-saved-tmpl-description" class="customize-control-title"><?php _e('Template description', 'nimble-builder'); ?></label>
               <textarea id="sek-saved-tmpl-description" type="text" value=""></textarea>
           </div>
           <div class="sek-save-tmpl-action">
@@ -963,7 +963,7 @@ function sek_print_nimble_customizer_tmpl() {
             </div>
           </div>
           <div class="sek-tmpl-remove-dialog">
-            <p><?php _e('Removing a template cannot be undone. Are you sure you want to continue?', 'text_doma'); ?>
+            <p><?php _e('Removing a template cannot be undone. Are you sure you want to continue?', 'nimble-builder'); ?>
             <div class="sek-ui-button-group" role="group">
               <button class="sek-ui-button sek-do-remove-tmpl" type="button" title="<?php _e('Remove template', 'text_domain'); ?>">
                 <?php _e('Remove template', 'text_domain'); ?><span class="spinner"></span>
@@ -986,7 +986,7 @@ function sek_print_nimble_customizer_tmpl() {
           <div id="sek-tmpl-source-switcher">
             <div aria-label="" class="sek-ui-button-group" role="group">
                 <button type="button" aria-pressed="true" class="sek-ui-button is-selected" title="<?php _e('Nimble Builder templates', 'text_domain'); ?>" data-sek-tmpl-source="api_tmpl"><span><?php _e('Nimble Builder templates', 'text_domain'); ?></span></button>
-                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('My templates', 'text_domain'); ?>" data-sek-tmpl-source="user_tmpl"><span><?php _e('My templates', 'text_domain'); ?>&nbsp;<span class="sek-new-label"><?php _e('New!', 'text_doma'); ?></span></span></button>
+                <button type="button" aria-pressed="false" class="sek-ui-button" title="<?php _e('My templates', 'text_domain'); ?>" data-sek-tmpl-source="user_tmpl"><span><?php _e('My templates', 'text_domain'); ?>&nbsp;<span class="sek-new-label"><?php _e('New!', 'nimble-builder'); ?></span></span></button>
             </div>
           </div>
           <div class="sek-tmpl-filter-wrapper">

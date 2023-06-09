@@ -8,13 +8,13 @@ function sek_get_module_params_for_czr_divider_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_divider_module',
-        'name' => __('Divider', 'text_doma'),
+        'name' => __('Divider', 'nimble-builder'),
         'css_selectors' => array( '.sek-divider' ),
         'tmpl' => array(
             'item-inputs' => array(
                 'border_top_width_css' => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __('Weight', 'text_doma'),
+                    'title'       => __('Weight', 'nimble-builder'),
                     'min' => 1,
                     'max' => 50,
                     //'unit' => 'px',
@@ -26,7 +26,7 @@ function sek_get_module_params_for_czr_divider_module() {
                 ),
                 'border_top_style_css' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Style', 'text_doma'),
+                    'title'       => __('Style', 'nimble-builder'),
                     'default' => 'solid',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -35,7 +35,7 @@ function sek_get_module_params_for_czr_divider_module() {
                 ),
                 'border_top_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Color', 'text_doma'),
+                    'title'       => __('Color', 'nimble-builder'),
                     'width-100'   => true,
                     'default'    => '#5a5a5a',
                     'refresh_markup' => false,
@@ -44,7 +44,7 @@ function sek_get_module_params_for_czr_divider_module() {
                 ),
                 'width_css' => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __('Width', 'text_doma'),
+                    'title'       => __('Width', 'nimble-builder'),
                     'min' => 1,
                     'max' => 100,
                     //'unit' => '%',
@@ -56,7 +56,7 @@ function sek_get_module_params_for_czr_divider_module() {
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'border_radius',
-                    'title'       => __( 'Rounded corners', 'text_doma' ),
+                    'title'       => __( 'Rounded corners', 'nimble-builder' ),
                     'default' => array( '_all_' => '0px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -69,7 +69,7 @@ function sek_get_module_params_for_czr_divider_module() {
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'       => __('Alignment', 'text_doma'),
+                    'title'       => __('Alignment', 'nimble-builder'),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -80,7 +80,7 @@ function sek_get_module_params_for_czr_divider_module() {
                 ),
                 'v_spacing_css' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Space before and after', 'text_doma'),
+                    'title'       => __('Space before and after', 'nimble-builder'),
                     'min'         => 1,
                     'max'         => 100,
                     'default'     => array( 'desktop' => '15px' ),

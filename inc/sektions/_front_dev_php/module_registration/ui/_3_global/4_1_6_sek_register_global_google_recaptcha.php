@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_global_recaptcha() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_recaptcha',
-        //'name' => __('Protect your contact forms with Google reCAPTCHA', 'text_doma'),
+        //'name' => __('Protect your contact forms with Google reCAPTCHA', 'nimble-builder'),
         // 'starting_value' => array(
 
         // ),
@@ -14,32 +14,32 @@ function sek_get_module_params_for_sek_global_recaptcha() {
             'item-inputs' => array(
                 'enable' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => sprintf( '<img height="20" width="20" src="%1$s"/> %2$s', NIMBLE_BASE_URL . '/assets/img/recaptcha_32.png', __('Activate Google reCAPTCHA on your forms', 'text_doma') ),
+                    'title'       => sprintf( '<img height="20" width="20" src="%1$s"/> %2$s', NIMBLE_BASE_URL . '/assets/img/recaptcha_32.png', __('Activate Google reCAPTCHA on your forms', 'nimble-builder') ),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'notice_after' => sprintf( __('Nimble Builder can activate the %1$s service to protect your forms against spambots. You need to %2$s.'),
-                        sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-form-module', __('Google reCAPTCHA', 'text_doma') ),
-                        sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://www.google.com/recaptcha/admin#list', __('get your domain API keys from Google', 'text_doma') )
+                        sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-form-module', __('Google reCAPTCHA', 'nimble-builder') ),
+                        sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://www.google.com/recaptcha/admin#list', __('get your domain API keys from Google', 'nimble-builder') )
                     )
                 ),
                 'public_key' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Site key', 'text_doma'),
+                    'title'       => __('Site key', 'nimble-builder'),
                     'default'     => '',
                     'refresh_preview' => false,
                     'refresh_markup' => false
                 ),
                 'private_key' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Secret key', 'text_doma'),
+                    'title'       => __('Secret key', 'nimble-builder'),
                     'default'     => '',
                     'refresh_preview' => false,
                     'refresh_markup' => false
                 ),
                 'score'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Score threshold', 'text_doma' ),
+                    'title'       => __( 'Score threshold', 'nimble-builder' ),
                     'default'     => 0.5,
                     'min'         => 0,
                     'max'         => 1,
@@ -47,13 +47,13 @@ function sek_get_module_params_for_sek_global_recaptcha() {
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'width-100'   => true,
-                    'notice_after'  => __( 'reCAPTCHA returns a score from 0 to 1 on each submission. 1 is very likely a good interaction, 0 is very likely a bot. A form submission that scores lower than your threshold will be considered as done by a robot, and aborted.', 'text_doma'),
+                    'notice_after'  => __( 'reCAPTCHA returns a score from 0 to 1 on each submission. 1 is very likely a good interaction, 0 is very likely a bot. A form submission that scores lower than your threshold will be considered as done by a robot, and aborted.', 'nimble-builder'),
                     'refresh_preview' => false,
                     'refresh_markup' => false
                 ),//0,
                 'show_failure_message' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Show a failure message', 'text_doma' ),
+                    'title'       => __( 'Show a failure message', 'nimble-builder' ),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
@@ -61,19 +61,19 @@ function sek_get_module_params_for_sek_global_recaptcha() {
                 'failure_message' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __( 'Failure message' , 'text_doma' ),
+                    'title'       => __( 'Failure message' , 'nimble-builder' ),
                     'title_width' => 'width-100',
-                    'default'     => __( 'Google ReCAPTCHA validation failed. This form only accepts messages from humans.', 'text_doma'),
+                    'default'     => __( 'Google ReCAPTCHA validation failed. This form only accepts messages from humans.', 'nimble-builder'),
                     'refresh_preview'  => false,
                     'refresh_markup' => false
                 ),
                 'badge' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Show the reCAPTCHA badge at the bottom of your page', 'text_doma'),
+                    'title'       => __('Show the reCAPTCHA badge at the bottom of your page', 'nimble-builder'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after'       => __( 'The badge is not previewable when customizing.', 'text_doma')
+                    'notice_after'       => __( 'The badge is not previewable when customizing.', 'nimble-builder')
                 )
             )
         )//tmpl

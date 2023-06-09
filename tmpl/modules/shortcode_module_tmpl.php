@@ -31,7 +31,7 @@ if ( !empty( $value['text_content'] ) ) {
 } else {
     if ( skp_is_customizing() ) {
         printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',
-            __('Click to edit the shortcode module.', 'text_doma'),
+            __('Click to edit the shortcode module.', 'nimble-builder'),
             'background: url(' . esc_url(NIMBLE_MODULE_ICON_PATH) . 'Nimble_shortcode_icon.svg) no-repeat 50% 75%;background-size: 170px;'
         );
     }

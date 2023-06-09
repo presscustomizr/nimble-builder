@@ -417,7 +417,7 @@ function skp_get_skope_title( $args = array() ) {
 
     if( 'local' == $level ) {
         $type = skp_get_skope( 'type' );
-        $title = $is_prefixed ? __( 'Options for', 'text_doma') . ' ' : $title;
+        $title = $is_prefixed ? __( 'Options for', 'nimble-builder') . ' ' : $title;
         if ( skp_skope_has_a_group( $meta_type ) ) {
             $_id = skp_get_skope('id');
             switch ($meta_type) {
@@ -434,22 +434,22 @@ function skp_get_skope_title( $args = array() ) {
 
                 case 'user':
                   $author = get_userdata( $_id );
-                  $title .= sprintf( '%1$s "%3$s" (id : %2$s)', __('user', 'text_doma'), $_id, $author->user_login );
+                  $title .= sprintf( '%1$s "%3$s" (id : %2$s)', __('user', 'nimble-builder'), $_id, $author->user_login );
                   break;
             }
         } else if ( ( 'trans' == $_dyn_type || skp_skope_has_no_group( $skope ) ) ) {
             if ( is_post_type_archive() ) {
                 global $wp_the_query;
-                $title .= sprintf( __( '%1$s archive page', 'text_doma'), $wp_the_query->get( 'post_type' ) );
+                $title .= sprintf( __( '%1$s archive page', 'nimble-builder'), $wp_the_query->get( 'post_type' ) );
             } else {
                 $title .= strtolower( $skope );
             }
         } else {
-            $title .= __( 'Undefined', 'text_doma');
+            $title .= __( 'Undefined', 'nimble-builder');
         }
     }
     if ( 'group' == $level || 'special_group' == $level ) {
-        $title = $is_prefixed ? __( 'Options for all', 'text_doma') . ' ' : __( 'All' , 'text_doma' ) . ' ';
+        $title = $is_prefixed ? __( 'Options for all', 'nimble-builder') . ' ' : __( 'All' , 'nimble-builder' ) . ' ';
         switch( $meta_type ) {
             case 'post' :
                 $type_obj = get_post_type_object( $type );
@@ -462,12 +462,12 @@ function skp_get_skope_title( $args = array() ) {
             break;
 
             case 'user' :
-                $title .= __('users', 'text_doma');
+                $title .= __('users', 'nimble-builder');
             break;
         }
     }
     if ( 'global' == $level ) {
-        $title = __( 'Sitewide options', 'text_doma');
+        $title = __( 'Sitewide options', 'nimble-builder');
     }
     $title = ucfirst( $title );
     return skp_trim_text( $title, $long ? 45 : 28, '...');

@@ -96,7 +96,7 @@ if ( false !== strpos($stringified_bg_attributes, 'data-sek-bg-parallax="true"')
             if ( skp_is_customizing() && !sek_is_customize_previewing_a_changeset_post() && empty( $collection ) ) {
                 //$content_type = 1 === $col_number ? 'section' : 'module';
                 $content_type = 'module';
-                $title = 'section' === $content_type ? __('Drag and drop a section or a module here', 'text_doma' ) : __('Drag and drop a block of content here', 'text_doma' );
+                $title = 'section' === $content_type ? __('Drag and drop a section or a module here', 'nimble-builder' ) : __('Drag and drop a block of content here', 'nimble-builder' );
                 ?>
                 <div class="sek-no-modules-column">
                 <div class="sek-module-drop-zone-for-first-module sek-content-module-drop-zone sek-drop-zone">
