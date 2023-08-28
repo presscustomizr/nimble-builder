@@ -697,7 +697,7 @@ if ( !class_exists( 'Flat_Export_Skope_Data_And_Send_To_Panel' ) ) :
                             setTimeout( function() {
                                 attempts++;
                                 _doWhenCustomizeSettingsReady( attempts );
-                            }, 200 );
+                            }, 50 );
                         } else {
                             if ( window.console && window.console.log ) {
                                 console.log('Nimble Builder problem : _wpCustomizeSettings is not defined');
