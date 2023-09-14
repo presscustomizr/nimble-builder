@@ -290,7 +290,7 @@ function sek_strip_script_tags_and_print_js_inline( $html, $model ) {
     if ( skp_is_customizing() ) {
         // June 2020 => added a notice for https://github.com/presscustomizr/nimble-builder/issues/710
         $script_notice = sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>',
-        __('Custom javascript code is not executed when customizing.', 'text-doma')
+        __('Custom javascript code is not executed when customizing.', 'nimble-builder')
         );
         return preg_replace('#<script(.*?)>(.*?)</script>#is', $script_notice, $html);
     } else {
@@ -414,11 +414,11 @@ function sek_get_pro_notice_for_czr_input( $features = '' ) {
   return sprintf( '<hr/><p class="sek-pro-notice"><img class="sek-pro-icon" src="%1$s"/><span class="sek-pro-notice-icon-bef-text"><img src="%2$s"/></span><span class="sek-pro-notice-text">%3$s : %4$s<br/><br/>%5$s</span><p>',
       NIMBLE_BASE_URL.'/assets/czr/sek/img/pro_white.svg?ver='.NIMBLE_VERSION,
       NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
-      __('Unlock more features with Nimble Builder Pro', 'text-doma'),
+      __('Unlock more features with Nimble Builder Pro', 'nimble-builder'),
       $features,
       sprintf('<a href="%1$s" rel="noopener noreferrer" title="%2$s" target="_blank">%2$s <i class="fas fa-external-link-alt"></i></a>',
           'https://presscustomizr.com/nimble-builder-pro/?utm_source=usersite&utm_medium=link&utm_campaign=czr',
-          __('Go Pro', 'text-doma')
+          __('Go Pro', 'nimble-builder')
       )
   );
 }

@@ -21,6 +21,7 @@ $current_version = "3.3.4";
 if ( !defined( "NIMBLE_VERSION" ) ) { define( "NIMBLE_VERSION", $current_version ); }
 if ( !defined( 'NIMBLE_DIR_NAME' ) ) { define( 'NIMBLE_DIR_NAME' , basename( dirname( __FILE__ ) ) ); }
 if ( !defined( 'NIMBLE_BASE_URL' ) ) { define( 'NIMBLE_BASE_URL' , plugins_url( NIMBLE_DIR_NAME ) ); }
+if ( !defined( 'NIMBLE_DIR_PATH' ) ) { define( 'NIMBLE_DIR_PATH' , plugin_dir_path( __FILE__ ) ); }
 if ( !defined( 'NIMBLE_BASE_PATH' ) ) { define( 'NIMBLE_BASE_PATH' , dirname( __FILE__ ) ); }
 if ( !defined( 'NIMBLE_MIN_PHP_VERSION' ) ) { define ( 'NIMBLE_MIN_PHP_VERSION', '5.4' ); }
 if ( !defined( 'NIMBLE_MIN_WP_VERSION' ) ) { define ( 'NIMBLE_MIN_WP_VERSION', '4.7' ); }
@@ -57,15 +58,15 @@ function nimble_passes_requirements(){
 }
 
 function nimble_display_min_php_message() {
-    nimble_display_min_requirement_notice( __( 'PHP', 'text_doma' ), NIMBLE_MIN_PHP_VERSION );
+    nimble_display_min_requirement_notice( __( 'PHP', 'nimble-builder' ), NIMBLE_MIN_PHP_VERSION );
 }
 function nimble_display_min_wp_message() {
-    nimble_display_min_requirement_notice( __( 'WordPress', 'text_doma' ), NIMBLE_MIN_WP_VERSION );
+    nimble_display_min_requirement_notice( __( 'WordPress', 'nimble-builder' ), NIMBLE_MIN_WP_VERSION );
 }
 function nimble_display_min_requirement_notice( $requires_what, $requires_what_version ) {
     printf( '<div class="error"><p>%1$s</p></div>',
-        sprintf( __( 'The <strong>%1$s</strong> plugin requires at least %2$s version %3$s.', 'text_doma' ),
-            __('Nimble Builder', 'text_doma'),
+        sprintf( __( 'The <strong>%1$s</strong> plugin requires at least %2$s version %3$s.', 'nimble-builder' ),
+            __('Nimble Builder', 'nimble-builder'),
             esc_attr($requires_what),
             esc_attr($requires_what_version)
         )
@@ -139,7 +140,24 @@ if ( nimble_passes_requirements() ) {
     */
     function nimble_load_plugin_textdomain() {
         // Note to self, the third argument must not be hardcoded, to account for relocated folders.
-        load_plugin_textdomain( 'nimble-builder' );
+        //load_plugin_textdomain( 'nimble-builder' );
+
+        if (isset($_GET['po_lang']) ) {
+            $locale = $_GET['po_lang'];
+        }else if(is_admin() && !wp_doing_ajax() && function_exists( 'get_user_locale' )){
+            $locale =  get_user_locale();
+        }
+        else if(is_admin() && function_exists( 'get_user_locale' )){
+            $locale = get_user_locale();
+        }else{
+            $locale = get_locale();
+        }
+        $locale = apply_filters( 'plugin_locale', $locale, 'nimble-builder' );
+
+        unload_textdomain( 'nimble-builder' );
+        load_textdomain( 'nimble-builder', NIMBLE_DIR_PATH. 'languages/' . "nimble-builder-".$locale . '.mo' );
+        load_plugin_textdomain( 'nimble-builder', false, NIMBLE_DIR_PATH. 'languages' );
+
     }
 
     require_once( NIMBLE_BASE_PATH . '/inc/functions.php' );

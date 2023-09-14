@@ -102,12 +102,12 @@ if ( !class_exists( 'CZR_Fmk_Base_Ajax_Filter' ) ) :
             switch ( $requested_tmpl ) {
                 case 'crud-module-part' :
                     ?>
-                      <button class="<?php echo esc_attr($css_attr['open_pre_add_btn']); ?>"><?php _e('Add New', 'text_doma'); ?> <span class="fas fa-plus-square"></span></button>
+                      <button class="<?php echo esc_attr($css_attr['open_pre_add_btn']); ?>"><?php _e('Add New', 'nimble-builder'); ?> <span class="fas fa-plus-square"></span></button>
                       <div class="<?php echo esc_attr($css_attr['pre_add_wrapper']); ?>">
                         <div class="<?php echo esc_attr($css_attr['pre_add_success']); ?>"><p></p></div>
                         <div class="<?php echo esc_attr($css_attr['pre_add_item_content']); ?>">
 
-                          <span class="<?php echo esc_attr($css_attr['cancel_pre_add_btn']); ?> button"><?php _e('Cancel', 'text_doma'); ?></span> <span class="<?php echo esc_attr($css_attr['add_new_btn']); ?> button"><?php _e('Add it', 'text_doma'); ?></span>
+                          <span class="<?php echo esc_attr($css_attr['cancel_pre_add_btn']); ?> button"><?php _e('Cancel', 'nimble-builder'); ?></span> <span class="<?php echo esc_attr($css_attr['add_new_btn']); ?> button"><?php _e('Add it', 'nimble-builder'); ?></span>
                         </div>
                       </div>
                     <?php
@@ -120,7 +120,7 @@ if ( !class_exists( 'CZR_Fmk_Base_Ajax_Filter' ) ) :
                         <# } else { #>
                           <div class="<?php echo esc_attr($css_attr['item_title']); ?>"><h4>{{ data.title }}</h4></div>
                         <# } #>
-                        <div class="<?php echo esc_attr($css_attr['item_btns']); ?>"><a title="<?php _e('Edit', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-pencil-alt <?php echo esc_attr($css_attr['edit_view_btn']); ?>"></a>&nbsp;<a title="<?php _e('Remove', 'text_doma'); ?>" href="javascript:void(0);" class="fas fa-trash <?php echo esc_attr($css_attr['display_alert_btn']); ?>"></a></div>
+                        <div class="<?php echo esc_attr($css_attr['item_btns']); ?>"><a title="<?php _e('Edit', 'nimble-builder'); ?>" href="javascript:void(0);" class="fas fa-pencil-alt <?php echo esc_attr($css_attr['edit_view_btn']); ?>"></a>&nbsp;<a title="<?php _e('Remove', 'nimble-builder'); ?>" href="javascript:void(0);" class="fas fa-trash <?php echo esc_attr($css_attr['display_alert_btn']); ?>"></a></div>
                         <div class="<?php echo esc_attr($css_attr['remove_alert_wrapper']); ?>"></div>
                       </div>
                     <?php
@@ -128,8 +128,8 @@ if ( !class_exists( 'CZR_Fmk_Base_Ajax_Filter' ) ) :
 
                 case 'rud-item-alert-part' :
                     ?>
-                      <p class="czr-item-removal-title"><?php _e('Are you sure you want to remove : <strong>{{ data.title }} ?</strong>', 'text_doma'); ?></p>
-                      <span class="<?php echo esc_attr($css_attr['remove_view_btn']); ?> button"><?php _e('Yes', 'text_doma'); ?></span> <span class="<?php echo esc_attr($css_attr['cancel_alert_btn']); ?> button"><?php _e('No', 'text_doma'); ?></span>
+                      <p class="czr-item-removal-title"><?php _e('Are you sure you want to remove : <strong>{{ data.title }} ?</strong>', 'nimble-builder'); ?></p>
+                      <span class="<?php echo esc_attr($css_attr['remove_view_btn']); ?> button"><?php _e('Yes', 'nimble-builder'); ?></span> <span class="<?php echo esc_attr($css_attr['cancel_alert_btn']); ?> button"><?php _e('No', 'nimble-builder'); ?></span>
                     <?php
                 break;
 

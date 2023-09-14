@@ -1146,7 +1146,7 @@ var SekPreviewPrototype = SekPreviewPrototype || {};
                   //     <div class="sek-add-content-button <# if ( data.is_last ) { #>is_last<# } #>">
                   //       <div class="sek-add-content-button-wrapper">
                   //         <button data-sek-click-on="add-content" data-sek-add="section" class="sek-add-content-btn" style="--sek-add-content-btn-width:60px;">
-                  //           <span title="<?php _e('Add Content', 'text_doma' ); ?>" class="sek-click-on-button-icon fas fa-plus-circle sek-click-on"></span><span class="action-button-text"><?php _e('Add Content', 'text_doma' ); ?></span>
+                  //           <span title="<?php _e('Add Content', 'nimble-builder' ); ?>" class="sek-click-on-button-icon fas fa-plus-circle sek-click-on"></span><span class="action-button-text"><?php _e('Add Content', 'nimble-builder' ); ?></span>
                   //         </button>
                   //       </div>
                   //     </div>

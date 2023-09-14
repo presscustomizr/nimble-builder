@@ -43,9 +43,9 @@ function sek_add_customize_link() {
       'id'     => 'nimble_customize',
       'title'  => sprintf( '<span class="sek-nimble-icon" title="%3$s"><img src="%1$s" alt="%2$s"/><span class="sek-nimble-admin-bar-title">%4$s</span></span>',
           NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION,
-          __('Nimble Builder','text_domain_to_replace'),
-          __('Add sections in live preview with Nimble Builder', 'text_domain'),
-          apply_filters( 'nb_admin_bar_title', __( 'Build with Nimble Builder', 'text_domain' ) )
+          __('Nimble Builder','nimble-builder'),
+          __('Add sections in live preview with Nimble Builder', 'nimble-builder'),
+          apply_filters( 'nb_admin_bar_title', __( 'Build with Nimble Builder', 'nimble-builder' ) )
       ),
       'href'   => $customize_url,
       'meta'   => array(

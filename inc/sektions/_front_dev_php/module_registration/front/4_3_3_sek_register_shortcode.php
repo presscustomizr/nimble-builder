@@ -7,7 +7,7 @@ function sek_get_module_params_for_czr_shortcode_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_shortcode_module',
-        'name' => __('Shortcode', 'text_doma'),
+        'name' => __('Shortcode', 'nimble-builder'),
         'css_selectors' => array( '.sek-module-inner > *' ),
         'sanitize_callback' => '\Nimble\sek_sanitize_czr_shortcode_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -19,23 +19,23 @@ function sek_get_module_params_for_czr_shortcode_module() {
                         'media_button' => true,
                         'includedBtns' => 'basic_btns_with_lists',
                     ),
-                    'title'             => __( 'Write the shortcode(s) in the text editor', 'text_doma' ),
+                    'title'             => __( 'Write the shortcode(s) in the text editor', 'nimble-builder' ),
                     'default'           => '',
                     'width-100'         => true,
                     'title_width' => 'width-100',
                     'refresh_markup'    => '.sek-shortcode-content',
                     'notice_before' => __('A shortcode is a WordPress-specific code that lets you display predefined items. For example a trivial shortcode for a gallery looks like this [gallery].') . '<br/><br/>',
-                    'notice_after' => __('You may use some html tags in the "text" tab of the editor.', 'text_domain_to_be_replaced')
+                    'notice_after' => __('You may use some html tags in the "text" tab of the editor.', 'nimble-builder')
                 ),
                 'refresh_button' => array(
                     'input_type'  => 'refresh_preview_button',
-                    'title'       => __( '' , 'text_doma' ),
+                    'title'       => __( '' , 'nimble-builder' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => false,
                 ),
                 'lazyload' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Enable image lazy-loading', 'text_doma'),
+                    'title'       => __('Enable image lazy-loading', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
@@ -45,15 +45,15 @@ function sek_get_module_params_for_czr_shortcode_module() {
                 // When enabled, it can create layout issues like : https://github.com/presscustomizr/nimble-builder/issues/576
                 'use_flex' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Use a flex-box wrapper', 'text_doma'),
+                    'title'       => __('Use a flex-box wrapper', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after' => __('Flex-box is a CSS standard used to specify the layout of HTML pages. Using flex-box can make it easier to center the content of shortcodes.', 'text_doma')
+                    'notice_after' => __('Flex-box is a CSS standard used to specify the layout of HTML pages. Using flex-box can make it easier to center the content of shortcodes.', 'nimble-builder')
                 ),
                 'h_alignment_css'        => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'              => __( 'Horizontal alignment', 'text_doma' ),
+                    'title'              => __( 'Horizontal alignment', 'nimble-builder' ),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,

@@ -13,7 +13,7 @@ function sek_get_module_params_for_czr_heading_module() {
             'font_settings' => 'czr_font_child',
             'spacing' => 'czr_heading_spacing_child'
         ),
-        'name' => __('Heading', 'text_doma'),
+        'name' => __('Heading', 'nimble-builder'),
         'starting_value' => array(
             'main_settings' => array(
                 'heading_text' => 'This is a heading.'
@@ -36,7 +36,7 @@ function sek_get_module_params_for_czr_heading_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_heading_child',
-        'name' => __('Content', 'text_doma'),
+        'name' => __('Content', 'nimble-builder'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
@@ -48,21 +48,21 @@ function sek_get_module_params_for_czr_heading_child() {
                         'includedBtns' => 'basic_btns',
                         'height' => 50
                     ),
-                    'title'              => __( 'Heading text', 'text_doma' ),
+                    'title'              => __( 'Heading text', 'nimble-builder' ),
                     'default'            => '',
                     'width-100'         => true,
                     'refresh_markup'    => '.sek-heading [data-sek-input-type="textarea"]'
-                    //'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
+                    //'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'nimble-builder'),
                 ),
                 'heading_tag' => array(
                     'input_type'         => 'simpleselect',
-                    'title'              => __( 'Heading tag', 'text_doma' ),
+                    'title'              => __( 'Heading tag', 'nimble-builder' ),
                     'default'            => 'h1',
                     'choices'            => sek_get_select_options_for_input_id( 'heading_tag' )
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
-                    'title'       => __('Alignment', 'text_doma'),
+                    'title'       => __('Alignment', 'nimble-builder'),
                     'default'     => array( 'desktop' => 'center'),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -72,32 +72,32 @@ function sek_get_module_params_for_czr_heading_child() {
                 ),
                 'heading_title' => array(
                     'input_type'         => 'text',
-                    'title' => __('Display a tooltip text when the mouse is held over', 'text_domain_to' ),
+                    'title' => __('Display a tooltip text when the mouse is held over', 'nimble-builder' ),
                     'default'            => '',
                     'title_width' => 'width-100',
                     'width-100'         => true,
-                    'notice_after' => __('Not previewable during customization', 'text_domain_to')
+                    'notice_after' => __('Not previewable during customization', 'nimble-builder')
                 ),
                 'link-to' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Turn into a link', 'text_doma'),
+                    'title'       => __('Turn into a link', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Link url', 'text_doma'),
+                    'title'       => __('Link url', 'nimble-builder'),
                     'default'     => array()
                 ),
                 'link-custom-url' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Custom link url', 'text_doma'),
+                    'title'       => __('Custom link url', 'nimble-builder'),
                     'default'     => ''
                 ),
                 'link-target' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Open link in a new browser tab', 'text_doma'),
+                    'title'       => __('Open link in a new browser tab', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -140,14 +140,14 @@ function sek_get_module_params_for_czr_heading_spacing_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_heading_spacing_child',
-        'name' => __('Spacing', 'text_doma'),
+        'name' => __('Spacing', 'nimble-builder'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
                 'spacing_css'     => array(
                     'input_type'  => 'spacingWithDeviceSwitcher',
-                    'title'       => __( 'Margin and padding', 'text_doma' ),
+                    'title'       => __( 'Margin and padding', 'nimble-builder' ),
                     'default'     => array('desktop' => array('margin-bottom' => '0.6', 'margin-top' => '0.6', 'unit' => 'em')),
                     'width-100'   => true,
                     'title_width' => 'width-100',

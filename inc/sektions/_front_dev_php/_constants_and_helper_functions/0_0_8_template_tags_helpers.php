@@ -88,7 +88,7 @@ function sek_get_the_archive_title() {
     $is_archive = sek_get_posted_query_param_when_customizing( 'is_archive' );
   }
   if ( !$is_archive ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_archive_title', $msg = __('It can be used in archive pages only.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_archive_title', $msg = __('It can be used in archive pages only.', 'nimble-builder') );
   }
 
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
@@ -107,7 +107,7 @@ function sek_get_the_archive_description() {
     $is_archive = sek_get_posted_query_param_when_customizing( 'is_archive' );
   }
   if ( !$is_archive ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_archive_description', $msg = __('It can be used in archive pages only.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_archive_description', $msg = __('It can be used in archive pages only.', 'nimble-builder') );
   }
 
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
@@ -126,7 +126,7 @@ function sek_get_next_post_link() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_next_post_link', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_next_post_link', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
     $title = sek_get_posted_query_param_when_customizing( 'the_next_post_link' );
@@ -146,7 +146,7 @@ function sek_get_previous_post_link() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_previous_post_link', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_previous_post_link', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
     $title = sek_get_posted_query_param_when_customizing( 'the_previous_post_link' );
@@ -166,11 +166,11 @@ function sek_get_the_comments() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_comments', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_comments', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
     return sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>',
-      __('Comment template can not be refreshed while customizing', 'text_doma')
+      __('Comment template can not be refreshed while customizing', 'nimble-builder')
     );
   }
 
@@ -200,7 +200,7 @@ function sek_get_the_published_date() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_published_date', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_published_date', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   $post_id = sek_get_post_id_on_front_and_when_customizing();
   $published_date = get_the_date( get_option('date_format'), $post_id);
@@ -217,7 +217,7 @@ function sek_get_the_modified_date() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_modified_date', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_modified_date', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   $post_id = sek_get_post_id_on_front_and_when_customizing();
   $modified_date = get_the_modified_date( get_option('date_format'), $post_id );
@@ -234,7 +234,7 @@ function sek_get_the_tags( $separator = ' &middot; ') {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_tags', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_tags', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   return sprintf( '<span class="sek-post-tags">%1$s</span>', get_the_tag_list( $before = '', $sep = $separator, $after = '', $post_id = sek_get_post_id_on_front_and_when_customizing() ) );
 }
@@ -246,7 +246,7 @@ function sek_get_the_categories( $separator = ' / ') {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_categories', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_categories', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   return sprintf( '<span class="sek-post-category">%1$s</span>', get_the_category_list( $separator, '', $post_id = sek_get_post_id_on_front_and_when_customizing() ) );
 }
@@ -257,7 +257,7 @@ function sek_get_the_comment_number() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_comment_number', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_comment_number', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   return sprintf( '<span class="sek-post-comment-number">%1$s</span>', get_comments_number_text( $zero = false, $one = false, $more = false, $post_id = sek_get_post_id_on_front_and_when_customizing() ) );
 }
@@ -311,7 +311,7 @@ function sek_get_the_title() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_title', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_title', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   return get_the_title( sek_get_post_id_on_front_and_when_customizing() );
 }
@@ -323,7 +323,7 @@ function sek_get_the_content() {
     $is_singular = sek_get_posted_query_param_when_customizing( 'is_singular' );
   }
   if ( !$is_singular ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_content', $msg = __('It can only be used in single pages or single posts.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_content', $msg = __('It can only be used in single pages or single posts.', 'nimble-builder') );
   }
   if ( defined( 'DOING_AJAX' ) && DOING_AJAX && skp_is_customizing() ) {
       $post_id = (int)sek_get_posted_query_param_when_customizing( 'post_id' );
@@ -348,7 +348,7 @@ function sek_get_search_query() {
     $search_query = get_search_query();
   }
   if ( !$is_search ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_search_query', $msg = __('It can only be used in search results page.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_search_query', $msg = __('It can only be used in search results page.', 'nimble-builder') );
   }
   return sprintf( '<span class="sek-search-query">%1$s</span>', esc_html( $search_query ) );
 }
@@ -363,7 +363,7 @@ function sek_get_search_results_nb() {
     $search_res_nb = (int)$wp_query->found_posts;
   }
   if ( !$is_search ) {
-    return sek_get_tmpl_tag_error( $tag = 'the_search_results_number', $msg = __('It can only be used in search results page.', 'text_doma') );
+    return sek_get_tmpl_tag_error( $tag = 'the_search_results_number', $msg = __('It can only be used in search results page.', 'nimble-builder') );
   }
   return sprintf( '<span class="sek-search-results-number">%1$s</span>', esc_html( $search_res_nb ) );
 }
@@ -449,7 +449,7 @@ function sek_get_tmpl_tag_error( $tag, $msg ) {
   if ( !skp_is_customizing() )
     return;
   return sprintf('<div class="nimble-notice-in-preview nimble-inline-notice-in-preview"><i class="fas fa-info-circle"></i> %1$s %2$s</div>',
-    '{{' . $tag . '}} ' . __('could not be printed.', 'text_doma'),
+    '{{' . $tag . '}} ' . __('could not be printed.', 'nimble-builder'),
     $msg
   );
 }

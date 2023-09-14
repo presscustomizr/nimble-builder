@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_level_width_section() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_width_section',
-        //'name' => __('Width options', 'text_doma'),
+        //'name' => __('Width options', 'nimble-builder'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         // 'starting_value' => array(
@@ -15,7 +15,7 @@ function sek_get_module_params_for_sek_level_width_section() {
             'item-inputs' => array(
                 'use-custom-outer-width' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Define a custom outer width for this section', 'text_doma'),
+                    'title'       => __('Define a custom outer width for this section', 'nimble-builder'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -24,7 +24,7 @@ function sek_get_module_params_for_sek_level_width_section() {
                 ),
                 'outer-section-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Outer section width', 'text_doma'),
+                    'title'       => __('Outer section width', 'nimble-builder'),
                     'min' => 0,
                     'max' => 1500,
                     'default'     => array( 'desktop' => '100%' ),
@@ -33,7 +33,7 @@ function sek_get_module_params_for_sek_level_width_section() {
                 ),
                 'use-custom-inner-width' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Define a custom inner width for this section', 'text_doma'),
+                    'title'       => __('Define a custom inner width for this section', 'nimble-builder'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -42,7 +42,7 @@ function sek_get_module_params_for_sek_level_width_section() {
                 ),
                 'inner-section-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Inner section width', 'text_doma'),
+                    'title'       => __('Inner section width', 'nimble-builder'),
                     'min' => 0,
                     'max' => 1500,
                     'default'     => array( 'desktop' => '100%' ),

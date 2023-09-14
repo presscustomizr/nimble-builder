@@ -140,28 +140,28 @@ function sek_do_register_module_collection( $modules ) {
 // SINGLE MODULE PARAMS STUCTURE
 // 'dynamic_registration' => true,
 // 'module_type' => 'sek_column_layouts_sec_picker_module',
-// 'name' => __('Empty sections with columns layout', 'text_doma'),
+// 'name' => __('Empty sections with columns layout', 'nimble-builder'),
 // 'tmpl' => array(
 //     'item-inputs' => array(
 //         'sections' => array(
 //             'input_type'  => 'section_picker',
-//             'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+//             'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'nimble-builder'),
 //             'width-100'   => true,
 //             'title_width' => 'width-100',
 //             'section_collection' => array(
 //                 array(
 //                     'content-id' => 'two_columns',
-//                     'title' => __('two columns layout', 'text-domain' ),
+//                     'title' => __('two columns layout', 'nimble-builder' ),
 //                     'thumb' => 'two_columns.jpg'
 //                 ),
 //                 array(
 //                     'content-id' => 'three_columns',
-//                     'title' => __('three columns layout', 'text-domain' ),
+//                     'title' => __('three columns layout', 'nimble-builder' ),
 //                     'thumb' => 'three_columns.jpg'
 //                 ),
 //                 array(
 //                     'content-id' => 'four_columns',
-//                     'title' => __('four columns layout', 'text-domain' ),
+//                     'title' => __('four columns layout', 'nimble-builder' ),
 //                     'thumb' => 'four_columns.jpg'
 //                 ),
 //             )
@@ -180,7 +180,7 @@ function sek_register_prebuilt_section_modules() {
             'item-inputs' => array(
                 'sections' => array(
                     'input_type'  => 'section_picker',
-                    'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+                    'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'nimble-builder'),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'section_collection' => array()
@@ -212,12 +212,12 @@ function sek_register_user_sections_module() {
     $normalized_params = array(
         'dynamic_registration' => true,
         'module_type' => 'sek_my_sections_sec_picker_module',
-        'name' => __('My sections', 'text-doma'),
+        'name' => __('My sections', 'nimble-builder'),
         'tmpl' => array(
             'item-inputs' => array(
                 'sections' => array(
                     'input_type'  => 'section_picker',
-                    'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'text_doma'),
+                    'title'       => __('Drag-and-drop or double-click a section to insert it into a drop zone of the preview page.', 'nimble-builder'),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'section_collection' => array()
@@ -240,15 +240,15 @@ function sek_get_select_options_for_input_id( $input_id ) {
     switch( $input_id ) {
         case 'img_hover_effect' :
             $options = array(
-                'none' => __('No effect', 'text_doma' ),
-                'opacity' => __('Opacity', 'text_doma' ),
-                'zoom-out' => __('Zoom out', 'text_doma' ),
-                'zoom-in' => __('Zoom in', 'text_doma' ),
-                'move-up' =>__('Move up', 'text_doma' ),
-                'move-down' =>__('Move down', 'text_doma' ),
-                'blur' =>__('Blur', 'text_doma' ),
-                'grayscale' =>__('Grayscale', 'text_doma' ),
-                'reverse-grayscale' =>__('Reverse grayscale', 'text_doma' )
+                'none' => __('No effect', 'nimble-builder' ),
+                'opacity' => __('Opacity', 'nimble-builder' ),
+                'zoom-out' => __('Zoom out', 'nimble-builder' ),
+                'zoom-in' => __('Zoom in', 'nimble-builder' ),
+                'move-up' =>__('Move up', 'nimble-builder' ),
+                'move-down' =>__('Move down', 'nimble-builder' ),
+                'blur' =>__('Blur', 'nimble-builder' ),
+                'grayscale' =>__('Grayscale', 'nimble-builder' ),
+                'reverse-grayscale' =>__('Reverse grayscale', 'nimble-builder' )
             );
         break;
         case 'img-size' :
@@ -258,24 +258,24 @@ function sek_get_select_options_for_input_id( $input_id ) {
         // ALL MODULES
         case 'link-to' :
             $options = array(
-                'no-link' => __('No link', 'text_doma' ),
-                'url' => __('Site content or custom url', 'text_doma' ),
+                'no-link' => __('No link', 'nimble-builder' ),
+                'url' => __('Site content or custom url', 'nimble-builder' ),
             );
         break;
 
         // FEATURED PAGE MODULE
         case 'img-type' :
             $options = array(
-                'none' => __( 'No image', 'text_doma' ),
-                'featured' => __( 'Use the page featured image', 'text_doma' ),
-                'custom' => __( 'Use a custom image', 'text_doma' ),
+                'none' => __( 'No image', 'nimble-builder' ),
+                'featured' => __( 'Use the page featured image', 'nimble-builder' ),
+                'custom' => __( 'Use a custom image', 'nimble-builder' ),
             );
         break;
         case 'content-type' :
             $options = array(
-                'none' => __( 'No text', 'text_doma' ),
-                'page-excerpt' => __( 'Use the page excerpt', 'text_doma' ),
-                'custom' => __( 'Use a custom text', 'text_doma' ),
+                'none' => __( 'No text', 'nimble-builder' ),
+                'page-excerpt' => __( 'Use the page excerpt', 'nimble-builder' ),
+                'custom' => __( 'Use a custom text', 'nimble-builder' ),
             );
         break;
 
@@ -283,22 +283,22 @@ function sek_get_select_options_for_input_id( $input_id ) {
         case 'heading_tag':
             $options = array(
                 /* Not totally sure these should be localized as they strictly refer to html tags */
-                'h1' => __('H1', 'text_doma' ),
-                'h2' => __('H2', 'text_doma' ),
-                'h3' => __('H3', 'text_doma' ),
-                'h4' => __('H4', 'text_doma' ),
-                'h5' => __('H5', 'text_doma' ),
-                'h6' => __('H6', 'text_doma' ),
+                'h1' => __('H1', 'nimble-builder' ),
+                'h2' => __('H2', 'nimble-builder' ),
+                'h3' => __('H3', 'nimble-builder' ),
+                'h4' => __('H4', 'nimble-builder' ),
+                'h5' => __('H5', 'nimble-builder' ),
+                'h6' => __('H6', 'nimble-builder' ),
             );
         break;
 
         // CSS MODIFIERS INPUT ID
         case 'font_weight_css' :
             $options = array(
-                'normal'  => __( 'normal', 'text_doma' ),
-                'bold'    => __( 'bold', 'text_doma' ),
-                'bolder'  => __( 'bolder', 'text_doma' ),
-                'lighter'   => __( 'lighter', 'text_doma' ),
+                'normal'  => __( 'normal', 'nimble-builder' ),
+                'bold'    => __( 'bold', 'nimble-builder' ),
+                'bolder'  => __( 'bolder', 'nimble-builder' ),
+                'lighter'   => __( 'lighter', 'nimble-builder' ),
                 100     => 100,
                 200     => 200,
                 300     => 300,
@@ -312,88 +312,88 @@ function sek_get_select_options_for_input_id( $input_id ) {
         break;
         case 'font_style_css' :
             $options = array(
-                'inherit'   => __( 'inherit', 'text_doma' ),
-                'italic'  => __( 'italic', 'text_doma' ),
-                'normal'  => __( 'normal', 'text_doma' ),
-                'oblique' => __( 'oblique', 'text_doma' )
+                'inherit'   => __( 'inherit', 'nimble-builder' ),
+                'italic'  => __( 'italic', 'nimble-builder' ),
+                'normal'  => __( 'normal', 'nimble-builder' ),
+                'oblique' => __( 'oblique', 'nimble-builder' )
             );
         break;
         case 'text_decoration_css'  :
             $options = array(
-                'none'      => __( 'none', 'text_doma' ),
-                'inherit'   => __( 'inherit', 'text_doma' ),
-                'line-through' => __( 'line-through', 'text_doma' ),
-                'overline'    => __( 'overline', 'text_doma' ),
-                'underline'   => __( 'underline', 'text_doma' )
+                'none'      => __( 'none', 'nimble-builder' ),
+                'inherit'   => __( 'inherit', 'nimble-builder' ),
+                'line-through' => __( 'line-through', 'nimble-builder' ),
+                'overline'    => __( 'overline', 'nimble-builder' ),
+                'underline'   => __( 'underline', 'nimble-builder' )
             );
         break;
         case 'text_transform_css' :
             $options = array(
-                'none'      => __( 'none', 'text_doma' ),
-                'inherit'   => __( 'inherit', 'text_doma' ),
-                'capitalize'  => __( 'capitalize', 'text_doma' ),
-                'uppercase'   => __( 'uppercase', 'text_doma' ),
-                'lowercase'   => __( 'lowercase', 'text_doma' )
+                'none'      => __( 'none', 'nimble-builder' ),
+                'inherit'   => __( 'inherit', 'nimble-builder' ),
+                'capitalize'  => __( 'capitalize', 'nimble-builder' ),
+                'uppercase'   => __( 'uppercase', 'nimble-builder' ),
+                'lowercase'   => __( 'lowercase', 'nimble-builder' )
             );
         break;
 
         // SPACING MODULE
         case 'css_unit' :
             $options = array(
-                'px' => __('Pixels', 'text_doma' ),
-                'em' => __('Em', 'text_doma'),
-                'percent' => __('Percents', 'text_doma' )
+                'px' => __('Pixels', 'nimble-builder' ),
+                'em' => __('Em', 'nimble-builder'),
+                'percent' => __('Percents', 'nimble-builder' )
             );
         break;
 
         //QUOTE MODULE
         case 'quote_design' :
             $options = array(
-                'none' => __( 'Text only', 'text_doma' ),
-                'border-before' => __( 'Side Border', 'text_doma' ),
-                'quote-icon-before' => __( 'Quote Icon', 'text_doma' ),
+                'none' => __( 'Text only', 'nimble-builder' ),
+                'border-before' => __( 'Side Border', 'nimble-builder' ),
+                'quote-icon-before' => __( 'Quote Icon', 'nimble-builder' ),
             );
         break;
 
         // LEVELS UI : LAYOUT BACKGROUND BORDER HEIGHT WIDTH
         case 'boxed-wide' :
             $options = array(
-                'boxed' => __('Boxed', 'text_doma'),
-                'fullwidth' => __('Full Width', 'text_doma')
+                'boxed' => __('Boxed', 'nimble-builder'),
+                'fullwidth' => __('Full Width', 'nimble-builder')
             );
         break;
         case 'height-type' :
             $options = array(
-                'auto' => __('Adapt to content', 'text_doma'),
-                'custom' => __('Custom', 'text_doma' )
+                'auto' => __('Adapt to content', 'nimble-builder'),
+                'custom' => __('Custom', 'nimble-builder' )
             );
         break;
         case 'width-type' :
             $options = array(
-                'default' => __('Default', 'text_doma'),
-                'custom' => __('Custom', 'text_doma' )
+                'default' => __('Default', 'nimble-builder'),
+                'custom' => __('Custom', 'nimble-builder' )
             );
         break;
         case 'bg-scale' :
             $options = array(
-                'default' => __('Default', 'text_doma'),
-                'auto' => __('Automatic', 'text_doma'),
-                'cover' => __('Scale to fill', 'text_doma'),
-                'contain' => __('Fit', 'text_doma'),
+                'default' => __('Default', 'nimble-builder'),
+                'auto' => __('Automatic', 'nimble-builder'),
+                'cover' => __('Scale to fill', 'nimble-builder'),
+                'contain' => __('Fit', 'nimble-builder'),
             );
         break;
         case 'bg-position' :
             $options = array(
-                'default' => __('default', 'text_doma'),
+                'default' => __('default', 'nimble-builder'),
             );
         break;
         case 'border-type' :
             $options = array(
-                'none' => __('none', 'text_doma'),
-                'solid' => __('solid', 'text_doma'),
-                'double' => __('double', 'text_doma'),
-                'dotted' => __('dotted', 'text_doma'),
-                'dashed' => __('dashed', 'text_doma')
+                'none' => __('none', 'nimble-builder'),
+                'solid' => __('solid', 'nimble-builder'),
+                'double' => __('double', 'nimble-builder'),
+                'dotted' => __('dotted', 'nimble-builder'),
+                'dashed' => __('dashed', 'nimble-builder')
             );
         break;
 

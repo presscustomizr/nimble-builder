@@ -318,7 +318,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             );
             for ( $i=1; $i < ( intval( $number_of_widgets) + 1 ); $i++ ) {
                 $args['id'] = NIMBLE_WIDGET_PREFIX . $i;//'nimble-widget-area-'
-                $args['name'] = sprintf( __('Nimble widget area #%1$s', 'text_domain_to_replace' ), $i );
+                $args['name'] = sprintf( __('Nimble widget area #%1$s', 'nimble-builder' ), $i );
                 $args['description'] = $args['name'];
                 $args = wp_parse_args( $args, $defaults );
                 register_sidebar( $args );

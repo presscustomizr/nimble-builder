@@ -1,0 +1,4444 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Nimble Page Builder\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-11 12:25+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.6.6; wp-6.3.1\n"
+"X-Domain: nimble-builder"
+
+#. %d: ID of a post
+#: inc/czr-base-fmk/_dev_php/0_6_czr-base-fmk-content_picker-ajax_actions.php:184
+#: inc/czr-base-fmk/_dev_php/0_6_czr-base-fmk-content_picker-ajax_actions.php:393
+msgid "#%d (no title)"
+msgstr ""
+
+#: tmpl/modules/post_grid_module_tmpl.php:197
+msgid "% comments"
+msgstr ""
+
+#: tmpl/wp/comments-template.php:6
+msgid "% Responses"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:118
+#, php-format
+msgid "%1$s + cool additional options"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:28
+#, php-format
+msgid ""
+"%1$s + more controls on grid items content, like shadow, background, spacing."
+".."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:245
+#, php-format
+msgid "%1$s : <strong>%2$s</strong>."
+msgstr ""
+
+#: inc/czr-skope/index.php:443
+#: inc/czr-skope/_dev/0_0_1_skop_functions_skope_helpers.php:443
+#, php-format
+msgid "%1$s archive page"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:156
+#, php-format
+msgid "%1$s sent a message from %2$s"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:303
+#, php-format
+msgid "%1$s: new contact request"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_8_sek_register_breakpoint.php:43
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_1_sek_register_global_breakpoint.php:43
+#, php-format
+msgid ""
+"%s When enabled, this custom breakpoint is applied not only to responsive "
+"columns but also to all by-device customizations, like alignment for example."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:617
+msgid "(currently published version)"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:120
+msgid "(global)"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:622
+msgid "(opens in a new window)"
+msgstr ""
+
+#: tmpl/modules/post_grid_module_tmpl.php:197
+msgid "0 comments"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:46
+msgid "1 column, full-width background"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:40
+msgid "1 columns, call to action, full-width background"
+msgstr ""
+
+#: tmpl/modules/post_grid_module_tmpl.php:197
+msgid "1 comment"
+msgstr ""
+
+#: tmpl/wp/comments-template.php:6
+msgid "1 Response"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_1_sek_register_widget_area.php:23
+msgid "1) Select a widget area in the dropdown list,"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:52
+msgid "2 columns, call to action, full-width background"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:66
+msgid "2 columns, call to actions, image carousel"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_1_sek_register_widget_area.php:23
+#, php-format
+msgid ""
+"2) once selected an area, you can add and edit the WordPress widgets in it "
+"in the %1$s."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:163
+msgid "3 columns"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:114
+msgid "3 columns with icon"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:107
+msgid "3 columns with icon and call to action"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:170
+msgid "3 columns, call to action"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:58
+msgid "3 columns, call to actions"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:157
+msgid "4 column"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:114
+msgid "@location"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:106
+msgid "A &rarr; Z"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:241
+msgid ""
+"A color overlay is usually recommended when displaying text content on top "
+"of the image. You can customize the color and transparency in the global "
+"design settings of the carousel."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:138
+msgid "A contact form and a Google map"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:145
+msgid "A contact form with an image background"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:493
+msgid "A section must have at least one column."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:126
+msgid "A simple about us section with 2 columns"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:650
+msgid "A title is required"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:122
+msgid "About us sections"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:85
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:16
+msgid "Accordion"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:157
+msgid "Accordion options : font style, borders, background, ..."
+msgstr ""
+
+#: tmpl/modules/accordion_tmpl.php:33
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:640
+msgid "Accordion title"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php:17
+msgid "Activate Google reCAPTCHA on your forms"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:1005
+msgid "activate it in the global settings"
+msgstr ""
+
+#: inc/admin/nb-options.php:391
+msgid "Activate the debug mode when customizing"
+msgstr ""
+
+#: inc/admin/nb-options.php:379
+msgid "Activate to disable Google fonts"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:667
+msgid "Active template : "
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:319
+msgid "Adapt images to carousel's height"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:318
+msgid "Adapt images to carousel's width"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:367
+msgid "Adapt to content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:214
+msgid "Add a column"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:264
+msgid "Add a module"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:258
+msgid "Add a nested section"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_1_0_sek_register_animation.php:6
+msgid "add animations to anything"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:799
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:800
+msgid "Add content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:66
+msgid "Add custom parameters to the contextual WordPress post query"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_2_czr-base-fmk-ajax_filter.php:110
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:75
+msgid "Add it"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_2_czr-base-fmk-ajax_filter.php:105
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:70
+msgid "Add New"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:547
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_6_0_sektions_nimble_customize_link.php:47
+msgid "Add sections in live preview with Nimble Builder"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:122
+msgid "Add text content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:285
+msgid ""
+"add transition options with effects like fade and flip, link slides "
+"individually to any content."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:66
+msgid ""
+"add transition options with effects like fade or flip, link slides "
+"individually to any content."
+msgstr ""
+
+#: tmpl/modules/widget_area_module_tmpl.php:21
+msgid "Add widgets to"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_2_sek_register_local_custom_css.php:18
+msgid "Add your own CSS code here"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_4_sek_register_map.php:24
+msgid "Address"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:91
+msgid "Advanced List"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_3_sek_register_local_reset.php:17
+msgid "After removal : inherit the site template if specified"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:824
+msgid "Align bottom"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:227
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:242
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:823
+msgid "Align center"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:226
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:241
+msgid "Align left"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:228
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:243
+msgid "Align right"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:822
+msgid "Align top"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php:71
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:133
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_0_sek_register_heading.php:65
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_2_sek_register_divider.php:72
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:110
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_text_settings.php:20
+msgid "Alignment"
+msgstr ""
+
+#: inc/czr-skope/index.php:452
+#: inc/czr-skope/_dev/0_0_1_skop_functions_skope_helpers.php:452
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:460
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:460
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:486
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:486
+msgid "All"
+msgstr ""
+
+#: inc/admin/nb-options.php:443
+msgid ""
+"All Nimble Builder data have been successfully removed from your WordPress "
+"website."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:582
+msgid "Already used fonts"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:528
+msgid "Animation settings for the"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:161
+msgid "Apply a background overlay"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:242
+msgid "Apply a color overlay"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:340
+msgid "Apply a custom height to the thumbnail"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:198
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:240
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:228
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:408
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_border.php:49
+msgid "Apply a shadow"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:284
+msgid "Apply a shadow effect when hovering with the cursor"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:274
+msgid "Apply an inset shadow"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:279
+msgid "Apply an outset shadow"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php:148
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php:134
+msgid "Apply the style options in priority (uses !important)."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_8_sek_register_breakpoint.php:38
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_1_sek_register_global_breakpoint.php:38
+msgid "Apply this breakpoint to all by-device customizations"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_2_czr-base-fmk-ajax_filter.php:131
+msgid "Are you sure you want to remove : <strong>{{ data.title }} ?</strong>"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:415
+msgid "Arrows and bullets"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:416
+msgid "Arrows only"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:380
+msgid "Automatic"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php:81
+msgid "Automatically convert text into paragraph"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:327
+msgid "Autoplay"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:579
+msgid ""
+"Available soon ! This module is currently in beta, you can activate it in "
+"Site Wide Options > Beta features"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:194
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:134
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:317
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:370
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:18
+msgid "Background color"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:153
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:336
+msgid "Background color on mouse hover"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:517
+msgid "Background settings for the"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:221
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:338
+msgid "Backround color"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:877
+msgid "Be sure to import a file generated with Nimble Builder export system."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_9_sek_register_beta_features.php:25
+msgid ""
+"Be sure to refresh the customizer before you start using the beta features."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:551
+msgid "Beta features"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:249
+msgid "Blur"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:299
+msgid "bold"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:300
+msgid "bolder"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:246
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:205
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:164
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:346
+msgid "Border"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:311
+msgid "Border bottom color"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:297
+msgid "Border bottom weight"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:437
+msgid "Border Color"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:206
+msgid "Border color"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_border.php:19
+msgid "Border shape"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:425
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:193
+msgid "Border weight"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:254
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:213
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:172
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:354
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_border.php:25
+msgid "Borders"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:228
+msgid "Borders and corners"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:247
+msgid "Borders options"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:519
+msgid "Borders settings for the"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:460
+msgid "Bottom"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:486
+msgid "Bottom left"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:486
+msgid "Bottom right"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:361
+msgid "Boxed"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_section_layout.php:14
+msgid "Boxed or full width"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_6_sek_register_local_revisions.php:17
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_8_sek_register_global_revisions.php:17
+msgid "Browse your revision history"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:277
+msgid "Build"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:278
+msgid "Build sections in live preview with Nimble Builder"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:276
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_6_0_sektions_nimble_customize_link.php:48
+msgid "Build with Nimble Builder"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:417
+msgid "Bullets only"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:73
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:19
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:742
+msgid "Button"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:199
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:380
+msgid "Button alignment"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:52
+msgid "Button content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:127
+msgid "Button design"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:64
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:188
+msgid "Button text"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_2_czr-base-fmk-ajax_filter.php:110
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:906
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:907
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:971
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:972
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:1008
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:1008
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:75
+msgid "Cancel"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:883
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:890
+msgid "Cancel import"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:334
+msgid "capitalize"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:663
+msgid "Categories"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:109
+msgid "Change Image"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_7_sek_register_local_imp_exp.php:35
+msgid ""
+"Check this option if you want to keep the existing sections of this page, "
+"and combine them with the imported ones."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_9_sek_register_beta_features.php:22
+msgid "Check this option to try the upcoming features of Nimble Builder."
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:114
+msgid "Choose Image"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:233
+msgid "Cite content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:246
+msgid "Cite text"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:23
+msgid "Click me"
+msgstr ""
+
+#: tmpl/modules/shortcode_module_tmpl.php:34
+msgid "Click to edit the shortcode module."
+msgstr ""
+
+#: tmpl/modules/gallery_tmpl.php:215 tmpl/modules/img_slider_tmpl.php:290
+msgid "Click to start adding images."
+msgstr ""
+
+#: tmpl/modules/accordion_tmpl.php:74
+msgid "Click to start adding items."
+msgstr ""
+
+#: tmpl/modules/social_icons_tmpl.php:62
+msgid "Click to start adding social icons."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:95
+msgid "Clone"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:99
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:895
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:896
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:960
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:961
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:996
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:997
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:1019
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:1020
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:1020
+msgid "Close"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:731
+msgid "close"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:96
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_2_sek_register_divider.php:38
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:121
+msgid "Color"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:462
+msgid "Color of the active pagination bullet"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:441
+msgid "Color of the navigation arrows"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:237
+msgid "Color overlay"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:565
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:277
+msgid "column"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_5_sek_register_width_column.php:14
+msgid "Column width in percent"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_7_sek_register_local_imp_exp.php:28
+msgid "Combine the imported sections with the current ones."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:173
+msgid "Comment template can not be refreshed while customizing"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:170
+msgid "Consent message"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_2_sektions_front_class_simple_forms_inputs.php:249
+msgid "Contact"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:134
+msgid "Contact-us sections"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php:58
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php:65
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_0_sek_register_heading.php:39
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:113
+msgid "Content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:239
+msgid "Content blocks padding"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:513
+msgid "Content for"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:504
+msgid "Content Picker"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:334
+msgid "Content style"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:525
+msgid "Content type"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:276
+msgid "Continue building with Nimble"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:452
+msgid "could not be printed."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:535
+msgid "Current page options"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_2_sek_register_global_widths.php:27
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_5_sek_register_global_header_footer.php:31
+msgid "current page options"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:368
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:374
+msgid "Custom"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_6_sek_register_anchor.php:14
+msgid "Custom anchor"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:524
+msgid "Custom anchor ( CSS ID ) and CSS classes for the"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:180
+msgid "Custom column width"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:540
+msgid "Custom CSS"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_2_sek_register_local_custom_css.php:17
+msgid "Custom css"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_6_sek_register_anchor.php:21
+msgid "Custom CSS classes"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_9_sek_register_custom_css_section.php:6
+msgid "custom CSS on a per level basis (section, column, module )."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:282
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:395
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_height.php:23
+msgid "Custom height"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:179
+msgid "Custom image max height"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:159
+msgid "Custom image width"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/9_9_9_various_helpers.php:293
+msgid "Custom javascript code is not executed when customizing."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:121
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_0_sek_register_heading.php:95
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:86
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:90
+msgid "Custom link url"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:192
+msgid "Custom raw height"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:152
+msgid "Custom text displayed on mouse hover"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:251
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_5_sek_register_width_module.php:20
+msgid "Custom width"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:81
+msgid "Customize the magnitude of the visual effect when scrolling."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:514
+msgid "Customize the options for module :"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:116
+msgid "Customizing"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:396
+msgid "dashed"
+msgstr ""
+
+#: inc/admin/nb-options.php:384 inc/admin/nb-options.php:386
+msgid "Debug Mode"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:837
+msgid "Debug mode active ( WP admin > Settings > Nimble Builder options )"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:111
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:373
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:379
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:95
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:89
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:101
+msgid "Default"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:387
+msgid "default"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_4_menus_helpers.php:154
+msgid "Default page menu"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_0_sek_register_local_template.php:19
+msgid "Default theme template"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_4_sek_register_global_performances.php:17
+msgid "Defer loading off screen images"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_4_sek_register_global_performances.php:28
+msgid "Defer loading video backgrounds"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_8_sek_register_breakpoint.php:24
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_1_sek_register_global_breakpoint.php:25
+msgid "Define a custom breakpoint in pixels"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_1_sek_register_local_widths.php:46
+msgid "Define a custom inner width for the sections of this page"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_2_sek_register_global_widths.php:43
+msgid "Define a custom inner width for the sections site wide"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_5_sek_register_width_section.php:36
+msgid "Define a custom inner width for this section"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_1_sek_register_local_widths.php:18
+msgid "Define a custom outer width for the sections of this page"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_2_sek_register_global_widths.php:17
+msgid "Define a custom outer width for the sections site wide"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_5_sek_register_width_section.php:18
+msgid "Define a custom outer width for this section"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:168
+msgid "Define custom row and column dimensions"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:252
+msgid "Define custom spaces between columns and rows"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:335
+msgid "Delay between each slide in milliseconds (ms)"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:412
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:419
+msgid "Design"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:135
+msgid "Design options : size, spacing, alignment,..."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:525
+msgid "Device visibility settings for the"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:997
+msgid "Disable"
+msgstr ""
+
+#: inc/admin/nb-options.php:374
+msgid "Disable Google Fonts"
+msgstr ""
+
+#: inc/admin/nb-options.php:367
+msgid "Disable the Widgets Module"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:163
+msgid "Display a checkbox for privacy policy consent"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_0_sek_register_heading.php:75
+msgid "Display a tooltip text when the mouse is held over"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:419
+msgid "Display author"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:412
+msgid "Display categories"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:433
+msgid "Display comment number"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:426
+msgid "Display date"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:179
+msgid "Display first item expanded"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:141
+msgid "Display message field"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:92
+msgid "Display name field"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:186
+msgid "Display one item expanded at a time"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:74
+msgid "Display pagination links"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:322
+msgid "Display post thumbnail"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:129
+msgid "Display posts that have \"all\" of these categories"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:125
+msgid "Display posts that have these categories. Multiple categories allowed."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:119
+msgid "Display subject field"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:196
+msgid "Display the post excerpt"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:188
+msgid "Display the post title"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:129
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_2_sek_register_divider.php:11
+msgid "Divider"
+msgstr ""
+
+#: inc/admin/nb-options.php:104
+msgid "Docs"
+msgstr ""
+
+#: inc/admin/nb-options.php:557
+msgid "Documentation"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:101
+msgid "Done !"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:395
+msgid "dotted"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:394
+msgid "double"
+msgstr ""
+
+#: tmpl/base-tmpl/column.php:99
+msgid "Drag and drop a block of content here"
+msgstr ""
+
+#: tmpl/base-tmpl/column.php:99
+msgid "Drag and drop a section or a module here"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:501
+msgid "Drag and drop content"
+msgstr ""
+
+#: tmpl/base-tmpl/column.php:104
+msgid "Drag and drop or double-click the content that you want to insert here."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:571
+msgid "Drag and drop or double-click to insert in your chosen target element."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:209
+msgid "Drag section"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/10_0_1_sek_register_module_and_section_pickers.php:53
+msgid ""
+"Drag-and-drop or double-click a module to insert it into a drop zone of the "
+"preview page."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:183
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:220
+msgid ""
+"Drag-and-drop or double-click a section to insert it into a drop zone of the "
+"preview page."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:261
+msgid "Duplicate column"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:290
+msgid "Duplicate module"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:216
+msgid "Duplicate section"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:98
+#: inc/czr-base-fmk/_dev_php/0_2_czr-base-fmk-ajax_filter.php:123
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:93
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:199
+msgid "Edit"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:866
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:867
+msgid "Edit a section"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:931
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:932
+msgid "Edit a template"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:256
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:271
+msgid "Edit column settings"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:288
+msgid "Edit module content"
+msgstr ""
+
+#: tmpl/base-tmpl/module.php:31
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:289
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:297
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:317
+msgid "Edit module settings"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:212
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:221
+msgid "Edit section settings"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:648
+msgid "Edit this template"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:313
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:318
+msgid "Edit this WordPress content"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:339
+msgid "Edit with Nimble Builder"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:344
+msgid "Em"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_0_sektions_front_class_simple_forms_main_class.php:43
+msgid "Email"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:114
+msgid "Email field label"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:977
+msgid "Email footer"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:942
+msgid "Email recipient"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:180
+msgid "Empty sections with columns layout"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_9_sek_register_beta_features.php:17
+msgid "Enable beta features"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_3_sek_register_shortcode.php:38
+msgid "Enable image lazy-loading"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:154
+msgid "End time"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:65
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:78
+msgid "Enter the full url of your social profile (must be valid url)."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:960
+msgid "Error message on submission"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:653
+msgid "Error when processing templates"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:597
+msgid "Everything about Nimble Builder"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:567
+msgid "Excerpt"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:203
+msgid "Excerpt length in words"
+msgstr ""
+
+#: inc/admin/nb-options.php:584
+msgid "Explore Nimble Builder knowledge base"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_7_sek_register_local_imp_exp.php:18
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_7_sek_register_global_imp_exp.php:18
+msgid "EXPORT"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:872
+msgid "Export"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:621
+msgid "Export / Import"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:622
+msgid "Export / Import global sections"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:623
+msgid "Export failed"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:124
+msgid "External links are disabled when customizing"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php:64
+msgid "Failure message"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:969
+msgid "Failure message on submission"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:599
+msgid "Field Text"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:229
+msgid "Fields background color"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:240
+msgid "Fields border shape"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:456
+msgid "Fields labels"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:261
+msgid "Fields rounded corners"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:629
+msgid "File successfully imported"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:120
+msgid "Filter posts by category"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:993
+msgid "Filter templates"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:382
+msgid "Fit"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:56
+msgid "Fixed background"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_3_sek_register_shortcode.php:52
+msgid ""
+"Flex-box is a CSS standard used to specify the layout of HTML pages. Using "
+"flex-box can make it easier to center the content of shortcodes."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php:40
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:79
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:253
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:460
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:603
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:746
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:475
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:571
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:667
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:763
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php:27
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:154
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:256
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:361
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_text_settings.php:34
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:17
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:109
+msgid "Font family"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php:54
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:93
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:267
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:476
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:619
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:762
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:491
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:587
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:683
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:779
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php:40
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:171
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:273
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:378
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_text_settings.php:47
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:30
+msgid "Font size"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php:108
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:150
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:324
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:531
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:674
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:817
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:546
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:642
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:738
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:834
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php:94
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_text_settings.php:101
+msgid "Font style"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php:99
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:140
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:314
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:521
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:664
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:807
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:536
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:632
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:728
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:824
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php:85
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_text_settings.php:92
+msgid "Font weight"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:508
+msgid "Footer location only accepts modules and pre-built footer sections"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:119
+msgid "footer section"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:220
+msgid "Footer sections"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:233
+msgid "footer with dynamic date, site title and social links"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:299
+msgid "Form button design"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:74
+msgid "Form fields and button labels"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:211
+msgid "Form fields design"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:923
+msgid "Form submission options"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:447
+msgid "Form texts options : fonts, colors, ..."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:24
+msgid "Four Columns"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:194
+msgid "four columns layout"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:170
+msgid "From"
+msgstr ""
+
+#. %s: [your-name] <[your-email]>
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:309
+#, php-format
+msgid "From: %s"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:362
+msgid "Full Width"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:16
+msgid "Gallery"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:129
+msgid "Gallery options"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:309
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:175
+msgid "General"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:556
+msgid "General options applied for the sections site wide"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php:23
+msgid "get your domain API keys from Google"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:545
+msgid "Global text options for Nimble sections"
+msgstr ""
+
+#: inc/admin/nb-options.php:526 inc/admin/nimble-admin.php:560
+#: inc/admin/nimble-admin.php:1138
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/9_9_9_various_helpers.php:421
+msgid "Go Pro"
+msgstr ""
+
+#: inc/admin/nb-options.php:372
+msgid "Google Fonts"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:581
+msgid "Google fonts"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:1002
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php:22
+msgid "Google reCAPTCHA"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:97
+#, php-format
+msgid ""
+"Google reCAPTCHA returned a score of %s, which is lower than your threshold "
+"of %s."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php:66
+msgid ""
+"Google ReCAPTCHA validation failed. This form only accepts messages from "
+"humans."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:250
+msgid "Grayscale"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:807
+msgid "Grid layout"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:462
+msgid "Grid text settings : fonts, colors, ..."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:286
+msgid "H1"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:287
+msgid "H2"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:288
+msgid "H3"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:289
+msgid "H4"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:290
+msgid "H5"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:291
+msgid "H6"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_8_sek_register_menu.php:88
+msgid "Hamburger button alignment"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/10_0_1_sek_register_module_and_section_pickers.php:27
+msgid "header and footer"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:507
+msgid "Header location only accepts modules and pre-built header sections"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:118
+msgid "header section"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:201
+msgid "Header sections"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:50
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_0_sek_register_heading.php:16
+msgid "Heading"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_0_sek_register_heading.php:59
+msgid "Heading tag"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_0_sek_register_heading.php:51
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:98
+msgid "Heading text"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:185
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_4_sek_register_map.php:39
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:382
+msgid "Height"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:273
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:386
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_height.php:17
+msgid "Height : auto or custom"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:521
+msgid "Height, vertical alignment, z-index for the"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:22
+msgid "Hey, careful, man, there's a beverage here!"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:424
+msgid "Hide arrows and bullets on mobiles"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/7_0_0_sektions_detached_tinymce.php:229
+msgid "Hide Editor"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:200
+msgid "Hide editor"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_height.php:40
+msgid "Hide the content when it is too big to fit in its parent container."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:239
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:272
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:304
+msgid "Hide this menu if you need to access behind"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_4_menus_helpers.php:20
+msgid "Home"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:181
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:196
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:129
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_3_sek_register_shortcode.php:56
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_5_sek_register_width_module.php:29
+msgid "Horizontal alignment"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php:28
+msgid "Horizontal text alignment"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:114
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:139
+msgid "Hover color"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_4_0_sektions_front_class_render.php:526
+msgid "Html code goes here"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:174
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:978
+msgid "Html code is allowed"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php:22
+msgid "HTML Content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:99
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php:16
+msgid "Html Content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:66
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:79
+msgid "http://...,mailto:...,..."
+msgstr ""
+
+#. URI of the plugin
+msgid "https://nimblebuilder.com"
+msgstr ""
+
+#. Author URI of the plugin
+msgid ""
+"https://nimblebuilder.com/?utm_source=wp-plugins&utm_medium=wp-"
+"dashboard&utm_campaign=author-uri"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_0_sektions_front_class_simple_forms_main_class.php:61
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:171
+msgid "I have read and agree to the privacy policy."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:57
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:16
+msgid "Icon"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:49
+msgid "Icon collection"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:459
+msgid "Icon Color"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:102
+msgid "Icon next to the button text"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:166
+msgid "Icon options for background, spacing, border, shadow"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:52
+msgid "Icon settings"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:447
+msgid "Icon Size"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:107
+msgid "Icon's position"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:153
+msgid "Icons size"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_3_sek_register_local_reset.php:28
+msgid ""
+"If a site template is defined for this context, this page will inherit the "
+"site template by default, unless this option is unchecked."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:495
+msgid ""
+"If this problem locks Nimble Builder, you can try resetting the sections of "
+"this page."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_4_sek_register_map.php:58
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_4_sek_register_local_performances.php:27
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_4_sek_register_global_performances.php:22
+msgid ""
+"If you use a cache plugin, make sure that this option does not conflict with "
+"your caching options."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:36
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:16
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:94
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:24
+msgid "Image"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:79
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:16
+msgid "Image & Text Carousel"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:33
+msgid "Image background"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:71
+msgid "Image collection"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:43
+msgid "Image gallery"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:313
+msgid "Image layout"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:62
+msgid "Image main settings"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:46
+msgid "Image position"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:97
+msgid "Image title displayed as tooltip and in the lightbox popup"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:317
+msgid "Images fill space and are centered without being stretched"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:875
+msgid "IMPORT"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:889
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:896
+msgid "Import"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:626
+msgid ""
+"Import exceeds server response time, try to uncheck \"import images\" option."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:625
+msgid "Import failed"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:632
+msgid "Import failed, file problem"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:631
+msgid "Import failed, invalid file content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_7_sek_register_local_imp_exp.php:40
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_7_sek_register_global_imp_exp.php:30
+msgid "Import images in your media library."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:882
+msgid "Import in existing locations"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:881
+msgid "Import without modification"
+msgstr ""
+
+#: inc/admin/nb-options.php:392
+msgid ""
+"In debug mode, during customization Nimble Builder deactivates all modules "
+"content and prints only the structure of your sections. This lets you "
+"troubleshoot, remove or edit your modules safely."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:112
+msgid "Include \"sticky\" posts"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:353
+msgid "Infinite loop"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:315
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:324
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:333
+msgid "inherit"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:996
+msgid "Inherit the global option"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_4_sek_register_local_performances.php:20
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_5_sek_register_local_header_footer.php:24
+msgid "Inherit the site wide option"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:59
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:69
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:79
+msgid "Inherits your active theme's option when not set."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_4_sek_register_global_performances.php:77
+msgid "Inject non priority assets dynamically in the page only when needed."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:539
+msgid "Inner and outer widths"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_5_sek_register_width_section.php:45
+msgid "Inner section width"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_1_sek_register_local_widths.php:55
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_2_sek_register_global_widths.php:52
+msgid "Inner sections width"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_height.php:44
+msgid "Inner vertical alignment"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:115
+msgid "Insert a new global section"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:113
+msgid "Insert a new section"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:573
+msgid "Insert a new section here"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:1007
+msgid "Insert after existing sections"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:1006
+msgid "Insert before existing sections"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:571
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:110
+msgid "Insert here"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:572
+msgid "Insert in a new section"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:962
+msgid "Invalid form submission : some fields have not been entered properly."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:91
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:110
+msgid "It can be used in archive pages only."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:351
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:366
+msgid "It can only be used in search results page."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:129
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:149
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:169
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:203
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:220
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:237
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:249
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:260
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:314
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_8_template_tags_helpers.php:326
+msgid "It can only be used in single pages or single posts."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:606
+msgid ""
+"It is recommended to disable your cache plugin when customizing your website."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:316
+msgid "italic"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:68
+msgid "Item collection"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:244
+msgid "Justified"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:841
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:842
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:842
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:843
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:844
+msgid "Knowledge base"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:646
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:654
+msgid "Last modified"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:516
+msgid "Layout settings for the"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_4_sek_register_map.php:52
+msgid "Lazy load"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:361
+msgid "Lazy load images"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:365
+msgid "Lazy loading images improves page load performances."
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:103
+msgid "Learn more about this in the documentation"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:460
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:109
+msgid "Left"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php:136
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:180
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:354
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:561
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:704
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:847
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php:122
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_text_settings.php:129
+msgid "Letter spacing"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:105
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:233
+msgid "Lightbox : enlarge the image, and dim out the rest of the content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:301
+msgid "lighter"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_8_sek_register_global_revisions.php:22
+msgid "Like the global header and footer for example."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php:68
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:168
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:106
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:280
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:487
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:630
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:773
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:502
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:598
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:694
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:790
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php:54
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:182
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:284
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:389
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_text_settings.php:61
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:43
+msgid "Line height"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:325
+msgid "line-through"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:125
+msgid "Link deactivated while previewing"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:75
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:79
+msgid "Link to"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:107
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:234
+msgid "Link to image file"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:108
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:235
+msgid "Link to image page"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:106
+msgid "Link to site content or custom url"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:84
+msgid "Link underlining"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:96
+msgid "Link underlining on mouse hover"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:116
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_0_sek_register_heading.php:90
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:81
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:85
+msgid "Link url"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:64
+msgid "Links color"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:74
+msgid "Links color on mouse hover"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:643
+msgid "List item"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:806
+msgid "List layout"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:656
+msgid "Live demo"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_4_sek_register_local_performances.php:22
+msgid "Load all images on page load ( not optimized )"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_4_sek_register_local_performances.php:21
+msgid "Load images on scroll ( optimized )"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:826
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:827
+msgid "Local and global settings"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:562
+msgid "location"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:123
+msgid "Loop infinitely"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:336
+msgid "lowercase"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:39
+msgid "Main grid settings : layout, number of posts, columns,..."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:71
+msgid "Main quote content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:193
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:367
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:574
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:717
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:860
+msgid "Make those style options win if other rules are applied."
+msgstr ""
+
+#: inc/admin/nb-options.php:507 inc/admin/nb-options.php:511
+#: inc/admin/nb-options.php:517
+msgid "Manage authorized users"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:135
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_4_sek_register_map.php:11
+msgid "Map"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_0_sek_register_heading.php:150
+msgid "Margin and padding"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:401
+msgid "Margin bottom"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:358
+msgid "Margin left"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:393
+msgid "Margin right"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:351
+msgid "Margin top"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:121
+msgid "masonry galleries"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:31
+msgid "masonry grid"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:93
+msgid "Masonry post grid"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:162
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_8_sek_register_menu.php:21
+msgid "Menu"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_8_sek_register_menu.php:56
+msgid "Menu content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_8_sek_register_menu.php:77
+msgid "Menu items alignment"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_8_sek_register_menu.php:69
+msgid "menu panel"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_0_sektions_front_class_simple_forms_main_class.php:54
+msgid "Message"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:189
+msgid "Message body"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:314
+msgid "Message Body:"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:154
+msgid "Message field is required"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:149
+msgid "Message field label"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:759
+msgid "Metas"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:628
+msgid "Missing file"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:512
+msgid "Module"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:566
+msgid "module"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:510
+msgid "Module Content"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:511
+msgid "Module Settings"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:204
+msgid "Mouse over effect"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:255
+msgid "Move column"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:248
+msgid "Move down"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:287
+msgid "Move module"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:203
+msgid "Move section down"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:202
+msgid "Move section up"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:247
+msgid "Move up"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:108
+msgid "Moving elements between global and local sections is not allowed."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:215
+msgid "My sections"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:989
+msgid "My templates"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_0_sektions_front_class_simple_forms_main_class.php:37
+msgid "Name"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:105
+msgid "Name field is required"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:100
+msgid "Name field label"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:407
+msgid "Navigation"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:564
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:121
+msgid "nested section"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:989
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:528
+msgid "New!"
+msgstr ""
+
+#: tmpl/modules/post_grid_module_tmpl.php:36
+msgid "Newer"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:104
+msgid "Newest to oldest"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:578
+msgid "News & release notes"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:1069
+msgid ""
+"Nimble allows you to drag and drop content modules, or pre-built section "
+"templates, into <u>any context</u> of your site, including search results or "
+"404 pages. You can edit your pages in <i>real time</i> from the live "
+"customizer, and then publish when you are happy of the result, or save for "
+"later."
+msgstr ""
+
+#: nimble-builder.php:68 inc/admin/nb-options.php:19
+#: inc/admin/nb-options.php:20 inc/admin/nb-options.php:185
+#: inc/admin/nimble-admin.php:322 inc/admin/nimble-admin.php:549
+#: inc/admin/nimble-admin.php:1064
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:489
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:841
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_6_0_sektions_nimble_customize_link.php:46
+msgid "Nimble Builder"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:526
+#, php-format
+msgid "Nimble Builder & %s Overview"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:624
+msgid ""
+"Nimble Builder : you have nothing to export. Start adding sections to this "
+"page!"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:620
+msgid "Nimble Builder : you need to publish before exporting."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_5_sek_register_global_header_footer.php:28
+#, php-format
+msgid ""
+"Nimble Builder allows you to build your own header and footer, or to use "
+"your theme's ones. This option can be overriden in the %1$s."
+msgstr ""
+
+#: inc/admin/nb-options.php:524
+msgid ""
+"Nimble Builder can be used by default by all users with an administrator "
+"role. With Nimble Builder Pro you can decide which administrators are "
+"allowed to use the plugin."
+msgstr ""
+
+#: inc/admin/nb-options.php:558
+msgid "Nimble Builder knowledge base"
+msgstr ""
+
+#: inc/admin/nb-options.php:338
+msgid "Nimble Builder Options"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:523
+msgid "Nimble Builder Overview"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_0_sek_register_local_template.php:20
+msgid "Nimble Builder template"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:988
+msgid "Nimble Builder templates"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:64
+msgid "Nimble Image"
+msgstr ""
+
+#. Name of the plugin
+msgid "Nimble Page Builder"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_5_sek_register_local_header_footer.php:26
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_5_sek_register_global_header_footer.php:25
+msgid "Nimble site wide header and footer"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_5_sek_register_local_header_footer.php:27
+msgid "Nimble specific header and footer for this page"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_0_0_sektions_front_class_construct.php:321
+#, php-format
+msgid "Nimble widget area #%1$s"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:316
+msgid "Nimble wizard"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:323
+msgid ""
+"Nimble wizard ensures that the images fill all available space of the "
+"carousel in any devices, without blank spaces on the edges, and without "
+"stretching the images."
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_2_czr-base-fmk-ajax_filter.php:132
+msgid "No"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:104
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:232
+msgid "No click action"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:243
+msgid "No effect"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:269
+msgid "No image"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:112
+msgid "No image selected"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:261
+msgid "No link"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:96
+msgid "No repeat"
+msgstr ""
+
+#: tmpl/wp/comments-template.php:6
+msgid "No Responses"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_6_czr-base-fmk-content_picker-ajax_actions.php:327
+msgid "No results found."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:615
+msgid "No revision history available for the moment."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:600
+msgid "No sections to navigate"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:665
+msgid "No template set."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:276
+msgid "No text"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:418
+msgid "None"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:323
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:332
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:392
+msgid "none"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:298
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:317
+msgid "normal"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_0_sek_register_heading.php:79
+msgid "Not previewable during customization"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:75
+msgid "Not previewable when customizing."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:143
+msgid "Not recommended if you don't use a self-hosted video file"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:100
+msgid "Not set"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:91
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:103
+msgid "Not underlined"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/10_0_1_sek_register_module_and_section_pickers.php:21
+#, php-format
+msgid ""
+"Note : you can %1$s to replace your default theme template. Or design your "
+"own %2$s."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:126
+msgid ""
+"Note : you can adjust the text color and / or use a color overlay to improve "
+"accessibility of your text content."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:336
+msgid ""
+"Note that Nimble Builder will let browsers choose the most appropriate size "
+"for better performances."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:112
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:239
+msgid "Note that some click actions are disabled during customization."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:331
+msgid "Note that the autoplay is disabled during customization."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_7_sek_register_visibility.php:38
+msgid ""
+"Note that those options are not applied during the live customization of "
+"your site, but only when the changes are published."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:147
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:155
+msgid "Number of columns"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:82
+msgid "Number of posts"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:318
+msgid "oblique"
+msgstr ""
+
+#: tmpl/modules/post_grid_module_tmpl.php:35
+msgid "Older"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:105
+msgid "Oldest to newest"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_8_sek_register_menu.php:118
+msgid ""
+"On mobile devices, expand the menu in full width below the menu hamburger "
+"icon."
+msgstr ""
+
+#: inc/admin/nb-options.php:454
+msgid ""
+"Once you delete Nimble Builder data, there is no going back. Please be "
+"certain. "
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:244
+msgid "Opacity"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:258
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:175
+msgid "Opacity (in percents)"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:126
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:89
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_0_sek_register_heading.php:100
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:91
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:95
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:245
+msgid "Open link in a new browser tab"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:509
+msgid "Option type"
+msgstr ""
+
+#: inc/admin/nb-options.php:337
+msgid "Options"
+msgstr ""
+
+#: inc/czr-skope/index.php:420
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:105
+#: inc/czr-skope/_dev/0_0_1_skop_functions_skope_helpers.php:420
+msgid "Options for"
+msgstr ""
+
+#: inc/czr-skope/index.php:452
+#: inc/czr-skope/_dev/0_0_1_skop_functions_skope_helpers.php:452
+msgid "Options for all"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:555
+msgid "Options for the sections of the current page"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:1083
+msgid "Or"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:101
+msgid "Order posts by"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_3_images_and_videos_helpers.php:13
+msgid "Original image dimensions"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_5_sek_register_width_section.php:27
+msgid "Outer section width"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_1_sek_register_local_widths.php:34
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_2_sek_register_global_widths.php:33
+msgid "Outer sections width"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_height.php:34
+msgid "Overflow hidden"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:250
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:169
+msgid "Overlay Color"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:165
+msgid "Overlay color"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:326
+msgid "overline"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:520
+msgid "Padding and margin settings for the"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:385
+msgid "Padding bottom"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:373
+msgid "Padding left"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:378
+msgid "Padding right"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:366
+msgid "Padding top"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:538
+msgid "Page header and footer"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:543
+msgid "Page speed optimizations"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:536
+msgid "Page template"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_4_menus_helpers.php:72
+msgid "Pages"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:64
+msgid "Parallax effect on scroll"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:73
+msgid "Parallax force (in percents)"
+msgstr ""
+
+#: inc/admin/nb-options.php:354
+msgid "Parse shortcodes when building your pages in the customizer"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:346
+msgid "Pause autoplay on mouse over"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:345
+msgid "Percents"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:143
+msgid "percents"
+msgstr ""
+
+#: nimble-builder.php:60
+msgid "PHP"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:527
+#: inc/sektions/_front_dev_php/module_registration/ui/10_0_1_sek_register_module_and_section_pickers.php:46
+msgid "Pick a module"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:505
+msgid "Pick a pre-designed section"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:526
+msgid "Pick a section"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:528
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:925
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:925
+msgid "Pick a template"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:80
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:87
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:98
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:82
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:85
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:92
+msgid "Pick an image"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:343
+msgid "Pixels"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:143
+msgid "pixels"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:132
+msgid "Play after a delay"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:139
+msgid "Play on mobile devices"
+msgstr ""
+
+#: inc/admin/nb-options.php:547
+msgid "Please include your system informations when posting support requests."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:22
+msgid "Please supply correct information."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:105
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:9
+msgid "Post Grid"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:75
+msgid "Post lists sections"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:394
+msgid "Post metas : author, date, category, ..."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:303
+msgid "Post thumbnail settings : size, design..."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:471
+msgid "Post titles"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/8_1_0_sektions_customizer_ajax_various.php:124
+msgid "posts"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:137
+msgid "Posts layout : list or grid"
+msgstr ""
+
+#: tmpl/modules/post_grid_module_tmpl.php:58
+msgid "Posts navigation"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:86
+msgid "Posts on two columns"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:91
+msgid "Posts per page"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_4_sek_register_global_performances.php:63
+msgid "Preload Google fonts"
+msgstr ""
+
+#. Author of the plugin
+msgid "Press Customizr"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:178
+msgid "Privacy policy consent is required"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:577
+msgid "Pro feature"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:552
+msgid "Protect your contact forms with Google reCAPTCHA"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:235
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:415
+msgid "Push visual effect"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:111
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:17
+msgid "Quote"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:60
+msgid "Quote content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:354
+msgid "Quote Icon"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:726
+msgid "Read the detailled release notes"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:1092
+msgid "read the getting started guide"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:258
+msgid "reCAPTCHA problem (only visible by a logged in administrator )"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php:50
+msgid ""
+"reCAPTCHA returns a score from 0 to 1 on each submission. 1 is very likely a "
+"good interaction, 0 is very likely a bot. A form submission that scores "
+"lower than your threshold will be considered as done by a robot, and aborted."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:813
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:814
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:820
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:821
+msgid "Redo"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:850
+msgid "Refresh preview"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:671
+msgid ""
+"Refreshed to home page : site templates must be set when previewing home"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:110
+#: inc/czr-base-fmk/_dev_php/0_2_czr-base-fmk-ajax_filter.php:123
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:97
+msgid "Remove"
+msgstr ""
+
+#: inc/admin/nb-options.php:408 inc/admin/nb-options.php:410
+msgid "Remove all Nimble Builder data"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_3_sek_register_local_reset.php:33
+msgid "Remove all sections and Nimble Builder options of this page"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:541
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:673
+msgid "Remove all sections and options of this page"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:266
+msgid "Remove column"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:291
+msgid "Remove module"
+msgstr ""
+
+#: inc/admin/nb-options.php:452
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:838
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:838
+msgid "Remove now"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:892
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:893
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:903
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:904
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:218
+msgid "Remove section"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:869
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:870
+msgid "Remove section(s)"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:957
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:958
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:968
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:969
+msgid "Remove template"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:934
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:935
+msgid "Remove template(s)"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_3_sek_register_global_reset.php:12
+msgid "Remove the sections displayed globally"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:542
+msgid "Remove the sections displayed in global locations"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:601
+msgid "Remove this element"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:649
+msgid "Remove this template"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:901
+msgid "Removing a section cannot be undone. Are you sure you want to continue?"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:966
+msgid ""
+"Removing a template cannot be undone. Are you sure you want to continue?"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:179
+msgid "Reorganize image and content vertically on smartphones devices"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:170
+msgid "Reorganize image and content vertically on tablet devices"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:92
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:97
+msgid "Repeat"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:98
+msgid "Repeat x"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:99
+msgid "Repeat y"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:1005
+msgid "Replace existing sections"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:496
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:472
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:487
+msgid "Reset"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:413
+msgid "Reset all spacing"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:497
+msgid "Reset complete"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:498
+msgid "Reset failed"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:924
+msgid "Reset to default"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/7_0_0_sektions_detached_tinymce.php:230
+#: inc/sektions/_customizer_dev_php/7_0_0_sektions_detached_tinymce.php:231
+msgid "Resize the editor"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:526
+msgid "Responsive settings : breakpoint, column direction"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:251
+msgid "Reverse grayscale"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_8_sek_register_breakpoint.php:49
+msgid "Reverse the columns direction on devices smaller than the breakpoint."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:611
+msgid "Revision history of global sections"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:610
+msgid "Revision history of local sections"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:30
+msgid "Rich Text Editor"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:460
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:109
+msgid "Right"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:100
+msgid "Round"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:268
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_2_sek_register_divider.php:59
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:227
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:186
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:368
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:362
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_border.php:36
+msgid "Rounded corners"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:860
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:861
+msgid "Save as new section"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:925
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:926
+msgid "Save as new template"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:831
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:832
+msgid "Save as template"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:886
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:887
+msgid "Save section"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:951
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:952
+msgid "Save template"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:217
+msgid "Save this section"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:86
+msgid "Scale"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:381
+msgid "Scale to fill"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:101
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:229
+msgid "Schedule an action on click or tap"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php:42
+msgid "Score threshold"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_8_sek_register_menu.php:51
+msgid "search icon next to the menu, sticky header, hamburger color, ..."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php:35
+msgid "Secret key"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:563
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:117
+msgid "section"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:881
+msgid "Section description"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:804
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:805
+msgid "Section navigation"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:877
+msgid "Section title"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:487
+msgid "Sections"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:36
+msgid "Sections for an introduction"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:103
+msgid "Sections for services and features"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:153
+msgid "Sections for teams"
+msgstr ""
+
+#: inc/admin/nb-options.php:447
+msgid "Security problem when trying to remove Nimble Builder data."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:614
+msgid "Select"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/10_0_1_sek_register_module_and_section_pickers.php:10
+msgid "Select a content type"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:579
+msgid "Select a font family"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_5_sek_register_local_header_footer.php:21
+msgid "Select a header and a footer for this page"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_8_sek_register_menu.php:63
+msgid "Select a menu"
+msgstr ""
+
+#: tmpl/modules/widget_area_module_tmpl.php:17
+msgid "Select a Nimble widget area and start adding widgets."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_6_sek_register_local_revisions.php:23
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_8_sek_register_global_revisions.php:23
+msgid ""
+"Select a revision from the drop-down list to preview it. You can then "
+"restore it by clicking the Publish button at the top of the page."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:875
+msgid "Select a section"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_5_sek_register_global_header_footer.php:21
+msgid "Select a site wide header and footer"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:97
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:106
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:150
+msgid "Select a size for this image among those generated by WordPress."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:940
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_0_sek_register_local_template.php:15
+msgid "Select a template"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:168
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_1_sek_register_widget_area.php:19
+msgid "Select a widget area"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:70
+msgid "Select an Icon"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:588
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:60
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:72
+msgid "Select an icon"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_4_sek_register_local_performances.php:17
+msgid "Select how you want to load the images in the sections of this page."
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:108
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:113
+msgid "Select Image"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:876
+msgid "Select the file to import and click on Import button."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:94
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:103
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:147
+msgid "Select the image size"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:331
+msgid "Select the source image size of the thumbnail"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:144
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:327
+msgid "Set a custom background color on mouse hover"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:105
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:130
+msgid "Set a custom icon color on mouse hover"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_6_czr-base-fmk-content_picker-ajax_actions.php:29
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:584
+msgid "Set a custom url"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:57
+msgid ""
+"set a specific header logo on mobiles, shrink header logo when scrolling "
+"down the page, ..."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:135
+msgid "Set an optional delay in seconds before playing the video"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:157
+msgid "Set an optional start and end time in seconds"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_4_sek_register_spacing.php:18
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_4_sek_register_spacing_for_columns.php:18
+msgid "Set padding and margin"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:144
+msgid "Set the text displayed when the mouse is held over"
+msgstr ""
+
+#: inc/admin/nb-options.php:108
+#: inc/czr-base-fmk/_dev_php/0_1_czr-base-fmk-load_resources.php:104
+msgid "Settings"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_8_sek_register_menu.php:111
+msgid "Settings for mobile devices"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:529
+msgid "Settings for the"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:595
+msgid "Settings on desktops"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:597
+msgid "Settings on mobiles"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:596
+msgid "Settings on tablets"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:123
+msgid "Shift-click to visit the link"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:117
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_3_sek_register_shortcode.php:10
+msgid "Shortcode"
+msgstr ""
+
+#: inc/admin/nb-options.php:347 inc/admin/nb-options.php:349
+msgid "Shortcodes"
+msgstr ""
+
+#: inc/admin/nb-options.php:355
+msgid ""
+"Shortcodes are disabled by default when customizing to prevent any conflicts "
+"with Nimble Builder interface."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_4_0_sektions_front_class_render.php:885
+msgid ""
+"Shortcodes are not parsed by default when customizing. You can change this "
+"setting in your WP admin > Settings > Nimble Builder options."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php:56
+msgid "Show a failure message"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php:72
+msgid "Show the reCAPTCHA badge at the bottom of your page"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:353
+msgid "Side Border"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:224
+msgid "simple 2 columns footer"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:240
+msgid "simple 3 columns footer"
+msgstr ""
+
+#. Description of the plugin
+msgid ""
+"Simple and smart companion that allows you to insert sections into any "
+"existing page, create landing pages or entire websites including header and "
+"footer."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:155
+msgid "Simple Contact Form"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:21
+msgid "Simple Form"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:205
+msgid "simple header with a logo on the left and a menu on the right"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:212
+msgid "simple header with a logo on the right and a menu on the left"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:79
+msgid "Simple post grid"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:262
+msgid "Site content or custom url"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php:28
+msgid "Site key"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:559
+msgid "Site templates"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:547
+msgid "Site wide breakpoint for Nimble sections"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:546
+msgid "Site wide header and footer"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:548
+msgid "Site wide inner and outer sections widths"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:558
+msgid "Site wide options"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:29
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_1_sek_register_local_widths.php:28
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_5_sek_register_local_header_footer.php:35
+msgid "site wide options"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:550
+msgid "Site wide page speed optimizations"
+msgstr ""
+
+#: inc/czr-skope/index.php:470
+#: inc/czr-skope/_dev/0_0_1_skop_functions_skope_helpers.php:470
+msgid "Sitewide options"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:98
+msgid "Size"
+msgstr ""
+
+#: tmpl/header/nimble_header_tmpl.php:30
+msgid "Skip to content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:73
+msgid "Slide collection"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:291
+msgid "Slider options : height, autoplay, navigation..."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:15
+msgid "Social Icons"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:64
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:77
+msgid "Social link url"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:149
+msgid "Social Profiles"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:393
+msgid "solid"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:633
+msgid "Some image(s) could not be imported"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:888
+msgid ""
+"Some of the imported sections need a location that is not active on this "
+"page. For example, if you are importing a global header footer, you need to "
+"activate the Nimble site wide header and footer, in \"Site wide header and "
+"footer\" options."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:880
+msgid ""
+"Some of the imported sections need a location that is not active on this "
+"page. Sections in missing locations will not be rendered. You can continue "
+"importing or assign those sections to a contextually active location."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:135
+msgid "Someone"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:158
+#, php-format
+msgid "Someone sent a message from %1$s"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:586
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:109
+msgid "Something went wrong, please refresh this page."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_1_sek_register_spacer.php:23
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:101
+msgid "Space"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_2_sek_register_divider.php:83
+msgid "Space before and after"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:261
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:204
+msgid "Space between columns"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:192
+msgid "Space between icons"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:273
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_4_sek_register_gallery.php:217
+msgid "Space between rows"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:213
+msgid "Space between text blocks"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:123
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_1_sek_register_spacer.php:12
+msgid "Spacer"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_0_sek_register_heading.php:143
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_3_sek_register_icon.php:184
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:210
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:391
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:321
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:402
+msgid "Spacing"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:204
+msgid "Spacing of the icons wrapper"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:218
+msgid "Spacing of the text content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:990
+msgid "Spam protection with Google reCAPTCHA"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:572
+msgid "Start building"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:1079
+msgid "Start creating content in live preview"
+msgstr ""
+
+#: tmpl/base-tmpl/location.php:78
+msgid "Start designing the footer"
+msgstr ""
+
+#: tmpl/base-tmpl/location.php:78
+msgid "Start designing the header"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:148
+msgid "Start time"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_5_sek_register_local_header_footer.php:6
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_5_sek_register_global_header_footer.php:6
+msgid ""
+"sticky header, header over content, sticky footer, search icon, hamburger "
+"color, ..."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_2_sek_register_divider.php:29
+msgid "Style"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_0_sektions_front_class_simple_forms_main_class.php:49
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:171
+msgid "Subject"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:132
+msgid "Subject field is required"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:127
+msgid "Subject field label"
+msgstr ""
+
+#. %s: [your-subject]
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:312
+#, php-format
+msgid "Subject: %s"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_0_sektions_front_class_simple_forms_main_class.php:71
+msgid "Submit"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:950
+msgid "Success message on submission"
+msgstr ""
+
+#: inc/admin/nb-options.php:539 inc/admin/nb-options.php:540
+#: inc/admin/nimble-admin.php:22 inc/admin/nimble-admin.php:22
+msgid "System info"
+msgstr ""
+
+#: inc/admin/nb-options.php:546
+msgid "System Informations"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:946
+msgid "Template description"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_2_0_sek_register_site_tmpl_pickers.php:109
+msgid "Template for 404 error page"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_2_0_sek_register_site_tmpl_pickers.php:85
+msgid "Template for attachment pages"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_2_0_sek_register_site_tmpl_pickers.php:75
+msgid "Template for authors"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_2_0_sek_register_site_tmpl_pickers.php:55
+msgid "Template for categories"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_2_0_sek_register_site_tmpl_pickers.php:122
+msgid "Template for date pages"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_2_0_sek_register_site_tmpl_pickers.php:97
+msgid "Template for search page"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_2_0_sek_register_site_tmpl_pickers.php:31
+msgid "Template for single pages"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_2_0_sek_register_site_tmpl_pickers.php:45
+msgid "Template for single posts"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_2_0_sek_register_site_tmpl_pickers.php:65
+msgid "Template for tags"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:666
+msgid "Template not found : reset or pick another one."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:652
+msgid "Template removed"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:651
+msgid "Template saved"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:630
+msgid "Template successfully imported"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:942
+msgid "Template title"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_2_0_sek_register_site_tmpl_pickers.php:6
+msgid "templates for custom post types, custom taxonomies, ...."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:118
+msgid "Text"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:262
+msgid "Text alignment"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:226
+msgid "Text blocks alignment"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php:80
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:119
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:293
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:500
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:643
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:786
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:515
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:611
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:707
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:803
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php:66
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:143
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:233
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:350
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_text_settings.php:73
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:54
+msgid "Text color"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php:89
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:129
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:303
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:510
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:653
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:796
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:525
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:621
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:717
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:813
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php:75
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_text_settings.php:82
+msgid "Text color on mouse over"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:245
+msgid "Text color when active"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:134
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:121
+msgid "Text content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php:117
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:160
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:334
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:541
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:684
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:827
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php:103
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_text_settings.php:110
+msgid "Text decoration"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php:15
+msgid "Text Editor"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:352
+msgid "Text only"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php:9
+msgid "Text settings : font, color, size, ..."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:518
+msgid "Text settings for the"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_5_sek_register_simple_html.php:126
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:170
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:344
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:551
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:694
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:837
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:556
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:652
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:748
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:844
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_0_sek_register_font_child.php:112
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_text_settings.php:119
+msgid "Text transform"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:952
+msgid "Thanks! Your message has been sent."
+msgstr ""
+
+#: inc/admin/nimble-admin.php:716
+msgid "Thanks, you successfully upgraded"
+msgstr ""
+
+#: nimble-builder.php:67
+#, php-format
+msgid "The <strong>%1$s</strong> plugin requires at least %2$s version %3$s."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_6_sek_register_global_google_recaptcha.php:76
+msgid "The badge is not previewable when customizing."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_2_sek_register_local_custom_css.php:20
+msgid ""
+"The CSS code added below will only be applied to the currently previewed "
+"page, not site wide."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:627
+msgid ""
+"The current page has no available locations to import Nimble Builder "
+"sections."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_5_sek_register_quote.php:25
+#, php-format
+msgid "The Dude in %1s"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_1_sek_register_local_widths.php:25
+#, php-format
+msgid ""
+"The inner and outer widths of the sections displayed in this page can be set "
+"here. It will override in the %1$s. You can also set a custom inner and "
+"outer width for each single sections."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_2_sek_register_global_widths.php:24
+#, php-format
+msgid ""
+"The inner and outer widths of your sections can be set globally here, but "
+"also overriden in the %1$s, and for each sections."
+msgstr ""
+
+#: inc/admin/nimble-admin.php:1070
+msgid ""
+"The plugin automatically creates fluid and responsive sections for a pixel-"
+"perfect rendering on smartphones and tablets, without the need to add "
+"complex code."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:327
+msgid ""
+"The post thumbnail can be set as \"Featured image\" when creating a post."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:612
+msgid "The revision could not be restored."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:613
+msgid "The revision has been successfully restored."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:531
+msgid "The section cannot be moved higher."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:532
+msgid "The section cannot be moved lower."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:592
+#, php-format
+msgid ""
+"There are %d errors in your %s code which might break your site. Please fix "
+"them before saving."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_9_sek_register_beta_features.php:23
+msgid "There are currently no available beta features to test."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:591
+#, php-format
+msgid ""
+"There is %d error in your %s code which might break your site. Please fix it "
+"before saving."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_7_sek_register_global_imp_exp.php:23
+msgid ""
+"These options allows you to export and import global sections like a global "
+"header-footer."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:335
+msgid ""
+"This allows you to select a preferred image size among those generated by "
+"WordPress."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:569
+msgid ""
+"This browser does not support drag and drop. You might need to update your "
+"browser or use another one."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:111
+msgid "This content has been created with the WordPress editor."
+msgstr ""
+
+#. 1: blog name, 2: blog URL
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:319
+#, php-format
+msgid "This e-mail was sent from a contact form on %1$s (%2$s)"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_simple_form_classes/8_5_3_sektions_front_class_simple_forms_mailer.php:181
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:44
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:979
+#, php-format
+msgid ""
+"This e-mail was sent from a contact form on %1$s (<a href=\"%2$s\" "
+"target=\"_blank\">%2$s</a>)"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:637
+msgid ""
+"This is a single-column section with a width of 100%. You can act on the "
+"internal width of the parent section, or adjust padding and margin."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:616
+msgid "This is the current version."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_8_sek_register_global_revisions.php:22
+msgid ""
+"This is the revision history of the global sections displayed site wide."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_6_sek_register_local_revisions.php:22
+msgid ""
+"This is the revision history of the sections of the currently customized "
+"page."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:85
+msgid "This is the text displayed on mouse over."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:112
+#, php-format
+msgid ""
+"This is the text displayed on mouse over. You can use the following template "
+"tags referring to the image attributes : %1$s"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_8_sek_register_breakpoint.php:34
+msgid ""
+"This is the viewport width from which columns are rearranged vertically. The "
+"default breakpoint is 768px."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_1_sek_register_global_breakpoint.php:21
+msgid ""
+"This is the viewport width from which columns are rearranged vertically. The "
+"default global breakpoint is 768px. A custom breakpoint can also be set for "
+"each section."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_1_sek_register_widget_area.php:23
+msgid ""
+"This module allows you to embed any WordPress widgets in your Nimble "
+"sections."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:61
+msgid ""
+"This option allows you to use the posts normally displayed by WordPress on "
+"this page."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_5_sek_register_local_header_footer.php:32
+#, php-format
+msgid ""
+"This option overrides the site wide header and footer options set in the "
+"%1$s for this page only."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:669
+msgid "This page inherits a NB site template"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:670
+msgid "This page is customized with NB"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:668
+msgid "This page is not customized with NB"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:537
+msgid "This page uses Nimble Builder template."
+msgstr ""
+
+#: inc/admin/nb-options.php:451
+msgid ""
+"This will permanently remove all data created by Nimble Builder and stored "
+"in your database or as stylesheets : page customizations, custom sections, "
+"custom templates, options, CSS stylesheets."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_3_sek_register_local_reset.php:36
+msgid ""
+"This will remove the options and sections created for the currently "
+"previewed page only. All other sections and options in other contexts will "
+"be preserved."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_3_sek_register_global_reset.php:14
+msgid ""
+"This will remove the sections displayed on global scope locations. Local "
+"scope sections will not be impacted."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:18
+msgid "Three Columns"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:189
+msgid "three columns layout"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:349
+msgid "Thumbnail height"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_9_sek_register_social_icons.php:84
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:111
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:89
+msgid "Title"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:107
+msgid "Title on mouse over"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:217
+msgid "Title style"
+msgstr ""
+
+#: inc/admin/nb-options.php:548
+msgid ""
+"To copy the system info, click below then press Ctrl + C (PC) or Cmd + C "
+"(Mac)."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:26
+#, php-format
+msgid ""
+"To ensure better performances, use optimized images for your backgrounds. "
+"You can also enable the lazy loading option in the %1$s."
+msgstr ""
+
+#: inc/admin/nimble-admin.php:718
+msgid "to version"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:71
+msgid "Tooltip text on mouse hover"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:460
+msgid "Top"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:486
+msgid "Top left"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:486
+msgid "Top right"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_0_sek_register_heading.php:83
+msgid "Turn into a link"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:12
+msgid "Two Columns"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_5_2_sektions_local_sektion_data.php:184
+msgid "two columns layout"
+msgstr ""
+
+#: inc/admin/nb-options.php:525
+msgid ""
+"Unauthorized users will not see any reference to Nimble Builder when editing "
+"a page, in the customizer and in the WordPress admin screens."
+msgstr ""
+
+#: inc/czr-skope/index.php:448
+#: inc/czr-skope/_dev/0_0_1_skop_functions_skope_helpers.php:448
+msgid "Undefined"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:327
+msgid "underline"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:90
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_0_sek_register_global_text.php:102
+msgid "Underlined"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:810
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:811
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:817
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:818
+msgid "Undo"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:143
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:771
+msgid "unit"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/9_9_9_various_helpers.php:417
+msgid "Unlock more features with Nimble Builder Pro"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:863
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:864
+msgid "Update a section"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:928
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:929
+msgid "Update a template"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:889
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:890
+msgid "Update section"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:954
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:955
+msgid "Update template"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:893
+msgid "Uploading..."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:335
+msgid "uppercase"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_8_sek_register_breakpoint.php:15
+msgid "Use a custom breakpoint for responsive columns"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:271
+msgid "Use a custom image"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:278
+msgid "Use a custom text"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_3_sek_register_shortcode.php:48
+msgid "Use a flex-box wrapper"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_1_sek_register_global_breakpoint.php:17
+msgid "Use a global custom breakpoint for responsive columns"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:375
+msgid "Use a placeholder image when no post thumbnail is set"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:106
+msgid "Use a video background"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:57
+msgid "Use contextual WordPress post query"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_0_sek_register_local_template.php:23
+msgid ""
+"Use Nimble Builder's template to display content created only with Nimble "
+"Builder on this page. Your theme's default template will be overriden"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_5_sek_register_local_header_footer.php:25
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_5_sek_register_global_header_footer.php:24
+msgid "Use the active theme's header and footer"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:85
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:37
+msgid "Use the contextual post thumbnail"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/10_0_1_sek_register_module_and_section_pickers.php:23
+msgid "use the Nimble page template"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:277
+msgid "Use the page excerpt"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:270
+msgid "Use the page featured image"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:647
+msgid "Use this template"
+msgstr ""
+
+#: inc/czr-skope/index.php:437
+#: inc/czr-skope/_dev/0_0_1_skop_functions_skope_helpers.php:437
+msgid "user"
+msgstr ""
+
+#: inc/czr-skope/index.php:465
+#: inc/czr-skope/_dev/0_0_1_skop_functions_skope_helpers.php:465
+msgid "users"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:208
+msgid "Vertical alignment"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:112
+msgid "Video background"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:116
+msgid "Video link"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:119
+msgid ""
+"Video link from YouTube, Vimeo, or a self-hosted file ( mp4 format is "
+"recommended )"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_1_0_sektions_input_templates.php:656
+msgid "View in live demo"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_7_sek_register_visibility.php:14
+msgid "Visible on desktop devices"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_7_sek_register_visibility.php:32
+msgid "Visible on mobile devices"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_7_sek_register_visibility.php:23
+msgid "Visible on tablet devices"
+msgstr ""
+
+#: inc/admin/nb-options.php:196
+msgid "Watch the video below for a brief overview of Nimble Builder features"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:580
+msgid "Web safe fonts"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_2_sek_register_divider.php:17
+msgid "Weight"
+msgstr ""
+
+#: inc/admin/nb-options.php:184
+msgid "Welcome"
+msgstr ""
+
+#: inc/admin/nimble-admin.php:1067
+msgid "Welcome to Nimble Builder for WordPress :D"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:90
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:42
+msgid "When enabled and possible, Nimble will use the post thumbnail."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_2_sek_register_background.php:68
+msgid ""
+"When enabled, the background image moves slower than the page elements on "
+"scroll. This effect is not enabled on mobile devices."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_7_sek_register_local_imp_exp.php:47
+#: inc/sektions/_front_dev_php/module_registration/ui/_3_global/4_1_7_sek_register_global_imp_exp.php:37
+msgid ""
+"When this option is unchecked, Nimble Builder will not import images and use "
+"instead the url of the original images."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_2_local/4_1_4_sek_register_local_performances.php:26
+msgid ""
+"When you select \"Load images on scroll\", images below the window are "
+"loaded dynamically when scrolling. This can improve performance by reducing "
+"the weight of long web pages including multiple images."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_1_sek_register_widget_area.php:26
+msgid "widget panel"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_2_1_sek_register_widget_area.php:11
+msgid "Widget Zone"
+msgstr ""
+
+#: inc/admin/nb-options.php:360
+msgid "Widgets Module"
+msgstr ""
+
+#: inc/admin/nb-options.php:362
+msgid "Widgets module"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_7_sek_register_image.php:166
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_2_sek_register_divider.php:47
+msgid "Width"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_5_sek_register_width_module.php:14
+msgid "Width : 100% or custom"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:242
+msgid "Width : auto or custom"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:523
+msgid "Width and horizontal alignment for the"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:158
+msgid "Width of the image's column (in percent)"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:522
+msgid "Width settings for the"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_4_sek_register_map.php:57
+msgid ""
+"With the lazy load option enabled, Nimble loads the map when it becomes "
+"visible while scrolling. This improves your page load performances."
+msgstr ""
+
+#: nimble-builder.php:63
+msgid "WordPress"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:318
+#: inc/sektions/_front_dev_php/8_4_0_sektions_front_class_render.php:97
+msgid "WordPress content"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/_constants_and_helper_functions/0_0_5_modules_helpers.php:142
+msgid "WordPress widget area"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_0_6_sek_register_tiny_mce_editor.php:85
+msgid ""
+"WordPress wraps the editor text inside \"p\" tags by default. You can "
+"disable this behaviour by unchecking this option."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_3_sek_register_shortcode.php:22
+msgid "Write the shortcode(s) in the text editor"
+msgstr ""
+
+#: inc/czr-base-fmk/_dev_php/0_2_czr-base-fmk-ajax_filter.php:132
+msgid "Yes"
+msgstr ""
+
+#: inc/admin/nb-options.php:455
+msgid "Yes I want to clean all data"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_6_sek_register_button.php:158
+msgid ""
+"You can also customize the text color on mouseover in the group of text "
+"settings below."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_8_sek_register_menu.php:66
+#, php-format
+msgid ""
+"You can create and edit menus in the %1$s. If you just created a new menu, "
+"publish and refresh the customizer to see in the dropdown list."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:510
+msgid "You can't drop a footer section in the header location"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:509
+msgid "You can't drop a header section in the footer location"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:660
+msgid "You did not save any section yet."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:655
+msgid "You did not save any templates yet."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:570
+msgid "You first need to click on a target ( with a + icon ) in the preview."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:125
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_3_sek_register_shortcode.php:28
+msgid "You may use some html tags in the \"text\" tab of the editor."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_1_sek_register_img_slider.php:138
+#, php-format
+msgid ""
+"You may use some html tags in the \"text\" tab of the editor. You can also "
+"use the following template tags referring to the image attributes : %1$s"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_3_2_sek_register_accordion.php:102
+msgid ""
+"You may use some html tags like a, br, span with attributes like style, id, "
+"class ..."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/8_4_0_sektions_front_class_render.php:1319
+msgid "You need to login to view this content."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:605
+msgid "You seem to be using a cache plugin."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:491
+msgid "You've reached the maximum number of allowed nested sections."
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:492
+#: inc/sektions/_front_dev_php/8_2_1_sektions_front_class_preview_assets.php:107
+msgid "You've reached the maximum number of columns allowed in this section."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_70_sek_register_simple_form.php:971
+msgid "Your message was not sent. Try Again."
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_71_sek_register_post_grid.php:107
+msgid "Z &rarr; A"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/ui/_1_level/4_0_3_sek_register_height.php:54
+msgid "z-index"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/front/4_1_4_sek_register_map.php:30
+msgid "Zoom"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:246
+msgid "Zoom in"
+msgstr ""
+
+#: inc/sektions/_front_dev_php/module_registration/4_0_0_sek_register_modules_after_setup_theme_50.php:245
+msgid "Zoom out"
+msgstr ""
+
+#: inc/sektions/_customizer_dev_php/1_0_0_sektions_customizer_assets.php:657
+msgid "🍥 More templates coming..."
+msgstr ""

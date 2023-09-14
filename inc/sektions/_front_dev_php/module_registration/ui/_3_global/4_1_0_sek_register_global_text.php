@@ -4,9 +4,9 @@ function sek_get_module_params_for_sek_global_text() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_text',
-        //'name' => __('Global text', 'text_doma'),
+        //'name' => __('Global text', 'nimble-builder'),
         // 'starting_value' => array(
-        //     'global_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'text_doma' ) )
+        //     'global_custom_css' => sprintf( '/* %1$s */', __('Add your own CSS code here', 'nimble-builder' ) )
         // ),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
@@ -14,7 +14,7 @@ function sek_get_module_params_for_sek_global_text() {
             'item-inputs' => array(
                 'default_font_family' => array(
                     'input_type'  => 'font_picker',
-                    'title'       => __('Font family', 'text_doma'),
+                    'title'       => __('Font family', 'nimble-builder'),
                     'default'     => '',
                     'refresh_stylesheet' => true,
                     'refresh_fonts' => true,
@@ -27,7 +27,7 @@ function sek_get_module_params_for_sek_global_text() {
                 ),
                 'default_font_size'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Font size', 'text_doma' ),
+                    'title'       => __( 'Font size', 'nimble-builder' ),
                     // the default value is commented to fix https://github.com/presscustomizr/nimble-builder/issues/313
                     // => as a consequence, when a module uses the font child module, the default font-size rule must be defined in the module SCSS file.
                     //'default'     => array( 'desktop' => '16px' ),
@@ -40,7 +40,7 @@ function sek_get_module_params_for_sek_global_text() {
                 ),//16,//"14px",
                 'default_line_height'     => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Line height', 'text_doma' ),
+                    'title'       => __( 'Line height', 'nimble-builder' ),
                     'default'     => '1.5em',
                     'min' => 0,
                     'max' => 10,
@@ -51,62 +51,62 @@ function sek_get_module_params_for_sek_global_text() {
                 ),//24,//"20px",
                 'default_color'           => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Text color', 'text_doma'),
+                    'title'       => __('Text color', 'nimble-builder'),
                     'default'     => '',
                     'refresh_stylesheet' => true,
                     'refresh_preview' => false,
                     'width-100'   => true,
-                    'notice_before' => __('Inherits your active theme\'s option when not set.', 'text_doma')
+                    'notice_before' => __('Inherits your active theme\'s option when not set.', 'nimble-builder')
                 ),//"#000000",
 
                 'links_color'           => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Links color', 'text_doma'),
+                    'title'       => __('Links color', 'nimble-builder'),
                     'default'     => '',
                     'refresh_stylesheet' => true,
                     'refresh_preview' => false,
                     'width-100'   => true,
-                    'notice_before' => __('Inherits your active theme\'s option when not set.', 'text_doma'),
+                    'notice_before' => __('Inherits your active theme\'s option when not set.', 'nimble-builder'),
                     'html_before' => '<hr/><h3>' . __('GLOBAL STYLE OPTIONS FOR LINKS') .'</h3>'
                 ),//"#000000",
                 'links_color_hover'           => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Links color on mouse hover', 'text_doma'),
+                    'title'       => __('Links color on mouse hover', 'nimble-builder'),
                     'default'     => '',
                     'refresh_stylesheet' => true,
                     'refresh_preview' => false,
                     'width-100'   => true,
-                    'notice_before' => __('Inherits your active theme\'s option when not set.', 'text_doma'),
+                    'notice_before' => __('Inherits your active theme\'s option when not set.', 'nimble-builder'),
                     'title_width' => 'width-100'
                 ),//"#000000",
                 'links_underlining'      => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Link underlining', 'text_doma'),
+                    'title'       => __('Link underlining', 'nimble-builder'),
                     'default'     => 'inherit',
                     'refresh_stylesheet' => true,
                     'refresh_preview' => false,
                     'choices'            => array(
-                        'inherit' => __('Default', 'text_doma'),
-                        'underlined' => __( 'Underlined', 'text_doma'),
-                        'not_underlined' => __( 'Not underlined', 'text_doma'),
+                        'inherit' => __('Default', 'nimble-builder'),
+                        'underlined' => __( 'Underlined', 'nimble-builder'),
+                        'not_underlined' => __( 'Not underlined', 'nimble-builder'),
                     )
                 ),//null,
                 'links_underlining_hover'      => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Link underlining on mouse hover', 'text_doma'),
+                    'title'       => __('Link underlining on mouse hover', 'nimble-builder'),
                     'default'     => 'inherit',
                     'refresh_stylesheet' => true,
                     'refresh_preview' => false,
                     'choices'            => array(
-                        'inherit' => __('Default', 'text_doma'),
-                        'underlined' => __( 'Underlined', 'text_doma'),
-                        'not_underlined' => __( 'Not underlined', 'text_doma'),
+                        'inherit' => __('Default', 'nimble-builder'),
+                        'underlined' => __( 'Underlined', 'nimble-builder'),
+                        'not_underlined' => __( 'Not underlined', 'nimble-builder'),
                     )
                 ),//null,
 
                 'headings_font_family' => array(
                     'input_type'  => 'font_picker',
-                    'title'       => __('Font family', 'text_doma'),
+                    'title'       => __('Font family', 'nimble-builder'),
                     'default'     => '',
                     'refresh_stylesheet' => true,
                     'refresh_fonts' => true,

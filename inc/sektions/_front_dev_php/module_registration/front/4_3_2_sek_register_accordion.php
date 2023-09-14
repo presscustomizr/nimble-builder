@@ -13,7 +13,7 @@ function sek_get_module_params_for_czr_accordion_module() {
             'accord_collec' => 'czr_accordion_collection_child',
             'accord_opts' => 'czr_accordion_opts_child'
         ),
-        'name' => __('Accordion', 'text_doma'),
+        'name' => __('Accordion', 'nimble-builder'),
         'starting_value' => array(
             'accord_collec' => array(
                 array('text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'),
@@ -65,7 +65,7 @@ function sek_get_module_params_for_czr_accordion_collection_child() {
         'dynamic_registration' => true,
         'module_type' => 'czr_accordion_collection_child',
         'is_crud' => true,
-        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">toc</i> %1$s', __( 'Item collection', 'text_doma' ) ),
+        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">toc</i> %1$s', __( 'Item collection', 'nimble-builder' ) ),
         'starting_value' => array(
             'text_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
         ),
@@ -75,18 +75,18 @@ function sek_get_module_params_for_czr_accordion_collection_child() {
             'pre-item' => array(
                 // 'page-id' => array(
                 //     'input_type'  => 'content_picker',
-                //     'title'       => __('Pick a page', 'text_doma')
+                //     'title'       => __('Pick a page', 'nimble-builder')
                 // ),
                 'img' => array(
                     'input_type'  => 'upload',
-                    'title'       => __('Pick an image', 'text_doma'),
+                    'title'       => __('Pick an image', 'nimble-builder'),
                     'default'     => ''
                 ),
             ),
             'item-inputs' => array(
                 'tabs' => array(
                     array(
-                        'title' => __( 'Title', 'text_doma' ),
+                        'title' => __( 'Title', 'nimble-builder' ),
                         'inputs' => array(
                             'title_text' => array(
                                 'input_type'        => 'nimble_tinymce_editor',
@@ -95,22 +95,22 @@ function sek_get_module_params_for_czr_accordion_collection_child() {
                                     'includedBtns' => 'basic_btns',
                                     'height' => 50
                                 ),
-                                'title'              => __( 'Heading text', 'text_doma' ),
+                                'title'              => __( 'Heading text', 'nimble-builder' ),
                                 'default'            => '',
                                 'width-100'         => true,
                                 'refresh_markup'    => '.sek-inner-accord-title',
-                                'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'text_doma'),
+                                'notice_before'      => __( 'You may use some html tags like a, br, span with attributes like style, id, class ...', 'nimble-builder'),
                             ),
                             'title_attr'  => array(
                                 'input_type'  => 'text',
                                 'default'     => '',
-                                'title'       => __('Title on mouse over', 'text_domain_to_be_replaced'),
+                                'title'       => __('Title on mouse over', 'nimble-builder'),
                                 'notice_after' => __('This is the text displayed on mouse over.' )
                             ),
                         )
                     ),
                     array(
-                        'title' => __( 'Content', 'text_doma' ),
+                        'title' => __( 'Content', 'nimble-builder' ),
                         'inputs' => array(
                             'text_content' => array(
                                 'input_type'        => 'nimble_tinymce_editor',
@@ -118,15 +118,15 @@ function sek_get_module_params_for_czr_accordion_collection_child() {
                                     'media_button' => true,
                                     'includedBtns' => 'basic_btns_with_lists',
                                 ),
-                                'title'             => __( 'Text content', 'text_doma' ),
+                                'title'             => __( 'Text content', 'nimble-builder' ),
                                 'default'           => '',
                                 'width-100'         => true,
                                 'refresh_markup'    => '.sek-accord-content',
-                                'notice_before' => __('You may use some html tags in the "text" tab of the editor.', 'text_domain_to_be_replaced')
+                                'notice_before' => __('You may use some html tags in the "text" tab of the editor.', 'nimble-builder')
                             ),
                             'h_alignment_css' => array(
                                 'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
-                                'title'       => __('Horizontal alignment', 'text_doma'),
+                                'title'       => __('Horizontal alignment', 'nimble-builder'),
                                 'default'     => array( 'desktop' => 'center'),
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -154,10 +154,10 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_accordion_opts_child',
-        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">tune</i> %1$s', __( 'Accordion options : font style, borders, background, ...', 'text_doma' ) ),
+        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">tune</i> %1$s', __( 'Accordion options : font style, borders, background, ...', 'nimble-builder' ) ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
-        //     'button_text' => __('Click me','text_doma'),
+        //     'button_text' => __('Click me','nimble-builder'),
         //     'color_css'  => '#ffffff',
         //     'bg_color_css' => '#020202',
         //     'bg_color_hover' => '#151515', //lighten 15%,
@@ -172,25 +172,25 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
             'item-inputs' => array(
                 'tabs' => array(
                     array(
-                        'title' => __( 'General', 'text_doma' ),
+                        'title' => __( 'General', 'nimble-builder' ),
                         'inputs' => array(
                             'first_expanded' => array(
                                 'input_type'  => 'nimblecheck',
-                                'title'       => __('Display first item expanded', 'text_doma'),
+                                'title'       => __('Display first item expanded', 'nimble-builder'),
                                 'default'     => true,
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20'
                             ),
                             'one_expanded' => array(
                                 'input_type'  => 'nimblecheck',
-                                'title'       => __('Display one item expanded at a time', 'text_doma'),
+                                'title'       => __('Display one item expanded at a time', 'nimble-builder'),
                                 'default'     => true,
                                 'title_width' => 'width-80',
                                 'input_width' => 'width-20'
                             ),
                             'border_width_css' => array(
                                 'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Border weight', 'text_doma' ),
+                                'title'       => __( 'Border weight', 'nimble-builder' ),
                                 'min' => 0,
                                 'max' => 80,
                                 'default' => '1px',
@@ -203,7 +203,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                             ),
                             'border_color_css' => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Border color', 'text_doma' ),
+                                'title'       => __( 'Border color', 'nimble-builder' ),
                                 'width-100'   => true,
                                 'default'     => '#e3e3e3',
                                 'refresh_markup' => false,
@@ -214,11 +214,11 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                         )//inputs
                     ),
                     array(
-                        'title' => __( 'Title style', 'text_doma' ),
+                        'title' => __( 'Title style', 'nimble-builder' ),
                         'inputs' => array(
                             'title_bg_css' => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Backround color', 'text_doma'),
+                                'title'       => __('Backround color', 'nimble-builder'),
                                 'width-100'   => true,
                                 'title_width' => 'width-100',
                                 'default'    => '#ffffff',
@@ -230,7 +230,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                             ),
                             'color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
+                                'title'       => __( 'Text color', 'nimble-builder' ),
                                 'default'     => '#565656',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -242,7 +242,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                             'color_active_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
                                 'title_width' => 'width-100',
-                                'title'       => __( 'Text color when active', 'text_doma' ),
+                                'title'       => __( 'Text color when active', 'nimble-builder' ),
                                 'default'     => '#1e261f',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -253,7 +253,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
 
                             'font_family_css' => array(
                                 'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_doma' ),
+                                'title'       => __( 'Font family', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -270,7 +270,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'default'     => array( 'desktop' => '16px' ),
                                 'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_doma' ),
+                                'title'       => __( 'Font size', 'nimble-builder' ),
                                 'min' => 0,
                                 'max' => 100,
                                 'width-100' => true,
@@ -281,7 +281,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                             ),//16,//"14px",
                             'line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_doma' ),
+                                'title'       => __( 'Line height', 'nimble-builder' ),
                                 'default'     => '1.5em',
                                 'min' => 0,
                                 'max' => 10,
@@ -294,7 +294,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                             ),//24,//"20px",
                             'title_border_w_css' => array(
                                 'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Border bottom weight', 'text_doma' ),
+                                'title'       => __( 'Border bottom weight', 'nimble-builder' ),
                                 'min' => 0,
                                 'max' => 80,
                                 'default' => '1px',
@@ -308,7 +308,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                             ),
                             'title_border_c_css' => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Border bottom color', 'text_doma' ),
+                                'title'       => __( 'Border bottom color', 'nimble-builder' ),
                                 'width-100'   => true,
                                 'default'     => '#e3e3e3',
                                 //'refresh_markup' => false,
@@ -318,7 +318,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                             ),
                             'spacing_css'     => array(
                                 'input_type'  => 'spacingWithDeviceSwitcher',
-                                'title'       => __( 'Spacing', 'text_doma' ),
+                                'title'       => __( 'Spacing', 'nimble-builder' ),
                                 'default'     => array('desktop' => array('padding-top' => '15', 'padding-right' => '20', 'padding-left' => '20', 'padding-bottom' => '15', 'unit' => 'px')),//consistent with SCSS
                                 'title_width' => 'width-100',
                                 'width-100'   => true,
@@ -331,11 +331,11 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                         )
                     ),
                     array(
-                        'title' => __( 'Content style', 'text_doma' ),
+                        'title' => __( 'Content style', 'nimble-builder' ),
                         'inputs' => array(
                             'ct_bg_css' => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __('Backround color', 'text_doma'),
+                                'title'       => __('Backround color', 'nimble-builder'),
                                 'width-100'   => true,
                                 'title_width' => 'width-100',
                                 'default'    => '#f2f2f2',
@@ -347,7 +347,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                             ),
                             'ct_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
+                                'title'       => __( 'Text color', 'nimble-builder' ),
                                 'default'     => '#1e261f',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -358,7 +358,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
 
                             'ct_font_family_css' => array(
                                 'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_doma' ),
+                                'title'       => __( 'Font family', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -375,7 +375,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'default'     => array( 'desktop' => '16px' ),
                                 'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_doma' ),
+                                'title'       => __( 'Font size', 'nimble-builder' ),
                                 'min' => 0,
                                 'max' => 100,
                                 'width-100'         => true,
@@ -386,7 +386,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                             ),//16,//"14px",
                             'ct_line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_doma' ),
+                                'title'       => __( 'Line height', 'nimble-builder' ),
                                 'default'     => '1.5em',
                                 'min' => 0,
                                 'max' => 10,
@@ -399,7 +399,7 @@ function sek_get_module_params_for_czr_accordion_opts_child() {
                             ),//24,//"20px",
                             'ct_spacing_css'     => array(
                                 'input_type'  => 'spacingWithDeviceSwitcher',
-                                'title'       => __( 'Spacing', 'text_doma' ),
+                                'title'       => __( 'Spacing', 'nimble-builder' ),
                                 'default'     => array('desktop' => array('padding-top' => '15', 'padding-right' => '20', 'padding-left' => '20', 'padding-bottom' => '15', 'unit' => 'px')),//consistent with SCSS
                                 'title_width' => 'width-100',
                                 'width-100'   => true,

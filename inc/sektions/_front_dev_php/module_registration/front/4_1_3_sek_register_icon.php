@@ -13,7 +13,7 @@ function sek_get_module_params_for_czr_icon_module() {
             'icon_settings' => 'czr_icon_settings_child',
             'spacing_border' => 'czr_icon_spacing_border_child'
         ),
-        'name' => __('Icon', 'text_doma'),
+        'name' => __('Icon', 'nimble-builder'),
         'starting_value' => array(
             'icon_settings' => array(
                 'icon' =>  'far fa-star',
@@ -49,10 +49,10 @@ function sek_get_module_params_for_czr_icon_settings_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_icon_settings_child',
-        'name' => __( 'Icon settings', 'text_doma' ),
+        'name' => __( 'Icon settings', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
-        //     'button_text' => __('Click me','text_doma'),
+        //     'button_text' => __('Click me','nimble-builder'),
         //     'color_css'  => '#ffffff',
         //     'bg_color_css' => '#020202',
         //     'bg_color_hover' => '#151515', //lighten 15%,
@@ -67,35 +67,35 @@ function sek_get_module_params_for_czr_icon_settings_child() {
             'item-inputs' => array(
                 'icon' => array(
                     'input_type'  => 'fa_icon_picker',
-                    'title'       => __('Select an Icon', 'text_doma'),
+                    'title'       => __('Select an Icon', 'nimble-builder'),
                     //'default'     => 'no-link'
                 ),
                 'link-to' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Link to', 'text_doma'),
+                    'title'       => __('Link to', 'nimble-builder'),
                     'default'     => 'no-link',
                     'choices'     => sek_get_select_options_for_input_id( 'link-to' )
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Link url', 'text_doma'),
+                    'title'       => __('Link url', 'nimble-builder'),
                     'default'     => array()
                 ),
                 'link-custom-url' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Custom link url', 'text_doma'),
+                    'title'       => __('Custom link url', 'nimble-builder'),
                     'default'     => ''
                 ),
                 'link-target' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Open link in a new browser tab', 'text_doma'),
+                    'title'       => __('Open link in a new browser tab', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'font_size_css' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Size', 'text_doma'),
+                    'title'       => __('Size', 'nimble-builder'),
                     'default'     => array( 'desktop' => '16px' ),
                     'min' => 0,
                     'max' => 100,
@@ -107,7 +107,7 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'       => __('Alignment', 'text_doma'),
+                    'title'       => __('Alignment', 'nimble-builder'),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -118,7 +118,7 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                 ),
                 'color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Color', 'text_doma'),
+                    'title'       => __('Color', 'nimble-builder'),
                     'width-100'   => true,
                     'default'    => '#707070',
                     'refresh_markup' => false,
@@ -127,7 +127,7 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                 ),
                 'use_custom_color_on_hover' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Set a custom icon color on mouse hover', 'text_doma' ),
+                    'title'       => __( 'Set a custom icon color on mouse hover', 'nimble-builder' ),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
@@ -136,7 +136,7 @@ function sek_get_module_params_for_czr_icon_settings_child() {
                 ),
                 'color_hover' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Hover color', 'text_doma'),
+                    'title'       => __('Hover color', 'nimble-builder'),
                     'width-100'   => true,
                     'default'    => '#969696',
                     'refresh_markup' => false,
@@ -163,10 +163,10 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_icon_spacing_border_child',
-        'name' => __( 'Icon options for background, spacing, border, shadow', 'text_doma' ),
+        'name' => __( 'Icon options for background, spacing, border, shadow', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
-        //     'button_text' => __('Click me','text_doma'),
+        //     'button_text' => __('Click me','nimble-builder'),
         //     'color_css'  => '#ffffff',
         //     'bg_color_css' => '#020202',
         //     'bg_color_hover' => '#151515', //lighten 15%,
@@ -181,7 +181,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
             'item-inputs' => array(
                 'spacing_css'     => array(
                     'input_type'  => 'spacingWithDeviceSwitcher',
-                    'title'       => __( 'Spacing', 'text_doma' ),
+                    'title'       => __( 'Spacing', 'nimble-builder' ),
                     'default'     => array( 'desktop' => array() ),
                     'width-100'   => true,
                     'refresh_markup'     => false,
@@ -191,7 +191,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                 ),
                 'bg_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Background color', 'text_doma' ),
+                    'title'       => __( 'Background color', 'nimble-builder' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'default'    => '',
@@ -202,7 +202,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                 ),
                 'border-type' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Border', 'text_doma'),
+                    'title'       => __('Border', 'nimble-builder'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
                     'refresh_markup' => false,
@@ -210,7 +210,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                 ),
                 'borders' => array(
                     'input_type'  => 'borders',
-                    'title'       => __('Borders', 'text_doma'),
+                    'title'       => __('Borders', 'nimble-builder'),
                     'min' => 0,
                     'max' => 100,
                     'default' => array(
@@ -224,7 +224,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'border_radius',
-                    'title'       => __( 'Rounded corners', 'text_doma' ),
+                    'title'       => __( 'Rounded corners', 'nimble-builder' ),
                     'default' => array( '_all_' => '0px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -237,7 +237,7 @@ function sek_get_module_params_for_czr_icon_spacing_border_child() {
                 ),
                 'use_box_shadow' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Apply a shadow', 'text_doma' ),
+                    'title'       => __( 'Apply a shadow', 'nimble-builder' ),
                     'default'     => 0,
                 ),
             )

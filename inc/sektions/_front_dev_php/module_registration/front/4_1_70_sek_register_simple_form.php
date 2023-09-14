@@ -18,7 +18,7 @@ function sek_get_module_params_for_czr_simple_form_module() {
             'form_fonts'    => 'czr_simple_form_fonts_child',
             'form_submission'    => 'czr_simple_form_submission_child'
         ),
-        'name' => __( 'Simple Form', 'text_doma' ),
+        'name' => __( 'Simple Form', 'nimble-builder' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         'starting_value' => array(
             'fields_design' => array(
@@ -41,7 +41,7 @@ function sek_get_module_params_for_czr_simple_form_module() {
                 'btn_color_css' => '#ffffff'
             ),
             'form_submission' => array(
-                'email_footer' => sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_doma' ),
+                'email_footer' => sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'nimble-builder' ),
                     get_bloginfo( 'name' ),
                     get_site_url( 'url' )
                 )
@@ -71,10 +71,10 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_fields_child',
-        'name' => __( 'Form fields and button labels', 'text_doma' ),
+        'name' => __( 'Form fields and button labels', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
-        //     'button_text' => __('Click me','text_doma'),
+        //     'button_text' => __('Click me','nimble-builder'),
         //     'color_css'  => '#ffffff',
         //     'bg_color_css' => '#020202',
         //     'bg_color_hover' => '#151515', //lighten 15%,
@@ -89,7 +89,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
             'item-inputs' => array(
                 'show_name_field' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Display name field', 'text_doma'),
+                    'title'       => __('Display name field', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -97,12 +97,12 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 'name_field_label' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __('Name field label', 'text_doma'),
+                    'title'       => __('Name field label', 'nimble-builder'),
                     'default'     => __('Name', 'translate')
                 ),
                 'name_field_required' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Name field is required', 'text_doma'),
+                    'title'       => __('Name field is required', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -111,12 +111,12 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 'email_field_label' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __('Email field label', 'text_doma'),
+                    'title'       => __('Email field label', 'nimble-builder'),
                     'default'     => __('Email', 'translate')
                 ),
                 'show_subject_field' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Display subject field', 'text_doma'),
+                    'title'       => __('Display subject field', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -124,12 +124,12 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 'subject_field_label' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __('Subject field label', 'text_doma'),
+                    'title'       => __('Subject field label', 'nimble-builder'),
                     'default'     => __('Subject', 'translate')
                 ),
                 'subject_field_required' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Subject field is required', 'text_doma'),
+                    'title'       => __('Subject field is required', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -138,7 +138,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
 
                 'show_message_field' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Display message field', 'text_doma'),
+                    'title'       => __('Display message field', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -146,12 +146,12 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 'message_field_label' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __('Message field label', 'text_doma'),
+                    'title'       => __('Message field label', 'nimble-builder'),
                     'default'     => __('Message', 'translate')
                 ),
                 'message_field_required' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Message field is required', 'text_doma'),
+                    'title'       => __('Message field is required', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -160,22 +160,22 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
 
                 'show_privacy_field' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Display a checkbox for privacy policy consent', 'text_doma'),
+                    'title'       => __('Display a checkbox for privacy policy consent', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'privacy_field_label' => array(
                     'input_type'        => 'nimble_tinymce_editor',
-                    'title'       => __( 'Consent message' , 'text_doma' ),
-                    'default'     => __( 'I have read and agree to the privacy policy.', 'text_doma' ),
+                    'title'       => __( 'Consent message' , 'nimble-builder' ),
+                    'default'     => __( 'I have read and agree to the privacy policy.', 'nimble-builder' ),
                     'width-100'         => true,
                     'refresh_markup' => '.sek-privacy-wrapper label',
-                    'notice_before' => __('Html code is allowed', 'text-domain')
+                    'notice_before' => __('Html code is allowed', 'nimble-builder')
                 ),
                 'privacy_field_required' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Privacy policy consent is required', 'text_doma'),
+                    'title'       => __('Privacy policy consent is required', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -185,7 +185,7 @@ function sek_get_module_params_for_czr_simple_form_fields_child() {
                 'button_text' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __('Button text', 'text_doma'),
+                    'title'       => __('Button text', 'nimble-builder'),
                     'default'     => __('Submit', 'translate')
                 ),
             )
@@ -208,10 +208,10 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_design_child',
-        'name' => __( 'Form fields design', 'text_doma' ),
+        'name' => __( 'Form fields design', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
-        //     'button_text' => __('Click me','text_doma'),
+        //     'button_text' => __('Click me','nimble-builder'),
         //     'color_css'  => '#ffffff',
         //     'bg_color_css' => '#020202',
         //     'bg_color_hover' => '#151515', //lighten 15%,
@@ -226,7 +226,7 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
             'item-inputs' => array(
                 'bg_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Fields background color', 'text_doma' ),
+                    'title'       => __( 'Fields background color', 'nimble-builder' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
                     'default'    => '',
@@ -237,14 +237,14 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
                 ),
                 'border-type' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Fields border shape', 'text_doma'),
+                    'title'       => __('Fields border shape', 'nimble-builder'),
                     'default' => 'solid',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
                     'refresh_stylesheet' => true
                 ),
                 'borders' => array(
                     'input_type'  => 'borders',
-                    'title'       => __('Borders options', 'text_doma'),
+                    'title'       => __('Borders options', 'nimble-builder'),
                     'min' => 0,
                     'max' => 100,
                     'default' => array(
@@ -258,7 +258,7 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Fields rounded corners', 'text_doma' ),
+                    'title'       => __( 'Fields rounded corners', 'nimble-builder' ),
                     'default'     => '3px',
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -271,12 +271,12 @@ function sek_get_module_params_for_czr_simple_form_design_child() {
                 ),
                 'use_inset_shadow' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Apply an inset shadow', 'text_doma' ),
+                    'title'       => __( 'Apply an inset shadow', 'nimble-builder' ),
                     'default'     => 1,
                 ),
                 'use_outset_shadow' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Apply an outset shadow', 'text_doma' ),
+                    'title'       => __( 'Apply an outset shadow', 'nimble-builder' ),
                     'default'     => 0,
                 )
             )
@@ -296,10 +296,10 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_button_child',
-        'name' => __( 'Form button design', 'text_doma' ),
+        'name' => __( 'Form button design', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
-        //     'button_text' => __('Click me','text_doma'),
+        //     'button_text' => __('Click me','nimble-builder'),
         //     'color_css'  => '#ffffff',
         //     'bg_color_css' => '#020202',
         //     'bg_color_hover' => '#151515', //lighten 15%,
@@ -314,7 +314,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
             'item-inputs' => array(
                 'bg_color_css' => array(
                       'input_type'  => 'wp_color_alpha',
-                      'title'       => __( 'Background color', 'text_doma' ),
+                      'title'       => __( 'Background color', 'nimble-builder' ),
                       'width-100'   => true,
                       'default'    => '',
                       'refresh_markup' => false,
@@ -324,7 +324,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'use_custom_bg_color_on_hover' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Set a custom background color on mouse hover', 'text_doma' ),
+                    'title'       => __( 'Set a custom background color on mouse hover', 'nimble-builder' ),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
@@ -333,7 +333,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'bg_color_hover' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Background color on mouse hover', 'text_doma' ),
+                    'title'       => __( 'Background color on mouse hover', 'nimble-builder' ),
                     'width-100'   => true,
                     'default'    => '',
                     'refresh_markup' => false,
@@ -343,7 +343,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'border-type' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Border', 'text_doma'),
+                    'title'       => __('Border', 'nimble-builder'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
                     'refresh_markup' => false,
@@ -351,7 +351,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'borders' => array(
                     'input_type'  => 'borders',
-                    'title'       => __('Borders', 'text_doma'),
+                    'title'       => __('Borders', 'nimble-builder'),
                     'min' => 0,
                     'max' => 100,
                     'default' => array(
@@ -365,7 +365,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Rounded corners', 'text_doma' ),
+                    'title'       => __( 'Rounded corners', 'nimble-builder' ),
                     'default'     => '2px',
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -377,7 +377,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'h_alignment_css'        => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'       => __( 'Button alignment', 'text_doma' ),
+                    'title'       => __( 'Button alignment', 'nimble-builder' ),
                     'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
@@ -388,7 +388,7 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'spacing_css'        => array(
                     'input_type'         => 'spacing',
-                    'title'              => __( 'Spacing', 'text_doma' ),
+                    'title'              => __( 'Spacing', 'nimble-builder' ),
                     'default'            => array(
                         'margin-top'     => .5,
                         'padding-top'    => .5,
@@ -405,14 +405,14 @@ function sek_get_module_params_for_czr_simple_form_button_child() {
                 ),
                 'use_box_shadow' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Apply a shadow', 'text_doma' ),
+                    'title'       => __( 'Apply a shadow', 'nimble-builder' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'push_effect' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Push visual effect', 'text_doma' ),
+                    'title'       => __( 'Push visual effect', 'nimble-builder' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -444,7 +444,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_fonts_child',
-        'name' => __( 'Form texts options : fonts, colors, ...', 'text_doma' ),
+        'name' => __( 'Form texts options : fonts, colors, ...', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         // ),
@@ -453,11 +453,11 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
             'item-inputs' => array(
                 'tabs' => array(
                     array(
-                        'title' => __( 'Fields labels', 'text_doma' ),
+                        'title' => __( 'Fields labels', 'nimble-builder' ),
                         'inputs' => array(
                             'fl_font_family_css' => array(
                                 'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_doma' ),
+                                'title'       => __( 'Font family', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -473,7 +473,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'default'     => array( 'desktop' => '16px' ),
                                 'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_doma' ),
+                                'title'       => __( 'Font size', 'nimble-builder' ),
                                 'min' => 0,
                                 'max' => 100,
                                 'width-100'         => true,
@@ -484,7 +484,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//16,//"14px",
                             'fl_line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_doma' ),
+                                'title'       => __( 'Line height', 'nimble-builder' ),
                                 'default'     => '1.5em',
                                 'min' => 0,
                                 'max' => 10,
@@ -497,7 +497,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//24,//"20px",
                             'fl_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
+                                'title'       => __( 'Text color', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -507,7 +507,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//"#000000",
                             'fl_color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                                'title'       => __( 'Text color on mouse over', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -518,7 +518,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//"#000000",
                             'fl_font_weight_css'     => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font weight', 'text_doma' ),
+                                'title'       => __( 'Font weight', 'nimble-builder' ),
                                 'default'     => 'bold',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -528,7 +528,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'fl_font_style_css'      => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font style', 'text_doma' ),
+                                'title'       => __( 'Font style', 'nimble-builder' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -538,7 +538,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'fl_text_decoration_css' => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Text decoration', 'text_doma' ),
+                                'title'       => __( 'Text decoration', 'nimble-builder' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -548,7 +548,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'fl_text_transform_css'  => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Text transform', 'text_doma' ),
+                                'title'       => __( 'Text transform', 'nimble-builder' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -558,7 +558,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'fl_letter_spacing_css'  => array(
                                 'input_type'  => 'range_simple',
-                                'title'       => __( 'Letter spacing', 'text_doma' ),
+                                'title'       => __( 'Letter spacing', 'nimble-builder' ),
                                 'default'     => 0,
                                 'min'         => 0,
                                 'step'        => 1,
@@ -571,7 +571,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
                             'fl___flag_important'       => array(
                                 'input_type'  => 'nimblecheck',
-                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
+                                'title'       => __( 'Make those style options win if other rules are applied.', 'nimble-builder' ),
                                 'default'     => 0,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -596,11 +596,11 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                         )
                     ),
                     array(
-                        'title' => __( 'Field Text', 'text_doma' ),
+                        'title' => __( 'Field Text', 'nimble-builder' ),
                         'inputs' => array(
                             'ft_font_family_css' => array(
                                 'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_doma' ),
+                                'title'       => __( 'Font family', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -616,7 +616,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'default'     => array( 'desktop' => '16px' ),
                                 'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_doma' ),
+                                'title'       => __( 'Font size', 'nimble-builder' ),
                                 'min' => 0,
                                 'max' => 100,
                                 'width-100'         => true,
@@ -627,7 +627,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//16,//"14px",
                             'ft_line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_doma' ),
+                                'title'       => __( 'Line height', 'nimble-builder' ),
                                 'default'     => '1.5em',
                                 'min' => 0,
                                 'max' => 10,
@@ -640,7 +640,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//24,//"20px",
                             'ft_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
+                                'title'       => __( 'Text color', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -650,7 +650,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//"#000000",
                             'ft_color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                                'title'       => __( 'Text color on mouse over', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -661,7 +661,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//"#000000",
                             'ft_font_weight_css'     => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font weight', 'text_doma' ),
+                                'title'       => __( 'Font weight', 'nimble-builder' ),
                                 'default'     => 'normal',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -671,7 +671,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'ft_font_style_css'      => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font style', 'text_doma' ),
+                                'title'       => __( 'Font style', 'nimble-builder' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -681,7 +681,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'ft_text_decoration_css' => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Text decoration', 'text_doma' ),
+                                'title'       => __( 'Text decoration', 'nimble-builder' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -691,7 +691,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'ft_text_transform_css'  => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Text transform', 'text_doma' ),
+                                'title'       => __( 'Text transform', 'nimble-builder' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -701,7 +701,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'ft_letter_spacing_css'  => array(
                                 'input_type'  => 'range_simple',
-                                'title'       => __( 'Letter spacing', 'text_doma' ),
+                                'title'       => __( 'Letter spacing', 'nimble-builder' ),
                                 'default'     => 0,
                                 'min'         => 0,
                                 'step'        => 1,
@@ -714,7 +714,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
                             'ft___flag_important'       => array(
                                 'input_type'  => 'nimblecheck',
-                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
+                                'title'       => __( 'Make those style options win if other rules are applied.', 'nimble-builder' ),
                                 'default'     => 0,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -739,11 +739,11 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                         ),//inputs
                     ),//tab
                     array(
-                        'title' => __( 'Button', 'text_doma' ),
+                        'title' => __( 'Button', 'nimble-builder' ),
                         'inputs' => array(
                             'btn_font_family_css' => array(
                                 'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_doma' ),
+                                'title'       => __( 'Font family', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -759,7 +759,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'default'     => array( 'desktop' => '16px' ),
                                 'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_doma' ),
+                                'title'       => __( 'Font size', 'nimble-builder' ),
                                 'min' => 0,
                                 'max' => 100,
                                 'width-100'         => true,
@@ -770,7 +770,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//16,//"14px",
                             'line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_doma' ),
+                                'title'       => __( 'Line height', 'nimble-builder' ),
                                 'default'     => '1.5em',
                                 'min' => 0,
                                 'max' => 10,
@@ -783,7 +783,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//24,//"20px",
                             'btn_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
+                                'title'       => __( 'Text color', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -793,7 +793,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//"#000000",
                             'btn_color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                                'title'       => __( 'Text color on mouse over', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -804,7 +804,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//"#000000",
                             'btn_font_weight_css'     => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font weight', 'text_doma' ),
+                                'title'       => __( 'Font weight', 'nimble-builder' ),
                                 'default'     => 'normal',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -814,7 +814,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'btn_font_style_css'      => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font style', 'text_doma' ),
+                                'title'       => __( 'Font style', 'nimble-builder' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -824,7 +824,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'btn_text_decoration_css' => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Text decoration', 'text_doma' ),
+                                'title'       => __( 'Text decoration', 'nimble-builder' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -834,7 +834,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'btn_text_transform_css'  => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Text transform', 'text_doma' ),
+                                'title'       => __( 'Text transform', 'nimble-builder' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -844,7 +844,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             ),//null,
                             'btn_letter_spacing_css'  => array(
                                 'input_type'  => 'range_simple',
-                                'title'       => __( 'Letter spacing', 'text_doma' ),
+                                'title'       => __( 'Letter spacing', 'nimble-builder' ),
                                 'default'     => 0,
                                 'min'         => 0,
                                 'step'        => 1,
@@ -857,7 +857,7 @@ function sek_get_module_params_for_czr_simple_form_fonts_child() {
                             // Note : always use the suffix '_flag_important' to name an input controling the !important css flag @see Nimble\sek_add_css_rules_for_css_sniffed_input_id
                             'btn___flag_important'       => array(
                                 'input_type'  => 'nimblecheck',
-                                'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
+                                'title'       => __( 'Make those style options win if other rules are applied.', 'nimble-builder' ),
                                 'default'     => 0,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -920,10 +920,10 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_simple_form_submission_child',
-        'name' => __( 'Form submission options', 'text_doma' ),
+        'name' => __( 'Form submission options', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
-        //     'button_text' => __('Click me','text_doma'),
+        //     'button_text' => __('Click me','nimble-builder'),
         //     'color_css'  => '#ffffff',
         //     'bg_color_css' => '#020202',
         //     'bg_color_hover' => '#151515', //lighten 15%,
@@ -939,7 +939,7 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                 'recipients' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __('Email recipient', 'text_doma'),
+                    'title'       => __('Email recipient', 'nimble-builder'),
                     'default'     => get_option( 'admin_email' ),
                     'refresh_preview'  => false,
                     'refresh_markup' => false
@@ -947,9 +947,9 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                 'success_message' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __( 'Success message on submission' , 'text_doma' ),
+                    'title'       => __( 'Success message on submission' , 'nimble-builder' ),
                     'title_width' => 'width-100',
-                    'default'     => __( 'Thanks! Your message has been sent.', 'text_doma'),
+                    'default'     => __( 'Thanks! Your message has been sent.', 'nimble-builder'),
                     'refresh_preview'  => false,
                     'refresh_markup' => false,
                     'notice_before' => __('Tip : replace the default messages with a blank space to not show anything.')
@@ -957,26 +957,26 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                 'error_message' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __( 'Error message on submission' , 'text_doma' ),
+                    'title'       => __( 'Error message on submission' , 'nimble-builder' ),
                     'title_width' => 'width-100',
-                    'default'     => __( 'Invalid form submission : some fields have not been entered properly.', 'text_doma'),
+                    'default'     => __( 'Invalid form submission : some fields have not been entered properly.', 'nimble-builder'),
                     'refresh_preview'  => false,
                     'refresh_markup' => false
                 ),
                 'failure_message' => array(
                     'input_type'  => 'text',
                     'width-100'         => true,
-                    'title'       => __( 'Failure message on submission' , 'text_doma' ),
+                    'title'       => __( 'Failure message on submission' , 'nimble-builder' ),
                     'title_width' => 'width-100',
-                    'default'     => __( 'Your message was not sent. Try Again.', 'text_doma'),
+                    'default'     => __( 'Your message was not sent. Try Again.', 'nimble-builder'),
                     'refresh_preview'  => false,
                     'refresh_markup' => false
                 ),
                 'email_footer' => array(
                     'input_type'  => 'code_editor',
-                    'title'       => __( 'Email footer' , 'text_doma' ),
-                    'notice_before' => __('Html code is allowed', 'text-domain'),
-                    'default'     => sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_doma' ),
+                    'title'       => __( 'Email footer' , 'nimble-builder' ),
+                    'notice_before' => __('Html code is allowed', 'nimble-builder'),
+                    'default'     => sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'nimble-builder' ),
                         get_bloginfo( 'name' ),
                         get_site_url( 'url' )
                     ),
@@ -987,22 +987,22 @@ function sek_get_module_params_for_czr_simple_form_submission_child() {
                     'input_type'  => 'simpleselect',
                     'title'       => sprintf( '%s %s',
                         '<i class="material-icons">security</i>',
-                        __('Spam protection with Google reCAPTCHA', 'text_doma')
+                        __('Spam protection with Google reCAPTCHA', 'nimble-builder')
                     ),
                     'title_width' => 'width-100',
                     'width-100'   => true,
                     'default' => 'inherit',
                     'choices'     => array(
-                        'inherit' => __('Inherit the global option', 'text_doma'),
-                        'disabled' => __('Disable', 'text_doma')
+                        'inherit' => __('Inherit the global option', 'nimble-builder'),
+                        'disabled' => __('Disable', 'nimble-builder')
                     ),
                     'refresh_preview'  => false,
                     'refresh_markup' => false,
                     'notice_after' => sprintf( __('Nimble Builder can activate the %1$s service to protect your forms against spam. You need to %2$s.'),
-                        sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-form-module', __('Google reCAPTCHA', 'text_doma') ),
+                        sprintf('<a href="%1$s" target="_blank">%2$s</a>', 'https://docs.presscustomizr.com/article/385-how-to-enable-recaptcha-protection-against-spam-in-your-forms-with-the-nimble-builder/?utm_source=usersite&utm_medium=link&utm_campaign=nimble-form-module', __('Google reCAPTCHA', 'nimble-builder') ),
                         sprintf('<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__globalOptionsSectionId', function( _s_ ){ _s_.focus(); })",
-                            __('activate it in the global settings', 'text_doma')
+                            __('activate it in the global settings', 'nimble-builder')
                         )
                     )
                 )

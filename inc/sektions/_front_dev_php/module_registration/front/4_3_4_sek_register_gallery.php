@@ -13,7 +13,7 @@ function sek_get_module_params_for_czr_gallery_module() {
             'gallery_collec' => 'czr_gallery_collection_child',
             'gallery_opts' => 'czr_gallery_opts_child'
         ),
-        'name' => __('Gallery', 'text_doma'),
+        'name' => __('Gallery', 'nimble-builder'),
         'starting_value' => array(
             'gallery_collec' => array(
                 array( 'img' =>  NIMBLE_BASE_URL . '/assets/img/default-img.png' ),
@@ -68,7 +68,7 @@ function sek_get_module_params_for_czr_gallery_collection_child() {
         'dynamic_registration' => true,
         'module_type' => 'czr_gallery_collection_child',
         'is_crud' => true,
-        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">toc</i> %1$s', __( 'Image collection', 'text_doma' ) ),
+        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">toc</i> %1$s', __( 'Image collection', 'nimble-builder' ) ),
         // 'starting_value' => array(
         //     'custom_caption' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
         // ),
@@ -78,23 +78,23 @@ function sek_get_module_params_for_czr_gallery_collection_child() {
             'pre-item' => array(
                 // 'page-id' => array(
                 //     'input_type'  => 'content_picker',
-                //     'title'       => __('Pick a page', 'text_doma')
+                //     'title'       => __('Pick a page', 'nimble-builder')
                 // ),
                 'img' => array(
                     'input_type'  => 'upload',
-                    'title'       => __('Pick an image', 'text_doma'),
+                    'title'       => __('Pick an image', 'nimble-builder'),
                     'default'     => ''
                 ),
             ),
             'item-inputs' => array(
                 'img' => array(
                     'input_type'  => 'upload',
-                    'title'       => __('Pick an image', 'text_doma'),
+                    'title'       => __('Pick an image', 'nimble-builder'),
                     'default'     => ''
                 ),
                 'custom_caption' => array(
                     'input_type'         => 'text',
-                    'title' => __('Image title displayed as tooltip and in the lightbox popup', 'text_domain_to' ),
+                    'title' => __('Image title displayed as tooltip and in the lightbox popup', 'nimble-builder' ),
                     'default'            => '',
                     'title_width' => 'width-100',
                     'width-100'         => true,
@@ -115,10 +115,10 @@ function sek_get_module_params_for_czr_gallery_opts_child() {
     $main_content_selector = array( '.sek-accord-item .sek-accord-content', '.sek-accord-item .sek-accord-content *' );
     $pro_text = '';
     if ( !sek_is_pro() ) {
-        $pro_text = sprintf( __( '%1$s + cool additional options', 'text-doma'),
+        $pro_text = sprintf( __( '%1$s + cool additional options', 'nimble-builder'),
             sprintf( '<a href="%1$s" target="_blank" rel="noopener noreferrer" style="text-decoration:underline">%2$s</a>',
                 'https://nimblebuilder.com/gallery-examples/#masonry',
-                __('masonry galleries', 'text-doma')
+                __('masonry galleries', 'nimble-builder')
             )
         );
         $pro_text = sek_get_pro_notice_for_czr_input( $pro_text );
@@ -126,10 +126,10 @@ function sek_get_module_params_for_czr_gallery_opts_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_gallery_opts_child',
-        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">tune</i> %1$s', __( 'Gallery options', 'text_doma' ) ),
+        'name' => sprintf('<i class="material-icons" style="font-size: 1.2em;">tune</i> %1$s', __( 'Gallery options', 'nimble-builder' ) ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
-        //     'button_text' => __('Click me','text_doma'),
+        //     'button_text' => __('Click me','nimble-builder'),
         //     'color_css'  => '#ffffff',
         //     'bg_color_css' => '#020202',
         //     'bg_color_hover' => '#151515', //lighten 15%,
@@ -144,15 +144,15 @@ function sek_get_module_params_for_czr_gallery_opts_child() {
             'item-inputs' => array(
                 'img_size' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Select the image size', 'text_doma'),
+                    'title'       => __('Select the image size', 'nimble-builder'),
                     'default'     => 'large',
                     'choices'     => sek_get_select_options_for_input_id( 'img-size' ),
-                    'notice_before' => __('Select a size for this image among those generated by WordPress.', 'text_doma' ),
+                    'notice_before' => __('Select a size for this image among those generated by WordPress.', 'nimble-builder' ),
                     'html_after' => '<hr/>'
                 ),
                 'columns'  => array(
                     'input_type'  => 'range_simple_device_switcher',
-                    'title'       => __( 'Number of columns', 'text_doma' ),
+                    'title'       => __( 'Number of columns', 'nimble-builder' ),
                     'default'     => array( 'desktop' => '3', 'tablet' => '2', 'mobile' => '1' ),
                     'min'         => 1,
                     'max'         => 24,
@@ -165,19 +165,19 @@ function sek_get_module_params_for_czr_gallery_opts_child() {
 
                 'custom-rows-columns' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Define custom row and column dimensions', 'text_doma'),
+                    'title'       => __('Define custom row and column dimensions', 'nimble-builder'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     //'refresh_markup' => true,
                     'refresh_stylesheet' => true,
                     'default'     => 0,
                     'html_before' => '<hr/>'
-                    //'notice_after' => __('When enabled and possible, Nimble will use the post thumbnail.', 'text_doma'),
+                    //'notice_after' => __('When enabled and possible, Nimble will use the post thumbnail.', 'nimble-builder'),
                 ),
 
                 'column_width'  => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Custom column width', 'text_doma' ),
+                    'title'       => __( 'Custom column width', 'nimble-builder' ),
                     'min' => 0,
                     'max' => 1000,
                     'default'     => array( 'desktop' => '200px', 'tablet' => '150px', 'mobile' => '100px' ),
@@ -189,7 +189,7 @@ function sek_get_module_params_for_czr_gallery_opts_child() {
 
                 'raw_height'  => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Custom raw height', 'text_doma' ),
+                    'title'       => __( 'Custom raw height', 'nimble-builder' ),
                     'min' => 0,
                     'max' => 1000,
                     'default'     => array( 'desktop' => '200px', 'tablet' => '150px', 'mobile' => '100px' ),
@@ -201,7 +201,7 @@ function sek_get_module_params_for_czr_gallery_opts_child() {
 
                 'column_gap'  => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Space between columns', 'text_doma' ),
+                    'title'       => __( 'Space between columns', 'nimble-builder' ),
                     'min' => 0,
                     'max' => 100,
                     'default'     => array( 'desktop' => '5px' ),
@@ -214,7 +214,7 @@ function sek_get_module_params_for_czr_gallery_opts_child() {
 
                 'row_gap'  => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Space between rows', 'text_doma' ),
+                    'title'       => __( 'Space between rows', 'nimble-builder' ),
                     'min' => 0,
                     'max' => 100,
                     'default'     => array( 'desktop' => '5px' ),
@@ -226,23 +226,23 @@ function sek_get_module_params_for_czr_gallery_opts_child() {
 
                 'link-to' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Schedule an action on click or tap', 'text_doma'),
+                    'title'       => __('Schedule an action on click or tap', 'nimble-builder'),
                     'default'     => 'img-lightbox',
                     'choices'     => array(
-                        'no-link' => __('No click action', 'text_doma' ),
-                        'img-lightbox' =>__('Lightbox : enlarge the image, and dim out the rest of the content', 'text_doma' ),
-                        'img-file' => __('Link to image file', 'text_doma' ),
-                        'img-page' =>__('Link to image page', 'text_doma' )
+                        'no-link' => __('No click action', 'nimble-builder' ),
+                        'img-lightbox' =>__('Lightbox : enlarge the image, and dim out the rest of the content', 'nimble-builder' ),
+                        'img-file' => __('Link to image file', 'nimble-builder' ),
+                        'img-page' =>__('Link to image page', 'nimble-builder' )
                     ),
                     'title_width' => 'width-100',
                     'width-100'   => true,
-                    'notice_after' => __('Note that some click actions are disabled during customization.', 'text_doma' ),
+                    'notice_after' => __('Note that some click actions are disabled during customization.', 'nimble-builder' ),
                     'html_before' => '<hr/>'
                 ),
 
                 'link-target' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Open link in a new browser tab', 'text_doma'),
+                    'title'       => __('Open link in a new browser tab', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',

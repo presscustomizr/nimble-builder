@@ -8,7 +8,7 @@ function sek_get_module_params_for_czr_map_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_map_module',
-        'name' => __('Map', 'text_doma'),
+        'name' => __('Map', 'nimble-builder'),
         // 'sanitize_callback' => '\Nimble\sanitize_callback__czr_gmap_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         //'css_selectors' => array( '.sek-module-inner' ),
@@ -21,13 +21,13 @@ function sek_get_module_params_for_czr_map_module() {
             'item-inputs' => array(
                 'address' => array(
                     'input_type'  => 'text',
-                    'title'       => __( 'Address', 'text_doma'),
+                    'title'       => __( 'Address', 'nimble-builder'),
                     'width-100'   => true,
                     'default'    => '',
                 ),
                 'zoom' => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Zoom', 'text_doma' ),
+                    'title'       => __( 'Zoom', 'nimble-builder' ),
                     'min' => 1,
                     'max' => 20,
                     'unit' => '',
@@ -36,7 +36,7 @@ function sek_get_module_params_for_czr_map_module() {
                 ),
                 'height_css' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Height', 'text_doma' ),
+                    'title'       => __( 'Height', 'nimble-builder' ),
                     'min' => 1,
                     'max' => 600,
                     'default'     => array( 'desktop' => '200px' ),
@@ -49,13 +49,13 @@ function sek_get_module_params_for_czr_map_module() {
                 ),
                 'lazyload' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Lazy load', 'text_doma'),
+                    'title'       => __('Lazy load', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'notice_after' => sprintf('%1$s <br/><strong>%2$s</strong>',
-                        __( 'With the lazy load option enabled, Nimble loads the map when it becomes visible while scrolling. This improves your page load performances.', 'text_dom'),
-                        __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'text_dom')
+                        __( 'With the lazy load option enabled, Nimble loads the map when it becomes visible while scrolling. This improves your page load performances.', 'nimble-builder'),
+                        __( 'If you use a cache plugin, make sure that this option does not conflict with your caching options.', 'nimble-builder')
                     ),
                 )
             )

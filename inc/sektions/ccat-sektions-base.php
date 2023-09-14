@@ -2074,7 +2074,7 @@ function sek_add_css_rules_for_css_sniffed_input_id( $rules, $params ) {
 // Example of a *_flag_important input:
 // 'quote___flag_important'       => array(
 //     'input_type'  => 'nimblecheck',
-//     'title'       => __( 'Make those style options win if other rules are applied.', 'text_doma' ),
+//     'title'       => __( 'Make those style options win if other rules are applied.', 'nimble-builder' ),
 //     'default'     => 0,
 //     'refresh_markup' => false,
 //     'refresh_stylesheet' => true,
@@ -2439,7 +2439,7 @@ if ( !class_exists( 'SEK_Front_Construct' ) ) :
             );
             for ( $i=1; $i < ( intval( $number_of_widgets) + 1 ); $i++ ) {
                 $args['id'] = NIMBLE_WIDGET_PREFIX . $i;//'nimble-widget-area-'
-                $args['name'] = sprintf( __('Nimble widget area #%1$s', 'text_domain_to_replace' ), $i );
+                $args['name'] = sprintf( __('Nimble widget area #%1$s', 'nimble-builder' ), $i );
                 $args['description'] = $args['name'];
                 $args = wp_parse_args( $args, $defaults );
                 register_sidebar( $args );
@@ -3657,25 +3657,25 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                 'sekPreviewLocalized',
                 array(
                     'i18n' => array(
-                        "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_doma'),
-                        "Moving elements between global and local sections is not allowed." => __( "Moving elements between global and local sections is not allowed.", 'text_doma'),
-                        'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_doma'),
-                        'Insert here' => __('Insert here', 'text_doma'),
-                        'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'text_domain' ),
+                        "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'nimble-builder'),
+                        "Moving elements between global and local sections is not allowed." => __( "Moving elements between global and local sections is not allowed.", 'nimble-builder'),
+                        'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'nimble-builder'),
+                        'Insert here' => __('Insert here', 'nimble-builder'),
+                        'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'nimble-builder' ),
 
-                        'Insert a new section' => __('Insert a new section', 'text_doma' ),
-                        '@location' => __('@location', 'text_domain_to_be'),
-                        'Insert a new global section' => __('Insert a new global section', 'text_doma' ),
+                        'Insert a new section' => __('Insert a new section', 'nimble-builder' ),
+                        '@location' => __('@location', 'nimble-builder'),
+                        'Insert a new global section' => __('Insert a new global section', 'nimble-builder' ),
 
-                        'section' => __('section', 'text_doma'),
-                        'header section' => __('header section', 'text_doma'),
-                        'footer section' => __('footer section', 'text_doma'),
-                        '(global)' => __('(global)', 'text_doma'),
-                        'nested section' => __('nested section', 'text_doma'),
+                        'section' => __('section', 'nimble-builder'),
+                        'header section' => __('header section', 'nimble-builder'),
+                        'footer section' => __('footer section', 'nimble-builder'),
+                        '(global)' => __('(global)', 'nimble-builder'),
+                        'nested section' => __('nested section', 'nimble-builder'),
 
-                        'Shift-click to visit the link' => __('Shift-click to visit the link', 'text_doma'),
-                        'External links are disabled when customizing' => __('External links are disabled when customizing', 'text_doma'),
-                        'Link deactivated while previewing' => __('Link deactivated while previewing', 'text_doma')
+                        'Shift-click to visit the link' => __('Shift-click to visit the link', 'nimble-builder'),
+                        'External links are disabled when customizing' => __('External links are disabled when customizing', 'nimble-builder'),
+                        'Link deactivated while previewing' => __('Link deactivated while previewing', 'nimble-builder')
                     ),
                     'isDevMode' => sek_is_dev_mode(),
                     'isPreviewUIDebugMode' => isset( $_GET['preview_ui_debug'] ) || NIMBLE_IS_PREVIEW_UI_DEBUG_MODE,
@@ -3746,32 +3746,32 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                         <?php
                           // Code before implementing https://github.com/presscustomizr/nimble-builder/issues/521 :
                           /* <# if ( true !== data.is_first_section_in_parent ) { #>
-                          <i data-sek-click-on="move-section-up" class="material-icons sek-click-on" title="<?php _e( 'Move section up', 'text_domain' ); ?>">keyboard_arrow_up</i>
+                          <i data-sek-click-on="move-section-up" class="material-icons sek-click-on" title="<?php _e( 'Move section up', 'nimble-builder' ); ?>">keyboard_arrow_up</i>
                         <# } #>
                         <# if ( true !== data.is_last_section_in_parent ) { #>
-                          <i data-sek-click-on="move-section-down" class="material-icons sek-click-on" title="<?php _e( 'Move section down', 'text_domain' ); ?>">keyboard_arrow_down</i>
+                          <i data-sek-click-on="move-section-down" class="material-icons sek-click-on" title="<?php _e( 'Move section down', 'nimble-builder' ); ?>">keyboard_arrow_down</i>
                         <# } #>*/
                         ?>
-                        <i data-sek-click-on="move-section-up" class="material-icons sek-click-on" title="<?php _e( 'Move section up', 'text_domain' ); ?>">keyboard_arrow_up</i>
-                        <i data-sek-click-on="move-section-down" class="material-icons sek-click-on" title="<?php _e( 'Move section down', 'text_domain' ); ?>">keyboard_arrow_down</i>
+                        <i data-sek-click-on="move-section-up" class="material-icons sek-click-on" title="<?php _e( 'Move section up', 'nimble-builder' ); ?>">keyboard_arrow_up</i>
+                        <i data-sek-click-on="move-section-down" class="material-icons sek-click-on" title="<?php _e( 'Move section down', 'nimble-builder' ); ?>">keyboard_arrow_down</i>
 
 
                         <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it draggable for the moment. @todo ?>
                         <# if ( !data.is_nested ) { #>
                           <# if ( true !== data.is_global_location ) { #>
-                            <i class="fas fa-arrows-alt sek-move-section" title="<?php _e( 'Drag section', 'text_domain' ); ?>"></i>
+                            <i class="fas fa-arrows-alt sek-move-section" title="<?php _e( 'Drag section', 'nimble-builder' ); ?>"></i>
                            <# } #>
                         <# } #>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>">tune</i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit section settings', 'nimble-builder' ); ?>">tune</i>
                         <# if ( data.can_have_more_columns ) { #>
-                          <i data-sek-click-on="add-column" class="material-icons sek-click-on" title="<?php _e( 'Add a column', 'text_domain' ); ?>">view_column</i>
+                          <i data-sek-click-on="add-column" class="material-icons sek-click-on" title="<?php _e( 'Add a column', 'nimble-builder' ); ?>">view_column</i>
                         <# } #>
-                        <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate section', 'text_domain' ); ?>">filter_none</i>
-                        <i data-sek-click-on="toggle-save-section-ui" class="sek-save far fa-save" title="<?php _e( 'Save this section', 'text_domain' ); ?>"></i>
-                        <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'text_domain' ); ?>">delete_forever</i>
+                        <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate section', 'nimble-builder' ); ?>">filter_none</i>
+                        <i data-sek-click-on="toggle-save-section-ui" class="sek-save far fa-save" title="<?php _e( 'Save this section', 'nimble-builder' ); ?>"></i>
+                        <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'nimble-builder' ); ?>">delete_forever</i>
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>
-                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>">
+                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'nimble-builder' ); ?>">
                       <div class="sek-dyn-ui-location-inner">
                         <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
                           <div class="sek-ham__toggler-spn-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
@@ -3789,7 +3789,7 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                         #>
                         <div class="sek-dyn-ui-level-type">{{section_title}}</div>
                       </div><?php // .sek-dyn-ui-location-inner ?>
-                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'text-domain'); ?>"><i class="far fa-eye-slash"></i></div>
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'nimble-builder'); ?>"><i class="far fa-eye-slash"></i></div>
                     </div><?php // .sek-dyn-ui-location-type ?>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
@@ -3805,29 +3805,29 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                   <div class="sek-dyn-ui-wrapper sek-column-dyn-ui {{has_nested_section_class}}">
                     <div class="sek-dyn-ui-inner <?php echo esc_attr($icon_right_side_class); ?>">
                       <div class="sek-dyn-ui-icons">
-                        <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move column', 'text_domain' ); ?>"></i>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>">tune</i>
+                        <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move column', 'nimble-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit column settings', 'nimble-builder' ); ?>">tune</i>
                         <# if ( !data.parent_is_last_allowed_nested ) { #>
-                          <i data-sek-click-on="add-section" class="material-icons sek-click-on" title="<?php _e( 'Add a nested section', 'text_domain' ); ?>">account_balance_wallet</i>
+                          <i data-sek-click-on="add-section" class="material-icons sek-click-on" title="<?php _e( 'Add a nested section', 'nimble-builder' ); ?>">account_balance_wallet</i>
                         <# } #>
                         <# if ( data.parent_can_have_more_columns ) { #>
-                          <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate column', 'text_domain' ); ?>">filter_none</i>
+                          <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate column', 'nimble-builder' ); ?>">filter_none</i>
                         <# } #>
 
-                        <i data-sek-click-on="pick-content" data-sek-content-type="module" class="material-icons sek-click-on" title="<?php _e( 'Add a module', 'text_domain' ); ?>">add_circle_outline</i>
+                        <i data-sek-click-on="pick-content" data-sek-content-type="module" class="material-icons sek-click-on" title="<?php _e( 'Add a module', 'nimble-builder' ); ?>">add_circle_outline</i>
                         <# if ( !data.parent_is_single_column ) { #>
-                          <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove column', 'text_domain' ); ?>">delete_forever</i>
+                          <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove column', 'nimble-builder' ); ?>">delete_forever</i>
                         <# } #>
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>
 
-                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>">
-                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'text-domain'); ?>"><i class="far fa-eye-slash"></i></div>
+                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit column settings', 'nimble-builder' ); ?>">
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'nimble-builder'); ?>"><i class="far fa-eye-slash"></i></div>
                       <div class="sek-dyn-ui-location-inner">
                         <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
                           <div class="sek-ham__toggler-spn-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
                         </div>
-                        <div class="sek-dyn-ui-level-type"><?php _e( 'column', 'text_domain' ); ?></div>
+                        <div class="sek-dyn-ui-level-type"><?php _e( 'column', 'nimble-builder' ); ?></div>
                       </div><?php // .sek-dyn-ui-location-inner ?>
                     </div><?php // .sek-dyn-ui-location-type ?>
                   </div><?php // .sek-dyn-ui-wrapper ?>
@@ -3837,24 +3837,24 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                   <div class="sek-dyn-ui-wrapper sek-module-dyn-ui">
                     <div class="sek-dyn-ui-inner <?php echo esc_attr($icon_left_side_class); ?>">
                       <div class="sek-dyn-ui-icons">
-                        <i class="fas fa-arrows-alt sek-move-module" title="<?php _e( 'Move module', 'text_domain' ); ?>"></i>
-                        <i data-sek-click-on="edit-module" class="fas fa-pencil-alt sek-tip sek-click-on" title="<?php _e( 'Edit module content', 'text_domain' ); ?>"></i>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit module settings', 'text_domain' ); ?>">tune</i>
-                        <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate module', 'text_domain' ); ?>">filter_none</i>
-                        <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove module', 'text_domain' ); ?>">delete_forever</i>
+                        <i class="fas fa-arrows-alt sek-move-module" title="<?php _e( 'Move module', 'nimble-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-module" class="fas fa-pencil-alt sek-tip sek-click-on" title="<?php _e( 'Edit module content', 'nimble-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit module settings', 'nimble-builder' ); ?>">tune</i>
+                        <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate module', 'nimble-builder' ); ?>">filter_none</i>
+                        <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove module', 'nimble-builder' ); ?>">delete_forever</i>
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>
                     <#
                       var module_name = !_.isEmpty( data.module_name ) ? data.module_name + ' ' + '<?php _e("module", "text_domain"); ?>' : '<?php _e("module", "text_domain"); ?>';
                     #>
-                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-module" title="<?php _e( 'Edit module settings', 'text_domain' ); ?>">
+                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-module" title="<?php _e( 'Edit module settings', 'nimble-builder' ); ?>">
                       <div class="sek-dyn-ui-location-inner">
                         <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
                           <div class="sek-ham__toggler-spn-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
                         </div>
                         <div class="sek-dyn-ui-level-type">{{module_name}}</div>
                       </div>
-                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'text-domain'); ?>"><i class="far fa-eye-slash"></i></div>
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'nimble-builder'); ?>"><i class="far fa-eye-slash"></i></div>
                     </div>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
@@ -3863,12 +3863,12 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                   <div class="sek-dyn-ui-wrapper sek-wp-content-dyn-ui">
                     <div class="sek-dyn-ui-inner">
                       <div class="sek-dyn-ui-icons">
-                        <i class="fas fa-pencil-alt sek-edit-wp-content" title="<?php _e( 'Edit this WordPress content', 'text_domain' ); ?>"></i>
+                        <i class="fas fa-pencil-alt sek-edit-wp-content" title="<?php _e( 'Edit this WordPress content', 'nimble-builder' ); ?>"></i>
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>
 
-                    <span class="sek-dyn-ui-location-type" title="<?php _e( 'Edit module settings', 'text_domain' ); ?>">
-                      <i class="fab fa-wordpress sek-edit-wp-content" title="<?php _e( 'Edit this WordPress content', 'text_domain' ); ?>"> <?php _e( 'WordPress content', 'text_domain'); ?></i>
+                    <span class="sek-dyn-ui-location-type" title="<?php _e( 'Edit module settings', 'nimble-builder' ); ?>">
+                      <i class="fab fa-wordpress sek-edit-wp-content" title="<?php _e( 'Edit this WordPress content', 'nimble-builder' ); ?>"> <?php _e( 'WordPress content', 'nimble-builder'); ?></i>
                     </span>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
@@ -3972,7 +3972,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                       $post->ID,
                       // we can't rely on the get_edit_post_link() function when customizing because emptied by wp core
                       $this->get_unfiltered_edit_post_link( $post->ID ),
-                      __( 'WordPress content', 'text_domain'),
+                      __( 'WordPress content', 'nimble-builder'),
                       wpautop( $html )
                 );
             }
@@ -4401,7 +4401,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             }
             switch( $input_id ) {
                 case 'html_content' :
-                  $ph = skp_is_customizing() ? sprintf('<pre>%1$s<br/>%2$s</pre>', __('Html code goes here', 'text-domain'), __('Click to edit', 'here') ) : '';
+                  $ph = skp_is_customizing() ? sprintf('<pre>%1$s<br/>%2$s</pre>', __('Html code goes here', 'nimble-builder'), __('Click to edit', 'here') ) : '';
                 break;
             }
             if ( skp_is_customizing() ) {
@@ -4760,7 +4760,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
 
                     if ( !empty( $tagnames ) ) {
                     $content = sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>%2$s',
-                        __('Shortcodes are not parsed by default when customizing. You can change this setting in your WP admin > Settings > Nimble Builder options.', 'text-doma'),
+                        __('Shortcodes are not parsed by default when customizing. You can change this setting in your WP admin > Settings > Nimble Builder options.', 'nimble-builder'),
                         $content
                     );
                     }
@@ -5194,7 +5194,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 }
             // 2) for other plugins, if not printed already, print a default fitrable message
             } else if ( !did_action('nimble_after_restricted_content_html') ) {
-                echo apply_filters('nimble_restricted_content_html', sprintf( '<p>%1$s</p>', __('You need to login to view this content.', 'text_doma') ) );
+                echo apply_filters('nimble_restricted_content_html', sprintf( '<p>%1$s</p>', __('You need to login to view this content.', 'nimble-builder') ) );
                 do_action('nimble_after_restricted_content_html');
             }
         }
@@ -5464,31 +5464,31 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 'value'           => ''
             ),
             'nimble_name' => array(
-                'label'            => __( 'Name', 'text_doma' ),
+                'label'            => __( 'Name', 'nimble-builder' ),
                 'required'         => true,
                 'type'             => 'text',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_email' => array(
-                'label'            => __( 'Email', 'text_doma' ),
+                'label'            => __( 'Email', 'nimble-builder' ),
                 'required'         => true,
                 'type'             => 'email',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_subject' => array(
-                'label'            => __( 'Subject', 'text_doma' ),
+                'label'            => __( 'Subject', 'nimble-builder' ),
                 'type'             => 'text',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_message' => array(
-                'label'            => __( 'Message', 'text_doma' ),
+                'label'            => __( 'Message', 'nimble-builder' ),
                 'required'         => true,
                 'additional_attrs' => array( 'rows' => "10", 'cols' => "50" ),
                 'type'             => 'textarea',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_privacy' => array(
-                'label'            => __( 'I have read and agree to the privacy policy.', 'text_doma' ),
+                'label'            => __( 'I have read and agree to the privacy policy.', 'nimble-builder' ),
                 'type'             => 'checkbox',
                 'required'         => true,
                 'value'            => false,
@@ -5498,7 +5498,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             ),
             'nimble_submit' => array(
                 'type'             => 'submit',
-                'value'            => __( 'Submit', 'text_doma' ),
+                'value'            => __( 'Submit', 'nimble-builder' ),
                 'additional_attrs' => array( 'class' => 'sek-btn' ),
                 'wrapper_tag'      => 'div',
                 'wrapper_class'    => array( 'sek-form-field', 'sek-form-btn-wrapper' )
@@ -6009,7 +6009,7 @@ class Sek_Field {
         if ( $label ) {
             if ( true == $this->input->get_data( 'required' ) ) {
                 $label .= ' *';
-                //$label .= ' ' . esc_html__( '(required)', 'text_doma' );
+                //$label .= ' ' . esc_html__( '(required)', 'nimble-builder' );
             }
             $label = sprintf( '%1$s<label for="%2$s">%3$s</label>%4$s',
                 $this->data[ 'before_label' ],
@@ -6133,7 +6133,7 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
                     $value = '';
                 break;
                 // case 'nimble_message' :
-                //     $value = __('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.', 'text-domain');
+                //     $value = __('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.', 'nimble-builder');
                 // break;
             }
         }
@@ -6301,7 +6301,7 @@ class Sek_Input_Submit extends Sek_Input_Basic {
         $args             = is_array( $args ) ? $args : array();
         $args[ 'type' ]   = 'submit';
         $args             = wp_parse_args($args, [
-            'value' => esc_html__( 'Contact', 'text_doma' ),
+            'value' => esc_html__( 'Contact', 'nimble-builder' ),
         ]);
 
         parent::__construct( $args );
@@ -6361,9 +6361,9 @@ class Sek_Mailer {
 
         $this->messages = array(
             //status          => message
-            //'not_sent'        => __( 'Message was not sent. Try Again.', 'text_doma'),
-            //'sent'            => __( 'Thanks!Your message has been sent.', 'text_doma'),
-            'aborted'         => __( 'Please supply correct information.', 'text_doma') //<-todo too much generic
+            //'not_sent'        => __( 'Message was not sent. Try Again.', 'nimble-builder'),
+            //'sent'            => __( 'Thanks!Your message has been sent.', 'nimble-builder'),
+            'aborted'         => __( 'Please supply correct information.', 'nimble-builder') //<-todo too much generic
         );
         $this->status = 'init';
 
@@ -6438,7 +6438,7 @@ class Sek_Mailer {
 
             $is_valid = $is_human = $user_score_threshold < $score;
             if ( !$is_valid ) {
-                $this->recaptcha_errors = sprintf( __('Google reCAPTCHA returned a score of %s, which is lower than your threshold of %s.', 'text_dom' ), $score, $user_score_threshold );
+                $this->recaptcha_errors = sprintf( __('Google reCAPTCHA returned a score of %s, which is lower than your threshold of %s.', 'nimble-builder' ), $score, $user_score_threshold );
             }
         }
 
@@ -6476,7 +6476,7 @@ class Sek_Mailer {
 
         // Define a default sender name + make sure the field exists
         // fixes https://github.com/presscustomizr/nimble-builder/issues/513
-        $sender_name    = __('Someone', 'text_doma');
+        $sender_name    = __('Someone', 'nimble-builder');
         $sender_name_is_set = false;
         if ( is_array( $form_composition ) && array_key_exists( 'nimble_name', $form_composition ) ) {
             $sender_name_candidate  = sprintf( '%1$s', $this->form->get_field('nimble_name')->get_input()->get_value() );
@@ -6497,22 +6497,22 @@ class Sek_Mailer {
         if ( array_key_exists( 'nimble_subject' , $form_composition ) ) {
             $subject = $this->form->get_field('nimble_subject')->get_input()->get_value();
         } else if ( $sender_name_is_set ) {
-            $subject = sprintf( __( '%1$s sent a message from %2$s', 'text_doma' ), $sender_name, get_bloginfo( 'name' ) );
+            $subject = sprintf( __( '%1$s sent a message from %2$s', 'nimble-builder' ), $sender_name, get_bloginfo( 'name' ) );
         } else {
-            $subject = sprintf( __( 'Someone sent a message from %1$s', 'text_doma' ), get_bloginfo( 'name' ) );
+            $subject = sprintf( __( 'Someone sent a message from %1$s', 'nimble-builder' ), get_bloginfo( 'name' ) );
         }
 
 
 
-        // $sender_website = sprintf( __( 'Website: %1$s %2$s', 'text_doma' ),
+        // $sender_website = sprintf( __( 'Website: %1$s %2$s', 'nimble-builder' ),
         //     $this->form->get_field('website')->get_input()->get_value(),
         //     $allow_html ? '<br><br><br>': "\r\n\r\n\r\n"
         // );
 
         // the sender's email is written in the email's header reply-to field.
         // But it is also written inside the message body following this issue, https://github.com/presscustomizr/nimble-builder/issues/218
-        $before_message = sprintf( '%1$s: %2$s &lt;%3$s&gt;', __('From', 'text_doma'), $sender_name, $sender_email );//$sender_website;
-        $before_message .= sprintf( '<br>%1$s: %2$s', __('Subject', 'text_doma'), $subject );
+        $before_message = sprintf( '%1$s: %2$s &lt;%3$s&gt;', __('From', 'nimble-builder'), $sender_name, $sender_email );//$sender_website;
+        $before_message .= sprintf( '<br>%1$s: %2$s', __('Subject', 'nimble-builder'), $subject );
         $after_message  = '';
 
         if ( array_key_exists( 'email_footer', $submission_options ) ) {
@@ -6522,7 +6522,7 @@ class Sek_Mailer {
             $email_footer = sek_maybe_decode_richtext( $submission_options['email_footer'] );
             $email_footer = sek_strip_script_tags( $email_footer );
         } else {
-            $email_footer = sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_doma' ),
+            $email_footer = sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'nimble-builder' ),
                 get_bloginfo( 'name' ),
                 get_site_url( 'url' )
             );
@@ -6530,7 +6530,7 @@ class Sek_Mailer {
 
         if ( !empty( $sender_body_message ) ) {
             $sender_body_message = sprintf( '<br><br>%1$s: <br>%2$s',
-                __('Message body', 'text_doma'),
+                __('Message body', 'nimble-builder'),
                 //$allow_html ? '<br><br>': "\r\n\r\n",
                 $sender_body_message
             );
@@ -6586,7 +6586,7 @@ class Sek_Mailer {
                     $submission_message = $submission_options['error_message'];
                 }
                 if ( false !== $this->invalid_field ) {
-                    $submission_message = sprintf( __( '%1$s : <strong>%2$s</strong>.', 'text-domain' ), $submission_message, $this->invalid_field );
+                    $submission_message = sprintf( __( '%1$s : <strong>%2$s</strong>.', 'nimble-builder' ), $submission_message, $this->invalid_field );
                 }
             break;
             case 'recaptcha_fail' :
@@ -6599,7 +6599,7 @@ class Sek_Mailer {
         }
 
         if ( '_no_error_' !== $this->recaptcha_errors && current_user_can( 'customize' ) ) {
-              $submission_message .= sprintf( '<br/>%s : <i>%s</i>', __('reCAPTCHA problem (only visible by a logged in administrator )', 'text_doma'), $this->recaptcha_errors );
+              $submission_message .= sprintf( '<br/>%s : <i>%s</i>', __('reCAPTCHA problem (only visible by a logged in administrator )', 'nimble-builder'), $this->recaptcha_errors );
         }
         return $submission_message;
     }
@@ -6644,23 +6644,23 @@ endif;
 function sek_simple_form_mail_template() {
     $template = array(
         'subject' =>
-            sprintf( __( '%1$s: new contact request', 'text_doma' ),
+            sprintf( __( '%1$s: new contact request', 'nimble-builder' ),
                 get_bloginfo( 'name' )
             ),
         'sender' => sprintf( '[your-name] <%s>', simple_form_from_email() ),
         'body' =>
             /* translators: %s: [your-name] <[your-email]> */
-            sprintf( __( 'From: %s', 'text_doma' ),
+            sprintf( __( 'From: %s', 'nimble-builder' ),
                 '[your-name] <[your-email]>' ) . "\n"
             /* translators: %s: [your-subject] */
-            . sprintf( __( 'Subject: %s', 'text_doma' ),
+            . sprintf( __( 'Subject: %s', 'nimble-builder' ),
                 '[your-subject]' ) . "\n\n"
-            . __( 'Message Body:', 'text_doma' )
+            . __( 'Message Body:', 'nimble-builder' )
                 . "\n" . '[your-message]' . "\n\n"
             . '-- ' . "\n"
             /* translators: 1: blog name, 2: blog URL */
             . sprintf(
-                __( 'This e-mail was sent from a contact form on %1$s (%2$s)', 'text_doma' ),
+                __( 'This e-mail was sent from a contact form on %1$s (%2$s)', 'nimble-builder' ),
                 get_bloginfo( 'name' ),
                 get_bloginfo( 'url' ) ),
         'recipient' => get_option( 'admin_email' ),

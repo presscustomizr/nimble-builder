@@ -12,7 +12,7 @@ function sek_get_module_params_for_czr_social_icons_module() {
             'icons_collection' => 'czr_social_icons_settings_child',
             'icons_style' => 'czr_social_icons_style_child'
         ),
-        'name' => __('Social Icons', 'text_doma'),
+        'name' => __('Social Icons', 'nimble-builder'),
         'starting_value' => array(
             'icons_collection' => array(
                 array( 'icon' => 'fab fa-facebook', 'color_css' => '#3b5998' ),
@@ -46,54 +46,54 @@ function sek_get_module_params_for_czr_social_icons_settings_child() {
         'dynamic_registration' => true,
         'module_type' => 'czr_social_icons_settings_child',
         'is_crud' => true,
-        'name' => __( 'Icon collection', 'text_doma' ),
+        'name' => __( 'Icon collection', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         'css_selectors' => array( '.sek-social-icon' ),//array( '.sek-icon i' ),
         'tmpl' => array(
             'pre-item' => array(
                 // 'page-id' => array(
                 //     'input_type'  => 'content_picker',
-                //     'title'       => __('Pick a page', 'text_doma')
+                //     'title'       => __('Pick a page', 'nimble-builder')
                 // ),
                 'icon' => array(
                     'input_type'  => 'fa_icon_picker',
-                    'title'       => __('Select an icon', 'text_doma')
+                    'title'       => __('Select an icon', 'nimble-builder')
                 ),
                 'link'  => array(
                     'input_type'  => 'text',
-                    'title'       => __('Social link url', 'text_doma'),
-                    'notice_after'      => __('Enter the full url of your social profile (must be valid url).', 'text_doma'),
-                    'placeholder' => __('http://...,mailto:...,...', 'text_doma')
+                    'title'       => __('Social link url', 'nimble-builder'),
+                    'notice_after'      => __('Enter the full url of your social profile (must be valid url).', 'nimble-builder'),
+                    'placeholder' => __('http://...,mailto:...,...', 'nimble-builder')
                 )
             ),
             'item-inputs' => array(
                 'icon' => array(
                     'input_type'  => 'fa_icon_picker',
-                    'title'       => __('Select an icon', 'text_doma')
+                    'title'       => __('Select an icon', 'nimble-builder')
                 ),
                 'link'  => array(
                     'input_type'  => 'text',
                     'default'     => '',
-                    'title'       => __('Social link url', 'text_doma'),
-                    'notice_after'      => __('Enter the full url of your social profile (must be valid url).', 'text_doma'),
-                    'placeholder' => __('http://...,mailto:...,...', 'text_doma')
+                    'title'       => __('Social link url', 'nimble-builder'),
+                    'notice_after'      => __('Enter the full url of your social profile (must be valid url).', 'nimble-builder'),
+                    'placeholder' => __('http://...,mailto:...,...', 'nimble-builder')
                 ),
                 'title_attr'  => array(
                     'input_type'  => 'text',
                     'default'     => '',
-                    'title'       => __('Title', 'text_domain_to_be_replaced'),
-                    'notice_after'      => __('This is the text displayed on mouse over.', 'text_domain_to_be_replaced'),
+                    'title'       => __('Title', 'nimble-builder'),
+                    'notice_after'      => __('This is the text displayed on mouse over.', 'nimble-builder'),
                 ),
                 'link_target' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Open link in a new browser tab', 'text_doma'),
+                    'title'       => __('Open link in a new browser tab', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Color', 'text_doma'),
+                    'title'       => __('Color', 'nimble-builder'),
                     'width-100'   => true,
                     'default'    => '#707070',
                     'refresh_markup' => false,
@@ -102,7 +102,7 @@ function sek_get_module_params_for_czr_social_icons_settings_child() {
                 ),
                 'use_custom_color_on_hover' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Set a custom icon color on mouse hover', 'text_doma' ),
+                    'title'       => __( 'Set a custom icon color on mouse hover', 'nimble-builder' ),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
@@ -111,7 +111,7 @@ function sek_get_module_params_for_czr_social_icons_settings_child() {
                 ),
                 'social_color_hover' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __('Hover color', 'text_doma'),
+                    'title'       => __('Hover color', 'nimble-builder'),
                     'width-100'   => true,
                     'default'    => '#969696',
                     'refresh_markup' => false,
@@ -132,10 +132,10 @@ function sek_get_module_params_for_czr_social_icons_style_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_social_icons_style_child',
-        'name' => __( 'Design options : size, spacing, alignment,...', 'text_doma' ),
+        'name' => __( 'Design options : size, spacing, alignment,...', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
-        //     'button_text' => __('Click me','text_doma'),
+        //     'button_text' => __('Click me','nimble-builder'),
         //     'color_css'  => '#ffffff',
         //     'bg_color_css' => '#020202',
         //     'bg_color_hover' => '#151515', //lighten 15%,
@@ -150,7 +150,7 @@ function sek_get_module_params_for_czr_social_icons_style_child() {
             'item-inputs' => array(
                 'font_size_css'       => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Icons size', 'text_doma' ),
+                    'title'       => __( 'Icons size', 'nimble-builder' ),
                     // the default value is commented to fix https://github.com/presscustomizr/nimble-builder/issues/313
                     // => as a consequence, when a module uses the font child module, the default font-size rule must be defined in the module SCSS file.
                     //'default'     => array( 'desktop' => '16px' ),
@@ -165,7 +165,7 @@ function sek_get_module_params_for_czr_social_icons_style_child() {
                 ),//16,//"14px",
                 'line_height_css'     => array(
                     'input_type'  => 'range_with_unit_picker',
-                    'title'       => __( 'Line height', 'text_doma' ),
+                    'title'       => __( 'Line height', 'nimble-builder' ),
                     'default'     => '1.5em',
                     'min' => 0,
                     'max' => 10,
@@ -178,7 +178,7 @@ function sek_get_module_params_for_czr_social_icons_style_child() {
                 ),//24,//"20px",
                 'h_alignment_css'        => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'              => __( 'Horizontal alignment', 'text_doma' ),
+                    'title'              => __( 'Horizontal alignment', 'nimble-builder' ),
                     'default'     => array( 'desktop' => 'center' ),//consistent with SCSS
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
@@ -189,7 +189,7 @@ function sek_get_module_params_for_czr_social_icons_style_child() {
                 ),
                 'space_between_icons' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Space between icons', 'text_doma'),
+                    'title'       => __('Space between icons', 'nimble-builder'),
                     'min' => 1,
                     'max' => 100,
                     //'unit' => 'px',
@@ -201,7 +201,7 @@ function sek_get_module_params_for_czr_social_icons_style_child() {
                 ),
                 'spacing_css'     => array(
                     'input_type'  => 'spacingWithDeviceSwitcher',
-                    'title'       => __( 'Spacing of the icons wrapper', 'text_doma' ),
+                    'title'       => __( 'Spacing of the icons wrapper', 'nimble-builder' ),
                     'default'     => array('desktop' => array('margin-bottom' => '10', 'margin-top' => '10', 'unit' => 'px')),//consistent with SCSS
                     'title_width' => 'width-100',
                     'width-100'   => true,

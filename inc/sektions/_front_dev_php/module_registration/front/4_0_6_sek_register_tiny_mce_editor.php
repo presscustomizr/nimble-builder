@@ -12,7 +12,7 @@ function sek_get_module_params_for_czr_tiny_mce_editor_module() {
             'main_settings'   => 'czr_tinymce_child',
             'font_settings' => 'czr_font_child'
         ),
-        'name' => __('Text Editor', 'text_doma'),
+        'name' => __('Text Editor', 'nimble-builder'),
         'starting_value' => array(
             'main_settings' => array(
                 'content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.'
@@ -55,20 +55,20 @@ function sek_get_module_params_for_czr_tinymce_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_tinymce_child',
-        'name' => __('Content', 'text_doma'),
+        'name' => __('Content', 'nimble-builder'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
                 'content' => array(
                     'input_type'  => 'detached_tinymce_editor',
-                    'title'       => __('Content', 'text_doma'),
+                    'title'       => __('Content', 'nimble-builder'),
                     'default'     => '',
                     'refresh_markup' => '.sek-module-inner [data-sek-input-type="detached_tinymce_editor"]',
                 ),
                 'h_alignment_css' => array(
                     'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
-                    'title'       => __('Alignment', 'text_doma'),
+                    'title'       => __('Alignment', 'nimble-builder'),
                     'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -78,11 +78,11 @@ function sek_get_module_params_for_czr_tinymce_child() {
                 ),
                 'autop' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Automatically convert text into paragraph', 'text_doma'),
+                    'title'       => __('Automatically convert text into paragraph', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after' => __('WordPress wraps the editor text inside "p" tags by default. You can disable this behaviour by unchecking this option.', 'text-domain')
+                    'notice_after' => __('WordPress wraps the editor text inside "p" tags by default. You can disable this behaviour by unchecking this option.', 'nimble-builder')
                 ),
             )
         ),

@@ -94,7 +94,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                       $post->ID,
                       // we can't rely on the get_edit_post_link() function when customizing because emptied by wp core
                       $this->get_unfiltered_edit_post_link( $post->ID ),
-                      __( 'WordPress content', 'text_domain'),
+                      __( 'WordPress content', 'nimble-builder'),
                       wpautop( $html )
                 );
             }
@@ -523,7 +523,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             }
             switch( $input_id ) {
                 case 'html_content' :
-                  $ph = skp_is_customizing() ? sprintf('<pre>%1$s<br/>%2$s</pre>', __('Html code goes here', 'text-domain'), __('Click to edit', 'here') ) : '';
+                  $ph = skp_is_customizing() ? sprintf('<pre>%1$s<br/>%2$s</pre>', __('Html code goes here', 'nimble-builder'), __('Click to edit', 'here') ) : '';
                 break;
             }
             if ( skp_is_customizing() ) {
@@ -882,7 +882,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
 
                     if ( !empty( $tagnames ) ) {
                     $content = sprintf('<div class="nimble-notice-in-preview"><i class="fas fa-info-circle"></i>&nbsp;%1$s</div>%2$s',
-                        __('Shortcodes are not parsed by default when customizing. You can change this setting in your WP admin > Settings > Nimble Builder options.', 'text-doma'),
+                        __('Shortcodes are not parsed by default when customizing. You can change this setting in your WP admin > Settings > Nimble Builder options.', 'nimble-builder'),
                         $content
                     );
                     }
@@ -1316,7 +1316,7 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                 }
             // 2) for other plugins, if not printed already, print a default fitrable message
             } else if ( !did_action('nimble_after_restricted_content_html') ) {
-                echo apply_filters('nimble_restricted_content_html', sprintf( '<p>%1$s</p>', __('You need to login to view this content.', 'text_doma') ) );
+                echo apply_filters('nimble_restricted_content_html', sprintf( '<p>%1$s</p>', __('You need to login to view this content.', 'nimble-builder') ) );
                 do_action('nimble_after_restricted_content_html');
             }
         }

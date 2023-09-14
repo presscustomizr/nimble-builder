@@ -226,8 +226,8 @@ final class _NIMBLE_Editors {
 
     // Detached WP Editor => added when coding https://github.com/presscustomizr/nimble-builder/issues/403
     echo '<div id="czr-customize-content_editor-pane">';
-    printf('<div data-czr-action="close-tinymce-editor" class="czr-close-editor"><i class="fas fa-arrow-circle-down" title="%1$s"></i>&nbsp;<span>%2$s</span></div>', __( 'Hide Editor', 'text_doma' ), __( 'Hide Editor', 'text_doma'));
-      printf('<div id="czr-customize-content_editor-dragbar" title="%1$s">', __('Resize the editor', 'text_domain'));
+    printf('<div data-czr-action="close-tinymce-editor" class="czr-close-editor"><i class="fas fa-arrow-circle-down" title="%1$s"></i>&nbsp;<span>%2$s</span></div>', __( 'Hide Editor', 'nimble-builder' ), __( 'Hide Editor', 'nimble-builder'));
+      printf('<div id="czr-customize-content_editor-dragbar" title="%1$s">', __('Resize the editor', 'nimble-builder'));
         printf('<span class="screen-reader-text">%1$s</span>', __( 'Resize the editor', 'nimble-builder' ));
         echo '<i class="czr-resize-handle fas fa-arrows-alt-v"></i>';
       echo '</div>';

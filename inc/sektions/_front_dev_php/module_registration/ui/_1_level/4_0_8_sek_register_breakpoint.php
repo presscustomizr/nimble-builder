@@ -5,14 +5,14 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_breakpoint_module',
-        //'name' => __('Set a custom breakpoint', 'text_doma'),
+        //'name' => __('Set a custom breakpoint', 'nimble-builder'),
         // 'sanitize_callback' => 'function_prefix_to_be_replaced_sanitize_callback__czr_social_module',
         // 'validate_callback' => 'function_prefix_to_be_replaced_validate_callback__czr_social_module',
         'tmpl' => array(
             'item-inputs' => array(
                   'use-custom-breakpoint' => array(
                       'input_type'  => 'nimblecheck',
-                      'title'       => __('Use a custom breakpoint for responsive columns', 'text_doma'),
+                      'title'       => __('Use a custom breakpoint for responsive columns', 'nimble-builder'),
                       'default'     => 0,
                       'title_width' => 'width-80',
                       'input_width' => 'width-20',
@@ -21,7 +21,7 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
                   ),
                   'custom-breakpoint'  => array(
                       'input_type'  => 'range_simple',
-                      'title'       => __( 'Define a custom breakpoint in pixels', 'text_doma' ),
+                      'title'       => __( 'Define a custom breakpoint in pixels', 'nimble-builder' ),
                       'default'     => $global_custom_breakpoint > 0 ? $global_custom_breakpoint : 768,
                       'min'         => 1,
                       'max'         => 2000,
@@ -31,22 +31,22 @@ function sek_get_module_params_for_sek_level_breakpoint_module() {
                       //'css_identifier' => 'letter_spacing',
                       'width-100'   => true,
                       'title_width' => 'width-100',
-                      'notice_after' => __( 'This is the viewport width from which columns are rearranged vertically. The default breakpoint is 768px.', 'text_doma')
+                      'notice_after' => __( 'This is the viewport width from which columns are rearranged vertically. The default breakpoint is 768px.', 'nimble-builder')
                   ),//0,
                   'apply-to-all' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Apply this breakpoint to all by-device customizations', 'text_doma'),
+                    'title'       => __('Apply this breakpoint to all by-device customizations', 'nimble-builder'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'notice_after' => sprintf(
-                        __( '%s When enabled, this custom breakpoint is applied not only to responsive columns but also to all by-device customizations, like alignment for example.', 'text_doma'),
+                        __( '%s When enabled, this custom breakpoint is applied not only to responsive columns but also to all by-device customizations, like alignment for example.', 'nimble-builder'),
                         '<span class="sek-mobile-device-icons"><i class="sek-switcher preview-desktop"></i>&nbsp;<i class="sek-switcher preview-tablet"></i>&nbsp;<i class="sek-switcher preview-mobile"></i></span>'
                     )
                   ),
                   'reverse-col-at-breakpoint' => array(
                       'input_type'  => 'nimblecheck',
-                      'title'       => __('Reverse the columns direction on devices smaller than the breakpoint.', 'text_doma'),
+                      'title'       => __('Reverse the columns direction on devices smaller than the breakpoint.', 'nimble-builder'),
                       'default'     => 0,
                       'title_width' => 'width-80',
                       'input_width' => 'width-20',

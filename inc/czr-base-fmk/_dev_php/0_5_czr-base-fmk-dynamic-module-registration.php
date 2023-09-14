@@ -238,15 +238,15 @@ if ( !class_exists( 'CZR_Fmk_Dyn_Module_Registration' ) ) :
             // With tabs
             // 'tabs' => array(
               // array(
-              //     'title' => __('Spacing', 'text_doma'),
+              //     'title' => __('Spacing', 'nimble-builder'),
               //     'inputs' => array(
               //         'padding' => array(
               //             'input_type'  => 'number',
-              //             'title'       => __('Padding', 'text_doma')
+              //             'title'       => __('Padding', 'nimble-builder')
               //         ),
               //         'margin' => array(
               //             'input_type'  => 'number',
-              //             'title'       => __('Margin', 'text_doma')
+              //             'title'       => __('Margin', 'nimble-builder')
               //         )
               //     )
               // ),
@@ -256,11 +256,11 @@ if ( !class_exists( 'CZR_Fmk_Dyn_Module_Registration' ) ) :
               // Without tabs :
               //  'padding' => array(
               //       'input_type'  => 'number',
-              //       'title'       => __('Padding', 'text_doma')
+              //       'title'       => __('Padding', 'nimble-builder')
               //  ),
               //   'margin' => array(
               //      'input_type'  => 'number',
-              //      'title'       => __('Margin', 'text_doma')
+              //      'title'       => __('Margin', 'nimble-builder')
               //  )
             if ( array_key_exists( 'tabs', $tmpl_map ) ) {
                 ob_start();

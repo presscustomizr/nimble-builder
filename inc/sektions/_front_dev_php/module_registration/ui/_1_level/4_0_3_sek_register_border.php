@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_level_border_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_border_module',
-        //'name' => __('Borders', 'text_doma'),
+        //'name' => __('Borders', 'nimble-builder'),
         'starting_value' => array(
             'borders' => array(
                 '_all_' => array( 'wght' => '1px', 'col' => '#000000' )
@@ -16,13 +16,13 @@ function sek_get_module_params_for_sek_level_border_module() {
             'item-inputs' => array(
                 'border-type' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Border shape', 'text_doma'),
+                    'title'       => __('Border shape', 'nimble-builder'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' )
                 ),
                 'borders' => array(
                     'input_type'  => 'borders',
-                    'title'       => __('Borders', 'text_doma'),
+                    'title'       => __('Borders', 'nimble-builder'),
                     'min' => 0,
                     'max' => 100,
                     'default' => array(
@@ -33,7 +33,7 @@ function sek_get_module_params_for_sek_level_border_module() {
                 ),
                 'border-radius'       => array(
                     'input_type'  => 'border_radius',
-                    'title'       => __( 'Rounded corners', 'text_doma' ),
+                    'title'       => __( 'Rounded corners', 'nimble-builder' ),
                     'default' => array( '_all_' => '0px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -46,7 +46,7 @@ function sek_get_module_params_for_sek_level_border_module() {
                 ),
                 'shadow' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Apply a shadow', 'text_doma'),
+                    'title'       => __('Apply a shadow', 'nimble-builder'),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'default' => 0,

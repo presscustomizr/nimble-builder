@@ -78,7 +78,7 @@ abstract class Sek_Input_Abstract implements Sek_Input_Interface {
                     $value = '';
                 break;
                 // case 'nimble_message' :
-                //     $value = __('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.', 'text-domain');
+                //     $value = __('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.', 'nimble-builder');
                 // break;
             }
         }
@@ -246,7 +246,7 @@ class Sek_Input_Submit extends Sek_Input_Basic {
         $args             = is_array( $args ) ? $args : array();
         $args[ 'type' ]   = 'submit';
         $args             = wp_parse_args($args, [
-            'value' => esc_html__( 'Contact', 'text_doma' ),
+            'value' => esc_html__( 'Contact', 'nimble-builder' ),
         ]);
 
         parent::__construct( $args );

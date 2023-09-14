@@ -17,9 +17,9 @@ class Sek_Mailer {
 
         $this->messages = array(
             //status          => message
-            //'not_sent'        => __( 'Message was not sent. Try Again.', 'text_doma'),
-            //'sent'            => __( 'Thanks!Your message has been sent.', 'text_doma'),
-            'aborted'         => __( 'Please supply correct information.', 'text_doma') //<-todo too much generic
+            //'not_sent'        => __( 'Message was not sent. Try Again.', 'nimble-builder'),
+            //'sent'            => __( 'Thanks!Your message has been sent.', 'nimble-builder'),
+            'aborted'         => __( 'Please supply correct information.', 'nimble-builder') //<-todo too much generic
         );
         $this->status = 'init';
 
@@ -94,7 +94,7 @@ class Sek_Mailer {
 
             $is_valid = $is_human = $user_score_threshold < $score;
             if ( !$is_valid ) {
-                $this->recaptcha_errors = sprintf( __('Google reCAPTCHA returned a score of %s, which is lower than your threshold of %s.', 'text_dom' ), $score, $user_score_threshold );
+                $this->recaptcha_errors = sprintf( __('Google reCAPTCHA returned a score of %s, which is lower than your threshold of %s.', 'nimble-builder' ), $score, $user_score_threshold );
             }
         }
 
@@ -132,7 +132,7 @@ class Sek_Mailer {
 
         // Define a default sender name + make sure the field exists
         // fixes https://github.com/presscustomizr/nimble-builder/issues/513
-        $sender_name    = __('Someone', 'text_doma');
+        $sender_name    = __('Someone', 'nimble-builder');
         $sender_name_is_set = false;
         if ( is_array( $form_composition ) && array_key_exists( 'nimble_name', $form_composition ) ) {
             $sender_name_candidate  = sprintf( '%1$s', $this->form->get_field('nimble_name')->get_input()->get_value() );
@@ -153,22 +153,22 @@ class Sek_Mailer {
         if ( array_key_exists( 'nimble_subject' , $form_composition ) ) {
             $subject = $this->form->get_field('nimble_subject')->get_input()->get_value();
         } else if ( $sender_name_is_set ) {
-            $subject = sprintf( __( '%1$s sent a message from %2$s', 'text_doma' ), $sender_name, get_bloginfo( 'name' ) );
+            $subject = sprintf( __( '%1$s sent a message from %2$s', 'nimble-builder' ), $sender_name, get_bloginfo( 'name' ) );
         } else {
-            $subject = sprintf( __( 'Someone sent a message from %1$s', 'text_doma' ), get_bloginfo( 'name' ) );
+            $subject = sprintf( __( 'Someone sent a message from %1$s', 'nimble-builder' ), get_bloginfo( 'name' ) );
         }
 
 
 
-        // $sender_website = sprintf( __( 'Website: %1$s %2$s', 'text_doma' ),
+        // $sender_website = sprintf( __( 'Website: %1$s %2$s', 'nimble-builder' ),
         //     $this->form->get_field('website')->get_input()->get_value(),
         //     $allow_html ? '<br><br><br>': "\r\n\r\n\r\n"
         // );
 
         // the sender's email is written in the email's header reply-to field.
         // But it is also written inside the message body following this issue, https://github.com/presscustomizr/nimble-builder/issues/218
-        $before_message = sprintf( '%1$s: %2$s &lt;%3$s&gt;', __('From', 'text_doma'), $sender_name, $sender_email );//$sender_website;
-        $before_message .= sprintf( '<br>%1$s: %2$s', __('Subject', 'text_doma'), $subject );
+        $before_message = sprintf( '%1$s: %2$s &lt;%3$s&gt;', __('From', 'nimble-builder'), $sender_name, $sender_email );//$sender_website;
+        $before_message .= sprintf( '<br>%1$s: %2$s', __('Subject', 'nimble-builder'), $subject );
         $after_message  = '';
 
         if ( array_key_exists( 'email_footer', $submission_options ) ) {
@@ -178,7 +178,7 @@ class Sek_Mailer {
             $email_footer = sek_maybe_decode_richtext( $submission_options['email_footer'] );
             $email_footer = sek_strip_script_tags( $email_footer );
         } else {
-            $email_footer = sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'text_doma' ),
+            $email_footer = sprintf( __( 'This e-mail was sent from a contact form on %1$s (<a href="%2$s" target="_blank">%2$s</a>)', 'nimble-builder' ),
                 get_bloginfo( 'name' ),
                 get_site_url( 'url' )
             );
@@ -186,7 +186,7 @@ class Sek_Mailer {
 
         if ( !empty( $sender_body_message ) ) {
             $sender_body_message = sprintf( '<br><br>%1$s: <br>%2$s',
-                __('Message body', 'text_doma'),
+                __('Message body', 'nimble-builder'),
                 //$allow_html ? '<br><br>': "\r\n\r\n",
                 $sender_body_message
             );
@@ -242,7 +242,7 @@ class Sek_Mailer {
                     $submission_message = $submission_options['error_message'];
                 }
                 if ( false !== $this->invalid_field ) {
-                    $submission_message = sprintf( __( '%1$s : <strong>%2$s</strong>.', 'text-domain' ), $submission_message, $this->invalid_field );
+                    $submission_message = sprintf( __( '%1$s : <strong>%2$s</strong>.', 'nimble-builder' ), $submission_message, $this->invalid_field );
                 }
             break;
             case 'recaptcha_fail' :
@@ -255,7 +255,7 @@ class Sek_Mailer {
         }
 
         if ( '_no_error_' !== $this->recaptcha_errors && current_user_can( 'customize' ) ) {
-              $submission_message .= sprintf( '<br/>%s : <i>%s</i>', __('reCAPTCHA problem (only visible by a logged in administrator )', 'text_doma'), $this->recaptcha_errors );
+              $submission_message .= sprintf( '<br/>%s : <i>%s</i>', __('reCAPTCHA problem (only visible by a logged in administrator )', 'nimble-builder'), $this->recaptcha_errors );
         }
         return $submission_message;
     }
@@ -300,23 +300,23 @@ endif;
 function sek_simple_form_mail_template() {
     $template = array(
         'subject' =>
-            sprintf( __( '%1$s: new contact request', 'text_doma' ),
+            sprintf( __( '%1$s: new contact request', 'nimble-builder' ),
                 get_bloginfo( 'name' )
             ),
         'sender' => sprintf( '[your-name] <%s>', simple_form_from_email() ),
         'body' =>
             /* translators: %s: [your-name] <[your-email]> */
-            sprintf( __( 'From: %s', 'text_doma' ),
+            sprintf( __( 'From: %s', 'nimble-builder' ),
                 '[your-name] <[your-email]>' ) . "\n"
             /* translators: %s: [your-subject] */
-            . sprintf( __( 'Subject: %s', 'text_doma' ),
+            . sprintf( __( 'Subject: %s', 'nimble-builder' ),
                 '[your-subject]' ) . "\n\n"
-            . __( 'Message Body:', 'text_doma' )
+            . __( 'Message Body:', 'nimble-builder' )
                 . "\n" . '[your-message]' . "\n\n"
             . '-- ' . "\n"
             /* translators: 1: blog name, 2: blog URL */
             . sprintf(
-                __( 'This e-mail was sent from a contact form on %1$s (%2$s)', 'text_doma' ),
+                __( 'This e-mail was sent from a contact form on %1$s (%2$s)', 'nimble-builder' ),
                 get_bloginfo( 'name' ),
                 get_bloginfo( 'url' ) ),
         'recipient' => get_option( 'admin_email' ),

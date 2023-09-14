@@ -16,11 +16,11 @@ function sek_get_module_params_for_czr_button_module() {
             'design' => 'czr_btn_design_child',
             'font' => 'czr_font_child'
         ),
-        'name' => __( 'Button', 'text_doma' ),
+        'name' => __( 'Button', 'nimble-builder' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_button_module',
         'starting_value' => array(
             'content' => array(
-                'button_text' => __('Click me','text_doma'),
+                'button_text' => __('Click me','nimble-builder'),
             ),
             'design' => array(
                 'bg_color_css' => '#020202',
@@ -49,7 +49,7 @@ function sek_get_module_params_for_czr_btn_content_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_btn_content_child',
-        'name' => __( 'Button content', 'text_doma' ),
+        'name' => __( 'Button content', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' =>'',
         'tmpl' => array(
@@ -61,52 +61,52 @@ function sek_get_module_params_for_czr_btn_content_child() {
                         'includedBtns' => 'basic_btns_nolink',
                         'height' => 45
                     ),
-                    'title'              => __( 'Button text', 'text_doma' ),
+                    'title'              => __( 'Button text', 'nimble-builder' ),
                     'default'            => '',
                     'width-100'         => true,
                     'refresh_markup'    => '.sek-btn-text'
                 ),
                 'btn_text_on_hover' => array(
                     'input_type'         => 'text',
-                    'title'              => __( 'Tooltip text on mouse hover', 'text_doma' ),
+                    'title'              => __( 'Tooltip text on mouse hover', 'nimble-builder' ),
                     'default'            => '',
                     'width-100'         => true,
                     'title_width' => 'width-100',
-                    'notice_after'       => __( 'Not previewable when customizing.', 'text_doma')
+                    'notice_after'       => __( 'Not previewable when customizing.', 'nimble-builder')
                 ),
                 'link-to' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Link to', 'text_doma'),
+                    'title'       => __('Link to', 'nimble-builder'),
                     'default'     => 'no-link',
                     'choices'     => sek_get_select_options_for_input_id( 'link-to' )
                 ),
                 'link-pick-url' => array(
                     'input_type'  => 'content_picker',
-                    'title'       => __('Link url', 'text_doma'),
+                    'title'       => __('Link url', 'nimble-builder'),
                     'default'     => array()
                 ),
                 'link-custom-url' => array(
                     'input_type'  => 'text',
-                    'title'       => __('Custom link url', 'text_doma'),
+                    'title'       => __('Custom link url', 'nimble-builder'),
                     'default'     => ''
                 ),
                 'link-target' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Open link in a new browser tab', 'text_doma'),
+                    'title'       => __('Open link in a new browser tab', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'icon' => array(
                     'input_type'  => 'fa_icon_picker',
-                    'title'       => __( 'Icon next to the button text', 'text_doma' ),
+                    'title'       => __( 'Icon next to the button text', 'nimble-builder' ),
                     //'default'     => 'no-link'
                 ),
                 'icon-side' => array(
                     'input_type'  => 'buttons_choice',
-                    'title'       => __("Icon's position", 'text_doma'),
+                    'title'       => __("Icon's position", 'nimble-builder'),
                     'default'     => 'left',
-                    'choices'     => array( 'left' => __('Left', 'text-domain'), 'right' => __('Right', 'text-domain') )
+                    'choices'     => array( 'left' => __('Left', 'nimble-builder'), 'right' => __('Right', 'nimble-builder') )
                 ),
             )
         ),
@@ -124,14 +124,14 @@ function sek_get_module_params_for_czr_btn_design_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_btn_design_child',
-        'name' => __( 'Button design', 'text_doma' ),
+        'name' => __( 'Button design', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' =>'',
         'tmpl' => array(
             'item-inputs' => array(
                 'bg_color_css' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Background color', 'text_doma' ),
+                    'title'       => __( 'Background color', 'nimble-builder' ),
                     'width-100'   => true,
                     'default'    => '#020202',
                     'refresh_markup' => false,
@@ -141,7 +141,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'use_custom_bg_color_on_hover' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Set a custom background color on mouse hover', 'text_doma' ),
+                    'title'       => __( 'Set a custom background color on mouse hover', 'nimble-builder' ),
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
@@ -150,18 +150,18 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'bg_color_hover' => array(
                     'input_type'  => 'wp_color_alpha',
-                    'title'       => __( 'Background color on mouse hover', 'text_doma' ),
+                    'title'       => __( 'Background color on mouse hover', 'nimble-builder' ),
                     'width-100'   => true,
                     'default'    => '',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'notice_after' => __( 'You can also customize the text color on mouseover in the group of text settings below.', 'text_doma')
+                    'notice_after' => __( 'You can also customize the text color on mouseover in the group of text settings below.', 'nimble-builder')
                     //'css_identifier' => 'background_color_hover',
                     //'css_selectors'=> $css_selectors
                 ),
                 'border-type' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Border', 'text_doma'),
+                    'title'       => __('Border', 'nimble-builder'),
                     'default' => 'none',
                     'choices'     => sek_get_select_options_for_input_id( 'border-type' ),
                     'refresh_markup' => false,
@@ -169,7 +169,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'borders' => array(
                     'input_type'  => 'borders',
-                    'title'       => __('Borders', 'text_doma'),
+                    'title'       => __('Borders', 'nimble-builder'),
                     'min' => 0,
                     'max' => 100,
                     'default' => array(
@@ -183,7 +183,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'border_radius_css'       => array(
                     'input_type'  => 'border_radius',
-                    'title'       => __( 'Rounded corners', 'text_doma' ),
+                    'title'       => __( 'Rounded corners', 'nimble-builder' ),
                     'default' => array( '_all_' => '0px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -196,7 +196,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'h_alignment_css'        => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'              => __( 'Button alignment', 'text_doma' ),
+                    'title'              => __( 'Button alignment', 'nimble-builder' ),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
@@ -207,7 +207,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'spacing_css'        => array(
                     'input_type'         => 'spacing',
-                    'title'              => __( 'Spacing', 'text_doma' ),
+                    'title'              => __( 'Spacing', 'nimble-builder' ),
                     'default'            => array(
                         'padding-top'    => .5,
                         'padding-bottom' => .5,
@@ -225,21 +225,21 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'use_box_shadow' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Apply a shadow', 'text_doma' ),
+                    'title'       => __( 'Apply a shadow', 'nimble-builder' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'push_effect' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __( 'Push visual effect', 'text_doma' ),
+                    'title'       => __( 'Push visual effect', 'nimble-builder' ),
                     'default'     => 1,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'width-type' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Width : auto or custom', 'text_doma'),
+                    'title'       => __('Width : auto or custom', 'nimble-builder'),
                     'default'     => 'default',
                     'choices'     => sek_get_select_options_for_input_id( 'height-type' ),
                     'html_before' => '<hr/>',
@@ -248,7 +248,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'custom-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Custom width', 'text_doma'),
+                    'title'       => __('Custom width', 'nimble-builder'),
                     'min' => 0,
                     'max' => 500,
                     'default'     => array( 'desktop' => '150px' ),
@@ -259,7 +259,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'h_inner_align_css'        => array(
                     'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
-                    'title'              => __( 'Text alignment', 'text_doma' ),
+                    'title'              => __( 'Text alignment', 'nimble-builder' ),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup'     => false,
                     'refresh_stylesheet' => true,
@@ -270,7 +270,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'height-type' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Height : auto or custom', 'text_doma'),
+                    'title'       => __('Height : auto or custom', 'nimble-builder'),
                     'default'     => 'default',
                     'choices'     => sek_get_select_options_for_input_id( 'height-type' ),
                     'html_before' => '<hr/>',
@@ -279,7 +279,7 @@ function sek_get_module_params_for_czr_btn_design_child() {
                 ),
                 'custom-height' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Custom height', 'text_doma'),
+                    'title'       => __('Custom height', 'nimble-builder'),
                     'min' => 0,
                     'max' => 500,
                     'default'     => array( 'desktop' => '40px' ),

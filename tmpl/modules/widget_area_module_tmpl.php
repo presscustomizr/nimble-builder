@@ -14,11 +14,11 @@ if ( !function_exists( 'Nimble\sek_maybe_print_widget_placeholder') ) {
   function sek_maybe_print_widget_placeholder( $id ) {
       global $wp_registered_sidebars;
       if ( !sek_is_nimble_widget_id( $id ) || !array_key_exists( $id, $wp_registered_sidebars ) ) {
-          $placeholder_text = __('Select a Nimble widget area and start adding widgets.', 'text_domain_to_replace');
+          $placeholder_text = __('Select a Nimble widget area and start adding widgets.', 'nimble-builder');
       } else {
           $widget_area_model = $wp_registered_sidebars[ $id ];
           $placeholder_text = sprintf( '%1$s <span class="zone-name" style="font-weight:bold">%2$s</span>',
-              __('Add widgets to', 'text_domain_to_replace'),
+              __('Add widgets to', 'nimble-builder'),
               isset( $widget_area_model['name'] ) ? $widget_area_model['name'] : $widget_area_model['id']
           );
       }

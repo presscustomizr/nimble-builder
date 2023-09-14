@@ -28,7 +28,7 @@ $model = sek_normalize_module_value_with_defaults( $model );
 Nimble_Manager()->model = $model;
 $title_attribute = '';
 if ( skp_is_customizing() ) {
-    $title_attribute = __('Edit module settings', 'text-domain');
+    $title_attribute = __('Edit module settings', 'nimble-builder');
 }
 
 // SETUP MODULE TEMPLATE PATH

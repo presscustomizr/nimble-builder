@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_level_height_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_level_height_module',
-        //'name' => __('Height options', 'text_doma'),
+        //'name' => __('Height options', 'nimble-builder'),
         'starting_value' => array(
             'custom-height'  => array( 'desktop' => '50%' ),
         ),
@@ -14,13 +14,13 @@ function sek_get_module_params_for_sek_level_height_module() {
             'item-inputs' => array(
                 'height-type' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Height : auto or custom', 'text_doma'),
+                    'title'       => __('Height : auto or custom', 'nimble-builder'),
                     'default'     => 'default',
                     'choices'     => sek_get_select_options_for_input_id( 'height-type' )
                 ),
                 'custom-height' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Custom height', 'text_doma'),
+                    'title'       => __('Custom height', 'nimble-builder'),
                     'min' => 0,
                     'max' => 500,
                     'default'     => array( 'desktop' => '50%' ),
@@ -31,17 +31,17 @@ function sek_get_module_params_for_sek_level_height_module() {
                 // implemented to fix https://github.com/presscustomizr/nimble-builder/issues/365
                 'overflow_hidden' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Overflow hidden', 'text_doma'),
+                    'title'       => __('Overflow hidden', 'nimble-builder'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
-                    'notice_after' => __('Hide the content when it is too big to fit in its parent container.', 'text_doma')
+                    'notice_after' => __('Hide the content when it is too big to fit in its parent container.', 'nimble-builder')
                 ),
                 'v_alignment' => array(
                     'input_type'  => 'verticalAlignWithDeviceSwitcher',
-                    'title'       => __('Inner vertical alignment', 'text_doma'),
+                    'title'       => __('Inner vertical alignment', 'nimble-builder'),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -51,7 +51,7 @@ function sek_get_module_params_for_sek_level_height_module() {
                 ),
                 'zindex' => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __('z-index', 'text_doma'),
+                    'title'       => __('z-index', 'nimble-builder'),
                     'orientation' => 'horizontal',
                     'min' => 0,
                     'max' => 100,

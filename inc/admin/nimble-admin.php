@@ -19,7 +19,7 @@ function sek_plugin_menu() {
     if ( !current_user_can( 'update_plugins' ) || !sek_current_user_can_access_nb_ui() )
       return;
     // system infos should be displayed to users with admin capabilities only
-    add_plugins_page(__( 'System info', 'text_domain' ), __( 'System info', 'text_domain' ), 'read', 'nimble-builder', '\Nimble\sek_plugin_page');
+    add_plugins_page(__( 'System info', 'nimble-builder' ), __( 'System info', 'nimble-builder' ), 'read', 'nimble-builder', '\Nimble\sek_plugin_page');
 }
 
 
@@ -270,12 +270,12 @@ function sek_print_nb_btn_edit_with_nimble( $editor_type ) {
     $btn_css_classes = 'classic' === $editor_type ? 'button button-primary button-hero classic-ed' : 'button button-primary button-large guten-ed';
     ?>
     <button id="sek-edit-with-nimble" type="button" class="<?php echo esc_attr($btn_css_classes); ?>" data-cust-url="<?php echo esc_url( $customize_url ); ?>">
-      <?php //_e( 'Edit with Nimble Builder', 'text_doma' ); ?>
+      <?php //_e( 'Edit with Nimble Builder', 'nimble-builder' ); ?>
       <?php printf( '<span class="sek-spinner"></span><span class="sek-nimble-icon" title="%3$s"><img src="%1$s" alt="%2$s"/><span class="sek-nimble-admin-bar-title">%2$s</span><span class="sek-nimble-mobile-admin-bar-title">%3$s</span></span>',
           esc_url( NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION ),
-          apply_filters( 'nb_admin_nb_button_edit_title', sek_local_skope_has_been_customized( $manually_built_skope_id ) ? __('Continue building with Nimble','text_domain') : __('Build with Nimble Builder','text_domain'), $manually_built_skope_id ),
-          __('Build','text_domain'),
-          __('Build sections in live preview with Nimble Builder', 'text_domain')
+          apply_filters( 'nb_admin_nb_button_edit_title', sek_local_skope_has_been_customized( $manually_built_skope_id ) ? __('Continue building with Nimble','nimble-builder') : __('Build with Nimble Builder','nimble-builder'), $manually_built_skope_id ),
+          __('Build','nimble-builder'),
+          __('Build sections in live preview with Nimble Builder', 'nimble-builder')
       ); ?>
     </button>
     <?php
@@ -319,7 +319,7 @@ function sek_add_nimble_post_state( $post_states, $post ) {
       return $post_states;
     $manually_built_skope_id = strtolower( NIMBLE_SKOPE_ID_PREFIX . 'post_' . $post->post_type . '_' . $post->ID );
     if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_been_customized( $manually_built_skope_id ) ) {
-        $post_states['nimble'] = __( 'Nimble Builder', 'text-doma' );
+        $post_states['nimble'] = __( 'Nimble Builder', 'nimble-builder' );
     }
     return $post_states;
 }
@@ -336,7 +336,7 @@ function sek_filter_post_row_actions( $actions, $post ) {
     if ( $post && current_user_can( 'edit_post', $post->ID ) && sek_local_skope_has_been_customized( $manually_built_skope_id ) ) {
         $actions['edit_with_nimble_builder'] = sprintf( '<a href="%1$s" title="%2$s">%2$s</a>',
             esc_url(sek_get_customize_url_for_post_id( $post->ID )),
-            __( 'Edit with Nimble Builder', 'text-doma' )
+            __( 'Edit with Nimble Builder', 'nimble-builder' )
         );
     }
     return $actions;
@@ -520,10 +520,10 @@ function sek_register_dashboard_widgets() {
       return;
 
     $theme_name = sek_get_parent_theme_slug();
-    $title = __( 'Nimble Builder Overview', 'text_doma' );
+    $title = __( 'Nimble Builder Overview', 'nimble-builder' );
     wp_add_dashboard_widget(
         'presscustomizr-dashboard',
-        !sek_is_presscustomizr_theme( $theme_name ) ? $title : sprintf( __( 'Nimble Builder & %s Overview', 'text_doma' ), ucfirst($theme_name) ),
+        !sek_is_presscustomizr_theme( $theme_name ) ? $title : sprintf( __( 'Nimble Builder & %s Overview', 'nimble-builder' ), ucfirst($theme_name) ),
         '\Nimble\sek_nimble_dashboard_callback_fn'
     );
 
@@ -544,9 +544,9 @@ function sek_nimble_dashboard_callback_fn() {
     <div class="nimble-db-wrapper">
       <div class="nimble-db-header">
         <div class="nimble-logo-version">
-          <div class="nimble-logo"><div class="sek-nimble-icon" title="<?php _e('Add sections in live preview with Nimble Builder', 'text_doma' );?>"><img src="<?php echo esc_url(NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION); ?>" alt="Nimble Builder"></div></div>
+          <div class="nimble-logo"><div class="sek-nimble-icon" title="<?php _e('Add sections in live preview with Nimble Builder', 'nimble-builder' );?>"><img src="<?php echo esc_url(NIMBLE_BASE_URL.'/assets/img/nimble/nimble_icon.svg?ver='.NIMBLE_VERSION); ?>" alt="Nimble Builder"></div></div>
           <div class="nimble-version">
-            <span class="nimble-version-text"><?php _e('Nimble Builder', 'text_doma'); ?> v<?php echo esc_attr(NIMBLE_VERSION); ?></span>
+            <span class="nimble-version-text"><?php _e('Nimble Builder', 'nimble-builder'); ?> v<?php echo esc_attr(NIMBLE_VERSION); ?></span>
             <?php if ( sek_is_presscustomizr_theme( $theme_name ) ) : ?>
               <?php
                 $theme_data = wp_get_theme();
@@ -557,7 +557,7 @@ function sek_nimble_dashboard_callback_fn() {
         </div>
         <?php if ( sek_is_upsell_enabled() ) : ?>
           <?php printf( '<a class="sek-pro-link-in-dashboard" href="https://presscustomizr.com/nimble-builder-pro/" rel="noopener noreferrer" title="Go Pro" target="_blank">%1$s <span class="dashicons dashicons-external"></span></a>',
-                __('Go Pro', 'text_domain')
+                __('Go Pro', 'nimble-builder')
               );
           ?>
         <?php else : ?>
@@ -569,13 +569,13 @@ function sek_nimble_dashboard_callback_fn() {
                 ),
                 admin_url( 'customize.php' )
             ) ),
-            __( 'Start building', 'nimble' )
+            __( 'Start building', 'nimble-builder' )
           ); ?>
         <?php endif; ?>
       </div>
       <?php if ( !empty( $post_data ) ) : ?>
         <div class="nimble-post-list">
-          <h3 class="nimble-post-list-title"><?php _e( 'News & release notes', 'text_doma' ); ?></h3>
+          <h3 class="nimble-post-list-title"><?php _e( 'News & release notes', 'nimble-builder' ); ?></h3>
           <ul class="nimble-collection">
             <?php foreach ( $post_data as $single_post_data ) : ?>
               <li class="nimble-single-post">
@@ -590,11 +590,11 @@ function sek_nimble_dashboard_callback_fn() {
       <?php
         $footer_links = array(
           // 'news' => array(
-          //   'title' => __( 'Blog', 'text_doma' ),
+          //   'title' => __( 'Blog', 'nimble-builder' ),
           //   'link' => 'https://presscustomizr.com/blog/?ref=a&amp;utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=dashboard',
           // ),
           'doc' => array(
-            'title' => __( 'Everything about Nimble Builder', 'text_doma' ),
+            'title' => __( 'Everything about Nimble Builder', 'nimble-builder' ),
             'link' => 'https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin/?ref=a&amp;utm_source=usersite&amp;utm_medium=link&amp;utm_campaign=dashboard',
           ),
         );
@@ -619,7 +619,7 @@ function sek_nimble_dashboard_callback_fn() {
               <?php if ( !empty( $link_data['html'] ) ) : ?>
                 <?php echo esc_attr($link_data['html']); ?>
               <?php else : ?>
-              <a href="<?php echo esc_attr( $link_data['link'] ); ?>" target="_blank"><?php echo esc_html( $link_data['title'] ); ?> <span class="screen-reader-text"><?php _e( '(opens in a new window)', 'text_doma' ); ?></span></a><span aria-hidden="true" class="dashicons dashicons-external"></span>
+              <a href="<?php echo esc_attr( $link_data['link'] ); ?>" target="_blank"><?php echo esc_html( $link_data['title'] ); ?> <span class="screen-reader-text"><?php _e( '(opens in a new window)', 'nimble-builder' ); ?></span></a><span aria-hidden="true" class="dashicons dashicons-external"></span>
               <?php endif; ?>
             </div>
           <?php endforeach; ?>
@@ -713,30 +713,30 @@ function sek_may_be_display_update_notice() {
       <div class="updated czr-update-notice" style="position:relative;">
         <?php
           printf('<h3>%1$s %2$s %3$s %4$s :D</h3>',
-              __( "Thanks, you successfully upgraded", 'text_doma'),
+              __( "Thanks, you successfully upgraded", 'nimble-builder'),
               'Nimble Builder',
-              __( "to version", 'text_doma'),
+              __( "to version", 'nimble-builder'),
               esc_attr(NIMBLE_VERSION)
           );
         ?>
         <?php
           printf( '<h4>%1$s <a class="" href="%2$s" title="%3$s" target="_blank">%3$s &raquo;</a></h4>',
-              '',//__( "Let us introduce the new features we've been working on.", 'text_doma'),
+              '',//__( "Let us introduce the new features we've been working on.", 'nimble-builder'),
               esc_url(NIMBLE_RELEASE_NOTE_URL),
-              __( "Read the detailled release notes" , 'text_doma' )
+              __( "Read the detailled release notes" , 'nimble-builder' )
           );
         ?>
         <p style="text-align:right;position: absolute;font-size: 1.1em;<?php echo is_rtl() ? 'left' : 'right';?>: 7px;bottom: -6px;">
         <?php printf('<a href="#" title="%1$s" class="nimble-dismiss-update-notice"> ( %1$s <strong>X</strong> ) </a>',
-            __('close' , 'text_doma')
+            __('close' , 'nimble-builder')
           );
         ?>
         </p>
         <!-- <p>
           <?php
           // printf(
-          //   __( 'If you like %1$s please leave us a %2$s rating. A huge thanks in advance!', 'text_doma' ),
-          //   sprintf( '<strong>%s</strong>', esc_html__( 'Nimble Builder', 'text_doma' ) ),
+          //   __( 'If you like %1$s please leave us a %2$s rating. A huge thanks in advance!', 'nimble-builder' ),
+          //   sprintf( '<strong>%s</strong>', esc_html__( 'Nimble Builder', 'nimble-builder' ) ),
           //   sprintf( '<a href="%1$s" target="_blank" class="czr-rating-link">&#9733;&#9733;&#9733;&#9733;&#9733;</a>', esc_url( 'wordpress.org/support/plugin/nimble-builder/reviews/?filter=5#new-post') )
           // );
           ?>
@@ -1061,13 +1061,13 @@ function sek_render_welcome_notice() {
 function sek_get_welcome_block() {
   ?>
   <div class="nimble-welcome-icon-holder">
-    <img class="nimble-welcome-icon" src="<?php echo esc_url(NIMBLE_BASE_URL.'/assets/img/nimble/nimble_banner.svg?ver='.NIMBLE_VERSION); ?>" alt="<?php esc_html_e( 'Nimble Builder', 'nimble' ); ?>" />
+    <img class="nimble-welcome-icon" src="<?php echo esc_url(NIMBLE_BASE_URL.'/assets/img/nimble/nimble_banner.svg?ver='.NIMBLE_VERSION); ?>" alt="<?php esc_html_e( 'Nimble Builder', 'nimble-builder' ); ?>" />
   </div>
   <div class="nimble-welcome-content">
-    <h1><?php echo apply_filters( 'nimble_parse_admin_text', __('Welcome to Nimble Builder for WordPress :D', 'nimble' ) ); ?></h1>
+    <h1><?php echo apply_filters( 'nimble_parse_admin_text', __('Welcome to Nimble Builder for WordPress :D', 'nimble-builder' ) ); ?></h1>
 
-    <p><?php _e( 'Nimble allows you to drag and drop content modules, or pre-built section templates, into <u>any context</u> of your site, including search results or 404 pages. You can edit your pages in <i>real time</i> from the live customizer, and then publish when you are happy of the result, or save for later.', 'nimble' ); ?></p>
-    <p><?php _e( 'The plugin automatically creates fluid and responsive sections for a pixel-perfect rendering on smartphones and tablets, without the need to add complex code.', 'nimble' ); ?></p>
+    <p><?php _e( 'Nimble allows you to drag and drop content modules, or pre-built section templates, into <u>any context</u> of your site, including search results or 404 pages. You can edit your pages in <i>real time</i> from the live customizer, and then publish when you are happy of the result, or save for later.', 'nimble-builder' ); ?></p>
+    <p><?php _e( 'The plugin automatically creates fluid and responsive sections for a pixel-perfect rendering on smartphones and tablets, without the need to add complex code.', 'nimble-builder' ); ?></p>
     <?php printf( '<a href="%1$s" target="_blank" class="button button-primary button-hero"><span class="dashicons dashicons-admin-appearance"></span> %2$s</a>',
         esc_url( add_query_arg(
             array(
@@ -1076,11 +1076,11 @@ function sek_get_welcome_block() {
             ),
             admin_url( 'customize.php' )
         ) ),
-        __( 'Start creating content in live preview', 'nimble' )
+        __( 'Start creating content in live preview', 'nimble-builder' )
     ); ?>
     <div class="nimble-link-to-doc">
       <?php printf( '<div class="nimble-doc-link-wrap">%1$s <a href="%2$s" target="_blank" class="">%3$s</a>.</div>',
-          __('Or', 'nimble'),
+          __('Or', 'nimble-builder'),
           add_query_arg(
               array(
                 'utm_source' => 'usersite',
@@ -1089,7 +1089,7 @@ function sek_get_welcome_block() {
               ),
               'https://docs.presscustomizr.com/article/337-getting-started-with-the-nimble-builder-plugin'
           ),
-          __( 'read the getting started guide', 'nimble' )
+          __( 'read the getting started guide', 'nimble-builder' )
       ); ?>
     </div>
   </div>
@@ -1135,7 +1135,7 @@ add_filter( 'plugin_row_meta', function($plugin_meta, $plugin_file, $plugin_data
             $plugin_meta = is_array($plugin_meta) ? $plugin_meta : [];
             if ( sek_is_upsell_enabled() ) {
               $plugin_meta[] = sprintf( '<a class="sek-pro-link-in-plugins" href="https://presscustomizr.com/nimble-builder-pro/" rel="noopener noreferrer" title="Go Pro" target="_blank">%1$s <span class="dashicons dashicons-external"></span></a>',
-                __('Go Pro', 'text_domain')
+                __('Go Pro', 'nimble-builder')
               );
             } else {
               $plugin_meta[] = sprintf(

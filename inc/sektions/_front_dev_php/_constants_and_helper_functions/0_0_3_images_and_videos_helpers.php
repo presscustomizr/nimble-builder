@@ -10,7 +10,7 @@ function sek_get_img_sizes() {
 
     $sizes = array();
     $to_return = array(
-        'original' => __('Original image dimensions', 'text_doma')
+        'original' => __('Original image dimensions', 'nimble-builder')
     );
 
     foreach ( get_intermediate_image_sizes() as $_size ) {

@@ -30,7 +30,7 @@ if ( !function_exists( 'Nimble\sek_print_accordion' ) ) {
             <?php
                 $ind = 1;
                 foreach( $accord_collec as $key => $item ) {
-                    $title = !empty( $item['title_text'] ) ? $item['title_text'] : sprintf( '%s %s', __('Accordion title', 'text_dom'), '#' . $ind );
+                    $title = !empty( $item['title_text'] ) ? $item['title_text'] : sprintf( '%s %s', __('Accordion title', 'nimble-builder'), '#' . $ind );
                     $item_html_content = $item['text_content'];
 
                     $item_html_content = sek_maybe_decode_richtext($item_html_content);
@@ -71,7 +71,7 @@ if ( !empty( $accord_collec ) ) {
 } else {
     if ( skp_is_customizing() ) {
         printf( '<div class="sek-mod-preview-placeholder"><div class="sek-preview-ph-text" style="%2$s"><p>%1$s</p></div></div>',
-            __('Click to start adding items.', 'text_doma'),
+            __('Click to start adding items.', 'nimble-builder'),
             'background: url(' . esc_url(NIMBLE_MODULE_ICON_PATH) . 'Nimble_accordion_icon.svg) no-repeat 50% 75%;background-size: 170px;'
         );
     }

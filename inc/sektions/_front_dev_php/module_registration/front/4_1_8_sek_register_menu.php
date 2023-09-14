@@ -18,11 +18,11 @@ function sek_get_module_params_for_czr_menu_module() {
             'mobile_options' => 'czr_menu_mobile_options'
 
         ),
-        'name' => __( 'Menu', 'text_doma' ),
+        'name' => __( 'Menu', 'nimble-builder' ),
         'sanitize_callback' => '\Nimble\sanitize_callback__czr_button_module',
         'starting_value' => array(
             // 'content' => array(
-            //     'button_text' => __('Click me','text_doma'),
+            //     'button_text' => __('Click me','nimble-builder'),
             // ),
             // 'design' => array(
             //     'bg_color_css' => '#020202',
@@ -48,25 +48,25 @@ function sek_get_module_params_for_czr_menu_module() {
 function sek_get_module_params_for_czr_menu_content_child() {
     $pro_text = '';
     if ( !sek_is_pro() ) {
-        $pro_text = sek_get_pro_notice_for_czr_input( __('search icon next to the menu, sticky header, hamburger color, ...', 'text-doma') );
+        $pro_text = sek_get_pro_notice_for_czr_input( __('search icon next to the menu, sticky header, hamburger color, ...', 'nimble-builder') );
     }
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_menu_content_child',
-        'name' => __( 'Menu content', 'text_doma' ),
+        'name' => __( 'Menu content', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' =>'',
         'tmpl' => array(
             'item-inputs' => array(
                 'menu-id' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Select a menu', 'text_doma'),
+                    'title'       => __('Select a menu', 'nimble-builder'),
                     'default'     => 'no-link',
                     'choices'     => sek_get_user_created_menus(),
-                    'notice_after' => sprintf( __( 'You can create and edit menus in the %1$s. If you just created a new menu, publish and refresh the customizer to see in the dropdown list.', 'text_doma'),
+                    'notice_after' => sprintf( __( 'You can create and edit menus in the %1$s. If you just created a new menu, publish and refresh the customizer to see in the dropdown list.', 'nimble-builder'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.panel('nav_menus', function( _p_ ){ _p_.focus(); })",
-                            __('menu panel', 'text_doma')
+                            __('menu panel', 'nimble-builder')
                         )
                     ),
                 ),
@@ -74,7 +74,7 @@ function sek_get_module_params_for_czr_menu_content_child() {
                 // janv 2021 : alignement of menu items in the vertical mobile mnenu with '[data-sek-is-mobile-vertical-menu="yes"] .sek-nav li a'
                 'h_alignment_css' => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'       => __('Menu items alignment', 'text_doma'),
+                    'title'       => __('Menu items alignment', 'nimble-builder'),
                     'default'     => array( 'desktop' => 'right', 'tablet' => 'left' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -85,7 +85,7 @@ function sek_get_module_params_for_czr_menu_content_child() {
                 ),
                 'hamb_h_alignment_css' => array(
                     'input_type'  => 'horizAlignmentWithDeviceSwitcher',
-                    'title'       => __('Hamburger button alignment', 'text_doma'),
+                    'title'       => __('Hamburger button alignment', 'nimble-builder'),
                     'default'     => array( 'desktop' => 'center' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -108,14 +108,14 @@ function sek_get_module_params_for_czr_menu_mobile_options() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_menu_mobile_options',
-        'name' => __( 'Settings for mobile devices', 'text_doma' ),
+        'name' => __( 'Settings for mobile devices', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         //'css_selectors' =>'',
         'tmpl' => array(
             'item-inputs' => array(
                 'expand_below' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => sprintf('%s %s', '<i class="material-icons sek-level-option-icon">devices</i>', __('On mobile devices, expand the menu in full width below the menu hamburger icon.', 'text_doma') ),
+                    'title'       => sprintf('%s %s', '<i class="material-icons sek-level-option-icon">devices</i>', __('On mobile devices, expand the menu in full width below the menu hamburger icon.', 'nimble-builder') ),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'

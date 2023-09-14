@@ -121,7 +121,7 @@ function sek_get_post_categories() {
         $cat_collection[] = array(
             'id' => $cat->term_id,
             'slug' => $cat->slug,
-            'name' => sprintf( '%s (%s %s)', $cat->cat_name, $cat->count, __('posts', 'text_doma') )
+            'name' => sprintf( '%s (%s %s)', $cat->cat_name, $cat->count, __('posts', 'nimble-builder') )
         );
     }
     wp_send_json_success( $cat_collection );
@@ -292,9 +292,9 @@ function sek_get_gfonts( $what = null ) {
     //$subsets = array();
 
     // $subsets['all-subsets'] = sprintf( '%1$s ( %2$s %3$s )',
-    //   __( 'All languages' , 'text_doma' ),
+    //   __( 'All languages' , 'nimble-builder' ),
     //   count($gfonts_decoded['items']) + count( get_cfonts() ),
-    //   __('fonts' , 'text_doma' )
+    //   __('fonts' , 'nimble-builder' )
     // );
 
     foreach ( $gfonts_decoded['items'] as $font ) {
@@ -318,7 +318,7 @@ function sek_get_gfonts( $what = null ) {
     //   $subsets[$subset] = sprintf('%1$s ( %2$s %3$s )',
     //     $subset,
     //     $font_number,
-    //     __('fonts' , 'text_doma' )
+    //     __('fonts' , 'nimble-builder' )
     //   );
     // }
 

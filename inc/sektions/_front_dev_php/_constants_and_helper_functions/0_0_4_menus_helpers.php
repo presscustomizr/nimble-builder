@@ -17,7 +17,7 @@ function sek_page_menu_fallback( $args = array() ) {
     // Show Home in the menu
     if ( !empty($args['show_home']) ) {
         if ( true === $args['show_home'] || '1' === $args['show_home'] || 1 === $args['show_home'] ) {
-            $text = __('Home' , 'text_domain_to_replace');
+            $text = __('Home' , 'nimble-builder');
         } else {
             $text = $args['show_home'];
         }
@@ -69,7 +69,7 @@ function sek_list_pages( $args = '' ) {
         'date_format' => get_option( 'date_format' ),
         'child_of' => 0,
         'exclude' => '',
-        'title_li' => __( 'Pages', 'text_domain_to_replace' ),
+        'title_li' => __( 'Pages', 'nimble-builder' ),
         'echo' => 1,
         'authors' => '',
         'sort_column' => 'menu_order, post_title',
@@ -148,10 +148,10 @@ function sek_get_user_created_menus() {
         }
     }
     // sek_error_log( 'sek_get_user_created_menus', array_merge(
-    //     array( 'nimble_page_menu' => __('Default page menu', 'text_domain_to_replace') )
+    //     array( 'nimble_page_menu' => __('Default page menu', 'nimble-builder') )
     // , $user_menus ) );
     return array_merge(
-        array( 'nimble_page_menu' => __('Default page menu', 'text_domain_to_replace') )
+        array( 'nimble_page_menu' => __('Default page menu', 'nimble-builder') )
     , $user_menus );
 }
 

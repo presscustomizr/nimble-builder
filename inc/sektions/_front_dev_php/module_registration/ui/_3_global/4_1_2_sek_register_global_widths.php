@@ -4,7 +4,7 @@ function sek_get_module_params_for_sek_global_widths() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_global_widths',
-        //'name' => __('Site wide width options', 'text_doma'),
+        //'name' => __('Site wide width options', 'nimble-builder'),
         // 'starting_value' => array(
 
         // ),
@@ -14,23 +14,23 @@ function sek_get_module_params_for_sek_global_widths() {
             'item-inputs' => array(
                 'use-custom-outer-width' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Define a custom outer width for the sections site wide', 'text_doma'),
+                    'title'       => __('Define a custom outer width for the sections site wide', 'nimble-builder'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
                     'refresh_preview' => true,
-                    'notice_before_title' => sprintf( __( 'The inner and outer widths of your sections can be set globally here, but also overriden in the %1$s, and for each sections.', 'text_doma'),
+                    'notice_before_title' => sprintf( __( 'The inner and outer widths of your sections can be set globally here, but also overriden in the %1$s, and for each sections.', 'nimble-builder'),
                         sprintf( '<a href="#" onclick="%1$s">%2$s</a>',
                             "javascript:wp.customize.section('__localOptionsSection', function( _s_ ){_s_.container.find('.accordion-section-title').first().trigger('click');})",
-                            __('current page options', 'text_doma')
+                            __('current page options', 'nimble-builder')
                         )
                     ),
                 ),
                 'outer-section-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Outer sections width', 'text_doma'),
+                    'title'       => __('Outer sections width', 'nimble-builder'),
                     'min' => 0,
                     'max' => 1500,
                     'default'     => array( 'desktop' => '100%' ),
@@ -40,7 +40,7 @@ function sek_get_module_params_for_sek_global_widths() {
                 ),
                 'use-custom-inner-width' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Define a custom inner width for the sections site wide', 'text_doma'),
+                    'title'       => __('Define a custom inner width for the sections site wide', 'nimble-builder'),
                     'default'     => 0,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -49,7 +49,7 @@ function sek_get_module_params_for_sek_global_widths() {
                 ),
                 'inner-section-width' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Inner sections width', 'text_doma'),
+                    'title'       => __('Inner sections width', 'nimble-builder'),
                     'min' => 0,
                     'max' => 1500,
                     'default'     => array( 'desktop' => '100%' ),

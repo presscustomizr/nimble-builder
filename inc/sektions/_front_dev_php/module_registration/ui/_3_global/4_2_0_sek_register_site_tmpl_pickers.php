@@ -3,13 +3,13 @@
 function sek_get_module_params_for_sek_site_tmpl_pickers() {
     $pro_text = '';
     if ( !sek_is_pro() ) {
-        $pro_text = sek_get_pro_notice_for_czr_input( __('templates for custom post types, custom taxonomies, ....', 'text-doma') );
+        $pro_text = sek_get_pro_notice_for_czr_input( __('templates for custom post types, custom taxonomies, ....', 'nimble-builder') );
     }
     $default_params = [ 'site_tmpl_id' => '_no_site_tmpl_', 'site_tmpl_source' => 'user_tmpl', 'site_tmpl_title' => '' ];
     return array(
         'dynamic_registration' => true,
         'module_type' => 'sek_site_tmpl_pickers',
-        //'name' => __('Site wide header', 'text_doma'),
+        //'name' => __('Site wide header', 'nimble-builder'),
         // 'starting_value' => array(
 
         // ),
@@ -19,7 +19,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
             'item-inputs' => array(
                 // 'skp__home' => array(
                 //     'input_type'  => 'site_tmpl_picker',
-                //     'title'       => __('Template for home', 'text_doma'),
+                //     'title'       => __('Template for home', 'nimble-builder'),
                 //     'default'     => $default_params,
                 //     //'refresh_preview' => true,
                 //     'notice_before_title' => '',
@@ -28,7 +28,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 // ),
                 'skp__all_page' => array(
                     'input_type'  => 'site_tmpl_picker',
-                    'title'       => __('Template for single pages', 'text_doma'),
+                    'title'       => __('Template for single pages', 'nimble-builder'),
                     'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
@@ -42,7 +42,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 ),
                 'skp__all_post' => array(
                     'input_type'  => 'site_tmpl_picker',
-                    'title'       => __('Template for single posts', 'text_doma'),
+                    'title'       => __('Template for single posts', 'nimble-builder'),
                     'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
@@ -52,7 +52,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 ),
                 'skp__all_category' => array(
                     'input_type'  => 'site_tmpl_picker',
-                    'title'       => __('Template for categories', 'text_doma'),
+                    'title'       => __('Template for categories', 'nimble-builder'),
                     'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
@@ -62,7 +62,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 ),
                 'skp__all_post_tag' => array(
                     'input_type'  => 'site_tmpl_picker',
-                    'title'       => __('Template for tags', 'text_doma'),
+                    'title'       => __('Template for tags', 'nimble-builder'),
                     'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
@@ -72,7 +72,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 ),
                 'skp__all_author' => array(
                     'input_type'  => 'site_tmpl_picker',
-                    'title'       => __('Template for authors', 'text_doma'),
+                    'title'       => __('Template for authors', 'nimble-builder'),
                     'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
@@ -82,7 +82,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 ),
                 'skp__all_attachment'  => array(
                     'input_type'  => 'site_tmpl_picker',
-                    'title'       => __('Template for attachment pages', 'text_doma'),
+                    'title'       => __('Template for attachment pages', 'nimble-builder'),
                     'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
@@ -94,7 +94,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 // @ see skp_get_no_group_skope_list()
                 'skp__search_for_site_tmpl' => array(
                     'input_type'  => 'site_tmpl_picker',
-                    'title'       => __('Template for search page', 'text_doma'),
+                    'title'       => __('Template for search page', 'nimble-builder'),
                     'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
@@ -106,7 +106,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 // @ see skp_get_no_group_skope_list()
                 'skp__404_for_site_tmpl' => array(
                     'input_type'  => 'site_tmpl_picker',
-                    'title'       => __('Template for 404 error page', 'text_doma'),
+                    'title'       => __('Template for 404 error page', 'nimble-builder'),
                     'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',
@@ -119,7 +119,7 @@ function sek_get_module_params_for_sek_site_tmpl_pickers() {
                 // @ see skp_get_no_group_skope_list()
                 'skp__date_for_site_tmpl' => array(
                     'input_type'  => 'site_tmpl_picker',
-                    'title'       => __('Template for date pages', 'text_doma'),
+                    'title'       => __('Template for date pages', 'nimble-builder'),
                     'default'     => $default_params,
                     //'refresh_preview' => true,
                     'notice_before_title' => '',

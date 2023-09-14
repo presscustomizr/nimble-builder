@@ -148,7 +148,7 @@ class Sek_Field {
         if ( $label ) {
             if ( true == $this->input->get_data( 'required' ) ) {
                 $label .= ' *';
-                //$label .= ' ' . esc_html__( '(required)', 'text_doma' );
+                //$label .= ' ' . esc_html__( '(required)', 'nimble-builder' );
             }
             $label = sprintf( '%1$s<label for="%2$s">%3$s</label>%4$s',
                 $this->data[ 'before_label' ],

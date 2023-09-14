@@ -104,25 +104,25 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                 'sekPreviewLocalized',
                 array(
                     'i18n' => array(
-                        "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'text_doma'),
-                        "Moving elements between global and local sections is not allowed." => __( "Moving elements between global and local sections is not allowed.", 'text_doma'),
-                        'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'text_doma'),
-                        'Insert here' => __('Insert here', 'text_doma'),
-                        'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'text_domain' ),
+                        "You've reached the maximum number of columns allowed in this section." => __( "You've reached the maximum number of columns allowed in this section.", 'nimble-builder'),
+                        "Moving elements between global and local sections is not allowed." => __( "Moving elements between global and local sections is not allowed.", 'nimble-builder'),
+                        'Something went wrong, please refresh this page.' => __('Something went wrong, please refresh this page.', 'nimble-builder'),
+                        'Insert here' => __('Insert here', 'nimble-builder'),
+                        'This content has been created with the WordPress editor.' => __('This content has been created with the WordPress editor.', 'nimble-builder' ),
 
-                        'Insert a new section' => __('Insert a new section', 'text_doma' ),
-                        '@location' => __('@location', 'text_domain_to_be'),
-                        'Insert a new global section' => __('Insert a new global section', 'text_doma' ),
+                        'Insert a new section' => __('Insert a new section', 'nimble-builder' ),
+                        '@location' => __('@location', 'nimble-builder'),
+                        'Insert a new global section' => __('Insert a new global section', 'nimble-builder' ),
 
-                        'section' => __('section', 'text_doma'),
-                        'header section' => __('header section', 'text_doma'),
-                        'footer section' => __('footer section', 'text_doma'),
-                        '(global)' => __('(global)', 'text_doma'),
-                        'nested section' => __('nested section', 'text_doma'),
+                        'section' => __('section', 'nimble-builder'),
+                        'header section' => __('header section', 'nimble-builder'),
+                        'footer section' => __('footer section', 'nimble-builder'),
+                        '(global)' => __('(global)', 'nimble-builder'),
+                        'nested section' => __('nested section', 'nimble-builder'),
 
-                        'Shift-click to visit the link' => __('Shift-click to visit the link', 'text_doma'),
-                        'External links are disabled when customizing' => __('External links are disabled when customizing', 'text_doma'),
-                        'Link deactivated while previewing' => __('Link deactivated while previewing', 'text_doma')
+                        'Shift-click to visit the link' => __('Shift-click to visit the link', 'nimble-builder'),
+                        'External links are disabled when customizing' => __('External links are disabled when customizing', 'nimble-builder'),
+                        'Link deactivated while previewing' => __('Link deactivated while previewing', 'nimble-builder')
                     ),
                     'isDevMode' => sek_is_dev_mode(),
                     'isPreviewUIDebugMode' => isset( $_GET['preview_ui_debug'] ) || NIMBLE_IS_PREVIEW_UI_DEBUG_MODE,
@@ -193,32 +193,32 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                         <?php
                           // Code before implementing https://github.com/presscustomizr/nimble-builder/issues/521 :
                           /* <# if ( true !== data.is_first_section_in_parent ) { #>
-                          <i data-sek-click-on="move-section-up" class="material-icons sek-click-on" title="<?php _e( 'Move section up', 'text_domain' ); ?>">keyboard_arrow_up</i>
+                          <i data-sek-click-on="move-section-up" class="material-icons sek-click-on" title="<?php _e( 'Move section up', 'nimble-builder' ); ?>">keyboard_arrow_up</i>
                         <# } #>
                         <# if ( true !== data.is_last_section_in_parent ) { #>
-                          <i data-sek-click-on="move-section-down" class="material-icons sek-click-on" title="<?php _e( 'Move section down', 'text_domain' ); ?>">keyboard_arrow_down</i>
+                          <i data-sek-click-on="move-section-down" class="material-icons sek-click-on" title="<?php _e( 'Move section down', 'nimble-builder' ); ?>">keyboard_arrow_down</i>
                         <# } #>*/
                         ?>
-                        <i data-sek-click-on="move-section-up" class="material-icons sek-click-on" title="<?php _e( 'Move section up', 'text_domain' ); ?>">keyboard_arrow_up</i>
-                        <i data-sek-click-on="move-section-down" class="material-icons sek-click-on" title="<?php _e( 'Move section down', 'text_domain' ); ?>">keyboard_arrow_down</i>
+                        <i data-sek-click-on="move-section-up" class="material-icons sek-click-on" title="<?php _e( 'Move section up', 'nimble-builder' ); ?>">keyboard_arrow_up</i>
+                        <i data-sek-click-on="move-section-down" class="material-icons sek-click-on" title="<?php _e( 'Move section down', 'nimble-builder' ); ?>">keyboard_arrow_down</i>
 
 
                         <?php // if this is a nested section, it has the is_nested property set to true. We don't want to make it draggable for the moment. @todo ?>
                         <# if ( !data.is_nested ) { #>
                           <# if ( true !== data.is_global_location ) { #>
-                            <i class="fas fa-arrows-alt sek-move-section" title="<?php _e( 'Drag section', 'text_domain' ); ?>"></i>
+                            <i class="fas fa-arrows-alt sek-move-section" title="<?php _e( 'Drag section', 'nimble-builder' ); ?>"></i>
                            <# } #>
                         <# } #>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>">tune</i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit section settings', 'nimble-builder' ); ?>">tune</i>
                         <# if ( data.can_have_more_columns ) { #>
-                          <i data-sek-click-on="add-column" class="material-icons sek-click-on" title="<?php _e( 'Add a column', 'text_domain' ); ?>">view_column</i>
+                          <i data-sek-click-on="add-column" class="material-icons sek-click-on" title="<?php _e( 'Add a column', 'nimble-builder' ); ?>">view_column</i>
                         <# } #>
-                        <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate section', 'text_domain' ); ?>">filter_none</i>
-                        <i data-sek-click-on="toggle-save-section-ui" class="sek-save far fa-save" title="<?php _e( 'Save this section', 'text_domain' ); ?>"></i>
-                        <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'text_domain' ); ?>">delete_forever</i>
+                        <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate section', 'nimble-builder' ); ?>">filter_none</i>
+                        <i data-sek-click-on="toggle-save-section-ui" class="sek-save far fa-save" title="<?php _e( 'Save this section', 'nimble-builder' ); ?>"></i>
+                        <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove section', 'nimble-builder' ); ?>">delete_forever</i>
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>
-                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'text_domain' ); ?>">
+                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit section settings', 'nimble-builder' ); ?>">
                       <div class="sek-dyn-ui-location-inner">
                         <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
                           <div class="sek-ham__toggler-spn-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
@@ -236,7 +236,7 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                         #>
                         <div class="sek-dyn-ui-level-type">{{section_title}}</div>
                       </div><?php // .sek-dyn-ui-location-inner ?>
-                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'text-domain'); ?>"><i class="far fa-eye-slash"></i></div>
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'nimble-builder'); ?>"><i class="far fa-eye-slash"></i></div>
                     </div><?php // .sek-dyn-ui-location-type ?>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
@@ -252,29 +252,29 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                   <div class="sek-dyn-ui-wrapper sek-column-dyn-ui {{has_nested_section_class}}">
                     <div class="sek-dyn-ui-inner <?php echo esc_attr($icon_right_side_class); ?>">
                       <div class="sek-dyn-ui-icons">
-                        <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move column', 'text_domain' ); ?>"></i>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>">tune</i>
+                        <i class="fas fa-arrows-alt sek-move-column" title="<?php _e( 'Move column', 'nimble-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit column settings', 'nimble-builder' ); ?>">tune</i>
                         <# if ( !data.parent_is_last_allowed_nested ) { #>
-                          <i data-sek-click-on="add-section" class="material-icons sek-click-on" title="<?php _e( 'Add a nested section', 'text_domain' ); ?>">account_balance_wallet</i>
+                          <i data-sek-click-on="add-section" class="material-icons sek-click-on" title="<?php _e( 'Add a nested section', 'nimble-builder' ); ?>">account_balance_wallet</i>
                         <# } #>
                         <# if ( data.parent_can_have_more_columns ) { #>
-                          <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate column', 'text_domain' ); ?>">filter_none</i>
+                          <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate column', 'nimble-builder' ); ?>">filter_none</i>
                         <# } #>
 
-                        <i data-sek-click-on="pick-content" data-sek-content-type="module" class="material-icons sek-click-on" title="<?php _e( 'Add a module', 'text_domain' ); ?>">add_circle_outline</i>
+                        <i data-sek-click-on="pick-content" data-sek-content-type="module" class="material-icons sek-click-on" title="<?php _e( 'Add a module', 'nimble-builder' ); ?>">add_circle_outline</i>
                         <# if ( !data.parent_is_single_column ) { #>
-                          <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove column', 'text_domain' ); ?>">delete_forever</i>
+                          <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove column', 'nimble-builder' ); ?>">delete_forever</i>
                         <# } #>
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>
 
-                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit column settings', 'text_domain' ); ?>">
-                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'text-domain'); ?>"><i class="far fa-eye-slash"></i></div>
+                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-options" title="<?php _e( 'Edit column settings', 'nimble-builder' ); ?>">
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'nimble-builder'); ?>"><i class="far fa-eye-slash"></i></div>
                       <div class="sek-dyn-ui-location-inner">
                         <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
                           <div class="sek-ham__toggler-spn-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
                         </div>
-                        <div class="sek-dyn-ui-level-type"><?php _e( 'column', 'text_domain' ); ?></div>
+                        <div class="sek-dyn-ui-level-type"><?php _e( 'column', 'nimble-builder' ); ?></div>
                       </div><?php // .sek-dyn-ui-location-inner ?>
                     </div><?php // .sek-dyn-ui-location-type ?>
                   </div><?php // .sek-dyn-ui-wrapper ?>
@@ -284,24 +284,24 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                   <div class="sek-dyn-ui-wrapper sek-module-dyn-ui">
                     <div class="sek-dyn-ui-inner <?php echo esc_attr($icon_left_side_class); ?>">
                       <div class="sek-dyn-ui-icons">
-                        <i class="fas fa-arrows-alt sek-move-module" title="<?php _e( 'Move module', 'text_domain' ); ?>"></i>
-                        <i data-sek-click-on="edit-module" class="fas fa-pencil-alt sek-tip sek-click-on" title="<?php _e( 'Edit module content', 'text_domain' ); ?>"></i>
-                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit module settings', 'text_domain' ); ?>">tune</i>
-                        <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate module', 'text_domain' ); ?>">filter_none</i>
-                        <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove module', 'text_domain' ); ?>">delete_forever</i>
+                        <i class="fas fa-arrows-alt sek-move-module" title="<?php _e( 'Move module', 'nimble-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-module" class="fas fa-pencil-alt sek-tip sek-click-on" title="<?php _e( 'Edit module content', 'nimble-builder' ); ?>"></i>
+                        <i data-sek-click-on="edit-options" class="material-icons sek-click-on" title="<?php _e( 'Edit module settings', 'nimble-builder' ); ?>">tune</i>
+                        <i data-sek-click-on="duplicate" class="material-icons sek-click-on" title="<?php _e( 'Duplicate module', 'nimble-builder' ); ?>">filter_none</i>
+                        <i data-sek-click-on="remove" class="material-icons sek-click-on" title="<?php _e( 'Remove module', 'nimble-builder' ); ?>">delete_forever</i>
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>
                     <#
                       var module_name = !_.isEmpty( data.module_name ) ? data.module_name + ' ' + '<?php _e("module", "text_domain"); ?>' : '<?php _e("module", "text_domain"); ?>';
                     #>
-                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-module" title="<?php _e( 'Edit module settings', 'text_domain' ); ?>">
+                    <div class="sek-dyn-ui-location-type" data-sek-click-on="edit-module" title="<?php _e( 'Edit module settings', 'nimble-builder' ); ?>">
                       <div class="sek-dyn-ui-location-inner">
                         <div class="sek-dyn-ui-hamb-menu-wrapper sek-collapsed">
                           <div class="sek-ham__toggler-spn-wrapper"><span class="line line-1"></span><span class="line line-2"></span><span class="line line-3"></span></div>
                         </div>
                         <div class="sek-dyn-ui-level-type">{{module_name}}</div>
                       </div>
-                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'text-domain'); ?>"><i class="far fa-eye-slash"></i></div>
+                      <div class="sek-minimize-ui" title="<?php _e('Hide this menu if you need to access behind', 'nimble-builder'); ?>"><i class="far fa-eye-slash"></i></div>
                     </div>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>
@@ -310,12 +310,12 @@ if ( !class_exists( 'SEK_Front_Assets_Customizer_Preview' ) ) :
                   <div class="sek-dyn-ui-wrapper sek-wp-content-dyn-ui">
                     <div class="sek-dyn-ui-inner">
                       <div class="sek-dyn-ui-icons">
-                        <i class="fas fa-pencil-alt sek-edit-wp-content" title="<?php _e( 'Edit this WordPress content', 'text_domain' ); ?>"></i>
+                        <i class="fas fa-pencil-alt sek-edit-wp-content" title="<?php _e( 'Edit this WordPress content', 'nimble-builder' ); ?>"></i>
                       </div>
                     </div><?php // .sek-dyn-ui-inner ?>
 
-                    <span class="sek-dyn-ui-location-type" title="<?php _e( 'Edit module settings', 'text_domain' ); ?>">
-                      <i class="fab fa-wordpress sek-edit-wp-content" title="<?php _e( 'Edit this WordPress content', 'text_domain' ); ?>"> <?php _e( 'WordPress content', 'text_domain'); ?></i>
+                    <span class="sek-dyn-ui-location-type" title="<?php _e( 'Edit module settings', 'nimble-builder' ); ?>">
+                      <i class="fab fa-wordpress sek-edit-wp-content" title="<?php _e( 'Edit this WordPress content', 'nimble-builder' ); ?>"> <?php _e( 'WordPress content', 'nimble-builder'); ?></i>
                     </span>
                   </div><?php // .sek-dyn-ui-wrapper ?>
               </script>

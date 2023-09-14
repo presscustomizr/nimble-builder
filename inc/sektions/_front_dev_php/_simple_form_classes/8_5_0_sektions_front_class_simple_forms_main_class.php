@@ -34,31 +34,31 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
                 'value'           => ''
             ),
             'nimble_name' => array(
-                'label'            => __( 'Name', 'text_doma' ),
+                'label'            => __( 'Name', 'nimble-builder' ),
                 'required'         => true,
                 'type'             => 'text',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_email' => array(
-                'label'            => __( 'Email', 'text_doma' ),
+                'label'            => __( 'Email', 'nimble-builder' ),
                 'required'         => true,
                 'type'             => 'email',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_subject' => array(
-                'label'            => __( 'Subject', 'text_doma' ),
+                'label'            => __( 'Subject', 'nimble-builder' ),
                 'type'             => 'text',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_message' => array(
-                'label'            => __( 'Message', 'text_doma' ),
+                'label'            => __( 'Message', 'nimble-builder' ),
                 'required'         => true,
                 'additional_attrs' => array( 'rows' => "10", 'cols' => "50" ),
                 'type'             => 'textarea',
                 'wrapper_tag'      => 'div'
             ),
             'nimble_privacy' => array(
-                'label'            => __( 'I have read and agree to the privacy policy.', 'text_doma' ),
+                'label'            => __( 'I have read and agree to the privacy policy.', 'nimble-builder' ),
                 'type'             => 'checkbox',
                 'required'         => true,
                 'value'            => false,
@@ -68,7 +68,7 @@ class Sek_Simple_Form extends SEK_Front_Render_Css {
             ),
             'nimble_submit' => array(
                 'type'             => 'submit',
-                'value'            => __( 'Submit', 'text_doma' ),
+                'value'            => __( 'Submit', 'nimble-builder' ),
                 'additional_attrs' => array( 'class' => 'sek-btn' ),
                 'wrapper_tag'      => 'div',
                 'wrapper_class'    => array( 'sek-form-field', 'sek-form-btn-wrapper' )

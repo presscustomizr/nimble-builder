@@ -6,7 +6,7 @@ function sek_get_module_params_for_czr_post_grid_module() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_post_grid_module',
-        'name' => __('Post Grid', 'text_doma'),
+        'name' => __('Post Grid', 'nimble-builder'),
         'is_father' => true,
         'children' => array(
             'grid_main'   => 'czr_post_grid_main_child',
@@ -25,10 +25,10 @@ function sek_get_module_params_for_czr_post_grid_module() {
 function sek_get_module_params_for_czr_post_grid_main_child() {
     $pro_text = '';
     if ( !sek_is_pro() ) {
-        $pro_text = sprintf( __( '%1$s + more controls on grid items content, like shadow, background, spacing...', 'text-doma'),
+        $pro_text = sprintf( __( '%1$s + more controls on grid items content, like shadow, background, spacing...', 'nimble-builder'),
             sprintf( '<a href="%1$s" target="_blank" rel="noopener noreferrer" style="text-decoration:underline">%2$s</a>',
                 'https://nimblebuilder.com/post-grid-sections/#pro-grid-one',
-                __('masonry grid', 'text-doma')
+                __('masonry grid', 'nimble-builder')
             )
         );
         $pro_text = sek_get_pro_notice_for_czr_input( $pro_text );
@@ -36,10 +36,10 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_post_grid_main_child',
-        'name' => __( 'Main grid settings : layout, number of posts, columns,...', 'text_doma' ),
+        'name' => __( 'Main grid settings : layout, number of posts, columns,...', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
-        //     'button_text' => __('Click me','text_doma'),
+        //     'button_text' => __('Click me','nimble-builder'),
         //     'color_css'  => '#ffffff',
         //     'bg_color_css' => '#020202',
         //     'bg_color_hover' => '#151515', //lighten 15%,
@@ -54,16 +54,16 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
             'item-inputs' => array(
                 'use_current_query' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Use contextual WordPress post query', 'text_doma'),
+                    'title'       => __('Use contextual WordPress post query', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
-                    'notice_after' => __('This option allows you to use the posts normally displayed by WordPress on this page.', 'text_doma')
+                    'notice_after' => __('This option allows you to use the posts normally displayed by WordPress on this page.', 'nimble-builder')
                     //'html_before' => '<hr>'
                 ),
                 'replace_query' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Add custom parameters to the contextual WordPress post query', 'text_doma'),
+                    'title'       => __('Add custom parameters to the contextual WordPress post query', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
@@ -71,7 +71,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
                 'display_pagination' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Display pagination links', 'text_doma'),
+                    'title'       => __('Display pagination links', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
@@ -79,7 +79,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
                 'post_number'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Number of posts', 'text_doma' ),
+                    'title'       => __( 'Number of posts', 'nimble-builder' ),
                     'default'     => 3,
                     'min'         => 1,
                     'max'         => 50,
@@ -88,7 +88,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),//0,
                 'posts_per_page'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Posts per page', 'text_doma' ),
+                    'title'       => __( 'Posts per page', 'nimble-builder' ),
                     'default'     => 10,
                     'min'         => 1,
                     'max'         => 50,
@@ -98,18 +98,18 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),//0,
                 'order_by'  => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __( 'Order posts by', 'text_doma' ),
+                    'title'       => __( 'Order posts by', 'nimble-builder' ),
                     'default'     => 'date_desc',
                     'choices'      => array(
-                        'date_desc' => __('Newest to oldest', 'text_doma'),
-                        'date_asc' => __('Oldest to newest', 'text_doma'),
-                        'title_asc' => __('A &rarr; Z', 'text_doma'),
-                        'title_desc' => __('Z &rarr; A', 'text_doma')
+                        'date_desc' => __('Newest to oldest', 'nimble-builder'),
+                        'date_asc' => __('Oldest to newest', 'nimble-builder'),
+                        'title_asc' => __('A &rarr; Z', 'nimble-builder'),
+                        'title_desc' => __('Z &rarr; A', 'nimble-builder')
                     )
                 ),//null,
                 'include_sticky' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Include "sticky" posts', 'text_doma'),
+                    'title'       => __('Include "sticky" posts', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
@@ -117,16 +117,16 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
                 'categories'  => array(
                     'input_type'  => 'category_picker',
-                    'title'       => __( 'Filter posts by category', 'text_doma' ),
+                    'title'       => __( 'Filter posts by category', 'nimble-builder' ),
                     'default'     => array(),
                     'choices'      => array(),
                     'title_width' => 'width-100',
                     'width-100'   => true,
-                    'notice_before' => __('Display posts that have these categories. Multiple categories allowed.', 'text_doma')
+                    'notice_before' => __('Display posts that have these categories. Multiple categories allowed.', 'nimble-builder')
                 ),//null,
                 'must_have_all_cats' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Display posts that have "all" of these categories', 'text_doma'),
+                    'title'       => __('Display posts that have "all" of these categories', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20'
@@ -134,7 +134,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
                 'layout'  => array(
                     'input_type'  => 'grid_layout',
-                    'title'       => __( 'Posts layout : list or grid', 'text_doma' ),
+                    'title'       => __( 'Posts layout : list or grid', 'nimble-builder' ),
                     'default'     => 'list',
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -144,7 +144,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),//null,
                 'columns'  => array(
                     'input_type'  => 'range_simple_device_switcher',
-                    'title'       => __( 'Number of columns', 'text_doma' ),
+                    'title'       => __( 'Number of columns', 'nimble-builder' ),
                     'default'     => array( 'desktop' => '2', 'tablet' => '2', 'mobile' => '1' ),
                     'min'         => 1,
                     'max'         => 12,
@@ -155,7 +155,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),//null,
                 'img_column_width' => array(
                     'input_type'  => 'range_simple_device_switcher',
-                    'title'       => __( 'Width of the image\'s column (in percent)', 'text_doma' ),
+                    'title'       => __( 'Width of the image\'s column (in percent)', 'nimble-builder' ),
                     'default'     => array( 'desktop' => '30' ),
                     'min'         => 1,
                     'max'         => 100,
@@ -167,7 +167,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),//null,
                 'has_tablet_breakpoint' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => '<i class="material-icons sek-input-title-icon">tablet_mac</i>' . __('Reorganize image and content vertically on tablet devices', 'text_doma'),
+                    'title'       => '<i class="material-icons sek-input-title-icon">tablet_mac</i>' . __('Reorganize image and content vertically on tablet devices', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -176,7 +176,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
                 'has_mobile_breakpoint' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => '<i class="material-icons sek-input-title-icon">phone_iphone</i>' . __('Reorganize image and content vertically on smartphones devices', 'text_doma'),
+                    'title'       => '<i class="material-icons sek-input-title-icon">phone_iphone</i>' . __('Reorganize image and content vertically on smartphones devices', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -185,7 +185,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
 
                 'show_title' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Display the post title', 'text_doma'),
+                    'title'       => __('Display the post title', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -193,14 +193,14 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
                 'show_excerpt' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Display the post excerpt', 'text_doma'),
+                    'title'       => __('Display the post excerpt', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'excerpt_length'  => array(
                     'input_type'  => 'range_simple',
-                    'title'       => __( 'Excerpt length in words', 'text_doma' ),
+                    'title'       => __( 'Excerpt length in words', 'nimble-builder' ),
                     'default'     => 20,
                     'min'         => 1,
                     'max'         => 50,
@@ -210,7 +210,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),//0,
                 'space_between_el' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Space between text blocks', 'text_doma'),
+                    'title'       => __('Space between text blocks', 'nimble-builder'),
                     'min' => 1,
                     'max' => 100,
                     //'unit' => 'px',
@@ -223,7 +223,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
 
                 'pg_alignment_css' => array(
                     'input_type'  => 'horizTextAlignmentWithDeviceSwitcher',
-                    'title'       => __('Text blocks alignment', 'text_doma'),
+                    'title'       => __('Text blocks alignment', 'nimble-builder'),
                     'default'     => array( 'desktop' => is_rtl() ? 'right' : 'left' ),
                     'refresh_markup' => false,
                     'refresh_stylesheet' => true,
@@ -236,7 +236,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
 
                 'content_padding' => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __('Content blocks padding', 'text_doma'),
+                    'title'       => __('Content blocks padding', 'nimble-builder'),
                     'min' => 0,
                     'max' => 100,
                     //'unit' => 'px',
@@ -249,7 +249,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
 
                 'custom_grid_spaces' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Define custom spaces between columns and rows', 'text_doma'),
+                    'title'       => __('Define custom spaces between columns and rows', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -258,7 +258,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),
                 'column_gap'  => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Space between columns', 'text_doma' ),
+                    'title'       => __( 'Space between columns', 'nimble-builder' ),
                     'min' => 0,
                     'max' => 100,
                     'default'     => array( 'desktop' => '20px' ),
@@ -270,7 +270,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
 
                 'row_gap'  => array(
                     'input_type'  => 'range_with_unit_picker_device_switcher',
-                    'title'       => __( 'Space between rows', 'text_doma' ),
+                    'title'       => __( 'Space between rows', 'nimble-builder' ),
                     'min' => 0,
                     'max' => 100,
                     'default'     => array( 'desktop' => '25px' ),
@@ -281,7 +281,7 @@ function sek_get_module_params_for_czr_post_grid_main_child() {
                 ),//null,
                 'apply_shadow_on_hover' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Apply a shadow effect when hovering with the cursor', 'text_doma'),
+                    'title'       => __('Apply a shadow effect when hovering with the cursor', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -300,10 +300,10 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_post_grid_thumb_child',
-        'name' => __( 'Post thumbnail settings : size, design...', 'text_doma' ),
+        'name' => __( 'Post thumbnail settings : size, design...', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
-        //     'button_text' => __('Click me','text_doma'),
+        //     'button_text' => __('Click me','nimble-builder'),
         //     'color_css'  => '#ffffff',
         //     'bg_color_css' => '#020202',
         //     'bg_color_hover' => '#151515', //lighten 15%,
@@ -319,25 +319,25 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                 // IMAGE
                 'show_thumb' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Display post thumbnail', 'text_doma'),
+                    'title'       => __('Display post thumbnail', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                     'refresh_stylesheet' => true,
-                    'notice_after' => __('The post thumbnail can be set as "Featured image" when creating a post.', 'text_doma')
+                    'notice_after' => __('The post thumbnail can be set as "Featured image" when creating a post.', 'nimble-builder')
                 ),
                 'img_size' => array(
                     'input_type'  => 'simpleselect',
-                    'title'       => __('Select the source image size of the thumbnail', 'text_doma'),
+                    'title'       => __('Select the source image size of the thumbnail', 'nimble-builder'),
                     'title_width' => 'width-100',
                     'default'     => 'medium_large',
                     'choices'     => sek_get_select_options_for_input_id( 'img-size' ),
-                    'notice_before' => __('This allows you to select a preferred image size among those generated by WordPress.', 'text_doma' ),
-                    'notice_after' => __('Note that Nimble Builder will let browsers choose the most appropriate size for better performances.', 'text_doma' )
+                    'notice_before' => __('This allows you to select a preferred image size among those generated by WordPress.', 'nimble-builder' ),
+                    'notice_after' => __('Note that Nimble Builder will let browsers choose the most appropriate size for better performances.', 'nimble-builder' )
                 ),
                 'img_has_custom_height' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Apply a custom height to the thumbnail', 'text_doma'),
+                    'title'       => __('Apply a custom height to the thumbnail', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -346,7 +346,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                 ),
                 'img_height' => array(
                     'input_type'  => 'range_simple_device_switcher',
-                    'title'       => __( 'Thumbnail height', 'text_doma' ),
+                    'title'       => __( 'Thumbnail height', 'nimble-builder' ),
                     'default'     =>  array( 'desktop' => '65' ),
                     'min'         => 1,
                     'max'         => 300,
@@ -359,7 +359,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                 ),//null,
                 'border_radius_css'       => array(
                     'input_type'  => 'border_radius',
-                    'title'       => __( 'Rounded corners', 'text_doma' ),
+                    'title'       => __( 'Rounded corners', 'nimble-builder' ),
                     'default' => array( '_all_' => '4px' ),
                     'width-100'   => true,
                     'title_width' => 'width-100',
@@ -372,7 +372,7 @@ function sek_get_module_params_for_czr_post_grid_thumb_child() {
                 ),
                 'use_post_thumb_placeholder' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Use a placeholder image when no post thumbnail is set', 'text_doma'),
+                    'title'       => __('Use a placeholder image when no post thumbnail is set', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -391,10 +391,10 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_post_grid_metas_child',
-        'name' => __( 'Post metas : author, date, category, ...', 'text_doma' ),
+        'name' => __( 'Post metas : author, date, category, ...', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
-        //     'button_text' => __('Click me','text_doma'),
+        //     'button_text' => __('Click me','nimble-builder'),
         //     'color_css'  => '#ffffff',
         //     'bg_color_css' => '#020202',
         //     'bg_color_hover' => '#151515', //lighten 15%,
@@ -409,28 +409,28 @@ function sek_get_module_params_for_czr_post_grid_metas_child() {
             'item-inputs' => array(
                 'show_cats' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Display categories', 'text_doma'),
+                    'title'       => __('Display categories', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'show_author' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Display author', 'text_doma'),
+                    'title'       => __('Display author', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'show_date' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Display date', 'text_doma'),
+                    'title'       => __('Display date', 'nimble-builder'),
                     'default'     => true,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
                 ),
                 'show_comments' => array(
                     'input_type'  => 'nimblecheck',
-                    'title'       => __('Display comment number', 'text_doma'),
+                    'title'       => __('Display comment number', 'nimble-builder'),
                     'default'     => false,
                     'title_width' => 'width-80',
                     'input_width' => 'width-20',
@@ -459,7 +459,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
     return array(
         'dynamic_registration' => true,
         'module_type' => 'czr_post_grid_fonts_child',
-        'name' => __( 'Grid text settings : fonts, colors, ...', 'text_doma' ),
+        'name' => __( 'Grid text settings : fonts, colors, ...', 'nimble-builder' ),
         //'sanitize_callback' => '\Nimble\sanitize_callback__czr_simple_form_module',
         // 'starting_value' => array(
         // ),
@@ -468,11 +468,11 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
             'item-inputs' => array(
                 'tabs' => array(
                     array(
-                        'title' => __( 'Post titles', 'text_doma' ),
+                        'title' => __( 'Post titles', 'nimble-builder' ),
                         'inputs' => array(
                             'pt_font_family_css' => array(
                                 'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_doma' ),
+                                'title'       => __( 'Font family', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -488,7 +488,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'default'     => array( 'desktop' => '28px', 'tablet' => '22px', 'mobile' => '20px' ),
                                 'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_doma' ),
+                                'title'       => __( 'Font size', 'nimble-builder' ),
                                 'min' => 0,
                                 'max' => 100,
                                 'width-100'         => true,
@@ -499,7 +499,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//16,//"14px",
                             'pt_line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_doma' ),
+                                'title'       => __( 'Line height', 'nimble-builder' ),
                                 'default'     => '1.3em',
                                 'min' => 0,
                                 'max' => 10,
@@ -512,7 +512,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//24,//"20px",
                             'pt_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
+                                'title'       => __( 'Text color', 'nimble-builder' ),
                                 'default'     => '#121212',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -522,7 +522,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//"#000000",
                             'pt_color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                                'title'       => __( 'Text color on mouse over', 'nimble-builder' ),
                                 'default'     => '#666',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -533,7 +533,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//"#000000",
                             'pt_font_weight_css'     => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font weight', 'text_doma' ),
+                                'title'       => __( 'Font weight', 'nimble-builder' ),
                                 'default'     => 400,
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -543,7 +543,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//null,
                             'pt_font_style_css'      => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font style', 'text_doma' ),
+                                'title'       => __( 'Font style', 'nimble-builder' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -553,7 +553,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//null,
                             'pt_text_transform_css'  => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Text transform', 'text_doma' ),
+                                'title'       => __( 'Text transform', 'nimble-builder' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -564,11 +564,11 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                         )
                     ),
                     array(
-                        'title' => __( 'Excerpt', 'text_doma' ),
+                        'title' => __( 'Excerpt', 'nimble-builder' ),
                         'inputs' => array(
                             'pe_font_family_css' => array(
                                 'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_doma' ),
+                                'title'       => __( 'Font family', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -584,7 +584,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'default'     => array( 'desktop' => '14px' ),
                                 'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_doma' ),
+                                'title'       => __( 'Font size', 'nimble-builder' ),
                                 'min' => 0,
                                 'max' => 100,
                                 'width-100'         => true,
@@ -595,7 +595,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//16,//"14px",
                             'pe_line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_doma' ),
+                                'title'       => __( 'Line height', 'nimble-builder' ),
                                 'default'     => '1.3em',
                                 'min' => 0,
                                 'max' => 10,
@@ -608,7 +608,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//24,//"20px",
                             'pe_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
+                                'title'       => __( 'Text color', 'nimble-builder' ),
                                 'default'     => '#555',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -618,7 +618,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//"#000000",
                             'pe_color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                                'title'       => __( 'Text color on mouse over', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -629,7 +629,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//"#000000",
                             'pe_font_weight_css'     => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font weight', 'text_doma' ),
+                                'title'       => __( 'Font weight', 'nimble-builder' ),
                                 'default'     => 'normal',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -639,7 +639,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//null,
                             'pe_font_style_css'      => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font style', 'text_doma' ),
+                                'title'       => __( 'Font style', 'nimble-builder' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -649,7 +649,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),
                             'pe_text_transform_css'  => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Text transform', 'text_doma' ),
+                                'title'       => __( 'Text transform', 'nimble-builder' ),
                                 'default'     => 'none',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -660,11 +660,11 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                         ),//inputs
                     ),//tab
                     array(
-                        'title' => __( 'Categories', 'text_doma' ),
+                        'title' => __( 'Categories', 'nimble-builder' ),
                         'inputs' => array(
                             'cat_font_family_css' => array(
                                 'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_doma' ),
+                                'title'       => __( 'Font family', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -680,7 +680,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'default'     => array( 'desktop' => '13px' ),
                                 'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_doma' ),
+                                'title'       => __( 'Font size', 'nimble-builder' ),
                                 'min' => 0,
                                 'max' => 100,
                                 'width-100'         => true,
@@ -691,7 +691,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//16,//"14px",
                             'cat_line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_doma' ),
+                                'title'       => __( 'Line height', 'nimble-builder' ),
                                 'default'     => '1.2em',
                                 'min' => 0,
                                 'max' => 10,
@@ -704,7 +704,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//24,//"20px",
                             'cat_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
+                                'title'       => __( 'Text color', 'nimble-builder' ),
                                 'default'     => '#767676',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -714,7 +714,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//"#000000",
                             'cat_color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                                'title'       => __( 'Text color on mouse over', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -725,7 +725,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//"#000000",
                             'cat_font_weight_css'     => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font weight', 'text_doma' ),
+                                'title'       => __( 'Font weight', 'nimble-builder' ),
                                 'default'     => 'normal',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -735,7 +735,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//null,
                             'cat_font_style_css'      => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font style', 'text_doma' ),
+                                'title'       => __( 'Font style', 'nimble-builder' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -745,7 +745,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),
                             'cat_text_transform_css'  => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Text transform', 'text_doma' ),
+                                'title'       => __( 'Text transform', 'nimble-builder' ),
                                 'default'     => 'uppercase',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -756,11 +756,11 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                         ),//inputs
                     ),//tab
                     array(
-                        'title' => __( 'Metas', 'text_doma' ),
+                        'title' => __( 'Metas', 'nimble-builder' ),
                         'inputs' => array(
                             'met_font_family_css' => array(
                                 'input_type'  => 'font_picker',
-                                'title'       => __( 'Font family', 'text_doma' ),
+                                'title'       => __( 'Font family', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -776,7 +776,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                                 'input_type'  => 'range_with_unit_picker_device_switcher',
                                 'default'     => array( 'desktop' => '13px' ),
                                 'title_width' => 'width-100',
-                                'title'       => __( 'Font size', 'text_doma' ),
+                                'title'       => __( 'Font size', 'nimble-builder' ),
                                 'min' => 0,
                                 'max' => 100,
                                 'width-100'         => true,
@@ -787,7 +787,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//16,//"14px",
                             'met_line_height_css'     => array(
                                 'input_type'  => 'range_with_unit_picker',
-                                'title'       => __( 'Line height', 'text_doma' ),
+                                'title'       => __( 'Line height', 'nimble-builder' ),
                                 'default'     => '1.2em',
                                 'min' => 0,
                                 'max' => 10,
@@ -800,7 +800,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//24,//"20px",
                             'met_color_css'           => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color', 'text_doma' ),
+                                'title'       => __( 'Text color', 'nimble-builder' ),
                                 'default'     => '#767676',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -810,7 +810,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//"#000000",
                             'met_color_hover_css'     => array(
                                 'input_type'  => 'wp_color_alpha',
-                                'title'       => __( 'Text color on mouse over', 'text_doma' ),
+                                'title'       => __( 'Text color on mouse over', 'nimble-builder' ),
                                 'default'     => '',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -821,7 +821,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//"#000000",
                             'met_font_weight_css'     => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font weight', 'text_doma' ),
+                                'title'       => __( 'Font weight', 'nimble-builder' ),
                                 'default'     => 'normal',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -831,7 +831,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),//null,
                             'met_font_style_css'      => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Font style', 'text_doma' ),
+                                'title'       => __( 'Font style', 'nimble-builder' ),
                                 'default'     => 'inherit',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
@@ -841,7 +841,7 @@ function sek_get_module_params_for_czr_post_grid_fonts_child() {
                             ),
                             'met_text_transform_css'  => array(
                                 'input_type'  => 'simpleselect',
-                                'title'       => __( 'Text transform', 'text_doma' ),
+                                'title'       => __( 'Text transform', 'nimble-builder' ),
                                 'default'     => 'uppercase',
                                 'refresh_markup' => false,
                                 'refresh_stylesheet' => true,
