@@ -6159,10 +6159,12 @@ function sanitize_cb__czr_accordion_module( $value ) {
     if ( !empty($value['accord_collec']) && is_array( $value['accord_collec'] ) ) {
         foreach( $value['accord_collec'] as $key => $data ) {
             if ( array_key_exists( 'text_content', $data ) && is_string( $data['text_content'] ) ) {
-                $value['accord_collec'][$key]['text_content'] = sek_maybe_encode_richtext( $data['text_content'] );
+                //$value['accord_collec'][$key]['text_content'] = sek_maybe_encode_richtext( $data['text_content'] );
+                $value['accord_collec'][$key]['text_content'] = $data['text_content'];
             }
             if ( array_key_exists( 'title_text', $data ) && is_string( $data['title_text'] ) ) {
-                $value['accord_collec'][$key]['title_text'] = sek_maybe_encode_richtext( $data['title_text'] );
+                //$value['accord_collec'][$key]['title_text'] = sek_maybe_encode_richtext( $data['title_text'] );
+                $value['accord_collec'][$key]['title_text'] = $data['title_text'];
             }
         }
     }
