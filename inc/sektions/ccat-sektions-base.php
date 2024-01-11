@@ -4967,6 +4967,8 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
             $nimble_post_candidates = array();
             // The search string has been found in a set of Nimble posts
             if ( is_array( $query->posts ) ) {
+                $current_language = function_exists('pll_current_language') ? pll_current_language() : '';
+
                 foreach ( $query->posts as $post_object ) {
                     // The related WP object ( == skope ) is written in the title of Nimble CPT
                     // ex : nimble___skp__post_post_114, where 114 is the post_id
@@ -4974,7 +4976,22 @@ if ( !class_exists( 'SEK_Front_Render' ) ) :
                         $_post_id = preg_replace('/[^0-9]/', '', $post_object->post_title );
                         $_post_id = intval($_post_id);
                         $post_candidate = get_post( $_post_id );
-                        if ( is_object( $post_candidate ) ) {
+                        $valid_posts = true;
+                        if($current_language){
+                            $lang_term = get_term_by('slug', $current_language, 'language');
+                            $post_terms = get_the_terms($post_candidate, 'language');
+                            if($post_terms){
+                                foreach($post_terms as $terms){
+                                    if($terms->term_id != $lang_term->term_id){
+                                        $valid_posts = false;
+                                    }
+                                }
+                            }
+                            else{
+                                $valid_posts = false;
+                            }
+                        }
+                        if ( is_object( $post_candidate ) && $valid_posts ) {
                             array_push($nimble_post_candidates, $post_candidate);
                         }
                     }
