@@ -652,62 +652,63 @@ function sek_add_css_rules_for_czr_image_module( $rules, $complete_modul_model )
 
 
     // HEIGHT
-    if ( sek_booleanize_checkbox_val( $main_settings['use_custom_height'] ) ) {
-        $height = $main_settings[ 'custom_height' ];
-        $css_rules = '';
-        if ( isset( $height ) && FALSE !== $height ) {
-            $numeric = sek_extract_numeric_value( $height );
-            if ( !empty( $numeric ) ) {
-                $unit = sek_extract_unit( $height );
-                $css_rules .= 'max-height:' . $numeric . $unit . ';';
+    if (array_key_exists('use_custom_height', $main_settings)) {
+        if ( sek_booleanize_checkbox_val( $main_settings['use_custom_height'] ) ) {
+            $height = $main_settings[ 'custom_height' ];
+            $css_rules = '';
+            if ( isset( $height ) && FALSE !== $height ) {
+                $numeric = sek_extract_numeric_value( $height );
+                if ( !empty( $numeric ) ) {
+                    $unit = sek_extract_unit( $height );
+                    $css_rules .= 'max-height:' . $numeric . $unit . ';';
+                }
+                // same treatment as in sek_add_css_rules_for_css_sniffed_input_id() => 'width'
+                if ( is_string( $height ) ) {
+                    $numeric = sek_extract_numeric_value($height);
+                    if ( !empty( $numeric ) ) {
+                        $unit = sek_extract_unit( $height );
+                        $css_rules .= 'max-height:' . $numeric . $unit . ';';
+                    }
+                } else if ( is_array( $height ) ) {
+                    $height = wp_parse_args( $height, array(
+                        'desktop' => '100%',
+                        'tablet' => '',
+                        'mobile' => ''
+                    ));
+                    // replace % by vh when needed
+                    $ready_value = $height;
+                    foreach ($height as $device => $num_unit ) {
+                        $numeric = sek_extract_numeric_value( $num_unit );
+                        if ( !empty( $numeric ) ) {
+                            $unit = sek_extract_unit( $num_unit );
+                            $ready_value[$device] = $numeric . $unit;
+                        }
+                    }
+
+                    $rules = sek_set_mq_css_rules(array(
+                        'value' => $ready_value,
+                        'css_property' => 'max-height',
+                        'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner figure',
+                        'is_important' => false,
+                        'level_id' => $complete_modul_model['id']
+                    ), $rules );
+                }
+            }//if
+
+
+            if ( !empty( $css_rules ) ) {
+                $rules[] = array(
+                    'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner img',
+                    'css_rules' => $css_rules,
+                    'mq' =>null
+                );
             }
-            // same treatment as in sek_add_css_rules_for_css_sniffed_input_id() => 'width'
-            if ( is_string( $height ) ) {
-                  $numeric = sek_extract_numeric_value($height);
-                  if ( !empty( $numeric ) ) {
-                      $unit = sek_extract_unit( $height );
-                      $css_rules .= 'max-height:' . $numeric . $unit . ';';
-                  }
-            } else if ( is_array( $height ) ) {
-                  $height = wp_parse_args( $height, array(
-                      'desktop' => '100%',
-                      'tablet' => '',
-                      'mobile' => ''
-                  ));
-                  // replace % by vh when needed
-                  $ready_value = $height;
-                  foreach ($height as $device => $num_unit ) {
-                      $numeric = sek_extract_numeric_value( $num_unit );
-                      if ( !empty( $numeric ) ) {
-                          $unit = sek_extract_unit( $num_unit );
-                          $ready_value[$device] = $numeric . $unit;
-                      }
-                  }
-
-                  $rules = sek_set_mq_css_rules(array(
-                      'value' => $ready_value,
-                      'css_property' => 'max-height',
-                      'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner figure',
-                      'is_important' => false,
-                      'level_id' => $complete_modul_model['id']
-                  ), $rules );
-            }
-        }//if
-
-
-        if ( !empty( $css_rules ) ) {
-            $rules[] = array(
-                'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner img',
-                'css_rules' => $css_rules,
-                'mq' =>null
-            );
-        }
-    }// height
-
+        }// height
+    }
 
     // BORDERS
-    $border_settings = $borders_corners_settings[ 'borders' ];
-    $border_type = $borders_corners_settings[ 'border-type' ];
+    $border_settings = (array_key_exists('borders', $borders_corners_settings)) ? $borders_corners_settings[ 'borders' ] : '';
+    $border_type = (array_key_exists('border-type', $borders_corners_settings)) ? $borders_corners_settings[ 'border-type' ] : '';
     $has_border_settings  = 'none' != $border_type && !empty( $border_type );
 
     //border width + type + color
@@ -1015,7 +1016,7 @@ function sek_add_css_rules_for_czr_social_icons_module( $rules, $complete_modul_
     $icons_style = $value['icons_style'];
 
     // HORIZONTAL SPACE BETWEEN ICONS
-    $padding_right = $icons_style['space_between_icons'];
+    $padding_right = (array_key_exists('space_between_icons', $icons_style)) ? $icons_style['space_between_icons'] : '';
     $padding_right = is_array( $padding_right ) ? $padding_right : array();
     $defaults = array(
         'desktop' => '15px',// <= this value matches the static CSS rule and the input default for the module
@@ -4680,7 +4681,7 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
 
 
     // SPACE BETWEEN CONTENT ELEMENTS
-    $margin_bottom = $main_settings['space_between_el'];
+    $margin_bottom = (array_key_exists('space_between_el', $main_settings)) ? $main_settings['space_between_el'] : '';
     $margin_bottom = is_array( $margin_bottom ) ? $margin_bottom : array();
     $defaults = array(
         'desktop' => '10px',// <= this value matches the static CSS rule and the input default for the module
@@ -4787,112 +4788,114 @@ function sek_add_css_rules_for_czr_post_grid_module( $rules, $complete_modul_mod
     // we set the height of the image container ( <a> tag ), with the padding property
     // because padding and margin are relative to the width in CSS
     // @see https://www.w3.org/TR/2011/REC-CSS2-20110607/box.html#padding-properties
-    if ( true === sek_booleanize_checkbox_val( $thumb_settings['img_has_custom_height'] ) ) {
-        $img_height = $thumb_settings['img_height'];
-        $img_height = is_array( $img_height ) ? $img_height : array();
-        $defaults = array(
-            'desktop' => '65%',// <= this value matches the static CSS rule and the input default for the module
-            'tablet' => '',
-            'mobile' => ''
-        );
-        $img_height = wp_parse_args( $img_height, $defaults );
+    if (array_key_exists('img_has_custom_height', $thumb_settings)) {
+        if ( true === sek_booleanize_checkbox_val( $thumb_settings['img_has_custom_height'] ) ) {
+            $img_height = $thumb_settings['img_height'];
+            $img_height = is_array( $img_height ) ? $img_height : array();
+            $defaults = array(
+                'desktop' => '65%',// <= this value matches the static CSS rule and the input default for the module
+                'tablet' => '',
+                'mobile' => ''
+            );
+            $img_height = wp_parse_args( $img_height, $defaults );
 
-        $img_height_ready_value = $img_height;
-        foreach ( $img_height as $device => $num_val ) {
-            $num_val = sek_extract_numeric_value( $num_val );
-            $img_height_ready_value[$device] = '';
-            // Leave the device value empty if === to default
-            // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
-            // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-            if ( !empty( $num_val ) && $num_val.'%' !== $defaults[$device].'' ) {
-                $num_val = $num_val < 1 ? 1 : $num_val;
-                $img_height_ready_value[$device] = sprintf('%s;', $num_val .'%');
+            $img_height_ready_value = $img_height;
+            foreach ( $img_height as $device => $num_val ) {
+                $num_val = sek_extract_numeric_value( $num_val );
+                $img_height_ready_value[$device] = '';
+                // Leave the device value empty if === to default
+                // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
+                // fixes https://github.com/presscustomizr/nimble-builder/issues/419
+                if ( !empty( $num_val ) && $num_val.'%' !== $defaults[$device].'' ) {
+                    $num_val = $num_val < 1 ? 1 : $num_val;
+                    $img_height_ready_value[$device] = sprintf('%s;', $num_val .'%');
+                }
             }
+            $rules = sek_set_mq_css_rules(array(
+                'value' => $img_height_ready_value,
+                'css_property' => 'padding-top',
+                'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-thumb-custom-height figure a',
+                'is_important' => false,
+                'level_id' => $complete_modul_model['id']
+            ), $rules );
         }
-        $rules = sek_set_mq_css_rules(array(
-            'value' => $img_height_ready_value,
-            'css_property' => 'padding-top',
-            'selector' => '[data-sek-id="'.$complete_modul_model['id'].'"] .sek-post-grid-wrapper .sek-thumb-custom-height figure a',
-            'is_important' => false,
-            'level_id' => $complete_modul_model['id']
-        ), $rules );
     }
-
 
     // COLUMN AND ROW GAP
-    if ( true === sek_booleanize_checkbox_val( $main_settings['custom_grid_spaces'] ) ) {
-          // Horizontal Gap
-          $gap = $main_settings['column_gap'];
-          $gap = is_array( $gap ) ? $gap : array();
-          $defaults = array(
-              'desktop' => '20px',// <= this value matches the static CSS rule and the input default for the module
-              'tablet' => '',
-              'mobile' => ''
-          );
-          $gap = wp_parse_args( $gap, $defaults );
-          // replace % by vh when needed
-          $gap_ready_value = $gap;
-          foreach ($gap as $device => $num_unit ) {
-              $numeric = sek_extract_numeric_value( $num_unit );
-              $numeric = $numeric < 0 ? '0' : $numeric;
-              $gap_ready_value[$device] = '';
-              // Leave the device value empty if === to default
-              // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
-              // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-              //if ( !empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
-              if ( !empty( $num_unit ) ) {
-                  $unit = sek_extract_unit( $num_unit );
-                  $gap_ready_value[$device] = $numeric . $unit;
-              }
-          }
+    if (array_key_exists('custom_grid_spaces', $thumb_settings)) {
+        if ( true === sek_booleanize_checkbox_val( $main_settings['custom_grid_spaces'] ) ) {
+            // Horizontal Gap
+            $gap = $main_settings['column_gap'];
+            $gap = is_array( $gap ) ? $gap : array();
+            $defaults = array(
+                'desktop' => '20px',// <= this value matches the static CSS rule and the input default for the module
+                'tablet' => '',
+                'mobile' => ''
+            );
+            $gap = wp_parse_args( $gap, $defaults );
+            // replace % by vh when needed
+            $gap_ready_value = $gap;
+            foreach ($gap as $device => $num_unit ) {
+                $numeric = sek_extract_numeric_value( $num_unit );
+                $numeric = $numeric < 0 ? '0' : $numeric;
+                $gap_ready_value[$device] = '';
+                // Leave the device value empty if === to default
+                // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
+                // fixes https://github.com/presscustomizr/nimble-builder/issues/419
+                //if ( !empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
+                if ( !empty( $num_unit ) ) {
+                    $unit = sek_extract_unit( $num_unit );
+                    $gap_ready_value[$device] = $numeric . $unit;
+                }
+            }
 
-          // for grid layout => gap between columns
-          // for list layout => gap between image and content
-          $rules = sek_set_mq_css_rules(array(
-              'value' => $gap_ready_value,
-              'css_property' => 'grid-column-gap',
-              'selector' => implode( ',', [
-                  '.nb-loc [data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-post-grid-wrapper .sek-grid-layout',
-                  '.nb-loc [data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-post-grid-wrapper .sek-list-layout article.sek-has-thumb'
-              ] ),
-              'is_important' => false,
-              'level_id' => $complete_modul_model['id']
-          ), $rules );
+            // for grid layout => gap between columns
+            // for list layout => gap between image and content
+            $rules = sek_set_mq_css_rules(array(
+                'value' => $gap_ready_value,
+                'css_property' => 'grid-column-gap',
+                'selector' => implode( ',', [
+                    '.nb-loc [data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-post-grid-wrapper .sek-grid-layout',
+                    '.nb-loc [data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-post-grid-wrapper .sek-list-layout article.sek-has-thumb'
+                ] ),
+                'is_important' => false,
+                'level_id' => $complete_modul_model['id']
+            ), $rules );
 
-          // Vertical Gap => common to list and grid layout
-          $v_gap = $main_settings['row_gap'];
-          $v_gap = is_array( $v_gap ) ? $v_gap : array();
-          $defaults = array(
-              'desktop' => '25px',// <= this value matches the static CSS rule and the input default for the module
-              'tablet' => '',
-              'mobile' => ''
-          );
-          $v_gap = wp_parse_args( $v_gap, $defaults );
-          // replace % by vh when needed
-          $v_gap_ready_value = $v_gap;
-          foreach ($v_gap as $device => $num_unit ) {
-              $numeric = sek_extract_numeric_value( $num_unit );
-              $numeric = $numeric < 0 ? 0 : $numeric;
-              $v_gap_ready_value[$device] = '';
-              // Leave the device value empty if === to default
-              // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
-              // fixes https://github.com/presscustomizr/nimble-builder/issues/419
-              //if ( !empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
-              if ( !empty( $num_unit ) ) {
-                  $unit = sek_extract_unit( $num_unit );
-                  $v_gap_ready_value[$device] = $numeric . $unit;
-              }
-          }
+            // Vertical Gap => common to list and grid layout
+            $v_gap = $main_settings['row_gap'];
+            $v_gap = is_array( $v_gap ) ? $v_gap : array();
+            $defaults = array(
+                'desktop' => '25px',// <= this value matches the static CSS rule and the input default for the module
+                'tablet' => '',
+                'mobile' => ''
+            );
+            $v_gap = wp_parse_args( $v_gap, $defaults );
+            // replace % by vh when needed
+            $v_gap_ready_value = $v_gap;
+            foreach ($v_gap as $device => $num_unit ) {
+                $numeric = sek_extract_numeric_value( $num_unit );
+                $numeric = $numeric < 0 ? 0 : $numeric;
+                $v_gap_ready_value[$device] = '';
+                // Leave the device value empty if === to default
+                // Otherwise it will print a duplicated dynamic css rules, already hardcoded in the static stylesheet
+                // fixes https://github.com/presscustomizr/nimble-builder/issues/419
+                //if ( !empty( $num_unit ) && $numeric.'px' !== $defaults[$device].'' ) {
+                if ( !empty( $num_unit ) ) {
+                    $unit = sek_extract_unit( $num_unit );
+                    $v_gap_ready_value[$device] = $numeric . $unit;
+                }
+            }
 
-          $rules = sek_set_mq_css_rules(array(
-              'value' => $v_gap_ready_value,
-              'css_property' => 'grid-row-gap',
-              'selector' => '.nb-loc [data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-post-grid-wrapper .sek-grid-items',
-              'is_important' => false,
-              'level_id' => $complete_modul_model['id']
-          ), $rules );
+            $rules = sek_set_mq_css_rules(array(
+                'value' => $v_gap_ready_value,
+                'css_property' => 'grid-row-gap',
+                'selector' => '.nb-loc [data-sek-id="'.$complete_modul_model['id'].'"] .sek-module-inner .sek-post-grid-wrapper .sek-grid-items',
+                'is_important' => false,
+                'level_id' => $complete_modul_model['id']
+            ), $rules );
+        }
     }
-
 
     // TABLET AND MOBILE BREAKPOINT SETUP
     $mobile_breakpoint = Sek_Dyn_CSS_Builder::$breakpoints['sm'];// 576
