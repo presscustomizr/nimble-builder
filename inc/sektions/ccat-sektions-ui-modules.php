@@ -1821,7 +1821,10 @@ function sek_add_css_rules_for_level_background( $rules, $level ) {
     //Background overlay?
     // 1) a background image or video should be set
     // 2) the option should be checked
-    if ( ( !empty( $bg_options['bg-image']) || sek_is_checked( $bg_options['bg-use-post-thumb'] ) || ( sek_is_checked( $bg_options['bg-use-video'] ) && !empty( $bg_options['bg-video'] ) ) ) && !empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {
+    $bg_use_post_thumb = (array_key_exists('bg-use-post-thumb', $bg_options)) ? $bg_options['bg-use-post-thumb'] : '';
+    $bg_use_video = (array_key_exists('bg-use-video', $bg_options)) ? $bg_options['bg-use-video'] : '';
+    $bg_use_post_thumb = (array_key_exists('bg-use-post-thumb', $bg_options)) ? $bg_options['bg-use-post-thumb'] : '';
+    if ( ( !empty( $bg_options['bg-image']) || sek_is_checked( $bg_use_post_thumb ) || ( sek_is_checked( $bg_use_video ) && !empty( $bg_options['bg-video'] ) ) ) && !empty( $bg_options[ 'bg-apply-overlay'] ) && sek_is_checked( $bg_options[ 'bg-apply-overlay'] ) ) {
         //(needs validation: we need a sanitize hex or rgba color)
         $bg_color_overlay = isset( $bg_options[ 'bg-color-overlay' ] ) ? $bg_options[ 'bg-color-overlay' ] : null;
         if ( $bg_color_overlay ) {
