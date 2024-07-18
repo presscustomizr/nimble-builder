@@ -6694,7 +6694,8 @@ function sek_simple_form_mail_template() {
 ?><?php
 
 if ( !class_exists( '\Nimble\Sek_Nimble_Manager' ) ) :
-  final class Sek_Nimble_Manager extends Sek_Simple_Form {}
+    #[\AllowDynamicProperties]
+    final class Sek_Nimble_Manager extends Sek_Simple_Form {}
 endif;
 
 function Nimble_Manager( $params = array() ) {
