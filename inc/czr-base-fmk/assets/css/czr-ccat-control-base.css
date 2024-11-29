@@ -227,6 +227,7 @@ li#customize-control-custom_css textarea {
 .control-section.control-panel > .accordion-section-title:after {
 	color: #00a0d2;
 }
+
 .customize-control-title {
 	line-height: 1.5em;
   /* font-size: 13px; */
@@ -315,6 +316,7 @@ li#customize-control-custom_css textarea {
 	left: 10px;
 	right: initial;
 }
+
 #customize-theme-controls .control-section.control-panel h3.accordion-section-title:hover:after ,  #customize-theme-controls .control-section.control-panel h3.accordion-section-title:focus:after {
 	right: 8px;
 	opacity:1;
@@ -325,6 +327,27 @@ li#customize-control-custom_css textarea {
   left: 6px;
   right: initial;
 }
+
+#customize-theme-controls .customize-pane-parent h3.accordion-section-title {
+  display: flex;
+  align-items: center;
+  flex-wrap:wrap;
+  column-gap: 10px;
+  position:relative;
+}
+#customize-theme-controls .accordion-section-title:after {
+  top: 50%;
+  transform: translateY(-50%);
+}
+#customize-theme-controls .customize-pane-parent .accordion-section-title .accordion-trigger {
+  padding-left:0;
+  width: auto;
+}
+#customize-theme-controls .customize-pane-parent  .czr-panel-subtitle{
+  width:100%;
+  display:block;
+}
+
 /* Overrides WP built in style : hack for nested section arrow */
 #customize-theme-controls .control-section.control-panel>h3.accordion-section-title:focus:after, #customize-theme-controls .control-section.control-panel>h3.accordion-section-title:hover:after, .control-section.control-panel>.accordion-section-title:after {
 	background: none!important;
