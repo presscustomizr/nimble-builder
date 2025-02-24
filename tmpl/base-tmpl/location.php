@@ -46,7 +46,7 @@ if ( $has_content_restriction_for_location ) {
         Nimble_Manager()->nimble_customizing_or_content_is_printed_on_this_page = true;
         printf( '<div class="sektion-wrapper nb-loc %6$s" data-sek-level="location" data-sek-id="%1$s" %2$s %3$s %4$s %5$s>',
             $id,
-            esc_attr(sprintf('data-sek-is-global-location="%1$s"', sek_is_global_location( $id ) ? 'true' : 'false')),
+            sprintf("data-sek-is-global-location=%1$s", sek_is_global_location( $id ) ? 'true' : 'false'),
             $is_header_location ? 'data-sek-is-header-location="true"' : '',
             $is_footer_location ? 'data-sek-is-footer-location="true"' : '',
             // introduced for https://github.com/presscustomizr/nimble-builder/issues/494
@@ -81,5 +81,5 @@ if ( $has_content_restriction_for_location ) {
             ?>
         </div>
     <?php endif; ?>
-    </div><?php //class="sektion-wrapper" ?>
+    <?php printf( '</div>' ); //class="sektion-wrapper" ?>
 <?php endif; ?>
