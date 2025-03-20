@@ -1144,6 +1144,7 @@ function sek_is_plugin_active_for_network( $plugin ) {
 // this filter is declared in class-wp-customize-manager.php, get_allowed_urls()
 add_filter('customize_allowed_urls', function( $allowed_urls ) {
   $allowed_urls = is_array($allowed_urls) ? $allowed_urls : [];
+  global $blog_id;
   // @see https://developer.wordpress.org/reference/functions/get_home_url/
   if ( is_multisite() ) {
       switch_to_blog( $blog_id );
@@ -4214,7 +4215,7 @@ function sek_retrieve_decoded_font_awesome_icons() {
             wp_send_json_error( __FUNCTION__ . ' => the file faicons.json is missing' );
         }
     }
-    else {
+    else {      
         $faicons_decoded = get_transient( $faicons_transient_name );
     }
 

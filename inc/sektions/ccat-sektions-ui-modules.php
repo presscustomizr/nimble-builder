@@ -741,9 +741,9 @@ function sek_rgb2hex( $rgb, $make_prop_value = false ) {
     $rgb = count( $rgb ) < 3 ? array_pad( $rgb, 3, 255 ) : $rgb;
 
     // Convert RGB to HEX
-    $hex[0] = str_pad( dechex( $rgb[0] ), 2, '0', STR_PAD_LEFT );
-    $hex[1] = str_pad( dechex( $rgb[1] ), 2, '0', STR_PAD_LEFT );
-    $hex[2] = str_pad( dechex( $rgb[2] ), 2, '0', STR_PAD_LEFT );
+    $hex[0] = str_pad( $rgb[0], 2, '0', STR_PAD_LEFT );
+    $hex[1] = str_pad( $rgb[1], 2, '0', STR_PAD_LEFT );
+    $hex[2] = str_pad( $rgb[2], 2, '0', STR_PAD_LEFT );
 
     $hex = implode( '', $hex );
 

@@ -96,6 +96,11 @@ function nimble_load_czr_base_fmk() {
     }
 }
 
+/*
+    Just uncomment below line to generate font awesome json file (faicons.json)
+*/
+//require_once( NIMBLE_BASE_PATH . '/generate-fontawesome-json.php' );
+
 if ( nimble_passes_requirements() ) {
     require_once( NIMBLE_BASE_PATH . '/inc/czr-skope/index.php' );
     add_action( 'after_setup_theme', 'nimble_load_skope_php');
