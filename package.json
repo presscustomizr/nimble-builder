@@ -28,7 +28,7 @@
     "grunt-wp-i18n": "^1.0.3",
     "jshint-stylish": "^2.2.1",
     "load-grunt-config": "^0.19.2",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "postcss-calc": "^6.0.2"
   },
   "browserslist": [
