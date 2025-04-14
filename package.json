@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^8.6.5",
-    "grunt": "^1.0.4",
+    "grunt": "^1.5.3",
     "grunt-concurrent": "^2.3.1",
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-compress": "^1.6.0",
