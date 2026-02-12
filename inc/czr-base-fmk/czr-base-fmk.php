@@ -1631,9 +1631,9 @@ if ( !class_exists( 'CZR_Fmk_Dyn_Module_Registration' ) ) :
                         // print the tabs nav
                         foreach ( $tmpl_map['tabs'] as $_key => $tab ) {
                           printf( '<li data-tab-id="section-topline-%1$s" %2$s><a href="#"><span>%3$s</span></a></li>',
-                              esc_attr($_key + 1),
-                              esc_attr(array_key_exists('attributes', $tab) ? $tab['attributes'] : ''),
-                              esc_html($tab['title'])
+                              $_key + 1,
+                              array_key_exists('attributes', $tab) ? $tab['attributes'] : '',
+                              $tab['title']
                           );
                         }//foreach
                       ?>
@@ -1643,8 +1643,8 @@ if ( !class_exists( 'CZR_Fmk_Dyn_Module_Registration' ) ) :
                     <?php
                       foreach ( $tmpl_map['tabs'] as $_key => $tab ) {
                         printf( '<section id="section-topline-%1$s">%2$s</section>',
-                            esc_attr($_key + 1),
-                            wp_kses_post($this->ac_generate_czr_tmpl_from_map( $tab['inputs'] ))
+                            $_key + 1,
+                            $this->ac_generate_czr_tmpl_from_map( $tab['inputs'] )
                         );
                       }//foreach
                     ?>
